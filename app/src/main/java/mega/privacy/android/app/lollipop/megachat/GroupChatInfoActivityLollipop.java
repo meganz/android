@@ -536,23 +536,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
         }
 
-        String myFullName =  megaChatApi.getMyFullname();
-        if(myFullName!=null){
-            if(myFullName.trim().isEmpty()){
+        if(!chat.isPreview()){
+            log("Is not preview - add me as participant");
+            String myFullName =  megaChatApi.getMyFullname();
+            if(myFullName!=null){
+                if(myFullName.trim().isEmpty()){
+                    myFullName =  megaChatApi.getMyEmail();
+                }
+            }
+            else{
                 myFullName =  megaChatApi.getMyEmail();
             }
-        }
-        else{
-            myFullName =  megaChatApi.getMyEmail();
-        }
 
-        MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
+            MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
 
-        participants.add(me);
+            participants.add(me);
+        }
 
         log("number of participants with me: "+participants.size());
         if (adapter == null){
-            adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
+            if(chat.isPreview()){
+                adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView, true);
+            }
+            else{
+                adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView, false);
+            }
+
             adapter.setHasStableIds(true);
             adapter.setPositionClicked(-1);
             recyclerView.setAdapter(adapter);

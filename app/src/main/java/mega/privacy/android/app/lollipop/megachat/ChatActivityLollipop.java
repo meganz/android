@@ -183,6 +183,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ProgressDialog dialog;
     ProgressDialog statusDialog;
 
+    boolean retryHistory = false;
+
 //    public MegaChatMessage lastMessageSeen = null;
     public long lastIdMsgSeen = -1;
     public long generalUnreadCount = -1;
@@ -1877,7 +1879,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
-                closeChat();
+                closeChat(true);
+                if(megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS){
+                    Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+                    loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                    startActivity(loginIntent);
+                }
+
                 finish();
                 break;
             }
@@ -2656,7 +2664,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             megaChatApi.signalPresenceActivity();
         }
 
-        closeChat();
+        closeChat(true);
 
         if (emojiKeyboardShown) {
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2664,6 +2672,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else if(fileStorageLayout.isShown()){
             hideFileStorageSection();
         }else{
+            if(megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS){
+                Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+                loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                startActivity(loginIntent);
+            }
+
             finish();
         }
     }
@@ -2680,9 +2694,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         switch (v.getId()) {
-            case R.id.home:{
-                break;
-            }
 //			case R.id.attach_icon_chat:{
 //                showUploadPanel();
 //                break;
@@ -4416,8 +4427,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CHAT_MODE)){
             log("CHANGE_TYPE_CHAT_MODE for the chat: "+chat.getChatId());
-
-
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UPDATE_PREVIEWERS)){
             log("CHANGE_TYPE_UPDATE_PREVIEWERS for the chat: "+chat.getChatId());
@@ -4833,6 +4842,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if((bufferMessages.size()+messages.size())>=numberToLoad){
                 fullHistoryReceivedOnLoad();
                 isLoadingHistory = false;
+            }
+            if(((bufferMessages.size()+messages.size())<numberToLoad) && (stateHistory==MegaChatApi.SOURCE_ERROR)){
+                log("onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
+                retryHistory = true;
             }
             else{
                 log("onMessageLoaded:lessNumberReceived");
@@ -6423,7 +6436,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onDestroy();
     }
 
-    public void closeChat(){
+    public void closeChat(boolean shouldLogout){
         if(idChat!=-1){
             megaChatApi.closeChatRoom(idChat, this);
         }
@@ -6431,6 +6444,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(chatRoom!=null){
             if(chatRoom.isPreview()){
                 megaChatApi.closeChatPreview(idChat);
+
+                if(megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS && shouldLogout){
+                    megaChatApi.logout();
+                }
             }
         }
 
@@ -6513,7 +6530,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
 
                     adapter.notifyDataSetChanged();
-                    closeChat();
+                    closeChat(false);
                     MegaApplication.setOpenChatId(-1);
                     initAfterIntent(intent, null);
                 }
@@ -7175,23 +7192,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void updateNavigationToolbarIcon(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            int numberUnread = megaChatApi.getUnreadChats();
 
-            if(numberUnread==0){
-                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-            }
-            else{
+            if(megaChatApi.getInitState() != MegaChatApi.INIT_ANONYMOUS){
+                int numberUnread = megaChatApi.getUnreadChats();
 
-                badgeDrawable.setProgress(1.0f);
-
-                if(numberUnread>9){
-                    badgeDrawable.setText("9+");
+                if(numberUnread==0){
+                    aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
                 }
                 else{
-                    badgeDrawable.setText(numberUnread+"");
-                }
 
-                aB.setHomeAsUpIndicator(badgeDrawable);
+                    badgeDrawable.setProgress(1.0f);
+
+                    if(numberUnread>9){
+                        badgeDrawable.setText("9+");
+                    }
+                    else{
+                        badgeDrawable.setText(numberUnread+"");
+                    }
+
+                    aB.setHomeAsUpIndicator(badgeDrawable);
+                }
+            }
+            else{
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             }
         }
         else{
@@ -7218,21 +7241,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-//        log("onChatConnectionStateUpdate: "+newState);
+        log("onChatConnectionStateUpdate: " + newState);
 
         supportInvalidateOptionsMenu();
 
-        if(idChat==chatid){
-        if(newState==MegaChatApi.CHAT_CONNECTION_ONLINE){
-            log("Chat is now ONLINE");
-                setAsRead=true;
+        if (idChat == chatid) {
+            if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE) {
+                log("Chat is now ONLINE");
+                setAsRead = true;
                 setLastMessageSeen();
+
+                if (stateHistory == MegaChatApi.SOURCE_ERROR && retryHistory) {
+                    log("onChatConnectionStateUpdate:SOURCE_ERROR:call to load history again");
+                    retryHistory = false;
+                    loadHistory();
+                }
+
+            } else {
+                setAsRead = false;
             }
-            else{
-                setAsRead=false;
-            }
+
+            setChatSubtitle();
         }
-        setChatSubtitle();
     }
 
     @Override

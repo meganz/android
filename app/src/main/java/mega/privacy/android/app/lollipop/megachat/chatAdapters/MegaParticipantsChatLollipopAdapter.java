@@ -57,10 +57,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	boolean multipleSelect;
 	DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
+	boolean isPreview;
 
-	public MegaParticipantsChatLollipopAdapter(Context _context, ArrayList<MegaChatParticipant> _participants, RecyclerView _listView) {
-		this.context = _context;
-		this.participants = _participants;
+	public MegaParticipantsChatLollipopAdapter(Context context, ArrayList<MegaChatParticipant> participants, RecyclerView listView, boolean isPreview) {
+		this.context = context;
+		this.participants = participants;
 		this.positionClicked = -1;
 		
 		if (megaApi == null){
@@ -71,7 +72,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 
-		listFragment = _listView;
+		this.listFragment = listView;
+		this.isPreview = isPreview;
 	}
 	
 	/*private view holder class*/
@@ -366,6 +368,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 						megaApi.getUserAvatar(((ViewHolderParticipantsList)holder).userHandle, context.getCacheDir().getAbsolutePath() + "/" + ((ViewHolderParticipantsList)holder).userHandle + ".jpg", listener);
 					}
 				}
+			}
+
+			if(isPreview && megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS){
+				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
 			}
 
 			int permission = participant.getPrivilege();
