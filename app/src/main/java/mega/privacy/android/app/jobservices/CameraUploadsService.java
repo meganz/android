@@ -361,7 +361,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void prepareUpload(Queue<Media> primaryList,Queue<Media> secondaryList,Queue<Media> primaryVideoList,Queue<Media> secondaryVideoList) {
-        Log.d("Yuan","prepareUpload");
+        log("prepareUpload");
         pendingUploadsList = getPendingList(primaryList,false,false);
         saveDataToDB(pendingUploadsList);
         pendingVideoUploadsList = getPendingList(primaryVideoList,false,true);
@@ -383,12 +383,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (isCompressedVideoPending()) {
                 startVideoCompression();
             } else {
-                Log.d("yuan","nothing to upload");
+                log("nothing to upload");
                 finish();
                 return;
             }
         } else {
-            Log.d("yuan","got pending uploads " + finalList.size());
+            log("got pending uploads " + finalList.size());
             startParallelUpload(finalList,false);
         }
     }
@@ -408,18 +408,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 if (ERROR_CREATE_FILE_IO_ERROR.equals(newPath)) {
                     continue;
                 }
-//            if("space isn't enough!".equals(newPath)) {
-//                TODO show dialog.
-//                return;
-//            }
-                while ("space isn't enough!".equals(newPath)) {
+
+                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath)) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     if (megaApi.getNumPendingUploads() == 0) {
-                        //TODO show dialog.
+                        showNotification("", "" ,null);
                         return;
                     }
                     newPath = createTempFile(file);
@@ -447,9 +444,11 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void saveDataToDB(ArrayList<SyncRecord> list) {
         for (SyncRecord file : list) {
-            if(dbH.recordExists(file)) {
-                continue;
+            SyncRecord exist = dbH.recordExists(file);
+            if (exist != null && exist.getTimestamp() < file.getTimestamp()) {
+                dbH.deleteSyncRecordByLocalPath(exist.getLocalPath());
             }
+            
             boolean isSec = file.isSecondary();
             MegaNode parent;
             if (isSec) {
@@ -567,7 +566,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             //Source file
             File sourceFile = new File(media.filePath);
 
-            //nodeExists = megaApi.getNodeByFingerprint(localFingerPrint,uploadNode);
             possibleNodeList = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
             if(possibleNodeList != null && possibleNodeList.size() > 0){
                 nodeExists = possibleNodeList.get(0);
@@ -581,7 +579,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 String photoFinalName;
                 do {
                     //Iterate between all files with the correct target name
-
                     //Create the final name taking into account the
                     if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
                         //Keep the file names as device
@@ -1137,10 +1134,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         running = false;
         stopForeground(true);
         if (mNotificationManager != null) {
-            Log.d("Yuan","cancelling notification id is " + notificationChannelId);
+            log("cancelling notification id is " + notificationChannelId);
             mNotificationManager.cancel(notificationId);
         } else {
-            Log.d("Yuan","no notification to cancel");
+            log("no notification to cancel");
         }
         jobFinished(globalParams,true);
     }
@@ -1254,15 +1251,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_COPY) {
-            String nodeName = megaApi.getNodeByHandle(request.getNodeHandle()).getName();
-            //TODO get new fingerprint
-//            String oriFingerprint = megaApi.getNodeByHandle(request.getNodeHandle()).getFingerprint();
-//            String newFingerprint = megaApi.getNodeByHandle(request.getNodeHandle()).getFingerprint();
             if (e.getErrorCode() == MegaError.API_OK) {
-//                dbH.deleteSyncRecordByFingerprint(oriFingerprint,newFingerprint);
-                dbH.deleteSyncRecordByFileName(nodeName);
+                MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+                String fingerPrint = node.getFingerprint();
+                dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint);
             }
-            Log.d("Yuan","updateProgressNotification 1" + request.getType() + " " + e.getErrorString());
+            
             updateUpload();
         } else if (request.getType() == MegaRequest.TYPE_RENAME) {
             //No need to handle anything
@@ -1487,7 +1481,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void startVideoCompression() {
-        Log.d("Yuan","startVideoCompression");
+        log("startVideoCompression");
 
         List<SyncRecord> fullList = dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS);
         megaApi.resetTotalUploads();
@@ -1498,7 +1492,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
-        Log.d("Yuan",totalPendingSizeInMB + "byte to Conversion");
+        log(totalPendingSizeInMB + "byte to Conversion");
 
         double availableFreeSpace = Double.MAX_VALUE;
         try {
@@ -1555,12 +1549,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     public synchronized void onCompressSuccessful(String originalPath) {
-        Log.d("Yuan","compression successfully " + originalPath);
+        log("compression successfully " + originalPath);
         dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,originalPath);
     }
 
     public synchronized void onCompressFailed(String originalPath) {
-        Log.d("Yuan","compression failed " + originalPath);
+        log("compression failed " + originalPath);
         //file can not be compress will be uploaded directly?
         dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,originalPath);
     }
