@@ -3,10 +3,10 @@ package mega.privacy.android.app.components.twemoji;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.text.emoji.widget.EmojiTextViewHelper;
-import android.text.InputFilter;
+import android.support.text.emoji.EmojiCompat;
 import android.text.Spannable;
 import android.text.TextUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,14 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
 import mega.privacy.android.app.utils.Util;
-import android.support.text.emoji.EmojiCompat;
 
-
-import static android.support.text.emoji.EmojiCompat.REPLACE_STRATEGY_DEFAULT;
-import static android.support.text.emoji.EmojiCompat.REPLACE_STRATEGY_NON_EXISTENT;
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
 
 /* EmojiManager where an EmojiProvider can be installed for further usage.*/

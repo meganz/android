@@ -15,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
 import java.util.concurrent.TimeUnit;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;

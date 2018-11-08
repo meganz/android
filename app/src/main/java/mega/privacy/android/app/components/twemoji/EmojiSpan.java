@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.text.style.DynamicDrawableSpan;
-import android.text.style.ImageSpan;
 import android.text.style.ReplacementSpan;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
