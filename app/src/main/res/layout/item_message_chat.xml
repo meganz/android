@@ -70,7 +70,7 @@
                     android:layout_marginLeft="16dp"
                     android:visibility="gone"/>
 
-                <TextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/own_management_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                 android:background="@android:color/transparent">
 
                 <!-- text message-->
-                <mega.privacy.android.app.components.WrapEmojiconTextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_own_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/background_text_rich_link" >
 
-                        <mega.privacy.android.app.components.WrapEmojiconTextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_own_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -942,8 +942,8 @@
                         android:src="@drawable/ic_call_started"
                         android:visibility="gone"/>
 
-                    <TextView
-                        android:id="@+id/contact_management_message_text"
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/contact_management_message_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
@@ -994,7 +994,7 @@
                 </RelativeLayout>
 
                 <!-- text message-->
-                <mega.privacy.android.app.components.WrapEmojiconTextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -1021,7 +1021,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/contact_background_text_rich_link" >
 
-                        <mega.privacy.android.app.components.WrapEmojiconTextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_contact_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
