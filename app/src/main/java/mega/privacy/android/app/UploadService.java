@@ -860,13 +860,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				String qrFileName = megaApi.getMyEmail() + "QRcode.jpg";
 
 				if (getApplicationContext().getExternalCacheDir() != null) {
-					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
+					File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
+					File localFile = new File(qrDir, transfer.getFileName());
 					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}
 				} else {
-					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
+					File qrDir = getApplicationContext().getDir("qrMEGA", 0);
+					File localFile = new File(qrDir, transfer.getFileName());
 					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
