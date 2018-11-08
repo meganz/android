@@ -150,11 +150,11 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         mainLinearLayout = (LinearLayout) v.findViewById(R.id.choose_account_main_linear_layout);
 
-        //Replace elevation
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-            mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-        }
+//        //Replace elevation
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+//            mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+//        }
 
         //FREE ACCOUNT
         freeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout);
