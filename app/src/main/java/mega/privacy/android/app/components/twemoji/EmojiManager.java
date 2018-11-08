@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.Util;
 import android.support.text.emoji.EmojiCompat;
 
 
+import static android.support.text.emoji.EmojiCompat.REPLACE_STRATEGY_DEFAULT;
 import static android.support.text.emoji.EmojiCompat.REPLACE_STRATEGY_NON_EXISTENT;
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
 
@@ -55,11 +56,39 @@ public final class EmojiManager {
       if(findAllEmojis.size() == 0){
         EmojiCompat.get().process(text);
       }else{
-        EmojiCompat.get().process(text);
-        for (int i = 0; i < findAllEmojis.size(); i++) {
-          final EmojiRange location = findAllEmojis.get(i);
-            text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
+          if(emojiManager.isOnlyEmojis(text.toString())){
+              for (int i = 0; i < findAllEmojis.size(); i++) {
+                  final EmojiRange location = findAllEmojis.get(i);
+                  text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+              }
+          }else{
+              for (int i = 0; i < findAllEmojis.size(); i++) {
+                EmojiRange currentLocation = findAllEmojis.get(i);
+
+                if(i == 0){
+                  //First emoji found
+                  EmojiCompat.get().process(text,0, currentLocation.start);
+
+                  if(i == (findAllEmojis.size()-1)){
+                    //First emoji found and it's the last one too
+                    EmojiCompat.get().process(text,currentLocation.end, text.length());
+                  }
+
+                }else if(i == (findAllEmojis.size()-1)){
+                  //Last emoji found but there is another minimum
+                  EmojiRange previewLocation = findAllEmojis.get(i-1);
+                  EmojiCompat.get().process(text,previewLocation.end, currentLocation.start);
+                  EmojiCompat.get().process(text,currentLocation.end, text.length());
+
+                }else{
+                  //Emoji found in the middle
+                  EmojiRange previewLocation = findAllEmojis.get(i-1);
+                  EmojiCompat.get().process(text,previewLocation.end, currentLocation.start);
+
+                }
+                text.setSpan(new EmojiSpan(context, currentLocation.emoji, emojiSize), currentLocation.start, currentLocation.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+              }
+          }
       }
     }
   };
@@ -179,9 +208,6 @@ public final class EmojiManager {
           result.add(new EmojiRange(matcher.start(), matcher.end(), found));
         }
       }
-//      if(isTV){
-//        CharSequence processed = EmojiCompat.get().process(text);
-//      }
 
     }else{
 

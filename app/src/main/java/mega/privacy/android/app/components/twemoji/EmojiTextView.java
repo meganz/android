@@ -8,7 +8,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
-import android.support.text.emoji.EmojiCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.InputFilter;
 import android.text.SpannableStringBuilder;

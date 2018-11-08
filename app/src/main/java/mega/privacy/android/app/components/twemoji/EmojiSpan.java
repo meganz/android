@@ -17,13 +17,14 @@ final class EmojiSpan extends ReplacementSpan {
   private final Emoji emoji;
   private Drawable deferredDrawable;
 
-  EmojiSpan(final Context context, final Emoji emoji, final float size) {
+  public EmojiSpan(final Context context, final Emoji emoji, final float size) {
     this.context = context;
     this.emoji = emoji;
     this.size = size;
   }
 
    public Drawable getDrawable() {
+
      if (deferredDrawable == null) {
        deferredDrawable = emoji.getDrawable(context);
        deferredDrawable.setBounds(0, 0, (int) size, (int) size);
