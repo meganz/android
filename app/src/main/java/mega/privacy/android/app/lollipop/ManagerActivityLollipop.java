@@ -9800,13 +9800,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	@Override
-	public boolean onNavigationItemSelected(MenuItem menuItem) {
-		log("onNavigationItemSelected");
+	void isFirstTimeCam() {
 		if(firstTimeCam){
 			firstTimeCam = false;
 			dbH.setCamSyncEnabled(false);
+			bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
 		}
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(MenuItem menuItem) {
+		log("onNavigationItemSelected");
 
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
@@ -13281,6 +13285,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case R.id.navigation_drawer_account_section:
 			case R.id.my_account_section: {
+				isFirstTimeCam();
 				if (Util.isOnline(this) && megaApi.getRootNode()!=null) {
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
@@ -13290,26 +13295,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 			case R.id.inbox_section: {
+				isFirstTimeCam();
 				drawerItem = DrawerItem.INBOX;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
+				isFirstTimeCam();
 				drawerItem = DrawerItem.CONTACTS;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
+				isFirstTimeCam();
 				drawerItem = DrawerItem.NOTIFICATIONS;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.settings_section: {
+				isFirstTimeCam();
 				drawerItem = DrawerItem.SETTINGS;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
+				isFirstTimeCam();
 				drawerLayout.closeDrawer(Gravity.LEFT);
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
