@@ -2224,6 +2224,7 @@
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough space to perform Camera Upload, please clean up disk and try again.</string>
 	<string name="title_compression_size_over_limit" context="display when compression larger than setting">Video compression size is too large</string>
 	<string name="message_compression_size_over_limit" context="display when compression larger than settin">Please charge the device or change the setting.</string>
+	<string name="message_keep_device_name" context="changed file name setting">Setting will take affect from next time Camera Upload run</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d file</item>

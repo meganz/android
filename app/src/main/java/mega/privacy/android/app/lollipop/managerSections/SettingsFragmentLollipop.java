@@ -2244,6 +2244,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("KEY_KEEP_FILE_NAMES");
 			fileNames = keepFileNames.isChecked();
 			dbH.setKeepFileNames(fileNames);
+            Toast.makeText(context, getString(R.string.message_keep_device_name), Toast.LENGTH_SHORT).show();
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER) == 0){
 			log("Changing the LOCAL folder for camera uploads");
