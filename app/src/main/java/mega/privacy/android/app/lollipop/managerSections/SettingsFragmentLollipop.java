@@ -2414,6 +2414,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			String pickedDirName = pickedDir.getName();
 			if(pickedDirName!=null){
 				prefs.setCamSyncLocalPath(pickedDir.getName());
+				//prefs.setCamSyncHandle();
 				camSyncLocalPath = pickedDir.getName();
 				dbH.setCamSyncLocalPath(pickedDir.getName());
 				localCameraUploadFolder.setSummary(pickedDir.getName());
@@ -2543,7 +2544,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
 			if(handle!=-1){
-				dbH.setSecondaryFolderHandle(handle);						
+				dbH.setSecondaryFolderHandle(handle);
+				prefs.setMegaHandleSecondaryFolder(String.valueOf(handle));
 				
 				handleSecondaryMediaFolder = handle;
 				megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
@@ -2587,7 +2589,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
 			if(handle!=-1){
 				dbH.setCamSyncHandle(handle);
-				
+				prefs.setCamSyncHandle(String.valueOf(handle));
 				camSyncHandle = handle;
 				camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);	
 				camSyncMegaPath = camSyncMegaNode.getName();
