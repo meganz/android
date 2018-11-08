@@ -365,7 +365,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			MegaApplication app = (MegaApplication) ((FullScreenImageViewerLollipop) context).getApplication();
 			megaApiFolder = app.getMegaApiFolder();
 			MegaNode nodeAuth = megaApiFolder.authorizeNode(node);
-			if (nodeAuth != null) {
+			if (nodeAuth == null) {
+				nodeAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(imageHandles.get(position)));
+				node = nodeAuth;
+			}
+			else {
 				node = nodeAuth;
 			}
 		}

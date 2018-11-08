@@ -387,7 +387,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(handle));
                         if (currentDocumentAuth == null){
                             log("CurrentDocumentAuth is null");
-                            showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                            currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
+                            if (currentDocumentAuth == null) {
+                                log("CurrentDocumentAuth is null 2");
+                                showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                            }
+                            else {
+                                String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
+                                if (url != null) {
+                                    uri = Uri.parse(url);
+                                }
+                            }
                         }
                         else{
                             log("CurrentDocumentAuth is not null");
