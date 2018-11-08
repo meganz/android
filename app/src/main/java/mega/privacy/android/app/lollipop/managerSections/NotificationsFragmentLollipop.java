@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -201,6 +200,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
+
+            if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
+                megaApi.acknowledgeUserAlerts();
+            }
         }
     }
 
@@ -331,7 +334,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public void updateNotifications(ArrayList<MegaUserAlert> updatedUserAlerts) {
-        log("updateNotifications: ");
+        log("updateNotifications");
 
         if(!isAdded()){
             log("return!");
@@ -339,6 +342,11 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         }
 
         for(int i = 0;i<updatedUserAlerts.size();i++){
+
+            if(updatedUserAlerts.get(i).isOwnChange()){
+                log("updateNotifications:isOwnChange");
+                continue;
+            }
 
             long idToUpdate = updatedUserAlerts.get(i).getId();
             int indexToReplace = -1;
@@ -374,10 +382,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             }
 
         }
-
-
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -394,29 +399,11 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         setNotifications();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        megaApi.acknowledgeUserAlerts();
-    }
-
     public int getItemCount(){
         if(adapterList != null){
             return adapterList.getItemCount();
         }
         return 0;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        log("onActivityCreated");
-        super.onActivityCreated(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-            listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-        }
     }
 
     private static void log(String log) {
