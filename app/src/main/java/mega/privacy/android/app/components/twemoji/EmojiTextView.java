@@ -9,13 +9,13 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;

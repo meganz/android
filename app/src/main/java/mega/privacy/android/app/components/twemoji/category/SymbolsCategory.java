@@ -1,10 +1,11 @@
 package mega.privacy.android.app.components.twemoji.category;
 
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 
 
 public final class SymbolsCategory implements EmojiCategory {
