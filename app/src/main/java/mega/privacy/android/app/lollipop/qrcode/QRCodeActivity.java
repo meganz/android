@@ -276,59 +276,65 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            if (parentPath != null){
+            if (parentPath != null) {
                 File qrFile = null;
                 if (megaApi == null) {
                     megaApi = ((MegaApplication) getApplication()).getMegaApi();
                 }
                 String myEmail = megaApi.getMyEmail();
-                if (this.getExternalCacheDir() != null){
+                if (this.getExternalCacheDir() != null) {
                     qrFile = new File(this.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
-                else{
+                else {
                     qrFile = new File(this.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
-                if (qrFile != null && qrFile.exists()){
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                        if (!hasStoragePermission) {
-                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                if (qrFile == null) {
+                    showSnackbar(getString(R.string.general_error));
+                }
+                else {
+                    if (qrFile.exists()) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                            if (!hasStoragePermission) {
+                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                            }
                         }
-                    }
 
-                    double availableFreeSpace = Double.MAX_VALUE;
-                    try{
-                        StatFs stat = new StatFs(parentPath);
-                        availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-                    }
-                    catch(Exception ex){}
-
-                    if(availableFreeSpace < qrFile.length()) {
-                        showSnackbar(getString(R.string.error_not_enough_free_space));
-                        return;
-                    }
-                    File newQrFile = new File(parentPath, myEmail + "QRcode.jpg");
-                    if (newQrFile != null && !newQrFile.exists()){
+                        double availableFreeSpace = Double.MAX_VALUE;
                         try {
-                            newQrFile.createNewFile();
-                            FileChannel src = new FileInputStream(qrFile).getChannel();
-                            FileChannel dst = new FileOutputStream(newQrFile).getChannel();
-                            dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
-                            src.close();
-                            dst.close();
-                            showSnackbar(getString(R.string.success_download_qr, parentPath));
-                        }catch (IOException e) {
-                            e.printStackTrace();
+                            StatFs stat = new StatFs(parentPath);
+                            availableFreeSpace = (double) stat.getAvailableBlocks() * (double) stat.getBlockSize();
+                        } catch (Exception ex) {
+                        }
+
+                        if (availableFreeSpace < qrFile.length()) {
+                            showSnackbar(getString(R.string.error_not_enough_free_space));
+                            return;
+                        }
+                        File newQrFile = new File(parentPath, myEmail + "QRcode.jpg");
+                        if (newQrFile == null) {
+                            showSnackbar(getString(R.string.general_error));
+                        }
+                        else {
+                            try {
+                                newQrFile.createNewFile();
+                                FileChannel src = new FileInputStream(qrFile).getChannel();
+                                FileChannel dst = new FileOutputStream(newQrFile, false).getChannel();
+                                dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
+                                src.close();
+                                dst.close();
+                                showSnackbar(getString(R.string.success_download_qr, parentPath));
+                            } catch (IOException e) {
+                                showSnackbar(getString(R.string.general_error));
+                                e.printStackTrace();
+                            }
                         }
                     }
                     else {
                         showSnackbar(getString(R.string.error_download_qr));
                     }
                 }
-                else {
-                    showSnackbar(getString(R.string.error_download_qr));
-                }
-           }
+            }
         }
     }
 

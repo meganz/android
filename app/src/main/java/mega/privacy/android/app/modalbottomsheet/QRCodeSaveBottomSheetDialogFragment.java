@@ -87,7 +87,6 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
         }
 
         if (qrFile != null && qrFile.exists()){
-
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
             Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
             intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -96,6 +95,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
             intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
             intent.putExtra("qrfile", true);
             getActivity().startService(intent);
+            ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.save_qr_cloud_drive, qrFile.getName()));
         }
         else {
             ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.error_upload_qr));
