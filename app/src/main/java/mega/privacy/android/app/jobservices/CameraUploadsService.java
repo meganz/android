@@ -415,8 +415,14 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    
+                    //show no space notification
                     if (megaApi.getNumPendingUploads() == 0) {
-                        showNotification("", "" ,null);
+                        String title = getResources().getString(R.string.title_out_of_space);
+                        String message = getResources().getString(R.string.message_out_of_space);
+                        Intent intent = new Intent(this,ManagerActivityLollipop.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+                        showNotification(title,message,pendingIntent);
                         return;
                     }
                     newPath = createTempFile(file);
@@ -565,10 +571,17 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             MegaNodeList possibleNodeList;
             //Source file
             File sourceFile = new File(media.filePath);
-
+    
             possibleNodeList = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
             if(possibleNodeList != null && possibleNodeList.size() > 0){
                 nodeExists = possibleNodeList.get(0);
+                for(int i = 0;i < possibleNodeList.size();i++) {
+                    MegaNode node = possibleNodeList.get(i);
+                    if(node.getParentHandle() == uploadNode.getHandle()) {
+                        nodeExists = node;
+                        break;
+                    }
+                }
             }
             
             if (nodeExists == null) {
@@ -1505,14 +1518,14 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (availableFreeSpace < mVideoCompressor.getTotalInputSize()) {
             stopForeground(true);
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
-            intent.setAction(Constants.ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-            showNotification("No Space","Not enough space to perform compression.",pendingIntent);
+            String title = getResources().getString(R.string.title_out_of_space);
+            String message = getResources().getString(R.string.message_out_of_space);
+            showNotification(title,message,pendingIntent);
             return;
         }
 
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
-            showNotification("Start compression","Starting",mPendingIntent);
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -1525,7 +1538,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
             intent.setAction(Constants.ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-            showNotification("Over limit","Do you want to change the setting",pendingIntent);
+            String title = getResources().getString(R.string.title_compression_size_over_limit);
+            String message = getResources().getString(R.string.message_compression_size_over_limit);
+            showNotification(title,message,pendingIntent);
         }
 
     }

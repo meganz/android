@@ -695,7 +695,7 @@
         <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
 
-    <string name="settings_camera_upload_charging" context="Option to choose that the video compression will only be enable when the device is charging">Video compression notification</string>
+    <string name="settings_camera_upload_charging" context="Option to choose that the video compression will only be enable when the device is charging">Video Compression Notification</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
@@ -2138,9 +2138,9 @@
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remove files older than</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
-	<string name="settings_video_compression_queue_size_popup_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Notice me when queue is larger than</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Notice me when size is larger than</string>
 
-	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Notice me when queue is larger than</string>
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Notice me when size is larger than</string>
 
 	<string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable Rubbish bin cleaning scheduler or set a longer retention period you need to subscribe to a PRO plan.</string>
 
@@ -2219,6 +2219,11 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
+
+	<string name="title_out_of_space" context="title of notification. ">Not enough space</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough space to perform Camera Upload, please clean up disk and try again.</string>
+	<string name="title_compression_size_over_limit" context="display when compression larger than setting">Video compression size is too large</string>
+	<string name="message_compression_size_over_limit" context="display when compression larger than settin">Please charge the device or change the setting.</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d file</item>
