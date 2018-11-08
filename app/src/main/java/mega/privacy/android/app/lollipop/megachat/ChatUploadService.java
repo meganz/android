@@ -488,8 +488,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						inProgress = inProgress + currentTransfer.getTransferredBytes();
 					}
 				}
-				inProgress = inProgress *100;
-				progressPercent = inProgress/total;
+
+				long inProgressTemp = 0;
+				if(total>0){
+					inProgressTemp = inProgress *100;
+					progressPercent = inProgressTemp/total;
+				}
 			}
 			else{
 
