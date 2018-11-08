@@ -7,7 +7,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Px;
-import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.widget.EmojiAppCompatEditText;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.SpannableStringBuilder;
