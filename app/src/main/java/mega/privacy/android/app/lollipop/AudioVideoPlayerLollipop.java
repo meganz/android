@@ -627,7 +627,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(handle));
                         if (currentDocumentAuth == null){
                             log("CurrentDocumentAuth is null");
-                            showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                            currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));;
+                            if (currentDocumentAuth == null) {
+                                log("CurrentDocumentAuth is null 2");
+                                showSnackbar(getString(R.string.error_streaming) + ": node not authorized");
+                            }
+                            else {
+                                String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
+                                if (url != null) {
+                                    uri = Uri.parse(url);
+                                }
+                            }
                         }
                         else{
                             log("CurrentDocumentAuth is not null");
@@ -1241,7 +1251,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 handle = -1;
             }
             else {
-                MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                MegaNode n;
+                if (isFolderLink) {
+                    n = megaApiFolder.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                }
+                else {
+                    n = megaApi.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                }
                 fileName = n.getName();
                 handle = n.getHandle();
             }
@@ -1400,7 +1416,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             getImageView(0, handle);
         }
         else {
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            MegaNode parentNode;
+            if (isFolderLink) {
+                parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+            }
+            else {
+                parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            }
             ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
@@ -1445,7 +1467,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             scrollToPosition(0, handle);
         }
         else {
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            MegaNode parentNode;
+            if (isFolderLink) {
+                parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+            }
+            else {
+                parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            }
             ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
 
             for (int i=0; i<listNodes.size(); i++){
@@ -4514,6 +4542,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     for (int i = 0; i < mediaHandles.size(); i++) {
                         if (isFolderLink) {
                             n = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(mediaHandles.get(i)));
+                            if (n == null){
+                                n = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(mediaHandles.get(i)));
+                            }
                         }
                         else {
                             n = megaApi.getNodeByHandle(mediaHandles.get(i));

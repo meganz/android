@@ -1837,6 +1837,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 						String url = megaApi.httpServerGetLocalLink(file);
 						if (url != null) {
+							log("FolderLink URL: "+url);
 							mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 						}
 					}
@@ -1905,6 +1906,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 						String url = megaApi.httpServerGetLocalLink(file);
 						if (url != null) {
+							log("FolderLink URL: "+url);
 							pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 						}
 					}
