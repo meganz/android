@@ -227,7 +227,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_1_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -241,7 +246,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_2_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -255,7 +265,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_3_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -270,7 +285,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_lite_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
