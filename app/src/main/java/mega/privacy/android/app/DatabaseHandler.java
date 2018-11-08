@@ -744,14 +744,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
     
-    public boolean recordExists(SyncRecord record) {
+    public SyncRecord recordExists(SyncRecord record) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FP_ORI + " ='" + encrypt(record.getOriginFingerprint()) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(record.isSecondary())) + "' AND "
-                + KEY_SYNC_COPYONLY + " = '" + encrypt(String.valueOf(false)) + "'";
-        try (Cursor cursor = db.rawQuery(selectQuery,null)) {
-            return cursor != null && cursor.getCount() > 0;
+                + KEY_SYNC_COPYONLY + " = '" + encrypt(String.valueOf(record.isCopyOnly())) + "'";
+        Cursor cursor = db.rawQuery(selectQuery,null );
+        if (cursor != null && cursor.moveToFirst()) {
+            SyncRecord exist = extractSyncRecord(cursor);
+            cursor.close();
+            return exist;
         }
+        return null;
     }
 
     public List<SyncRecord> findAllPendingSyncRecords() {
