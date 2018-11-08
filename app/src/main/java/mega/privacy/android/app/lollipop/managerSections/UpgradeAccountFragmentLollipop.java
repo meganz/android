@@ -165,11 +165,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		});
 		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
 
-		//Replace elevation
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-		}
+//		//Replace elevation
+//		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//			scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+//			linearLayoutMain.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
+//		}
 
 		textMyAccount = (TextView) v.findViewById(R.id.text_of_my_account);
 		semitransparentLayer = (RelativeLayout) v.findViewById(R.id.semitransparent_layer);
@@ -599,29 +599,29 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	public void onUpgradeClick(int account){
 		log("onUpgradeClick: "+account);
-		LinearLayout selectPaymentMethodClicked;
+		RelativeLayout selectPaymentMethodClicked;
 
 		switch (account){
 			case Constants.PRO_LITE:{
 				log("onUpgradeClick:PRO_LITE ");
 
-				selectPaymentMethodClicked = (LinearLayout) selectPaymentMethodLayoutLite;
+				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutLite;
 				break;
 			}
 			case Constants.PRO_I:{
-				selectPaymentMethodClicked = (LinearLayout) selectPaymentMethodLayoutPro1;
+				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro1;
 				break;
 			}
 			case Constants.PRO_II:{
-				selectPaymentMethodClicked = (LinearLayout) selectPaymentMethodLayoutPro2;
+				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro2;
 				break;
 			}
 			case Constants.PRO_III:{
-				selectPaymentMethodClicked = (LinearLayout) selectPaymentMethodLayoutPro3;
+				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutPro3;
 				break;
 			}
 			default:{
-				selectPaymentMethodClicked = (LinearLayout) selectPaymentMethodLayoutLite;
+				selectPaymentMethodClicked = (RelativeLayout) selectPaymentMethodLayoutLite;
 				break;
 			}
 		}
@@ -765,10 +765,14 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
             buttonContinue = (TextView) selectPaymentMethodClicked.findViewById(R.id.button_continue);
             buttonContinue.setOnClickListener(this);
 
+            buttonContinue.setEnabled(false);
+			buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.invite_button_deactivated)));
+
 			googlePlayLayout.setVisibility(View.GONE);
 			creditCardLayout.setVisibility(View.GONE);
 			fortumoLayout.setVisibility(View.GONE);
 			centiliLayout.setVisibility(View.GONE);
+            layoutButtons.setVisibility(View.GONE);
 			optionsBilling.setVisibility(View.GONE);
 
 			showPaymentMethods(account);
@@ -1209,13 +1213,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							else{
 								googlePlayLayout.setVisibility(View.VISIBLE);
+                                layoutButtons.setVisibility(View.VISIBLE);
 							}
 						}
 					}
 
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
-					}
+                        layoutButtons.setVisibility(View.VISIBLE);
+
+                    }
 					fortumoLayout.setVisibility(View.GONE);
 					centiliLayout.setVisibility(View.GONE);
 
@@ -1252,13 +1259,17 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							else{
 								googlePlayLayout.setVisibility(View.VISIBLE);
-							}
+                                layoutButtons.setVisibility(View.VISIBLE);
+
+                            }
 						}
 					}
 
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
-					}
+                        layoutButtons.setVisibility(View.VISIBLE);
+
+                    }
 					fortumoLayout.setVisibility(View.GONE);
 					centiliLayout.setVisibility(View.GONE);
 
@@ -1291,13 +1302,17 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							else{
 								googlePlayLayout.setVisibility(View.VISIBLE);
-							}
+                                layoutButtons.setVisibility(View.VISIBLE);
+
+                            }
 						}
 					}
 
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
-					}
+                        layoutButtons.setVisibility(View.VISIBLE);
+
+                    }
 					fortumoLayout.setVisibility(View.GONE);
 					centiliLayout.setVisibility(View.GONE);
 
@@ -1327,19 +1342,27 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							}
 							else{
 								googlePlayLayout.setVisibility(View.VISIBLE);
-							}
+                                layoutButtons.setVisibility(View.VISIBLE);
+
+                            }
 						}
 					}
 
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 						creditCardLayout.setVisibility(View.VISIBLE);
-					}
+                        layoutButtons.setVisibility(View.VISIBLE);
+
+                    }
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 						fortumoLayout.setVisibility(View.VISIBLE);
-					}
+                        layoutButtons.setVisibility(View.VISIBLE);
+
+                    }
 					if (Util.checkBitSet(myAccountInfo.getPaymentBitSet(), MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
 						centiliLayout.setVisibility(View.VISIBLE);
-					}
+                        layoutButtons.setVisibility(View.VISIBLE);
+
+                    }
 
 					if(!Util.isPaymentMethod(myAccountInfo.getPaymentBitSet(), parameterType)){
 						selectPaymentMethod.setText(getString(R.string.no_available_payment_method));
@@ -1656,6 +1679,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1667,6 +1692,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1678,6 +1705,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1689,6 +1718,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 
@@ -1800,6 +1831,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1811,6 +1844,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1822,6 +1857,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1833,6 +1870,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 
@@ -1945,6 +1984,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1956,6 +1997,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1967,6 +2010,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						break;
@@ -1978,6 +2023,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						if (myAccountInfo.getProIIIMonthly() != null) {
@@ -2088,6 +2135,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedMonthly.setChecked(true);
 						billedYearly.setVisibility(View.GONE);
@@ -2100,6 +2149,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedMonthly.setChecked(true);
 						billedYearly.setVisibility(View.GONE);
@@ -2112,6 +2163,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						billedYearly.setChecked(true);
@@ -2124,6 +2177,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
 						optionsBilling.setVisibility(View.VISIBLE);
+						buttonContinue.setEnabled(true);
+						buttonContinue.setTextColor((ContextCompat.getColor(context, R.color.accentColor)));
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 
