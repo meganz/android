@@ -2205,8 +2205,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
-
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						intent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(intent);
+						finish();
 //						finish();
 						return;
 					}
