@@ -2201,6 +2201,8 @@
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
 
+    <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file.txt</string>
+
     <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Error. The value typed should be mayour than 0</string>
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
@@ -2238,9 +2240,7 @@
         <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
-    <string name="type_month" context=" ">[A]From[/A] %s [A]month[/A] *</string>
+    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
-
-
 
 </resources>

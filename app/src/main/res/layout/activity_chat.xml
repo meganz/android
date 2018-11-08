@@ -16,16 +16,15 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-        <FrameLayout
-            android:id="@+id/chat_emoji_keyboard"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_alignParentBottom="true" />
+        <!--<FrameLayout-->
+            <!--android:id="@+id/chat_emoji_keyboard"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_alignParentBottom="true" />-->
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/chat_emoji_keyboard">
+            android:layout_height="match_parent">
 
             <!--<android.support.v7.widget.Toolbar-->
                 <!--android:id="@+id/toolbar_chat"-->
@@ -141,7 +140,7 @@
                             android:tint="@color/accentColor"
                             android:src="@drawable/ic_send_black"/>
 
-                        <mega.privacy.android.app.components.emojicon.EmojiconEditText
+                        <mega.privacy.android.app.components.twemoji.EmojiEditText
                             android:id="@id/edit_text_chat"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -154,11 +153,9 @@
                             android:textSize="14sp"
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
-                            emojicon:emojiconSize="16sp"
-                            android:minLines="1"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:textColor="@color/black"/>
+                            android:textColor="@color/black" />
 
                         <RelativeLayout
                             android:id="@+id/writing_disabled_linear_layout_chat"
@@ -170,18 +167,19 @@
                     </RelativeLayout>
 
                     <LinearLayout
+                        android:id="@+id/linear_layout_twemoji"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:orientation="horizontal"
                         android:layout_alignBottom="@+id/edit_text_chat">
 
                         <RelativeLayout
-                            android:id="@+id/rl_keyboard_icon_chat"
+                            android:id="@+id/rl_keyboard_twemoji_chat"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_weight="1">
                             <ImageButton
-                                android:id="@+id/keyboard_icon_chat"
+                                android:id="@+id/keyboard_twemoji_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:background="@null"
@@ -265,84 +263,14 @@
                                 android:src="@drawable/ic_b_select_image"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
-
                     </LinearLayout>
 
-                    <!--<RelativeLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="48dp"-->
-                    <!--android:layout_alignBottom="@+id/edit_text_chat">-->
-                    <!--<LinearLayout-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:orientation="horizontal"-->
-                    <!--android:layout_centerHorizontal="true"-->
-                    <!--android:layout_centerVertical="true">-->
-
-                    <!--<ImageButton-->
-                    <!--android:id="@+id/keyboard_icon_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@null"-->
-                    <!--android:tint="@color/transparent_black"-->
-                    <!--android:src="@drawable/ic_emoticon_white"-->
-                    <!--android:layout_gravity="center_vertical"/>-->
-
-                    <!--<ImageButton-->
-                    <!--android:id="@+id/media_icon_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@null"-->
-                    <!--android:tint="@color/transparent_black"-->
-                    <!--android:src="@drawable/ic_media"-->
-                    <!--android:layout_marginLeft="30dp"-->
-                    <!--android:layout_gravity="center_vertical"/>-->
-
-                    <!--<ImageButton-->
-                    <!--android:id="@+id/send_contact_icon_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@null"-->
-                    <!--android:tint="@color/transparent_black"-->
-                    <!--android:src="@drawable/ic_send_contact"-->
-                    <!--android:layout_marginLeft="30dp"-->
-                    <!--android:layout_gravity="center_vertical"/>-->
-
-                    <!--<ImageButton-->
-                    <!--android:id="@+id/pick_file_system_icon_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@null"-->
-                    <!--android:tint="@color/transparent_black"-->
-                    <!--android:src="@drawable/ic_pick_file_system"-->
-                    <!--android:layout_marginLeft="30dp"-->
-                    <!--android:layout_gravity="center_vertical"/>-->
-
-                    <!--<ImageButton-->
-                    <!--android:id="@+id/pick_cloud_drive_icon_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@null"-->
-                    <!--android:layout_marginLeft="30dp"-->
-                    <!--android:tint="@color/transparent_black"-->
-                    <!--android:src="@drawable/ic_pick_cloud_drive"-->
-                    <!--android:layout_gravity="center_vertical"/>-->
-
-                    <!--<ImageButton-->
-                    <!--android:id="@+id/pick_file_storage_icon_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@null"-->
-                    <!--android:tint="@color/transparent_black"-->
-                    <!--android:layout_marginLeft="30dp"-->
-                    <!--android:src="@drawable/ic_collections_white"-->
-                    <!--android:layout_gravity="center_vertical"/>-->
-                    <!--</LinearLayout>-->
-                    <!---->
-                    <!--</RelativeLayout>-->
-
-                    <!--File storage fragment-->
+                    <mega.privacy.android.app.components.twemoji.EmojiKeyboard
+                        android:id="@+id/emojiView"
+                        android:animateLayoutChanges="true"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
                     <RelativeLayout
                         android:id="@+id/relative_layout_file_storage"
