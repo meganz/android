@@ -5,16 +5,10 @@ import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Px;
-import android.support.text.emoji.widget.EmojiAppCompatEditText;
 import android.support.v7.widget.AppCompatEditText;
-import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
-import android.view.inputmethod.InputConnectionWrapper;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;

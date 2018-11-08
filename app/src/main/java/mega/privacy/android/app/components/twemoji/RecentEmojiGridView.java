@@ -3,6 +3,7 @@ package mega.privacy.android.app.components.twemoji;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import java.util.Collection;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;

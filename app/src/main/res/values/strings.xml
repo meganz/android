@@ -601,8 +601,6 @@
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>
 
-    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled anytime before the renewal date</string>
-
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">The link has been copied to the clipboard</string>
     <!--
     <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
@@ -2187,9 +2185,6 @@
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
 
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">[A]%s[/A] is your current account</string>
-    <string name="type_month" context=" ">[A]From[/A] %s [A]month[/A][B] *[/B]</string>
-    <string name="upgrade_account_comment" context="the meaning of the asterisk in month*">[A]* [/A]Recurring subscription can be cancelled anytime before renewal date.</string>
-
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievement program.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Payment</string>
 
@@ -2244,5 +2239,8 @@
         <item context="Singular of participant. 1 participant" quantity="one">%d participant</item>
         <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
+
+    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s [A]month[/A] *</string>
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
 
 </resources>
