@@ -1488,6 +1488,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			dbH.setSecSyncTimeStamp(0);
 			dbH.setCamSyncEnabled(false);
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+			Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent stopIntent = null;
@@ -1515,6 +1516,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 										dbH.setSecSyncTimeStamp(0);
 										dbH.setCamSyncEnabled(true);
                                         dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+                                        Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
+                                        
                                         //video quality
                                         if(isDeviceSupportCompression()){
                                             dbH.setCameraUploadVideoQuality(MEDIUM);
@@ -1568,6 +1571,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					dbH.setCamSyncEnabled(true);
                     dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
+                    Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 					File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 					String localPath = localFile.getAbsolutePath();
 					dbH.setCamSyncLocalPath(localPath);

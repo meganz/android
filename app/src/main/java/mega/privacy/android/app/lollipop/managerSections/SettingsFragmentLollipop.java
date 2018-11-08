@@ -1510,6 +1510,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
             dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+            Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
             restartCameraUpload();
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
@@ -2427,6 +2428,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
             dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+            Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -2486,6 +2488,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCamSyncTimeStamp(0);
             dbH.setSecSyncTimeStamp(0);
             dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+            Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -2598,6 +2601,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setCamSyncTimeStamp(0);
                 dbH.setSecSyncTimeStamp(0);
                 dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+                Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					Intent photosVideosIntent = null;
@@ -3225,6 +3229,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
         dbH.setCamSyncEnabled(false);
         dbH.setSecondaryUploadEnabled(false);
+        Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
         secondaryUpload = false;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             Intent stopIntent = null;

@@ -60,6 +60,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.barteksc.pdfviewer.util.FileUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -2180,5 +2182,22 @@ public class Util {
     
     public static boolean isDeviceSupportCompression(){
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    }
+    
+    public static void purgeDirectory(File dir) {
+	    if(!dir.exists()){
+	        return;
+        }
+        
+	    try{
+            for (File file: dir.listFiles()) {
+                if (file.isDirectory()) {
+                    purgeDirectory(file);
+                }
+                file.delete();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
