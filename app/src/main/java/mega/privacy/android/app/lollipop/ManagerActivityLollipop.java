@@ -5753,6 +5753,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     public void checkScrollElevation() {
 
+    	if(drawerItem==null){
+    		return;
+		}
+
         switch (drawerItem) {
             case CLOUD_DRIVE: {
                 if (fbFLol != null && fbFLol.isAdded()) {

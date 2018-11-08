@@ -175,7 +175,6 @@ public class Constants {
 	public static String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
 
 	public static String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
-	public static String ACTION_OPEN_CHAT_LINK_NOT_LOGGED = "OPEN_CHAT_LINK_NOT_LOGGED";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
 	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";

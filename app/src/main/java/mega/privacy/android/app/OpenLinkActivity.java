@@ -152,8 +152,11 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				}
 				else{
 					log("Not logged");
+					int initResult = megaChatApi.getInitState();
+					if(initResult<MegaChatApi.INIT_WAITING_NEW_SESSION){
+						initResult = megaChatApi.initAnonymous();
+					}
 
-					int initResult = megaChatApi.initAnonymous();
 					if(initResult!= MegaChatApi.INIT_ERROR){
 						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
 						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
