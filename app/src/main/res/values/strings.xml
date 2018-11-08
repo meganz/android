@@ -2282,4 +2282,8 @@
         <item context="Singular of participant. 1 participant" quantity="one">%d participant</item>
         <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
+
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Set a title to the chat before getting the chat link</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 </resources>

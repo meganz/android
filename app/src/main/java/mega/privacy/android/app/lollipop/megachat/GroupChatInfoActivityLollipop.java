@@ -1047,7 +1047,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
                 clipboard.setPrimaryClip(clip);
             }
-            showSnackbar(getString(R.string.messages_copied_clipboard));
+            showSnackbar(getString(R.string.chat_link_copied_clipboard));
         }
         else {
             showSnackbar(getString(R.string.email_verification_text_error));
@@ -1136,7 +1136,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         if(fromGetLink){
             final TextView alertRename = new TextView(this);
-            alertRename.setText("Set a title to the chat before getting the chat link");
+            alertRename.setText(getString(R.string.message_error_set_title_get_link));
 
             LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             paramsText.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(12, outMetrics), 0);

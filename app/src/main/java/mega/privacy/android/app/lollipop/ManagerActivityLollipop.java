@@ -145,6 +145,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -14486,14 +14487,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
 					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
-//						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
-//						megaChatApi.createChat(true, peers, listener);
                     if (isEKR) {
                         megaChatApi.createChat(true, peers, chatTitle, this);
                     }
                     else {
                     	final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
-                        megaChatApi.createPublicChat(peers, chatTitle, this);
+
+                    	if(chatLink){
+                    		if(chatTitle!=null && !chatTitle.isEmpty()){
+								CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
+								megaChatApi.createPublicChat(peers, chatTitle, listener);
+							}
+							else{
+                    			Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+							}
+						}
+						else{
+							megaChatApi.createPublicChat(peers, chatTitle, this);
+						}
                     }
 				}
 			}
@@ -15478,7 +15489,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish");
-			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
 			log("remove from chat finish!!!");
@@ -15630,7 +15641,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 
@@ -15646,6 +15657,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 			intent.putExtra("CHAT_ID", chatHandle);
+			if(publicLink){
+				intent.putExtra("PUBLIC_LINK", errorCode);
+			}
 			this.startActivity(intent);
 
 //				log("open new chat");
