@@ -1039,6 +1039,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if (text != null) {
                             showSnackbar(text);
                         }
+                        else{
+                            int errorCode = newIntent.getIntExtra("PUBLIC_LINK", 1);
+                            if(errorCode!=1){
+                                if(errorCode==MegaChatError.ERROR_OK){
+                                    showSnackbar(getString(R.string.chat_link_copied_clipboard));
+                                }
+                                else{
+                                    log("initAfterIntent:publicLinkError:errorCode");
+                                    showSnackbar(getString(R.string.general_error) + ": " + errorCode);
+                                }
+                            }
+                        }
                     }
 
                     showChat();
