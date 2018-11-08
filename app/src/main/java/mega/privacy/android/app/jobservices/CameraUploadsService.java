@@ -451,8 +451,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private void saveDataToDB(ArrayList<SyncRecord> list) {
         for (SyncRecord file : list) {
             SyncRecord exist = dbH.recordExists(file);
-            if (exist != null && exist.getTimestamp() < file.getTimestamp()) {
-                dbH.deleteSyncRecordByLocalPath(exist.getLocalPath());
+            if (exist != null ){
+                if( exist.getTimestamp() < file.getTimestamp()) {
+                    dbH.deleteSyncRecordByLocalPath(exist.getLocalPath());
+                }else{
+                    continue;
+                }
             }
             
             boolean isSec = file.isSecondary();
@@ -668,6 +672,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     record.setLatitude(gpsData[0]);
                     record.setLongitude(gpsData[1]);
                     record.setOriginFingerprint(localFingerPrint);
+                    
                     pendingList.add(record);
                     log("MediaFinalName: " + file.getName());
                 }
@@ -675,7 +680,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 log("NODE EXISTS: " + megaApi.getParentNode(nodeExists).getName() + " : " + nodeExists.getName());
                 if (megaApi.getParentNode(nodeExists).getHandle() != uploadNodeHandle) {
                     SyncRecord record = new SyncRecord(nodeExists.getHandle(),file.getName(),true,media.filePath,media.timestamp,isSecondary,type);
-                    record.setOriginFingerprint(nodeExists.getFingerprint());
+                    record.setOriginFingerprint(nodeExists.getOriginalFingerprint());
+                    record.setNewFingerprint(nodeExists.getFingerprint());
                     pendingList.add(record);
                     log("MediaFinalName: " + file.getName());
                 } else {
