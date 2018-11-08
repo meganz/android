@@ -2,31 +2,24 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
 import android.os.Build;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class EmojiKeyboard extends LinearLayout {

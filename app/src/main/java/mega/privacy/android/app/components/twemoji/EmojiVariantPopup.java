@@ -14,7 +14,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
 import java.util.List;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;

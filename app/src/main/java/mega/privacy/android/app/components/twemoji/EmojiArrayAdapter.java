@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

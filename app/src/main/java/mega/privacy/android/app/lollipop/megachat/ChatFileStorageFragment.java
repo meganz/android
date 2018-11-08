@@ -2,43 +2,28 @@ package mega.privacy.android.app.lollipop.megachat;
 
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.LoaderManager;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +32,10 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaNode;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 

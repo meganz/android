@@ -13,8 +13,6 @@ import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.text.emoji.EmojiCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -44,19 +42,15 @@ import android.widget.TextView;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
-//import com.vdurmont.emoji.EmojiManager;
-//import com.vdurmont.emoji.EmojiParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -91,6 +85,9 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
+
+//import com.vdurmont.emoji.EmojiManager;
+//import com.vdurmont.emoji.EmojiParser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
