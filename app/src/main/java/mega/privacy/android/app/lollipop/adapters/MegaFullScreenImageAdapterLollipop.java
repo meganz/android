@@ -513,25 +513,49 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 				else {
 					holder.progressBar.setVisibility(View.VISIBLE);
+                    if (dbH == null) {
+                        dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                    }
+                    String url = null;
+                    if (dbH != null && dbH.getCredentials() != null) {
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                        }
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
+                        if (mi.totalMem > Constants.BUFFER_COMP) {
+                            log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else {
+                            log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+                        url = megaApi.httpServerGetLocalLink(node);
+                    }
+                    else if (isFolderLink){
+                        if (megaApiFolder.httpServerIsRunning() == 0) {
+                            megaApiFolder.httpServerStart();
+                        }
 
-					if (mi.totalMem > Constants.BUFFER_COMP) {
-						log("Total mem: " + mi.totalMem + " allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else {
-						log("Total mem: " + mi.totalMem + " allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-					String url = megaApi.httpServerGetLocalLink(node);
+                        if (mi.totalMem > Constants.BUFFER_COMP) {
+                            log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else {
+                            log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+                        url = megaApiFolder.httpServerGetLocalLink(node);
+                    }
+
 					if (url != null) {
 						final ProgressBar pb = holder.progressBar;
 

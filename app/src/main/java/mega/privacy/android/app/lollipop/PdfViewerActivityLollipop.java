@@ -362,68 +362,86 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
+            if (dbH == null){
+                dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+            }
+
             if (uri.toString().contains("http://")) {
-                if (megaApi.httpServerIsRunning() == 0) {
-                    megaApi.httpServerStart();
-                }
+                if (dbH != null && dbH.getCredentials() != null) {
+                    if (megaApi.httpServerIsRunning() == 0) {
+                        megaApi.httpServerStart();
+                    }
 
-                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-                activityManager.getMemoryInfo(mi);
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
 
-                if(mi.totalMem>Constants.BUFFER_COMP){
-                    log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                }
-                else{
-                    log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                }
-                if (savedInstanceState != null) {
-                    if (isFolderLink){
-                        megaApiFolder = app.getMegaApiFolder();
-
-                        log("Folder link node");
-                        MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(handle));
-                        if (currentDocumentAuth == null){
-                            log("CurrentDocumentAuth is null");
-                            currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
-                            if (currentDocumentAuth == null) {
-                                log("CurrentDocumentAuth is null 2");
-                                showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
-                            }
-                            else {
-                                String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
-                                if (url != null) {
-                                    uri = Uri.parse(url);
-                                }
-                            }
-                        }
-                        else{
-                            log("CurrentDocumentAuth is not null");
-                            String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
-                            if (url != null) {
-                                uri = Uri.parse(url);
-                            }
-                        }
+                    if (mi.totalMem > Constants.BUFFER_COMP) {
+                        log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
                     }
                     else {
-                        MegaNode node = null;
-                        if (fromChat) {
-                            node = nodeChat;
-                        }
-                        else if (type == Constants.FILE_LINK_ADAPTER) {
-                            node = currentDocument;
-                        }
-                        else {
-                            node = megaApi.getNodeByHandle(handle);
-                        }
-                        if (node != null){
-                            uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
-                        }
-                        else {
-                            showSnackbar(getString(R.string.error_streaming));
-                        }
+                        log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
+                }
+                else if (isFolderLink) {
+                    if (megaApiFolder.httpServerIsRunning() == 0) {
+                        megaApiFolder.httpServerStart();
+                    }
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if (mi.totalMem > Constants.BUFFER_COMP) {
+                        log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else {
+                        log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
+                }
+                if (savedInstanceState != null && ! isFolderLink) {
+                    MegaNode node = null;
+                    if (fromChat) {
+                        node = nodeChat;
+                    }
+                    else if (type == Constants.FILE_LINK_ADAPTER) {
+                        node = currentDocument;
+                    }
+                    else {
+                        node = megaApi.getNodeByHandle(handle);
+                    }
+                    if (node != null){
+                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                    }
+                    else {
+                        showSnackbar(getString(R.string.error_streaming));
+                    }
+                }
+            }
+
+            if (isFolderLink){
+                megaApiFolder = app.getMegaApiFolder();
+                log("Folder link node");
+                MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
+                if (currentDocumentAuth == null){
+                    log("CurrentDocumentAuth is null");
+                    showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                }
+                else{
+                    log("CurrentDocumentAuth is not null");
+                    String url;
+                    if (dbH != null && dbH.getCredentials() != null) {
+                        url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
+                    }
+                    else {
+                        url = megaApiFolder.httpServerGetLocalLink(currentDocumentAuth);
+                    }
+                    if (url != null) {
+                        uri = Uri.parse(url);
                     }
                 }
             }
@@ -3093,6 +3111,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
             megaApi.httpServerStop();
+        }
+
+        if (megaApiFolder != null) {
+            megaApiFolder.httpServerStop();
         }
 
         if (handler != null) {

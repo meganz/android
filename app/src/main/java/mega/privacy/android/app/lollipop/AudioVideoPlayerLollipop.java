@@ -537,6 +537,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         handler = new Handler();
 
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
         if (!isOffline && !isZip){
             MegaApplication app = (MegaApplication)getApplication();
             megaApi = app.getMegaApi();
@@ -585,21 +589,45 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if (megaApi.httpServerIsRunning() == 0) {
-                    megaApi.httpServerStart();
+                if (isFolderLink) {
+                    megaApiFolder = app.getMegaApiFolder();
                 }
 
-                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                activityManager.getMemoryInfo(mi);
+                if (dbH != null && dbH.getCredentials() != null) {
+                    if (megaApi.httpServerIsRunning() == 0) {
+                        megaApi.httpServerStart();
+                    }
 
-                if(mi.totalMem>Constants.BUFFER_COMP){
-                    log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if(mi.totalMem>Constants.BUFFER_COMP){
+                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else{
+                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
                 }
-                else{
-                    log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                else if (isFolderLink) {
+                    if (megaApiFolder.httpServerIsRunning() == 0) {
+                        megaApiFolder.httpServerStart();
+                    }
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if(mi.totalMem>Constants.BUFFER_COMP){
+                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else{
+                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
                 }
 
                 if (megaChatApi != null){
@@ -617,55 +645,50 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if (isFolderLink) {
-                    megaApiFolder = app.getMegaApiFolder();
-                }
-
-                if (savedInstanceState != null && uri.toString().contains("http://")){
-                    if (isFolderLink){
-                        log("Folder link node");
-                        MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(handle));
-                        if (currentDocumentAuth == null){
-                            log("CurrentDocumentAuth is null");
-                            currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));;
-                            if (currentDocumentAuth == null) {
-                                log("CurrentDocumentAuth is null 2");
-                                showSnackbar(getString(R.string.error_streaming) + ": node not authorized");
-                            }
-                            else {
-                                String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
-                                if (url != null) {
-                                    uri = Uri.parse(url);
-                                }
-                            }
-                        }
-                        else{
-                            log("CurrentDocumentAuth is not null");
-                            String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
-                            if (url != null) {
-                                uri = Uri.parse(url);
-                            }
+                if (savedInstanceState != null && uri.toString().contains("http://") && !isFolderLink){
+                    MegaNode node = null;
+                    if (fromChat) {
+                        node = nodeChat;
+                    }
+                    else if (adapterType == Constants.FILE_LINK_ADAPTER) {
+                        node = currentDocument;
+                    }
+                    else {
+                        node = megaApi.getNodeByHandle(handle);
+                    }
+                    if (node != null){
+                        String url = megaApi.httpServerGetLocalLink(node);
+                        if (url != null) {
+                            uri = Uri.parse(url);
                         }
                     }
                     else {
-                        MegaNode node = null;
-                        if (fromChat) {
-                            node = nodeChat;
-                        }
-                        else if (adapterType == Constants.FILE_LINK_ADAPTER) {
-                            node = currentDocument;
+                        showSnackbar(getString(R.string.error_streaming));
+                    }
+
+                }
+
+                if (isFolderLink){
+                    log("Folder link node");
+                    MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
+                    if (dbH == null){
+                        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+                    }
+                    if (currentDocumentAuth == null){
+                        log("CurrentDocumentAuth is null");
+                        showSnackbar(getString(R.string.error_streaming) + ": node not authorized");
+                    }
+                    else{
+                        log("CurrentDocumentAuth is not null");
+                        String url;
+                        if (dbH != null && dbH.getCredentials() != null) {
+                            url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
                         }
                         else {
-                            node = megaApi.getNodeByHandle(handle);
+                            url = megaApiFolder.httpServerGetLocalLink(currentDocumentAuth);
                         }
-                        if (node != null){
-                            String url = megaApi.httpServerGetLocalLink(node);
-                            if (url != null) {
-                                uri = Uri.parse(url);
-                            }
-                        }
-                        else {
-                            showSnackbar(getString(R.string.error_streaming));
+                        if (url != null) {
+                            uri = Uri.parse(url);
                         }
                     }
                 }
@@ -688,10 +711,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             isUrl = false;
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
 
         if (isAbHide) {
@@ -3690,6 +3709,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             megaApi.removeGlobalListener(this);
             megaApi.httpServerStop();
         }
+
+        if (megaApiFolder != null) {
+            megaApiFolder.httpServerStop();
+        }
+
         if (player != null){
             player.release();
         }
@@ -4580,7 +4604,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         else {
-                            String url = megaApi.httpServerGetLocalLink(n);
+                            String url = null;
+                            if (dbH != null && dbH.getCredentials() != null) {
+                                url = megaApi.httpServerGetLocalLink(n);
+                            }
+                            else if (isFolderLink) {
+                                url = megaApiFolder.httpServerGetLocalLink(n);
+                            }
                             if (url != null) {
                                 mediaUri = Uri.parse(url);
                                 mediaUris.add(mediaUri);
