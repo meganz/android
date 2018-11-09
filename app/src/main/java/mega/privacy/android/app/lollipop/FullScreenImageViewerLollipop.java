@@ -389,7 +389,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
-			if (adapterMega.isGIF(node.getName())) {
+			if (MimeTypeList.typeForName(node.getName()).isGIF()) {
 				if (isDownloaded(node)) {
 					shareIcon.setVisible(true);
 					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -451,7 +451,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			removelinkIcon.setVisible(false);
 			downloadIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			if (adapterMega.isGIF(node.getName())) {
+			if (MimeTypeList.typeForName(node.getName()).isGIF()) {
 				if (isDownloaded(node)) {
 					shareIcon.setVisible(true);
 					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -498,7 +498,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					shareIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
-				if (adapterMega.isGIF(node.getName())) {
+				if (MimeTypeList.typeForName(node.getName()).isGIF()) {
 					if (isDownloaded(node)) {
 						shareIcon.setVisible(true);
 						menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -774,7 +774,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					previewFile = new File(fileName);
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					if (adapterMega.isGIF(node.getName())){
+					if (MimeTypeList.typeForName(node.getName()).isGIF()){
 						String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
 						if (localPath != null) {
 							previewFile = new File(localPath);
@@ -2072,7 +2072,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(savedInstanceState);
-
+		if (getIntent() != null) {
+			getIntent().putExtra("position", positionG);
+		}
 		savedInstanceState.putInt("adapterType", adapterType);
 		if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
 
