@@ -385,6 +385,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             } else {
                 log("nothing to upload");
                 finish();
+                Util.purgeDirectory(new File(tempRoot));
                 return;
             }
         } else {
