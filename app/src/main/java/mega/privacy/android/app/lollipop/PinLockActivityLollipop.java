@@ -63,8 +63,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	Handler handler;
 
-	float scaleH, scaleW;
-	float scaleText;
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
@@ -165,16 +163,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
-
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
-
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_pin_lock);
 		coordinatorLayout = (CoordinatorLayout) findViewById(R.id.myCoordinatorLayout);
 		android.view.ViewGroup.LayoutParams coordinatorLayoutParams = coordinatorLayout.getLayoutParams();
@@ -191,7 +179,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		redLayout.setVisibility(View.GONE);
 
 		textLogout = (TextView) findViewById(R.id.alert_text);
-		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20));
 		//Margins
 		RelativeLayout.LayoutParams textLogoutParams = (RelativeLayout.LayoutParams)textLogout.getLayoutParams();
 		textLogoutParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0);
@@ -1334,7 +1322,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		final CheckedTextView pin4Check = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_4_check);
 		pin4Check.setText(getString(R.string.four_pin_lock));
-		pin4Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		pin4Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
 		pin4Check.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
 		ViewGroup.MarginLayoutParams pin4MLP = (ViewGroup.MarginLayoutParams) pin4Check.getLayoutParams();
 		pin4MLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
@@ -1342,14 +1330,14 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		final CheckedTextView pin6Check = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_6_check);
 		pin6Check.setText(getString(R.string.six_pin_lock));
-		pin6Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		pin6Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
 		pin6Check.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
 		ViewGroup.MarginLayoutParams pin6MLP = (ViewGroup.MarginLayoutParams) pin6Check.getLayoutParams();
 		pin6MLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
 		final CheckedTextView pinANCheck = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_alphaN_check);
 		pinANCheck.setText(getString(R.string.AN_pin_lock));
-		pinANCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		pinANCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
 		pinANCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
 		ViewGroup.MarginLayoutParams pinANMLP = (ViewGroup.MarginLayoutParams) pinANCheck.getLayoutParams();
 		pinANMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
