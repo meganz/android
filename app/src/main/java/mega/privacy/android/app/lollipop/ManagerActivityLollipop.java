@@ -407,7 +407,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	public String searchQuery = null;
+	SearchView searchView;
+	boolean searchExpand = false;
+	public String searchQuery = "";
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -1625,6 +1627,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putInt("verifyPin2FADialogType", verifyPin2FADialogType);
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
+		outState.putBoolean("searchExpand", searchExpand);
 	}
 
 	@Override
@@ -1681,6 +1684,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			verifyPin2FADialogType = savedInstanceState.getInt("verifyPin2FADialogType");
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
+			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -1694,7 +1698,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			indexContacts = -1;
 			deepBrowserTreeIncoming = 0;
 			deepBrowserTreeOutgoing = 0;
-
 			this.setPathNavigationOffline("/");
 		}
 
@@ -5667,8 +5670,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			ft.commitNowAllowingStateLoss();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
-
 				showFabButton();
+
     			break;
     		}
 			case ACCOUNT:{
@@ -6070,7 +6073,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
-		final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+		searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
 		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
@@ -6093,6 +6096,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
 					}
 				}
+				searchExpand = true;
 				textsearchQuery = false;
 				searchQuery = "";
 				firstNavigationLevel = true;
@@ -6109,6 +6113,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("onMenuItemActionCollapse()");
 //				drawerItem = DrawerItem.CLOUD_DRIVE;
 //				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
+				searchExpand = false;
 				backToDrawerItem(bottomNavigationCurrentItem);
 				textSubmitted = true;
 				changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
@@ -6126,6 +6131,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				supportInvalidateOptionsMenu();
 				log("Search query: " + query);
 				textSubmitted = true;
+				searchExpand = false;
 				return true;
 			}
 
@@ -6134,7 +6140,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				if(textSubmitted){
 					sFLol.setAllowedMultiselect(true);
-
 					textSubmitted = false;
 				}else if (textsearchQuery) {
 					selectDrawerItemLollipop(DrawerItem.SEARCH);
@@ -6946,35 +6951,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if (drawerItem == DrawerItem.SEARCH){
 				log("createOptions search");
 				if (sFLol != null && sFLol.isAdded()){
-					if (createFolderMenuItem != null){
+					//Hide
+					searchByDate.setVisible(false);
+					cancelAllTransfersMenuItem.setVisible(false);
+					clearCompletedTransfers.setVisible(false);
+					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+					log("createFolderMenuItem.setVisible_23");
+					createFolderMenuItem.setVisible(false);
+					addContactMenuItem.setVisible(false);
+					addMenuItem.setVisible(false);
+					refreshMenuItem.setVisible(false);
+					sortByMenuItem.setVisible(false);
+					unSelectMenuItem.setVisible(false);
+					changePass.setVisible(false);
+					clearRubbishBinMenuitem.setVisible(false);
+					importLinkMenuItem.setVisible(false);
+					takePicture.setVisible(false);
+					refreshMenuItem.setVisible(false);
+					helpMenuItem.setVisible(false);
+					gridSmallLargeMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
+					newChatMenuItem.setVisible(false);
+					setStatusMenuItem.setVisible(false);
 
-						//Hide
-						searchByDate.setVisible(false);
-						upgradeAccountMenuItem.setVisible(true);
-						cancelAllTransfersMenuItem.setVisible(false);
-						clearCompletedTransfers.setVisible(false);
-						pauseTransfersMenuIcon.setVisible(false);
-						playTransfersMenuIcon.setVisible(false);
-						log("createFolderMenuItem.setVisible_23");
-						createFolderMenuItem.setVisible(false);
-						addContactMenuItem.setVisible(false);
-						addMenuItem.setVisible(false);
-						refreshMenuItem.setVisible(false);
-						sortByMenuItem.setVisible(false);
-						unSelectMenuItem.setVisible(false);
-						changePass.setVisible(false);
+				    if (searchExpand) {
+				        openSearchView();
+						upgradeAccountMenuItem.setVisible(false);
+				        rubbishBinMenuItem.setVisible(false);
+				        selectMenuItem.setVisible(false);
+				        thumbViewMenuItem.setVisible(false);
+                    }
+                    else {
+				    	upgradeAccountMenuItem.setVisible(true);
 						rubbishBinMenuItem.setVisible(true);
-						clearRubbishBinMenuitem.setVisible(false);
-						importLinkMenuItem.setVisible(false);
-						takePicture.setVisible(false);
-						refreshMenuItem.setVisible(false);
-						helpMenuItem.setVisible(false);
-						gridSmallLargeMenuItem.setVisible(false);
-						logoutMenuItem.setVisible(false);
-						forgotPassMenuItem.setVisible(false);
-						newChatMenuItem.setVisible(false);
-						setStatusMenuItem.setVisible(false);
-
 						//Show
 						if(sFLol.getNodes()!=null){
 							if(sFLol.getNodes().size()!=0){
@@ -6998,6 +7009,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								selectMenuItem.setVisible(false);
 								thumbViewMenuItem.setVisible(false);
 							}
+						}
+						else {
+							selectMenuItem.setVisible(false);
+							thumbViewMenuItem.setVisible(false);
 						}
 					}
 				}
@@ -8197,6 +8212,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 	    			}
 	        	}
+	        	supportInvalidateOptionsMenu();
 
 	        	return true;
 	        }
@@ -16227,7 +16243,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("Code: "+e.getErrorString());
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
-						showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+						boolean found = false;
+						ArrayList<MegaContactRequest> outgoingContactRequests = megaApi.getOutgoingContactRequests();
+						if (outgoingContactRequests != null){
+							for (int i=0; i< outgoingContactRequests.size(); i++) {
+								if (outgoingContactRequests.get(i).getTargetEmail().equals(request.getEmail())) {
+									found = true;
+									break;
+								}
+							}
+						}
+						if (found) {
+							showSnackbar(getString(R.string.invite_not_sent_already_sent, request.getEmail()));
+						}
+						else {
+							showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+						}
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
 					{
@@ -18803,6 +18834,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						fragmentLayout.setLayoutParams(params);
 					}
 				}).start();
+			}
+		}
+	}
+
+	public void openSearchView () {
+		String querySaved = searchQuery;
+		if (searchMenuItem != null) {
+			searchMenuItem.expandActionView();
+			if (searchView != null) {
+				searchView.setQuery(querySaved, false);
 			}
 		}
 	}
