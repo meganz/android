@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -803,6 +804,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 //                    holder.itemLayout.setForeground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                 holder.fileGridSelected.setVisibility(View.VISIBLE);
+
             } else {
 //                    holder.itemLayout.setForeground(new ColorDrawable());
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
@@ -846,7 +848,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
 
                 if (temp != null) {
-                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
@@ -856,7 +858,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                     if (temp != null) {
-                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                         holder.fileGridIconForFile.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
@@ -870,7 +872,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         } // Too many AsyncTasks
 
                         if (temp != null) {
-                            thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                            thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                             holder.imageViewIcon.setVisibility(View.GONE);
                             holder.imageViewThumb.setVisibility(View.VISIBLE);
                             holder.imageViewThumb.setImageBitmap(thumb);
@@ -883,7 +885,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 
 //				thumb = ThumbnailUtils.getThumbnailFromCache(node);
                 if (temp != null) {
-                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
@@ -892,7 +894,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                     if (temp != null) {
-                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                         holder.fileGridIconForFile.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
@@ -908,50 +910,20 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
 
         //Check if is an offline file to show the red arrow
-        File offlineFile = null;
-        //Find in the database
-        MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
-        if (offlineNode != null) {
-            log("Node found OFFLINE: " + offlineNode.getName());
-            if (incoming) {
-                log("Incoming tab: MegaBrowserGridAdapter: " + node.getHandle());
-                //Find in the filesystem
-                if (Environment.getExternalStorageDirectory() != null) {
-                    offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath() + offlineNode.getName());
-                    log("offline File: " + offlineFile.getAbsolutePath());
-                } else {
-                    offlineFile = context.getFilesDir();
-                }
-
-            } else if (inbox) {
-                String pathMega = megaApi.getNodePath(node);
-                pathMega = pathMega.replace("/in","");
-                if (Environment.getExternalStorageDirectory() != null) {
-                    offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + pathMega + offlineNode.getName());
-                } else {
-                    offlineFile = context.getFilesDir();
-                }
-            } else {
-                //Find in the filesystem
-                if (Environment.getExternalStorageDirectory() != null) {
-                    offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node) + offlineNode.getName());
-                } else {
-                    offlineFile = context.getFilesDir();
-                }
-            }
-        } else {
-            log("Node NOT found OFFLINE: " + node.getName());
+        boolean availableOffline = false;
+        if (incoming) {
+            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
         }
-
-        if (offlineFile != null) {
-            if (offlineFile.exists()) {
-                log("File EXISTS!!!");
-                holder.savedOffline.setVisibility(View.VISIBLE);
-            } else {
-                log("File NOT exists!!!");
-                holder.savedOffline.setVisibility(View.INVISIBLE);
-            }
-        } else {
+        else if (inbox){
+            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
+        }
+        else {
+            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
+        }
+        if (availableOffline) {
+            holder.savedOffline.setVisibility(View.VISIBLE);
+        }
+        else {
             holder.savedOffline.setVisibility(View.INVISIBLE);
         }
     }
@@ -1401,51 +1373,20 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
 
         //Check if is an offline file to show the red arrow
-        File offlineFile = null;
-        //Find in the database
-        MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
-        if (offlineNode != null) {
-            log("YESS FOUND: " + node.getName());
-            if (incoming) {
-                log("Incoming tab: MegaBrowserListAdapter: " + node.getHandle());
-                //Find in the filesystem
-                if (Environment.getExternalStorageDirectory() != null) {
-                    offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath());
-                    log("offline File: " + offlineFile.getAbsolutePath());
-                } else {
-                    offlineFile = context.getFilesDir();
-                }
-
-            } else if (inbox) {
-                log("In Inbox");
-                String pathMega = megaApi.getNodePath(node);
-                pathMega = pathMega.replace("/in","");
-                if (Environment.getExternalStorageDirectory() != null) {
-                    offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + pathMega);
-                    log("The path to find is: " + offlineFile.getPath());
-                } else {
-                    offlineFile = context.getFilesDir();
-                }
-            } else {
-                log("CLOUD tab: MegaBrowserListAdapter: " + node.getHandle());
-                //Find in the filesystem
-                if (Environment.getExternalStorageDirectory() != null) {
-                    offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
-                } else {
-                    offlineFile = context.getFilesDir();
-                }
-            }
-        } else {
-            log("Not found: " + node.getHandle() + " " + node.getName());
+        boolean availableOffline = false;
+        if (incoming) {
+            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
         }
-
-        if (offlineFile != null) {
-            if (offlineFile.exists()) {
-                holder.savedOffline.setVisibility(View.VISIBLE);
-            } else {
-                holder.savedOffline.setVisibility(View.INVISIBLE);
-            }
-        } else {
+        else if (inbox){
+            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
+        }
+        else {
+            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
+        }
+        if (availableOffline) {
+            holder.savedOffline.setVisibility(View.VISIBLE);
+        }
+        else {
             holder.savedOffline.setVisibility(View.INVISIBLE);
         }
     }

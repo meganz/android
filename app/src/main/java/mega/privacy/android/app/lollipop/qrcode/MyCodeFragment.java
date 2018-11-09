@@ -16,7 +16,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,14 +46,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -72,8 +69,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     final int RELATIVE_WIDTH = 280;
     final int WIDTH = 500;
     final int AVATAR_LEFT = 177;
-    final int AVATAR_RIGTH = 323;
-    final int AVATAR_WIDTH = 145;
+    final int AVATAR_RIGTH = 312;
+    final int AVATAR_WIDTH = 135;
 
     MegaUser myUser;
     String myEmail;
@@ -134,10 +131,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         log("queryIfQRExists");
 
         if (context.getExternalCacheDir() != null){
-            qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
         }
         else{
-            qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            File qrDir = context.getDir("qrMEGA", 0);
+            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
         }
 
         if (qrFile.exists()){
@@ -235,7 +234,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(WHITE);
-        int pos = (c.getWidth()/2) - (width/2);
+//        int pos = (c.getWidth()/2) - (width/2);
 //        int border = getDP(4);
 //        float radius = getDP(40);
 
@@ -246,7 +245,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
                 AVATAR_RIGTH,
                 AVATAR_RIGTH, paint);
 //        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
-        c.drawBitmap(avatar, pos, pos, null);
+        c.drawBitmap(avatar, AVATAR_LEFT, AVATAR_LEFT, null);
 
         return qrCode;
     }
@@ -387,43 +386,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public Bitmap createDefaultAvatar(){
         log("createDefaultAvatar()");
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-
-        String color = megaApi.getUserAvatarColor(myUser);
-        if(color!=null){
-            log("The color to set the avatar is "+color);
-            paintCircle.setColor(Color.parseColor(color));
-            paintCircle.setAntiAlias(true);
-        }
-        else{
-            log("Default color to the avatar");
-            paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            paintCircle.setAntiAlias(true);
-        }
-
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
         UserCredentials credentials = dbH.getCredentials();
         String fullName = null;
         if(credentials!=null){
@@ -436,20 +398,11 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             }
         }
         else{
-            //No name, ask for it and later refresh!!
             fullName = myEmail;
         }
         String firstLetter = fullName.charAt(0) + "";
 
-        log("Draw letter: "+firstLetter);
-        Rect bounds = new Rect();
-
-        paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-        int xPos = (c.getWidth()/2);
-        int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-
-        return defaultAvatar;
+        return Util.createDefaultAvatar(megaApi.getUserAvatarColor(myUser), firstLetter);
     }
 
     @Override
@@ -557,24 +510,23 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
             File qrCodeFile = null;
             if (context.getExternalCacheDir() != null){
-                qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+                if (qrDir != null){
+                    qrDir.mkdirs();
+                }
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             else{
-                qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            if (reset && qrCodeFile!= null && qrCodeFile.exists()){
-                qrCodeFile.delete();
-                qrCodeFile = null;
-                if (context.getExternalCacheDir() != null){
-                    qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = context.getDir("qrMEGA", 0);
+                if (qrDir != null){
+                    qrDir.mkdirs();
                 }
-                else{
-                    qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
-            if (qrCodeFile != null && !qrCodeFile.exists()) {
+
+            if (qrCodeFile != null) {
                 try {
-                    FileOutputStream out = new FileOutputStream(qrCodeFile);
+                    FileOutputStream out = new FileOutputStream(qrCodeFile, false);
                     qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
@@ -608,10 +560,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
             File qrCodeFile = null;
             if (context.getExternalCacheDir() != null){
-                qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             else{
-                qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = context.getDir("qrMEGA", 0);
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             if (qrCodeFile != null && qrCodeFile.exists()){
                 qrCodeFile.delete();

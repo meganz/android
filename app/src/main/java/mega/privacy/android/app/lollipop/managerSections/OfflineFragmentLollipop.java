@@ -55,8 +55,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -86,7 +86,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
-	public FloatingItemDecoration floatingItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
@@ -173,8 +173,7 @@ public class OfflineFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+
         if (getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -182,7 +181,7 @@ public class OfflineFragmentLollipop extends Fragment{
             }
             if(folderCount > 0) {
                 for (int i = 0;i < spanCount;i++) {
-                    sections.put(i,folderCount + " " + folderStr);
+                    sections.put(i, getString(R.string.general_folders));
                 }
             }
             
@@ -190,25 +189,25 @@ public class OfflineFragmentLollipop extends Fragment{
                 placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
                 if (placeholderCount == 0) {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + i, getString(R.string.general_files));
                     }
                 } else {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
                     }
                 }
             }
         } else {
             placeholderCount = 0;
-            sections.put(0,folderCount + " " + folderStr);
-            sections.put(folderCount,fileCount + " " + fileStr);
+            sections.put(0, getString(R.string.general_folders));
+            sections.put(folderCount, getString(R.string.general_files));
         }
-        if (floatingItemDecoration == null) {
-            floatingItemDecoration = new FloatingItemDecoration(context);
-            recyclerView.addItemDecoration(floatingItemDecoration);
-        }
-        floatingItemDecoration.setType(getAdapterType());
-        floatingItemDecoration.setKeys(sections);
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+			recyclerView.addItemDecoration(headerItemDecoration);
+		}
+		headerItemDecoration.setType(getAdapterType());
+		headerItemDecoration.setKeys(sections);
     }
 
 	public ImageView getImageDrag(int position) {
@@ -342,7 +341,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -359,6 +358,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("ActionBarCallBack::onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.offline_browser_action, menu);
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			return true;
 		}
 		
@@ -367,11 +367,13 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("ActionBarCallBack::onDestroyActionMode");
 			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			log("ActionBarCallBack::onPrepareActionMode");
+//			ContextCompat.getDrawable(context, R.drawable.ic_arrow_back_white)
 			List<MegaOffline> selected = adapter.getSelectedOfflineNodes();
 			
 			if (Util.isOnline(context)){
@@ -423,7 +425,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_move).setVisible(false);
 				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 				menu.findItem(R.id.cab_menu_rename).setVisible(false);
-			}			
+			}
 			return false;
 		}
 		
@@ -476,6 +478,17 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		mOffList = new ArrayList<MegaOffline>();
 	}
+
+	public void checkScroll () {
+		if (recyclerView != null) {
+			if (recyclerView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -508,8 +521,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
-            recyclerView.removeItemDecoration(floatingItemDecoration);
-            floatingItemDecoration = null;
+            recyclerView.removeItemDecoration(headerItemDecoration);
+            headerItemDecoration = null;
 //			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
@@ -517,6 +530,13 @@ public class OfflineFragmentLollipop extends Fragment{
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text);
@@ -543,7 +563,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
 					try {
 						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
@@ -580,12 +600,19 @@ public class OfflineFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
-			recyclerView.removeItemDecoration(floatingItemDecoration);
-			floatingItemDecoration = null;
+			recyclerView.removeItemDecoration(headerItemDecoration);
+			headerItemDecoration = null;
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text_grid);
@@ -613,7 +640,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -744,7 +771,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
 
-				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1042,7 +1069,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
 				if (selectedNodes.size() > 0){
 					updateActionModeTitle();
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 
 				}
 			}
@@ -1159,7 +1186,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1495,7 +1522,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		adapter.clearSelections();
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1597,7 +1624,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
-				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1678,7 +1705,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 			}
-			String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+			String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline_new));
 			try{
 				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 				textToShow = textToShow.replace("[/A]", "</font>");
