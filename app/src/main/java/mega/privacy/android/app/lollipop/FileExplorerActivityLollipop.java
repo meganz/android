@@ -2551,12 +2551,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("Chat CREATED.");
 			//Update chat view
 			String chatTag1;
-
-			if(isChatFirst){
-				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			if (importFileF) {
+				chatTag1  ="chatExplorer";
 			}
-			else{
-				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			else {
+				if (isChatFirst) {
+					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				}
+				else {
+					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				}
 			}
 			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 			if(chatExplorer!=null && chatExplorer.isAdded()){
