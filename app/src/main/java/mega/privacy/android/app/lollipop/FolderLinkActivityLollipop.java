@@ -376,6 +376,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
+		megaApiFolder.httpServerStop();
 		megaApi = app.getMegaApi();
 		megaApi.httpServerStop();
 
@@ -1799,6 +1800,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
+					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
+					}
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
@@ -1818,24 +1825,47 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-						}
+						String url;
+						if (dbH.getCredentials() != null) {
+							if (megaApi.httpServerIsRunning() == 0) {
+								megaApi.httpServerStart();
+							}
 
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-						}
-						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-						}
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
 
-						String url = megaApi.httpServerGetLocalLink(file);
+							url = megaApi.httpServerGetLocalLink(file);
+						}
+						else {
+							if (megaApiFolder.httpServerIsRunning() == 0) {
+								megaApiFolder.httpServerStart();
+							}
+
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
+
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
+
+							url = megaApiFolder.httpServerGetLocalLink(file);
+						}
 						if (url != null) {
 							log("FolderLink URL: "+url);
 							mediaIntent.setDataAndType(Uri.parse(url), mimeType);
@@ -1887,24 +1917,47 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-						}
+						String url;
+						if (dbH != null && dbH.getCredentials() != null) {
+							if (megaApi.httpServerIsRunning() == 0) {
+								megaApi.httpServerStart();
+							}
 
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-						}
-						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-						}
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
 
-						String url = megaApi.httpServerGetLocalLink(file);
+							url = megaApi.httpServerGetLocalLink(file);
+						}
+						else {
+							if (megaApiFolder.httpServerIsRunning() == 0) {
+								megaApiFolder.httpServerStart();
+							}
+
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
+
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
+
+							url = megaApiFolder.httpServerGetLocalLink(file);
+						}
 						if (url != null) {
 							log("FolderLink URL: "+url);
 							pdfIntent.setDataAndType(Uri.parse(url), mimeType);
