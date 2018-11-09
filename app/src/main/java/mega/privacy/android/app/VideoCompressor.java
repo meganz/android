@@ -9,6 +9,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
+import android.os.StatFs;
 import android.view.Surface;
 
 import java.io.File;
@@ -138,6 +139,20 @@ public class VideoCompressor {
         ChangerWrapper.changeResolutionInSeparatedThread(this);
     }
 
+    private boolean notEnoughSpace(long size) {
+        double availableFreeSpace = Double.MAX_VALUE;
+        try {
+            StatFs stat = new StatFs(outputRoot);
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return (size > availableFreeSpace);
+    }
+
+    private boolean videoTooSmall() {
+        return false;
+    }
 
     public void start() {
         isRunning = true;
@@ -147,6 +162,14 @@ public class VideoCompressor {
             String path = record.getLocalPath();
             File src = new File(path);
             long size = src.length();
+            if(notEnoughSpace(size)) {
+                updater.onInsufficientSpace();
+                return;
+            }
+
+            if(videoTooSmall()) {
+                //TODO
+            }
 
             VideoUpload video = new VideoUpload(path,record.getNewPath(),size);
             try {
@@ -154,25 +177,12 @@ public class VideoCompressor {
                 updater.onCompressSuccessful(path);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                if (ex instanceof IllegalStateException) {
-                    handleIllegalStateException();
-                } else {
-                    handleException();
-                }
+                updater.onCompressNotSupported(path,record.getNewPath());
                 currentFileIndex++;
                 totalRead += size;
-                updater.onCompressFailed(path);
             }
         }
         updater.onCompressFinished(totalCount + "/" + totalCount);
-    }
-
-    private void handleException() {
-        //TODO
-    }
-
-    private void handleIllegalStateException() {
-        //TODO
     }
 
     private static class ChangerWrapper implements Runnable {

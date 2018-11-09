@@ -9,4 +9,8 @@ public interface VideoCompressionCallback {
     void onCompressFailed(String path);
 
     void onCompressFinished(String currentIndexString);
+
+    void onCompressNotSupported(String originalPath,String newPath);
+
+    void onInsufficientSpace();
 }

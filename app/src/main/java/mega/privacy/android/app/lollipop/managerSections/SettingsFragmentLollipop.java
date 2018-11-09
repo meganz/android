@@ -1522,6 +1522,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                     prefs.setUploadVideoQuality(ORIGINAL + "");
                     videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
                     disableChargingSettings();
+                    dbH.updateVideoState(SyncRecord.STATUS_PENDING);
                     break;
                 }
                 case VIDEO_QUALITY_MEDIUM:{
@@ -1529,6 +1530,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                     prefs.setUploadVideoQuality(MEDIUM + "");
                     videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
                     enableChargingSettings();
+                    dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
                     break;
                 }
                 default:
@@ -1536,10 +1538,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
             }
             
             videoQuality.setSummary(videoQuality.getEntry());
-            dbH.setCamSyncTimeStamp(0);
-            dbH.setSecSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords(SyncRecord.TYPE_VIDEO);
-            
             restartCameraUpload();
             
         } else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){

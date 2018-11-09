@@ -720,6 +720,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_SYNC_RECORDS,null,values);
     }
 
+    public void updateVideoState(int state) {
+        String sql = "UPDATE " + TABLE_SYNC_RECORDS + " SET " + KEY_SYNC_STATE + " = " + state + "  WHERE "
+                + KEY_SYNC_TYPE + " = " + SyncRecord.TYPE_VIDEO;
+        db.execSQL(sql);
+    }
+
     public boolean fileNameExists(String name,boolean isSecondary,int fileType) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "'" + " AND "

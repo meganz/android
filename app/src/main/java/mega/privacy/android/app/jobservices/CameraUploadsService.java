@@ -438,6 +438,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             String path;
             if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO) {
                 path = file.getNewPath();
+                File temp = new File(path);
+                if(!temp.exists()) {
+                    path = file.getLocalPath();
+                }
             } else {
                 path = file.getLocalPath();
             }
@@ -1515,24 +1519,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
         log(totalPendingSizeInMB + "byte to Conversion");
 
-        double availableFreeSpace = Double.MAX_VALUE;
-        try {
-            StatFs stat = new StatFs(tempRoot);
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        if (availableFreeSpace < mVideoCompressor.getTotalInputSize()) {
-            stopForeground(true);
-            Intent intent = new Intent(this,ManagerActivityLollipop.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-            String title = getString(R.string.title_out_of_space);
-            String message = getString(R.string.error_not_enough_free_space);
-            showNotification(title,message,pendingIntent);
-            return;
-        }
-
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -1566,6 +1552,16 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
     }
 
+    @Override
+    public void onInsufficientSpace() {
+        stopForeground(true);
+        Intent intent = new Intent(this,ManagerActivityLollipop.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+        String title = getResources().getString(R.string.title_out_of_space);
+        String message = getResources().getString(R.string.message_out_of_space);
+        showNotification(title,message,pendingIntent);
+    }
+
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
         String message = progress + "% compression has been completed";
         showProgressNotification(progress,mPendingIntent,message,currentIndexString,"");
@@ -1578,8 +1574,25 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     public synchronized void onCompressFailed(String originalPath) {
         log("compression failed " + originalPath);
+    }
+
+    public synchronized void onCompressNotSupported(String originalPath,String newPath) {
+        log("compression failed " + originalPath);
         //file can not be compress will be uploaded directly?
-        dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,originalPath);
+        File srcFile = new File(originalPath);
+        if(srcFile.exists()) {
+            StatFs stat = new StatFs(tempRoot);
+            double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+            if (availableFreeSpace > srcFile.length()) {
+                File temp = new File(newPath);
+                dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,originalPath);
+                if(temp.exists()) {
+                    temp.delete();
+                }
+            }
+        } else {
+            dbH.deleteSyncRecordByLocalPath(originalPath);
+        }
     }
 
     public void onCompressFinished(String currentIndexString) {
