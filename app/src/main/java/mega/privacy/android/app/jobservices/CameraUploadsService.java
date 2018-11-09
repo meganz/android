@@ -419,8 +419,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     
                     //show no space notification
                     if (megaApi.getNumPendingUploads() == 0) {
-                        String title = getResources().getString(R.string.title_out_of_space);
-                        String message = getResources().getString(R.string.message_out_of_space);
+                        stopForeground(true);
+                        String title = getString(R.string.title_out_of_space);
+                        String message = getString(R.string.error_not_enough_free_space);
                         Intent intent = new Intent(this,ManagerActivityLollipop.class);
                         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
                         showNotification(title,message,pendingIntent);
@@ -1526,8 +1527,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             stopForeground(true);
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-            String title = getResources().getString(R.string.title_out_of_space);
-            String message = getResources().getString(R.string.message_out_of_space);
+            String title = getString(R.string.title_out_of_space);
+            String message = getString(R.string.error_not_enough_free_space);
             showNotification(title,message,pendingIntent);
             return;
         }
@@ -1545,8 +1546,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
             intent.setAction(Constants.ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-            String title = getResources().getString(R.string.title_compression_size_over_limit);
-            String message = getResources().getString(R.string.message_compression_size_over_limit);
+            String title = getString(R.string.title_compression_size_over_limit);
+            String message = getString(R.string.message_compression_size_over_limit);
             showNotification(title,message,pendingIntent);
         }
 
