@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
+
 import java.lang.ref.WeakReference;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
