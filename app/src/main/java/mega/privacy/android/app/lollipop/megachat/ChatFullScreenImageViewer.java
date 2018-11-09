@@ -505,9 +505,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
-					fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
-				}
-			catch(Exception e){}
+				}catch(Exception e){}
+				fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 			}
 		}
 	}
@@ -569,6 +568,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
+		if (getIntent() != null) {
+			getIntent().putExtra("position", positionG);
+		}
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
