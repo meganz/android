@@ -1,6 +1,7 @@
 package mega.privacy.android.app.components.twemoji;
 
 import android.support.annotation.NonNull;
+
 import java.util.List;
 
 public final class EmojiInformation {
