@@ -6073,6 +6073,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
+
 		searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
 		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -6230,245 +6231,237 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    if(Util.isOnline(this)){
 
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				if (fbFLol!=null && fbFLol.isAdded()){
-					log("onCreateOptionsMenuLollipop: in Cloud");
+				log("onCreateOptionsMenuLollipop: in Cloud");
+				//Show
+				addMenuItem.setEnabled(true);
+				addMenuItem.setVisible(true);
+				log("createFolderMenuItem.setVisible_14");
+				createFolderMenuItem.setVisible(true);
+				if(!firstTimeCam){
+					thumbViewMenuItem.setVisible(true);
+				}else{
+					thumbViewMenuItem.setVisible(false);
+				}
+				rubbishBinMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(true);
+				importLinkMenuItem.setVisible(true);
+				if(!firstTimeCam){
+					takePicture.setVisible(true);
+				}else{
+					takePicture.setVisible(false);
+				}
+				selectMenuItem.setVisible(true);
+				searchMenuItem.setVisible(true);
 
-					//Show
-					addMenuItem.setEnabled(true);
-					addMenuItem.setVisible(true);
-					log("createFolderMenuItem.setVisible_14");
-					createFolderMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						thumbViewMenuItem.setVisible(true);
-					}else{
-						thumbViewMenuItem.setVisible(false);
-					}
-					rubbishBinMenuItem.setVisible(true);
-					upgradeAccountMenuItem.setVisible(true);
-					importLinkMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+				//Hide
+				searchByDate.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				changePass.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+
+				if (fbFLol!=null && fbFLol.isAdded() && fbFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
-					searchMenuItem.setVisible(true);
-
-					//Hide
-					searchByDate.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					changePass.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					killAllSessions.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
-
-					if(fbFLol.getItemCount()>0){
-						selectMenuItem.setVisible(true);
-						sortByMenuItem.setVisible(true);
-					}
-					else{
-						selectMenuItem.setVisible(false);
-						sortByMenuItem.setVisible(false);
-					}
-
-					if (isList){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
-					gridSmallLargeMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
+					sortByMenuItem.setVisible(true);
 				}
 				else{
-					log("ERROR: Fragment not visible");
+					selectMenuItem.setVisible(false);
+					sortByMenuItem.setVisible(false);
 				}
+
+				if (isList){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+				}
+				gridSmallLargeMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 			}
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
-				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-					//Show
+				log("onCreateOptionsMenuLollipop: in Rubbish");
+				//Show
 
-					if(!firstTimeCam){
-						thumbViewMenuItem.setVisible(true);
-					}else{
-						thumbViewMenuItem.setVisible(false);
-					}
-
-					clearRubbishBinMenuitem.setVisible(true);
-					searchMenuItem.setVisible(true);
-
-					//Hide
-					searchByDate.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_13");
-					createFolderMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					addMenuItem.setEnabled(false);
-					changePass.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
-
-					if (isList){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
-
-					if(rubbishBinFLol.getItemCount()>0){
-						sortByMenuItem.setVisible(true);
-						selectMenuItem.setVisible(true);
-						clearRubbishBinMenuitem.setVisible(true);
-					}
-					else{
-						sortByMenuItem.setVisible(false);
-						selectMenuItem.setVisible(false);
-						clearRubbishBinMenuitem.setVisible(false);
-					}
-
-					rubbishBinMenuItem.setVisible(false);
-					gridSmallLargeMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
+				if(!firstTimeCam){
+					thumbViewMenuItem.setVisible(true);
+				}else{
+					thumbViewMenuItem.setVisible(false);
 				}
+
+				clearRubbishBinMenuitem.setVisible(true);
+				searchMenuItem.setVisible(true);
+
+				//Hide
+				searchByDate.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_13");
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				changePass.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+
+				if (isList){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+				}
+
+				if(rubbishBinFLol != null && rubbishBinFLol.isAdded() &&rubbishBinFLol.getItemCount()>0){
+					sortByMenuItem.setVisible(true);
+					selectMenuItem.setVisible(true);
+					clearRubbishBinMenuitem.setVisible(true);
+				}
+				else{
+					sortByMenuItem.setVisible(false);
+					selectMenuItem.setVisible(false);
+					clearRubbishBinMenuitem.setVisible(false);
+				}
+
+				rubbishBinMenuItem.setVisible(false);
+				gridSmallLargeMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-				if (oFLol != null && oFLol.isAdded()){
-					//Show
-					if(!firstTimeCam){
-						thumbViewMenuItem.setVisible(true);
-					}else{
-						thumbViewMenuItem.setVisible(false);
-					}
-
-					if(oFLol.getItemCountWithoutRK()>0){
-						sortByMenuItem.setVisible(true);
-						selectMenuItem.setVisible(true);
-					}
-					else{
-						sortByMenuItem.setVisible(false);
-						selectMenuItem.setVisible(false);
-					}
-					searchMenuItem.setVisible(true);
-
-					//Hide
-					searchByDate.setVisible(false);
-					upgradeAccountMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_15");
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					addMenuItem.setEnabled(false);
-					changePass.setVisible(false);
-					rubbishBinMenuItem.setVisible(true);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
-
-					if (isList){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-					}
-					gridSmallLargeMenuItem.setVisible(false);
+				log("onCreateOptionsMenuLollipop: in Offline");
+				//Show
+				if(!firstTimeCam){
+					thumbViewMenuItem.setVisible(true);
+				}else{
+					thumbViewMenuItem.setVisible(false);
 				}
+
+				if(oFLol != null && oFLol.isAdded() && oFLol.getItemCountWithoutRK()>0){
+					sortByMenuItem.setVisible(true);
+					selectMenuItem.setVisible(true);
+				}
+				else{
+					sortByMenuItem.setVisible(false);
+					selectMenuItem.setVisible(false);
+				}
+				searchMenuItem.setVisible(true);
+
+				//Hide
+				searchByDate.setVisible(false);
+				upgradeAccountMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_15");
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				changePass.setVisible(false);
+				rubbishBinMenuItem.setVisible(true);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+
+				if (isList){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+				}
+				gridSmallLargeMenuItem.setVisible(false);
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-				if (cuFL != null && cuFL.isAdded()){
+				log("onCreateOptionsMenuLollipop: in Camera Uploads");
+				gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				//Show
+				upgradeAccountMenuItem.setVisible(true);
+				takePicture.setVisible(false);
 
-					//Show
-					upgradeAccountMenuItem.setVisible(true);
-					takePicture.setVisible(false);
-
-					if(firstNavigationLevel){
-						if(!firstTimeCam){
-							searchByDate.setVisible(true);
-						}else{
-							searchByDate.setVisible(false);
-						}
+				if(firstNavigationLevel){
+					if(!firstTimeCam){
+						searchByDate.setVisible(true);
 					}else{
 						searchByDate.setVisible(false);
 					}
+				}else{
+					searchByDate.setVisible(false);
+				}
 
-					//Hide
-					sortByMenuItem.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_16");
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					if(!firstTimeCam){
-						thumbViewMenuItem.setVisible(true);
-					}else{
-						thumbViewMenuItem.setVisible(false);
-					}
-					changePass.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
+				//Hide
+				sortByMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_16");
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				if(!firstTimeCam){
+					thumbViewMenuItem.setVisible(true);
+				}else{
+					thumbViewMenuItem.setVisible(false);
+				}
+				changePass.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
 
-					searchMenuItem.setVisible(true);
-					if (isListCameraUploads){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						gridSmallLargeMenuItem.setVisible(false);
+				searchMenuItem.setVisible(true);
+				if (isListCameraUploads){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					gridSmallLargeMenuItem.setVisible(false);
 
-						if(cuFL.getItemCountList()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
+					if(cuFL != null && cuFL.isAdded() && cuFL.getItemCountList()>0){
+						selectMenuItem.setVisible(true);
 					}
 					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						}else{
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-						}
+						selectMenuItem.setVisible(false);
+					}
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					if (isSmallGridCameraUploads){
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					}else{
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+					}
 
 //						if (isLargeGridCameraUploads){
 //							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview_small));
@@ -6476,86 +6469,85 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						else{
 //							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview));
 //						}
-						if(!firstTimeCam) {
-							gridSmallLargeMenuItem.setVisible(true);
-						}else{
-							gridSmallLargeMenuItem.setVisible(false);
-						}
+					if(!firstTimeCam) {
+						gridSmallLargeMenuItem.setVisible(true);
+					}else{
+						gridSmallLargeMenuItem.setVisible(false);
+					}
 
-						if(cuFL.getItemCountGrid()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
+					if(cuFL != null && cuFL.isAdded() && cuFL.getItemCountGrid()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(false);
 					}
 				}
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-				if (muFLol != null && muFLol.isAdded()){
+				log("onCreateOptionsMenuLollipop: in Media Uploads");
+				gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				//Show
+				upgradeAccountMenuItem.setVisible(true);
 
-					//Show
-					upgradeAccountMenuItem.setVisible(true);
+				takePicture.setVisible(false);
 
-					takePicture.setVisible(false);
-
-					if(firstNavigationLevel){
-						if(!firstTimeCam){
-							searchByDate.setVisible(true);
-						}else{
-							searchByDate.setVisible(false);
-						}
+				if(firstNavigationLevel){
+					if(!firstTimeCam){
+						searchByDate.setVisible(true);
 					}else{
 						searchByDate.setVisible(false);
 					}
+				}else{
+					searchByDate.setVisible(false);
+				}
 
-					//Hide
-					sortByMenuItem.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_17");
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					if(!firstTimeCam){
-						thumbViewMenuItem.setVisible(true);
-					}else{
-						thumbViewMenuItem.setVisible(false);
-					}
-					changePass.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
+				//Hide
+				sortByMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_17");
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				if(!firstTimeCam){
+					thumbViewMenuItem.setVisible(true);
+				}else{
+					thumbViewMenuItem.setVisible(false);
+				}
+				changePass.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
 
-					searchMenuItem.setVisible(true);
-					if (isListCameraUploads){
-						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						gridSmallLargeMenuItem.setVisible(false);
+				searchMenuItem.setVisible(true);
+				if (isListCameraUploads){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					gridSmallLargeMenuItem.setVisible(false);
 
-						if(muFLol.getItemCountList()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
+					if(muFLol != null && muFLol.isAdded() && muFLol.getItemCountList()>0){
+						selectMenuItem.setVisible(true);
 					}
 					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						}else{
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-						}
+						selectMenuItem.setVisible(false);
+					}
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					thumbViewMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+					if (isSmallGridCameraUploads){
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					}else{
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+					}
 
 //						if (isLargeGridCameraUploads){
 //							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview_small));
@@ -6564,18 +6556,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview));
 //						}
 
-						if(!firstTimeCam) {
-							gridSmallLargeMenuItem.setVisible(true);
-						}else{
-							gridSmallLargeMenuItem.setVisible(false);
-						}
+					if(!firstTimeCam) {
+						gridSmallLargeMenuItem.setVisible(true);
+					}else{
+						gridSmallLargeMenuItem.setVisible(false);
+					}
 
-						if(muFLol.getItemCountGrid()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
+					if(muFLol != null && muFLol.isAdded() && muFLol.getItemCountGrid()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(false);
 					}
 				}
 				newChatMenuItem.setVisible(false);
@@ -6583,9 +6574,106 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			else if (drawerItem == DrawerItem.INBOX){
-				if (iFLol != null && iFLol.isAdded()){
-					//Show
-					if(iFLol.getItemCount()>0){
+				log("onCreateOptionsMenuLollipop: in Inbox");
+				//Show
+				if(iFLol != null && iFLol.isAdded() && iFLol.getItemCount()>0){
+					selectMenuItem.setVisible(true);
+					sortByMenuItem.setVisible(true);
+
+				}
+				else{
+					selectMenuItem.setVisible(false);
+					sortByMenuItem.setVisible(false);
+
+				}
+
+				if (isList){
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+				}
+
+				searchMenuItem.setVisible(true);
+				if(!firstTimeCam){
+					thumbViewMenuItem.setVisible(true);
+				}else{
+					thumbViewMenuItem.setVisible(false);
+				}
+				//Hide
+				searchByDate.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				log("createFolderMenuItem.setVisible_18");
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
+				unSelectMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				changePass.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+				gridSmallLargeMenuItem.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
+			}
+			else if (drawerItem == DrawerItem.SHARED_ITEMS){
+				//Lollipop
+				int index = viewPagerShares.getCurrentItem();
+				if(index==0){
+					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+					log("onCreateOptionsMenuLollipop: in Incoming");
+					if(!firstTimeCam){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}
+					addMenuItem.setEnabled(true);
+
+					log("onCreateOptionsMenu parentHandleIncoming: "+parentHandleIncoming);
+					if(parentHandleIncoming==-1){
+						addMenuItem.setVisible(false);
+						createFolderMenuItem.setVisible(false);
+					}
+					else{
+						MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+						if(node!=null){
+							//Check the folder's permissions
+							int accessLevel= megaApi.getAccess(node);
+							log("onCreateOptionsMenu Node: "+node.getName());
+
+							switch(accessLevel){
+								case MegaShare.ACCESS_OWNER:
+								case MegaShare.ACCESS_READWRITE:
+								case MegaShare.ACCESS_FULL:{
+									addMenuItem.setVisible(true);
+									createFolderMenuItem.setVisible(true);
+									break;
+								}
+								case MegaShare.ACCESS_READ:{
+									addMenuItem.setVisible(false);
+									createFolderMenuItem.setVisible(false);
+									break;
+								}
+							}
+						}
+						else{
+							addMenuItem.setVisible(false);
+							createFolderMenuItem.setVisible(false);
+						}
+					}
+
+					if(inSFLol != null && inSFLol.isAdded() && inSFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
 
@@ -6595,6 +6683,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						sortByMenuItem.setVisible(false);
 
 					}
+					searchMenuItem.setVisible(true);
+
+					//Hide
+					searchByDate.setVisible(false);
+					pauseTransfersMenuIcon.setVisible(false);
+					playTransfersMenuIcon.setVisible(false);
+					addContactMenuItem.setVisible(false);
+					unSelectMenuItem.setVisible(false);
+					rubbishBinMenuItem.setVisible(true);
+					clearRubbishBinMenuitem.setVisible(false);
+					changePass.setVisible(false);
+					importLinkMenuItem.setVisible(false);
+					takePicture.setVisible(false);
+					refreshMenuItem.setVisible(false);
+					helpMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(false);
+					gridSmallLargeMenuItem.setVisible(false);
+					logoutMenuItem.setVisible(false);
+					forgotPassMenuItem.setVisible(false);
 
 					if (isList){
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -6604,189 +6711,68 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
+				}
+				else if(index==1){
+					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
+					log("onCreateOptionsMenuLollipop: in Outgoing");
 
-					searchMenuItem.setVisible(true);
 					if(!firstTimeCam){
 						thumbViewMenuItem.setVisible(true);
 					}else{
 						thumbViewMenuItem.setVisible(false);
 					}
+					log("parentHandleOutgoing: "+parentHandleOutgoing);
+					if(parentHandleOutgoing==-1){
+						addMenuItem.setVisible(false);
+						createFolderMenuItem.setVisible(false);
+					}
+					else{
+						addMenuItem.setVisible(true);
+						createFolderMenuItem.setVisible(true);
+					}
+
+					if(outSFLol != null && outSFLol.isAdded() && outSFLol.getItemCount()>0){
+						selectMenuItem.setVisible(true);
+						sortByMenuItem.setVisible(true);
+
+					}
+					else{
+						selectMenuItem.setVisible(false);
+						sortByMenuItem.setVisible(false);
+
+					}
+					searchMenuItem.setVisible(true);
+
 					//Hide
 					searchByDate.setVisible(false);
-					refreshMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
-					log("createFolderMenuItem.setVisible_18");
-					createFolderMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(true);
 					unSelectMenuItem.setVisible(false);
-					addMenuItem.setEnabled(false);
+					rubbishBinMenuItem.setVisible(true);
+					clearRubbishBinMenuitem.setVisible(false);
 					changePass.setVisible(false);
 					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-					rubbishBinMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
-				}
-			}
 
-			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-				//Lollipop
-				int index = viewPagerShares.getCurrentItem();
-				if(index==0){
-					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-					if (inSFLol != null && inSFLol.isAdded()){
-						if(!firstTimeCam){
-							thumbViewMenuItem.setVisible(true);
-						}else{
-							thumbViewMenuItem.setVisible(false);
-						}
-						addMenuItem.setEnabled(true);
-
-						log("onCreateOptionsMenu parentHandleIncoming: "+parentHandleIncoming);
-						if(parentHandleIncoming==-1){
-							addMenuItem.setVisible(false);
-							createFolderMenuItem.setVisible(false);
-						}
-						else{
-							MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-							if(node!=null){
-								//Check the folder's permissions
-								int accessLevel= megaApi.getAccess(node);
-								log("onCreateOptionsMenu Node: "+node.getName());
-
-								switch(accessLevel){
-									case MegaShare.ACCESS_OWNER:
-									case MegaShare.ACCESS_READWRITE:
-									case MegaShare.ACCESS_FULL:{
-										addMenuItem.setVisible(true);
-										createFolderMenuItem.setVisible(true);
-										break;
-									}
-									case MegaShare.ACCESS_READ:{
-										addMenuItem.setVisible(false);
-										createFolderMenuItem.setVisible(false);
-										break;
-									}
-								}
-							}
-							else{
-								addMenuItem.setVisible(false);
-								createFolderMenuItem.setVisible(false);
-							}
-						}
-
-						if(inSFLol.getItemCount()>0){
-							selectMenuItem.setVisible(true);
-							sortByMenuItem.setVisible(true);
-
-						}
-						else{
-							selectMenuItem.setVisible(false);
-							sortByMenuItem.setVisible(false);
-
-						}
-						searchMenuItem.setVisible(true);
-
-						//Hide
-						searchByDate.setVisible(false);
-						pauseTransfersMenuIcon.setVisible(false);
-						playTransfersMenuIcon.setVisible(false);
-						addContactMenuItem.setVisible(false);
-						unSelectMenuItem.setVisible(false);
-						rubbishBinMenuItem.setVisible(true);
-						clearRubbishBinMenuitem.setVisible(false);
-						changePass.setVisible(false);
-						importLinkMenuItem.setVisible(false);
-						takePicture.setVisible(false);
-						refreshMenuItem.setVisible(false);
-						helpMenuItem.setVisible(false);
-						upgradeAccountMenuItem.setVisible(false);
-						gridSmallLargeMenuItem.setVisible(false);
-						logoutMenuItem.setVisible(false);
-						forgotPassMenuItem.setVisible(false);
-
-						if (isList){
-							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-							thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-							thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-						}
+					if (isList){
+						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 					}
-				}
-				else if(index==1){
-					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-					if (outSFLol != null && outSFLol.isAdded()){
-
-						if(!firstTimeCam){
-							thumbViewMenuItem.setVisible(true);
-						}else{
-							thumbViewMenuItem.setVisible(false);
-						}
-						log("parentHandleOutgoing: "+parentHandleOutgoing);
-						if(parentHandleOutgoing==-1){
-							addMenuItem.setVisible(false);
-							createFolderMenuItem.setVisible(false);
-						}
-						else{
-							addMenuItem.setVisible(true);
-							createFolderMenuItem.setVisible(true);
-						}
-
-						if(outSFLol.getItemCount()>0){
-							selectMenuItem.setVisible(true);
-							sortByMenuItem.setVisible(true);
-
-						}
-						else{
-							selectMenuItem.setVisible(false);
-							sortByMenuItem.setVisible(false);
-
-						}
-						searchMenuItem.setVisible(true);
-
-						//Hide
-						searchByDate.setVisible(false);
-						upgradeAccountMenuItem.setVisible(false);
-						pauseTransfersMenuIcon.setVisible(false);
-						playTransfersMenuIcon.setVisible(false);
-						addContactMenuItem.setVisible(false);
-						unSelectMenuItem.setVisible(false);
-						rubbishBinMenuItem.setVisible(true);
-						clearRubbishBinMenuitem.setVisible(false);
-						changePass.setVisible(false);
-						importLinkMenuItem.setVisible(false);
-						takePicture.setVisible(false);
-						refreshMenuItem.setVisible(false);
-						helpMenuItem.setVisible(false);
-						gridSmallLargeMenuItem.setVisible(false);
-						logoutMenuItem.setVisible(false);
-						forgotPassMenuItem.setVisible(false);
-
-						if (isList){
-							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-							thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-							thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-						}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
 				}
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 			}
-
 			else if (drawerItem == DrawerItem.CONTACTS){
 				log("createOptions CONTACTS");
 				int index = viewPagerContacts.getCurrentItem();
@@ -6807,22 +6793,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchMenuItem.setVisible(false);
 					scanQRcodeMenuItem.setVisible(true);
 
-					if (cFLol != null && cFLol.isAdded()) {
-						if(cFLol.getItemCount()>0){
-							selectMenuItem.setVisible(true);
-							sortByMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-							sortByMenuItem.setVisible(false);
-						}
-						if (handleInviteContact != 0) {
-							cFLol.invite(handleInviteContact);
-							handleInviteContact = 0;
-						}
+					if (cFLol != null && cFLol.isAdded() && cFLol.getItemCount()>0) {
+						selectMenuItem.setVisible(true);
+						sortByMenuItem.setVisible(true);
 					}
 					else{
-						log("The CONTACTS tab is null");
+						selectMenuItem.setVisible(false);
+						sortByMenuItem.setVisible(false);
+					}
+					if (handleInviteContact != 0) {
+						if (cFLol != null && cFLol.isAdded()) {
+							cFLol.invite(handleInviteContact);
+						}
+						handleInviteContact = 0;
 					}
 
 					//Hide
@@ -6868,13 +6851,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					upgradeAccountMenuItem.setVisible(true);
 					scanQRcodeMenuItem.setVisible(true);
 
-					if (sRFLol != null && sRFLol.isAdded()) {
-						if(sRFLol.getItemCount()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
+					if (sRFLol != null && sRFLol.isAdded() && sRFLol.getItemCount()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(false);
 					}
 
 					//Hide
@@ -6911,13 +6892,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
 
-					if (rRFLol != null && rRFLol.isAdded()) {
-						if(rRFLol.getItemCount()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
+					if (rRFLol != null && rRFLol.isAdded() && rRFLol.getItemCount()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(false);
 					}
 
 					//Hide
@@ -6950,9 +6929,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
 				log("createOptions search");
-				if (sFLol != null && sFLol.isAdded()){
+				if (createFolderMenuItem != null){
+
 					//Hide
 					searchByDate.setVisible(false);
+					upgradeAccountMenuItem.setVisible(true);
 					cancelAllTransfersMenuItem.setVisible(false);
 					clearCompletedTransfers.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
@@ -6965,6 +6946,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sortByMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);
 					changePass.setVisible(false);
+					rubbishBinMenuItem.setVisible(true);
 					clearRubbishBinMenuitem.setVisible(false);
 					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);
@@ -6976,41 +6958,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					newChatMenuItem.setVisible(false);
 					setStatusMenuItem.setVisible(false);
 
-				    if (searchExpand) {
-				        openSearchView();
-						upgradeAccountMenuItem.setVisible(false);
-				        rubbishBinMenuItem.setVisible(false);
-				        selectMenuItem.setVisible(false);
-				        thumbViewMenuItem.setVisible(false);
-                    }
-                    else {
-				    	upgradeAccountMenuItem.setVisible(true);
-						rubbishBinMenuItem.setVisible(true);
-						//Show
-						if(sFLol.getNodes()!=null){
-							if(sFLol.getNodes().size()!=0){
+					//Show
+					if(sFLol != null && sFLol.isAdded() && sFLol.getNodes()!=null){
+						if(sFLol.getNodes().size()!=0){
 //							log("size after search: "+sFLol.getNodes().size());
-								selectMenuItem.setVisible(true);
-								if(!firstTimeCam){
-									thumbViewMenuItem.setVisible(true);
-								}else{
-									thumbViewMenuItem.setVisible(false);
-								}
-								if (isList){
-									thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-									thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-								}
-								else{
-									thumbViewMenuItem.setTitle(getString(R.string.action_list));
-									thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
-								}
-							}
-							else{
-								selectMenuItem.setVisible(false);
+							selectMenuItem.setVisible(true);
+							if(!firstTimeCam){
+								thumbViewMenuItem.setVisible(true);
+							}else{
 								thumbViewMenuItem.setVisible(false);
 							}
+							if (isList){
+								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+								thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+							}
+							else{
+								thumbViewMenuItem.setTitle(getString(R.string.action_list));
+								thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+							}
 						}
-						else {
+						else{
 							selectMenuItem.setVisible(false);
 							thumbViewMenuItem.setVisible(false);
 						}
@@ -7167,62 +7134,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			else if (drawerItem == DrawerItem.SETTINGS){
 				log("in Settings Section");
-				if (sttFLol != null){
-
-					//Hide
-					searchByDate.setVisible(false);
-					searchMenuItem.setVisible(false);
-					log("createFolderMenuItem.setVisible_settings");
-					createFolderMenuItem.setVisible(false);
-					addContactMenuItem.setVisible(false);
-					addMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
-					selectMenuItem.setVisible(false);
-					unSelectMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(false);
-					addMenuItem.setEnabled(false);
-					rubbishBinMenuItem.setVisible(true);
-					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
-					takePicture.setVisible(false);
-					refreshMenuItem.setVisible(false);
-					helpMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(true);
-					changePass.setVisible(false);
-					cancelSubscription.setVisible(false);
-					killAllSessions.setVisible(false);
-					logoutMenuItem.setVisible(false);
-					cancelAllTransfersMenuItem.setVisible(false);
-					clearCompletedTransfers.setVisible(false);
-					forgotPassMenuItem.setVisible(false);
-					playTransfersMenuIcon.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
-					newChatMenuItem.setVisible(false);
-					setStatusMenuItem.setVisible(false);
-				}
+				//Hide
+				searchByDate.setVisible(false);
+				searchMenuItem.setVisible(false);
+				log("createFolderMenuItem.setVisible_settings");
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				selectMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				rubbishBinMenuItem.setVisible(true);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(true);
+				changePass.setVisible(false);
+				cancelSubscription.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				cancelAllTransfersMenuItem.setVisible(false);
+				clearCompletedTransfers.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+				newChatMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CHAT){
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
 
-					if (rChatFL != null && rChatFL.isAdded()){
-
-						if(Util.isOnline(this)){
-							newChatMenuItem.setVisible(true);
-							if(rChatFL.getItemCount()>0){
-								selectMenuItem.setVisible(true);
-							}
-							else{
-								selectMenuItem.setVisible(false);
-							}
-							setStatusMenuItem.setVisible(true);
+					if(Util.isOnline(this)){
+						newChatMenuItem.setVisible(true);
+						if(rChatFL != null && rChatFL.isAdded() && rChatFL.getItemCount()>0){
+							selectMenuItem.setVisible(true);
 						}
 						else{
-							newChatMenuItem.setVisible(false);
 							selectMenuItem.setVisible(false);
-							setStatusMenuItem.setVisible(false);
 						}
+						setStatusMenuItem.setVisible(true);
+					}
+					else{
+						newChatMenuItem.setVisible(false);
+						selectMenuItem.setVisible(false);
+						setStatusMenuItem.setVisible(false);
 					}
 
 					//Hide
