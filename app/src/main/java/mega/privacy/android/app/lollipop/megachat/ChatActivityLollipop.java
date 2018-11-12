@@ -6596,20 +6596,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                        }
                    }
 
-                   //Check if it has no my messages after
-                   positionLastMessage = positionLastMessage + 1;
-                   AndroidMegaChatMessage message = messages.get(positionLastMessage);
-                   log("Position lastMessage found: "+positionLastMessage+" messages.size: "+messages.size());
-
-                   while(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
-                       lastIdMsgSeen = message.getMessage().getMsgId();
-                       positionLastMessage = positionLastMessage + 1;
-                       message = messages.get(positionLastMessage);
+                   if(positionLastMessage==-1){
+                       scrollToMessage(-1);
                    }
+                   else{
+                       //Check if it has no my messages after
 
-                   generalUnreadCount = unreadCount;
+                       if(positionLastMessage >= messages.size()-1){
+                           log("Nothing after, do not increment position");
+                       }
+                       else{
+                           positionLastMessage = positionLastMessage + 1;
+                       }
 
-                   scrollToMessage(lastIdMsgSeen);
+                       AndroidMegaChatMessage message = messages.get(positionLastMessage);
+                       log("Position lastMessage found: "+positionLastMessage+" messages.size: "+messages.size());
+
+                       while(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
+                           lastIdMsgSeen = message.getMessage().getMsgId();
+                           positionLastMessage = positionLastMessage + 1;
+                           message = messages.get(positionLastMessage);
+                       }
+
+                       generalUnreadCount = unreadCount;
+
+                       scrollToMessage(lastIdMsgSeen);
+                   }
                }
                else{
                    if(generalUnreadCount!=0){
