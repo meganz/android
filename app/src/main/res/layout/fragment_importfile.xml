@@ -1,0 +1,156 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_container_import"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".FileExplorerListFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/content_text"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_marginLeft="16dp"
+            android:textColor="@color/name_my_account"
+            android:textSize="14sp"
+            android:fontFamily="roboto"
+            android:gravity="left|center_vertical"
+            android:text="File"/>
+
+        <RelativeLayout
+            android:id="@+id/files_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/content_text">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/file_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:choiceMode="multipleChoice"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/show_more_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_below="@id/files_layout">
+
+            <View
+                android:id="@+id/separator_show_more"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="@color/tour_bar_grey"/>
+
+            <TextView
+                android:id="@+id/show_more_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="14sp"
+                android:textColor="@color/accentColor"
+                android:fontFamily="roboto"
+                android:text="@string/general_show_more"
+                android:gravity="left|center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_below="@+id/separator_show_more"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"/>
+
+            <ImageView
+                android:id="@+id/show_more_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/ic_collapse_acc"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/separator"
+            android:background="@color/tour_bar_grey"
+            android:layout_width = "match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/show_more_layout"/>
+
+        <TextView
+            android:id="@+id/choose_destination"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_marginLeft="16dp"
+            android:textColor="@color/name_my_account"
+            android:textSize="14sp"
+            android:fontFamily="roboto"
+            android:layout_below="@+id/separator"
+            android:text="@string/choose_destionation"
+            android:gravity="left|center_vertical"
+            android:layout_marginTop="8dp"/>
+
+        <RelativeLayout
+            android:id="@+id/cloud_drive_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_below="@+id/choose_destination">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:textSize="14sp"
+                android:text="@string/section_cloud_drive"
+                android:textAllCaps="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/incoming_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_below="@+id/cloud_drive_layout">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:textSize="14sp"
+                android:text="@string/title_incoming_shares_explorer"
+                android:textAllCaps="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/chat_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_below="@+id/incoming_layout">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:layout_centerVertical="true"
+                android:gravity="left"
+                android:textSize="14sp"
+                android:text="@string/section_chat"
+                android:textAllCaps="true"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>
