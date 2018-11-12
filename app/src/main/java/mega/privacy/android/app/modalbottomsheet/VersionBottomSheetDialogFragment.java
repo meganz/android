@@ -108,6 +108,8 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
         optionRevert.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
+        LinearLayout separatorRevert = (LinearLayout) contentView.findViewById(R.id.separator_revert);
+
         nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
@@ -147,9 +149,11 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
             if(((VersionsFileActivity) context).getSelectedPosition()==0){
                 optionRevert.setVisibility(View.GONE);
+                separatorRevert.setVisibility(View.GONE);
             }
             else{
                 optionRevert.setVisibility(View.VISIBLE);
+                separatorRevert.setVisibility(View.VISIBLE);
             }
 
             dialog.setContentView(contentView);
@@ -177,7 +181,7 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(node.getHandle());
-                nC.prepareForDownload(handleList);
+                nC.prepareForDownload(handleList, false);
                 break;
             }
             case R.id.option_revert_layout:{

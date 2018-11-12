@@ -42,8 +42,8 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -92,10 +92,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isForeground = false;
 	private boolean canceled;
 
-	private boolean isFolderLink = false;
-	private boolean fromContactFile = false;
 	private String pathFileToOpen;
-	private Uri contentUri;
 
 	private boolean openFile = true;
 
@@ -222,12 +219,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
-        isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
-        fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
+        boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
+
+        boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
 
         boolean fromMV = intent.getBooleanExtra("fromMV", false);
         log("fromMV: "+fromMV);
@@ -410,7 +409,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			log("CurrentDocument is not null");
-			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+
+			if(highPriority){
+				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", "", this);
+			}
+			else{
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+			}
         }
         else{
 			log("contentUri NULL");
@@ -464,7 +469,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 }
 
                 log("CurrentDocument is not null");
-                megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+				if(highPriority){
+					megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", "", this);
+				}
+				else{
+					megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+				}
 
             }
             else{
@@ -489,19 +499,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 
-		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads() + megaApiFolder.getNumPendingUploads();
+		int total = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
 		log("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
-			log("onQueueComplete: reset total uploads/downloads");
-			megaApi.resetTotalUploads();
+			log("onQueueComplete: reset total downloads");
 			megaApi.resetTotalDownloads();
 			megaApiFolder.resetTotalDownloads();
-			megaApiFolder.resetTotalUploads();
 			errorCount = 0;
 			alreadyDownloaded = 0;
 		}
 	}
-
 
 	private File getDir(MegaNode document, Intent intent) {
 		log("getDir");
@@ -1512,13 +1519,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					File f = new File(filePath);
 					try {
 						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-						Uri contentUri;
+						Uri finishedContentUri;
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
+							finishedContentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
 						} else {
-							contentUri = Uri.fromFile(f);
+							finishedContentUri = Uri.fromFile(f);
 						}
-						mediaScanIntent.setData(contentUri);
+						mediaScanIntent.setData(finishedContentUri);
 						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						this.sendBroadcast(mediaScanIntent);
 					}

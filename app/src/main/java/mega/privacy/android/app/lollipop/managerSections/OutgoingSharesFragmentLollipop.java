@@ -52,9 +52,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -106,7 +105,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		
 	ArrayList<MegaNode> nodes;
 	
-	FloatingItemDecoration floatingItemDecoration;
+	NewHeaderItemDecoration headerItemDecoration;
 
 	public ActionMode actionMode;
 
@@ -151,8 +150,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+
         if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -160,7 +158,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             }
             if(folderCount > 0) {
                 for (int i = 0;i < spanCount;i++) {
-                    sections.put(i,folderCount + " " + folderStr);
+                    sections.put(i, getString(R.string.general_folders));
                 }
             }
             
@@ -168,25 +166,25 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                 placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
                 if (placeholderCount == 0) {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + i, getString(R.string.general_files));
                     }
                 } else {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
                     }
                 }
             }
         } else {
             placeholderCount = 0;
-            sections.put(0,folderCount + " " + folderStr);
-            sections.put(folderCount,fileCount + " " + fileStr);
+            sections.put(0, getString(R.string.general_folders));
+            sections.put(folderCount, getString(R.string.general_files));
         }
-        if (floatingItemDecoration == null) {
-            floatingItemDecoration = new FloatingItemDecoration(context);
-            recyclerView.addItemDecoration(floatingItemDecoration);
-        }
-        floatingItemDecoration.setType(type);
-        floatingItemDecoration.setKeys(sections);
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+			recyclerView.addItemDecoration(headerItemDecoration);
+		}
+		headerItemDecoration.setType(type);
+		headerItemDecoration.setKeys(sections);
     }
 
 	public ImageView getImageDrag(int position) {
@@ -234,7 +232,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}
 
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, false);
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -334,7 +332,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -352,6 +350,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			return true;
 		}
 
@@ -361,6 +360,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 		}
 
 		@Override
@@ -535,6 +535,15 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
+
+	public void checkScroll () {
+		if (recyclerView.canScrollVertically(-1)){
+			((ManagerActivityLollipop) context).changeActionBarElevation(true);
+		}
+		else {
+			((ManagerActivityLollipop) context).changeActionBarElevation(false);
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -568,6 +577,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
@@ -699,6 +715,13 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
@@ -1124,7 +1147,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{
@@ -1297,7 +1320,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					else{
 						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					}
-
+                    mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("screenPosition", screenPosition);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
@@ -1358,7 +1381,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
 							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList);
+							nC.prepareForDownload(handleList, true);
 						}
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -1421,7 +1444,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, true);
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -1476,7 +1499,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 										ArrayList<Long> handleList = new ArrayList<Long>();
 										handleList.add(nodes.get(position).getHandle());
 										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList);
+										nC.prepareForDownload(handleList, true);
 									}
 								}
 							}
@@ -1496,7 +1519,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 								ArrayList<Long> handleList = new ArrayList<Long>();
 								handleList.add(nodes.get(position).getHandle());
 								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList);
+								nC.prepareForDownload(handleList, true);
 							}
 
 						} finally {
@@ -1511,14 +1534,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, true);
 					}
 				} else{
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, true);
 				}
 			}
 		}
@@ -1728,7 +1751,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
