@@ -174,10 +174,10 @@ public class VideoCompressor {
             VideoUpload video = new VideoUpload(path,record.getNewPath(),size);
             try {
                 prepareAndChangeResolutionSingleThread(video);
-                updater.onCompressSuccessful(path);
+                updater.onCompressSuccessful(record);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                updater.onCompressNotSupported(path,record.getNewPath());
+                updater.onCompressNotSupported(record);
                 currentFileIndex++;
                 totalRead += size;
             }

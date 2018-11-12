@@ -26,9 +26,9 @@ public class SyncRecord {
 
     private Long timestamp;
 
-    private float latitude;
+    private Float latitude;
 
-    private float longitude;
+    private Float longitude;
 
     private Long nodeHandle;
 
@@ -159,19 +159,39 @@ public class SyncRecord {
         this.newFingerprint = newFingerprint;
     }
 
-    public float getLatitude() {
+    public Float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public Float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
+    }
+
+    @Override
+    public String toString() {
+        return "SyncRecord{" +
+                "id=" + id +
+                ", localPath='" + localPath + '\'' +
+                ", newPath='" + newPath + '\'' +
+                ", originFingerprint='" + originFingerprint + '\'' +
+                ", newFingerprint='" + newFingerprint + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", timestamp=" + timestamp +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", nodeHandle=" + nodeHandle +
+                ", secondary=" + secondary +
+                ", copyOnly=" + copyOnly +
+                ", status=" + status +
+                ", type=" + type +
+                '}';
     }
 }

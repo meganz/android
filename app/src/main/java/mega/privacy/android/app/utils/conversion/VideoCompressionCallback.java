@@ -1,16 +1,18 @@
 package mega.privacy.android.app.utils.conversion;
 
+import mega.privacy.android.app.jobservices.SyncRecord;
+
 public interface VideoCompressionCallback {
 
     void onCompressUpdateProgress(int progress,String currentIndexString);
     
-    void onCompressSuccessful(String path);
+    void onCompressSuccessful(SyncRecord record);
     
-    void onCompressFailed(String path);
+    void onCompressFailed(SyncRecord record);
 
     void onCompressFinished(String currentIndexString);
 
-    void onCompressNotSupported(String originalPath,String newPath);
+    void onCompressNotSupported(SyncRecord record);
 
     void onInsufficientSpace();
 }

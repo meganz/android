@@ -676,14 +676,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_CREDENTIALS, null, values);
     }
 
-    public void savePendingUploadRecords(List<SyncRecord> list) {
-        if (list != null) {
-            for (SyncRecord record : list) {
-               saveSyncRecord(record);
-            }
-        }
-    }
-
     public void saveSyncRecord(SyncRecord record) {
         ContentValues values = new ContentValues();
         if (record.getLocalPath() != null) {
@@ -701,20 +693,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (record.getFileName() != null) {
             values.put(KEY_SYNC_FILENAME,encrypt(record.getFileName()));
         }
-        if(record.getNodeHandle() != null) {
+        if (record.getNodeHandle() != null) {
             values.put(KEY_SYNC_HANDLE,encrypt(String.valueOf(record.getNodeHandle())));
         }
-        if(record.getTimestamp() != null) {
+        if (record.getTimestamp() != null) {
             values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
         }
-        if(record.isCopyOnly() != null) {
+        if (record.isCopyOnly() != null) {
             values.put(KEY_SYNC_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
         }
-        if(record.isSecondary() != null) {
+        if (record.isSecondary() != null) {
             values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.isSecondary())));
         }
-        values.put(KEY_SYNC_LONGITUDE,record.getLongitude());
-        values.put(KEY_SYNC_LATITUDE,record.getLatitude());
+        if (record.getLongitude() != null) {
+            values.put(KEY_SYNC_LONGITUDE,encrypt(String.valueOf(record.getLongitude())));
+        }
+        if (record.getLatitude() != null) {
+            values.put(KEY_SYNC_LATITUDE,encrypt(String.valueOf(record.getLatitude())));
+        }
         values.put(KEY_SYNC_STATE,record.getStatus());
         values.put(KEY_SYNC_TYPE,record.getType());
         db.insert(TABLE_SYNC_RECORDS,null,values);
@@ -728,7 +724,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public boolean fileNameExists(String name,boolean isSecondary,int fileType) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
-                + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "'" + " AND "
+                + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
         if (fileType != SyncRecord.TYPE_ANY) {
             selectQuery += " AND " + KEY_SYNC_TYPE + " = " + fileType;
@@ -750,11 +746,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
     
-    public SyncRecord recordExists(SyncRecord record) {
+    public SyncRecord recordExists(String originalFingerprint,boolean isSecondary,boolean isCopyOnly) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
-                + KEY_SYNC_FP_ORI + " ='" + encrypt(record.getOriginFingerprint()) + "' AND "
-                + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(record.isSecondary())) + "' AND "
-                + KEY_SYNC_COPYONLY + " = '" + encrypt(String.valueOf(record.isCopyOnly())) + "'";
+                + KEY_SYNC_FP_ORI + " ='" + encrypt(originalFingerprint) + "' AND "
+                + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "' AND "
+                + KEY_SYNC_COPYONLY + " = '" + encrypt(String.valueOf(isCopyOnly)) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null );
         if (cursor != null && cursor.moveToFirst()) {
             SyncRecord exist = extractSyncRecord(cursor);
@@ -842,8 +838,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return record;
     }
 
-    public SyncRecord findSyncRecordByLocalPath(String localPath) {
-        String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE " + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "'";
+    public SyncRecord findSyncRecordByLocalPath(String localPath,boolean isSecondary) {
+        String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
+                + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "' AND "
+                + KEY_SYNC_SECONDARY + " ='" + encrypt(String.valueOf(isSecondary)) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
             SyncRecord record = extractSyncRecord(cursor);
@@ -853,15 +851,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
 
-    public void deleteSyncRecordByPath(String path) {
-        String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + "  WHERE "
+    public void deleteSyncRecordByPath(String path,boolean isSecondary) {
+        String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + "  WHERE ("
                 + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(path) + "' OR "
-                + KEY_SYNC_FILEPATH_NEW + " ='" + encrypt(path) + "'";
+                + KEY_SYNC_FILEPATH_NEW + " ='" + encrypt(path) + "') AND "
+                + KEY_SYNC_SECONDARY + " ='" + encrypt(String.valueOf(isSecondary)) + "'";
         db.execSQL(sql);
     }
 
-    public void deleteSyncRecordByLocalPath(String localPath) {
-        String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + "  WHERE " + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "'";
+    public void deleteSyncRecordByLocalPath(String localPath,boolean isSecondary) {
+        String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + "  WHERE "
+                + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "' AND "
+                + KEY_SYNC_SECONDARY + " ='" + encrypt(String.valueOf(isSecondary)) + "'";
         db.execSQL(sql);
     }
 
@@ -877,16 +878,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
-    public void deleteSyncRecordByFingerprint(String oriFingerprint,String newFingerprint) {
+    public void deleteSyncRecordByFingerprint(String oriFingerprint,String newFingerprint,boolean isSecondary) {
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + "  WHERE "
                 + KEY_SYNC_FP_ORI + " = '" + encrypt(oriFingerprint) + "' OR "
-                + KEY_SYNC_FP_NEW + " = '" + encrypt(newFingerprint) + "'";
+                + KEY_SYNC_FP_NEW + " = '" + encrypt(newFingerprint) + "' AND "
+                + KEY_SYNC_SECONDARY + " ='" + encrypt(String.valueOf(isSecondary)) + "'";
         db.execSQL(sql);
     }
 
-    public void updateSyncRecordStatusByLocalPath(int status,String localPath) {
+    public void updateSyncRecordStatusByLocalPath(int status,String localPath,boolean isSecondary) {
         String sql = "UPDATE " + TABLE_SYNC_RECORDS + " SET " + KEY_SYNC_STATE + " = " + status + "  WHERE "
-                + KEY_SYNC_FILEPATH_ORI + " = '" + encrypt(localPath) + "'";
+                + KEY_SYNC_FILEPATH_ORI + " = '" + encrypt(localPath) + "' AND "
+                + KEY_SYNC_SECONDARY + " ='" + encrypt(String.valueOf(isSecondary)) + "'";
         db.execSQL(sql);
     }
 

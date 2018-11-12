@@ -22,7 +22,6 @@ import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +34,6 @@ import java.util.Queue;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
@@ -44,6 +42,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
@@ -117,6 +116,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     static CameraUploadsService cameraUploadsService;
     static String gSession;
+    private boolean isSec;
 
     public class Media {
         public String filePath;
@@ -396,7 +396,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void startParallelUpload(List<SyncRecord> finalList,boolean isCompressedVideo) {
         for (SyncRecord file : finalList) {
-            boolean isSec = file.isSecondary();
+            isSec = file.isSecondary();
             MegaNode parent;
             if (isSec) {
                 parent = secondaryUploadNode;
@@ -449,17 +449,22 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (file.isCopyOnly()) {
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),parent,file.getFileName(),this);
             } else {
-                megaApi.startUpload(path,parent,file.getFileName(),this);
+                File toUpload = new File(path);
+                if(toUpload.exists()) {
+                    megaApi.startUpload(path,parent,file.getFileName(),this);
+                } else {
+                    dbH.deleteSyncRecordByPath(path,isSec);
+                }
             }
         }
     }
 
     private void saveDataToDB(ArrayList<SyncRecord> list) {
         for (SyncRecord file : list) {
-            SyncRecord exist = dbH.recordExists(file);
+            SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(),file.isSecondary(),file.isCopyOnly());
             if (exist != null ){
                 if( exist.getTimestamp() < file.getTimestamp()) {
-                    dbH.deleteSyncRecordByLocalPath(exist.getLocalPath());
+                    dbH.deleteSyncRecordByLocalPath(exist.getLocalPath(),exist.isSecondary());
                 }else{
                     continue;
                 }
@@ -478,7 +483,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             } else {
                 File f = new File(file.getLocalPath());
                 if (!f.exists()) {
-                    dbH.deleteSyncRecordByLocalPath(file.getLocalPath());
+                    dbH.deleteSyncRecordByLocalPath(file.getLocalPath(),isSec);
                     continue;
                 }
             }
@@ -1279,9 +1284,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (e.getErrorCode() == MegaError.API_OK) {
                 MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
                 String fingerPrint = node.getFingerprint();
-                dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint);
+                boolean isSecondarty = node.getParentHandle() == secondaryUploadHandle;
+                dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint,isSecondarty);
             }
-            
             updateUpload();
         } else if (request.getType() == MegaRequest.TYPE_RENAME) {
             //No need to handle anything
@@ -1369,27 +1374,37 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (isOverquota) {
                 return;
             }
-
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Image Sync OK: " + transfer.getFileName() + " IMAGESYNCFILE: " + path);
                 MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                boolean isSecondary = (node.getParentHandle() == secondaryUploadHandle);
                 SyncRecord record = dbH.findSyncRecordByNewPath(path);
                 if(record != null){
                     String originalFingerprint = record.getOriginFingerprint();
                     megaApi.setOriginalFingerprint(node, originalFingerprint, this);
                 }else{
-                    record = dbH.findSyncRecordByLocalPath(path);
+                    record = dbH.findSyncRecordByLocalPath(path,isSecondary);
                 }
-                megaApi.setNodeCoordinates(node,record.getLatitude(),node.getLongitude(),null);
-                File file = new File(path);
-                if(file.exists()){
+                megaApi.setNodeCoordinates(node,record.getLatitude(),record.getLongitude(),null);
+
+                File src = new File(record.getLocalPath());
+                if(src.exists()){
                     log("Creating preview");
                     File previewDir = PreviewUtils.getPreviewFolder(this);
                     File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
-//                    megaApi.createPreview(path,preview.getAbsolutePath());
+                    megaApi.createThumbnail(record.getLocalPath(),thumb.getAbsolutePath());
+                    megaApi.createPreview(record.getLocalPath(),preview.getAbsolutePath());
+                }
+                //delete database record
+                dbH.deleteSyncRecordByPath(path,isSecondary);
+                //delete temp files
+                if(path.startsWith(tempRoot)) {
+                    File temp = new File(path);
+                    if (temp.exists()) {
+                        temp.delete();
+                    }
                 }
             } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
                 log("over quota error: " + e.getErrorCode());
@@ -1397,17 +1412,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 cancel();
             } else {
                 log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
-                deleteFromDBIfFileNotExist(path);
-            }
 
-            //delete database record
-            dbH.deleteSyncRecordByPath(path);
-            //delete temp files
-            if(path.startsWith(tempRoot)) {
-                File file = new File(path);
-                if (file.exists()) {
-                    file.delete();
-                }
             }
         }
         updateUpload();
@@ -1494,10 +1499,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         dbH.setSecSyncTimeStamp(secondaryTimeStamp);
     }
 
-    private void deleteFromDBIfFileNotExist(String path) {
+    private void deleteFromDBIfFileNotExist(String path,boolean isSecondary) {
         File f = new File(path);
         if (!f.exists()) {
-            dbH.deleteSyncRecordByPath(path);
+            dbH.deleteSyncRecordByPath(path,isSecondary);
         }
     }
 
@@ -1523,6 +1528,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    TL.log(this,"start compress at: " + Thread.currentThread().getName() );
                     mVideoCompressor.start();
                 }
             });
@@ -1567,31 +1573,34 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         showProgressNotification(progress,mPendingIntent,message,currentIndexString,"");
     }
 
-    public synchronized void onCompressSuccessful(String originalPath) {
-        log("compression successfully " + originalPath);
-        dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,originalPath);
+    public synchronized void onCompressSuccessful(SyncRecord record) {
+        log("compression successfully " + record.getLocalPath());
+        dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,record.getLocalPath(),record.isSecondary());
     }
 
-    public synchronized void onCompressFailed(String originalPath) {
-        log("compression failed " + originalPath);
+    public synchronized void onCompressFailed(SyncRecord record) {
+        log("compression failed " + record.getLocalPath());
     }
 
-    public synchronized void onCompressNotSupported(String originalPath,String newPath) {
-        log("compression failed " + originalPath);
+    public synchronized void onCompressNotSupported(SyncRecord record) {
+        String localPath = record.getLocalPath();
+        boolean isSecondary = record.isSecondary();
+        log("compression failed " + localPath);
         //file can not be compress will be uploaded directly?
-        File srcFile = new File(originalPath);
+        File srcFile = new File(localPath);
         if(srcFile.exists()) {
             StatFs stat = new StatFs(tempRoot);
             double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
             if (availableFreeSpace > srcFile.length()) {
+                String newPath = record.getNewPath();
                 File temp = new File(newPath);
-                dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,originalPath);
-                if(temp.exists()) {
+                dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,localPath,isSecondary);
+                if(newPath.startsWith(tempRoot) && temp.exists()) {
                     temp.delete();
                 }
             }
         } else {
-            dbH.deleteSyncRecordByLocalPath(originalPath);
+            dbH.deleteSyncRecordByLocalPath(localPath,isSecondary);
         }
     }
 
