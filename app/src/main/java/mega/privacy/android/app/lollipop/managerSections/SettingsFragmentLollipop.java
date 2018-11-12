@@ -1805,9 +1805,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);			
-			cameraUpload = !cameraUpload;			
+			cameraUpload = !cameraUpload;
 			
-			refreshCameraUploadsSettings(cameraUpload);
+			refreshCameraUploadsSettings();
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
 			log("KEY_PIN_LOCK_ENABLE");
@@ -2230,12 +2230,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	/**
 	 * Refresh the Camera Uploads service settings depending on the service status.
-	 * @param status Service status: TRUE if enabled or FALSE if disabled.
 	 */
-	private void refreshCameraUploadsSettings(boolean status) {
+	private void refreshCameraUploadsSettings() {
 		log("refreshCameraUploadsSettings");
 
-		if (status){
+		if (cameraUpload){
 			log("Camera ON");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				log("Lollipop version");
@@ -2633,8 +2632,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if (intent != null) {
 				switch (intent.getAction()) {
 					case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-						boolean status = intent.getBooleanExtra(CAMERA_UPLOADS_STATUS, false);
-						refreshCameraUploadsSettings(status);
+						cameraUpload = intent.getBooleanExtra(CAMERA_UPLOADS_STATUS, false);
+						refreshCameraUploadsSettings();
 						break;
 					case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
 						taskGetSizeOffline();
