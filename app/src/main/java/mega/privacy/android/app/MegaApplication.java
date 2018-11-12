@@ -77,10 +77,6 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import android.support.text.emoji.EmojiCompat;
-import android.support.text.emoji.FontRequestEmojiCompatConfig;
-import android.support.v4.provider.FontRequest;
-
 import static mega.privacy.android.app.utils.JobUtil.startJob;
 
 
@@ -391,7 +387,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
         
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+        if (Util.isDeviceSupportParallelUpload()) {
             startJob(getApplicationContext());
         }
 		

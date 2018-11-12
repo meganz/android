@@ -59,7 +59,7 @@ public class BootJobService extends JobService {
     
     // Check whether this job is currently scheduled.
     private boolean isScheduled(int id) {
-        JobScheduler js = getSystemService(JobScheduler.class);
+        JobScheduler js = (JobScheduler)getSystemService(Context.JOB_SCHEDULER_SERVICE);
         List<JobInfo> jobs = js.getAllPendingJobs();
         if (jobs == null) {
             return false;

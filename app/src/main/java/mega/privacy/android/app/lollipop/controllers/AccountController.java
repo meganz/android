@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.controllers;
 import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -495,13 +494,13 @@ public class AccountController implements View.OnClickListener{
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            if (Util.isDeviceSupportParallelUpload()) {
+                cancelAllJobs(context);
+            } else {
                 Intent stopIntent = null;
                 stopIntent = new Intent(context, CameraSyncService.class);
                 stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
                 context.startService(stopIntent);
-            } else {
-                cancelAllJobs(context);
             }
         }
         dbH.clearOffline();

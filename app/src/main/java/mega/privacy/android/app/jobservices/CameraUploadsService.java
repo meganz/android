@@ -43,7 +43,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
@@ -1528,7 +1527,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    TL.log(this,"start compress at: " + Thread.currentThread().getName());
                     mVideoCompressor.start();
                 }
             });
@@ -1653,7 +1651,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setOnlyAlertOnce(true);
 
             mNotification = mBuilderCompat.build();
-        } else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        } else {
             mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100,progressPercent,false)
                     .setContentIntent(pendingIntent)

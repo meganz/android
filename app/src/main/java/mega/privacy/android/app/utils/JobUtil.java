@@ -23,7 +23,7 @@ public class JobUtil {
     public static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
 
     public static boolean isJobScheduled(Context context,int id) {
-        JobScheduler js = context.getSystemService(JobScheduler.class);
+        JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
             List<JobInfo> jobs = js.getAllPendingJobs();
             for (JobInfo info : jobs) {
@@ -44,7 +44,7 @@ public class JobUtil {
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
-        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+        JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
             JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(PHOTOS_UPLOAD_JOB_ID,new ComponentName(context,CameraUploadsService.class));
             jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL);
@@ -58,14 +58,14 @@ public class JobUtil {
     }
 
     public static void cancelAllJobs(Context context) {
-        JobScheduler js = context.getSystemService(JobScheduler.class);
+        JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
             js.cancelAll();
         }
     }
 
     public static void cancelScheduledJob(Context context,int id) {
-        JobScheduler js = context.getSystemService(JobScheduler.class);
+        JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
             js.cancel(id);
         }

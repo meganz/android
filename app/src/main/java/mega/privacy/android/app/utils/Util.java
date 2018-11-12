@@ -2181,7 +2181,11 @@ public class Util {
     }
     
     public static boolean isDeviceSupportCompression(){
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    }
+    
+    public static boolean isDeviceSupportParallelUpload(){
+	    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
     
     public static void purgeDirectory(File dir) {

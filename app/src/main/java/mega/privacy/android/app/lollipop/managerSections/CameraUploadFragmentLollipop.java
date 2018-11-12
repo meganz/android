@@ -1461,10 +1461,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            context.startService(new Intent(context,CameraSyncService.class));
-        }  else {
+        if (Util.isDeviceSupportParallelUpload()) {
             startJob(context);
+        }  else {
+            context.startService(new Intent(context,CameraSyncService.class));
         }
 		
 		((ManagerActivityLollipop)context).refreshCameraUpload();
@@ -1490,13 +1490,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 			Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-				Intent stopIntent = null;
-				stopIntent = new Intent(context, CameraSyncService.class);
-				stopIntent.setAction(CameraSyncService.ACTION_STOP);
-				context.startService(stopIntent);
-			} else {
+			if (Util.isDeviceSupportParallelUpload()) {
                 cancelAllJobs(context);
+            } else {
+                Intent stopIntent = null;
+                stopIntent = new Intent(context, CameraSyncService.class);
+                stopIntent.setAction(CameraSyncService.ACTION_STOP);
+                context.startService(stopIntent);
             }
 			
 			((ManagerActivityLollipop)context).refreshCameraUpload();
@@ -1534,11 +1534,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
                                             @Override
                                             public void run() {
-                                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                                                    log("Now I start the service");
-                                                    context.startService(new Intent(context,CameraSyncService.class));
-                                                } else {
+                                                log("Now I start the service");
+                                                if (Util.isDeviceSupportParallelUpload()) {
                                                     startJob(context);
+                                                } else {
+                                                    context.startService(new Intent(context,CameraSyncService.class));
                                                 }
                                             }
                                         },5 * 1000);
@@ -1582,11 +1582,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
                         @Override
                         public void run() {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                                log("Now I start the service");
-                                context.startService(new Intent(context,CameraSyncService.class));
-                            } else {
+                            log("Now I start the service");
+                            if (Util.isDeviceSupportParallelUpload()) {
                                 startJob(context);
+                            } else {
+                                context.startService(new Intent(context,CameraSyncService.class));
                             }
                         }
                     },5 * 1000);

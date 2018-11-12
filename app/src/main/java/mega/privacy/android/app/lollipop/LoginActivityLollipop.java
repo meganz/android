@@ -486,17 +486,14 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         log("stopCameraSyncService");
         dbH.clearPreferences();
         dbH.setFirstTime(false);
-//					dbH.setPinLockEnabled(false);
-//					dbH.setPinLockCode("");
-//					dbH.setCamSyncEnabled(false);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (Util.isDeviceSupportParallelUpload()) {
+            cancelAllJobs(this);
+        } else {
             Intent stopIntent = null;
             stopIntent = new Intent(this, CameraSyncService.class);
             stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
             startService(stopIntent);
-        } else {
-            cancelAllJobs(this);
         }
     }
 
@@ -515,10 +512,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
-                    } else {
+                    if (Util.isDeviceSupportParallelUpload()) {
                         startJob(LoginActivityLollipop.this);
+                    } else {
+                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
                     }
                 }
             }, time);
@@ -613,7 +610,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
                     log("ACTION_CANCEL_CAM_SYNC");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    if (!Util.isDeviceSupportParallelUpload()) {
                         Intent tempIntent = null;
                         String title = null;
                         String text = null;
