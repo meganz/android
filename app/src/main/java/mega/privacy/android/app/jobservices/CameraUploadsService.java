@@ -23,6 +23,8 @@ import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +148,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        log("onStartJob");
+        Log.d("yuan","onStartJob");
         cameraUploadsService = this;
         globalParams = params;
         handler = new Handler();
@@ -159,7 +161,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 public void run() {
                     try {
                         int result = shouldRun();
-
+                        Log.d("yuan", "onStartJob should run result: " + result + "");
                         if (result == 0) {
                             startCameraUploads();
                         }
@@ -174,6 +176,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             return true;
         } catch (Exception e) {
             log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
+            finish();
         }
 
         return false;
@@ -191,6 +194,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void startCameraUploads() {
+        log("startCameraUploads");
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_title),mPendingIntent);
         startForeground(notificationId,mNotification);
         try {
@@ -361,7 +365,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void prepareUpload(Queue<Media> primaryList,Queue<Media> secondaryList,Queue<Media> primaryVideoList,Queue<Media> secondaryVideoList) {
-        log("prepareUpload");
+        log("prepareUpload primaryList " + primaryList.size() + " secondaryList " + secondaryList.size() + " primaryVideoList " + primaryVideoList.size() + " secondaryVideoList " + secondaryVideoList.size());
         pendingUploadsList = getPendingList(primaryList,false,false);
         saveDataToDB(pendingUploadsList);
         pendingVideoUploadsList = getPendingList(primaryVideoList,false,true);
@@ -380,6 +384,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         List<SyncRecord> finalList = dbH.findAllPendingSyncRecords();
 
         if (finalList.size() == 0) {
+            log("pending upload list is empty, now check view compression status");
             if (isCompressedVideoPending()) {
                 startVideoCompression();
             } else {
@@ -412,6 +417,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
                 while (ERROR_NOT_ENOUGH_SPACE.equals(newPath)) {
                     try {
+                        log("waiting for disk space to process");
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -419,6 +425,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
                     //show no space notification
                     if (megaApi.getNumPendingUploads() == 0) {
+                        log("stop service due to out of space issue");
                         stopForeground(true);
                         String title = getString(R.string.title_out_of_space);
                         String message = getString(R.string.error_not_enough_free_space);
@@ -447,10 +454,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
 
             if (file.isCopyOnly()) {
+                log("copy node " + file.getFileName());
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),parent,file.getFileName(),this);
             } else {
                 File toUpload = new File(path);
                 if (toUpload.exists()) {
+                    log("upload node " + path);
                     megaApi.startUpload(path,parent,file.getFileName(),this);
                 } else {
                     dbH.deleteSyncRecordByPath(path,isSec);
@@ -464,8 +473,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(),file.isSecondary(),file.isCopyOnly());
             if (exist != null) {
                 if (exist.getTimestamp() < file.getTimestamp()) {
+                    log("got newer time stamp");
                     dbH.deleteSyncRecordByLocalPath(exist.getLocalPath(),exist.isSecondary());
                 } else {
+                    log("duplicated sync records");
                     continue;
                 }
             }
@@ -477,12 +488,14 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             } else {
                 parent = cameraUploadNode;
             }
+            log("is Secondary " + isSec);
 
             if (file.isCopyOnly()) {
                 //file exist in other location, server will copy internally
             } else {
                 File f = new File(file.getLocalPath());
                 if (!f.exists()) {
+                    log("file does not exist, remove from DB");
                     dbH.deleteSyncRecordByLocalPath(file.getLocalPath(),isSec);
                     continue;
                 }
@@ -523,6 +536,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
             file.setFileName(fileName);
             file.setNewPath(tempRoot + System.nanoTime() + "." + extension);
+            log("file name is " + fileName + "temp path is " + file.getNewPath());
             dbH.saveSyncRecord(file);
         }
     }
@@ -579,15 +593,14 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (dbH.localPathExists(localPath,isSecondary,SyncRecord.TYPE_ANY)) {
                 continue;
             }
-            File file = new File(media.filePath);
-            String localFingerPrint = megaApi.getFingerprint(media.filePath);
-
-            MegaNode nodeExists = null;
-            MegaNodeList possibleNodeList;
+    
             //Source file
             File sourceFile = new File(media.filePath);
+            String localFingerPrint = megaApi.getFingerprint(media.filePath);
+            MegaNode nodeExists = null;
 
-            possibleNodeList = megaApi.getNodesByOriginalFingerprint(localFingerPrint,null);
+            //megaApi.getNodesByFingerprint()
+            ArrayList<MegaNode> possibleNodeList = megaApi.getNodesByFingerprint(localFingerPrint);
             if (possibleNodeList != null && possibleNodeList.size() > 0) {
                 nodeExists = possibleNodeList.get(0);
                 for (int i = 0;i < possibleNodeList.size();i++) {
@@ -668,33 +681,33 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 boolean photoAlreadyExists = false;
                 ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode,MegaApiJava.ORDER_ALPHABETICAL_ASC);
                 for (int i = 0;i < nL.size();i++) {
-                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp,media.filePath)) == 0) && (nL.get(i).getSize() == file.length())) {
+                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp,media.filePath)) == 0) && (nL.get(i).getSize() == sourceFile.length())) {
                         photoAlreadyExists = true;
                     }
                 }
 
                 if (!photoAlreadyExists) {
                     log("if (!photoAlreadyExists)");
-                    SyncRecord record = new SyncRecord(file.getAbsolutePath(),file.getName(),media.timestamp,isSecondary,type);
+                    SyncRecord record = new SyncRecord(sourceFile.getAbsolutePath(),sourceFile.getName(),media.timestamp,isSecondary,type);
                     if (shouldCompressVideo() && type == SyncRecord.TYPE_VIDEO) {
                         record.setStatus(STATUS_TO_COMPRESS);
                     }
-                    float gpsData[] = getGPSCoordinates(file.getAbsolutePath(),isVideo);
+                    float gpsData[] = getGPSCoordinates(sourceFile.getAbsolutePath(),isVideo);
                     record.setLatitude(gpsData[0]);
                     record.setLongitude(gpsData[1]);
                     record.setOriginFingerprint(localFingerPrint);
 
                     pendingList.add(record);
-                    log("MediaFinalName: " + file.getName());
+                    log("MediaFinalName: " + sourceFile.getName());
                 }
             } else {
                 log("NODE EXISTS: " + megaApi.getParentNode(nodeExists).getName() + " : " + nodeExists.getName());
                 if (megaApi.getParentNode(nodeExists).getHandle() != uploadNodeHandle) {
-                    SyncRecord record = new SyncRecord(nodeExists.getHandle(),file.getName(),true,media.filePath,media.timestamp,isSecondary,type);
+                    SyncRecord record = new SyncRecord(nodeExists.getHandle(),sourceFile.getName(),true,media.filePath,media.timestamp,isSecondary,type);
                     record.setOriginFingerprint(nodeExists.getOriginalFingerprint());
                     record.setNewFingerprint(nodeExists.getFingerprint());
                     pendingList.add(record);
-                    log("MediaFinalName: " + file.getName());
+                    log("MediaFinalName: " + sourceFile.getName());
                 } else {
                     if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
                         //Change the file names as device
@@ -1172,43 +1185,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         jobFinished(globalParams,true);
     }
 
-    private void showStorageOverQuotaNotification() {
-        log("showStorageOverQuotaNotification");
-
-        String contentText = getString(R.string.download_show_info);
-        String message = getString(R.string.overquota_alert_title);
-
-        Intent intent = new Intent(this,ManagerActivityLollipop.class);
-        intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setShowBadge(true);
-            channel.setSound(null,null);
-            mNotificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(mContext,notificationChannelId);
-
-            mBuilderCompatO
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false);
-
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilderCompatO.build());
-        } else {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false);
-
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.build());
-        }
-    }
-
     @Override
     public boolean onStopJob(JobParameters params) {
         log("onStopJob");
@@ -1489,11 +1465,13 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void updateCurrentTimeStamp(long timeStamp) {
+        log("updateCurrentTimeStamp " + timeStamp);
         currentTimeStamp = timeStamp;
         dbH.setCamSyncTimeStamp(currentTimeStamp);
     }
 
     private void updateSecondaryTimeStamp(long timeStamp) {
+        log("updateSecondaryTimeStamp " + timeStamp);
         secondaryTimeStamp = timeStamp;
         dbH.setSecSyncTimeStamp(secondaryTimeStamp);
     }
@@ -1521,7 +1499,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
-        log(totalPendingSizeInMB + "byte to Conversion");
+        log("total videos are " + fullList.size() + " " + totalPendingSizeInMB + "byte to Conversion");
 
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
             Thread t = new Thread(new Runnable() {
@@ -1532,6 +1510,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             });
             t.start();
         } else {
+            log("Compression queue bigger than setting, show notification to user.");
             stopForeground(true);
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
             intent.setAction(Constants.ACTION_SHOW_SETTINGS);
@@ -1558,6 +1537,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     @Override
     public void onInsufficientSpace() {
+        log("onInsufficientSpace");
         stopForeground(true);
         Intent intent = new Intent(this,ManagerActivityLollipop.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
@@ -1590,6 +1570,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             StatFs stat = new StatFs(tempRoot);
             double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
             if (availableFreeSpace > srcFile.length()) {
+                log("can not compress but got enough disk space, so should be un-supported format issue");
                 String newPath = record.getNewPath();
                 File temp = new File(newPath);
                 dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,localPath,isSecondary);
@@ -1603,13 +1584,16 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     public void onCompressFinished(String currentIndexString) {
+        log("onCompressFinished");
         if (!canceled) {
+            log("preparing to upload compressed video");
             ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(STATUS_PENDING));
             startParallelUpload(compressedList,true);
         }
     }
 
     private void showNotification(String title,String content,PendingIntent intent) {
+        log("showNotification");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
@@ -1630,6 +1614,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void showProgressNotification(int progressPercent,PendingIntent pendingIntent,String message,String subText,String contentText) {
+        log("showProgressNotification");
         mNotification = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1651,22 +1636,74 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setOnlyAlertOnce(true);
 
             mNotification = mBuilderCompat.build();
-        } else {
-            mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100,progressPercent,false)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(this,R.color.mega))
+                    .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentTitle(message)
-                    .setSubText(subText)
+                    .setOngoing(true).setContentTitle(message).setSubText(subText)
                     .setContentText(contentText)
                     .setOnlyAlertOnce(true);
+            mNotification = mBuilder.build();
+        } else {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setProgress(100, progressPercent, false)
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true).setContentTitle(message).setContentInfo(subText)
+                    .setContentText(contentText)
+                    .setOnlyAlertOnce(true);
+    
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            }
+    
             mNotification = mBuilder.getNotification();
         }
 
         mNotificationManager.notify(notificationId,mNotification);
     }
+    
+    private void showStorageOverQuotaNotification() {
+        log("showStorageOverQuotaNotification");
+        
+        String contentText = getString(R.string.download_show_info);
+        String message = getString(R.string.overquota_alert_title);
+        
+        Intent intent = new Intent(this,ManagerActivityLollipop.class);
+        intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null,null);
+            mNotificationManager.createNotificationChannel(channel);
+            
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(mContext,notificationChannelId);
+            
+            mBuilderCompatO
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentText(contentText)
+                    .setOngoing(false);
+            
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilderCompatO.build());
+        } else {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentText(contentText)
+                    .setOngoing(false);
+            
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.build());
+        }
+    }
 
     private void removeGPSCoordinates(String filePath) {
+        log("removeGPSCoordinates from path " + filePath);
         try {
             ExifInterface exif = new ExifInterface(filePath);
             exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE,"0/1,0/1,0/1000");
@@ -1682,8 +1719,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private String createTempFile(SyncRecord file) {
+        log("createTempFile");
         File srcFile = new File(file.getLocalPath());
         if (!srcFile.exists()) {
+            log(ERROR_SOURCE_FILE_NOT_EXIST);
             return ERROR_SOURCE_FILE_NOT_EXIST;
         }
 
@@ -1691,6 +1730,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             StatFs stat = new StatFs(tempRoot);
             double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
             if (availableFreeSpace <= srcFile.length()) {
+                log(ERROR_NOT_ENOUGH_SPACE);
                 return ERROR_NOT_ENOUGH_SPACE;
             }
         } catch (Exception ex) {
@@ -1704,6 +1744,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             removeGPSCoordinates(destPath);
         } catch (IOException e) {
             e.printStackTrace();
+            log(ERROR_CREATE_FILE_IO_ERROR);
             return ERROR_CREATE_FILE_IO_ERROR;
         }
         return destPath;
@@ -1722,6 +1763,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
 
         fileName = name + "_" + index + extension;
+        
+        log("getNoneDuplicatedDeviceFileName " + fileName);
         return fileName;
     }
 

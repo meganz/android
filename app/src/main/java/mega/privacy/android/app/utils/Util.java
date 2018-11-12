@@ -2189,12 +2189,14 @@ public class Util {
     }
     
     public static void purgeDirectory(File dir) {
+	    log("removing cache files ");
 	    if(!dir.exists()){
 	        return;
         }
         
 	    try{
             for (File file: dir.listFiles()) {
+                log("removing " + file.getAbsolutePath());
                 if (file.isDirectory()) {
                     purgeDirectory(file);
                 }
