@@ -63,13 +63,11 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	Handler handler;
 
-	float scaleH, scaleW;
-	float scaleText;
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
 
-	String choosenTypePin;
+	String chosenTypePin;
 
 	CoordinatorLayout coordinatorLayout;
 	MegaApiAndroid megaApi;
@@ -114,13 +112,37 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Intent intent = getIntent();
-		if ((intent != null) && (intent.getAction() != null)){
-			if (intent.getAction().equals(ACTION_SET_PIN_LOCK)){
-				mode=SET;
+//		dbH = new DatabaseHandler(this);
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		prefs = dbH.getPreferences();
+		att = dbH.getAttributes();
+		attemps = att.getAttemps();
+		log("onCreate Attemps number: "+attemps);
+
+		if (savedInstanceState != null) {
+			log("Bundle is NOT NULL");
+			mode = savedInstanceState.getInt("mode");
+			chosenTypePin = savedInstanceState.getString("chosenTypePin");
+			secondRound = savedInstanceState.getBoolean("isSecondRound");
+			if (secondRound) {
+				sbFirst.append(savedInstanceState.get("sbFirstString"));
 			}
-			else if(intent.getAction().equals(ACTION_RESET_PIN_LOCK)){
-				mode=RESET_UNLOCK;
+		}
+		else {
+			log("Bundle is NULL");
+
+			if (prefs != null) {
+				chosenTypePin = prefs.getPinLockType();
+			}
+
+			Intent intent = getIntent();
+			if ((intent != null) && (intent.getAction() != null)){
+				if (intent.getAction().equals(ACTION_SET_PIN_LOCK)){
+					mode=SET;
+				}
+				else if(intent.getAction().equals(ACTION_RESET_PIN_LOCK)){
+					mode=RESET_UNLOCK;
+				}
 			}
 		}
 
@@ -141,23 +163,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-	    scaleW = Util.getScaleW(outMetrics, density);
-	    scaleH = Util.getScaleH(outMetrics, density);
-
-	    if (scaleH < scaleW){
-	    	scaleText = scaleH;
-	    }
-	    else{
-	    	scaleText = scaleW;
-	    }
-
-//		dbH = new DatabaseHandler(this);
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		prefs = dbH.getPreferences();
-		att = dbH.getAttributes();
-		attemps = att.getAttemps();
-		log("onCreate Attemps number: "+attemps);
-
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_pin_lock);
 		coordinatorLayout = (CoordinatorLayout) findViewById(R.id.myCoordinatorLayout);
 		android.view.ViewGroup.LayoutParams coordinatorLayoutParams = coordinatorLayout.getLayoutParams();
@@ -174,7 +179,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		redLayout.setVisibility(View.GONE);
 
 		textLogout = (TextView) findViewById(R.id.alert_text);
-		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20));
 		//Margins
 		RelativeLayout.LayoutParams textLogoutParams = (RelativeLayout.LayoutParams)textLogout.getLayoutParams();
 		textLogoutParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0);
@@ -204,7 +209,13 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
 //		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
-		unlockText.setText(R.string.unlock_pin_title);
+
+		if (mode == RESET_SET) {
+			unlockText.setText(secondRound ? R.string.reset_pin_title_2 : R.string.reset_pin_title);
+		}
+		else {
+			unlockText.setText(secondRound ? R.string.unlock_pin_title_2 : R.string.unlock_pin_title);
+		}
 
 		if(mode!=SET){
 			logoutButton.setVisibility(View.VISIBLE);
@@ -258,12 +269,12 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		}
 
 		if (prefs != null){
-			if (prefs.getPinLockType() != null){
-				if(prefs.getPinLockType().equals(Constants.PIN_4)){
+			if (chosenTypePin != null){
+				if(chosenTypePin.equals(Constants.PIN_4)){
 					log("4 PIN");
 					add4DigitsPin();
 				}
-				else if(prefs.getPinLockType().equals(Constants.PIN_6)){
+				else if(chosenTypePin.equals(Constants.PIN_6)){
 					add6DigitsPin();
 				}
 				else{
@@ -884,8 +895,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		if ( pin != null){
 			dbH.setPinLockCode(pin);
-			if(choosenTypePin!=null){
-				dbH.setPinLockType(choosenTypePin);
+			if(chosenTypePin!=null){
+				dbH.setPinLockType(chosenTypePin);
 			}
 		}
 		PinUtil.update();
@@ -1120,7 +1131,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	 */
 	private void submitFormAlphanumeric(String code) {
 //		String code = sbSecond
-		choosenTypePin = Constants.PIN_ALPHANUMERIC;
+		chosenTypePin = Constants.PIN_ALPHANUMERIC;
 		switch(mode){
 			case UNLOCK:{
 				String codePref = prefs.getPinLockCode();
@@ -1311,7 +1322,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		final CheckedTextView pin4Check = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_4_check);
 		pin4Check.setText(getString(R.string.four_pin_lock));
-		pin4Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		pin4Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
 		pin4Check.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
 		ViewGroup.MarginLayoutParams pin4MLP = (ViewGroup.MarginLayoutParams) pin4Check.getLayoutParams();
 		pin4MLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
@@ -1319,14 +1330,14 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		final CheckedTextView pin6Check = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_6_check);
 		pin6Check.setText(getString(R.string.six_pin_lock));
-		pin6Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		pin6Check.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
 		pin6Check.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
 		ViewGroup.MarginLayoutParams pin6MLP = (ViewGroup.MarginLayoutParams) pin6Check.getLayoutParams();
 		pin6MLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
 
 		final CheckedTextView pinANCheck = (CheckedTextView) dialoglayout.findViewById(R.id.choose_pin_alphaN_check);
 		pinANCheck.setText(getString(R.string.AN_pin_lock));
-		pinANCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+		pinANCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
 		pinANCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
 		ViewGroup.MarginLayoutParams pinANMLP = (ViewGroup.MarginLayoutParams) pinANCheck.getLayoutParams();
 		pinANMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
@@ -1385,7 +1396,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	public void modeSetResetOn(String type)	{
 		log("modeSetResetOn");
-		choosenTypePin = type;
+		chosenTypePin = type;
 		mode=RESET_SET;
 
 		if(type.equals(Constants.PIN_4)){
@@ -1449,6 +1460,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 					moveTaskToBack(true);
 					break;
 				}
+				case RESET_UNLOCK:
+				case RESET_SET:
+					MegaApplication.setShowPinScreen(false);
 				default:
 					finish();
 			}
@@ -1456,6 +1470,13 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		else{
 			log("attemps MORE 10");
 			moveTaskToBack(false);
+		}
+	}
+
+	@Override
+	protected void onUserLeaveHint() {
+		if (mode != UNLOCK) {
+			finish();
 		}
 	}
 
@@ -1608,6 +1629,28 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		MegaApplication.activityResumed();
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+	}
+
+	@Override
+	protected void onDestroy() {
+		log("onDestroy");
+
+		MegaApplication.setShowPinScreen(isFinishing() ? true : false);
+
+		super.onDestroy();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		log("onSaveInstanceState");
+		super.onSaveInstanceState(outState);
+
+		outState.putInt("mode", mode);
+		outState.putString("chosenTypePin", chosenTypePin);
+		outState.putBoolean("isSecondRound", secondRound);
+		if (secondRound) {
+			outState.putString("sbFirstString", sbFirst.toString());
+		}
 	}
 
 	@Override

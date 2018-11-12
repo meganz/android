@@ -93,7 +93,8 @@
                         android:text="@string/save_to_mega"
                         android:textAlignment="center"
                         android:textSize="16sp"
-                        android:layout_toRightOf="@id/mega_imageview"/>
+                        android:layout_toRightOf="@id/mega_imageview"
+                        android:gravity="center"/>
 
                 </RelativeLayout>
 

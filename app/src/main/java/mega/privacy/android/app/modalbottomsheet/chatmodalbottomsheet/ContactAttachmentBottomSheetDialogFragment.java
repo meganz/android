@@ -178,6 +178,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         optionStartConversation.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
 
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+
         optionRemove.setVisibility(View.GONE);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -410,6 +412,14 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     addAvatarParticipantPanel(userHandle, email, name);
                 }
             }
+
+            if (optionInfo.getVisibility() == View.GONE && optionView.getVisibility() == View.GONE){
+                separatorInfo.setVisibility(View.GONE);
+            }
+            else {
+                separatorInfo.setVisibility(View.VISIBLE);
+            }
+
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
