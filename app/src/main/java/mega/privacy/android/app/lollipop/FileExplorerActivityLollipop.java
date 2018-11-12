@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -46,8 +47,12 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +63,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
@@ -68,6 +74,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -92,7 +99,12 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener {
-	
+
+	public final static int CLOUD_FRAGMENT = 0;
+	public final static int INCOMING_FRAGMENT = 1;
+	public final static int CHAT_FRAGMENT = 3;
+	public final static int IMPORT_FRAGMENT = 4;
+
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
@@ -124,6 +136,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	DatabaseHandler dbH = null;
 
+	AppBarLayout abL;
 	Toolbar tB;
     ActionBar aB;
 	DisplayMetrics outMetrics;
@@ -181,16 +194,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
 	private ChatExplorerFragment chatExplorer;
+	private ImportFilesFragment importFileFragment;
 
 	private AlertDialog newFolderDialog;
 	
 	ProgressDialog statusDialog;
-	
+
 	private List<ShareInfo> filePreparedInfos;
 
 	//Tabs in Cloud
 	TabLayout tabLayoutExplorer;
-	LinearLayout fileExplorerSectionLayout;
 	FileExplorerPagerAdapter mTabsAdapterExplorer;
 	ViewPager viewPagerExplorer;
 
@@ -204,6 +217,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	int deepBrowserTree = 0;
 
 	Intent intent = null;
+	boolean importFileF = false;
+	int importFragmentSelected = -1;
+	String action = null;
+    private android.support.v7.app.AlertDialog renameDialog;
+	HashMap<String, String> nameFiles = new HashMap<>();
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -257,8 +275,28 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
-			filePreparedInfos = info;			
-			onIntentProcessed();
+			filePreparedInfos = info;
+			if (action != null && getIntent() != null) {
+				getIntent().setAction(action);
+			}
+			if (importFileF) {
+				if (importFragmentSelected != -1) {
+					chooseFragment(importFragmentSelected);
+				}
+				else {
+					chooseFragment(IMPORT_FRAGMENT);
+				}
+
+				if (statusDialog != null) {
+					try {
+						statusDialog.dismiss();
+					}
+					catch(Exception ex){}
+				}
+			}
+			else {
+				onIntentProcessed();
+			}
 		}			
 	}
 	
@@ -298,12 +336,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("savedInstanceState -> parentHandleIncoming: "+parentHandleIncoming);
 			deepBrowserTree = savedInstanceState.getInt("deepBrowserTree", 0);
 			log("savedInstanceState -> deepBrowserTree: "+deepBrowserTree);
+			importFileF = savedInstanceState.getBoolean("importFileF", false);
+			importFragmentSelected = savedInstanceState.getInt("importFragmentSelected", -1);
+			action = savedInstanceState.getString("action", null);
+			nameFiles = (HashMap<String, String>) savedInstanceState.getSerializable("nameFiles");
 		}
 		else{
 			log("Bundle is NULL");
 			parentHandleCloud = -1;
 			parentHandleIncoming = -1;
 			deepBrowserTree = 0;
+			importFileF = false;
+			importFragmentSelected = -1;
+			action = null;
 		}
 				
 		dbH = DatabaseHandler.getDbHandler(this);
@@ -365,7 +410,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		setContentView(R.layout.activity_file_explorer);
 		
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_file_explorer);
-				
+
+		abL = (AppBarLayout) findViewById(R.id.app_bar_layout_explorer);
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
 		setSupportActionBar(tB);
@@ -381,7 +427,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		fabButton.setOnClickListener(this);
 		fabButton.setVisibility(View.GONE);
 		//TABS
-		fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
 		tabLayoutExplorer =  (TabLayout) findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);
 		viewPagerExplorer.setOffscreenPageLimit(3);
@@ -412,7 +457,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				MegaApplication.setLoggingIn(true);
 
 				getSupportActionBar().hide();
-				fileExplorerSectionLayout.setVisibility(View.GONE);
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
@@ -495,8 +541,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		aB.show();
 		log("aB.setHomeAsUpIndicator_65");
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
@@ -510,7 +555,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				selectFile = false;
 				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
-				aB.setTitle(getString(R.string.title_share_folder_explorer));
+				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 
@@ -524,13 +569,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-				if(fileExplorerSectionLayout!=null){
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
-				else{
-					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 
 				tabShown=NO_TABS;
 
@@ -558,13 +598,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-				if(fileExplorerSectionLayout!=null){
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
-				else{
-					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 
 				tabShown=NO_TABS;
 			}
@@ -593,13 +628,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-				if(fileExplorerSectionLayout!=null){
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
-				else{
-					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 
 				tabShown=NO_TABS;
 			}
@@ -610,10 +640,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = MOVE;
 					moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -651,10 +681,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = COPY;
 					copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -682,10 +711,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
 					mode = SELECT_CAMERA_FOLDER;
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -703,10 +732,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -724,10 +753,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = SELECT;
 					selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -745,7 +774,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = UPLOAD;
 					selectFile = false;
 
-					aB.setTitle(getString(R.string.title_cloud_explorer));
+					aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
 
 					cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 
@@ -759,13 +788,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-					if(fileExplorerSectionLayout!=null){
-						fileExplorerSectionLayout.setVisibility(View.GONE);
-					}
-					else{
-						fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-						fileExplorerSectionLayout.setVisibility(View.GONE);
-					}
+					tabLayoutExplorer.setVisibility(View.GONE);
+					viewPagerExplorer.setVisibility(View.GONE);
 
 					tabShown=NO_TABS;
 				}
@@ -786,30 +810,39 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 					if(isChatFirst){
-						aB.setTitle(getString(R.string.title_chat_explorer));
-						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-
-						if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
-							if (mTabsAdapterExplorer == null){
-								fileExplorerSectionLayout.setVisibility(View.VISIBLE);
-								viewPagerExplorer.setVisibility(View.VISIBLE);
-								mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
-								viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
-								tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
-							}
-						}
-					}
-					else{
-						aB.setTitle(getString(R.string.title_cloud_explorer));
+						aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						if (mTabsAdapterExplorer == null){
-							fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+							tabLayoutExplorer.setVisibility(View.VISIBLE);
 							viewPagerExplorer.setVisibility(View.VISIBLE);
-							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
+							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
 							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
 						}
+					}
+					else{
+						aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
+						importFileF = true;
+						action = intent.getAction();
+						cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+						ownFilePrepareTask.execute(getIntent());
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(this);
+							temp.setMessage(getString(R.string.upload_prepare));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+
+						cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+
+						tabLayoutExplorer.setVisibility(View.GONE);
+						viewPagerExplorer.setVisibility(View.GONE);
+						tabShown=NO_TABS;
 					}
 				}
 
@@ -831,12 +864,65 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
+	public void chooseFragment (int fragment) {
+		importFragmentSelected = fragment;
+		if (fragment == CLOUD_FRAGMENT) {
+			if(cDriveExplorer==null){
+				cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
+			}
+
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
+			ft.commitNow();
+		}
+		else if (fragment == INCOMING_FRAGMENT) {
+			if(iSharesExplorer==null){
+				iSharesExplorer = new IncomingSharesExplorerFragmentLollipop();
+			}
+
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.cloudDriveFrameLayout, iSharesExplorer, "iSharesExplorer");
+			ft.commitNow();
+		}
+		else if (fragment == CHAT_FRAGMENT) {
+			if(chatExplorer==null){
+				chatExplorer = new ChatExplorerFragment();
+			}
+
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.cloudDriveFrameLayout, chatExplorer, "chatExplorer");
+			ft.commitNow();
+		}
+		else if (fragment == IMPORT_FRAGMENT){
+			if(importFileFragment==null){
+				importFileFragment = new ImportFilesFragment();
+			}
+
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.cloudDriveFrameLayout, importFileFragment, "importFileFragment");
+			ft.commitNow();
+		}
+		supportInvalidateOptionsMenu();
+		changeTitle();
+	}
+
 	public void showFabButton(boolean show){
 		if(show){
 			fabButton.setVisibility(View.VISIBLE);
 		}
 		else{
 			fabButton.setVisibility(View.GONE);
+		}
+	}
+
+	public void changeActionBarElevation(boolean whitElevation){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (whitElevation) {
+				abL.setElevation(Util.px2dp(4, outMetrics));
+			}
+			else {
+				abL.setElevation(0);
+			}
 		}
 	}
 	
@@ -852,6 +938,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
 		createFolderMenuItem.setVisible(false);
+		newChatMenuItem.setVisible(false);
 
 //	    if(iSharesExplorer != null){
 //	    	if (iSharesExplorer.deepBrowserTree==0){
@@ -871,7 +958,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("onPrepareOptionsMenuLollipop");
 
 	    //Check the tab shown
-		if (viewPagerExplorer != null){
+		if (viewPagerExplorer != null && tabShown != NO_TABS){
 
 			int index = viewPagerExplorer.getCurrentItem();
 
@@ -978,11 +1065,50 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 
-		}else{
-			if (cDriveExplorer != null){
+		}
+		else{
+			if (cDriveExplorer != null && !importFileF){
 				createFolderMenuItem.setVisible(true);
 			}
-			newChatMenuItem.setVisible(false);
+			else if (importFileF) {
+				if (importFragmentSelected != -1 ) {
+					switch (importFragmentSelected) {
+						case CLOUD_FRAGMENT: {
+							createFolderMenuItem.setVisible(true);
+							break;
+						}
+						case INCOMING_FRAGMENT:{
+							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
+							if(iSharesExplorer != null && iSharesExplorer.isAdded()){
+								if (deepBrowserTree > 0) {
+									//Check the folder's permissions
+									long parentH = iSharesExplorer.getParentHandle();
+									MegaNode n = megaApi.getNodeByHandle(parentH);
+									int accessLevel= megaApi.getAccess(n);
+
+									switch(accessLevel){
+										case MegaShare.ACCESS_OWNER:
+										case MegaShare.ACCESS_READWRITE:
+										case MegaShare.ACCESS_FULL:{
+											createFolderMenuItem.setVisible(true);
+											break;
+										}
+										case MegaShare.ACCESS_READ:{
+											createFolderMenuItem.setVisible(false);
+											break;
+										}
+									}
+								}
+							}
+							break;
+						}
+						case CHAT_FRAGMENT:{
+							newChatMenuItem.setVisible(true);
+							break;
+						}
+					}
+				}
+			}
 		}
 	    return super.onPrepareOptionsMenu(menu);
 	}
@@ -1019,7 +1145,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void setRootTitle(){
 		log("setRootTitle");
 
-		if(mode==SELECT){
+		if(mode == SELECT){
 			if(selectFile){
 				if(multiselect){
 					String title = getResources().getQuantityString(R.plurals.plural_select_file, 10);
@@ -1031,14 +1157,36 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 			else{
-				aB.setTitle(getString(R.string.title_share_folder_explorer));
+				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 			}
 		}
 		else if(mode == MOVE || mode == COPY || mode == SELECT_CAMERA_FOLDER || mode == IMPORT){
-			aB.setTitle(getString(R.string.title_share_folder_explorer));
+			aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 		}
-		else if(mode==UPLOAD){
-			aB.setTitle(getString(R.string.title_cloud_explorer));
+		else if(mode == UPLOAD && !importFileF){
+			aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
+		}
+		else if (mode == UPLOAD && importFileF) {
+			if (importFragmentSelected != -1) {
+				switch (importFragmentSelected) {
+					case CLOUD_FRAGMENT: {
+						aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
+						break;
+					}
+					case INCOMING_FRAGMENT:{
+						aB.setTitle(getString(R.string.title_incoming_shares_explorer).toUpperCase());
+						break;
+					}
+					case CHAT_FRAGMENT:{
+						aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+						break;
+					}
+					case IMPORT_FRAGMENT:{
+						aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -1046,17 +1194,59 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("changeTitle");
 
 		if(tabShown==NO_TABS){
-			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
+			if (importFileF) {
+				if (importFragmentSelected != -1) {
+					switch (importFragmentSelected) {
+						case CLOUD_FRAGMENT: {
+							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 
-			if(cDriveExplorer!=null){
-				if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
-					setRootTitle();
-				}
-				else{
-					aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+							if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+								if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
+									setRootTitle();
+								}
+								else{
+									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+								}
+							}
+							break;
+						}
+						case INCOMING_FRAGMENT:{
+							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
+
+							if(iSharesExplorer!=null && iSharesExplorer.isAdded()){
+								if(deepBrowserTree==0){
+									setRootTitle();
+								}
+								else{
+									aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
+								}
+							}
+							break;
+						}
+						case CHAT_FRAGMENT:{
+							setRootTitle();
+							break;
+						}
+						case IMPORT_FRAGMENT:{
+							setRootTitle();
+							break;
+						}
+					}
 				}
 			}
-			fabButton.setVisibility(View.GONE);
+			else {
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
+
+				if(cDriveExplorer!=null){
+					if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
+						setRootTitle();
+					}
+					else{
+						aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+					}
+				}
+				fabButton.setVisibility(View.GONE);
+			}
 		}
 		else{
 			int position = viewPagerExplorer.getCurrentItem();
@@ -1073,7 +1263,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						if(((ChatExplorerFragment)f)!=null){
-							aB.setTitle(getString(R.string.title_chat_explorer));
+							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
 						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
@@ -1148,7 +1338,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						if(((ChatExplorerFragment)f)!=null){
-							aB.setTitle(getString(R.string.title_chat_explorer));
+							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
 						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
@@ -1206,11 +1396,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		bundle.putLong("parentHandleCloud", parentHandleCloud);
 		String cFTag1;
-		if(isChatFirst){
-			cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+		if (importFileF) {
+			cFTag1 = "iSharesExplorer";
 		}
-		else{
-			cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);
+		else {
+			if (isChatFirst) {
+				cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			}
+			else {
+				cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			}
 		}
 
 		iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
@@ -1223,6 +1418,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		bundle.putLong("parentHandleIncoming", parentHandleIncoming);
 		bundle.putInt("deepBrowserTree", deepBrowserTree);
 		log("IN BUNDLE -> deepBrowserTree: "+deepBrowserTree);
+
+		bundle.putBoolean("importFileF", importFileF);
+		bundle.putInt("importFragmentSelected", importFragmentSelected);
+		bundle.putString("action", action);
+		bundle.putSerializable("nameFiles", nameFiles);
 	}
 	
 	@Override
@@ -1289,10 +1489,41 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if(tabShown==NO_TABS){
 			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
+			importFileFragment = (ImportFilesFragment) getSupportFragmentManager().findFragmentByTag("importFileFragment");
 
-			if(cDriveExplorer!=null){
+			if (importFileF) {
+				switch (importFragmentSelected) {
+					case CLOUD_FRAGMENT: {
+						if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+							if (cDriveExplorer.onBackPressed() == 0){
+								chooseFragment(IMPORT_FRAGMENT);
+							}
+						}
+						break;
+					}
+					case INCOMING_FRAGMENT:{
+						if(iSharesExplorer!=null && iSharesExplorer.isAdded()){
+							if (iSharesExplorer.onBackPressed() == 0){
+								iSharesExplorer = null;
+								chooseFragment(IMPORT_FRAGMENT);
+							}
+						}
+						break;
+					}
+					case CHAT_FRAGMENT:{
+						if(chatExplorer!=null && chatExplorer.isAdded()){
+							chooseFragment(IMPORT_FRAGMENT);
+						}
+						break;
+					}
+					case IMPORT_FRAGMENT:{
+						finishActivity();
+						break;
+					}
+				}
+			}
+			else if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
 				if (cDriveExplorer.onBackPressed() == 0){
-//					super.onBackPressed();
 					finishActivity();
 				}
 			}
@@ -1307,6 +1538,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	 */
 	public void onIntentChatProcessed(List<ShareInfo> infos) {
 		log("onIntentChatProcessed");
+
+		if (getIntent() != null && getIntent().getAction() != ACTION_PROCESSED) {
+			getIntent().setAction(ACTION_PROCESSED);
+		}
 
 		if (infos == null) {
 			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
@@ -1438,11 +1673,15 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	public void onIntentProcessed() {
 		List<ShareInfo> infos = filePreparedInfos;
-		
+
+		if (getIntent() != null && getIntent().getAction() != ACTION_PROCESSED) {
+			getIntent().setAction(ACTION_PROCESSED);
+		}
+
 		if (statusDialog != null) {
-			try { 
-				statusDialog.dismiss(); 
-			} 
+			try {
+				statusDialog.dismiss();
+			}
 			catch(Exception ex){}
 		}
 		
@@ -1469,6 +1708,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					if (nameFiles != null && nameFiles.get(info.getTitle()) != null && !nameFiles.get(info.getTitle()).equals(info.getTitle())) {
+						intent.putExtra(UploadService.EXTRA_NAME_EDITED, nameFiles.get(info.getTitle()));
+					}
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
 					startService(intent);
@@ -1546,13 +1788,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					Bundle extras = intent.getExtras();
 					if(extras!=null){
 						if (!extras.containsKey(Intent.EXTRA_STREAM)) {
+							boolean isURL = false;
 							StringBuilder body = new StringBuilder();
-							String header = "[InternetShortcut]\n";
-							body.append(header);
-
 							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 							if (sharedText != null) {
-								body.append("URL=");
+								if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
+									isURL = true;
+									String header = "[InternetShortcut]\n";
+									body.append(header);
+
+									body.append("URL=");
+								}
 //								body.append(getString(R.string.new_file_content_when_uploading)+": ");
 								body.append(sharedText);
 							}
@@ -1576,7 +1822,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								parentNode = megaApi.getRootNode();
 							}
 
-							showNewFileDialog(parentNode,body.toString());
+							showNewFileDialog(parentNode,body.toString(), isURL);
 							return;
 						}
 					}
@@ -1691,9 +1937,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         snackbar.show();
     }
 
-    private void createFile(String name, String data, MegaNode parentNode){
-
-		File file = Util.createTemporalURLFile(name, data);
+    private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+		File file;
+		if (isURL){
+			file = Util.createTemporalURLFile(name, data);
+		}
+		else {
+			file = Util.createTemporalTextFile(name, data);
+		}
 		if(file!=null){
 			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
 
@@ -1767,7 +2018,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else if (tabShown == NO_TABS){
-			if (cDriveExplorer != null){
+			if (importFileF && importFragmentSelected != -1) {
+				switch (importFragmentSelected) {
+					case CLOUD_FRAGMENT: {
+						if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
+							parentHandle = cDriveExplorer.getParentHandle();
+						}
+						break;
+					}
+					case INCOMING_FRAGMENT: {
+						if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
+							parentHandle = iSharesExplorer.getParentHandle();
+						}
+						break;
+					}
+				}
+			}
+			else if (cDriveExplorer != null){
 				parentHandle = cDriveExplorer.getParentHandle();
 				log("1)cDriveExplorer != null: " + parentHandle);
 			}
@@ -1907,7 +2174,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}						
 				}
 				else if (tabShown == NO_TABS){
-					if (cDriveExplorer != null){
+					if (importFileF && importFragmentSelected != -1) {
+						switch (importFragmentSelected) {
+							case CLOUD_FRAGMENT: {
+								if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
+									cDriveExplorer.navigateToFolder(request.getNodeHandle());
+								}
+								break;
+							}
+							case INCOMING_FRAGMENT: {
+								if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
+									iSharesExplorer.navigateToFolder(request.getNodeHandle());
+								}
+								break;
+							}
+						}
+					}
+					else if (cDriveExplorer != null){
 						cDriveExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleCloud = request.getNodeHandle();
 					}
@@ -2131,8 +2414,36 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		{	
 			megaApi.removeGlobalListener(this);
 		}
+
+		File childThumbDir = new File(ThumbnailUtils.getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER);
+		if (childThumbDir != null){
+			if (childThumbDir.exists()){
+				try {
+					deleteFile(childThumbDir);
+				} catch (IOException e) {}
+			}
+		}
 		
 		super.onDestroy();
+	}
+
+	public void deleteFile(File file) throws IOException {
+		if (file.isDirectory()) {
+			if (file.list().length == 0) {
+				file.delete();
+			} else {
+				String[] files = file.list();
+				for (String temp : files) {
+					File deleteFile = new File(file, temp);
+					deleteFile(deleteFile);
+				}
+				if (file.list().length == 0) {
+					file.delete();
+				}
+			}
+		} else {
+			file.delete();
+		}
 	}
 
 	@Override
@@ -2436,13 +2747,18 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		switch(v.getId()) {
 			case R.id.fab_file_explorer: {
-				String chatTag1;
 
-				if(isChatFirst){
-					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				String chatTag1;
+				if (importFileF) {
+					chatTag1  ="chatExplorer";
 				}
-				else{
-					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				else {
+					if(isChatFirst){
+						chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					}
+					else{
+						chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+					}
 				}
 				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 				if(chatExplorer!=null && chatExplorer.isAdded()){
@@ -2528,7 +2844,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					statusDialog = temp;
 				}
 				else{
-//			onIntentProcessed();
+                    onIntentChatProcessed(filePreparedInfos);
 				}
 			}
 		}
@@ -2548,13 +2864,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				statusDialog = temp;
 			}
 			else{
-//			onIntentProcessed();
+				onIntentChatProcessed(filePreparedInfos);
 			}
 		}
 	}
 
-	public void showNewFileDialog(final MegaNode parentNode, final String data){
+	public void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL){
 		log("showNewFileDialog");
+
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2617,7 +2934,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_link_name));
+		if (isURL) {
+			input.setHint(getString(R.string.context_new_link_name));
+		}
+		else {
+			input.setHint(getString(R.string.context_new_file_name_hint));
+		}
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 
@@ -2640,7 +2962,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							input.requestFocus();
 
 						}else{
-							createFile(value, data, parentNode);
+							createFile(value, data, parentNode, isURL);
 							newFolderDialog.dismiss();
 						}
 					}
@@ -2661,7 +2983,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.dialog_title_new_link));
+		if (isURL) {
+			builder.setTitle(getString(R.string.dialog_title_new_link));
+		}
+		else {
+			builder.setTitle(getString(R.string.context_new_file_name));
+		}
 		builder.setPositiveButton(getString(R.string.cam_sync_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -2669,7 +2996,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (value.length() == 0) {
 							return;
 						}
-						createFile(value, data, parentNode);
+						createFile(value, data, parentNode, isURL);
 					}
 				});
 
@@ -2701,13 +3028,239 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 					}else{
-						createFile(value, data, parentNode);
+						createFile(value, data, parentNode, isURL);
 						newFolderDialog.dismiss();
 					}
 				}
 			}
 		});
 	}
+
+	public void changeName (String name, String rename) {
+		String[] params = {name, rename};
+		new ChangeNameTask().execute(params);
+    }
+
+    public class ChangeNameTask extends AsyncTask<String, Void, Void> {
+
+		HashMap<String, String> temp = new HashMap<>();
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			String name = strings[0];
+			String rename = strings[1];
+
+			if (importFileFragment != null && importFileFragment.isAdded()) {
+				HashMap<String, String> names = importFileFragment.getNameFiles();
+				Iterator it = names.entrySet().iterator();
+
+				while (it.hasNext()) {
+					Map.Entry entry = (Map.Entry) it.next();
+					if (entry.getKey().equals(name)) {
+						temp.put((String)entry.getKey(), rename);
+					}
+					else {
+						temp.put((String)entry.getKey(), (String)entry.getValue());
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			nameFiles = temp;
+			importFileFragment.setNameFiles(temp);
+			if (importFileFragment.adapter != null) {
+				importFileFragment.adapter.setImportNameFiles(temp);
+			}
+		}
+	}
+
+    public void showRenameDialog(final File document, final String text){
+        log("showRenameDialog");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+//	    layout.setLayoutParams(params);
+
+        final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isDirectory());
+//		input.setId(EDIT_TEXT_ID);
+        input.setSingleLine();
+        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+//		input.setHint(getString(R.string.context_new_folder_name));
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+        input.setText(text);
+        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(final View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (document.isDirectory()){
+                        input.setSelection(0, input.getText().length());
+                    }
+                    else{
+                        String [] s = text.split("\\.");
+                        if (s != null){
+
+                            int numParts = s.length;
+                            int lastSelectedPos = 0;
+                            if (numParts == 1){
+                                input.setSelection(0, input.getText().length());
+                            }
+                            else if (numParts > 1){
+                                for (int i=0; i<(numParts-1);i++){
+                                    lastSelectedPos += s[i].length();
+                                    lastSelectedPos++;
+                                }
+                                lastSelectedPos--; //The last point should not be selected)
+                                input.setSelection(0, lastSelectedPos);
+                            }
+                        }
+                        showKeyboardDelayed(v);
+                    }
+                }
+            }
+        });
+
+        layout.addView(input, params);
+
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+        final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
+        layout.addView(error_layout, params1);
+
+        final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
+        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
+        error_layout.addView(error_icon);
+        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        error_icon.setLayoutParams(params_icon);
+
+        error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
+
+        final TextView textError = new TextView(FileExplorerActivityLollipop.this);
+        error_layout.addView(textError);
+        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+        textError.setLayoutParams(params_text_error);
+
+        textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
+
+        error_layout.setVisibility(View.GONE);
+
+        input.getBackground().mutate().clearColorFilter();
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(error_layout.getVisibility() == View.VISIBLE){
+                    error_layout.setVisibility(View.GONE);
+                    input.getBackground().mutate().clearColorFilter();
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+        });
+
+        input.setOnEditorActionListener(new OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                                          KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    String value = v.getText().toString().trim();
+                    if (value.length() == 0) {
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        textError.setText(getString(R.string.invalid_string));
+                        error_layout.setVisibility(View.VISIBLE);
+                        input.requestFocus();
+
+                    }else{
+                        boolean result=matches(regex, value);
+                        if(result){
+                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            textError.setText(getString(R.string.invalid_characters));
+                            error_layout.setVisibility(View.VISIBLE);
+                            input.requestFocus();
+
+                        }
+                        else{
+                            changeName(document.getName(), value);
+//                            nC.renameNode(document, value);
+                            renameDialog.dismiss();
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
+        builder.setPositiveButton(getString(R.string.context_rename),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                input.getBackground().clearColorFilter();
+            }
+        });
+        builder.setView(layout);
+        renameDialog = builder.create();
+        renameDialog.show();
+        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String value = input.getText().toString().trim();
+
+                if (value.length() == 0) {
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    textError.setText(getString(R.string.invalid_string));
+                    error_layout.setVisibility(View.VISIBLE);
+                    input.requestFocus();
+                }
+                else{
+                    boolean result=matches(regex, value);
+                    if(result){
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        textError.setText(getString(R.string.invalid_characters));
+                        error_layout.setVisibility(View.VISIBLE);
+                        input.requestFocus();
+
+                    }
+                    else{
+                        changeName(document.getName(), value);
+//                        nC.renameNode(document, value);
+                        renameDialog.dismiss();
+                    }
+                }
+            }
+        });
+    }
 
 	public static boolean matches(String regex, CharSequence input) {
 		Pattern p = Pattern.compile(regex);
@@ -2772,4 +3325,15 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		deepBrowserTree--;
 	}
 
+	public List<ShareInfo> getFilePreparedInfos() {
+		return filePreparedInfos;
+	}
+
+	public void setNameFiles (HashMap<String, String> nameFiles) {
+		this.nameFiles = nameFiles;
+	}
+
+	public HashMap<String, String> getNameFiles () {
+		return nameFiles;
+	}
 }
