@@ -77,7 +77,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
@@ -129,7 +129,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	DisplayMetrics outMetrics;
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
-	MegaBrowserLollipopAdapter adapterList;
+	MegaNodeAdapter adapterList;
 
 	ImageView fileLinkIconView;
 	TextView fileLinkNameView;
@@ -1485,7 +1485,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						}
 
 						if (adapterList == null){
-							adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+							adapterList = new MegaNodeAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 						}
 						else{
 							adapterList.setParentHandle(parentHandle);
