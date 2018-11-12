@@ -199,8 +199,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean setAsRead = false;
 
-    boolean isOpeningChat = true;
-
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
     public long selectedMessageId = -1;
@@ -1027,7 +1025,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES) || intentAction.equals(Constants.ACTION_NEW_CHAT)) {
                             log("ACTION_CHAT_SHOW_MESSAGES or rotating a new chat");
-                            isOpeningChat = true;
 
                             String text = newIntent.getStringExtra("showSnackbar");
                             if(text!=null){
@@ -4504,8 +4501,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void fullHistoryReceivedOnLoad(){
         log("fullHistoryReceivedOnLoad");
 
-        isOpeningChat = false;
-
         if(bufferMessages.size()!=0){
             log("fullHistoryReceivedOnLoad:buffer size: "+bufferMessages.size());
             loadBufferMessages();
@@ -6580,7 +6575,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Update last seen position if different and there is unread messages
        //If the chat is being opened do not update, onLoad will do that
 
-        if(!isOpeningChat) {
+        if(!isLoadingHistory) {
+            log("Chat is NOT loading history");
             if(lastSeenReceived == true){
                long unreadCount = chatRoom.getUnreadCount();
                if (unreadCount != 0) {
@@ -6603,6 +6599,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                    //Check if it has no my messages after
                    positionLastMessage = positionLastMessage + 1;
                    AndroidMegaChatMessage message = messages.get(positionLastMessage);
+                   log("Position lastMessage found: "+positionLastMessage+" messages.size: "+messages.size());
 
                    while(message.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()){
                        lastIdMsgSeen = message.getMessage().getMsgId();
