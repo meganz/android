@@ -1567,7 +1567,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 							if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
 
-								if(sendOriginalAttachments){
+								if(sendOriginalAttachments || MimeTypeList.typeForName(info.getFileAbsolutePath()).isGIF()){
 									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 
 									//Add node to db
