@@ -65,6 +65,8 @@ public final class ChatAdvancedNotificationBuilder {
     private String notificationChannelNameChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_NAME;
     private String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
     private String notificationChannelNameChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
+    private String notificationChannelIdChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
+    private String notificationChannelNameChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
     private String notificationChannelIdInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelNameInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
     private String notificationChannelIdIncomingCall = Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
@@ -373,6 +375,8 @@ public final class ChatAdvancedNotificationBuilder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(true);
+            channel.enableVibration(false);
+            channel.setVibrationPattern(new long[]{ 0 });
             if (notificationManager != null){
                 notificationManager.createNotificationChannel(channel);
             }
@@ -693,7 +697,8 @@ public final class ChatAdvancedNotificationBuilder {
             if (!beep) {
                 NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
                 channel.setShowBadge(true);
-                channel.setVibrationPattern(null);
+                channel.enableVibration(false);
+                channel.setVibrationPattern(new long[]{ 0 });
                 if (notificationManager != null) {
                     notificationManager.createNotificationChannel(channel);
                 }
@@ -711,13 +716,45 @@ public final class ChatAdvancedNotificationBuilder {
 
                 return notificationBuilderO.build();
             } else {
-                NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSummary, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
-                channel.setShowBadge(true);
+                boolean vibrationEnabled = true;
+                ChatSettings chatSettings = dbH.getChatSettings();
+                if (chatSettings != null){
+                    if (chatSettings.getVibrationEnabled().compareTo("false") == 0){
+                        vibrationEnabled = false;
+                    }
+                }
+
+                NotificationChannel channel = null;
+                if (vibrationEnabled){
+                    channel = new NotificationChannel(notificationChannelIdChatSummary, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
+                    channel.setShowBadge(true);
+                }
+                else{
+                    channel = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate, notificationChannelNameChatSummaryNoVibrate, NotificationManager.IMPORTANCE_HIGH);
+                    channel.setShowBadge(true);
+                    channel.enableVibration(false);
+                    channel.setVibrationPattern(new long[] {0L});
+                }
+
                 if (notificationManager != null) {
+                    if (notificationManager.getNotificationChannel(notificationChannelIdChatSummary) != null){
+                        notificationManager.deleteNotificationChannel(notificationChannelIdChatSummary);
+                    }
+                    if (notificationManager.getNotificationChannel(notificationChannelIdChatSummaryNoVibrate) != null){
+                        notificationManager.deleteNotificationChannel(notificationChannelIdChatSummaryNoVibrate);
+                    }
+
                     notificationManager.createNotificationChannel(channel);
                 }
 
-                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
+                NotificationCompat.Builder notificationBuilderO = null;
+                if (vibrationEnabled){
+                    notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
+                }
+                else{
+                    notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryNoVibrate);
+                }
+
                 notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
 
                 notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify)
@@ -802,6 +839,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
+            channel.enableVibration(false);
+            channel.setVibrationPattern(new long[]{ 0 });
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
