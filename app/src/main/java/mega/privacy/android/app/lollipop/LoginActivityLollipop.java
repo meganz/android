@@ -213,8 +213,19 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
         switch (item.getItemId()){
             case android.R.id.home: {
-                if (loginFragment != null) {
-                    loginFragment.returnToLogin();
+                switch (visibleFragment) {
+                    case Constants.LOGIN_FRAGMENT: {
+                        if (loginFragment != null && loginFragment.isAdded()) {
+                            loginFragment.returnToLogin();
+                        }
+                        break;
+                    }
+                    case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
+                        if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
+                            chooseAccountFragment.onFreeClick(null);
+                        }
+                        break;
+                    }
                 }
                 break;
             }
@@ -285,7 +296,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     Window window = this.getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
                 }
                 break;
             }
@@ -306,6 +317,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
                 }
                 break;
+
             }
             case Constants.TOUR_FRAGMENT: {
                 log("Show TOUR_FRAGMENT");
@@ -586,7 +598,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 break;
             }
             case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
-                //nothing to do
+                if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
+                    chooseAccountFragment.onFreeClick(null);
+                }
                 break;
             }
         }
@@ -983,9 +997,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     public void showAB(Toolbar tB){
         setSupportActionBar(tB);
-        if (aB == null){
-            aB = getSupportActionBar();
-        }
+        aB = getSupportActionBar();
         aB.show();
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -994,7 +1006,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+            if (visibleFragment == Constants.LOGIN_FRAGMENT) {
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+            }
         }
     }
 

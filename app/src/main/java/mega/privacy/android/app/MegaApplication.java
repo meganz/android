@@ -19,9 +19,11 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.FontRequestEmojiCompatConfig;
+import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -43,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
@@ -86,7 +90,7 @@ import nz.mega.sdk.MegaUserAlert;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.1_213";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -102,6 +106,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
+
+	private static final boolean USE_BUNDLED_EMOJI = false;
 
 	private static boolean showInfoChatMessages = false;
 
@@ -513,11 +519,34 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-		if(Util.isChatEnabled()){
-			FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
-			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest);
-			EmojiCompat.init(configDF);
+//		if(Util.isChatEnabled()){}
+		EmojiManager.install(new TwitterEmojiProvider());
+
+		final EmojiCompat.Config config;
+		if (USE_BUNDLED_EMOJI) {
+			// Use the bundled font for EmojiCompat
+			config = new BundledEmojiCompatConfig(getApplicationContext());
+		} else {
+			// Use a downloadable font for EmojiCompat
+			final FontRequest fontRequest = new FontRequest(
+					"com.google.android.gms.fonts",
+					"com.google.android.gms",
+					"Noto Color Emoji Compat",
+					R.array.com_google_android_gms_fonts_certs);
+			config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
+					.setReplaceAll(false)
+					.registerInitCallback(new EmojiCompat.InitCallback() {
+						@Override
+						public  void onInitialized() {
+							Log.i(TAG, "EmojiCompat initialized");
+						}
+						@Override
+						public  void onFailed(@Nullable Throwable throwable) {
+							Log.e(TAG, "EmojiCompat initialization failed", throwable);
+						}
+					});
 		}
+		EmojiCompat.init(config);
 
 
 //		initializeGA();
