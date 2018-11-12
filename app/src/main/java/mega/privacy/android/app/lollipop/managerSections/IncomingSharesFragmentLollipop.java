@@ -59,8 +59,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -86,7 +85,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	CloudDriveAdapter adapter;
+	MegaNodeAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 	
 	NewHeaderItemDecoration headerItemDecoration;
@@ -125,7 +124,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -138,7 +137,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -171,7 +170,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
             }
         }
 
-        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
@@ -549,10 +548,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleIncoming == -1){
@@ -676,15 +675,15 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 //				adapterList.setNodes(nodes);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 //				adapterList.setNodes(nodes);
 			}
 
@@ -1602,9 +1601,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		log("setNodes");
 		this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 		} else {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 		}
 		adapter.setNodes(nodes);
 	}
