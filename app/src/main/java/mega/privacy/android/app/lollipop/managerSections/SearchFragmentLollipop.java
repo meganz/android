@@ -1356,13 +1356,16 @@ public class SearchFragmentLollipop extends Fragment{
 
 	public ArrayList<MegaNode> getNodes(){
 	    //remove the null placeholder.
-        CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
-	    for(MegaNode node : safeList) {
-	        if(node == null) {
-                safeList.remove(node);
-            }
-        }
-		return new ArrayList<>(safeList);
+		if (nodes != null) {
+			CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
+			for (MegaNode node : safeList) {
+				if (node == null) {
+					safeList.remove(node);
+				}
+			}
+			return new ArrayList<>(safeList);
+		}
+	    return null;
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){

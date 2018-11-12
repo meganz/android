@@ -80,14 +80,15 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
         String myEmail = megaApi.getMyUser().getEmail();
         File qrFile = null;
         if (getActivity().getExternalCacheDir() != null){
-            qrFile = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            File qrDir = new File (getActivity().getExternalCacheDir(), "qrMEGA");
+            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
         }
         else{
-            qrFile = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            File qrDir = getActivity().getDir("qrMEGA", 0);
+            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
         }
 
         if (qrFile != null && qrFile.exists()){
-
             ShareInfo info = ShareInfo.infoFromFile(qrFile);
             Intent intent = new Intent(getActivity().getApplicationContext(), UploadService.class);
             intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -96,6 +97,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
             intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
             intent.putExtra("qrfile", true);
             getActivity().startService(intent);
+            ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.save_qr_cloud_drive, qrFile.getName()));
         }
         else {
             ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.error_upload_qr));
