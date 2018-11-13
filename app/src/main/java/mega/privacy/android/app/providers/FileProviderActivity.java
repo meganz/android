@@ -157,7 +157,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	EditText et_user;
 	EditText et_password;
 	TextView bRegisterLol;
-	TextView bLoginLol;
+	Button bLoginLol;
 
 	RelativeLayout relativeLayout;
 	
@@ -583,7 +583,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		});
 
 		
-		bLoginLol = (TextView) findViewById(R.id.button_login_login);
+		bLoginLol = (Button) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
 
 		bLoginLol.setOnClickListener(this);
