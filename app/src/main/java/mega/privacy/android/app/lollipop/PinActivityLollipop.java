@@ -61,10 +61,6 @@ public class PinActivityLollipop extends BaseActivity {
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
-		
-		log("retryPendingConnections()");
-		megaApi.retryPendingConnections();
-
 
 		if(Util.isChatEnabled()){
 			if (megaChatApi == null){
