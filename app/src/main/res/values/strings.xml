@@ -42,6 +42,9 @@
 
     <string name="general_export" context="button">Export</string>
 
+    <string name="general_retry" context="Button to try retry some action">Retry</string>
+    <string name="general_open_browser" context="Button to open the default web browser">Open browser</string>
+
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     -->
@@ -287,7 +290,7 @@
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
     <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
-    
+
     <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Share Permissions</string>
     <string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
@@ -2244,6 +2247,9 @@
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
+
+    <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL certificate error</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public WiFi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 

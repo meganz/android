@@ -189,7 +189,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			log("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-				if (e.getErrorCode() == MegaError.API_ESID){
+				if (e.getErrorCode() == MegaError.API_EINCOMPLETE){
+					if (request.getParamType() == MegaError.API_ESSL) {
+						log("SSL verification failed");
+						Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED);
+						LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+					}
+				}
+				else if (e.getErrorCode() == MegaError.API_ESID){
 					log("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
 
@@ -684,7 +691,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			Log.d(TAG, "Database path: " + path);
 			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
-			
+
+			megaApiFolder.retrySSLerrors(true);
+
 			megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 			megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 		}
@@ -756,7 +765,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			Log.d(TAG, "Database path: " + path);
 			megaApi = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
-			
+
+			megaApi.retrySSLerrors(true);
+
 			megaApi.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 			megaApi.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 			
