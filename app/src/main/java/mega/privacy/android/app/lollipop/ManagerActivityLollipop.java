@@ -108,6 +108,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -3519,6 +3520,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 					setToolbarTitle();
 				}
+				case NOTIFICATIONS: {
+					if(notificFragment!=null && notificFragment.isAdded()){
+						notificFragment.setNotifications();
+					}
+				}
     		}
     	}
 	}
@@ -5134,6 +5140,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		fragmentContainer.setVisibility(View.VISIBLE);
 
+		ArrayList<MegaUserAlert> notifications = megaApi.getUserAlerts();
+		Collections.reverse(notifications);
+
 		if (notificFragment == null){
 			log("New NotificationsFragment");
 			notificFragment = new NotificationsFragmentLollipop();
@@ -5145,8 +5154,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("NotificationsFragment is not null");
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
-			ft.commitNow();
+			ft.commitNowAllowingStateLoss();
 		}
+
+		notificFragment.updateNotificationsView(notifications);
 
 		setToolbarTitle();
 
