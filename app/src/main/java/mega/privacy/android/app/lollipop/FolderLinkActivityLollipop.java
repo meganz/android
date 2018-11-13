@@ -77,7 +77,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
@@ -129,7 +129,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	DisplayMetrics outMetrics;
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
-	MegaBrowserLollipopAdapter adapterList;
+	MegaNodeAdapter adapterList;
 
 	ImageView fileLinkIconView;
 	TextView fileLinkNameView;
@@ -226,6 +226,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 
@@ -235,6 +236,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -370,8 +372,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			scaleText = scaleW;
 		}
 
+		handler = new Handler();
+
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
+		megaApiFolder.httpServerStop();
 		megaApi = app.getMegaApi();
 		megaApi.httpServerStop();
 
@@ -550,7 +555,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
 		fileLinkDownloadButton.setOnClickListener(this);
-		fileLinkDownloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		fileLinkDownloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
 		downloadTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
@@ -737,6 +742,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		handler.removeCallbacksAndMessages(null);
 
 		super.onDestroy();
 	}
@@ -845,7 +851,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
@@ -959,7 +965,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;
@@ -1480,7 +1486,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						}
 
 						if (adapterList == null){
-							adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+							adapterList = new MegaNodeAdapter(this, null, nodes, parentHandle, listView, aB, Constants.FOLDER_LINK_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 						}
 						else{
 							adapterList.setParentHandle(parentHandle);
@@ -1794,6 +1800,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
+					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
+					}
 					imageDrag = imageView;
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
@@ -1801,7 +1813,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1813,25 +1825,51 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApiFolder.httpServerIsRunning() == 0) {
-							megaApiFolder.httpServerStart();
-						}
+						String url;
+						if (dbH.getCredentials() != null) {
+							if (megaApi.httpServerIsRunning() == 0) {
+								megaApi.httpServerStart();
+							}
 
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-						}
-						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-						}
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
 
-						String url = megaApiFolder.httpServerGetLocalLink(file);
-						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+							url = megaApi.httpServerGetLocalLink(file);
+						}
+						else {
+							if (megaApiFolder.httpServerIsRunning() == 0) {
+								megaApiFolder.httpServerStart();
+							}
+
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
+
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
+
+							url = megaApiFolder.httpServerGetLocalLink(file);
+						}
+						if (url != null) {
+							log("FolderLink URL: "+url);
+							mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+						}
 					}
 					if (opusFile){
 						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
@@ -1879,25 +1917,51 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApiFolder.httpServerIsRunning() == 0) {
-							megaApiFolder.httpServerStart();
-						}
+						String url;
+						if (dbH != null && dbH.getCredentials() != null) {
+							if (megaApi.httpServerIsRunning() == 0) {
+								megaApi.httpServerStart();
+							}
 
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
 
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-						}
-						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-						}
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
 
-						String url = megaApiFolder.httpServerGetLocalLink(file);
-						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+							url = megaApi.httpServerGetLocalLink(file);
+						}
+						else {
+							if (megaApiFolder.httpServerIsRunning() == 0) {
+								megaApiFolder.httpServerStart();
+							}
+
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
+
+							if (mi.totalMem > Constants.BUFFER_COMP) {
+								log("Total mem: " + mi.totalMem + " allocate 32 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else {
+								log("Total mem: " + mi.totalMem + " allocate 16 MB");
+								megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
+
+							url = megaApiFolder.httpServerGetLocalLink(file);
+						}
+						if (url != null) {
+							log("FolderLink URL: "+url);
+							pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+						}
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("isFolderLink", true);

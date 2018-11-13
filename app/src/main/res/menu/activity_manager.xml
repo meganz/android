@@ -3,19 +3,19 @@
 
 	<item
 		android:id="@+id/action_search"
-		android:orderInCategory="100"
+		android:orderInCategory="85"
 		android:title="@string/action_search"
 		android:icon="@drawable/ic_menu_search"
 		MEGA:actionViewClass="android.support.v7.widget.SearchView"
-		MEGA:showAsAction="ifRoom|collapseActionView" />
+		MEGA:showAsAction="ifRoom|collapseActionView"/>
 
 	<item
 		android:id="@+id/action_grid_view_large_small"
-		android:orderInCategory="100"
+		android:orderInCategory="90"
 		android:title="@string/action_grid"
 		android:icon="@drawable/ic_menu_gridview"
-		MEGA:showAsAction="always"
-		android:visible="false" />
+		MEGA:showAsAction="ifRoom"
+		android:visible="false"/>
 
 	<item
 		android:id="@+id/action_play"
@@ -32,15 +32,6 @@
 		android:icon="@drawable/ic_pause_white"
 		MEGA:showAsAction="ifRoom"
 		android:visible="false" />
-
-	<!--     <item
-            android:id="@+id/action_search"
-            MEGA:actionViewClass="android.support.v7.widget.SearchView"
-            android:icon="@drawable/ic_menu_search"
-            android:orderInCategory="100"
-            MEGA:showAsAction="ifRoom|collapseActionView"
-            android:title="@string/action_search" />
-    -->
 
 	<item
 		android:id="@+id/action_menu_kill_all_sessions"
@@ -174,16 +165,7 @@
 		android:orderInCategory="120"
 		android:title="@string/action_grid"
 		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
-
-	<!--
-        <item
-            android:id="@+id/action_rubbish_bin"
-            android:orderInCategory="110"
-            android:showAsAction="never"
-            android:title="@string/section_rubbish_bin"
-            android:icon="@drawable/ic_menu_upload_here_dark"
-            MEGA:showAsAction="never" />-->
+		MEGA:showAsAction="always" />
 
 	<item
 		android:id="@+id/action_menu_refresh"

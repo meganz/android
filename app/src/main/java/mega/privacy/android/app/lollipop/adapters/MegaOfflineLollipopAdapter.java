@@ -487,7 +487,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 	    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    
-		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+		if (viewType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST){
 		
 			ViewHolderOfflineList holder = null;
 			
@@ -514,7 +514,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			v.setTag(holder);
 			
 			return holder;
-		}else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+		}else if (viewType == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID){
 			ViewHolderOfflineGrid holder = null;
 			
 			View v = inflater.inflate(R.layout.item_offline_grid, parent, false);
@@ -1112,7 +1112,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			case R.id.offline_grid_item_layout:{
 				int[] screenPosition = new int[2];
 				ImageView imageView;
-				if (getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+				if (getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
 					imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 				}
 				else {

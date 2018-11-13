@@ -87,7 +87,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -118,7 +117,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_download"
+                    android:src="@drawable/ic_b_save_to_device"
                     android:visibility="visible" />
 
                 <TextView
@@ -127,11 +126,17 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:text="@string/general_download"
+                    android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/option_revert_layout"
@@ -163,6 +168,14 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_revert"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/option_delete_layout"
