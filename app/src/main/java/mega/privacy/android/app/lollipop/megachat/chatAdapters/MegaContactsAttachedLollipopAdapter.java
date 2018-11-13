@@ -32,13 +32,11 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -49,7 +47,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -730,7 +727,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			selectedItems.put(pos, true);
 		}
 
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+		if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST){
 			log("adapter type is LIST");
 			MegaContactsAttachedLollipopAdapter.ViewHolderContactsList view = (MegaContactsAttachedLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){
@@ -784,7 +781,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 		notifyItemChanged(pos);
 
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+		if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
 			log("adapter type is LIST");
 			MegaContactsAttachedLollipopAdapter.ViewHolderContactsList view = (MegaContactsAttachedLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){
