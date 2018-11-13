@@ -1279,7 +1279,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             View view = getCurrentFocus();
             if (view != null) {
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                //inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
                 inputMethodManager.restartInput(view);
             }
         }

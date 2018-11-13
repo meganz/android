@@ -23,7 +23,8 @@
 				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
-				android:textAppearance="?android:attr/textAppearanceMedium"/>
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:theme="@style/ColorControlStyle"/>
 
 			<LinearLayout
 				android:id="@+id/administrator_text_layout"
@@ -64,7 +65,8 @@
 				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
-				android:textAppearance="?android:attr/textAppearanceMedium"/>
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:theme="@style/ColorControlStyle"/>
 
 			<LinearLayout
 				android:id="@+id/member_text_layout"
@@ -105,7 +107,8 @@
 				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
-				android:textAppearance="?android:attr/textAppearanceMedium"/>
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:theme="@style/ColorControlStyle"/>
 
 			<LinearLayout
 				android:id="@+id/observer_text_layout"

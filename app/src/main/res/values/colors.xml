@@ -177,4 +177,8 @@
     <color name="green_notif_contacts">#FF00897B</color>
 
     <color name="free_account">#2bb200</color>
+
+    <!-- DIALOGS -->
+    <color name="dialog_title">#FF333333</color>
+    <color name="dialog_text">#FF666666</color>
 </resources>
