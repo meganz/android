@@ -56,7 +56,7 @@
 				android:layout_marginLeft="18dp"
 				android:layout_marginRight="18dp"
 				android:layout_centerVertical="true"
-				android:inputType="textEmailAddress"
+				android:inputType="textEmailAddress|text"
 				android:textCursorDrawable="@drawable/cursor_color"
 				android:backgroundTint="@color/white"
 				android:singleLine="true"/>

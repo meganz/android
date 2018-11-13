@@ -28,7 +28,8 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_descending_check"
@@ -39,7 +40,8 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	    
 	    <TextView 
@@ -59,7 +61,8 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_oldest_check"
@@ -70,7 +73,8 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:theme="@style/ColorControlStyle"/>
 
 		<TextView 
 	        android:id="@+id/sortby_dialog_size_text"
@@ -89,7 +93,8 @@
 		    android:gravity="center_vertical"
 		    android:textAppearance="?android:attr/textAppearanceMedium"
 			android:fontFamily="sans-serif"
-			android:textColor="#de000000"/>
+			android:textColor="#de000000"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/sortby_dialog_smallest_first_check"
@@ -102,7 +107,7 @@
 			android:fontFamily="sans-serif"
 			android:textColor="#de000000"
 			android:layout_marginBottom="22dp"
-			/>
+			android:theme="@style/ColorControlStyle"/>
 
 	</LinearLayout>
 </ScrollView>

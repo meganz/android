@@ -51,7 +51,7 @@
                     android:textSize="16sp"
                     android:imeOptions="actionNext"
                     android:inputType="textEmailAddress"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
 
                 <RelativeLayout
                     android:layout_width="fill_parent"
@@ -94,7 +94,7 @@
                         android:layout_marginTop="24dp"
                         android:fontFamily="sans-serif"
                         android:inputType="textPassword"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
 
                     <ImageView
                         android:id="@+id/toggle_button"
@@ -257,7 +257,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_second_login"
@@ -269,7 +269,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_third_login"
@@ -281,7 +281,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fouth_login"
@@ -293,7 +293,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fifth_login"
@@ -305,7 +305,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_sixth_login"
@@ -317,7 +317,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/EditTextStyle" />
+                        android:theme="@style/ColorControlStyle" />
                 </LinearLayout>
 
                 <TextView

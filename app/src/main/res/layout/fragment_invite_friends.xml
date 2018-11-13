@@ -145,8 +145,9 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"
                                 android:hint="@string/contact_email"
+                                android:singleLine="true"
                                 android:inputType="textEmailAddress"
-                                android:theme="@style/EditTextStyle"/>
+                                android:theme="@style/ColorControlStyle"/>
 
                             <ImageView
                                 android:id="@+id/toggle_button_invite_mail"
