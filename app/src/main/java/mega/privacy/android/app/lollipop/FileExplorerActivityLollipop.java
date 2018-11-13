@@ -1567,7 +1567,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 							if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
 
-								if(sendOriginalAttachments){
+								if(sendOriginalAttachments || MimeTypeList.typeForName(info.getFileAbsolutePath()).isGIF()){
 									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 
 									//Add node to db
@@ -2551,12 +2551,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("Chat CREATED.");
 			//Update chat view
 			String chatTag1;
-
-			if(isChatFirst){
-				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			if (importFileF) {
+				chatTag1  ="chatExplorer";
 			}
-			else{
-				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			else {
+				if (isChatFirst) {
+					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				}
+				else {
+					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				}
 			}
 			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 			if(chatExplorer!=null && chatExplorer.isAdded()){

@@ -11,9 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -21,8 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 
 public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -114,7 +111,7 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
         for (int i=0; i<parent.getChildCount(); i++) {
             View child = parent.getChildAt(i);
             final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)child.getLayoutParams();
-            if(type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+            if(type == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
                 LEFT_OFFSET = 73;
             }else{
                 LEFT_OFFSET = 17;
@@ -127,7 +124,7 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
                 float y = bottom - (mTitleHeight - mTextHeight) / 2 - mTextBaselineOffset;
                 c.drawText(keys.get(params.getViewLayoutPosition()),x,y,mTextPaint);
 
-                if (i != 0 && type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+                if (i != 0 && type == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
                     bottom = top + mDivider.getIntrinsicHeight();
                     float leftOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
                     mDivider.setBounds((int)(left + leftOffset),top,right,bottom);
@@ -135,7 +132,7 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
                 }
             }
             else {
-                if (type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+                if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
                     top = child.getTop() - params.topMargin - mDivider.getIntrinsicHeight();
                     bottom = top + mDivider.getIntrinsicHeight();
                     float leftOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
@@ -145,7 +142,7 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
             }
             //Draw the separator for the last item.
             if(i == parent.getChildCount() -1) {
-				if (type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+				if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
 					float leftOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
 					mDivider.setBounds((int)(left + leftOffset),child.getBottom(),right,child.getBottom() + mDivider.getIntrinsicHeight());
 					mDivider.draw(c);

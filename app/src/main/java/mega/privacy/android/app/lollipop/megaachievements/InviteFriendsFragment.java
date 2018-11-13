@@ -276,6 +276,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	public void refreshKeyboard() {
 
 		String s = inputString;
+		int imeOptions = editTextMail.getImeOptions();
+
 		if (s != null) {
 			if (s.length() == 0 && !mails.isEmpty()){
 				editTextMail.setImeOptions(EditorInfo.IME_ACTION_SEND);
@@ -291,11 +293,13 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			editTextMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		}
 
-		View view = ((AchievementsActivity) context).getCurrentFocus();
-		if (view != null) {
-			InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-			//inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			inputMethodManager.restartInput(view);
+		int imeOptionsNew = editTextMail.getImeOptions();
+		if (imeOptions != imeOptionsNew) {
+			View view = ((AchievementsActivity) context).getCurrentFocus();
+			if (view != null) {
+				InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputMethodManager.restartInput(view);
+			}
 		}
 	}
 
