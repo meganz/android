@@ -71,7 +71,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                                 currentView.setVisibility(View.GONE);
                                 if (activity instanceof FullScreenImageViewerLollipop) {
                                     ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                                } else {
+                                } else if (activity instanceof AudioVideoPlayerLollipop){
                                     ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
                                 }
 
@@ -111,7 +111,8 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                                 currentView.setVisibility(View.GONE);
                                 if (activity instanceof FullScreenImageViewerLollipop) {
                                     ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                                } else {
+                                }
+                                else if (activity instanceof AudioVideoPlayerLollipop){
                                     ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
                                 }
 
@@ -151,7 +152,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                         public void onAnimationEnd(View view) {
                             if (activity instanceof FullScreenImageViewerLollipop) {
                                 ((FullScreenImageViewerLollipop) activity).setImageDragVisibility(View.VISIBLE);
-                            } else {
+                            } else if (activity instanceof AudioVideoPlayerLollipop) {
                                 ((AudioVideoPlayerLollipop) activity).setImageDragVisibility(View.VISIBLE);
                             }
 
