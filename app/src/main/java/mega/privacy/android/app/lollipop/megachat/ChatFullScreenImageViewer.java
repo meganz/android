@@ -142,6 +142,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		downloadIcon = menu.findItem(R.id.chat_full_image_viewer_download);
 		importIcon = menu.findItem(R.id.chat_full_image_viewer_import);
 		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
+        saveForOfflineIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
 		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
 
 //		Drawable drawable = importIcon.getIcon();
@@ -504,9 +505,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
-					fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
-				}
-			catch(Exception e){}
+				}catch(Exception e){}
+				fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 			}
 		}
 	}
@@ -534,7 +534,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		builder.setView(confirmationLayout);
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -568,6 +568,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
+		if (getIntent() != null) {
+			getIntent().putExtra("position", positionG);
+		}
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);

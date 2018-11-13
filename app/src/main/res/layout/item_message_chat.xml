@@ -70,7 +70,7 @@
                     android:layout_marginLeft="16dp"
                     android:visibility="gone"/>
 
-                <TextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/own_management_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                 android:background="@android:color/transparent">
 
                 <!-- text message-->
-                <mega.privacy.android.app.components.WrapEmojiconTextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_own_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/background_text_rich_link" >
 
-                        <mega.privacy.android.app.components.WrapEmojiconTextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_own_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -407,8 +407,7 @@
                             android:layout_width="152dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
-                            android:background="@drawable/gradient_chat_video" />
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait" />
 
                         <ImageView
                             android:id="@+id/video_icon_own_message_thumb_portrait"
@@ -540,7 +539,6 @@
                             android:layout_width="212dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@drawable/gradient_chat_video"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape" />
 
                         <ImageView
@@ -942,8 +940,8 @@
                         android:src="@drawable/ic_call_started"
                         android:visibility="gone"/>
 
-                    <TextView
-                        android:id="@+id/contact_management_message_text"
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/contact_management_message_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
@@ -994,7 +992,7 @@
                 </RelativeLayout>
 
                 <!-- text message-->
-                <mega.privacy.android.app.components.WrapEmojiconTextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -1021,7 +1019,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/contact_background_text_rich_link" >
 
-                        <mega.privacy.android.app.components.WrapEmojiconTextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_contact_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1189,8 +1187,7 @@
                             android:layout_width="152dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
-                            android:background="@drawable/gradient_chat_video" />
+                            android:layout_alignBottom="@+id/content_contact_message_thumb_portrait" />
 
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_portrait"
@@ -1272,8 +1269,7 @@
                             android:layout_width="212dp"
                             android:layout_height="30dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@drawable/gradient_chat_video" />
+                            android:layout_gravity="center_horizontal|center_vertical"/>
 
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_landscape"

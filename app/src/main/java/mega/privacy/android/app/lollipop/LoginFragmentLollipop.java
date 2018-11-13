@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,7 +42,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 
 import java.util.Locale;
 
@@ -91,7 +91,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private EditText et_user;
     private EditText et_password;
     private TextView bRegister;
-    private TextView bLogin;
+    private Button bLogin;
     private TextView bForgotPass;
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
@@ -191,6 +191,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean is2FAEnabled = false;
     private boolean accountConfirmed = false;
     private boolean pinLongClick = false;
+
+    private boolean twoFA = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -353,7 +355,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
-        bLogin = (TextView) v.findViewById(R.id.button_login_login);
+        bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
         bLogin.setOnClickListener(this);
 
@@ -467,7 +469,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
-        tB  =(Toolbar) v.findViewById(R.id.toolbar);
+        tB  =(Toolbar) v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
@@ -871,6 +873,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (intentReceived.getAction().equals(Constants.ACTION_REFRESH)){
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
+                    return v;
+                }
+                else if (intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING)){
+                    twoFA = true;
+                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+                    startFastLogin();
                     return v;
                 }
                 else if (intentReceived.getAction().equals(Constants.ACTION_ENABLE_CHAT)){
@@ -1620,7 +1628,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;
@@ -2075,6 +2083,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     log("(2) Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
 
+                    if (twoFA){
+                        intent.setAction(Constants.ACTION_REFRESH_STAGING);
+                        twoFA = false;
+                    }
+
                     startActivity(intent);
                     ((LoginActivityLollipop)context).finish();
                 }
@@ -2414,7 +2427,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
-                if (error.getErrorCode() == MegaError.API_ENOENT){
+                if (error.getErrorCode() == MegaError.API_ENOENT || error.getErrorCode() == MegaError.API_EKEY){
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
                 }
                 else{
@@ -2943,6 +2956,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
 
     }
 

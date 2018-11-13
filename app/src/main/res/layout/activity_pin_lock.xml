@@ -65,7 +65,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_second"
@@ -74,7 +75,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_third"
@@ -83,7 +85,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_fourth"
@@ -92,7 +95,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionDone"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
     </LinearLayout>
 
     <LinearLayout
@@ -112,7 +116,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_second"
@@ -121,7 +126,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_third"
@@ -130,7 +136,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_fourth"
@@ -139,7 +146,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_fifth"
@@ -148,7 +156,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_sixth"
@@ -157,7 +166,8 @@
             android:layout_gravity="left"
             android:imeOptions="actionDone"
             android:inputType="numberPassword"
-            android:maxLength="1" />
+            android:maxLength="1"
+            android:theme="@style/EditTextStyle" />
     </LinearLayout>
     
     <LinearLayout
@@ -178,7 +188,8 @@
             android:imeOptions="actionDone"
             android:textSize="16sp"
             android:fontFamily="sans-serif"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:theme="@style/EditTextStyle" />
         
     </LinearLayout>
 

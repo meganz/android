@@ -131,6 +131,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/separator_delete"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/divider_upgrade_account"/>
+
+            <LinearLayout
                 android:id="@+id/transfers_cancel_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
