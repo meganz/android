@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -22,13 +23,17 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,6 +51,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.components.dragger.DraggableView;
+import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -73,8 +80,23 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.TRANSPARENT;
 
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
+
+	boolean fromChatSavedInstance = false;
+	int[] screenPosition;
+	int mLeftDelta;
+	int mTopDelta;
+	float mWidthScale;
+	float mHeightScale;
+	public DraggableView draggableView;
+	public static int screenHeight;
+	int screenWidth;
+	RelativeLayout relativeImageViewerLayout;
+	ImageView ivShadow;
+	private Handler handler;
 
 	private DisplayMetrics outMetrics;
 
@@ -142,6 +164,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		downloadIcon = menu.findItem(R.id.chat_full_image_viewer_download);
 		importIcon = menu.findItem(R.id.chat_full_image_viewer_import);
 		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
+        saveForOfflineIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
 		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
 
 //		Drawable drawable = importIcon.getIcon();
@@ -282,11 +305,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		log("onCreate");
 		super.onCreate(savedInstanceState);
 
+		handler = new Handler();
 		fullScreenImageViewer = this;
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
+		screenHeight = outMetrics.heightPixels;
+		screenWidth = outMetrics.widthPixels;
 		float density  = getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
@@ -352,6 +378,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		setContentView(R.layout.activity_chat_full_screen_image_viewer);
 
+		draggableView.setViewAnimator(new ExitViewAnimator());
+
+		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
 		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
 		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
@@ -478,6 +507,91 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
+		if (savedInstanceState == null && adapterMega!= null){
+			ViewTreeObserver observer = viewPager.getViewTreeObserver();
+			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+				@Override
+				public boolean onPreDraw() {
+
+					viewPager.getViewTreeObserver().removeOnPreDrawListener(this);
+					int[] location = new int[2];
+					viewPager.getLocationOnScreen(location);
+
+					if (screenPosition != null){
+						mLeftDelta = screenPosition[0] - (screenPosition[2]/2) - location[0];
+						mTopDelta = screenPosition[1] - (screenPosition[3]/2) - location[1];
+
+						mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
+						mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
+					}
+					else {
+						mLeftDelta = (screenWidth/2) - location[0];
+						mTopDelta = (screenHeight/2) - location[1];
+
+						mWidthScale = (float) (screenWidth/4) / viewPager.getWidth();
+						mHeightScale = (float) (screenHeight/4) / viewPager.getHeight();
+					}
+
+					runEnterAnimation();
+
+					return true;
+				}
+			});
+		}
+		else {
+			fromChatSavedInstance = true;
+		}
+	}
+
+	public void runEnterAnimation() {
+		log("runEnterAnimation");
+		final long duration = 600;
+		if (aB != null && aB.isShowing()) {
+			if(tB != null) {
+				tB.animate().translationY(-220).setDuration(0)
+						.withEndAction(new Runnable() {
+							@Override
+							public void run() {
+								aB.hide();
+							}
+						}).start();
+				bottomLayout.animate().translationY(220).setDuration(0).start();
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			} else {
+				aB.hide();
+			}
+		}
+
+		fragmentContainer.setBackgroundColor(TRANSPARENT);
+		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
+		appBarLayout.setBackgroundColor(TRANSPARENT);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			fragmentContainer.setElevation(0);
+			relativeImageViewerLayout.setElevation(0);
+			appBarLayout.setElevation(0);
+
+		}
+
+		viewPager.setPivotX(0);
+		viewPager.setPivotY(0);
+		viewPager.setScaleX(mWidthScale);
+		viewPager.setScaleY(mHeightScale);
+		viewPager.setTranslationX(mLeftDelta);
+		viewPager.setTranslationY(mTopDelta);
+
+		ivShadow.setAlpha(0);
+
+		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+			@Override
+			public void run() {
+				showActionBar();
+				fragmentContainer.setBackgroundColor(BLACK);
+				relativeImageViewerLayout.setBackgroundColor(BLACK);
+				appBarLayout.setBackgroundColor(BLACK);
+			}
+		});
+
+		ivShadow.animate().setDuration(duration).alpha(1);
 	}
 
 	@Override
@@ -504,9 +618,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
-					fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
-				}
-			catch(Exception e){}
+				}catch(Exception e){}
+				fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 			}
 		}
 	}
@@ -534,7 +647,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		builder.setView(confirmationLayout);
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -568,6 +681,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
+		if (getIntent() != null) {
+			getIntent().putExtra("position", positionG);
+		}
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
@@ -956,4 +1072,82 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
+
+	@Override
+	public void setContentView(int layoutResID) {
+		super.setContentView(getContainer());
+		View view = LayoutInflater.from(this).inflate(layoutResID, null);
+		draggableView.addView(view);
+	}
+
+	private View getContainer() {
+		RelativeLayout container = new RelativeLayout(this);
+		draggableView = new DraggableView(this);
+		if (getIntent() != null) {
+			screenPosition = getIntent().getIntArrayExtra("screenPosition");
+			draggableView.setScreenPosition(screenPosition);
+		}
+		draggableView.setDraggableListener(this);
+		ivShadow = new ImageView(this);
+		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+		container.addView(ivShadow, params);
+		container.addView(draggableView);
+		return container;
+	}
+
+	@Override
+	public void onViewPositionChanged(float fractionScreen) {
+
+	}
+
+	@Override
+	public void onDragActivated(boolean activated) {
+		log("onDragActivated");
+
+		if (activated) {
+//			updateCurrentImage();
+			if (aB != null && aB.isShowing()) {
+				if(tB != null) {
+					tB.animate().translationY(-220).setDuration(0)
+							.withEndAction(new Runnable() {
+								@Override
+								public void run() {
+									aB.hide();
+								}
+							}).start();
+					bottomLayout.animate().translationY(220).setDuration(0).start();
+					getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				} else {
+					aB.hide();
+				}
+			}
+			fragmentContainer.setBackgroundColor(TRANSPARENT);
+			relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
+			appBarLayout.setBackgroundColor(TRANSPARENT);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fragmentContainer.setElevation(0);
+				relativeImageViewerLayout.setElevation(0);
+				appBarLayout.setElevation(0);
+
+			}
+			if (fromChatSavedInstance) {
+				draggableView.setCurrentView(null);
+			}
+			else {
+				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
+			}
+		}
+		else {
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+//					showActionBar();
+					fragmentContainer.setBackgroundColor(BLACK);
+					relativeImageViewerLayout.setBackgroundColor(BLACK);
+					appBarLayout.setBackgroundColor(BLACK);
+				}
+			}, 300);
+		}
+	}
 }

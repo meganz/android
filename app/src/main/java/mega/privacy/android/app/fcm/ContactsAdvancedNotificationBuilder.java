@@ -640,56 +640,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT);
     }
 
-    public void showSimpleNotification(){
-        log("showSimpleNotification");
-
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.ACTION_CHAT_SUMMARY);
-        intent.putExtra("CHAT_ID", -1);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
-            channel.setShowBadge(true);
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-            notificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
-            notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true).setTicker("Chat activity")
-                    .setContentTitle("Chat activity").setContentText("You may have new messages")
-                    .setOngoing(false)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
-
-            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
-        }
-        else {
-            mBuilderCompat = new NotificationCompat.Builder(context);
-
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-
-            mBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true).setTicker("Chat activity")
-                    .setContentTitle("Chat activity").setContentText("You may have new messages")
-                    .setOngoing(false);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.mega));
-            }
-
-            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
-        }
-    }
-
     public void showSimpleNotificationAPC(){
         log("showSimpleNotificationAPC");
 

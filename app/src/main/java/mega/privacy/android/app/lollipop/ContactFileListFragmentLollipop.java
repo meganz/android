@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -45,7 +46,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.Constants;
@@ -65,7 +66,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	MegaBrowserLollipopAdapter adapter;
+	MegaNodeAdapter adapter;
 	FloatingActionButton fab;
 	Stack<Long> parentHandleStack = new Stack<Long>();
     int currNodePosition = -1;
@@ -73,6 +74,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
     public void setCurrNodePosition(int currNodePosition) {
         this.currNodePosition = currNodePosition;
     }
+
+	Handler handler;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -171,6 +174,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			fab.setVisibility(View.GONE);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -180,6 +184,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -271,9 +276,16 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 		View v = null;
+		handler = new Handler();
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_file_list, container, false);
 
@@ -339,7 +351,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			if (adapter == null) {
-				adapter = new MegaBrowserLollipopAdapter(context, this, contactNodes, -1,listView, aB,Constants.CONTACT_FILE_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, contactNodes, -1,listView, aB,Constants.CONTACT_FILE_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 
 			} else {
 				adapter.setNodes(contactNodes);

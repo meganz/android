@@ -19,12 +19,12 @@ import nz.mega.sdk.MegaPricing;
 
 public class MyAccountInfo {
 
-    int usedPerc = 0;
+    int usedPerc = -1;
+    long usedStorage = -1;
     int accountType = -1;
     MegaAccountDetails accountInfo = null;
     BitSet paymentBitSet = null;
     long numberOfSubscriptions = -1;
-    long usedGbStorage = -1;
     String usedFormatted = "";
     String totalFormatted = "";
     String formattedUsedCloud = "";
@@ -43,8 +43,6 @@ public class MyAccountInfo {
 
     String firstNameText = "";
     String lastNameText = "";
-    boolean lastName = false;
-    boolean firstName = false;
     String firstLetter;
     String fullName = "";
 
@@ -85,6 +83,7 @@ public class MyAccountInfo {
     }
 
     public void setAccountDetails(){
+        log("setAccountDetails");
 
         if(accountInfo==null){
             log("Error because account info is NUll in setAccountDetails");
@@ -92,10 +91,9 @@ public class MyAccountInfo {
         }
 
         long totalStorage = accountInfo.getStorageMax();
-        long usedStorage = 0;
-        long usedCloudDrive = 0;
-        long usedInbox = 0;
-        long usedRubbish = 0;
+        long usedCloudDrive = -1;
+        long usedInbox = -1;
+        long usedRubbish = -1;
         long usedIncoming = 0;
         boolean totalGb = false;
 
@@ -132,7 +130,7 @@ public class MyAccountInfo {
 
         totalFormatted = Util.getSizeString(totalStorage);
 
-        usedStorage = usedCloudDrive+usedInbox+usedIncoming+usedRubbish;
+        usedStorage = accountInfo.getStorageUsed();
         usedFormatted=Util.getSizeString(usedStorage);
 
         usedPerc = 0;
@@ -147,39 +145,6 @@ public class MyAccountInfo {
         else{
             formattedAvailableSpace = Util.getSizeString(availableSpace);
         }
-
-
-//        totalStorage = ((totalStorage / 1024) / 1024) / 1024;
-//        totalFormatted="";
-//
-//        if (totalStorage >= 1024){
-//            totalStorage = totalStorage / 1024;
-//            totalFormatted = totalFormatted + totalStorage + " TB";
-//        }
-//        else{
-//            totalFormatted = totalFormatted + totalStorage + " GB";
-//            totalGb = true;
-//        }
-//
-//        usedStorage = ((usedStorage / 1024) / 1024) / 1024;
-//        usedFormatted="";
-//
-//        if(totalGb){
-//            usedGbStorage = usedStorage;
-//            usedFormatted = usedFormatted + usedStorage + " GB";
-//        }
-//        else{
-//            if (usedStorage >= 1024){
-//                usedGbStorage = usedStorage;
-//                usedStorage = usedStorage / 1024;
-//
-//                usedFormatted = usedFormatted + usedStorage + " TB";
-//            }
-//            else{
-//                usedGbStorage = usedStorage;
-//                usedFormatted = usedFormatted + usedStorage + " GB";
-//            }
-//        }
 
         accountDetailsFinished = true;
 
@@ -242,14 +207,6 @@ public class MyAccountInfo {
 
     public void setPaymentBitSet(BitSet paymentBitSet) {
         this.paymentBitSet = paymentBitSet;
-    }
-
-    public long getUsedGbStorage() {
-        return usedGbStorage;
-    }
-
-    public void setUsedGbStorage(long usedGbStorage) {
-        this.usedGbStorage = usedGbStorage;
     }
 
     public int getUsedPerc() {
@@ -374,14 +331,6 @@ public class MyAccountInfo {
         this.productAccounts = productAccounts;
     }
 
-    public boolean isFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(boolean firstName) {
-        this.firstName = firstName;
-    }
-
     public String getFirstNameText() {
         return firstNameText;
     }
@@ -389,14 +338,6 @@ public class MyAccountInfo {
     public void setFirstNameText(String firstNameText) {
         this.firstNameText = firstNameText;
         setFullName();
-    }
-
-    public boolean isLastName() {
-        return lastName;
-    }
-
-    public void setLastName(boolean lastName) {
-        this.lastName = lastName;
     }
 
     public String getLastNameText() {
@@ -572,4 +513,9 @@ public class MyAccountInfo {
     public void setPricing(MegaPricing pricing) {
         this.pricing = pricing;
     }
+
+    public long getUsedStorage() {
+        return usedStorage;
+    }
+
 }

@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -56,8 +55,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	LinearLayoutManager mLayoutManager;
 	MegaContactRequest selectedRequest = null;
 	
@@ -92,7 +89,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 			switch(item.getItemId()){
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -210,7 +207,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapterList.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -273,10 +270,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				adapterList.setContacts(contacts);
 			}
 
-			if (contacts.size() > 0) {
-				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
-			}
-
 			adapterList.setPositionClicked(-1);
 
 			if (adapterList.getItemCount() == 0) {
@@ -303,15 +296,24 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				emptyTextViewFirst.setText(result);
 
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			} else {
 				log("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+			}
+		}
+	}
+
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
 			}
 		}
 	}
@@ -352,23 +354,23 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.empty_text_contacts_requests);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.empty_text_contacts_requests_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_requests_list_content_text_layout);
-
-			contentText = (TextView) v.findViewById(R.id.contact_requests_list_content_text);
 
 			if (adapterList == null){
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
-			}
-
-			if (contacts.size() > 0) {
-				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
 			}
 		
 			adapterList.setPositionClicked(-1);
@@ -378,7 +380,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				log("adapterList.getItemCount() == 0");
 
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -406,7 +407,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			}else{
 				log("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -460,7 +460,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			List<MegaContactRequest> users = adapterList.getSelectedRequest();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{

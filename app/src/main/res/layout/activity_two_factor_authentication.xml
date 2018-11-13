@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container_2fa"
+    android:fitsSystemWindows="true"
     android:background="@color/camera_uploads_list_view">
 
     <android.support.v7.widget.Toolbar
@@ -15,7 +16,7 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextAppearance="@style/ToolbarTitle"
+        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".lollipop.TwoFactorAuthenticationActivity" />
 
@@ -419,7 +420,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle"/>
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_second"
@@ -430,7 +432,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_third"
@@ -441,7 +444,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_fourth"
@@ -452,7 +456,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_fifth"
@@ -463,7 +468,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_sixth"
@@ -474,7 +480,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
                 </LinearLayout>
 
                 <TextView
