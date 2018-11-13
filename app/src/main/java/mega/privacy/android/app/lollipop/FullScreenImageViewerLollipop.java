@@ -1171,7 +1171,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("handle: "+hash);
 					imageHandles.add(hash);
 
-					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi, isFileLink, currentDocument);
+					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
 					viewPager.setOnPageChangeListener(this);
@@ -1312,7 +1312,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi, false, null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 
 			viewPager.setAdapter(adapterMega);
 
@@ -1372,7 +1372,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi,false, null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 
 			viewPager.setAdapter(adapterMega);
 
@@ -1454,7 +1454,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi,false, null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 
 			viewPager.setAdapter(adapterMega);
 
@@ -3230,6 +3230,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}, 300);
 		}
+	}
+
+	public boolean isFolderLink () {
+		return isFolderLink;
+	}
+
+	public boolean isFileLink() {
+		return isFileLink;
+	}
+
+	public MegaNode getCurrentDocument() {
+		return currentDocument;
 	}
 
 	public void setSendToChat (boolean sendToChat) {
