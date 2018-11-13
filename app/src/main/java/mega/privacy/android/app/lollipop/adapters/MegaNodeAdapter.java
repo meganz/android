@@ -1024,6 +1024,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 //			holder.propertiesText.setText(R.string.general_folder_info);
             holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context));
 
+            holder.versionsIcon.setVisibility(View.GONE);
+
             if (type == Constants.FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context,megaApi));
                 if (!multipleSelect) {
@@ -1251,6 +1253,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 //			holder.propertiesText.setText(R.string.general_file_info);
             long nodeSize = node.getSize();
             holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+
+            if(megaApi.hasVersions(node)){
+                holder.versionsIcon.setVisibility(View.VISIBLE);
+            }
+            else{
+                holder.versionsIcon.setVisibility(View.GONE);
+            }
 
             if (!multipleSelect) {
                 log("Not multiselect");
