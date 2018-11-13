@@ -3302,37 +3302,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					megaApi.setAvatar(path, this);
 				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-    				log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+    				log("onPostResume: ACTION_CANCEL_CAM_SYNC");
+					String title = getString(R.string.cam_sync_syncing);
+					String text = getString(R.string.cam_sync_cancel_sync);
+
+					Intent tempIntent = null;
 					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-						Intent tempIntent = null;
-						String title = null;
-						String text = null;
-						if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-							tempIntent = new Intent(this, CameraSyncService.class);
-							tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-							title = getString(R.string.cam_sync_syncing);
-							text = getString(R.string.cam_sync_cancel_sync);
-						}
+						tempIntent = new Intent(this, CameraSyncService.class);
+						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+					}
 
-						final Intent cancelIntent = tempIntent;
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					final Intent cancelIntent = tempIntent;
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //					builder.setTitle(title);
-						builder.setMessage(text);
-
-						builder.setPositiveButton(getString(R.string.cam_sync_stop),
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int whichButton) {
+					builder.setMessage(text);
+					builder.setPositiveButton(getString(R.string.cam_sync_stop),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 										startService(cancelIntent);
 									}
-								});
-						builder.setNegativeButton(getString(R.string.general_cancel), null);
-						final AlertDialog dialog = builder.create();
-						try {
-							dialog.show();
-						} catch (Exception ex) {
-							startService(cancelIntent);
-						}
-					}
+									else {
+										if (megaApi != null) {
+											megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, managerActivity);
+										}
+
+										if (dbH == null){
+											dbH = DatabaseHandler.getDbHandler(managerActivity);
+										}
+
+										dbH.setCamSyncEnabled(false);
+									}
+
+									Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+									intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+									intent.putExtra(SettingsFragmentLollipop.CAMERA_UPLOADS_STATUS, false);
+									LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+								}
+					});
+					builder.setNegativeButton(getString(R.string.general_cancel), null);
+					final AlertDialog dialog = builder.create();
+					try {
+						dialog.show();
+					} catch (Exception ex) { }
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
     				log("onPostResume: intent show transfers");
@@ -13432,6 +13444,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         if(outSFLol != null && outSFLol.isAdded()){
                             outSFLol.refresh();
                         }
+
+                        if (sttFLol != null && sttFLol.isAdded()) {
+                        	sttFLol.taskGetSizeOffline();
+                        }
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13469,6 +13485,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							nC.deleteOffline(documents.get(i), pathNavigation);
 						}
 						updateOfflineView(documents.get(0));
+						if (sttFLol != null && sttFLol.isAdded()) {
+							sttFLol.taskGetSizeOffline();
+						}
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -16273,12 +16292,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setInboxNavigationDrawer();
 						}
 						moveToRubbish = false;
+						((MegaApplication) getApplication()).askForAccountDetails();
 					}
 					else if(restoreFromRubbish){
 						log("Not moved to rubbish");
 						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
 						showSnackbar(getString(R.string.context_correctly_node_restored, destination.getName()));
 						restoreFromRubbish = false;
+						((MegaApplication) getApplication()).askForAccountDetails();
 					}
 					else{
 						log("Not moved to rubbish");
@@ -16416,6 +16437,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				refreshAfterRemoving();
 				showSnackbar(getString(R.string.context_correctly_removed));
+				((MegaApplication) getApplication()).askForAccountDetails();
 			}
 			else{
 				showSnackbar(getString(R.string.context_no_removed));
@@ -16786,6 +16808,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
 									log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
 									megaApi.getContactLinksOption(this);
+								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
+									log("Change on CHANGE_TYPE_RUBBISH_TIME");
+									megaApi.getRubbishBinAutopurgePeriod(this);
 								}
 							}
 						}
