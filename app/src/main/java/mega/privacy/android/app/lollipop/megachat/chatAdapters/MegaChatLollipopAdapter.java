@@ -47,7 +47,6 @@ import com.shockwave.pdfium.PdfiumCore;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -798,7 +797,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             GradientDrawable shape = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, colors);;
             shape.setShape(GradientDrawable.RECTANGLE);
             shape.setCornerRadii(new float[]{radius, 0,radius,0,radius,radius,radius,radius});
-            shape.setStroke(0, null);
 
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
