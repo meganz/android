@@ -168,6 +168,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
 
     private MegaApiAndroid megaApi;
+    MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
     MegaPreferences prefs = null;
@@ -531,16 +532,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         handler = new Handler();
 
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
         if (!isOffline && !isZip){
             MegaApplication app = (MegaApplication)getApplication();
-            if (isFolderLink){
-                log("isFolderLink");
-                megaApi = app.getMegaApiFolder();
-            }
-            else{
-                log("NOT isFolderLink");
-                megaApi = app.getMegaApi();
-            }
+            megaApi = app.getMegaApi();
 
             log("Add transfer listener");
             megaApi.addTransferListener(this);
@@ -586,21 +584,45 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if (megaApi.httpServerIsRunning() == 0) {
-                    megaApi.httpServerStart();
+                if (isFolderLink) {
+                    megaApiFolder = app.getMegaApiFolder();
                 }
 
-                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                activityManager.getMemoryInfo(mi);
+                if (dbH != null && dbH.getCredentials() != null) {
+                    if (megaApi.httpServerIsRunning() == 0) {
+                        megaApi.httpServerStart();
+                    }
 
-                if(mi.totalMem>Constants.BUFFER_COMP){
-                    log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if(mi.totalMem>Constants.BUFFER_COMP){
+                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else{
+                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
                 }
-                else{
-                    log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                else if (isFolderLink) {
+                    if (megaApiFolder.httpServerIsRunning() == 0) {
+                        megaApiFolder.httpServerStart();
+                    }
+
+                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                    ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                    activityManager.getMemoryInfo(mi);
+
+                    if(mi.totalMem>Constants.BUFFER_COMP){
+                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                    }
+                    else{
+                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                        megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                    }
                 }
 
                 if (megaChatApi != null){
@@ -618,33 +640,62 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
 
-                if (savedInstanceState != null && uri.toString().contains("http://")){
+                if (savedInstanceState != null && uri.toString().contains("http://") && !isFolderLink){
                     MegaNode node = null;
                     if (fromChat) {
                         node = nodeChat;
                     }
-                    else if (adapterType == Constants.FILE_LINK_ADAPTER){
+                    else if (adapterType == Constants.FILE_LINK_ADAPTER) {
                         node = currentDocument;
                     }
                     else {
                         node = megaApi.getNodeByHandle(handle);
                     }
                     if (node != null){
-                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                        String url = megaApi.httpServerGetLocalLink(node);
+                        if (url != null) {
+                            uri = Uri.parse(url);
+                        }
                     }
                     else {
                         showSnackbar(getString(R.string.error_streaming));
                     }
-                }
-            }
 
-            log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
-            if(megaApi.getBandwidthOverquotaDelay()>0){
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
                 }
-                else if (!(alertDialogTransferOverquota.isShowing())) {
-                    showTransferOverquotaDialog();
+
+                if (isFolderLink){
+                    log("Folder link node");
+                    MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
+                    if (dbH == null){
+                        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+                    }
+                    if (currentDocumentAuth == null){
+                        log("CurrentDocumentAuth is null");
+                        showSnackbar(getString(R.string.error_streaming) + ": node not authorized");
+                    }
+                    else{
+                        log("CurrentDocumentAuth is not null");
+                        String url;
+                        if (dbH != null && dbH.getCredentials() != null) {
+                            url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
+                        }
+                        else {
+                            url = megaApiFolder.httpServerGetLocalLink(currentDocumentAuth);
+                        }
+                        if (url != null) {
+                            uri = Uri.parse(url);
+                        }
+                    }
+                }
+
+                log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+                if(megaApi.getBandwidthOverquotaDelay()>0){
+                    if(alertDialogTransferOverquota==null){
+                        showTransferOverquotaDialog();
+                    }
+                    else if (!(alertDialogTransferOverquota.isShowing())) {
+                        showTransferOverquotaDialog();
+                    }
                 }
             }
         }
@@ -655,10 +706,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             isUrl = false;
-        }
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
 
         if (isAbHide) {
@@ -897,62 +944,73 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
             else{
-                if (parentNodeHandle == -1){
-
-                    switch(adapterType){
-                        case Constants.FILE_BROWSER_ADAPTER:{
-                            parentNode = megaApi.getRootNode();
-                            break;
-                        }
-                        case Constants.RUBBISH_BIN_ADAPTER:{
-                            parentNode = megaApi.getRubbishNode();
-                            break;
-                        }
-                        case Constants.SHARED_WITH_ME_ADAPTER:{
-                            parentNode = megaApi.getInboxNode();
-                            break;
-                        }
-                        case Constants.FOLDER_LINK_ADAPTER:{
-                            parentNode = megaApi.getRootNode();
-                            break;
-                        }
-                        default:{
-                            parentNode = megaApi.getRootNode();
-                            break;
-                        }
+                ArrayList<MegaNode> nodes = null;
+                if (adapterType == Constants.FOLDER_LINK_ADAPTER) {
+                    if (parentNodeHandle == -1) {
+                        parentNode = megaApiFolder.getRootNode();
                     }
-
+                    else {
+                        parentNode = megaApiFolder.getNodeByHandle(parentNodeHandle);
+                    }
+                    if (parentNode != null) {
+                        nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
+                    }
                 }
-                else{
-                    parentNode = megaApi.getNodeByHandle(parentNodeHandle);
+                else {
+                    if (parentNodeHandle == -1) {
+                        switch (adapterType) {
+                            case Constants.FILE_BROWSER_ADAPTER: {
+                                parentNode = megaApi.getRootNode();
+                                break;
+                            }
+                            case Constants.RUBBISH_BIN_ADAPTER: {
+                                parentNode = megaApi.getRubbishNode();
+                                break;
+                            }
+                            case Constants.SHARED_WITH_ME_ADAPTER: {
+                                parentNode = megaApi.getInboxNode();
+                                break;
+                            }
+                            default: {
+                                parentNode = megaApi.getRootNode();
+                                break;
+                            }
+                        }
+
+                    }
+                    else {
+                        parentNode = megaApi.getNodeByHandle(parentNodeHandle);
+                    }
+                    if (parentNode != null) {
+                        nodes = megaApi.getChildren(parentNode, orderGetChildren);
+                    }
                 }
 
                 mediaHandles = new ArrayList<>();
-                ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 
                 int mediaNumber = 0;
-                for (int i=0;i<nodes.size();i++){
-                    MegaNode n = nodes.get(i);
-                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
-                            || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
-                        mediaHandles.add(n.getHandle());
-                        if (i == currentPosition){
-                            currentPosition = mediaNumber;
+                if (nodes != null) {
+                    for (int i = 0; i < nodes.size(); i++) {
+                        MegaNode n = nodes.get(i);
+                        if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
+                                || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
+                            mediaHandles.add(n.getHandle());
+                            if (i == currentPosition) {
+                                currentPosition = mediaNumber;
+                            }
+                            mediaNumber++;
                         }
-                        mediaNumber++;
                     }
                 }
 
-                if(mediaHandles.size() == 0)                    {
+                if(mediaHandles.size() == 0) {
                     finish();
                 }
 
-                if(currentPosition >= mediaHandles.size())
-                {
+                if(currentPosition >= mediaHandles.size()){
                     currentPosition = 0;
                 }
 
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 size = mediaHandles.size();
             }
 
@@ -1207,7 +1265,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 handle = -1;
             }
             else {
-                MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                MegaNode n;
+                if (isFolderLink) {
+                    n = megaApiFolder.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                }
+                else {
+                    n = megaApi.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                }
                 fileName = n.getName();
                 handle = n.getHandle();
             }
@@ -1366,7 +1430,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             getImageView(0, handle);
         }
         else {
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            MegaNode parentNode;
+            if (isFolderLink) {
+                parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+            }
+            else {
+                parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            }
             ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
@@ -1411,7 +1481,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             scrollToPosition(0, handle);
         }
         else {
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            MegaNode parentNode;
+            if (isFolderLink) {
+                parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(handle));
+            }
+            else {
+                parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
+            }
             ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
 
             for (int i=0; i<listNodes.size(); i++){
@@ -3367,6 +3443,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             megaApi.removeGlobalListener(this);
             megaApi.httpServerStop();
         }
+
+        if (megaApiFolder != null) {
+            megaApiFolder.httpServerStop();
+        }
+
         if (player != null){
             player.release();
         }
@@ -4198,7 +4279,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else {
                     MegaNode n;
                     for (int i = 0; i < mediaHandles.size(); i++) {
-                        n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                        if (isFolderLink) {
+                            n = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(mediaHandles.get(i)));
+                            if (n == null){
+                                n = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(mediaHandles.get(i)));
+                            }
+                        }
+                        else {
+                            n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                        }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
                         localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
@@ -4206,7 +4295,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;
                         }
-                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(n) != null && megaApi.getFingerprint(n).equals(megaApi.getFingerprint(localPath))))) {
+                        String nodeFingerPrint;
+                        String localPathFingerPrint;
+                        if (isFolderLink) {
+                            nodeFingerPrint = megaApiFolder.getFingerprint(n);
+                            localPathFingerPrint = megaApiFolder.getFingerprint(localPath);
+                        }
+                        else {
+                            nodeFingerPrint = megaApi.getFingerprint(n);
+                            localPathFingerPrint = megaApi.getFingerprint(localPath);
+                        }
+                        if (localPath != null && (isOnMegaDownloads || (nodeFingerPrint != null && nodeFingerPrint.equals(localPathFingerPrint)))) {
                             mediaFile = new File(localPath);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                 mediaUri = FileProvider.getUriForFile(audioVideoPlayerLollipop, "mega.privacy.android.app.providers.fileprovider", mediaFile);
@@ -4220,7 +4319,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         else {
-                            String url = megaApi.httpServerGetLocalLink(n);
+                            String url = null;
+                            if (dbH != null && dbH.getCredentials() != null) {
+                                url = megaApi.httpServerGetLocalLink(n);
+                            }
+                            else if (isFolderLink) {
+                                url = megaApiFolder.httpServerGetLocalLink(n);
+                            }
                             if (url != null) {
                                 mediaUri = Uri.parse(url);
                                 mediaUris.add(mediaUri);
