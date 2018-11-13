@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 import static android.media.MediaFormat.KEY_COLOR_FORMAT;
@@ -99,6 +100,7 @@ public class VideoCompressor {
 
     public void stop() {
         isRunning = false;
+        log("video compressor stopped");
     }
 
     public VideoCompressor(Context context) {
@@ -117,6 +119,7 @@ public class VideoCompressor {
     public void setPendingList(List<SyncRecord> pendingList) {
         this.pendingList = pendingList;
         totalCount = pendingList.size();
+        log("total compression videos count is " + totalCount);
         calculateTotalSize();
     }
 
@@ -124,6 +127,7 @@ public class VideoCompressor {
         for (int i = 0;i < totalCount;i++) {
             totalInputSize += new File(pendingList.get(i).getLocalPath()).length();
         }
+        log("total compression size is " + totalInputSize);
     }
 
     public long getTotalInputSize() {
@@ -159,6 +163,7 @@ public class VideoCompressor {
         for (int i = 0;i < totalCount && isRunning;i++) {
             currentFileIndex = i + 1;
             SyncRecord record = pendingList.get(i);
+            log("video compressor start: " + record.toString());
             String path = record.getLocalPath();
             File src = new File(path);
             long size = src.length();
@@ -649,7 +654,8 @@ public class VideoCompressor {
 
         int pendingAudioDecoderOutputBufferIndex = -1;
         boolean muxing = false;
-        while ((!videoEncoderDone) || (!audioEncoderDone)) {
+        while (((!videoEncoderDone) || (!audioEncoderDone)) && isRunning) {
+
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
@@ -826,9 +832,6 @@ public class VideoCompressor {
                 outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat);
                 muxer.start();
                 muxing = true;
-            }
-            if (!isRunning) {
-                break;
             }
             int percentage = (int)Math.round((double)totalRead / totalInputSize * 100);
             updater.onCompressUpdateProgress(percentage,currentFileIndex + "/" + totalCount);
@@ -1096,5 +1099,9 @@ public class VideoCompressor {
             }
         }
         return null;
+    }
+    
+    private static void log(String message){
+        Util.log("video compressor",message);
     }
 }
