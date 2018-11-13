@@ -2245,4 +2245,6 @@
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
 
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
+
 </resources>
