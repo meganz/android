@@ -89,7 +89,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -133,6 +132,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
+
+            <LinearLayout
                 android:id="@+id/contact_list_option_start_conversation_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -148,7 +155,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_start_chat"
+                    android:src="@drawable/ic_chat"
                     android:visibility="visible" />
 
                 <TextView
@@ -179,7 +186,8 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_send_file"
+                    android:tint="@color/black"
+                    android:src="@drawable/ic_w_send_to_contact"
                     android:visibility="visible" />
 
                 <TextView
@@ -254,6 +262,14 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_share"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/contact_list_option_remove_layout"

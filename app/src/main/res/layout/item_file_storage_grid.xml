@@ -21,15 +21,18 @@
             android:id="@+id/thumbnail_selected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_alignParentLeft="true"
             android:src="@drawable/media_select_ic"/>
 
-        <RelativeLayout
-            android:id="@+id/thumbnail_unselected"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/transparency_white">
-        </RelativeLayout>
+        <!--<RelativeLayout-->
+            <!--android:id="@+id/thumbnail_unselected"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="@color/transparency_white">-->
+        <!--</RelativeLayout>-->
 
     </RelativeLayout>
 

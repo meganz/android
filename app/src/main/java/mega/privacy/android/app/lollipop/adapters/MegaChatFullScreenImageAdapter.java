@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
@@ -302,7 +303,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		Bitmap preview = null;
 		Bitmap thumb = null;
 
-		if (isGIF(node.getName())){
+		if (MimeTypeList.typeForName(node.getName()).isGIF()){
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -612,18 +613,5 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		
-	}
-
-	public boolean isGIF(String name){
-
-		String s[] = name.split("\\.");
-
-		if (s != null){
-			if (s[s.length-1].equals("gif")){
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
