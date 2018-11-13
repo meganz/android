@@ -16,7 +16,7 @@
         android:imeOptions="actionDone"
         android:singleLine="true"
         android:textColor="@color/name_my_account"
-        android:theme="@style/EditTextStyle"/>
+        android:theme="@style/ColorControlStyle"/>
 
     <RelativeLayout
         android:id="@+id/autoaway_error"

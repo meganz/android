@@ -2,14 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/new_background_fragment"
+    android:background="@color/white"
     tools:context=".RubbishBinFragmentLollipop" >
     
    <RelativeLayout
         android:id="@+id/rubbishbin_grid_content_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="36dp"
-        android:background="@color/new_background_fragment">
+        android:background="@color/white">
 
 		   <TextView
 			   android:id="@+id/rubbishbin_grid_content_text"
