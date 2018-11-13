@@ -102,6 +102,20 @@ public class TransfersFragmentLollipop extends Fragment {
 		listView.setLayoutManager(mLayoutManager);
 		listView.setHasFixedSize(true);
 		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				if (listView != null) {
+					if (listView.canScrollVertically(-1)) {
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			}
+		});
 
 		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
 		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);

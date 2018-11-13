@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -19,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -59,8 +57,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     //Empty screen
     TextView emptyTextView;
-    LinearLayout emptyLayout;
-    TextView emptyTextViewInvite;
+    RelativeLayout emptyLayout;
     ImageView emptyImageView;
 
 //    boolean chatEnabled = true;
@@ -121,27 +118,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         listView.setLayoutManager(mLayoutManager);
 
-        emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_notifications);
-        emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_notifications_invite);
-        emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
+        emptyLayout = (RelativeLayout) v.findViewById(R.id.empty_layout_notifications);
+
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_notifications);
-
-        LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
-        emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
-
-        LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
-        emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
-        emptyTextView.setLayoutParams(emptyTextViewParams2);
-
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
-        emptyImageView.setOnClickListener(this);
-
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
-        }else{
-            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
-        }
+        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_notifications);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout_notifications);
 
@@ -154,13 +134,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         return fragment;
     }
 
-    public void setNotifications(){
-        log("setNotifications");
+    public void updateNotificationsView(ArrayList<MegaUserAlert> notifs) {
+        log("updateNotificationsView");
+
+        notifications = notifs;
 
         if(isAdded()) {
-            notifications = megaApi.getUserAlerts();
-
-            Collections.reverse(notifications);
 
             if (adapterList == null){
                 log("adapterList is NULL");
@@ -174,8 +153,17 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             listView.setAdapter(adapterList);
 
             if (notifications == null || notifications.isEmpty()) {
-                String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
+                listView.setVisibility(View.GONE);
+                emptyImageView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.VISIBLE);
 
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+                }else{
+                    emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+                }
+
+                String textToShow = String.format(getString(R.string.context_empty_notifications), getString(R.string.section_contacts));
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -184,16 +172,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 }
                 catch (Exception e){}
                 Spanned result = null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
                 } else {
                     result = Html.fromHtml(textToShow);
                 }
-
-                emptyTextViewInvite.setText(result);
-                emptyTextViewInvite.setVisibility(View.VISIBLE);
-                listView.setVisibility(View.GONE);
-                emptyLayout.setVisibility(View.VISIBLE);
+                emptyTextView.setText(result);
 
             } else {
                 log("number of notifications: "+notifications.size());
@@ -205,6 +189,16 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 megaApi.acknowledgeUserAlerts();
             }
         }
+    }
+
+    public void setNotifications(){
+        log("setNotifications");
+
+        notifications = megaApi.getUserAlerts();
+
+        Collections.reverse(notifications);
+
+        updateNotificationsView(notifications);
     }
 
     public void addNotification(MegaUserAlert newAlert){
@@ -391,12 +385,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         if(listView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        setNotifications();
     }
 
     public int getItemCount(){

@@ -20,6 +20,6 @@
 	    android:layout_below="@id/dialog_cancel_text" 
 	    android:hint="@string/hint_cancel_subscriptions"
 	    android:scrollHorizontally="false"
-	   android:theme="@style/EditTextStyle" />
+	   android:theme="@style/ColorControlStyle" />
     
 </RelativeLayout>
