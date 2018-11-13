@@ -842,13 +842,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 // Get the first visible item
 //                            int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
-                if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
-                    hideMessageJump();
-                }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
-                    if(newVisibility){
-                        showJumpMessage();
+                int lastPosition = messages.size()-1;
+                AndroidMegaChatMessage msg = messages.get(lastPosition);
+
+                while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
+                    lastPosition--;
+                    msg = messages.get(lastPosition);
+                }
+                if(lastPosition == (messages.size()-1)){
+                    //Scroll to end
+                    if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
+                        hideMessageJump();
+                    }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
+                        if(newVisibility){
+                            showJumpMessage();
+                        }
+                    }
+                }else{
+                    lastPosition++;
+                    if(lastPosition == (mLayoutManager.findLastVisibleItemPosition()-1)){
+                        hideMessageJump();
+                    }else if(lastPosition != (mLayoutManager.findLastVisibleItemPosition()-1)){
+                        if(newVisibility){
+                            showJumpMessage();
+                        }
                     }
                 }
+
+//                if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
+//                    hideMessageJump();
+//                }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
+//                    if(newVisibility){//
+//                        showJumpMessage();
+//                    }
+//                }
 
                 if(stateHistory!=MegaChatApi.SOURCE_NONE){
                     if (dy > 0) {
@@ -2635,7 +2662,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.message_jump_layout:{
-                log("onClick:jump to least");
                 goToEnd();
                 break;
             }
@@ -2759,7 +2785,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("State of the message: "+androidMsgSent.getMessage().getStatus());
             }
 
-            log("Index: "+index);
             if(index==-1){
                 //First element
                 log("First element!");
@@ -2787,9 +2812,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 index++;
                 log("Add in position: "+index);
-
                 messages.add(index, androidMsgSent);
-
                 infoToShow = adjustInfoToShow(index);
             }
 
@@ -4460,7 +4483,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("onMessageLoaded: Last message seen received!");
                         lastSeenReceived=true;
                         positionToScroll = 0;
-                        log("(1) positionToScroll: "+positionToScroll);
+                        log("positionToScroll: "+positionToScroll);
                     }
                 }
                 else{
@@ -4472,7 +4495,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(positionToScroll>=0){
                     positionToScroll++;
-                    log("(2)positionToScroll:increase: "+positionToScroll);
+                    log("positionToScroll:increase: "+positionToScroll);
                 }
 
                 bufferMessages.add(androidMsg);
@@ -4569,7 +4592,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         }else{
                             scrollToMessage(lastIdMsgSeen);
-
                         }
 
                     }
@@ -4593,7 +4615,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             pendingMessagesLoaded = true;
             loadPendingMessages();
             if(positionToScroll<=0){
-                log("positionToScroll is 0 - no unread messages");
                 mLayoutManager.scrollToPosition(messages.size());
             }
         }
@@ -4687,12 +4708,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(mLayoutManager.findLastCompletelyVisibleItemPosition()==messages.size()-1){
             log("Do scroll to end");
-
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
             if((emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())&&(messages.size()==1)){
-             mLayoutManager.scrollToPosition(messages.size());
+                mLayoutManager.scrollToPosition(messages.size());
             }
 
             log("DONT scroll to end");
@@ -5115,7 +5135,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 int scrollToP = appendMessagePosition(msg);
                 if(scrollToP!=-1){
                     if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
-                        log("modifyMessageReceived: need to scroll to position: "+indexToChange);
                         mLayoutManager.scrollToPosition(scrollToP+1);
                         //mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
                     }
@@ -5891,7 +5910,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 //getFlag - Returns true if it is a video-audio call or false for audio call
             }
             else{
-                log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
+                log("ERROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
                 showSnackbar(getString(R.string.call_error));
             }
         }
@@ -6602,6 +6621,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(!isLoadingHistory) {
             log("Chat is NOT loading history");
             if(lastSeenReceived == true){
+
                long unreadCount = chatRoom.getUnreadCount();
                if (unreadCount != 0) {
                    lastIdMsgSeen = megaChatApi.getLastMessageSeenId(idChat);
@@ -6622,6 +6642,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                    if(positionLastMessage==-1){
                        scrollToMessage(-1);
+
                    }
                    else{
                        //Check if it has no my messages after
@@ -6652,12 +6673,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                        scrollToMessage(-1);
                    }
                }
-           }
-
+            }
            setLastMessageSeen();
         }
         else{
-           log("onResume:openingChat:doNotUpdateLastMessageSeen");
+            log("onResume:openingChat:doNotUpdateLastMessageSeen");
         }
 
         activityVisible = true;
@@ -7061,9 +7081,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void goToEnd(){
+        log("goToEnd()");
+        int infoToShow = -1;
         int index = messages.size()-1;
-        final int indexToScroll = index+1;
-        mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
+
+        AndroidMegaChatMessage msg = messages.get(index);
+
+        while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
+            index--;
+            msg = messages.get(index);
+        }
+
+        if(index == (messages.size()-1)){
+            //Scroll to end
+            mLayoutManager.scrollToPositionWithOffset(index+1,Util.scaleHeightPx(20, outMetrics));
+        }else{
+            index++;
+            infoToShow = adjustInfoToShow(index);
+            if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
+                mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
+            }else{
+                mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(20, outMetrics));
+            }
+        }
         hideMessageJump();
     }
 
