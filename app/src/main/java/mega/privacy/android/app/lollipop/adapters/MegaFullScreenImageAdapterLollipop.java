@@ -34,7 +34,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
@@ -65,11 +67,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
 	private ArrayList<Long> pendingFullImages = new ArrayList<Long>();
-	
+
+	MegaApiAndroid megaApiFolder;
 	MegaApiAndroid megaApi;
 	Context context;
 	boolean isFileLink = false;
 	MegaNode fileLink = null;
+	boolean isFolderLink = false;
 
 	String downloadLocationDefaultPath = Util.downloadDIR;
 	DatabaseHandler dbH;
@@ -308,14 +312,15 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 	
 	// constructor
-	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi, boolean isFileLink, MegaNode fileLink) {
+	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
 		this.activity = activity;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
 		this.megaFullScreenImageAdapter = this;
 		this.context = context;
-		this.isFileLink = isFileLink;
-		this.fileLink = fileLink;
+		this.isFileLink = ((FullScreenImageViewerLollipop) context).isFileLink();
+		this.fileLink = ((FullScreenImageViewerLollipop) context).getCurrentDocument();
+		this.isFolderLink = ((FullScreenImageViewerLollipop) context).isFolderLink();
 
 		dbH = DatabaseHandler.getDbHandler(context);
 
@@ -357,6 +362,18 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
         log ("instantiateItem POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
+		if (isFolderLink){
+			MegaApplication app = (MegaApplication) ((FullScreenImageViewerLollipop) context).getApplication();
+			megaApiFolder = app.getMegaApiFolder();
+			MegaNode nodeAuth = megaApiFolder.authorizeNode(node);
+			if (nodeAuth == null) {
+				nodeAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(imageHandles.get(position)));
+				node = nodeAuth;
+			}
+			else {
+				node = nodeAuth;
+			}
+		}
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
@@ -387,7 +404,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		if ((node == null) && isFileLink) {
 			log("isFileLink");
 
-			if (isGIF(fileLink.getName())) {
+			if (MimeTypeList.typeForName(fileLink.getName()).isGIF()) {
 				holder.isGIF = true;
 				holder.imgDisplay.setVisibility(View.GONE);
 				holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -458,7 +475,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			}
 		}
 		else {
-			if (isGIF(node.getName())) {
+			if (MimeTypeList.typeForName(node.getName()).isGIF()) {
 				holder.isGIF = true;
 				holder.imgDisplay.setVisibility(View.GONE);
 				holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -497,30 +514,54 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 				else {
 					holder.progressBar.setVisibility(View.VISIBLE);
+                    if (dbH == null) {
+                        dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                    }
+                    String url = null;
+                    if (dbH != null && dbH.getCredentials() != null) {
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                        }
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
+                        if (mi.totalMem > Constants.BUFFER_COMP) {
+                            log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else {
+                            log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+                        url = megaApi.httpServerGetLocalLink(node);
+                    }
+                    else if (isFolderLink){
+                        if (megaApiFolder.httpServerIsRunning() == 0) {
+                            megaApiFolder.httpServerStart();
+                        }
 
-					if (mi.totalMem > Constants.BUFFER_COMP) {
-						log("Total mem: " + mi.totalMem + " allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else {
-						log("Total mem: " + mi.totalMem + " allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
 
-					String url = megaApi.httpServerGetLocalLink(node);
+                        if (mi.totalMem > Constants.BUFFER_COMP) {
+                            log("Total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else {
+                            log("Total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+                        url = megaApiFolder.httpServerGetLocalLink(node);
+                    }
+
 					if (url != null) {
 						final ProgressBar pb = holder.progressBar;
 
 						if (drawable != null) {
-							Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							Glide.with(context).load(Uri.parse(url)).listener(new RequestListener<Uri, GlideDrawable>() {
 								@Override
 								public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
 									return false;
@@ -534,7 +575,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 							}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 						}
 						else {
-							Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							Glide.with(context).load(Uri.parse(url)).listener(new RequestListener<Uri, GlideDrawable>() {
 								@Override
 								public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
 									return false;
@@ -885,18 +926,5 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
-	}
-
-	public boolean isGIF(String name){
-
-		String s[] = name.split("\\.");
-
-		if (s != null){
-			if (s[s.length-1].equals("gif")){
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

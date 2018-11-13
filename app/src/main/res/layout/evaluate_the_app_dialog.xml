@@ -18,7 +18,8 @@
             android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
             android:ellipsize="marquee"
             android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:theme="@style/ColorControlStyle"/>
 
         <CheckedTextView
             android:id="@+id/send_feedback"
@@ -27,7 +28,8 @@
             android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
             android:ellipsize="marquee"
             android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:theme="@style/ColorControlStyle"/>
 
     </LinearLayout>
 </ScrollView>
