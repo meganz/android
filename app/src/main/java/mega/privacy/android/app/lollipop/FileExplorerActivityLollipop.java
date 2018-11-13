@@ -2781,55 +2781,51 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		this.chatListItems = chatListItems;
 
 		if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
-			if ("text/plain".equals(intent.getType())) {
+			Bundle extras = intent.getExtras();
+			if ("text/plain".equals(intent.getType()) && extras != null && !extras.containsKey(Intent.EXTRA_STREAM)) {
 				log("Handle intent of text plain");
-				Bundle extras = intent.getExtras();
-				if (extras != null) {
-					if (!extras.containsKey(Intent.EXTRA_STREAM)) {
-						StringBuilder body = new StringBuilder();
-						String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-						if (sharedText2 != null) {
-							body.append(getString(R.string.new_file_subject_when_uploading) + ": ");
-							body.append(sharedText2);
-						}
-						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-						if (sharedText != null) {
-							if(body.length()>0){
-								body.append("\n");
-							}
-							body.append(getString(R.string.new_file_content_when_uploading) + ": ");
-							body.append(sharedText);
-						}
-						String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
-						if (sharedText3 != null) {
-							if(body.length()>0){
-								body.append("\n");
-							}
-							body.append(getString(R.string.new_file_email_when_uploading) + ": ");
-							body.append(sharedText3);
-						}
-
-						for(int i=0; i < chatListItems.size();i++){
-							megaChatApi.sendMessage(chatListItems.get(i).getChatId(), body.toString());
-						}
-
-						if(chatListItems.size()==1){
-							MegaChatListItem chatItem = chatListItems.get(0);
-							long idChat = chatItem.getChatId();
-							if(chatItem!=null){
-								Intent intent = new Intent(this, ManagerActivityLollipop.class);
-								intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-								intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-								intent.putExtra("CHAT_ID", idChat);
-								startActivity(intent);
-							}
-						}
-						else{
-							Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
-							chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
-							startActivity(chatIntent);
-						}
+				StringBuilder body = new StringBuilder();
+				String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+				if (sharedText2 != null) {
+					body.append(getString(R.string.new_file_subject_when_uploading) + ": ");
+					body.append(sharedText2);
+				}
+				String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+				if (sharedText != null) {
+					if(body.length()>0){
+						body.append("\n");
 					}
+					body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+					body.append(sharedText);
+				}
+				String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
+				if (sharedText3 != null) {
+					if(body.length()>0){
+						body.append("\n");
+					}
+					body.append(getString(R.string.new_file_email_when_uploading) + ": ");
+					body.append(sharedText3);
+				}
+
+				for(int i=0; i < chatListItems.size();i++){
+					megaChatApi.sendMessage(chatListItems.get(i).getChatId(), body.toString());
+				}
+
+				if(chatListItems.size()==1){
+					MegaChatListItem chatItem = chatListItems.get(0);
+					long idChat = chatItem.getChatId();
+					if(chatItem!=null){
+						Intent intent = new Intent(this, ManagerActivityLollipop.class);
+						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+						intent.putExtra("CHAT_ID", idChat);
+						startActivity(intent);
+					}
+				}
+				else{
+					Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
+					chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
+					startActivity(chatIntent);
 				}
 			}
 			else{
