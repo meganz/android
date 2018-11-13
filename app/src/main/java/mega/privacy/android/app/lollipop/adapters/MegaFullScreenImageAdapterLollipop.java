@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
@@ -403,7 +404,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		if ((node == null) && isFileLink) {
 			log("isFileLink");
 
-			if (isGIF(fileLink.getName())) {
+			if (MimeTypeList.typeForName(fileLink.getName()).isGIF()) {
 				holder.isGIF = true;
 				holder.imgDisplay.setVisibility(View.GONE);
 				holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -474,7 +475,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			}
 		}
 		else {
-			if (isGIF(node.getName())) {
+			if (MimeTypeList.typeForName(node.getName()).isGIF()) {
 				holder.isGIF = true;
 				holder.imgDisplay.setVisibility(View.GONE);
 				holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -925,18 +926,5 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
-	}
-
-	public boolean isGIF(String name){
-
-		String s[] = name.split("\\.");
-
-		if (s != null){
-			if (s[s.length-1].equals("gif")){
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
