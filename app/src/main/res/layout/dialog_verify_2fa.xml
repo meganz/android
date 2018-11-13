@@ -61,7 +61,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_second_verify"
@@ -73,7 +73,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_third_verify"
@@ -85,7 +85,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_fouth_verify"
@@ -97,7 +97,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_fifth_verify"
@@ -109,7 +109,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_sixth_verify"
@@ -121,7 +121,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/EditTextStyle" />
+                    android:theme="@style/ColorControlStyle" />
             </LinearLayout>
 
             <TextView

@@ -17,7 +17,8 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>	    
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/choose_pin_6_check"
@@ -26,7 +27,8 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>	    
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	    <CheckedTextView
 		    android:id="@+id/choose_pin_alphaN_check"
@@ -35,7 +37,8 @@
 		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 		    android:ellipsize="marquee"
 		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>    
+		    android:textAppearance="?android:attr/textAppearanceMedium"
+			android:theme="@style/ColorControlStyle"/>
 	    
 	</LinearLayout>
 </ScrollView>
