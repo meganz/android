@@ -8,4 +8,5 @@
     android:paddingStart="25dip"
     android:paddingEnd="15dip"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textSize="18sp"/>
+    android:textSize="18sp"
+    android:theme="@style/ColorControlStyle"/>

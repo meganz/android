@@ -1131,7 +1131,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (MimeTypeList.typeForName(mOffList.get(i).getName()).isImage()){
 						mOffListImages.add(mOffList.get(i));
 						positionImage++;
-						if (i == positionG){
+						if (i == positionG && savedInstanceState == null){
 							positionG = positionImage;
 						}
 					}
@@ -1235,7 +1235,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				log("F: " + f.getAbsolutePath());
 				if (MimeTypeList.typeForName(f.getName()).isImage()){
 					paths.add(f.getAbsolutePath());
-					if (index == positionG){
+					if (index == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1294,7 +1294,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
-					if (i == positionG){
+					if (i == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1343,7 +1343,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
-					if (i == positionG){
+					if (i == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1424,7 +1424,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
-					if (i == positionG){
+					if (i == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
