@@ -153,6 +153,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener{
 
+    boolean fromChatSavedInstance = false;
     int[] screenPosition;
     int mLeftDelta;
     int mTopDelta;
@@ -427,7 +428,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else if (adapterType == Constants.FROM_CHAT){
             fromChat = true;
-            draggableView.setDraggable(false);
             chatC = new ChatController(this);
             msgId = intent.getLongExtra("msgId", -1);
             chatId = intent.getLongExtra("chatId", -1);
@@ -733,8 +733,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     int[] getlocation = new int[2];
                     getLocationOnScreen(getlocation);
                     if (screenPosition != null){
-                        mLeftDelta = getlocation[0] - location[0];
-                        mTopDelta = getlocation[1] - location[1];
+                        if (fromChat) {
+                            mLeftDelta = screenPosition[0] - (screenPosition[2]/2) - location[0];
+                            mTopDelta = screenPosition[1] - (screenPosition[3]/2) - location[1];
+                        }
+                        else {
+                            mLeftDelta = getlocation[0] - location[0];
+                            mTopDelta = getlocation[1] - location[1];
+                        }
 
                         mWidthScale = (float) screenPosition[2] / simpleExoPlayerView.getWidth();
                         mHeightScale = (float) screenPosition[3] / simpleExoPlayerView.getHeight();
@@ -752,6 +758,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     return true;
                 }
             });
+        }
+        else {
+            if (fromChat) {
+                fromChatSavedInstance = true;
+            }
         }
     }
 
@@ -1627,7 +1638,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void runEnterAnimation() {
-        final long duration = 400;
+        final long duration = 600;
+
         if (aB != null && aB.isShowing()) {
             if(tB != null) {
                 tB.animate().translationY(-220).setDuration(0)
@@ -3801,7 +3813,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             playerLayout.setBackgroundColor(TRANSPARENT);
             appBarLayout.setBackgroundColor(TRANSPARENT);
-            draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
+            if (fromChatSavedInstance) {
+                draggableView.setCurrentView(null);
+            }
+            else {
+                draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 containerAudioVideoPlayer.setElevation(0);
                 playerLayout.setElevation(0);
