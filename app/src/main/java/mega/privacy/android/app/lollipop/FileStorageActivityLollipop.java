@@ -295,7 +295,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		newFolderMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_b_new_folder, R.color.white));
+		newFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 		
 		if (mode == Mode.PICK_FOLDER) {
 			boolean writable = path.canWrite();
@@ -346,6 +346,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+		}
+
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		

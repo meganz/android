@@ -34,4 +34,7 @@
     <dimen name="translationZ_fab_chat">12dp</dimen>
     <dimen name="marginTop_fab_chat">0dp</dimen>
 
+    <dimen name="emoji_grid_view_column_width">35dp</dimen>
+    <dimen name="emoji_grid_view_spacing">6dp</dimen>
+
 </resources>
