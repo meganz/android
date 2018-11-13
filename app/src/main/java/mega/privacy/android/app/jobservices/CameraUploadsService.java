@@ -184,7 +184,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void startCameraUploads() {
         log("startCameraUploads");
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_title),mPendingIntent);
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
         startForeground(notificationId,mNotification);
         try {
             getFilesFromMediaStore();
@@ -1597,16 +1597,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private void showProgressNotification(int progressPercent,PendingIntent pendingIntent,String message,String subText,String contentText) {
         log("showProgressNotification");
         mNotification = null;
-
+        mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(mContext,notificationChannelId);
-
-            mBuilderCompat
+    
+            mBuilder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100,progressPercent,false)
                     .setContentIntent(pendingIntent)
@@ -1616,11 +1615,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setContentText(contentText)
                     .setOnlyAlertOnce(true);
 
-            mNotification = mBuilderCompat.build();
+            mNotification = mBuilder.build();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this,R.color.mega))
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setSubText(subText)
@@ -1629,7 +1627,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             mNotification = mBuilder.build();
         } else {
             mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100, progressPercent, false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true).setContentTitle(message).setContentInfo(subText)
