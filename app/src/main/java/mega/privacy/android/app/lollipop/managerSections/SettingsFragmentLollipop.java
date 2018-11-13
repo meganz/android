@@ -1345,6 +1345,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		autoawayChatCategory.setEnabled(isOnline);
 		persistenceChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
+		rubbishFileManagement.setEnabled(isOnline);
+		clearVersionsFileManagement.setEnabled(isOnline);
 		securityCategory.setEnabled(isOnline);
 		qrCodeCategory.setEnabled(isOnline);
 		twoFACategory.setEnabled(isOnline);
@@ -1372,6 +1374,27 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		//Cancel account
 		cancelAccount.setEnabled(isOnline);
+
+		if (isOnline) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				clearVersionsFileManagement.setLayoutResource(R.layout.delete_versions_preferences_v21);
+				cancelAccount.setLayoutResource(R.layout.cancel_account_preferences_v21);
+			}
+			else{
+				clearVersionsFileManagement.setLayoutResource(R.layout.delete_versions_preferences);
+				cancelAccount.setLayoutResource(R.layout.cancel_account_preferences);
+			}
+		}
+		else {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				clearVersionsFileManagement.setLayoutResource(R.layout.delete_versions_preferences_disabled_v21);
+				cancelAccount.setLayoutResource(R.layout.cancel_account_preferences_disabled_v21);
+			}
+			else{
+				clearVersionsFileManagement.setLayoutResource(R.layout.delete_versions_preferences_disabled);
+				cancelAccount.setLayoutResource(R.layout.cancel_account_preferences_disabled);
+			}
+		}
 	}
 
 	@Override
@@ -2701,7 +2724,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		IntentFilter filter = new IntentFilter(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
 		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+		LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
 
 	    prefs=dbH.getPreferences();
 	    
@@ -2744,7 +2767,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	@Override
 	public void onPause(){
 		super.onPause();
-		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+		LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
 	}
 
 	private void refreshAccountInfo(){
