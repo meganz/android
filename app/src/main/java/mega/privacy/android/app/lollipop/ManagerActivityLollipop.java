@@ -1746,12 +1746,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaChatApi=null;
 		}
 
-		log("retryPendingConnections()");
-		if (megaApi != null){
-			log("---------retryPendingConnections");
-			megaApi.retryPendingConnections();
-		}
-
+		log("retryChatPendingConnections()");
 		if (megaChatApi != null){
 			megaChatApi.retryPendingConnections(false, null);
 		}
