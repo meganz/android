@@ -1552,7 +1552,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 								}
 								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
 							} catch (Exception e) {
-								log("EXCEPTION" + e.getMessage());
+								log("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isOutgoing " + e.getMessage());
 							}
 						}else if(call.isIncoming()){
 							try {
@@ -1569,7 +1569,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 								}
 								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
 							} catch (Exception e) {
-								log("EXCEPTION" + e.getMessage());
+								log("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isIncoming " + e.getMessage());
 							}
 						}
 					}else if (call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REJECT) {
@@ -1589,7 +1589,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 								}
 								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
 							} catch (Exception e) {
-								log("EXCEPTION" + e.getMessage());
+								log("EXCEPTION:TERM_CODE_CALL_REJECT:call.isOutgoing " + e.getMessage());
 							}
 						}else if(call.isIncoming()){
 							try {
@@ -1606,7 +1606,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 								}
 								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
 							} catch (Exception e) {
-								log("EXCEPTION" + e.getMessage());
+								log("EXCEPTION:TERM_CODE_CALL_REJECT:call.isIncoming " + e.getMessage());
 							}
 						}
 					}else if (call.getTermCode() == MegaChatCall.TERM_CODE_USER_HANGUP) {
@@ -1626,7 +1626,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 								}
 								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
 							} catch (Exception e) {
-								log("EXCEPTION" + e.getMessage());
+								log("EXCEPTION:TERM_CODE_USER_HANGUP:call.isOutgoing " + e.getMessage());
 							}
 						}else if(call.isIncoming()){
 							try {
@@ -1643,12 +1643,12 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 								}
 								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
 							} catch (Exception e) {
-								log("EXCEPTION" + e.getMessage());
+								log("EXCEPTION:TERM_CODE_USER_HANGUP:call.isIncoming " + e.getMessage());
 							}
 						}
 					}
 				} catch (Exception e) {
-					log("EXCEPTION" + e.getMessage());
+					log("EXCEPTION:register call on device " + e.getMessage());
 				}
 			}
 		}
