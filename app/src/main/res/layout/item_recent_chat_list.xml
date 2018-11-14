@@ -34,11 +34,10 @@
 
     </RelativeLayout>
 
-    <TextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/recent_chat_list_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
         android:textSize="16sp"
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="16dp"
@@ -79,7 +78,7 @@
         android:layout_toRightOf="@id/recent_chat_list_contact_state"
         android:layout_marginLeft="4dp"/>
 
-    <mega.privacy.android.app.components.EmojiconTextView
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/recent_chat_list_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

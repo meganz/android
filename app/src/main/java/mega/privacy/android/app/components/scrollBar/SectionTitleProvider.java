@@ -7,5 +7,4 @@ package mega.privacy.android.app.components.scrollBar;
 public interface SectionTitleProvider {
 
     String getSectionTitle(int position);
-
 }

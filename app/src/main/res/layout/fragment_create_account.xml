@@ -48,7 +48,8 @@
                     android:hint="@string/name_text"
                     android:textSize="16sp"
                     android:imeOptions="actionNext"
-                    android:inputType="text|textCapWords" />
+                    android:inputType="text|textCapWords"
+                    android:theme="@style/ColorControlStyle" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -84,7 +85,8 @@
                     android:hint="@string/lastname_text"
                     android:imeOptions="actionNext"
                     android:inputType="text|textCapWords"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:theme="@style/ColorControlStyle"/>
                 <RelativeLayout
                     android:id="@+id/create_account_last_name_error"
                     android:layout_width="wrap_content"
@@ -117,7 +119,8 @@
                     android:hint="@string/email_text"
                     android:textSize="16sp"
                     android:imeOptions="actionNext"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:theme="@style/ColorControlStyle" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -159,7 +162,8 @@
                         android:imeOptions="actionNext"
                         android:textSize="16sp"
                         android:fontFamily="sans-serif"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:theme="@style/ColorControlStyle" />
 
                     <ImageView
                         android:id="@+id/toggle_button_passwd"
@@ -286,7 +290,8 @@
                         android:imeOptions="actionDone"
                         android:textSize="16sp"
                         android:fontFamily="sans-serif"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:theme="@style/ColorControlStyle" />
 
                     <ImageView
                         android:id="@+id/toggle_button_confirm_passwd"

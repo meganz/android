@@ -11,7 +11,7 @@
         android:text="@string/dialog_cancel_subscriptions"
         android:layout_centerHorizontal="true"/>
     
-   <EditText 
+   <EditText
 	    android:id="@+id/dialog_cancel_feedback"
 	    android:gravity="top|left" 
 	    android:inputType="textMultiLine"
@@ -19,6 +19,7 @@
 	    android:lines="5"
 	    android:layout_below="@id/dialog_cancel_text" 
 	    android:hint="@string/hint_cancel_subscriptions"
-	    android:scrollHorizontally="false" />
+	    android:scrollHorizontally="false"
+	   android:theme="@style/ColorControlStyle" />
     
 </RelativeLayout>

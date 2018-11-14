@@ -85,6 +85,18 @@
 			android:defaultValue="true"/>
 
 		<ListPreference
+			android:key="settings_chat_list_status"
+			android:title="@string/set_status_option_label"
+			android:entries="@array/settings_status_entries"
+			android:entryValues="@array/settings_chat_status_values" />
+
+		<SwitchPreference
+			android:key="settings_last_green_chat_switch"
+			android:title="@string/option_enable_last_green_chat"
+			android:summary="@string/subtitle_option_enable_last_green_chat"
+			android:defaultValue="false"/>
+
+		<ListPreference
 			android:key="settings_chat_send_originals"
 			android:title="@string/settings_chat_upload_quality"
 			android:entries="@array/settings_chat_upload_quality_entries"
@@ -94,20 +106,6 @@
 			android:key="settings_rich_links_enable"
 			android:title="@string/option_enable_chat_rich_preview"
 			android:defaultValue="false"/>
-
-	</PreferenceCategory>
-
-	<PreferenceCategory
-		android:key="settings_status_chat"
-		android:layout="@layout/my_category_preference"
-		android:title="@string/chat_status_title">
-		<!--        android:textColor="@color/pressed_mega">  -->
-
-		<ListPreference
-			android:key="settings_chat_list_status"
-			android:title="@string/set_status_option_label"
-			android:entries="@array/settings_status_entries"
-			android:entryValues="@array/settings_chat_status_values" />
 
 	</PreferenceCategory>
 

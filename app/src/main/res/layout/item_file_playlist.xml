@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/container_thumbnail"
         android:layout_below="@+id/file_list_filename"
-        android:textColor="@color/file_playlist_state"
+        android:textColor="@color/accentColor"
         android:layout_marginLeft="13dp"
         android:textSize="14sp"
         android:ellipsize="end"
