@@ -423,6 +423,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 				}, 350);
 			}
+			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}
 
 		@Override
