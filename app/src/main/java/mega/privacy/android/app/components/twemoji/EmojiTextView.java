@@ -18,6 +18,7 @@ import android.view.KeyEvent;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Util;
@@ -81,6 +82,13 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
       setText(getText());
 
+    }else if(mContext instanceof ArchivedChatsActivity){
+      Display display = ((ArchivedChatsActivity)mContext).getWindowManager().getDefaultDisplay();
+      mOutMetrics = new DisplayMetrics ();
+      display.getMetrics(mOutMetrics);
+      textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      setText(getText());
+
     }else {
       setText(getText());
     }
@@ -97,7 +105,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         if(mContext instanceof ManagerActivityLollipop){
           CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
           super.setText(textF, type);
-        }else  if(mContext instanceof ChatExplorerActivity){
+        }else  if(mContext instanceof ChatExplorerActivity) {
+          CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+          super.setText(textF, type);
+        }else if(mContext instanceof ArchivedChatsActivity){
           CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
           super.setText(textF, type);
         }else  if(mContext instanceof ChatActivityLollipop){
