@@ -6933,7 +6933,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("createOptions search");
 				//Hide
 				searchByDate.setVisible(false);
-				upgradeAccountMenuItem.setVisible(true);
 				cancelAllTransfersMenuItem.setVisible(false);
 				clearCompletedTransfers.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
@@ -6958,26 +6957,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				newChatMenuItem.setVisible(false);
 				setStatusMenuItem.setVisible(false);
 
-				//Show
-				if(sFLol != null && sFLol.isAdded() && sFLol.getNodes()!=null){
-					if(sFLol.getNodes().size()!=0){
-//							log("size after search: "+sFLol.getNodes().size());
-						selectMenuItem.setVisible(true);
-						if(!firstTimeCam){
-							thumbViewMenuItem.setVisible(true);
-						}else{
-							thumbViewMenuItem.setVisible(false);
-						}
-						if (isList){
-							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-							thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+				if (searchExpand) {
+					openSearchView();
+					upgradeAccountMenuItem.setVisible(false);
+					rubbishBinMenuItem.setVisible(false);
+					selectMenuItem.setVisible(false);
+					thumbViewMenuItem.setVisible(false);
+				}
+				else {
+					upgradeAccountMenuItem.setVisible(true);
+					//Show
+					if(sFLol != null && sFLol.isAdded() && sFLol.getNodes()!=null){
+						if(sFLol.getNodes().size()!=0){
+							selectMenuItem.setVisible(true);
+							if(!firstTimeCam){
+								thumbViewMenuItem.setVisible(true);
+							}else{
+								thumbViewMenuItem.setVisible(false);
+							}
+							if (isList){
+								thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+								thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+							}
+							else{
+								thumbViewMenuItem.setTitle(getString(R.string.action_list));
+								thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+							}
 						}
 						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-							thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+							selectMenuItem.setVisible(false);
+							thumbViewMenuItem.setVisible(false);
 						}
 					}
-					else{
+					else {
 						selectMenuItem.setVisible(false);
 						thumbViewMenuItem.setVisible(false);
 					}
@@ -18414,6 +18426,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 	}
+
+	public void setDrawerLockMode (boolean locked) {
+        if (locked){
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
+        else{
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        }
+    }
 
 	public void changeActionBarElevation(boolean whitElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
