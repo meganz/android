@@ -20,11 +20,6 @@
 
 package mega.privacy.android.app.components;
 
-import static mega.privacy.android.app.components.TouchImageView.State.ANIMATE_ZOOM;
-import static mega.privacy.android.app.components.TouchImageView.State.DRAG;
-import static mega.privacy.android.app.components.TouchImageView.State.FLING;
-import static mega.privacy.android.app.components.TouchImageView.State.NONE;
-import static mega.privacy.android.app.components.TouchImageView.State.ZOOM;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -54,6 +49,12 @@ import android.widget.Scroller;
 
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
+
+import static mega.privacy.android.app.components.TouchImageView.State.ANIMATE_ZOOM;
+import static mega.privacy.android.app.components.TouchImageView.State.DRAG;
+import static mega.privacy.android.app.components.TouchImageView.State.FLING;
+import static mega.privacy.android.app.components.TouchImageView.State.NONE;
+import static mega.privacy.android.app.components.TouchImageView.State.ZOOM;
 
 public class TouchImageView extends ImageView {
 

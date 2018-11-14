@@ -102,6 +102,8 @@ import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
+import android.provider.CallLog;
+
 public class ChatCallActivity extends AppCompatActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
@@ -660,6 +662,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
             }
         }
+
+        checkPermissionsWriteLog();
 
         if(checkPermissions()){
             showInitialFABConfiguration();
@@ -1430,7 +1434,22 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
+    public boolean checkPermissionsWriteLog(){
+        log("checkPermissionsWriteLog()");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
+            if (!hasWriteLogPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
+                return false;
+            }else{
+                return true;
+            }
+        }
+        return true;
+    }
+
     public boolean checkPermissions(){
+        log("checkPermissions()");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -1819,6 +1838,18 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 else{
                     hangFAB.setVisibility(View.VISIBLE);
+                }
+                break;
+            }
+
+            case Constants.WRITE_LOG: {
+                log("WRITE_LOG");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissionsWriteLog()){
+                        log("accepted WRITE_LOG permissions");
+                    }else{
+                        log("rejected WRITE_LOG permissions");
+                    }
                 }
                 break;
             }
