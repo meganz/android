@@ -612,9 +612,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     
                     // If the file matches name, mtime and size, and doesn't have a fingerprint,
                     // => we consider that it's the correct one
-                    if (possibleNode != null &&
-                            sourceFile.length() == possibleNode.getSize() &&
-                            megaApi.getFingerprint(possibleNode) == null) {
+                    if (possibleNode != null  && megaApi.getFingerprint(possibleNode) == null) {
                         nodeExists = possibleNode;
                         log("nodeExists = possibleNode;");
                         break;
@@ -639,9 +637,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                                 // If the file matches name, mtime and size, and doesn't have a fingerprint,
                                 // => we consider that it's the correct one
                                 possibleNode = megaApi.getChildNode(prevFolder,sourceFile.getName());
-                                if (possibleNode != null &&
-                                        sourceFile.length() == possibleNode.getSize() &&
-                                        megaApi.getFingerprint(possibleNode) == null) {
+                                if (possibleNode != null && megaApi.getFingerprint(possibleNode) == null) {
                                     nodeExists = possibleNode;
                                 }
                             }
@@ -658,7 +654,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 boolean photoAlreadyExists = false;
                 ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode,MegaApiJava.ORDER_ALPHABETICAL_ASC);
                 for (int i = 0;i < nL.size();i++) {
-                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp,media.filePath)) == 0) && (nL.get(i).getSize() == sourceFile.length())) {
+                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp,media.filePath)) == 0)) {
                         photoAlreadyExists = true;
                     }
                 }
@@ -686,6 +682,17 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     pendingList.add(record);
                     log("MediaFinalName: " + sourceFile.getName());
                 } else {
+                    if(!isSecondary) {
+                        if(media.timestamp > currentTimeStamp) {
+                            currentTimeStamp = media.timestamp;
+                            dbH.setCamSyncTimeStamp(media.timestamp);
+                        }
+                    } else {
+                        if(media.timestamp > secondaryTimeStamp) {
+                            secondaryTimeStamp = media.timestamp;
+                            dbH.setSecSyncTimeStamp(media.timestamp);
+                        }
+                    }
                     if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
                         //Change the file names as device
                         log("Call Look for Rename Task");
@@ -715,8 +722,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         
         protected Boolean rename(MegaNode nodeExists) {
-            
-            File file = new File(media.filePath);
             log("RENOMBRAR EL FICHERO: " + media.filePath);
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(media.timestamp);
@@ -738,7 +743,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 } while (megaApi.getChildNode(uploadNode,photoFinalName) != null);
                 
                 log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                
                 megaApi.renameNode(nodeExists,photoFinalName,cameraUploadsService);
                 log("RENAMED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
                 
