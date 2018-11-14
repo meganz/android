@@ -12,6 +12,7 @@ import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import java.util.Objects;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
 public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
@@ -29,15 +30,30 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         super(context);
 
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(Color.WHITE);
+        if (context instanceof ManagerActivityLollipop) {
+            backgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
+        }
+        else {
+            backgroundPaint.setColor(Color.WHITE);
+        }
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
-        bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+        if (context instanceof ManagerActivityLollipop) {
+            bigBackgroundPaint.setColor(Color.WHITE);
+        }
+        else {
+            bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
+        }
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
-        textPaint.setColor(Color.RED);
+        if (context instanceof ManagerActivityLollipop) {
+            textPaint.setColor(Color.WHITE);
+        }
+        else {
+            textPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
+        }
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);

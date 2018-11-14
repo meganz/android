@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
@@ -45,10 +44,10 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.tab_incoming_shares);
+                return context.getString(R.string.tab_incoming_shares).toLowerCase();
             }
             case 1:{
-                return context.getString(R.string.tab_outgoing_shares);
+                return context.getString(R.string.tab_outgoing_shares).toLowerCase();
             }
         }
         return null;

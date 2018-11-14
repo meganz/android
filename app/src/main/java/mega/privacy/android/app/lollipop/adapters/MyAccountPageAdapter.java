@@ -39,10 +39,10 @@ public class MyAccountPageAdapter extends FragmentPagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.tab_my_account_general);
+                return context.getString(R.string.tab_my_account_general).toLowerCase();
             }
             case 1:{
-                return context.getString(R.string.tab_my_account_storage);
+                return context.getString(R.string.tab_my_account_storage).toLowerCase();
             }
         }
         return null;
