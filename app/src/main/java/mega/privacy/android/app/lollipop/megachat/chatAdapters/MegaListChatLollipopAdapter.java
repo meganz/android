@@ -735,12 +735,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void setMultipleSelect(boolean multipleSelect) {
 		log("setMultipleSelect");
+		if (!this.multipleSelect && multipleSelect) {
+			selectedItems = new SparseBooleanArray();
+		}
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-		}
-		if(this.multipleSelect)
-		{
-			selectedItems = new SparseBooleanArray();
 		}
 	}
 
@@ -828,6 +827,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			});
 			view.imageView.startAnimation(flipAnimation);
+		}
+		else {
+			if (selectedItems.size() <= 0){
+				if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
+					((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+				}
+			}
 		}
 	}
 
