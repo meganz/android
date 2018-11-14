@@ -40,8 +40,8 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -136,11 +136,13 @@ public class AccountController implements View.OnClickListener{
         File qrFile = null;
         if (context.getExternalCacheDir() != null){
             avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-            qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
+            File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+            qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
         }
         else{
             avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-            qrFile = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
+            File qrDir = context.getDir("qrMEGA", 0);
+            qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
         }
 
         if (avatar.exists()) {

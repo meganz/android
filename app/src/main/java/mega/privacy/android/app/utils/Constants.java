@@ -126,6 +126,8 @@ public class Constants {
 	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
 	public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
+	public static final int WRITE_LOG = 10;
+
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
@@ -193,6 +195,8 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
 	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
 	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
+	public static String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
+	public static String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -263,6 +267,8 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
 	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID = "ChatSummaryNotificationNoVibrate";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME = "MEGA Chat Summary (no vibration)";
 	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID = "InProgressMissedCallNotification";
 	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME = "MEGA In Progress and Missed Calls";
 	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_ID = "ChatIncomingCallNotification";

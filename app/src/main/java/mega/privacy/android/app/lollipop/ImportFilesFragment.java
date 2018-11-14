@@ -160,7 +160,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
                 });
             }
             adapter.setImportNameFiles(nameFiles);
-            if (incomingButton.getVisibility() == View.VISIBLE) {
+            if (showMoreLayout.getVisibility() == View.VISIBLE) {
                 itemsVisibles = false;
                 adapter.setItemsVisibility(itemsVisibles);
             }

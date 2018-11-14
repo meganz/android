@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -19,9 +20,13 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.provider.CallLog;
+import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.FontRequestEmojiCompatConfig;
+import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -43,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
@@ -86,7 +93,7 @@ import nz.mega.sdk.MegaUserAlert;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.1_213";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -102,6 +109,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
+
+	private static final boolean USE_BUNDLED_EMOJI = false;
 
 	private static boolean showInfoChatMessages = false;
 
@@ -183,7 +192,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			log("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
 
 			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-				if (e.getErrorCode() == MegaError.API_ESID){
+				if (e.getErrorCode() == MegaError.API_EINCOMPLETE){
+					if (request.getParamType() == MegaError.API_ESSL) {
+						log("SSL verification failed");
+						Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED);
+						LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+					}
+				}
+				else if (e.getErrorCode() == MegaError.API_ESID){
 					log("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
 
@@ -513,11 +529,34 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-		if(Util.isChatEnabled()){
-			FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
-			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest);
-			EmojiCompat.init(configDF);
+//		if(Util.isChatEnabled()){}
+		EmojiManager.install(new TwitterEmojiProvider());
+
+		final EmojiCompat.Config config;
+		if (USE_BUNDLED_EMOJI) {
+			// Use the bundled font for EmojiCompat
+			config = new BundledEmojiCompatConfig(getApplicationContext());
+		} else {
+			// Use a downloadable font for EmojiCompat
+			final FontRequest fontRequest = new FontRequest(
+					"com.google.android.gms.fonts",
+					"com.google.android.gms",
+					"Noto Color Emoji Compat",
+					R.array.com_google_android_gms_fonts_certs);
+			config = new FontRequestEmojiCompatConfig(getApplicationContext(), fontRequest)
+					.setReplaceAll(false)
+					.registerInitCallback(new EmojiCompat.InitCallback() {
+						@Override
+						public  void onInitialized() {
+							Log.i(TAG, "EmojiCompat initialized");
+						}
+						@Override
+						public  void onFailed(@Nullable Throwable throwable) {
+							Log.e(TAG, "EmojiCompat initialization failed", throwable);
+						}
+					});
 		}
+		EmojiCompat.init(config);
 
 
 //		initializeGA();
@@ -655,7 +694,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			Log.d(TAG, "Database path: " + path);
 			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
-			
+
+			megaApiFolder.retrySSLerrors(true);
+
 			megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 			megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 		}
@@ -727,7 +768,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			Log.d(TAG, "Database path: " + path);
 			megaApi = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
-			
+
+			megaApi.retrySSLerrors(true);
+
 			megaApi.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 			megaApi.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 			
@@ -1483,6 +1526,130 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			}
 			catch(Exception e){
 				log("EXCEPTION when showing missed call notification: "+e.getMessage());
+			}
+
+			//Register a call from Mega in the phone
+			MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+			if(chatRoom.isGroup()){
+				//Group call ended
+			}else{
+				//Individual call ended
+				try {
+					if (call.getTermCode() == MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) {
+						//Unanswered call
+						if (call.isOutgoing()) {
+							try {
+								//I'm calling and the contact doesn't answer
+								ContentValues values = new ContentValues();
+								values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+								values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+								values.put(CallLog.Calls.DURATION, 0);
+								values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
+								values.put(CallLog.Calls.NEW, 1);
+
+								if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+									return;
+								}
+								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+							} catch (Exception e) {
+								log("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isOutgoing " + e.getMessage());
+							}
+						}else if(call.isIncoming()){
+							try {
+								//I'm receiving a call and I don't answer
+								ContentValues values = new ContentValues();
+								values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+								values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+								values.put(CallLog.Calls.DURATION, 0);
+								values.put(CallLog.Calls.TYPE, CallLog.Calls.MISSED_TYPE);
+								values.put(CallLog.Calls.NEW, 1);
+
+								if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+									return;
+								}
+								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+							} catch (Exception e) {
+								log("EXCEPTION:TERM_CODE_ANSWER_TIMEOUT:call.isIncoming " + e.getMessage());
+							}
+						}
+					}else if (call.getTermCode() == MegaChatCall.TERM_CODE_CALL_REJECT) {
+						//Rejected call
+						if (call.isOutgoing()) {
+							try {
+								//I'm calling and the user rejects the call
+								ContentValues values = new ContentValues();
+								values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+                                values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+								values.put(CallLog.Calls.DURATION, 0);
+								values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
+								values.put(CallLog.Calls.NEW, 1);
+
+								if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+									return;
+								}
+								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+							} catch (Exception e) {
+								log("EXCEPTION:TERM_CODE_CALL_REJECT:call.isOutgoing " + e.getMessage());
+							}
+						}else if(call.isIncoming()){
+							try {
+								//I'm receiving a call and I reject it
+								ContentValues values = new ContentValues();
+								values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+								values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+								values.put(CallLog.Calls.DURATION, 0);
+								values.put(CallLog.Calls.TYPE, CallLog.Calls.REJECTED_TYPE);
+								values.put(CallLog.Calls.NEW, 1);
+
+								if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+									return;
+								}
+								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+							} catch (Exception e) {
+								log("EXCEPTION:TERM_CODE_CALL_REJECT:call.isIncoming " + e.getMessage());
+							}
+						}
+					}else if (call.getTermCode() == MegaChatCall.TERM_CODE_USER_HANGUP) {
+						//Call answered and hung
+						if (call.isOutgoing()) {
+							try {
+								//I'm calling and the user answers it
+								ContentValues values = new ContentValues();
+								values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+								values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+								values.put(CallLog.Calls.DURATION, call.getDuration());
+								values.put(CallLog.Calls.TYPE, CallLog.Calls.OUTGOING_TYPE);
+								values.put(CallLog.Calls.NEW, 1);
+
+								if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+									return;
+								}
+								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+							} catch (Exception e) {
+								log("EXCEPTION:TERM_CODE_USER_HANGUP:call.isOutgoing " + e.getMessage());
+							}
+						}else if(call.isIncoming()){
+							try {
+								//I'm receiving a call and I answer it
+								ContentValues values = new ContentValues();
+                                values.put(CallLog.Calls.NUMBER, chatRoom.getPeerFullname(0));
+								values.put(CallLog.Calls.DATE, System.currentTimeMillis());
+								values.put(CallLog.Calls.DURATION, call.getDuration());
+								values.put(CallLog.Calls.TYPE, CallLog.Calls.INCOMING_TYPE);
+								values.put(CallLog.Calls.NEW, 1);
+
+								if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+									return;
+								}
+								this.getContentResolver().insert(CallLog.Calls.CONTENT_URI, values);
+							} catch (Exception e) {
+								log("EXCEPTION:TERM_CODE_USER_HANGUP:call.isIncoming " + e.getMessage());
+							}
+						}
+					}
+				} catch (Exception e) {
+					log("EXCEPTION:register call on device " + e.getMessage());
+				}
 			}
 		}
 	}

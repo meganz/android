@@ -234,7 +234,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					case CHECK_FILE_TO_UPLOAD_COPY: {
 						log("CHECK_FILE_TO_UPLOAD_COPY");
-						copiedCount++;
 						break;
 					}
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
@@ -276,7 +275,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					case CHECK_FILE_TO_UPLOAD_COPY: {
 						log("CHECK_FILE_TO_UPLOAD_COPY");
-						copiedCount++;
 						break;
 					}
 					case CHECK_FILE_TO_UPLOAD_OVERWRITE: {
@@ -853,13 +851,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				String qrFileName = megaApi.getMyEmail() + "QRcode.jpg";
 
 				if (getApplicationContext().getExternalCacheDir() != null) {
-					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
+					File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
+					File localFile = new File(qrDir, transfer.getFileName());
 					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}
 				} else {
-					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
+					File qrDir = getApplicationContext().getDir("qrMEGA", 0);
+					File localFile = new File(qrDir, transfer.getFileName());
 					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
@@ -881,8 +881,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					log("transfer.getPath() is NULL");
 				}
 
-				int total = totalUploadsCompleted + copiedCount;
-				if (total==totalUploads && transfersCount == 0) {
+				if (transfersCopy.isEmpty() && totalUploadsCompleted==totalUploads && transfersCount == 0) {
 					onQueueComplete();
 				}
 				else{
@@ -1015,6 +1014,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if (request.getType() == MegaRequest.TYPE_COPY){
 			log("TYPE_COPY finished");
 			if (e.getErrorCode() == MegaError.API_OK){
+				copiedCount++;
 				MegaNode n = megaApi.getNodeByHandle(request.getNodeHandle());
 				if (n != null){
 					String currentNodeName = n.getName();
@@ -1027,9 +1027,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						}
 					}
 					transfersCopy.remove(megaFingerPrint);
-					int total = totalUploadsCompleted + copiedCount;
-					if (total==totalUploads){
-						onQueueComplete();
+
+					if(transfersCopy.isEmpty()){
+						//int total = totalUploadsCompleted + copiedCount;
+						if (totalUploads==totalUploadsCompleted && transfersCount == 0) {
+							onQueueComplete();
+						}
 					}
 				}
 				else{
