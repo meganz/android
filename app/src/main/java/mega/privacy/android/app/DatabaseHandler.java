@@ -70,6 +70,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
     private static final String KEY_CONVERSION_ON_CHARGING = "conversionOnCharging";
     private static final String KEY_CHARGING_ON_SIZE = "chargingOnSize";
+    private static final String KEY_SHOULD_CLEAR_CAMSYNC_RECORDS = "shouldclearcamsyncrecords";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
@@ -239,7 +240,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
 				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
-                KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT" +")";
+                KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT" + ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -626,6 +627,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CONVERSION_ON_CHARGING + " BOOLEAN;");
 //            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_ON_CHARGING + " = '" + encrypt("true") + "';");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CHARGING_ON_SIZE + " TEXT;");
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT;");
 //            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + " = " + MegaPreferences.CONVERSION_ON_CHARGING_WHEN_SIZE + ";");
 		}
 	}
@@ -911,6 +913,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return record;
         }
         return null;
+    }
+    
+    public boolean shouldClearCamsyncRecords() {
+        String selectQuery = "SELECT " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " FROM " + TABLE_PREFERENCES;
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            String should = cursor.getString(cursor.getColumnIndex(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS));
+            should = decrypt(should);
+            if(TextUtils.isEmpty(should)) {
+                return false;
+            } else {
+                return Boolean.valueOf(should);
+            }
+        }
+        return false;
+    }
+    
+    public void saveShouldClearCamsyncRecords(boolean should) {
+        String sql = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS +" = '" + encrypt(String.valueOf(should)) + "'";
+        db.execSQL(sql);
     }
 
     public Long findMaxTimestamp(Boolean isSecondary) {

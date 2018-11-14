@@ -1541,9 +1541,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                                                     context.startService(new Intent(context,CameraSyncService.class));
                                                 }
                                             }
-                                        },5 * 1000);
-									
-										((ManagerActivityLollipop)context).refreshCameraUpload();
+                                        },10 * 1000);
+                                        
+                                        ((ManagerActivityLollipop)context).refreshCameraUpload();
 										
 										return;		
 									}
@@ -1589,7 +1589,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                                 context.startService(new Intent(context,CameraSyncService.class));
                             }
                         }
-                    },5 * 1000);
+                    },10 * 1000);
 				
 					((ManagerActivityLollipop)context).refreshCameraUpload();
 					switch (which){

@@ -1497,10 +1497,34 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadWhat.setSummary(fileUpload);
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords(TYPE_ANY);
+			dbH.saveShouldClearCamsyncRecords(true);
             Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-
-            restartCameraUpload();
+            
+            if (Util.isDeviceSupportParallelUpload()) {
+                cancelAllJobs(context);
+            }else{
+                Intent photosVideosIntent = null;
+                photosVideosIntent = new Intent(context, CameraSyncService.class);
+                photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+                context.startService(photosVideosIntent);
+            }
+            
+            handler.postDelayed(new Runnable() {
+                
+                @Override
+                public void run() {
+                    log("Now I start the service");
+                    if(dbH.shouldClearCamsyncRecords()){
+                        dbH.deleteAllSyncRecords(TYPE_ANY);
+                        dbH.saveShouldClearCamsyncRecords(false);
+                    }
+                    if (Util.isDeviceSupportParallelUpload()) {
+                        startJob(context);
+                    }else{
+                        context.startService(new Intent(context, CameraSyncService.class));
+                    }
+                }
+            }, 10 * 1000);
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
             
             Log.d("Yuan", "video quality selected");
@@ -2413,7 +2437,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords(TYPE_ANY);
+            dbH.saveShouldClearCamsyncRecords(true);
             Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 			if (Util.isDeviceSupportParallelUpload()) {
@@ -2430,13 +2454,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				@Override
 				public void run() {
 					log("Now I start the service");
+                    if(dbH.shouldClearCamsyncRecords()){
+                        dbH.deleteAllSyncRecords(TYPE_ANY);
+                        dbH.saveShouldClearCamsyncRecords(false);
+                    }
 					if (Util.isDeviceSupportParallelUpload()) {
                         startJob(context);
                     }else {
                         context.startService(new Intent(context, CameraSyncService.class));
                     }
 				}
-			}, 5 * 1000);
+			}, 10 * 1000);
 		}
 		else if(requestCode == Constants.SET_PIN){
 			if(resultCode == Activity.RESULT_OK) {
@@ -2473,7 +2501,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
             dbH.setSecSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords(TYPE_ANY);
+            dbH.saveShouldClearCamsyncRecords(true);
             Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 			if (Util.isDeviceSupportParallelUpload()) {
@@ -2490,13 +2518,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				@Override
 				public void run() {
 					log("Now I start the service");
+                    if(dbH.shouldClearCamsyncRecords()){
+                        dbH.deleteAllSyncRecords(TYPE_ANY);
+                        dbH.saveShouldClearCamsyncRecords(false);
+                    }
 					if (Util.isDeviceSupportParallelUpload()) {
                         startJob(context);
                     }else{
                         context.startService(new Intent(context, CameraSyncService.class));
                     }
 				}
-			}, 5 * 1000);
+			}, 10 * 1000);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
@@ -2586,7 +2618,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
                 dbH.setSecSyncTimeStamp(0);
-                dbH.deleteAllSyncRecords(TYPE_ANY);
+                dbH.saveShouldClearCamsyncRecords(true);
                 Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
 				if (Util.isDeviceSupportParallelUpload()) {
@@ -2603,13 +2635,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
+                        if(dbH.shouldClearCamsyncRecords()){
+                            dbH.deleteAllSyncRecords(TYPE_ANY);
+                            dbH.saveShouldClearCamsyncRecords(false);
+                        }
 						if (Util.isDeviceSupportParallelUpload()) {
                             startJob(context);
                         }else{
                             context.startService(new Intent(context, CameraSyncService.class));
                         }
 					}
-				}, 5 * 1000);
+				}, 10 * 1000);
 				
 				log("Mega folder to sync the Camera CHANGED!!");
 			}
@@ -3164,7 +3200,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                     context.startService(new Intent(context, CameraSyncService.class));
                 }
             }
-        }, 5 * 1000);
+        }, 30 * 1000);
         
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
         cameraUploadHow.setSummary(wifi);
@@ -3210,7 +3246,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         cameraUpload = false;
         dbH.setCamSyncTimeStamp(0);
         dbH.setSecSyncTimeStamp(0);
-        dbH.deleteAllSyncRecords(TYPE_ANY);
+        dbH.saveShouldClearCamsyncRecords(true);
+        handler.postDelayed(new Runnable() {
+        
+            @Override
+            public void run() {
+                if(dbH.shouldClearCamsyncRecords()){
+                    dbH.deleteAllSyncRecords(TYPE_ANY);
+                    dbH.saveShouldClearCamsyncRecords(false);
+                }
+            }
+        },10 * 1000);
+        
         dbH.setCamSyncEnabled(false);
         dbH.setSecondaryUploadEnabled(false);
         Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
@@ -3414,7 +3461,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                     context.startService(new Intent(context, CameraSyncService.class));
                 }
             }
-        }, 5 * 1000);
+        }, 10 * 1000);
     }
     
     
