@@ -25,7 +25,6 @@ public class MyAccountInfo {
     MegaAccountDetails accountInfo = null;
     BitSet paymentBitSet = null;
     long numberOfSubscriptions = -1;
-    long usedGbStorage = -1;
     String usedFormatted = "";
     String totalFormatted = "";
     String formattedUsedCloud = "";
@@ -44,8 +43,6 @@ public class MyAccountInfo {
 
     String firstNameText = "";
     String lastNameText = "";
-    boolean lastName = false;
-    boolean firstName = false;
     String firstLetter;
     String fullName = "";
 
@@ -86,6 +83,7 @@ public class MyAccountInfo {
     }
 
     public void setAccountDetails(){
+        log("setAccountDetails");
 
         if(accountInfo==null){
             log("Error because account info is NUll in setAccountDetails");
@@ -96,7 +94,7 @@ public class MyAccountInfo {
         long usedCloudDrive = -1;
         long usedInbox = -1;
         long usedRubbish = -1;
-        long usedIncoming = -1;
+        long usedIncoming = 0;
         boolean totalGb = false;
 
         //Check size of the different nodes
@@ -132,70 +130,21 @@ public class MyAccountInfo {
 
         totalFormatted = Util.getSizeString(totalStorage);
 
-        if (usedCloudDrive == -1 && usedInbox == -1 && usedIncoming == -1 && usedRubbish == -1) {
-            usedStorage = -1;
-        }
-        else {
-            if (usedCloudDrive == -1) {
-                usedCloudDrive = 0;
-            }
-            if (usedInbox == -1) {
-                usedInbox = 0;
-            }
-            if (usedIncoming == -1) {
-                usedIncoming = 0;
-            }
-            if (usedRubbish == -1) {
-                usedRubbish = 0;
-            }
-            usedStorage = usedCloudDrive + usedInbox + usedIncoming + usedRubbish;
-            usedFormatted=Util.getSizeString(usedStorage);
+        usedStorage = accountInfo.getStorageUsed();
+        usedFormatted=Util.getSizeString(usedStorage);
 
-            usedPerc = 0;
-            if (totalStorage != 0){
-                usedPerc = (int)((100 * usedStorage) / totalStorage);
-            }
-
-            long availableSpace = totalStorage - usedStorage;
-            if (availableSpace < 0) {
-                formattedAvailableSpace = Util.getSizeString(0);
-            }
-            else{
-                formattedAvailableSpace = Util.getSizeString(availableSpace);
-            }
+        usedPerc = 0;
+        if (totalStorage != 0){
+            usedPerc = (int)((100 * usedStorage) / totalStorage);
         }
 
-//        totalStorage = ((totalStorage / 1024) / 1024) / 1024;
-//        totalFormatted="";
-//
-//        if (totalStorage >= 1024){
-//            totalStorage = totalStorage / 1024;
-//            totalFormatted = totalFormatted + totalStorage + " TB";
-//        }
-//        else{
-//            totalFormatted = totalFormatted + totalStorage + " GB";
-//            totalGb = true;
-//        }
-//
-//        usedStorage = ((usedStorage / 1024) / 1024) / 1024;
-//        usedFormatted="";
-//
-//        if(totalGb){
-//            usedGbStorage = usedStorage;
-//            usedFormatted = usedFormatted + usedStorage + " GB";
-//        }
-//        else{
-//            if (usedStorage >= 1024){
-//                usedGbStorage = usedStorage;
-//                usedStorage = usedStorage / 1024;
-//
-//                usedFormatted = usedFormatted + usedStorage + " TB";
-//            }
-//            else{
-//                usedGbStorage = usedStorage;
-//                usedFormatted = usedFormatted + usedStorage + " GB";
-//            }
-//        }
+        long availableSpace = totalStorage - usedStorage;
+        if (availableSpace < 0) {
+            formattedAvailableSpace = Util.getSizeString(0);
+        }
+        else{
+            formattedAvailableSpace = Util.getSizeString(availableSpace);
+        }
 
         accountDetailsFinished = true;
 
@@ -258,14 +207,6 @@ public class MyAccountInfo {
 
     public void setPaymentBitSet(BitSet paymentBitSet) {
         this.paymentBitSet = paymentBitSet;
-    }
-
-    public long getUsedGbStorage() {
-        return usedGbStorage;
-    }
-
-    public void setUsedGbStorage(long usedGbStorage) {
-        this.usedGbStorage = usedGbStorage;
     }
 
     public int getUsedPerc() {
@@ -390,14 +331,6 @@ public class MyAccountInfo {
         this.productAccounts = productAccounts;
     }
 
-    public boolean isFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(boolean firstName) {
-        this.firstName = firstName;
-    }
-
     public String getFirstNameText() {
         return firstNameText;
     }
@@ -405,14 +338,6 @@ public class MyAccountInfo {
     public void setFirstNameText(String firstNameText) {
         this.firstNameText = firstNameText;
         setFullName();
-    }
-
-    public boolean isLastName() {
-        return lastName;
-    }
-
-    public void setLastName(boolean lastName) {
-        this.lastName = lastName;
     }
 
     public String getLastNameText() {

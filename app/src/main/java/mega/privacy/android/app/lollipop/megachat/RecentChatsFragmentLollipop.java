@@ -731,8 +731,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             adapterList.setMultipleSelect(true);
             if(context instanceof ManagerActivityLollipop){
                 ((ManagerActivityLollipop)context).hideFabButton();
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
             }
-            ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+
             return true;
         }
 
@@ -742,8 +743,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             adapterList.setMultipleSelect(false);
             if(context instanceof ManagerActivityLollipop){
                 ((ManagerActivityLollipop)context).showFabButton();
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
             }
-            ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
         }
 
         @Override

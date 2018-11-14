@@ -11,6 +11,7 @@
 		android:id="@+id/item_file_grid_folder"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:background="@drawable/background_item_grid_new"
 		android:visibility="visible">
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout"

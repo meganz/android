@@ -53,7 +53,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -97,7 +97,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	DisplayMetrics outMetrics;
 
 	ArrayList<MegaNode> nodes;
-	MegaBrowserLollipopAdapter adapterList;
+	MegaNodeAdapter adapterList;
 
 	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
 
@@ -367,7 +367,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		}
 
 		if (adapterList == null){
-			adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, -1, listView, aB, Constants.NODE_ATTACHMENT_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			adapterList = new MegaNodeAdapter(this, null, nodes, -1, listView, aB, Constants.NODE_ATTACHMENT_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 		}
 		else{
 //			adapterList.setParentHandle(parentHandle);

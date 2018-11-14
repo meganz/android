@@ -218,8 +218,13 @@
         <item name="android:windowMinWidthMinor">90%</item>
     </style>
 
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="colorControlActivated">@color/accentColor</item>
-        <item name="colorControlNormal">#000000</item>
+    <style name="ColorControlStyle" parent="Theme.Megaactionbar">
+        <item name="android:colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlNormal">@color/text_secondary</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:minHeight">24dp</item>
+        <item name="android:minWidth">44dp</item>
     </style>
 </resources>

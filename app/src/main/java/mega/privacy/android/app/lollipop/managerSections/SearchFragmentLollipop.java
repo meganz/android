@@ -60,7 +60,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -88,7 +88,7 @@ public class SearchFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-    CloudDriveAdapter adapter;
+    MegaNodeAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -130,7 +130,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -143,7 +143,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -508,7 +508,7 @@ public class SearchFragmentLollipop extends Fragment{
 
         String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
         String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
-        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
@@ -620,10 +620,10 @@ public class SearchFragmentLollipop extends Fragment{
 			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-                adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+                adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			adapter.setMultipleSelect(false);
@@ -672,10 +672,10 @@ public class SearchFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
 
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			adapter.setMultipleSelect(false);
 
@@ -1356,13 +1356,16 @@ public class SearchFragmentLollipop extends Fragment{
 
 	public ArrayList<MegaNode> getNodes(){
 	    //remove the null placeholder.
-        CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
-	    for(MegaNode node : safeList) {
-	        if(node == null) {
-                safeList.remove(node);
-            }
-        }
-		return new ArrayList<>(safeList);
+		if (nodes != null) {
+			CopyOnWriteArrayList<MegaNode> safeList = new CopyOnWriteArrayList(nodes);
+			for (MegaNode node : safeList) {
+				if (node == null) {
+					safeList.remove(node);
+				}
+			}
+			return new ArrayList<>(safeList);
+		}
+	    return null;
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){

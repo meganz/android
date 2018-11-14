@@ -63,7 +63,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -90,7 +90,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-    CloudDriveAdapter adapter;
+    MegaNodeAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 
 	ProgressBar progressBar;
@@ -141,7 +141,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -153,7 +153,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -619,11 +619,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			transfersOverViewLayout.setOnClickListener(this);
 
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleBrowser, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleBrowser, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 //				adapter.setNodes(nodes);
             }
 
@@ -700,10 +700,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //            contentText = (TextView)v.findViewById(R.id.content_grid_text);
             
             if (adapter == null) {
-                adapter = new CloudDriveAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+                adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             } else {
                 adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-                adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+                adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
                 adapter.setNodes(nodes);
             }
 
@@ -719,7 +719,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             recyclerView.setAdapter(adapter);
             fastScroller.setRecyclerView(recyclerView);
-            addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+            addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             setNodes(nodes);
             
             if (adapter.getItemCount() == 0) {
@@ -1538,7 +1538,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         }
 
-        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
@@ -1581,10 +1581,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         visibilityFastScroller();
         this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 		}
 		else {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 		}
 
 		if (adapter != null) {

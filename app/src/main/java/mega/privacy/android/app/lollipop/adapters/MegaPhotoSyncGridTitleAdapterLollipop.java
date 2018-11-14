@@ -241,6 +241,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
             }
+            ((ManagerActivityLollipop) context).setDrawerLockMode(true);
             return true;
         }
 
@@ -262,6 +263,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                 }, 350);
             }
+            ((ManagerActivityLollipop) context).setDrawerLockMode(false);
         }
 
         @Override

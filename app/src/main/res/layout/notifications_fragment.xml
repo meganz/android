@@ -5,37 +5,35 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <LinearLayout
-        android:id="@+id/linear_empty_layout_notifications"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/empty_layout_notifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal">
 
-            <TextView
-                android:id="@+id/empty_text_notifications_invite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxWidth="300dp"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/mail_my_account"
-                android:textSize="16sp" />
+        <ImageView
+            android:id="@+id/empty_image_view_notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"/>
 
-            <ImageView
-                android:id="@+id/empty_image_view_recent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
-
+        <LinearLayout
+            android:id="@+id/layout_empty_text_notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/empty_image_view_notifications"
+            android:layout_centerHorizontal="true">
             <TextView
                 android:id="@+id/empty_text_notifications"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/adapters_background"
-                android:textSize="18sp" />
-    </LinearLayout>
+                android:textColor="@color/text_secondary"
+                android:fontFamily="sans-serif"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/linear_layout_recycler"

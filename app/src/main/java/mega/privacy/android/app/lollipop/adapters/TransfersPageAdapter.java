@@ -7,8 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 

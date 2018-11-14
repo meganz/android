@@ -52,7 +52,8 @@
         android:id="@+id/contact_list_decline"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="wrap_content"

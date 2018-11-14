@@ -249,6 +249,10 @@ public class MimeTypeList {
 		return resId;
 	}
 
+	public boolean isGIF () {
+		return extension.equals("gif");
+	}
+
 	public static void log(String message) {
 		Util.log("MimeType", message);
 	}
