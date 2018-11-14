@@ -317,7 +317,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 case R.id.action_file_contact_list_permissions:{
                     
                     //Change permissions
-                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop);
+                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
                     dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                     
                     final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -2607,7 +2607,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
             if (node.isFolder()){
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop);
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
                 dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -3217,7 +3217,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     
     public void changePermissions(){
         log("changePermissions");
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
         dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
