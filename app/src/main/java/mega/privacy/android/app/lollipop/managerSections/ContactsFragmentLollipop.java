@@ -668,6 +668,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		}
 
 		@Override
@@ -912,7 +913,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				adapter.setContacts(visibleContacts);
-				//adapter.setListFragment(recyclerView);
+				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 		
