@@ -6623,7 +6623,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(!isLoadingHistory) {
             log("Chat is NOT loading history");
-            if(lastSeenReceived == true){
+            if(lastSeenReceived == true && messages != null){
 
                long unreadCount = chatRoom.getUnreadCount();
                if (unreadCount != 0) {
