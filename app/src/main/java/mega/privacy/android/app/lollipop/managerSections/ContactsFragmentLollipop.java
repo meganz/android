@@ -112,8 +112,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
-	boolean isList = true;
 
 	ContactsFragmentLollipop contactsFragment = this;
 	
@@ -884,10 +882,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
-	    
-	    isList = ((ManagerActivityLollipop)context).isList();
-		
-		if (isList){
+
+		if (((ManagerActivityLollipop)context).isList()){
 			log("isList");
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
 			
@@ -916,7 +912,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				adapter.setContacts(visibleContacts);
-				adapter.setListFragment(recyclerView);
+				//adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 		
@@ -1130,15 +1126,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			return 0;
 		}
 	}
-	
-	public void setIsList(boolean isList){
-		this.isList = isList;
-	}
-	
-	public boolean getIsList(){
-		return isList;
-	}
-	
+
 	public void setPositionClicked(int positionClicked){
 		if (adapter != null){
 			adapter.setPositionClicked(positionClicked);
@@ -1164,9 +1152,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 
 		if(adapter == null){
-			isList = ((ManagerActivityLollipop)context).isList();
-
-			if (isList) {
+			if (((ManagerActivityLollipop)context).isList()) {
 				log("isList");
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}

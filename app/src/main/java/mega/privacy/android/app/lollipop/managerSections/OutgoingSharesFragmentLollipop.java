@@ -105,7 +105,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		
 	ArrayList<MegaNode> nodes;
 	
-	NewHeaderItemDecoration headerItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	public ActionMode actionMode;
 

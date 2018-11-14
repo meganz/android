@@ -88,7 +88,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	MegaNodeAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 	
-	NewHeaderItemDecoration headerItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	RelativeLayout transfersOverViewLayout;
 
