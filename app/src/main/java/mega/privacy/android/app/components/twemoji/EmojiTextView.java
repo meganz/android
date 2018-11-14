@@ -88,7 +88,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       display.getMetrics(mOutMetrics);
       textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
       setText(getText());
-
     }else {
       setText(getText());
     }
