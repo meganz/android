@@ -916,6 +916,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				adapter.setContacts(visibleContacts);
+				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 		

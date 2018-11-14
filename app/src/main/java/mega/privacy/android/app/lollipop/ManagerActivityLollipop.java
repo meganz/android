@@ -8154,26 +8154,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         fragTransaction.commitNowAllowingStateLoss();
                     }
 
+					//Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
+					if (cFLol != null && cFLol.isAdded()){
+
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(cFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+
+						cFLol.setIsList(isList);
+
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(cFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+
+					}
+
 	    			if(drawerItem == DrawerItem.INBOX){
 	    				selectDrawerItemLollipop(drawerItem);
 	    			}
-	    			else if (drawerItem == DrawerItem.CONTACTS){
-	    				String cFTagC = getFragmentTag(R.id.contact_tabs_pager, 0);
-			    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagC);
-			        	if (cFLol != null){
-
-		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(cFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
-
-		        			cFLol.setIsList(isList);
-
-		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(cFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
-
-		        		}
-	    			}
+//	    			else if (drawerItem == DrawerItem.CONTACTS){
+//	    				String cFTagC = getFragmentTag(R.id.contact_tabs_pager, 0);
+//			    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagC);
+//			        	if (cFLol != null){
+//
+//		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//		        			fragTransaction.detach(cFLol);
+//		        			fragTransaction.commitNowAllowingStateLoss();
+//
+//		        			cFLol.setIsList(isList);
+//
+//		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+//		        			fragTransaction.attach(cFLol);
+//		        			fragTransaction.commitNowAllowingStateLoss();
+//
+//		        		}
+//	    			}
 	    			else if (drawerItem == DrawerItem.SEARCH){
 						selectDrawerItemLollipop(drawerItem);
 	    			}
