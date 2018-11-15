@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 27
-        versionCode 213
-        versionName "3.4.1 (213)"
+        versionCode 216
+        versionName "3.5 (216)"
         multiDexEnabled true
     }
 
