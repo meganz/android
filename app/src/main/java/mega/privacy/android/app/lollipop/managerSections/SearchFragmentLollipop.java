@@ -117,7 +117,7 @@ public class SearchFragmentLollipop extends Fragment{
 
     private int placeholderCount;
 
-	NewHeaderItemDecoration headerItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	public void activateActionMode(){
 		log("activateActionMode");

@@ -88,7 +88,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	MegaNodeAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 	
-	NewHeaderItemDecoration headerItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	RelativeLayout transfersOverViewLayout;
 
@@ -330,6 +330,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		}
 
 		@Override

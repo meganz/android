@@ -8137,9 +8137,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ft.commitNowAllowingStateLoss();
 					}
 
-					if(sharesPageAdapter!=null){
-						sharesPageAdapter.notifyDataSetChanged();
-					}
 					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
                     if (oFLol != null && oFLol.isAdded()){
                         Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
@@ -8154,29 +8151,78 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         fragTransaction.commitNowAllowingStateLoss();
                     }
 
-	    			if(drawerItem == DrawerItem.INBOX){
-	    				selectDrawerItemLollipop(drawerItem);
-	    			}
-	    			else if (drawerItem == DrawerItem.CONTACTS){
-	    				String cFTagC = getFragmentTag(R.id.contact_tabs_pager, 0);
-			    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagC);
-			        	if (cFLol != null){
+					//Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
+					if (cFLol != null && cFLol.isAdded()){
 
-		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(cFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(cFLol);
+						fragTransaction.commitNowAllowingStateLoss();
 
-		        			cFLol.setIsList(isList);
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(cFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+					}
 
-		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(cFLol);
-		        			fragTransaction.commitNowAllowingStateLoss();
+					//Refresh shares section
+					if (inSFLol != null && inSFLol.isAdded()){
 
-		        		}
-	    			}
-	    			else if (drawerItem == DrawerItem.SEARCH){
-						selectDrawerItemLollipop(drawerItem);
-	    			}
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(inSFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+
+						inSFLol.headerItemDecoration = null;
+
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(inSFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+					}
+
+					//Refresh shares section
+					if (outSFLol != null && outSFLol.isAdded()){
+
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(outSFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+
+						outSFLol.headerItemDecoration = null;
+
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(outSFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+					}
+
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+
+					//Refresh search section
+					if (sFLol != null && sFLol.isAdded()){
+
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(sFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+
+						sFLol.headerItemDecoration = null;
+
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(sFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+					}
+
+					//Refresh inbox section
+					if (iFLol != null && iFLol.isAdded()){
+
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(iFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+
+						iFLol.headerItemDecoration = null;
+
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(iFLol);
+						fragTransaction.commitNowAllowingStateLoss();
+					}
+
 	        	}
 	        	supportInvalidateOptionsMenu();
 
