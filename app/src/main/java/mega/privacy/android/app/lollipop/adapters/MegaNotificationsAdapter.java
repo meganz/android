@@ -28,6 +28,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.Util.toCDATA;
+
 
 public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener{
 
@@ -1239,14 +1241,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 				if(path!=null){
 					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), toCDATA(name));
 					}
 					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
 				}
 
 				try{
@@ -1314,14 +1316,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 				if(path!=null){
 					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), toCDATA(name));
 					}
 					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
 				}
 
                 try{
