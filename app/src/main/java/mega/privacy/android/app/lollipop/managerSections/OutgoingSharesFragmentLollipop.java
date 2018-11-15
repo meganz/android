@@ -105,7 +105,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		
 	ArrayList<MegaNode> nodes;
 	
-	NewHeaderItemDecoration headerItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	public ActionMode actionMode;
 
@@ -361,6 +361,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		}
 
 		@Override
