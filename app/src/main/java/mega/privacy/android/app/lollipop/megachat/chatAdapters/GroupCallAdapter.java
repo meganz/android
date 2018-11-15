@@ -721,6 +721,18 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         this.recyclerViewFragment = recyclerViewFragment;
     }
 
+    public void removeSurfacesView(){
+        if((peers!=null)&&(peers.size())>0){
+            for(int i=0;i<peers.size();i++){
+                ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
+                if(holder!=null){
+                    holder.surfaceViewLayout.removeAllViewsInLayout();
+                    holder.surfaceViewLayout.setVisibility(GONE);
+                }
+            }
+        }
+    }
+
     public void changesInAudio(int position, ViewHolderGroupCall holder){
         log("changesInAudio");
 

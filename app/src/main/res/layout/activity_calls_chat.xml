@@ -106,6 +106,8 @@
                             android:id="@+id/micro_avatar_big_camera_group_call"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentRight="true"
                             android:background="@android:color/transparent"
                             android:visibility="gone"
                             android:src="@drawable/ic_mic_off_contact"/>
