@@ -8191,6 +8191,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						fragTransaction.commitNowAllowingStateLoss();
 					}
 
+					if(sharesPageAdapter!=null){
+						sharesPageAdapter.notifyDataSetChanged();
+					}
+
 					//Refresh search section
 					if (sFLol != null && sFLol.isAdded()){
 
