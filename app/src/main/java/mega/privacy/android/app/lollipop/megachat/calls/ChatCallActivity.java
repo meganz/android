@@ -1391,7 +1391,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }else{
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null,null);
                                 peersOnCall.add(myPeer);
-//                              createNewAdapter(true);
+                                createNewAdapter(true);
                             }
                             updateLocalVideoStatus();
                             updateLocalAudioStatus();
@@ -2624,9 +2624,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         recyclerView.setColumnWidth((int) widthScreenPX/2);
                     }
 
-                    //recyclerView.setAdapter(null);
+                    if(adapter!=null){
+                        adapter.removeSurfacesView();
+                    }
                     adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag);
-                   recyclerView.setAdapter(adapter);
+                    recyclerView.setAdapter(adapter);
 
                 }else{
                     recyclerView.setAdapter(null);
@@ -2647,6 +2649,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
                     bigRecyclerView.setVisibility(View.VISIBLE);
+                    if(adapter!=null){
+                        adapter.removeSurfacesView();
+                    }
                     adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
                     bigRecyclerView.setAdapter(adapter);
 
@@ -2716,6 +2721,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
 //                recyclerView.setAdapter(null);
+                    if(adapter!=null){
+                        adapter.removeSurfacesView();
+                    }
                     adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag);
                     recyclerView.setAdapter(adapter);
                 }else{
@@ -2736,6 +2744,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
                     bigRecyclerView.setVisibility(View.VISIBLE);
+                    if(adapter!=null){
+                        adapter.removeSurfacesView();
+                    }
                     adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
                     bigRecyclerView.setAdapter(adapter);
 
