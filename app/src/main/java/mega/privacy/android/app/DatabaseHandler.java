@@ -16,8 +16,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.lollipop.megachat.PendingMessage;
-import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
+import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -26,7 +25,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 42;
+	private static final int DATABASE_VERSION = 43;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -41,6 +40,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_PENDING_MSG = "pendingmsg";
 	private static final String TABLE_MSG_NODES = "msgnodes";
 	private static final String TABLE_NODE_ATTACHMENTS = "nodeattachments";
+	private static final String TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -151,6 +151,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_LAST_PUBLIC_HANDLE = "lastpublichandle";
 	private static final String KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp";
 
+	private static final String KEY_PENDING_MSG_ID_CHAT = "idchat";
+	private static final String KEY_PENDING_MSG_TIMESTAMP = "timestamp";
+	private static final String KEY_PENDING_MSG_TEMP_KARERE = "idtempkarere";
+	private static final String KEY_PENDING_MSG_FILE_PATH = "filePath";
+	private static final String KEY_PENDING_MSG_NAME = "filename";
+	private static final String KEY_PENDING_MSG_NODE_HANDLE = "nodehandle";
+	private static final String KEY_PENDING_MSG_FINGERPRINT = "filefingerprint";
+	private static final String KEY_PENDING_MSG_TRANSFER_TAG = "transfertag";
+	private static final String KEY_PENDING_MSG_STATE = "state";
+
     private static DatabaseHandler instance;
     
     private static SQLiteDatabase db;
@@ -251,6 +261,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
 		db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
+
+		String CREATE_NEW_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG_SINGLE + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_PENDING_MSG_ID_CHAT + " TEXT, " + KEY_PENDING_MSG_TIMESTAMP + " TEXT, " +KEY_PENDING_MSG_TEMP_KARERE + " TEXT, " + KEY_PENDING_MSG_FILE_PATH + " TEXT, " + KEY_PENDING_MSG_NAME + " TEXT, " +KEY_PENDING_MSG_NODE_HANDLE + " TEXT, " +KEY_PENDING_MSG_FINGERPRINT + " TEXT, " + KEY_PENDING_MSG_TRANSFER_TAG + " INTEGER, " + KEY_PENDING_MSG_STATE + " INTEGER" +")";
+		db.execSQL(CREATE_NEW_PENDING_MSG_TABLE);
 	}
 
 	@Override
@@ -576,6 +590,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " = '" + encrypt("-1") + "';");
 		}
+
+		if (oldVersion <= 42){
+			String CREATE_NEW_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG_SINGLE + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_PENDING_MSG_ID_CHAT + " TEXT, " + KEY_PENDING_MSG_TIMESTAMP + " TEXT, " +KEY_PENDING_MSG_TEMP_KARERE + " TEXT, " + KEY_PENDING_MSG_FILE_PATH + " TEXT, " + KEY_PENDING_MSG_NAME + " TEXT, " +KEY_PENDING_MSG_NODE_HANDLE + " TEXT, " +KEY_PENDING_MSG_FINGERPRINT + " TEXT, " + KEY_PENDING_MSG_TRANSFER_TAG + " INTEGER, " + KEY_PENDING_MSG_STATE + " INTEGER" +")";
+
+			db.execSQL(CREATE_NEW_PENDING_MSG_TABLE);
+		}
 	}
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -771,369 +792,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return ephemeralCredentials;
     }
-
-	public void updatePendingMessage(long idMessage, String temporalId, int sent) {
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_ID_TEMP_KARERE, encrypt(temporalId));
-		values.put(KEY_STATE, sent);
-		String where = KEY_ID + "=" +idMessage;
-
-		int rows = db.update(TABLE_PENDING_MSG, values, where, null);
-		log("Rows updated: "+rows);
-	}
-
-	public void setFinishedPendingMessages() {
-		log("setFinishedPendingMessages");
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_STATE, PendingMessage.STATE_ERROR);
-		String where = KEY_STATE + "=" +PendingMessage.STATE_SENDING;
-
-		int rows = db.update(TABLE_PENDING_MSG, values, where, null);
-		log("Rows updated: "+rows);
-	}
-
-
-	public void removePendingMessageById(long idMsg){
-
-		ArrayList<Long> nodes = findMsgNodes(idMsg);
-		if(nodes!=null){
-			for(int i=0;i<nodes.size();i++){
-				int rows = db.delete(TABLE_NODE_ATTACHMENTS, KEY_ID + "="+nodes.get(i), null);
-				log("From TABLE_NODe_ATTACHMENTS deleted: "+rows);
-			}
-		}
-
-		int rows = db.delete(TABLE_MSG_NODES, KEY_ID_PENDING_MSG + "="+idMsg, null);
-		log("From TABLE_MSG_NODES deleted: "+rows);
-		rows = db.delete(TABLE_PENDING_MSG, KEY_ID + "="+idMsg, null);
-		log("From TABLE_PENDING_MSG deleted: "+rows);
-	}
-
-	public void removePendingMessageByChatId(long idChat){
-		log("removePendingMessageByChatId");
-		ArrayList<Long> messages = findIdPendingMessagesByChatId(idChat);
-		if(messages!=null){
-			for(int i=0;i<messages.size();i++){
-				removePendingMessageById(messages.get(i));
-			}
-		}
-	}
-
-	public ArrayList<Long> findIdPendingMessagesByChatId(long idChat){
-		log("findPendingMessageBySent");
-		ArrayList<Long> idMessages = new ArrayList<>();
-		String chat = idChat+"";
-
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " +KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		ArrayList<Long> pendingIds = new ArrayList<>();
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-				do{
-					long id = cursor.getLong(0);
-
-					idMessages.add(id);
-
-				} while (cursor.moveToNext());
-			}
-		}
-		cursor.close();
-		return idMessages;
-	}
-
-	public PendingMessage findPendingMessagesById(long messageId){
-		log("findPendingMessagesById");
-//		String id = messageId+"";
-		PendingMessage pendMsg = null;
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " +KEY_ID + " ='"+ messageId+"'";
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()) {
-//				long id = Integer.parseInt(cursor.getString(0));
-				long chatId = Long. parseLong(decrypt(cursor.getString(1)));
-				long timestamp = Long. parseLong(decrypt(cursor.getString(2)));
-				String idKarereString = decrypt(cursor.getString(3));
-				long idTempKarere = -1;
-				if(idKarereString!=null && (!idKarereString.isEmpty())){
-					idTempKarere = Long. parseLong(idKarereString);
-				}
-				int state = cursor.getInt(4);
-
-				pendMsg = new PendingMessage(messageId, chatId, timestamp, idTempKarere, state);
-			}
-		}
-
-		cursor.close();
-
-		ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(messageId);
-		pendMsg.setNodeAttachment(nodes.get(0));
-
-		return pendMsg;
-	}
-
-	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(int sent, long idChat){
-		log("findPendingMessageBySent");
-		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-		String chat = idChat+"";
-
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " = " + sent + " AND "+ KEY_ID_CHAT + " ='"+ encrypt(chat)+"'";
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		ArrayList<Long> pendingIds = new ArrayList<>();
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-                do{
-                    long id = cursor.getLong(0);
-                    String timestamp = cursor.getString(2);
-                    PendingMessage pendMsg = new PendingMessage(id, idChat, Long.valueOf(timestamp));
-
-                    ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-					pendMsg.setState(sent);
-                    pendMsg.setNodeAttachment(nodes.get(0));
-
-                    AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
-                    messages.add(androidMsg);
-
-                } while (cursor.moveToNext());
-			}
-		}
-		cursor.close();
-		return messages;
-	}
-
-	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesNotSent(long idChat){
-		log("findAndroidMessagesNotSent");
-		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-
-		ArrayList<PendingMessage> pendMsgs = findPendingMessagesNotSent(idChat);
-
-		for(int i=0;i<pendMsgs.size();i++){
-			PendingMessage pendMsg = pendMsgs.get(i);
-			long id = pendMsg.getId();
-			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-			if(nodes!=null && (!nodes.isEmpty())){
-				pendMsg.setNodeAttachment(nodes.get(0));
-
-				AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
-				messages.add(androidMsg);
-			}
-			else{
-				log("Error. Not nodes found any chat");
-			}
-		}
-
-		log("Found: "+ messages.size());
-		return messages;
-	}
-
-//	public ArrayList<AndroidMegaChatMessage> findPendingMessageById(long idMsg){
-//		log("findPendingMessagesById");
-////		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-////
-////		ArrayList<PendingMessage> pendMsgs = findPendingMessagesNotSent(idChat);
-////
-////		for(int i=0;i<pendMsgs.size();i++){
-////			PendingMessage pendMsg = pendMsgs.get(i);
-////			long id = pendMsg.getId();
-////			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-////			pendMsg.setNodeAttachments(nodes);
-////
-////			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
-////			messages.add(androidMsg);
-////		}
-////
-////		log("Found: "+ messages.size());
-//		return messages;
-//	}
-
-	public ArrayList<PendingMessage> findPendingMessagesNotSent(long idChat) {
-		log("findPendingMessagesNotSent");
-		ArrayList<PendingMessage> pendMsgs = new ArrayList<>();
-		String chat = idChat + "";
-
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " < " + PendingMessage.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
-		log("QUERY: " + selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (!cursor.equals(null)) {
-			if (cursor.moveToFirst()) {
-				do {
-					long id = cursor.getLong(0);
-					String timestamp = decrypt(cursor.getString(2));
-					long ts = Long.valueOf(timestamp);
-					PendingMessage pendMsg = new PendingMessage(id, idChat, ts);
-					pendMsg.setState(cursor.getInt(4));
-					pendMsgs.add(pendMsg);
-
-				} while (cursor.moveToNext());
-			}
-		}
-		cursor.close();
-		log("Found: "+pendMsgs.size());
-		return pendMsgs;
-	}
-
-	public ArrayList<PendingNodeAttachment> findPendingNodesByMsgId(long idMsg){
-		log("findPendingNodesByMsgId");
-		ArrayList<PendingNodeAttachment> nodes = new ArrayList<>();
-
-		String selectQuery = "SELECT * FROM " + TABLE_MSG_NODES + " WHERE " + KEY_ID_PENDING_MSG + " = " + idMsg;
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		ArrayList<Long> pendingIds = new ArrayList<>();
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-				pendingIds.add(cursor.getLong(2));
-			}
-		}
-		cursor.close();
-
-		for(int i=0;i<pendingIds.size();i++){
-            PendingNodeAttachment node = findPendingNodeById(pendingIds.get(i));
-            if(node!=null){
-                nodes.add(node);
-            }
-
-            else{
-                log("Error the node is NULL");
-            }
-		}
-
-		return nodes;
-	}
-
-	public PendingNodeAttachment findPendingNodeById(long idNode){
-		log("findPendingNodeById");
-        PendingNodeAttachment node = null;
-        String selectQuery = "SELECT * FROM " + TABLE_NODE_ATTACHMENTS + " WHERE " + KEY_ID + " = " + idNode;
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-				node = new PendingNodeAttachment(decrypt(cursor.getString(1)), decrypt(cursor.getString(3)), decrypt(cursor.getString(2)), Long.valueOf(cursor.getString(4)));
-			}
-		}
-		cursor.close();
-		return node;
-	}
-
-	public ArrayList<Long> findPendingMessagesBySent(int sent){
-		log("findPendingMessageBySent");
-
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_STATE + " = " + sent;
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		ArrayList<Long> pendingIds = new ArrayList<>();
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-				long id = cursor.getLong(0);
-				pendingIds.add(id);
-			}
-		}
-		cursor.close();
-		log("Found: "+pendingIds.size());
-		return pendingIds;
-	}
-
-	public void removeSentPendingMessages(){
-		log("removeSentPendingMessages");
-		ArrayList<Long> nodesToDelete = new ArrayList<>();
-		ArrayList<Long> messages = findPendingMessagesBySent(PendingMessage.STATE_SENT);
-		if(messages!=null){
-			for(int i=0;i<messages.size();i++){
-				ArrayList<Long> nodes = findMsgNodes(messages.get(i));
-				if(nodes!=null){
-					nodesToDelete.addAll(nodes);
-				}
-				int rows = db.delete(TABLE_MSG_NODES, KEY_ID_PENDING_MSG + "="+messages.get(i), null);
-				log("From TABLE_MSG_NODES deleted: "+rows);
-				rows = db.delete(TABLE_PENDING_MSG, KEY_ID + "="+messages.get(i), null);
-				log("From TABLE_PENDING_MSG deleted: "+rows);
-
-			}
-		}
-
-		for (int i=0; i<nodesToDelete.size();i++){
-			int rows = db.delete(TABLE_NODE_ATTACHMENTS, KEY_ID + "="+nodesToDelete.get(i), null);
-			log("From TABLE_NODE_ATTACHMENTS deleted: "+rows);
-		}
-	}
-
-	public ArrayList<Long> findMsgNodes(long idMsg){
-		log("findMsgNodes: "+idMsg);
-
-		String selectQuery = "SELECT * FROM " + TABLE_MSG_NODES + " WHERE " + KEY_ID_PENDING_MSG + " = '" + idMsg + "'";
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		ArrayList<Long> nodes = new ArrayList<>();
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-				do{
-					long idNode = cursor.getLong(1);
-					nodes.add(idNode);
-				} while (cursor.moveToNext());
-			}
-		}
-
-		cursor.close();
-
-		return nodes;
-	}
-
-	public long setPendingMessage(String idChat, String timestamp){
-		ContentValues values = new ContentValues();
-		values.put(KEY_ID_CHAT, encrypt(idChat));
-		values.put(KEY_MSG_TIMESTAMP, encrypt(timestamp));
-		values.put(KEY_ID_TEMP_KARERE, -1+"");
-		values.put(KEY_STATE, PendingMessage.STATE_SENDING);
-
-		long id = db.insert(TABLE_PENDING_MSG, null, values);
-		return id;
-	}
-
-	public long setNodeAttachment(String path, String name, String fingerprint){
-		ContentValues values = new ContentValues();
-		values.put(KEY_FILE_PATH, encrypt(path));
-		values.put(KEY_FILE_NAME, encrypt(name));
-		values.put(KEY_FILE_FINGERPRINT, encrypt(fingerprint));
-		values.put(KEY_NODE_HANDLE, -1+"");
-
-		long id = db.insert(TABLE_NODE_ATTACHMENTS, null, values);
-		return id;
-	}
-
-	public long setMsgNode(long idMsg, long idNode){
-		ContentValues values = new ContentValues();
-		values.put(KEY_ID_PENDING_MSG, idMsg);
-		values.put(KEY_ID_NODE, idNode);
-
-		long id = db.insert(TABLE_MSG_NODES, null, values);
-		return id;
-	}
-
-	public long findPendingMessageByIdTempKarere(long idTemp){
-		log("findPendingMessageById: "+idTemp);
-		String idPend = idTemp+"";
-		long id = -1;
-
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " + KEY_ID_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
-		log("QUERY: "+selectQuery);
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				id = cursor.getLong(0);
-			}
-		}
-		cursor.close();
-		return id;
-	}
 
 	public void setPreferences (MegaPreferences prefs){
         ContentValues values = new ContentValues();
@@ -3241,9 +2899,190 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PENDING_MSG);
 		onCreate(db);
 	}
-	
+
+	//New management of pending messages
+	public long addPendingMessage(String idChat, String timestamp, String filePath, String fingerprint, String name){
+		ContentValues values = new ContentValues();
+		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(idChat));
+		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(timestamp));
+		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(filePath));
+		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(fingerprint));
+		values.put(KEY_PENDING_MSG_NAME, encrypt(name));
+		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING);
+
+		long id = db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
+		return id;
+	}
+
+	public long addPendingMessage(PendingMessageSingle message){
+		ContentValues values = new ContentValues();
+		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId()+""));
+		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp()+""));
+		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.getFilePath()));
+		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.getFingerprint()));
+		values.put(KEY_PENDING_MSG_NAME, encrypt(message.getName()));
+		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING);
+
+		long id = db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
+		return id;
+	}
+
+	public PendingMessageSingle findPendingMessageById(long messageId){
+		log("findPendingMessageById");
+//		String id = messageId+"";
+		PendingMessageSingle pendMsg = null;
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " +KEY_ID + " ='"+ messageId+"'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()) {
+//				long id = Integer.parseInt(cursor.getString(0));
+				long chatId = Long. parseLong(decrypt(cursor.getString(1)));
+				long timestamp = Long. parseLong(decrypt(cursor.getString(2)));
+				String idKarereString = decrypt(cursor.getString(3));
+				long idTempKarere = -1;
+				if(idKarereString!=null && (!idKarereString.isEmpty())){
+					idTempKarere = Long. parseLong(idKarereString);
+				}
+				String filePath = decrypt(cursor.getString(4));
+				String name = decrypt(cursor.getString(5));
+
+				String nodeHandleString = decrypt(cursor.getString(6));
+				long nodeHandle = -1;
+				if(nodeHandleString!=null && (!nodeHandleString.isEmpty())){
+					nodeHandle = Long. parseLong(nodeHandleString);
+				}
+
+				String fingerPrint = decrypt(cursor.getString(7));
+				int transferTag = cursor.getInt(8);
+				int state = cursor.getInt(9);
+
+				pendMsg = new PendingMessageSingle(messageId, chatId, timestamp, idTempKarere, filePath, fingerPrint, name, nodeHandle, transferTag, state);
+			}
+		}
+
+		cursor.close();
+
+		return pendMsg;
+	}
+
+	public void updatePendingMessageOnTransferStart(long idMessage, int transferTag) {
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag);
+		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_UPLOADING);
+		String where = KEY_ID + "=" +idMessage;
+
+		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
+		log("Rows updated: "+rows);
+	}
+
+	public void updatePendingMessageOnTransferFinish(long idMessage, String nodeHandle, int state) {
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_PENDING_MSG_NODE_HANDLE, encrypt(nodeHandle));
+		values.put(KEY_PENDING_MSG_STATE, state);
+		String where = KEY_ID + "=" +idMessage;
+
+		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
+		log("Rows updated: "+rows);
+	}
+
+	public void updatePendingMessageOnAttach(long idMessage, String temporalId, int state) {
+
+		ContentValues values = new ContentValues();
+		log("----The id of my pending message to update: "+temporalId);
+		values.put(KEY_PENDING_MSG_TEMP_KARERE, encrypt(temporalId));
+		values.put(KEY_PENDING_MSG_STATE, state);
+		String where = KEY_ID + "=" +idMessage;
+
+		int rows = db.update(TABLE_PENDING_MSG_SINGLE, values, where, null);
+		log("Rows updated: "+rows);
+	}
+
+	public ArrayList<AndroidMegaChatMessage> findPendingMessagesNotSent(long idChat) {
+		log("findPendingMessagesNotSent");
+		ArrayList<AndroidMegaChatMessage> pendMsgs = new ArrayList<>();
+		String chat = idChat + "";
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_STATE + " < " + PendingMessageSingle.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
+		log("QUERY: " + selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (!cursor.equals(null)) {
+			if (cursor.moveToFirst()) {
+				do {
+					long id = cursor.getLong(0);
+					long chatId = Long. parseLong(decrypt(cursor.getString(1)));
+					long timestamp = Long. parseLong(decrypt(cursor.getString(2)));
+					String idKarereString = decrypt(cursor.getString(3));
+					long idTempKarere = -1;
+					if(idKarereString!=null && (!idKarereString.isEmpty())){
+						idTempKarere = Long. parseLong(idKarereString);
+					}
+					String filePath = decrypt(cursor.getString(4));
+					String name = decrypt(cursor.getString(5));
+
+					String nodeHandleString = decrypt(cursor.getString(6));
+					long nodeHandle = -1;
+					if(nodeHandleString!=null && (!nodeHandleString.isEmpty())){
+						nodeHandle = Long. parseLong(nodeHandleString);
+					}
+
+					String fingerPrint = decrypt(cursor.getString(7));
+					int transferTag = cursor.getInt(8);
+					int state = cursor.getInt(9);
+
+					PendingMessageSingle pendMsg = new PendingMessageSingle(id, chatId, timestamp, idTempKarere, filePath, fingerPrint, name, nodeHandle, transferTag, state);
+
+					AndroidMegaChatMessage aPMsg = new AndroidMegaChatMessage(pendMsg, true);
+					pendMsgs.add(aPMsg);
+
+				} while (cursor.moveToNext());
+			}
+		}
+		cursor.close();
+		log("Found: "+pendMsgs.size());
+		return pendMsgs;
+	}
+
+	public long findPendingMessageByIdTempKarere(long idTemp){
+		log("findPendingMessageById: "+idTemp);
+		String idPend = idTemp+"";
+		long id = -1;
+
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){
+
+				id = cursor.getLong(0);
+			}
+		}
+		cursor.close();
+		return id;
+	}
+
+	public void removeSentPendingMessages(){
+		log("removeSentPendingMessages");
+		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_PENDING_MSG_STATE + "="+PendingMessageSingle.STATE_SENT, null);
+	}
+
+	public void removePendingMessageByChatId(long idChat){
+		log("removePendingMessageByChatId");
+		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_PENDING_MSG_ID_CHAT + "="+idChat, null);
+
+	}
+
+	public void removePendingMessageById(long idMsg){
+		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_ID + "="+idMsg, null);
+	}
+
+	////
+
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);
 	}
-
 }
