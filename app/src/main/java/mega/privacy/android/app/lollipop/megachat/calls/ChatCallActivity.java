@@ -337,7 +337,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             if(userHandle == megaChatApi.getMyUserHandle()){
                                 log("updateScreenStatusInProgress()-peersOnCall.add("+megaChatApi.getMyFullname()+")-> ME");
 
-                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null, null);
+                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
                                 peersOnCall.add(myPeer);
                                 changes = true;
                             }else{
@@ -345,7 +345,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 if(userSession!=null){
                                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                                         log("updateScreenStatusInProgress()-peersOnCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
-                                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null, null);
+                                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
                                         peersOnCall.add(0, userPeer);
                                         changes = true;
                                     }
@@ -363,14 +363,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 for(int i = 0; i < callChat.getParticipants().size(); i++){
                     long userHandle = callChat.getParticipants().get(i);
                     if(userHandle == megaChatApi.getMyUserHandle()){
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
                         peersOnCall.add(myPeer);
                         changes = true;
                     }else{
                         MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                         if(userSession!=null){
                             if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
-                                InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null,null);
+                                InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
                                 peersOnCall.add(0, userPeer);
                                 changes = true;
                             }else{}
@@ -824,7 +824,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             boolean changes = false;
                             for(int i = 0; i < callChat.getParticipants().size(); i++){
                                 long userHandle = callChat.getParticipants().get(i);
-                                InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null, null);
+                                InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null);
                                 peersBeforeCall.add(0, userPeer);
                                 changes = true;
                             }
@@ -873,7 +873,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             peersOnCall.clear();
                         }
 
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
                         peersOnCall.add(myPeer);
                         updatePeers(true);
 
@@ -1386,12 +1386,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     }
                                 }
                                 if(!peerContain){
-                                    InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null,null);
+                                    InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
                                     peersOnCall.add(myPeer);
                                     updatePeers(true);
                                 }
                             }else{
-                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null,null);
+                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
                                 peersOnCall.add(myPeer);
                                 updatePeers(true);
                             }
@@ -1499,9 +1499,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     }
                                 }
                                 if(!peerContain){
-                                    InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null, null);
+                                    InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
                                     peersOnCall.add(0, userPeer);
-                                    updatePeers(true);
+                                    if((peersOnCall.size()<7)&&(adapterGrid!= null)){
+                                        adapterGrid.addAt(0);
+                                    }else{
+                                        updatePeers(true);
+                                    }
+
                                 }
 
                             }
@@ -1517,9 +1522,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                                 for(int i=0;i<peersOnCall.size();i++){
                                     if(peersOnCall.get(i).getHandle() == userHandle){
-//                                        adapter.removeAt(i);
                                         peersOnCall.remove(i);
-                                        updatePeers(true);
+
+                                        if((peersOnCall.size()<6)&&(adapterGrid!=null)){
+                                            adapterGrid.removeAt(i);
+                                        }else{
+                                            updatePeers(true);
+                                        }
                                         break;
                                     }
                                 }
@@ -1583,7 +1592,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         //Get all participant and add them
                         for(int i = 0; i < call.getParticipants().size(); i++){
                             long userHandle = call.getParticipants().get(i);
-                            InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null,null);
+                            InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null);
                             peersBeforeCall.add(0, userPeer);
                             changes = true;
                         }

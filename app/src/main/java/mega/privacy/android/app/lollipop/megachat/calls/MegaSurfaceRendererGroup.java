@@ -114,7 +114,6 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
 
     public void surfaceCreated(SurfaceHolder holder) {
         log("surfaceCreated()");
-
         Canvas canvas = holder.lockCanvas();
         if(canvas != null) {
             Rect dst = holder.getSurfaceFrame();

@@ -12,21 +12,17 @@ public class InfoPeerGroupCall {
     boolean videoOn;
     boolean audioOn;
     boolean greenLayer;
-
     GroupCallListener listener = null;
-    SurfaceView surfaceview = null;
 
-    public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, boolean greenLayer, GroupCallListener listener, SurfaceView surfaceview) {
-        this.handle = handle;
-        this.name = name;
-        this.videoOn = videoOn;
-        this.audioOn = audioOn;
-        this.greenLayer = greenLayer;
-        this.listener = listener;
-        this.surfaceview = surfaceview;
+public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, boolean greenLayer, GroupCallListener listener) {
 
-
-    }
+    this.handle = handle;
+    this.name = name;
+    this.videoOn = videoOn;
+    this.audioOn = audioOn;
+    this.greenLayer = greenLayer;
+    this.listener = listener;
+}
 
     public Long getHandle() {
         return handle;
@@ -76,11 +72,4 @@ public class InfoPeerGroupCall {
         this.listener = listener;
     }
 
-    public SurfaceView getSurfaceview() {
-        return surfaceview;
-    }
-
-    public void setSurfaceview(SurfaceView surfaceview) {
-        this.surfaceview = surfaceview;
-    }
 }
