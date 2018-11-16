@@ -343,6 +343,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     int orientationSaved;
 
+	public enum FragmentTag {
+		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY;
+
+		public String getTag () {
+			switch (this) {
+				case CLOUD_DRIVE: return "fbFLol";
+				case RUBBISH_BIN: return "rubbishBinFLol";
+				case OFFLINE: return "oFLol";
+				case CAMERA_UPLOADS: return "cuFLol";
+				case MEDIA_UPLOADS: return "muFLol";
+				case INBOX: return "iFLol";
+				case INCOMING_SHARES: return "isF";
+				case OUTGOING_SHARES: return "osF";
+				case CONTACTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 0;
+				case RECEIVED_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 1;
+				case SENT_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 2;
+				case SETTINGS: return "sttF";
+				case MY_ACCOUNT: return "android:switcher:" + R.id.my_account_tabs_pager + ":" + 0;
+				case MY_STORAGE: return "android:switcher:" + R.id.my_account_tabs_pager + ":" + 1;
+				case SEARCH: return "sFLol";
+				case TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 0;
+				case COMPLETED_TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 1;
+				case RECENT_CHAT: return "rChat";
+				case NOTIFICATIONS: return "notificFragment";
+				case UPGRADE_ACCOUNT: return "upAFL";
+				case MONTHLY_ANUALLY: return "myF";
+				case FORTUMO: return "fF";
+				case CENTILI: return "ctF";
+				case CREDIT_CARD: return "ccF";
+				case TURN_ON_NOTIFICATIONS: return "tonF";
+				case EXPORT_RECOVERY_KEY: return "eRKeyF";
+			}
+			return null;
+		}
+	}
+
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
 
@@ -641,15 +678,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						updateAccountDetailsVisibleInfo();
 
 						//Check if myAccount section is visible
-						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 						if(maFLol!=null && maFLol.isAdded()){
 							log("Update the account fragment");
 							maFLol.setAccountDetails();
 						}
 
-						String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
-						mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+						mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 						if(mStorageFLol!=null && mStorageFLol.isAdded()){
 							log("Update the account fragment");
 							mStorageFLol.setAccountDetails();
@@ -3087,7 +3122,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			tonF = new TurnOnNotificationsFragment();
 		}
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_container, tonF, "tonF");
+		ft.replace(R.id.fragment_container, tonF, FragmentTag.TURN_ON_NOTIFICATIONS.getTag());
 		ft.commitNowAllowingStateLoss();
 
 		tabLayoutContacts.setVisibility(View.GONE);
@@ -4173,7 +4208,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fbFLol = new FileBrowserFragmentLollipop().newInstance();
 
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_container, fbFLol, "fbFLol");
+		ft.replace(R.id.fragment_container, fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
 		ft.commitNow();
 
 		if (!firstTime){
@@ -4928,12 +4963,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else {
 			log("contactsPageAdapter NOT null");
-			String sharesTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-			sharesTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-			sharesTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
+			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
 
 			log("The index of the TAB CONTACTS is: " + indexContacts);
 			if (viewPagerContacts != null) {
@@ -4970,20 +5002,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("onPageSelected");
 				checkScrollElevation();
 				indexContacts = position;
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 				if(cFLol!=null && cFLol.isAdded()){
 					cFLol.hideMultipleSelect();
 					cFLol.clearSelectionsNoAnimations();
 				}
-				cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
 				if(sRFLol!=null && sRFLol.isAdded()){
 					sRFLol.clearSelections();
 					sRFLol.hideMultipleSelect();
 				}
-				cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
 				if(rRFLol!=null && rRFLol.isAdded()){
 					rRFLol.clearSelections();
 					rRFLol.hideMultipleSelect();
@@ -5077,11 +5106,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					log("mTabsAdapterMyAccount NOT null");
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 
-					myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
-					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 
 					if(indexAccount!=-1) {
 						log("The index of the TAB MyAccount is: " + indexAccount);
@@ -5154,13 +5181,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("New NotificationsFragment");
 			notificFragment = new NotificationsFragmentLollipop();
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
+			ft.replace(R.id.fragment_container, notificFragment, FragmentTag.NOTIFICATIONS.getTag());
 			ft.commitNowAllowingStateLoss();
 		}
 		else{
 			log("NotificationsFragment is not null");
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
+			ft.replace(R.id.fragment_container, notificFragment, FragmentTag.NOTIFICATIONS.getTag());
 			ft.commitNowAllowingStateLoss();
 		}
 
@@ -5232,11 +5259,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("mTabsAdapterTransfers NOT null");
-			String transfersTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(transfersTag);
-
-			transfersTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
-			completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(transfersTag);
+			tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
+			completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 			if(indexTransfers!=-1) {
 				log("The index of the TAB Transfers is: " + indexTransfers);
@@ -5302,13 +5326,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("New REcentChatFragment");
 			rChatFL = new RecentChatsFragmentLollipop();
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.replace(R.id.fragment_container, rChatFL, "rChat");
+			ft.replace(R.id.fragment_container, rChatFL, FragmentTag.RECENT_CHAT.getTag());
 			ft.commitNow();
 		}
 		else{
 			log("REcentChatFragment is not null");
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.replace(R.id.fragment_container, rChatFL, "rChat");
+			ft.replace(R.id.fragment_container, rChatFL, FragmentTag.RECENT_CHAT.getTag());
 			ft.commitNow();
 			rChatFL.setChats();
 			rChatFL.setStatus();
@@ -5375,7 +5399,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				viewPagerTransfers.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, rubbishBinFLol, "rubbishBinFLol");
+				ft.replace(R.id.fragment_container, rubbishBinFLol, FragmentTag.RUBBISH_BIN.getTag());
 				ft.commitNow();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
@@ -5418,7 +5442,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fragmentContainer.setVisibility(View.VISIBLE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, oFLol, "oFLol");
+				ft.replace(R.id.fragment_container, oFLol, FragmentTag.OFFLINE.getTag());
     			ft.commitNow();
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -5466,7 +5490,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fragmentContainer.setVisibility(View.VISIBLE);
 
 				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 				if (currentFragment != null) {
 					fragTransaction.detach(currentFragment);
 					fragTransaction.commitNowAllowingStateLoss();
@@ -5476,7 +5500,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fragTransaction.commitNowAllowingStateLoss();
 				}
 				else{
-					fragTransaction.replace(R.id.fragment_container, cuFL, "cuFLol");
+					fragTransaction.replace(R.id.fragment_container, cuFL, FragmentTag.CAMERA_UPLOADS.getTag());
 					fragTransaction.commitNowAllowingStateLoss();
 				}
 
@@ -5526,7 +5550,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fragmentContainer.setVisibility(View.VISIBLE);
 
 				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 				if (currentFragment != null) {
 					fragTransaction.detach(currentFragment);
 					fragTransaction.commitNowAllowingStateLoss();
@@ -5536,7 +5560,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fragTransaction.commitNowAllowingStateLoss();
 				}
 				else{
-					fragTransaction.replace(R.id.fragment_container, muFLol, "muFLol");
+					fragTransaction.replace(R.id.fragment_container, muFLol, FragmentTag.MEDIA_UPLOADS.getTag());
 					fragTransaction.commitNowAllowingStateLoss();
 				}
 
@@ -5565,7 +5589,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				viewPagerTransfers.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, iFLol, "iFLol");
+				ft.replace(R.id.fragment_container, iFLol, FragmentTag.INBOX.getTag());
     			ft.commitNow();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
@@ -5650,7 +5674,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-    			ft.replace(R.id.fragment_container, sttFLol, "sttF");
+    			ft.replace(R.id.fragment_container, sttFLol, FragmentTag.SETTINGS.getTag());
     			ft.commitAllowingStateLoss();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
@@ -5684,7 +5708,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				viewPagerTransfers.setVisibility(View.GONE);
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, sFLol, "sFLol");
+				ft.replace(R.id.fragment_container, sFLol, FragmentTag.SEARCH.getTag());
     			ft.commitNowAllowingStateLoss();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
@@ -5885,10 +5909,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	private String getFragmentTag(int viewPagerId, int fragmentPosition){
-	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
-	}
-
 	private void getOverflowMenu() {
 		log("getOverflowMenu");
 	     try {
@@ -5924,17 +5944,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (ccFL == null){
 				ccFL = new CreditCardFragmentLollipop();
 				ccFL.setInfo(type, payMonth);
-				ft.replace(R.id.fragment_container, ccFL, "ccF");
+				ft.replace(R.id.fragment_container, ccFL, FragmentTag.CREDIT_CARD.getTag());
 				ft.commitNow();
 			}
 			else{
 				ccFL.setInfo(type, payMonth);
-				ft.replace(R.id.fragment_container, ccFL, "ccF");
+				ft.replace(R.id.fragment_container, ccFL, FragmentTag.CREDIT_CARD.getTag());
 				ft.commitNow();
 			}
 		}
 		else{
-			Fragment tempF = getSupportFragmentManager().findFragmentByTag("ccF");
+			Fragment tempF = getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
 			if (tempF != null){
 				ft.detach(tempF);
 				ft.attach(tempF);
@@ -5944,12 +5964,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (ccFL == null){
 					ccFL = new CreditCardFragmentLollipop();
 					ccFL.setInfo(type, payMonth);
-					ft.replace(R.id.fragment_container, ccFL, "ccF");
+					ft.replace(R.id.fragment_container, ccFL, FragmentTag.CREDIT_CARD.getTag());
 					ft.commitNow();
 				}
 				else{
 					ccFL.setInfo(type, payMonth);
-					ft.replace(R.id.fragment_container, ccFL, "ccF");
+					ft.replace(R.id.fragment_container, ccFL, FragmentTag.CREDIT_CARD.getTag());
 					ft.commitNow();
 				}
 			}
@@ -5985,11 +6005,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (fFL == null){
 			fFL = new FortumoFragmentLollipop();
-			ft.replace(R.id.fragment_container,  fFL, "fF");
+			ft.replace(R.id.fragment_container,  fFL, FragmentTag.FORTUMO.getTag());
 			ft.commitNow();
 		}
 		else{
-			ft.replace(R.id.fragment_container, fFL, "fF");
+			ft.replace(R.id.fragment_container, fFL, FragmentTag.FORTUMO.getTag());
 			ft.commitNow();
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
@@ -6008,11 +6028,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (ctFL == null){
 			ctFL = new CentiliFragmentLollipop();
-			ft.replace(R.id.fragment_container,  ctFL, "ctF");
+			ft.replace(R.id.fragment_container,  ctFL, FragmentTag.CENTILI.getTag());
 			ft.commitNow();
 		}
 		else{
-			ft.replace(R.id.fragment_container, ctFL, "ctF");
+			ft.replace(R.id.fragment_container, ctFL, FragmentTag.CENTILI.getTag());
 			ft.commitNow();
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
@@ -6037,12 +6057,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (myFL == null){
 			myFL = new MonthlyAnnualyFragmentLollipop();
 			myFL.setInfo(paymentMethod, type);
-			ft.replace(R.id.fragment_container, myFL, "myF");
+			ft.replace(R.id.fragment_container, myFL, FragmentTag.MONTHLY_ANUALLY.getTag());
 			ft.commitNow();
 		}
 		else{
 			myFL.setInfo(paymentMethod, type);
-			ft.replace(R.id.fragment_container, myFL, "myF");
+			ft.replace(R.id.fragment_container, myFL, FragmentTag.MONTHLY_ANUALLY.getTag());
 			ft.commitNow();
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
@@ -6066,11 +6086,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if(upAFL==null){
 			upAFL = new UpgradeAccountFragmentLollipop();
-			ft.replace(R.id.fragment_container, upAFL, "upAFL");
+			ft.replace(R.id.fragment_container, upAFL, FragmentTag.UPGRADE_ACCOUNT.getTag());
 			ft.commitNowAllowingStateLoss();
 		}
 		else{
-			ft.replace(R.id.fragment_container, upAFL, "upAFL");
+			ft.replace(R.id.fragment_container, upAFL, FragmentTag.UPGRADE_ACCOUNT.getTag());
 			ft.commitNowAllowingStateLoss();
 		}
 		fragmentContainer.setVisibility(View.VISIBLE);
@@ -6782,8 +6802,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				setStatusMenuItem.setVisible(false);
 				if (index == 0){
 					log("createOptions TAB CONTACTS");
-					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 
 					//Show
 					addContactMenuItem.setVisible(true);
@@ -6845,8 +6864,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (index == 1){
 					log("createOptions TAB SENT requests");
 
-					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
 
 					//Show
 					addContactMenuItem.setVisible(true);
@@ -6888,8 +6906,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					log("createOptions TAB RECEIVED requests");
 
-					String contactsTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(contactsTag);
+					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
@@ -7098,8 +7115,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				cancelAllTransfersMenuItem.setVisible(true);
 
-				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
-				completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 				if(completedTFLol!=null){
 					if(completedTFLol.isAdded()){
 						if(completedTFLol.isAnyTransferCompleted()){
@@ -7811,8 +7827,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("----------------------------------------INDEX: "+index);
 					switch(index){
 						case 0:{
-							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 							if (cFLol != null && cFLol.isAdded()){
 								cFLol.selectAll();
 								if (cFLol.showSelectMenuItem()){
@@ -7828,8 +7843,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							break;
 						}
 						case 1:{
-							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-							sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
 							if (sRFLol != null && sRFLol.isAdded()){
 								sRFLol.selectAll();
 								if (sRFLol.showSelectMenuItem()){
@@ -7845,8 +7859,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							break;
 						}
 						case 2:{
-							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-							rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+							rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
 							if (rRFLol != null && rRFLol.isAdded()){
 								rRFLol.selectAll();
 								if (rRFLol.showSelectMenuItem()){
@@ -7986,7 +7999,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        case R.id.action_grid_view_large_small:{
 				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		if (cuFL != null){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commitNowAllowingStateLoss();
@@ -8017,7 +8030,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}
 	        	if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 	        		if (muFLol != null){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commitNowAllowingStateLoss();
@@ -8078,7 +8091,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
 	        		if (muFLol != null){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
         				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.detach(currentFragment);
         				fragTransaction.commitNowAllowingStateLoss();
@@ -8122,7 +8135,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						fbFLol.headerItemDecoration = null;
 
 						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-						ft.replace(R.id.fragment_container, fbFLol, "fbFLol");
+						ft.replace(R.id.fragment_container, fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
 						ft.commitNowAllowingStateLoss();
 					}
 
@@ -8133,13 +8146,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						rubbishBinFLol.headerItemDecoration = null;
 
 						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-						ft.replace(R.id.fragment_container, rubbishBinFLol, "rubbishBinFLol");
+						ft.replace(R.id.fragment_container, rubbishBinFLol, FragmentTag.RUBBISH_BIN.getTag());
 						ft.commitNowAllowingStateLoss();
 					}
 
 					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
                     if (oFLol != null && oFLol.isAdded()){
-                        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+                        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
                         FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
                         fragTransaction.detach(currentFragment);
                         fragTransaction.commitNowAllowingStateLoss();
@@ -9171,8 +9184,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 			case R.id.action_menu_forgot_pass:{
 				log("action menu forgot pass pressed");
-				String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 				if(maFLol!=null){
 					showConfirmationResetPasswordFromMyAccount();
 				}
@@ -9234,7 +9246,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			eRKeyF = new ExportRecoveryKeyFragment();
 		}
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_container, eRKeyF, "eRKeyF");
+		ft.replace(R.id.fragment_container, eRKeyF, FragmentTag.EXPORT_RECOVERY_KEY.getTag());
 		ft.commitNowAllowingStateLoss();
 
 		tabLayoutContacts.setVisibility(View.GONE);
@@ -9694,8 +9706,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			switch (index) {
 				case 0:{
 					//CONTACTS FRAGMENT
-		    		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		    		if (cFLol != null && cFLol.isAdded()){
 		    			if (cFLol.onBackPressed() == 0){
 							backToDrawerItem(bottomNavigationCurrentItem);
@@ -9705,8 +9716,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					break;
 				}
 				case 1:{
-					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
-					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
 		    		if (sRFLol != null){
 						backToDrawerItem(bottomNavigationCurrentItem);
                         return;
@@ -9714,8 +9724,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					break;
 				}
 				case 2:{
-					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
-					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
 		    		if (rRFLol != null){
 						backToDrawerItem(bottomNavigationCurrentItem);
 						return;
@@ -12178,8 +12187,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showNewContactDialog(){
 		log("showNewContactDialog");
 
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null && cFLol.isAdded()){
 			if (drawerItem == DrawerItem.CONTACTS){
 				cFLol.setPositionClicked(-1);
@@ -12660,8 +12668,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
-						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 						if(maFLol!=null && maFLol.isAdded()){
 							maFLol.resetPass();
 						}
@@ -12735,7 +12742,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
 		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 
-		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		fragTransaction.detach(currentFragment);
 		fragTransaction.commitNowAllowingStateLoss();
@@ -12988,8 +12995,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("selectSortByContacts");
 
 		this.setOrderContacts(_orderContacts);
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null && cFLol.isAdded()){
 			cFLol.sortBy();
 			cFLol.updateOrder();
@@ -13073,14 +13079,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		this.orderCamera = orderCamera;
 
-		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cuFLol");
+		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 		if (cuFL != null && cuFL.isAdded()){
 			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
 			cuFL.setNodes(nodes);
 			cuFL.getRecyclerView().invalidate();
 		}
 
-		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("muFLol");
+		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 		if (muFLol != null && muFLol.isAdded()){
 			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(muFLol.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
 			muFLol.setNodes(nodes);
@@ -15195,8 +15201,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(contacts){
 			log("Update Contacts Fragment");
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 			if (cFLol != null && cFLol.isAdded()){
 				cFLol.hideMultipleSelect();
 				cFLol.updateView();
@@ -15205,8 +15210,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(sentRequests){
 			log("Update SentRequests Fragment");
-			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);
-			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SENT_REQUESTS.getTag());
 			if (sRFLol != null && sRFLol.isAdded()){
 				sRFLol.hideMultipleSelect();
 				sRFLol.updateView();
@@ -15215,8 +15219,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(receivedRequests){
 			log("Update ReceivedRequest Fragment");
-			String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);
-			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
+			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECEIVED_REQUESTS.getTag());
 			if (rRFLol != null && rRFLol.isAdded()){
 				rRFLol.hideMultipleSelect();
 				rRFLol.updateView();
@@ -15290,8 +15293,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("NEW - the destination of the avatar is: "+newPath);
 							if(newFile!=null){
 								MegaUtilsAndroid.createAvatar(imgFile, newFile);
-								String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-								maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+								maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 								if(maFLol!=null){
 									megaApi.setAvatar(newFile.getAbsolutePath(), this);
 								}
@@ -15710,8 +15712,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The first name has changed");
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null){
 						if(maFLol.isAdded()){
 							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
@@ -15747,8 +15748,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The last name has changed");
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null){
 						if(maFLol.isAdded()){
 							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
@@ -15815,8 +15815,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					setProfileAvatar();
 
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null){
 						if(maFLol.isAdded()){
 							maFLol.updateAvatar(false);
@@ -15920,8 +15919,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (e.getErrorCode() == MegaError.API_OK){
 					setProfileAvatar();
 					//refresh MyAccountFragment if visible
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null && maFLol.isAdded()){
 						log("Update the account fragment");
 						maFLol.updateAvatar(false);
@@ -15943,8 +15941,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 
 					//refresh MyAccountFragment if visible
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null && maFLol.isAdded()){
 						log("Update the account fragment");
 						maFLol.updateAvatar(false);
@@ -15972,8 +15969,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 
 					//refresh MyAccountFragment if visible
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null && maFLol.isAdded()){
 						log("Update the account fragment");
 						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
@@ -16001,8 +15997,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					//refresh MyAccountFragment if visible
-					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null && maFLol.isAdded()){
 						log("Update the account fragment");
 						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
@@ -16309,8 +16304,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							cC.addContactDB(contactRequest.getSourceEmail());
 						}
 						//Update view to get avatar
-						String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 						if (cFLol != null && cFLol.isAdded()){
 							cFLol.updateView();
 						}
@@ -16389,8 +16383,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
 					log("show PLAY button");
 
-					String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
 						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
 							pauseTransfersMenuIcon.setVisible(false);
@@ -16400,8 +16393,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			else{
     				log("show PAUSE button");
-					String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
 						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
 							pauseTransfersMenuIcon.setVisible(true);
@@ -16417,8 +16409,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 				int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
 
-				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
 					if (tFLol.isAdded()){
 						tFLol.changeStatusButton(request.getTransferTag());
@@ -16437,8 +16428,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fbFLol.setOverviewLayout();
 				}
 
-				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
 						pauseTransfersMenuIcon.setVisible(false);
@@ -16795,8 +16785,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			//Refresh My Storage if it is shown
-			String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
-			mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+			mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 			if(mStorageFLol!=null && mStorageFLol.isAdded()){
 				mStorageFLol.refreshVersionsInfo();
 			}
@@ -16807,8 +16796,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
-			String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 			if (maFLol != null && maFLol.isAdded()) {
 				maFLol.initCreateQR(request, e);
 			}
@@ -16930,8 +16918,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}
 							else {
 								log("Update de ContactsFragment");
-								String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-								cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+								cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 								if (cFLol != null && cFLol.isAdded()) {
 									if (drawerItem == DrawerItem.CONTACTS) {
 										cFLol.updateView();
@@ -17089,8 +17076,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		dbH.saveMyEmail(email);
 
-		String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 		if(maFLol!=null){
 			if(maFLol.isAdded()){
 				maFLol.updateMailView(email);
@@ -17225,8 +17211,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(updateContacts){
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 			if (cFLol != null){
 				if(cFLol.isAdded()){
 					log("Incoming update - update contacts section");
@@ -17388,8 +17373,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					case DialogInterface.BUTTON_POSITIVE: {
 						log("Pressed button positive to clear transfers");
 						dbH.emptyCompletedTransfers();
-						String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
-						completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+						completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 						if (completedTFLol != null) {
 							if (completedTFLol.isAdded()) {
 								completedTFLol.updateCompletedTransfers();
@@ -17504,8 +17488,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String size = Util.getSizeString(transfer.getTotalBytes());
 		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 
-		String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 1);
-		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 		if(completedTFLol!=null){
 			if(completedTFLol.isAdded()){
 				completedTFLol.transferFinish(completedTransfer);
@@ -17535,8 +17518,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fbFLol.setOverviewLayout();
 				}
 
-				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
 					if(tFLol.isAdded()){
 						tFLol.transferStart(transfer);
@@ -17603,8 +17585,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
 
-				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
 					if(tFLol.isAdded()){
 						tFLol.transferFinish(index);
@@ -17640,8 +17621,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 
-					String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
+					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
 						if(tFLol.isAdded()){
 							tFLol.transferUpdate(transfer);
@@ -18098,14 +18078,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 
 	public ContactsFragmentLollipop getContactsFragment() {
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		return cFLol;
 	}
 
 	public MyAccountFragmentLollipop getMyAccountFragment() {
-		String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 		if(maFLol!=null){
 			return maFLol;
 		}
@@ -18113,8 +18091,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public MyStorageFragmentLollipop getMyStorageFragment() {
-		String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
-		mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+		mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 		if(mStorageFLol!=null){
 			return mStorageFLol;
 		}
@@ -18229,8 +18206,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void disableChat(){
 		log("disableChat");
 
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
 			if(cFLol.isAdded()){
 				cFLol.notifyDataSetChanged();
@@ -18325,8 +18301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 
-					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
-					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 					if(cFLol!=null){
 						if(cFLol.isAdded()){
 							log("Update Contacts view");
