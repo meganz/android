@@ -14,7 +14,7 @@ public class InfoPeerGroupCall {
     boolean greenLayer;
 
     GroupCallListener listener = null;
-    SurfaceView surfaceview;
+    SurfaceView surfaceview = null;
 
     public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, boolean greenLayer, GroupCallListener listener, SurfaceView surfaceview) {
         this.handle = handle;
