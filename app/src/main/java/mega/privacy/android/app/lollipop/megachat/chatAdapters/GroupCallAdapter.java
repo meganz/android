@@ -127,9 +127,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         TextView avatarInitialLetter;
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
-        public SurfaceView surfaceView = null;
-        public MegaSurfaceRendererGroup localRenderer;
-        SurfaceHolder localSurfaceHolder;
 
         public ViewHolderGroupCall(View itemView) {
             super(itemView);
@@ -146,7 +143,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     ViewHolderGroupCallGrid holderGrid = null;
 
     @Override public GroupCallAdapter.ViewHolderGroupCall onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder()");
+        log("**** onCreateViewHolder()");
 
         display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -183,8 +180,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid.surfaceMicroLayout = (RelativeLayout) v.findViewById(R.id.rl_surface_and_micro);
 
         holderGrid.parentSurfaceView = (RelativeLayout) v.findViewById(R.id.parent_surface_view);
-        holderGrid.parentSurfaceView.removeAllViewsInLayout();
-
         holderGrid.avatarMicroLayout = (RelativeLayout) v.findViewById(R.id.layout_avatar_micro);
 
         holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
@@ -209,7 +204,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     }
 
     public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, final int position){
-        log("onBindViewHolderGrid() - position: "+position);
+        log("**** onBindViewHolderGrid() - position: "+position);
 
         final InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
@@ -224,7 +219,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     if(getItemCount() < 7){
                         ((ChatCallActivity) context).remoteCameraClick();
                     }else{
-
                         ((ChatCallActivity) context).itemClicked(peer);
                     }
                 }
@@ -234,43 +228,82 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
 
         if(peer.isVideoOn()) {
-
+            log("**** Peer: "+peer.getName()+", VIDEO ON");
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
 
-            holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
 
-            //Create Surface View
-            if(peer.getSurfaceview() == null){
+            holder.parentSurfaceView.removeAllViewsInLayout();
+            holder.parentSurfaceView.removeAllViews();
+            holder.surfaceMicroLayout.setVisibility(GONE);
 
-                holder.surfaceView = new SurfaceView(context);
-                holder.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-                holder.surfaceView.setZOrderMediaOverlay(true);
-                holder.localSurfaceHolder = holder.surfaceView.getHolder();
-                holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-                holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
-                peer.setSurfaceview(holder.surfaceView);
-                holder.parentSurfaceView.addView(holder.surfaceView);
-                if(numPeersOnCall < 7){
-                    holder.localRenderer.addListener(null);
-                }else{
-                    holder.localRenderer.addListener(this);
-                }
-            }else {
-            }
-
-            //Listener
+            //Listener && SurfaceView
             if(peer.getListener() == null){
-                GroupCallListener listenerPeer = new GroupCallListener(context, holder);
+                SurfaceView surfaceView = new SurfaceView(context);
+                surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                surfaceView.setZOrderMediaOverlay(true);
+                GroupCallListener listenerPeer = new GroupCallListener(context, surfaceView, peer.getHandle());
                 peer.setListener(listenerPeer);
+
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                     megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
                 } else {
                     megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), peer.getListener());
                 }
+                if(numPeersOnCall < 7){
+                    peer.getListener().getLocalRenderer().addListener(null);
+                }else{
+                    peer.getListener().getLocalRenderer().addListener(this);
+                }
+                holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
             }else{
+                if(holder.parentSurfaceView.getChildCount()!=0){
+                    log("******** "+peer.getName()+"has "+holder.parentSurfaceView.getChildCount()+" childs");
+                }else{
+                    log("******** "+peer.getName()+"has not childs");
+
+                }
+                holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+
             }
 
+            holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
+
+
+            //        public MegaSurfaceRendererGroup localRenderer;
+//        SurfaceHolder localSurfaceHolder;
+//            //Create Surface View
+//            if(peer.getSurfaceview() == null){
+//
+//                holder.surfaceView = new SurfaceView(context);
+//                holder.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+//                holder.surfaceView.setZOrderMediaOverlay(true);
+//                holder.localSurfaceHolder = holder.surfaceView.getHolder();
+//                holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+//                holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
+//                peer.setSurfaceview(holder.surfaceView);
+//                holder.parentSurfaceView.addView(holder.surfaceView);
+//                if(numPeersOnCall < 7){
+//                    holder.localRenderer.addListener(null);
+//                }else{
+//                    holder.localRenderer.addListener(this);
+//                }
+//            }else {
+//            }
+
+            //Listener
+//            if(peer.getListener() == null){
+//                GroupCallListener listenerPeer = new GroupCallListener(context, peer.getSurfaceview(), peer.getLocalRenderer());
+//                peer.setListener(listenerPeer);
+//                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+//                    megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
+//                } else {
+//                    megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), peer.getListener());
+//                }
+//            }else{
+//            }
+
+            //Audio icon:
             if(numPeersOnCall < 7){
                 RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                 paramsMicroSurface.height = Util.scaleWidthPx(24, outMetrics);
@@ -288,9 +321,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
                 holder.microSurface.setLayoutParams(paramsMicroSurface);
             }
-
-
-            //Visibility of audio icon
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
@@ -301,7 +331,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
             }
 
-            //Visibility of green layer
+            //Green Layer:
             if(numPeersOnCall < 7){
                 holder.greenLayer.setVisibility(View.GONE);
             }else{
@@ -313,30 +343,31 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
         }else{
+            log("**** Peer: "+peer.getName()+", VIDEO OFF");
 
-            if(holder.surfaceView!=null){
-                holder.surfaceView.setVisibility(GONE);
-            }
-            peer.setSurfaceview(null);
-            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
-            }else{
-                megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
-            }
-            peer.setListener(null);
-            //Remove the surface view and the micro surface
+            //Remove Surface view && Listener:
             holder.parentSurfaceView.removeAllViewsInLayout();
-
             holder.surfaceMicroLayout.setVisibility(GONE);
 
-            //Create the avatar
+            holder.avatarMicroLayout.setVisibility(View.VISIBLE);
+
+            if(peer.getListener()!=null){
+                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                    megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
+                }else{
+                    megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
+                }
+                peer.setListener(null);
+            }
+
+            //Create Avatar:
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 setProfileMyAvatar(holder);
             }else{
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
 
-            //Update micro icon
+            //Micro icon:
             if(numPeersOnCall < 7){
                 RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
                 paramsMicroAvatar.height = Util.scaleWidthPx(24, outMetrics);
@@ -351,7 +382,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 paramsAvatarImage.height = Util.scaleWidthPx(88, outMetrics);
                 holder.avatarImage.setLayoutParams(paramsAvatarImage);
                 holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
-
             }else{
                 RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
                 paramsMicroAvatar.height = Util.scaleWidthPx(15, outMetrics);
@@ -367,21 +397,17 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 holder.avatarImage.setLayoutParams(paramsAvatarImage);
                 holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f);
             }
-
             if(peer.isAudioOn()){
                 holder.microAvatar.setVisibility(View.GONE);
             }else{
                 if(isCallInProgress){
                     holder.microAvatar.setVisibility(View.VISIBLE);
-
                 }else{
                     holder.microAvatar.setVisibility(View.GONE);
                 }
             }
 
-            holder.avatarMicroLayout.setVisibility(View.VISIBLE);
-
-            //Green Layer
+            //Green Layer:
             if(numPeersOnCall >= 7){
                 if(peer.hasGreenLayer()){
                     holder.greenLayer.setVisibility(View.VISIBLE);
@@ -804,8 +830,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     }
 
     public void removeAt(int position) {
-        peers.remove(position);
+//        peers.remove(position);
         notifyItemRemoved(position);
+        notifyItemRangeChanged(position, peers.size());
+    }
+    public void addAt(int position) {
+        notifyItemInserted(position);
         notifyItemRangeChanged(position, peers.size());
     }
 }
