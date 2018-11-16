@@ -5,16 +5,37 @@
     android:layout_height="wrap_content"
     android:background="@color/black">
 
-    <!--Surface view-->
     <RelativeLayout
-        android:id="@+id/rl_surface"
+        android:id="@+id/rl_surface_and_micro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_centerInParent="true"
         android:background="@android:color/transparent"
         android:visibility="gone">
+
+        <!--Surface view-->
+        <RelativeLayout
+            android:id="@+id/parent_surface_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent">
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/micro_surface_view"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:src="@drawable/ic_mic_off_contact"/>
+
     </RelativeLayout>
+
+
 
     <RelativeLayout
         android:id="@+id/layout_avatar_micro"

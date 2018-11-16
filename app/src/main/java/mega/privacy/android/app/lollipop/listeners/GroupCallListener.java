@@ -75,6 +75,7 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     }
 
 
+
     public void setWidth(int width) {
         this.width = width;
     }
