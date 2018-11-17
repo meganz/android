@@ -334,22 +334,21 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                         }
                         if (!peerContain) {
-                            if(userHandle == megaChatApi.getMyUserHandle()){
-                                log("updateScreenStatusInProgress()-peersOnCall.add("+megaChatApi.getMyFullname()+")-> ME");
-
-                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
-                                peersOnCall.add(myPeer);
-                                changes = true;
-                            }else{
+                            if(userHandle != megaChatApi.getMyUserHandle()){
                                 MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                                 if(userSession!=null){
                                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
-                                        log("updateScreenStatusInProgress()-peersOnCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
                                         InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
                                         peersOnCall.add(0, userPeer);
                                         changes = true;
                                     }
                                 }
+                            }else{
+                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
+                                peersOnCall.add(myPeer);
+                                changes = true;
+
+
                             }
                         }
                     }
@@ -362,19 +361,25 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 boolean changes = false;
                 for(int i = 0; i < callChat.getParticipants().size(); i++){
                     long userHandle = callChat.getParticipants().get(i);
-                    if(userHandle == megaChatApi.getMyUserHandle()){
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
-                        peersOnCall.add(myPeer);
-                        changes = true;
-                    }else{
+                    if(userHandle != megaChatApi.getMyUserHandle()){
+
                         MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                         if(userSession!=null){
                             if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                                 InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
+                                log("***** "+userPeer.getName()+"is adding updateScreenStatusInProgress 2º");
+
                                 peersOnCall.add(0, userPeer);
                                 changes = true;
                             }else{}
                         }
+                    }else{
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
+                        log("***** Me "+megaChatApi.getMyFullname()+"is adding updateScreenStatusInProgress 3º");
+
+                        peersOnCall.add(myPeer);
+                        changes = true;
+
 
                     }
                 }
@@ -825,7 +830,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             for(int i = 0; i < callChat.getParticipants().size(); i++){
                                 long userHandle = callChat.getParticipants().get(i);
                                 InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null);
-                                peersBeforeCall.add(0, userPeer);
+                                peersBeforeCall.add(userPeer);
                                 changes = true;
                             }
                             if(changes){
@@ -874,6 +879,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
 
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
+                        log("***** Me "+myPeer.getName()+"is adding Outgoing");
+
                         peersOnCall.add(myPeer);
                         updatePeers(true);
 
@@ -1219,7 +1226,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         peerSelected = null;
         isManualMode = false;
-
+        recyclerView.setAdapter(null);
+        bigRecyclerView.setAdapter(null);
         peersOnCall.clear();
         peersBeforeCall.clear();
         stopAudioSignals();
@@ -1387,11 +1395,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 }
                                 if(!peerContain){
                                     InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
+                                    log("***** Me "+myPeer.getName()+"is adding updateScreenStatusInProgress");
+
                                     peersOnCall.add(myPeer);
                                     updatePeers(true);
                                 }
                             }else{
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
+                                log("***** Me "+myPeer.getName()+"is adding updateScreenStatusInProgress");
+
                                 peersOnCall.add(myPeer);
                                 updatePeers(true);
                             }
@@ -1501,11 +1513,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 if(!peerContain){
                                     InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
                                     peersOnCall.add(0, userPeer);
-                                    if((peersOnCall.size()<7)&&(adapterGrid!= null)){
-                                        adapterGrid.addAt(0);
-                                    }else{
+                                    log("****** add "+userPeer.getName()+" is adding in the call (SESSION_STATUS_IN_PROGRESS)");
+//                                    if((peersOnCall.size()<7)&&(adapterGrid!= null)){
+//                                        adapterGrid.addAt(0);
+//                                    }else{
                                         updatePeers(true);
-                                    }
+//                                    }
 
                                 }
 
@@ -1522,6 +1535,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                                 for(int i=0;i<peersOnCall.size();i++){
                                     if(peersOnCall.get(i).getHandle() == userHandle){
+                                        log("****** remove "+peersOnCall.get(i).getName()+" is leaving the call (SESSION_STATUS_DESTROYED)");
                                         peersOnCall.remove(i);
 
                                         if((peersOnCall.size()<6)&&(adapterGrid!=null)){
@@ -1593,7 +1607,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         for(int i = 0; i < call.getParticipants().size(); i++){
                             long userHandle = call.getParticipants().get(i);
                             InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null);
-                            peersBeforeCall.add(0, userPeer);
+                            peersBeforeCall.add(userPeer);
                             changes = true;
                         }
                         if(changes){
@@ -2033,14 +2047,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                     videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
                     if (peersOnCall != null && !peersOnCall.isEmpty()) {
-                        InfoPeerGroupCall item = peersOnCall.get(peersOnCall.size()-1);
+                        int position = peersOnCall.size()-1;
+                        InfoPeerGroupCall item = peersOnCall.get(position);
                         if(!item.isVideoOn()){
-                            log("activate Local Video for "+peersOnCall.get(peersOnCall.size()-1).getName());
+                            log("activate Local Video for "+peersOnCall.get(position).getName());
                             item.setVideoOn(true);
                             if(peersOnCall.size()<7){
-                                adapterGrid.notifyItemChanged(peersOnCall.size()-1);
+                                log("**** updateLocalVideo "+peersOnCall.get(position).getName()+" Conencted video");
+
+                                adapterGrid.notifyItemChanged(position);
                             }else{
-                                adapterList.notifyItemChanged(peersOnCall.size()-1);
+                                adapterList.notifyItemChanged(position);
                             }
                             updateSubtitleToolbar();
                         }
@@ -2051,14 +2068,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                     videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
                     if (peersOnCall != null && !peersOnCall.isEmpty()) {
-                        InfoPeerGroupCall item = peersOnCall.get(peersOnCall.size()-1);
+                        int position = peersOnCall.size()-1;
+                        InfoPeerGroupCall item = peersOnCall.get(position);
                         if(item.isVideoOn()){
-                            log("remove Local Video fot "+peersOnCall.get(peersOnCall.size()-1).getName());
+                            log("remove Local Video fot "+peersOnCall.get(position).getName());
                             item.setVideoOn(false);
                             if(peersOnCall.size()<7){
-                                adapterGrid.notifyItemChanged(peersOnCall.size()-1);
+                                log("**** updateLocalVideo "+peersOnCall.get(position).getName()+" Disconnected video");
+
+                                adapterGrid.notifyItemChanged(position);
                             }else{
-                                adapterList.notifyItemChanged(peersOnCall.size()-1);
+                                adapterList.notifyItemChanged(position);
                             }
                             updateSubtitleToolbar();
                         }
@@ -2151,10 +2171,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
                     microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_record_audio_w));
                     if (peersOnCall != null && !peersOnCall.isEmpty()) {
-                        if(!peersOnCall.get(peersOnCall.size()-1).isAudioOn()){
-                            peersOnCall.get(peersOnCall.size()-1).setAudioOn(true);
-                            int position = peersOnCall.size() -1;
+                        int position = peersOnCall.size()-1;
+                        if(!peersOnCall.get(position).isAudioOn()){
+                            peersOnCall.get(position).setAudioOn(true);
                             if(peersOnCall.size()<7){
+                                log("**** updateLocalAudio "+peersOnCall.get(position)+" Connected audio");
                                 adapterGrid.changesInAudio(position,null);
                             }else{
                                 adapterList.changesInAudio(position,null);
@@ -2166,12 +2187,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                     microFAB.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_mic_off));
                     if (peersOnCall != null && !peersOnCall.isEmpty()) {
-                        if(peersOnCall.get(peersOnCall.size()-1).isAudioOn()){
-                            peersOnCall.get(peersOnCall.size()-1).setAudioOn(false);
-                            int position = peersOnCall.size() -1;
+                        int position = peersOnCall.size()-1;
+                        if(peersOnCall.get(position).isAudioOn()){
+                            peersOnCall.get(position).setAudioOn(false);
                             if(peersOnCall.size()<7){
+                                log("**** updateLocalAudio "+peersOnCall.get(position).getName()+" Disconnected audio");
                                 adapterGrid.changesInAudio(position,null);
                             }else{
+
                                 adapterList.changesInAudio(position,null);
                             }
                         }
@@ -2208,6 +2231,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 peersOnCall.get(i).setVideoOn(true);
                                 updateSubtitleToolbar();
                                 if(peersOnCall.size()<7){
+                                    log("**** updateRemoteVideo "+peersOnCall.get(i).getName()+" Connected video");
+
                                     adapterGrid.notifyItemChanged(i);
                                 }else{
                                     adapterList.notifyItemChanged(i);
@@ -2242,6 +2267,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 updateSubtitleToolbar();
 
                                 if(peersOnCall.size()<7){
+                                    log("**** updateRemoteVideo "+peersOnCall.get(i).getName()+" Disconnected video");
+
                                     adapterGrid.notifyItemChanged(i);
                                 }else{
                                     adapterList.notifyItemChanged(i);
@@ -2356,6 +2383,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     peersOnCall.get(i).setAudioOn(true);
 
                                     if(peersOnCall.size()<7){
+                                        log("**** updateRemoteAudio "+peersOnCall.get(i).getName()+" Connected audio");
+
                                         adapterGrid.changesInAudio(i,null);
                                     }else{
                                         adapterList.changesInAudio(i,null);
@@ -2380,6 +2409,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     peersOnCall.get(i).setAudioOn(false);
 
                                     if(peersOnCall.size()<7){
+                                        log("**** updateRemoteAudio "+peersOnCall.get(i).getName()+" Disconnected audio");
+
                                         adapterGrid.changesInAudio(i,null);
                                     }else{
                                         adapterList.changesInAudio(i,null);
@@ -2627,14 +2658,18 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updatePeers(boolean flag){
+
         if(flag){
-            log("updatePeers() ----> IN PROGRESS: peersOnCall("+peersOnCall.size()+")");
 
             //Call IN PROGRESS
             updateSubtitleToolbar();
             if(peersOnCall.size() < 7){
                     //1-6
                 if(peersOnCall.size()!=0){
+
+                    if(adapterList!=null){
+                        adapterList =null;
+                    }
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
                     parentBigCameraGroupCall.setOnClickListener(null);
@@ -2642,6 +2677,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     recyclerView.setVisibility(View.VISIBLE);
                     if(adapterGrid == null){
+                        recyclerView.setAdapter(null);
                         adapterGrid = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag);
                         recyclerView.setAdapter(adapterGrid);
                     }else{
@@ -2655,6 +2691,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                 }else{
+                    if(adapterGrid != null){
+                        adapterGrid = null;
+                    }
+                    if(adapterList!=null){
+                        adapterList =null;
+                    }
                     recyclerView.setAdapter(null);
                     recyclerView.setVisibility(View.GONE);
                     bigRecyclerView.setAdapter(null);
@@ -2664,14 +2706,18 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
+
                 //7 +
+                if(adapterGrid != null){
+                    adapterGrid = null;
+                }
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
                 parentBigCameraGroupCall.setOnClickListener(this);
                 parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
                 bigRecyclerView.setVisibility(View.VISIBLE);
-                if(adapterList==null){
+                if(adapterList == null){
                     adapterList = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
                     bigRecyclerView.setAdapter(adapterList);
                 }else{
@@ -2685,6 +2731,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 updateUserSelected(flag);
             }
+
             isNecesaryCreateAdapter = false;
 
         }else{
@@ -2697,21 +2744,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             if(peersBeforeCall.size() < 7) {
 
                 if(peersBeforeCall.size() != 0){
-                    //1-6 peers
+                    //1-6
+
+                    if(adapterList != null){
+                        adapterList = null;
+                    }
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
                     parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
 
                     recyclerView.setVisibility(View.VISIBLE);
-
-                    if(adapterGrid==null){
+                    if(adapterGrid == null){
                         adapterGrid = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag);
                         recyclerView.setAdapter(adapterGrid);
                     }else{
                         adapterGrid.notifyDataSetChanged();
                     }
+
                  }else{
+
+                    if(adapterGrid != null){
+                        adapterGrid = null;
+                    }
+                    if(adapterList != null){
+                        adapterList = null;
+                    }
                     recyclerView.setAdapter(null);
                     recyclerView.setVisibility(GONE);
                     bigRecyclerView.setAdapter(null);
@@ -2723,6 +2781,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }else{
 
                 //7 +
+                if(adapterGrid != null){
+                    adapterGrid = null;
+                }
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
                 parentBigCameraGroupCall.setOnClickListener(this);
@@ -2730,7 +2791,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 bigRecyclerView.setVisibility(View.VISIBLE);
                 if(adapterList==null){
-                    bigRecyclerView.setVisibility(View.VISIBLE);
+                    bigRecyclerView.setAdapter(null);
                     adapterList = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
                     bigRecyclerView.setAdapter(adapterList);
                 }else{

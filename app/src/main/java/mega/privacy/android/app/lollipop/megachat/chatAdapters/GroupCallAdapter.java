@@ -143,7 +143,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     ViewHolderGroupCallGrid holderGrid = null;
 
     @Override public GroupCallAdapter.ViewHolderGroupCall onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("**** onCreateViewHolder()");
+        log("onCreateViewHolder()");
 
         display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -180,6 +180,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid.surfaceMicroLayout = (RelativeLayout) v.findViewById(R.id.rl_surface_and_micro);
 
         holderGrid.parentSurfaceView = (RelativeLayout) v.findViewById(R.id.parent_surface_view);
+        holderGrid.parentSurfaceView.removeAllViews();
+        holderGrid.parentSurfaceView.removeAllViewsInLayout();
         holderGrid.avatarMicroLayout = (RelativeLayout) v.findViewById(R.id.layout_avatar_micro);
 
         holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
@@ -228,13 +230,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
 
         if(peer.isVideoOn()) {
-            log("**** Peer: "+peer.getName()+", VIDEO ON");
+            log("***** "+peer.getName()+" VIDEO ON");
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
 
-
-            holder.parentSurfaceView.removeAllViewsInLayout();
-            holder.parentSurfaceView.removeAllViews();
+            if(holder.parentSurfaceView.getChildCount()!=0){
+                holder.parentSurfaceView.removeAllViewsInLayout();
+            }
             holder.surfaceMicroLayout.setVisibility(GONE);
 
             //Listener && SurfaceView
@@ -256,52 +258,26 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     peer.getListener().getLocalRenderer().addListener(this);
                 }
                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+
             }else{
-                if(holder.parentSurfaceView.getChildCount()!=0){
-                    log("******** "+peer.getName()+"has "+holder.parentSurfaceView.getChildCount()+" childs");
-                }else{
-                    log("******** "+peer.getName()+"has not childs");
-
+                if(peer.getListener().getHeight() != 0){
+                    peer.getListener().setHeight(0);
                 }
-                holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-
+                if(peer.getListener().getWidth() != 0){
+                    peer.getListener().setWidth(0);
+                }
+                if(holder.parentSurfaceView.getChildCount() == 0){
+                    if(peer.getListener().getSurfaceView().getParent()!=null){
+                        if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeAllViewsInLayout();
+                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+                        }else{ }
+                    }else{
+                        holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+                    }
+                }else{ }
             }
-
             holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
-
-
-            //        public MegaSurfaceRendererGroup localRenderer;
-//        SurfaceHolder localSurfaceHolder;
-//            //Create Surface View
-//            if(peer.getSurfaceview() == null){
-//
-//                holder.surfaceView = new SurfaceView(context);
-//                holder.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-//                holder.surfaceView.setZOrderMediaOverlay(true);
-//                holder.localSurfaceHolder = holder.surfaceView.getHolder();
-//                holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-//                holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
-//                peer.setSurfaceview(holder.surfaceView);
-//                holder.parentSurfaceView.addView(holder.surfaceView);
-//                if(numPeersOnCall < 7){
-//                    holder.localRenderer.addListener(null);
-//                }else{
-//                    holder.localRenderer.addListener(this);
-//                }
-//            }else {
-//            }
-
-            //Listener
-//            if(peer.getListener() == null){
-//                GroupCallListener listenerPeer = new GroupCallListener(context, peer.getSurfaceview(), peer.getLocalRenderer());
-//                peer.setListener(listenerPeer);
-//                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-//                    megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
-//                } else {
-//                    megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), peer.getListener());
-//                }
-//            }else{
-//            }
 
             //Audio icon:
             if(numPeersOnCall < 7){
@@ -343,22 +319,32 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
         }else{
-            log("**** Peer: "+peer.getName()+", VIDEO OFF");
+            log("***** "+peer.getName()+" VIDEO OFF");
 
             //Remove Surface view && Listener:
-            holder.parentSurfaceView.removeAllViewsInLayout();
             holder.surfaceMicroLayout.setVisibility(GONE);
 
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
-            if(peer.getListener()!=null){
+            if(peer.getListener() != null){
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                     megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
                 }else{
                     megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
                 }
+
+                if(holder.parentSurfaceView.getChildCount() == 0){
+                    if(peer.getListener().getSurfaceView().getParent()!=null){
+                        if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeAllViewsInLayout();
+                        }else{ }
+                    }else{ }
+                }else{
+                    holder.parentSurfaceView.removeAllViews();
+                    holder.parentSurfaceView.removeAllViewsInLayout();
+                }
                 peer.setListener(null);
-            }
+            }else{ }
 
             //Create Avatar:
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
@@ -417,7 +403,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }else{
                 holder.greenLayer.setVisibility(View.GONE);
             }
-
         }
     }
 
