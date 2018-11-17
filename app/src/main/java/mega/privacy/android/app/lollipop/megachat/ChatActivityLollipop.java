@@ -2570,52 +2570,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }else{
-                    if(emojiKeyboard.getLetterKeyboardShown()){
-                        emojiKeyboard.hideBothKeyboard(this);
-                        handlerEmojiKeyboard.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                                    if (!hasStoragePermission) {
-                                        ActivityCompat.requestPermissions(chatActivity,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
-                                    }else{
+                    if(emojiKeyboard!=null){
+
+                        if(emojiKeyboard.getLetterKeyboardShown()){
+                            emojiKeyboard.hideBothKeyboard(this);
+                            handlerEmojiKeyboard.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                                        if (!hasStoragePermission) {
+                                            ActivityCompat.requestPermissions(chatActivity,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+                                        }else{
+                                            chatActivity.attachFromFileStorage();
+                                        }
+                                    }
+                                    else{
                                         chatActivity.attachFromFileStorage();
                                     }
                                 }
-                                else{
-                                    chatActivity.attachFromFileStorage();
+                            },250);
+                        }else{
+                            if(emojiKeyboard!=null){
+                                emojiKeyboard.hideBothKeyboard(this);
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                                if (!hasStoragePermission) {
+                                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+
+                                }else{
+                                    this.attachFromFileStorage();
                                 }
                             }
-                        },250);
-                    }else{
-                        emojiKeyboard.hideBothKeyboard(this);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
-
-                            }else{
+                            else{
                                 this.attachFromFileStorage();
                             }
                         }
-                        else{
-                            this.attachFromFileStorage();
-                        }
                     }
 
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-//                        if (!hasStoragePermission) {
-//                            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
-//
-//                        }else{
-//                            this.attachFromFileStorage();
-//                        }
-//                    }
-//                    else{
-//                        this.attachFromFileStorage();
-//                    }
                 }
                 break;
             }
@@ -5990,7 +5983,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     protected void onDestroy(){
-        emojiKeyboard.hideBothKeyboard(this);
+        if(emojiKeyboard!=null){
+            emojiKeyboard.hideBothKeyboard(this);
+        }
         if (handlerEmojiKeyboard != null){
             handlerEmojiKeyboard.removeCallbacksAndMessages(null);
         }
