@@ -55,7 +55,7 @@
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
                             android:layout_centerInParent="true"
-                            android:background="@android:color/holo_blue_bright"
+                            android:background="@android:color/transparent"
                             android:nestedScrollingEnabled="false"
                             android:horizontalSpacing="0dp"
                             android:verticalSpacing="0dp"

@@ -1201,7 +1201,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onDestroy(){
-        log("onDestroy()");
+        log("+++++ onDestroy()");
 
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
@@ -1368,7 +1368,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
 
                         if(chat.isGroup()){
-                            log("CALL_STATUS_IN_PROGRESS");
+                            log("+++++ CALL_STATUS_IN_PROGRESS");
 
                             if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
                                 peersBeforeCall.clear();
@@ -1428,7 +1428,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         log("CALL_STATUS_TERMINATING_USER_PARTICIPATION");
                         //I have finished the group call but I can join again
 
-                        log("Terminating call of chat: "+chatId);
+                        log("+++++++ Terminating call of chat: "+chatId);
                         if(chat.isGroup()){
                             stopAudioSignals();
                             rtcAudioManager.stop();
@@ -1450,7 +1450,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         break;
                     }
                     case MegaChatCall.CALL_STATUS_DESTROYED:{
-                        log("CALL_STATUS_DESTROYED:TERM code of the call: "+call.getTermCode());
+                        log("+++++ CALL_STATUS_DESTROYED:TERM code of the call: "+call.getTermCode());
                         //The group call has finished but I can not join again
 
                         stopAudioSignals();
@@ -1480,7 +1480,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                     if(userSession != null){
                         if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
-                            log("SESSION_STATUS_IN_PROGRESS");
+                            log("+++++ SESSION_STATUS_IN_PROGRESS -> "+chat.getPeerFullnameByHandle(userHandle)+" joined");
 
                             updateSubTitle();
 
@@ -1519,7 +1519,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
 
                         }else if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_DESTROYED){
-                            log("SESSION_STATUS_DESTROYED");
+                            log("++++++ SESSION_STATUS_DESTROYED -> "+chat.getPeerFullnameByHandle(userHandle)+" left ");
 
                             updateSubTitle();
 
@@ -1540,7 +1540,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             }else{
                                                 recyclerView.setColumnWidth((int) widthScreenPX/2);
                                                 adapterGrid.notifyItemRemoved(i);
-                                                adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
+                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
                                             }
                                             updateSubtitleToolbar();
                                         }else{
@@ -1589,7 +1589,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("onChatCallUpdate()-CHANGE_TYPE_RINGING_STATUS");
 
             }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)){
-                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION");
+                log("+++++++ CHANGE_TYPE_CALL_COMPOSITION");
                 if(call.getStatus() ==  MegaChatCall.CALL_STATUS_RING_IN){
 
                     if((peersBeforeCall!=null)&&(peersBeforeCall.size()!=0)){
@@ -1612,11 +1612,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             long userHandle = call.getParticipants().get(i);
                             InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null);
                             peersBeforeCall.add(userPeer);
-                            log("onChatCallUpdate()-USER COMPOSITION -> "+userPeer.getName()+" added");
                             changes = true;
                         }
                         if(changes){
-                            log("onChatCallUpdate()-USER COMPOSITION -> updatePeers ("+peersOnCall.size()+")");
                             updatePeers(false);
                         }
                     }
@@ -2762,7 +2760,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     parentBigCameraGroupCall.setVisibility(View.GONE);
 
                     recyclerView.setVisibility(View.VISIBLE);
-                    if(peersOnCall.size()< 4){
+                    if(peersBeforeCall.size()< 4){
                         recyclerView.setColumnWidth((int) widthScreenPX);
                     }else{
                         recyclerView.setColumnWidth((int) widthScreenPX/2);

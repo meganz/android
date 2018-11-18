@@ -208,19 +208,28 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) holder.rlGeneral.getLayoutParams();
 
         if(numPeersOnCall < 4){
+
             lp.height = maxScreenHeight/numPeersOnCall;
             lp.width = maxScreenWidth;
+
         }else if((numPeersOnCall >= 4) && (numPeersOnCall < 7)){
             lp.height = Util.scaleWidthPx(180, outMetrics);
             lp.width = maxScreenWidth/2;
+
+            if((peers.size()==5)&&(peer.getHandle().equals(megaChatApi.getMyUserHandle()))){
+                ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+                layoutParamsPeer.width = maxScreenWidth;
+                layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
+                holder.rlGeneral.setLayoutParams(layoutParamsPeer);
+            }
+
         }else{
+
             lp.height = Util.scaleWidthPx(90, outMetrics);
             lp.width = Util.scaleWidthPx(90, outMetrics);
+
         }
         holder.rlGeneral.setLayoutParams(lp);
-//        holder.rlGeneral.setGravity(RelativeLayout.CENTER_HORIZONTAL);
-//        holder.rlGeneral.setGravity(RelativeLayout.CENTER_VERTICAL);
-
 
         if(isCallInProgress){
             holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
@@ -238,7 +247,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
 
         if(peer.isVideoOn()) {
-            log(peer.getName()+" VIDEO ON");
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
 
@@ -278,6 +286,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
                 layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
+
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 if((position < 2)){
                     layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
@@ -296,18 +305,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
-                if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
-                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-                    layoutParamsPeer.width = maxScreenWidth;
-                    layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
-                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-                }else{
-                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-                    layoutParamsPeer.width = (maxScreenWidth/2);
-                    layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
-                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-                }
-
             }else if(numPeersOnCall == 6){
 
                 //Surface Layout:
@@ -318,16 +315,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
             }
 
-
-
-//            if(holder.parentSurfaceView.getChildCount()!=0){
-//                holder.parentSurfaceView.removeAllViewsInLayout();
-//            }
-//            holder.surfaceMicroLayout.setVisibility(GONE);
-
             //Listener && SurfaceView
             if(peer.getListener() == null){
-
                 SurfaceView surfaceView = new SurfaceView(context);
                 surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
                 surfaceView.setZOrderMediaOverlay(true);
@@ -344,59 +333,45 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }else{
                     peer.getListener().getLocalRenderer().addListener(this);
                 }
+
                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                 peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
 
             }else{
-
-//                if(peer.getListener().getHeight() != 0){
-//                    peer.getListener().setHeight(0);
-//                }
-//                if(peer.getListener().getWidth() != 0){
-//                    peer.getListener().setWidth(0);
-//                }
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     if(peer.getListener().getSurfaceView().getParent()!=null){
                         if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
-                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeAllViewsInLayout();
+                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
                             if(peer.getListener().getHeight() != 0){
                                 peer.getListener().setHeight(0);
                             }
                             if(peer.getListener().getWidth() != 0){
                                 peer.getListener().setWidth(0);
                             }
-                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                             peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-
-                        }else{
+                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
 
                         }
-                    }else{
-
-                        if(peer.getListener().getHeight() != 0){
-                            peer.getListener().setHeight(0);
-                        }
-                        if(peer.getListener().getWidth() != 0){
-                            peer.getListener().setWidth(0);
-                        }
-                        holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                        peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-
                     }
                 }else{
-                    peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                    //Remove items of parent
+                    holder.parentSurfaceView.removeAllViews();
 
-
-//                    if(peer.getListener().getHeight() != 0){
-//                        peer.getListener().setHeight(0);
-//                    }
-//                    if(peer.getListener().getWidth() != 0){
-//                        peer.getListener().setWidth(0);
-//                    }
-//                    holder.parentSurfaceView.setGravity(RelativeLayout.CENTER_HORIZONTAL);
+                    //Remove parent of Surface
+                    if(peer.getListener().getSurfaceView().getParent()!=null){
+                        if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                            if(peer.getListener().getHeight() != 0){
+                                peer.getListener().setHeight(0);
+                            }
+                            if(peer.getListener().getWidth() != 0){
+                                peer.getListener().setWidth(0);
+                            }
+                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+                        }
+                    }
                 }
-//                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-
             }
             holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
 
@@ -441,12 +416,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
         }else{
-            log(" "+peer.getName()+" VIDEO OFF");
 
             //Remove Surface view && Listener:
             holder.surfaceMicroLayout.setVisibility(GONE);
-
-
             if(peer.getListener() != null){
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                     megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
@@ -467,15 +439,18 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 peer.setListener(null);
             }else{ }
 
-            //Create Avatar:
+            if(peers.size() == 4){
+
+            }
+
+            holder.avatarMicroLayout.setVisibility(View.VISIBLE);
+
+            //Avatar:
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 setProfileMyAvatar(holder);
             }else{
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
-
-            holder.avatarMicroLayout.setVisibility(View.VISIBLE);
-
 
             //Micro icon:
             if(numPeersOnCall < 7){

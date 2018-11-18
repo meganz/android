@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_centerVertical="true"
     android:layout_centerInParent="true"
-    android:background="@color/orange">
+    android:background="@color/black">
 
     <RelativeLayout
         android:id="@+id/rl_surface_and_micro"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:background="@android:color/holo_green_dark"
+        android:background="@android:color/transparent"
         android:visibility="gone">
 
         <!--Surface view-->
@@ -24,7 +24,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_centerInParent="true"
-            android:background="@android:color/holo_red_dark">
+            android:background="@android:color/transparent">
         </RelativeLayout>
         <ImageView
             android:id="@+id/micro_surface_view"
@@ -49,7 +49,7 @@
         android:layout_centerInParent="true"
         android:layout_centerVertical="true"
         android:gravity="center_vertical"
-        android:background="@android:color/holo_green_dark"
+        android:background="@android:color/transparent"
         android:visibility="gone">
 
         <!--Big Avatar-->
