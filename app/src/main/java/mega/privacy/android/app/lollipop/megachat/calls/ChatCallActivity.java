@@ -1508,6 +1508,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                         }
                                         adapterGrid.notifyItemInserted(0);
                                         adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+
+                                        updateSubtitleToolbar();
+
                                     }else{
                                         log("onChatCallUpdate()-USER INPROGRESS -> updatePeers ("+peersOnCall.size()+")");
                                         updatePeers(true);
@@ -1532,11 +1535,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             log("onChatCallUpdate()-USER DESTROYED -> removeAt ("+i+")");
                                             if(peersOnCall.size()< 4){
                                                 recyclerView.setColumnWidth((int) widthScreenPX);
+                                                adapterGrid.notifyItemRemoved(i);
+                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
                                             }else{
                                                 recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                adapterGrid.notifyItemRemoved(i);
+                                                adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
                                             }
-                                            adapterGrid.notifyItemRemoved(i);
-                                            adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                            updateSubtitleToolbar();
                                         }else{
                                             log("onChatCallUpdate()-USER DESTROYED -> updatePeers ("+peersOnCall.size()+")");
                                             updatePeers(true);
