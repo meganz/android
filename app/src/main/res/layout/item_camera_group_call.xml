@@ -3,6 +3,8 @@
     android:id="@+id/general"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_centerVertical="true"
+    android:layout_centerInParent="true"
     android:background="@color/orange">
 
     <RelativeLayout
@@ -28,6 +30,10 @@
             android:id="@+id/micro_surface_view"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_alignTop="@+id/parent_surface_view"
+            android:layout_marginTop="10dp"
+            android:layout_alignRight="@+id/parent_surface_view"
+            android:layout_margin="10dp"
             android:background="@android:color/transparent"
             android:visibility="gone"
             android:src="@drawable/ic_mic_off_contact"/>
@@ -41,6 +47,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
         android:background="@android:color/holo_green_dark"
         android:visibility="gone">
 

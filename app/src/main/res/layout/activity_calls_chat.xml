@@ -40,7 +40,7 @@
                         <!--android:layout_centerInParent="true"-->
                         <!--android:nestedScrollingEnabled="false"/>-->
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
@@ -61,7 +61,7 @@
                             android:verticalSpacing="0dp"
                             android:numColumns="auto_fit"
                             android:stretchMode="columnWidth"/>
-                    </LinearLayout>
+                    </RelativeLayout>
 
 
                     <!--Layout big Camera in Group call (7 + users)-->

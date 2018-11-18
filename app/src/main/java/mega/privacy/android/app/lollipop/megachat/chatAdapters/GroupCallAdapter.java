@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -163,7 +164,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid = new ViewHolderGroupCallGrid(v);
 
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
-
+//        holderGrid.rlGeneral.setGravity(RelativeLayout.CENTER_HORIZONTAL);
+//        holderGrid.rlGeneral.setGravity(RelativeLayout.CENTER_VERTICAL);
         holderGrid.greenLayer = (RelativeLayout) v.findViewById(R.id.green_layer);
         holderGrid.surfaceMicroLayout = (RelativeLayout) v.findViewById(R.id.rl_surface_and_micro);
 
@@ -216,7 +218,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             lp.width = Util.scaleWidthPx(90, outMetrics);
         }
         holder.rlGeneral.setLayoutParams(lp);
-        holder.rlGeneral.setGravity(RelativeLayout.CENTER_HORIZONTAL);
+//        holder.rlGeneral.setGravity(RelativeLayout.CENTER_HORIZONTAL);
+//        holder.rlGeneral.setGravity(RelativeLayout.CENTER_VERTICAL);
+
 
         if(isCallInProgress){
             holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
@@ -245,7 +249,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.width = maxScreenWidth;
                 layoutParamsSurface.height = maxScreenWidth;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
@@ -255,7 +258,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(320, outMetrics);
                 layoutParamsSurface.height = Util.scaleWidthPx(320, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
@@ -266,7 +268,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(212, outMetrics);
                 layoutParamsSurface.height = Util.scaleWidthPx(212, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
@@ -278,9 +279,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
                 layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-
                 if((position < 2)){
                     layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                 }else{
@@ -402,23 +400,25 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
             holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
 
-
             //Audio icon:
-            if(numPeersOnCall < 7){
+            if(peers.size() < 7){
                 RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                 paramsMicroSurface.height = Util.scaleWidthPx(24, outMetrics);
                 paramsMicroSurface.width = Util.scaleWidthPx(24, outMetrics);
                 paramsMicroSurface.setMargins(0, Util.scaleWidthPx(15, outMetrics),  Util.scaleWidthPx(15, outMetrics), 0);
-                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                 holder.microSurface.setLayoutParams(paramsMicroSurface);
             }else{
                 RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                 paramsMicroSurface.height = Util.scaleWidthPx(15, outMetrics);
                 paramsMicroSurface.width = Util.scaleWidthPx(15, outMetrics);
                 paramsMicroSurface.setMargins(0,  Util.scaleWidthPx(7, outMetrics),  Util.scaleWidthPx(7, outMetrics), 0);
-                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                 holder.microSurface.setLayoutParams(paramsMicroSurface);
             }
+
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
@@ -441,11 +441,10 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
         }else{
-            log(peer.getName()+" VIDEO OFF");
+            log(" "+peer.getName()+" VIDEO OFF");
 
             //Remove Surface view && Listener:
             holder.surfaceMicroLayout.setVisibility(GONE);
-            holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
 
             if(peer.getListener() != null){
@@ -474,6 +473,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }else{
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
+
+            holder.avatarMicroLayout.setVisibility(View.VISIBLE);
+
 
             //Micro icon:
             if(numPeersOnCall < 7){
@@ -870,22 +872,24 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 }else{
                     holder.microAvatar.setVisibility(View.GONE);
-
                     holder.microSurface.setVisibility(View.VISIBLE);
+
                     //Audio icon:
                     if(peers.size() < 7){
                         RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                         paramsMicroSurface.height = Util.scaleWidthPx(24, outMetrics);
                         paramsMicroSurface.width = Util.scaleWidthPx(24, outMetrics);
                         paramsMicroSurface.setMargins(0, Util.scaleWidthPx(15, outMetrics),  Util.scaleWidthPx(15, outMetrics), 0);
-                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                         holder.microSurface.setLayoutParams(paramsMicroSurface);
                     }else{
                         RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                         paramsMicroSurface.height = Util.scaleWidthPx(15, outMetrics);
                         paramsMicroSurface.width = Util.scaleWidthPx(15, outMetrics);
                         paramsMicroSurface.setMargins(0,  Util.scaleWidthPx(7, outMetrics),  Util.scaleWidthPx(7, outMetrics), 0);
-                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                        paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                         holder.microSurface.setLayoutParams(paramsMicroSurface);
                     }
 
