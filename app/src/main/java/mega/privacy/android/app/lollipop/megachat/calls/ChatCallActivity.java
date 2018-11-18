@@ -1499,21 +1499,28 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
                                     peersOnCall.add(0, userPeer);
                                     log("onChatCallUpdate()-USER INPROGRESS -> "+userPeer.getName()+" added");
-                                    if((peersOnCall.size()<7)&&(adapterGrid!= null)){
-                                        log(" onChatCallUpdate()-USER INPROGRESS -> addAt (0)");
-                                        if(peersOnCall.size()< 4){
-                                            recyclerView.setColumnWidth((int) widthScreenPX);
+
+                                    if(peersOnCall.size()<7){
+                                        if(adapterGrid != null){
+                                            if(peersOnCall.size()< 4){
+                                                recyclerView.setColumnWidth((int) widthScreenPX);
+                                            }else{
+                                                recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                            }
+                                            adapterGrid.notifyItemInserted(0);
+                                            adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                            updateSubtitleToolbar();
                                         }else{
-                                            recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                            updatePeers(true);
                                         }
-                                        adapterGrid.notifyItemInserted(0);
-                                        adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
-
-                                        updateSubtitleToolbar();
-
                                     }else{
-                                        log("onChatCallUpdate()-USER INPROGRESS -> updatePeers ("+peersOnCall.size()+")");
-                                        updatePeers(true);
+                                        if(adapterList != null){
+                                            adapterList.notifyItemInserted(0);
+                                            adapterList.notifyItemRangeChanged(0, peersOnCall.size());
+                                            updateSubtitleToolbar();
+                                        }else{
+                                            updatePeers(true);
+                                        }
                                     }
                                 }
                             }
@@ -1531,21 +1538,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     if(peersOnCall.get(i).getHandle() == userHandle){
                                         peersOnCall.remove(i);
                                         log("onChatCallUpdate()-USER DESTROYED -> "+peersOnCall.get(i).getName()+" removed");
-                                        if((peersOnCall.size()<6)&&(adapterGrid!=null)){
-                                            log("onChatCallUpdate()-USER DESTROYED -> removeAt ("+i+")");
-                                            if(peersOnCall.size()< 4){
-                                                recyclerView.setColumnWidth((int) widthScreenPX);
-                                                adapterGrid.notifyItemRemoved(i);
-                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+
+                                        if(peersOnCall.size()<7){
+
+                                            if(adapterGrid != null){
+                                                if(peersOnCall.size()< 4){
+                                                    recyclerView.setColumnWidth((int) widthScreenPX);
+                                                    adapterGrid.notifyItemRemoved(i);
+                                                    adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                                }else{
+                                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                    adapterGrid.notifyItemRemoved(i);
+                                                    adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                                }
+                                                updateSubtitleToolbar();
                                             }else{
-                                                recyclerView.setColumnWidth((int) widthScreenPX/2);
-                                                adapterGrid.notifyItemRemoved(i);
-                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                                updatePeers(true);
                                             }
-                                            updateSubtitleToolbar();
+
                                         }else{
-                                            log("onChatCallUpdate()-USER DESTROYED -> updatePeers ("+peersOnCall.size()+")");
-                                            updatePeers(true);
+                                            if(adapterList != null){
+                                                adapterList.notifyItemRemoved(i);
+                                                adapterList.notifyItemRangeChanged(0, peersOnCall.size());
+                                                updateSubtitleToolbar();
+                                            }else{
+                                                updatePeers(true);
+                                            }
                                         }
                                         break;
                                     }
@@ -2723,6 +2741,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 bigRecyclerView.setVisibility(View.VISIBLE);
 
                 if(adapterList == null){
+                    bigRecyclerView.setAdapter(null);
                     adapterList = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
                     bigRecyclerView.setAdapter(adapterList);
                 }else{
