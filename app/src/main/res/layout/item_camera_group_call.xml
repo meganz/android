@@ -1,17 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/general"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@color/black">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/orange">
 
     <RelativeLayout
         android:id="@+id/rl_surface_and_micro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:background="@android:color/transparent"
+        android:background="@android:color/holo_green_dark"
         android:visibility="gone">
 
         <!--Surface view-->
@@ -19,9 +19,10 @@
             android:id="@+id/parent_surface_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:layout_centerInParent="true"
-            android:background="@android:color/transparent">
+            android:background="@android:color/holo_red_dark">
         </RelativeLayout>
         <ImageView
             android:id="@+id/micro_surface_view"
