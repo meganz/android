@@ -182,7 +182,7 @@ public class VideoCompressor {
                 updater.onCompressSuccessful(record);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                updater.onCompressNotSupported(record);
+                updater.onCompressFailed(record);
                 currentFileIndex++;
                 totalRead += size;
             }

@@ -156,23 +156,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         
         try {
             log("Start service here");
-            initService();
-            task = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        int result = shouldRun();
-                        Log.d("yuan","onStartJob should run result: " + result + "");
-                        if (result == 0) {
-                            startCameraUploads();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        finish();
-                    }
-                }
-            };
-            
+            task = createWorkerThread();
             task.start();
             return true;
         } catch (Exception e) {
@@ -181,6 +165,25 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         
         return false;
+    }
+    
+    private Thread createWorkerThread(){
+        return new Thread() {
+            @Override
+            public void run() {
+                try {
+                    initService();
+                    int result = shouldRun();
+                    Log.d("yuan","onStartJob should run result: " + result + "");
+                    if (result == 0) {
+                        startCameraUploads();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    finish();
+                }
+            }
+        };
     }
     
     private void startCameraUploads() {
@@ -888,7 +891,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                                                 }
                                             }
                                         }
-                                        
+                                        Log.d("Yuan", "camera upload start fast login");
                                         megaApi.fastLogin(gSession,cameraUploadsService);
                                     } else {
                                         log("Another login is processing");
@@ -1148,11 +1151,13 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             try {
                 lock.release();
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         if ((wl != null) && (wl.isHeld()))
             try {
                 wl.release();
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         
         if (isOverquota) {
@@ -1201,7 +1206,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     @Override
     public void onRequestFinish(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
-    
+        if (request.getType() == MegaChatRequest.TYPE_CONNECT){
+            isLoggingIn = false;
+            MegaApplication.setLoggingIn(isLoggingIn);
+        }
     }
     
     @Override
@@ -1227,8 +1235,52 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     private synchronized void requestFinished(MegaApiJava api,MegaRequest request,MegaError e) {
-        
-        if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
+        if (request.getType() == MegaRequest.TYPE_LOGIN){
+            if (e.getErrorCode() == MegaError.API_OK){
+                log("Fast login OK");
+                log("Calling fetchNodes from CameraSyncService");
+                Log.d("Yuan","logged in fetch nodes");
+                megaApi.fetchNodes(this);
+            } else{
+                log("ERROR: " + e.getErrorString());
+                isLoggingIn = false;
+                MegaApplication.setLoggingIn(isLoggingIn);
+                Log.d("Yuan","login error");
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            if (e.getErrorCode() == MegaError.API_OK){
+                Log.d("Yuan","fetch nodes ok");
+                chatSettings = dbH.getChatSettings();
+                if(chatSettings!=null) {
+                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
+                    if(chatEnabled){
+                        log("Chat enabled-->connect");
+                        megaChatApi.connectInBackground(this);
+                    } else{
+                        log("Chat NOT enabled - readyToManager");
+                    }
+                } else{
+                    log("chatSettings NULL - readyToManager");
+                }
+                isLoggingIn = false;
+                MegaApplication.setLoggingIn(isLoggingIn);
+    
+                try {
+                    log("Start service here");
+                    task = createWorkerThread();
+                    task.start();
+                } catch (Exception ex) {
+                    log("CameraUploadsService Exception: " + ex.getMessage() + "_" + ex.getStackTrace());
+                    finish();
+                }
+            } else{
+                log("ERROR: " + e.getErrorString());
+                isLoggingIn = false;
+                MegaApplication.setLoggingIn(isLoggingIn);
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Folder created: " + request.getName());
                 String name = request.getName();
@@ -1241,7 +1293,21 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());
                 }
             }
-        } else if (request.getType() == MegaRequest.TYPE_COPY) {
+        } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+            log("cancel_transfers received");
+            if (e.getErrorCode() == MegaError.API_OK){
+                //clear pause state and reset
+                megaApi.pauseTransfers(false,this);
+                megaApi.resetTotalUploads();
+            } else{
+                finish();
+            }
+        } else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+            log("pause_transfer false received");
+            if (e.getErrorCode() == MegaError.API_OK){
+                finish();
+            }
+        }else if (request.getType() == MegaRequest.TYPE_COPY) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
                 String fingerPrint = node.getFingerprint();
@@ -1519,11 +1585,11 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         dbH.updateSyncRecordStatusByLocalPath(STATUS_PENDING,record.getLocalPath(),record.isSecondary());
     }
     
-    public synchronized void onCompressFailed(SyncRecord record) {
+    public synchronized void onCompressNotSupported(SyncRecord record) {
         log("compression failed " + record.getLocalPath());
     }
     
-    public synchronized void onCompressNotSupported(SyncRecord record) {
+    public synchronized void onCompressFailed(SyncRecord record) {
         String localPath = record.getLocalPath();
         boolean isSecondary = record.isSecondary();
         log("compression failed " + localPath);
@@ -1533,6 +1599,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             StatFs stat = new StatFs(tempRoot);
             double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
             if (availableFreeSpace > srcFile.length()) {
+                Log.d("Yuan","video not supported");
                 log("can not compress but got enough disk space, so should be un-supported format issue");
                 String newPath = record.getNewPath();
                 File temp = new File(newPath);
@@ -1540,6 +1607,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 if (newPath.startsWith(tempRoot) && temp.exists()) {
                     temp.delete();
                 }
+            }else{
+                //record will remain in DB and will be re-compressed next launch
             }
         } else {
             log("compressed video not exists, remove from DB");

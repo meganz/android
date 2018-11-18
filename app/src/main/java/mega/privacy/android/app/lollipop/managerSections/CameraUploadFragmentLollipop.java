@@ -1460,12 +1460,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             dbH.setConversionOnCharging(false);
             dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
         }
-
-        if (Util.isDeviceSupportParallelUpload()) {
-            startJob(context);
-        }  else {
-            context.startService(new Intent(context,CameraSyncService.class));
-        }
+        
+        handler.postDelayed(new Runnable() {
+            
+            @Override
+            public void run() {
+                log("Now I start the service");
+                if (Util.isDeviceSupportParallelUpload()) {
+                    startJob(context);
+                } else {
+                    context.startService(new Intent(context,CameraSyncService.class));
+                }
+            }
+        },5 * 1000);
 		
 		((ManagerActivityLollipop)context).refreshCameraUpload();
 	}
