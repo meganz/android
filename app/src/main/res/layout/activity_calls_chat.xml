@@ -27,18 +27,42 @@
                     android:layout_height="match_parent"
                     android:background="@color/black">
 
-                    <!--RecyclerView (1-6 users)-->
-                    <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-                        android:id="@+id/recycler_view_cameras"
+                    <!--&lt;!&ndash;RecyclerView (1-6 users)&ndash;&gt;-->
+                    <!--<mega.privacy.android.app.components.CustomizedGridCallRecyclerView-->
+                        <!--android:id="@+id/recycler_view_cameras"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:scrollbars="horizontal"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:background="@color/blue"-->
+                        <!--android:layout_centerHorizontal="true"-->
+                        <!--android:layout_centerVertical="true"-->
+                        <!--android:layout_centerInParent="true"-->
+                        <!--android:nestedScrollingEnabled="false"/>-->
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scrollbars="horizontal"
-                        android:layout_gravity="center_vertical"
-                        android:background="@color/blue"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:layout_centerInParent="true"
-                        android:nestedScrollingEnabled="false"/>
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
+                            android:id="@+id/recycler_view_cameras"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scrollbars="horizontal"
+                            android:layout_gravity="center_vertical|center|center_horizontal"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:layout_centerInParent="true"
+                            android:background="@android:color/holo_blue_bright"
+                            android:nestedScrollingEnabled="false"
+                            android:horizontalSpacing="0dp"
+                            android:verticalSpacing="0dp"
+                            android:numColumns="auto_fit"
+                            android:stretchMode="columnWidth"/>
+                    </LinearLayout>
+
 
                     <!--Layout big Camera in Group call (7 + users)-->
                     <RelativeLayout
