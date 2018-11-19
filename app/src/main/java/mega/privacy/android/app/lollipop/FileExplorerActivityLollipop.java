@@ -1605,6 +1605,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						long idMessage = dbH.addPendingMessage(pMsgSingle);
+						pMsgSingle.setId(idMessage);
 
 						if(idMessage!=-1){
 							intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);

@@ -3006,7 +3006,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<AndroidMegaChatMessage> pendMsgs = new ArrayList<>();
 		String chat = idChat + "";
 
-		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_STATE + " < " + PendingMessageSingle.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_STATE + " < " + PendingMessageSingle.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
 		log("QUERY: " + selectQuery);
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (!cursor.equals(null)) {

@@ -1151,11 +1151,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
 
         AndroidMegaChatMessage message = messages.get(position - 1);
-        if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
+        if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_PREPARING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
             ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
         }else{
+            log("onBindViewHolderUploading:state " + message.getPendingMessage().getState());
             ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(null);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(null);
