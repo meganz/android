@@ -291,7 +291,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								if(videoDownsampling==null){
 									videoDownsampling = new VideoDownsampling(this);
 								}
-								videoDownsampling.changeResolution(file, outFile.getAbsolutePath());
+								videoDownsampling.changeResolution(file, outFile.getAbsolutePath(), pendingMsg.getId());
 							}
 
 						} catch (Throwable throwable) {
@@ -427,7 +427,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		updateProgressNotification();
 	}
 
-	public void finishDownsampling(String returnedFile, boolean success){
+	public void finishDownsampling(String returnedFile, boolean success, long idPendingMessage){
 		log("finishDownsampling");
 		numberVideosPending--;
 
@@ -461,7 +461,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		if(downFile!=null){
-			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT, false);
+			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+idPendingMessage, false);
 		}
 	}
 
