@@ -566,7 +566,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (mNotificationManager != null) {
             mNotificationManager.cancel(notificationId);
         }
-        jobFinished(globalParams,true);
+        jobFinished(globalParams,false);
     }
     
     private ArrayList<SyncRecord> getPendingList(Queue<Media> mediaList,boolean isSecondary,boolean isVideo) {
@@ -1173,7 +1173,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         } else {
             log("no notification to cancel");
         }
-        jobFinished(globalParams,true);
+        jobFinished(globalParams,false);
     }
     
     @Override
