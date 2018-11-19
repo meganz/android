@@ -358,8 +358,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case INCOMING_SHARES: return "isF";
 				case OUTGOING_SHARES: return "osF";
 				case CONTACTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 0;
-				case RECEIVED_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 1;
-				case SENT_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 2;
+				case SENT_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 1;
+				case RECEIVED_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 2;
 				case SETTINGS: return "sttF";
 				case MY_ACCOUNT: return "android:switcher:" + R.id.my_account_tabs_pager + ":" + 0;
 				case MY_STORAGE: return "android:switcher:" + R.id.my_account_tabs_pager + ":" + 1;
@@ -3108,15 +3108,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		selectDrawerItemLollipop(drawerItem);
 	}
 
+	void deleteCurrentFragment () {
+		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		if (currentFragment != null){
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+		}
+	}
+
 	void setTurnOnNotificationsFragment(){
 		log("setTurnOnNotificationsFragment");
 		aB.setSubtitle(null);
 		tB.setVisibility(View.GONE);
 
-		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
-		}
+		deleteCurrentFragment();
 
 		if (tonF == null){
 			tonF = new TurnOnNotificationsFragment();
@@ -4913,10 +4917,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		fragmentContainer.setVisibility(View.GONE);
 
-		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
-		}
+		deleteCurrentFragment();
+
 		tabLayoutContacts.setVisibility(View.VISIBLE);
 		viewPagerContacts.setVisibility(View.VISIBLE);
 
@@ -5655,10 +5657,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				tabLayoutTransfers.setVisibility(View.GONE);
 				viewPagerTransfers.setVisibility(View.GONE);
 
-    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-    			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
-    			}
+//    			deleteCurrentFragment();
 
     			if (sttFLol != null && sttFLol.isAdded()){
 					if (openSettingsStorage){
@@ -5673,7 +5672,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sttFLol = new SettingsFragmentLollipop();
 				}
 
-    			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+    			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, FragmentTag.SETTINGS.getTag());
     			ft.commitAllowingStateLoss();
 
@@ -8209,7 +8208,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 
 					//Refresh search section
-					if (sFLol != null && sFLol.isAdded()){
+                   if (sFLol != null && sFLol.isAdded()){
 
 						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.detach(sFLol);
@@ -8241,17 +8240,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	        	return true;
 	        }
-//	        case R.id.action_rubbish_bin:{
-//	        	if (drawerItem == DrawerItem.RUBBISH_BIN){
-//	        		drawerItem = DrawerItem.CLOUD_DRIVE;
-//	        		selectDrawerItem(drawerItem);
-//	        	}
-//	        	else if (drawerItem == DrawerItem.CLOUD_DRIVE){
-//	        		drawerItem = DrawerItem.RUBBISH_BIN;
-//	        		selectDrawerItem(drawerItem);
-//	        	}
-//	        	return true;
-//	        }
 	        case R.id.action_menu_clear_rubbish_bin:{
 	        	showClearRubbishBinDialog();
 	        	return true;
@@ -9237,10 +9225,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		aB.setSubtitle(null);
 		tB.setVisibility(View.GONE);
 
-		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
-		}
+		deleteCurrentFragment();
 
 		if (eRKeyF == null){
 			eRKeyF = new ExportRecoveryKeyFragment();
