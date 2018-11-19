@@ -52,6 +52,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     LinearLayoutManager mLayoutManager;
 
     ArrayList<MegaUserAlert> notifications;
+    boolean pendingNotifications = false;
 
     int numberOfClicks = 0;
 
@@ -125,6 +126,11 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout_notifications);
 
+        if (pendingNotifications) {
+            pendingNotifications = false;
+            updateNotificationsView(notifications);
+        }
+
         return v;
     }
 
@@ -140,7 +146,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         notifications = notifs;
 
         if(isAdded()) {
-
             if (adapterList == null){
                 log("adapterList is NULL");
                 adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);
@@ -188,6 +193,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
                 megaApi.acknowledgeUserAlerts();
             }
+        }
+        else {
+            log("fragment not added");
+            pendingNotifications = true;
         }
     }
 
