@@ -717,7 +717,8 @@ public class SearchFragmentLollipop extends Fragment{
 			}
 		}
 		else{
-			((ManagerActivityLollipop)context).textSubmitted = true;
+//			((ManagerActivityLollipop)context).textSubmitted = true;
+			((ManagerActivityLollipop)context).setTextSubmitted();
 			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
 				log("is a folder");
