@@ -3,9 +3,9 @@ package mega.privacy.android.app.lollipop.megachat;
 public class PendingMessageSingle {
 
     public static int STATE_PREPARING = 0;
-    public static int STATE_UPLOADING = 2;
-    public static int STATE_ATTACHING = 3;
-    public static int STATE_SENT = 4;
+    public static int STATE_UPLOADING = 1;
+    public static int STATE_ATTACHING = 2;
+    public static int STATE_SENT = 3;
     public static int STATE_ERROR_UPLOADING = -1;
     public static int STATE_ERROR_ATTACHING = -2;
 
@@ -19,7 +19,7 @@ public class PendingMessageSingle {
     long nodeHandle=-1;
     String fingerprint;
     String name;
-    int transferTag;
+    int transferTag = -1;
 
     public PendingMessageSingle() {
     }

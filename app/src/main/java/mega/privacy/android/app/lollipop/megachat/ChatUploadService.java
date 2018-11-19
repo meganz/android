@@ -665,7 +665,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			String appData = transfer.getAppData();
 
 			if(appData!=null && appData.contains(Constants.UPLOAD_APP_DATA_CHAT)){
-				log("This is a chat upload");
+				log("This is a chat upload: "+ appData);
 				transfersCount++;
 				if(transfer.isStreamingTransfer()){
 					return;

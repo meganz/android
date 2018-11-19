@@ -135,6 +135,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
@@ -2287,7 +2288,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 long idMessageDb = dbH.addPendingMessage(pMsgSingle);
-
+                pMsgSingle.setId(idMessageDb);
                 if(idMessageDb!=-1){
                     intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessageDb);
 
@@ -3432,9 +3433,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(m!=null){
                     if(m.isUploading()){
-                        if(m.getPendingMessage().getState()==PendingMessageSingle.STATE_ERROR_UPLOADING || m.getPendingMessage().getState()==PendingMessageSingle.STATE_ERROR_ATTACHING){
-                            showUploadingAttachmentBottomSheet(m, position);
-                        }
+                        showUploadingAttachmentBottomSheet(m, position);
                     }
                     else{
 
@@ -4815,9 +4814,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_STATUS)){
 
             int statusMsg = msg.getStatus();
-            log("Status change: "+statusMsg);
-            log("Temporal id: "+msg.getTempId());
-            log("Final id: "+msg.getMsgId());
+            log("Status change: "+statusMsg + "T emporal id: "+msg.getTempId() + " Final id: "+msg.getMsgId());
 
             if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
                 if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
@@ -4827,11 +4824,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("----The id of my pending message is: "+idMsg);
                     if(idMsg!=-1){
                         resultModify = modifyAttachmentReceived(androidMsg, idMsg);
-                        dbH.removePendingMessageById(idMsg);
                         if(resultModify==-1){
                             log("Node attachment message not in list -> resultModify -1");
 //                            AndroidMegaChatMessage msgToAppend = new AndroidMegaChatMessage(msg);
 //                            appendMessagePosition(msgToAppend);
+                        }
+                        else{
+                            dbH.removePendingMessageById(idMsg);
                         }
                         return;
                     }
@@ -4974,10 +4973,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int modifyAttachmentReceived(AndroidMegaChatMessage msg, long idPendMsg){
-        log("modifyAttachmentReceived");
-        log("Msg ID: "+msg.getMessage().getMsgId());
-        log("Msg TEMP ID: "+msg.getMessage().getTempId());
-        log("Msg status: "+msg.getMessage().getStatus());
+        log("modifyAttachmentReceived: id: "+msg.getMessage().getMsgId()+" tempID: "+msg.getMessage().getTempId()+" status: "+msg.getMessage().getStatus());
         int indexToChange = -1;
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
@@ -4986,6 +4982,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             AndroidMegaChatMessage messageToCheck = itr.previous();
 
             if(messageToCheck.getPendingMessage()!=null){
+                log("pending id: "+messageToCheck.getPendingMessage().getId() + " other: "+ idPendMsg);
+                log("pending id: "+messageToCheck.getPendingMessage().getId() + " other: "+ idPendMsg);
                 if(messageToCheck.getPendingMessage().getId()==idPendMsg){
                     indexToChange = itr.nextIndex();
                     log("Found index to change: "+indexToChange);
@@ -5228,15 +5226,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ArrayList<AndroidMegaChatMessage> pendMsgs = dbH.findPendingMessagesNotSent(idChat);
 //        dbH.findPendingMessagesBySent(1);
         log("Number of pending: "+pendMsgs.size());
+
         for(int i=0;i<pendMsgs.size();i++){
-            if(pendMsgs.get(i)!=null){
-                appendMessagePosition(pendMsgs.get(i));
+            AndroidMegaChatMessage pMsg = pendMsgs.get(i);
+            if(pMsg!=null && pMsg.getPendingMessage()!=null){
+                if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_UPLOADING){
+                    if(pMsg.getPendingMessage().getTransferTag()!=-1){
+                        log("Transfer tag: "+pMsg.getPendingMessage().getTransferTag());
+                        if(megaApi!=null && megaApi.isOnline()){
+                            MegaTransfer t = megaApi.getTransferByTag(pMsg.getPendingMessage().getTransferTag());
+                            if(t!=null){
+                                if(t.getState()==MegaTransfer.STATE_COMPLETED){
+                                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_SENT);
+                                }
+                                else if(t.getState()==MegaTransfer.STATE_CANCELLED){
+                                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_SENT);
+                                }
+                                else if(t.getState()==MegaTransfer.STATE_FAILED){
+                                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                    pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                    appendMessagePosition(pMsg);
+                                }
+                            }
+                            else{
+                                log("Mark message as error uploading - no transfer in progress");
+                                dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                appendMessagePosition(pMsg);
+                            }
+                        }
+                    }
+                }
+                else{
+                    appendMessagePosition(pMsg);
+                }
             }
             else{
                 log("Null pending messages");
             }
         }
-
     }
 
     public void loadMessage(AndroidMegaChatMessage messageToShow){
@@ -6407,6 +6435,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 long idMessage = dbH.addPendingMessage(pMsgSingle);
+                pMsgSingle.setId(idMessage);
 
                 if(idMessage!=-1){
                     intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
@@ -6972,6 +7001,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         long idMessage = dbH.addPendingMessage(pMsgSingle);
+        pMsgSingle.setId(idMessage);
 
         if(idMessage!=-1){
             intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
