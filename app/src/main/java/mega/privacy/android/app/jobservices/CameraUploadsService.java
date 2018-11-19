@@ -562,11 +562,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         
         finish();
-        stopForeground(true);
-        if (mNotificationManager != null) {
-            mNotificationManager.cancel(notificationId);
-        }
-        jobFinished(globalParams,false);
     }
     
     private ArrayList<SyncRecord> getPendingList(Queue<Media> mediaList,boolean isSecondary,boolean isVideo) {
@@ -1169,7 +1164,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         stopForeground(true);
         if (mNotificationManager != null) {
             log("cancelling notification id is " + notificationChannelId);
-            mNotificationManager.cancel(notificationId);
+            mNotificationManager.cancelAll();
         } else {
             log("no notification to cancel");
         }
@@ -1576,8 +1571,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
-        String message = progress + "% compression has been completed";
-        showProgressNotification(progress,mPendingIntent,message,currentIndexString,"");
+        String message = progress + "% " + getString(R.string.message_compress_video);
+        String subText = getString(R.string.title_compress_video) + " " + currentIndexString;
+        showProgressNotification(progress,mPendingIntent,message,subText,"");
     }
     
     public synchronized void onCompressSuccessful(SyncRecord record) {
@@ -1666,6 +1662,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 .setContentIntent(intent)
                 .setOngoing(false)
                 .setContentTitle(title)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 .setContentText(content)
                 .setOnlyAlertOnce(true);
         mNotification = mBuilder.build();
@@ -1689,6 +1686,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setProgress(100,progressPercent,false)
                     .setContentIntent(pendingIntent)
                     .setOngoing(true)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
                     .setContentTitle(message)
                     .setSubText(subText)
                     .setContentText(contentText)
@@ -1700,6 +1698,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100,progressPercent,false)
                     .setContentIntent(pendingIntent)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
                     .setOngoing(true).setContentTitle(message).setSubText(subText)
                     .setContentText(contentText)
                     .setOnlyAlertOnce(true);
@@ -1709,14 +1708,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100,progressPercent,false)
                     .setContentIntent(pendingIntent)
-                    .setOngoing(true).setContentTitle(message).setContentInfo(subText)
+                    .setOngoing(true)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
+                    .setContentTitle(message).setContentInfo(subText)
                     .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
-            }
-            
+                    .setOnlyAlertOnce(true)
+                    .setColor(ContextCompat.getColor(this,R.color.mega));
             mNotification = mBuilder.getNotification();
         }
         

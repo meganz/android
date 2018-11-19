@@ -10,6 +10,7 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
 import android.os.StatFs;
+import android.util.Log;
 import android.view.Surface;
 
 import java.io.File;
@@ -100,7 +101,7 @@ public class VideoCompressor {
 
     public void stop() {
         isRunning = false;
-        log("video compressor stopped");
+        Log.d("Yuan","video compressor stopped");
     }
 
     public VideoCompressor(Context context) {
