@@ -5247,6 +5247,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
                                     appendMessagePosition(pMsg);
                                 }
+                                else{
+                                    log("Found transfer in progress for the message");
+                                    appendMessagePosition(pMsg);
+                                }
                             }
                             else{
                                 log("Mark message as error uploading - no transfer in progress");
@@ -5822,6 +5826,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void removePendingMsg(long id){
         log("removePendingMsg: "+selectedMessageId);
+
+        PendingMessageSingle pMsg = dbH.findPendingMessageById(id);
+        if(pMsg!=null && pMsg.getState()==PendingMessageSingle.STATE_UPLOADING) {
+            if (pMsg.getTransferTag() != -1) {
+                log("Transfer tag: " + pMsg.getTransferTag());
+                if (megaApi != null && megaApi.isOnline()) {
+                    megaApi.cancelTransferByTag(pMsg.getTransferTag());
+                }
+            }
+        }
+
         try{
             dbH.removePendingMessageById(id);
             messages.remove(selectedPosition);
