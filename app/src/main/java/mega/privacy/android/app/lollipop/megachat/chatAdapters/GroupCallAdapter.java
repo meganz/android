@@ -213,21 +213,17 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             lp.width = maxScreenWidth;
 
         }else if((numPeersOnCall >= 4) && (numPeersOnCall < 7)){
-            lp.height = Util.scaleWidthPx(180, outMetrics);
+            lp.height = maxScreenWidth/2;
             lp.width = maxScreenWidth/2;
-
             if((peers.size()==5)&&(peer.getHandle().equals(megaChatApi.getMyUserHandle()))){
                 ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
                 layoutParamsPeer.width = maxScreenWidth;
-                layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
+                layoutParamsPeer.height = maxScreenWidth/2;
                 holder.rlGeneral.setLayoutParams(layoutParamsPeer);
             }
-
         }else{
-
             lp.height = Util.scaleWidthPx(90, outMetrics);
             lp.width = Util.scaleWidthPx(90, outMetrics);
-
         }
         holder.rlGeneral.setLayoutParams(lp);
 
@@ -264,8 +260,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(320, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(320, outMetrics);
+                layoutParamsSurface.width = maxScreenHeight/numPeersOnCall;
+                layoutParamsSurface.height = maxScreenHeight/numPeersOnCall;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
@@ -274,8 +270,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(212, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(212, outMetrics);
+                layoutParamsSurface.width = maxScreenHeight/numPeersOnCall;
+                layoutParamsSurface.height = maxScreenHeight/numPeersOnCall;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
@@ -284,10 +280,10 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
-
+                layoutParamsSurface.width = maxScreenWidth/2;
+                layoutParamsSurface.height = maxScreenWidth/2;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+
                 if((position < 2)){
                     layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                 }else{
@@ -300,8 +296,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
+                layoutParamsSurface.width = maxScreenWidth/2;
+                layoutParamsSurface.height = maxScreenWidth/2;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
@@ -309,8 +305,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.parentSurfaceView.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
+                layoutParamsSurface.width = maxScreenWidth/2;
+                layoutParamsSurface.height = maxScreenWidth/2;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
             }
@@ -335,44 +331,58 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
 
                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
 
             }else{
+
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     if(peer.getListener().getSurfaceView().getParent()!=null){
                         if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
                             ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                             if(peer.getListener().getHeight() != 0){
                                 peer.getListener().setHeight(0);
                             }
                             if(peer.getListener().getWidth() != 0){
                                 peer.getListener().setWidth(0);
                             }
-                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                        }else{
                             holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-
+                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
                         }
                     }
                 }else{
-                    //Remove items of parent
-                    holder.parentSurfaceView.removeAllViews();
 
-                    //Remove parent of Surface
-                    if(peer.getListener().getSurfaceView().getParent()!=null){
-                        if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
-                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
-                            if(peer.getListener().getHeight() != 0){
-                                peer.getListener().setHeight(0);
+                    if(holder.parentSurfaceView.getChildAt(0).equals(peer.getListener().getSurfaceView())){
+                        peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                        if(peer.getListener().getHeight() != 0){
+                            peer.getListener().setHeight(0);
+                        }
+                        if(peer.getListener().getWidth() != 0){
+                            peer.getListener().setWidth(0);
+                        }
+                    }else{
+                        //Remove items of parent
+                        holder.parentSurfaceView.removeAllViews();
+                        //Remove parent of Surface
+                        if(peer.getListener().getSurfaceView().getParent()!=null){
+                            if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                                ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                                if(peer.getListener().getHeight() != 0){
+                                    peer.getListener().setHeight(0);
+                                }
+                                if(peer.getListener().getWidth() != 0){
+                                    peer.getListener().setWidth(0);
+                                }
+                                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                                holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                             }
-                            if(peer.getListener().getWidth() != 0){
-                                peer.getListener().setWidth(0);
-                            }
-                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                         }
                     }
+
                 }
             }
+
+
             holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
 
             //Audio icon:
@@ -417,7 +427,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         }else{
 
-            //Remove Surface view && Listener:
+            //Remove SurfaceView && Listener:
             holder.surfaceMicroLayout.setVisibility(GONE);
             if(peer.getListener() != null){
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
@@ -429,19 +439,23 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     if(peer.getListener().getSurfaceView().getParent()!=null){
                         if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
-                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeAllViewsInLayout();
-                        }else{ }
-                    }else{ }
+                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                        }
+                    }
                 }else{
                     holder.parentSurfaceView.removeAllViews();
                     holder.parentSurfaceView.removeAllViewsInLayout();
+
+                    if(peer.getListener().getSurfaceView().getParent()!=null){
+                        if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                            ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+
+                        }
+                    }
                 }
                 peer.setListener(null);
-            }else{ }
-
-            if(peers.size() == 4){
-
             }
+
 
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
