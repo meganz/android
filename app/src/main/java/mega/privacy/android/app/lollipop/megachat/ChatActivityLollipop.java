@@ -5837,13 +5837,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
 
-        try{
-            dbH.removePendingMessageById(id);
-            messages.remove(selectedPosition);
-            adapter.removeMessage(selectedPosition, messages);
+        if(pMsg!=null && pMsg.getState()!=PendingMessageSingle.STATE_SENT){
+            try{
+                dbH.removePendingMessageById(id);
+                messages.remove(selectedPosition);
+                adapter.removeMessage(selectedPosition, messages);
+            }
+            catch (IndexOutOfBoundsException e){
+                log("removePendingMsg: EXCEPTION: "+e.getMessage());
+            }
         }
-        catch (IndexOutOfBoundsException e){
-            log("removePendingMsg: EXCEPTION: "+e.getMessage());
+        else{
+            showSnackbar(getString(R.string.error_message_already_sent));
         }
     }
 
