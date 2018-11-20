@@ -1254,6 +1254,7 @@
     <string name="message_option_retry" context="option shown when a message could not be sent">Retry</string>
 
     <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message not sent</string>
+    <string name="title_message_uploading_options" context="title of the menu for an uploading message with attachment">Attachment uploading</string>
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
