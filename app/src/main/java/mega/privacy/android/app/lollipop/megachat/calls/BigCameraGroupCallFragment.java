@@ -55,8 +55,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         this.userHandle = args.getLong("userHandle", -1);
-        this.width = 0;
-        this.height = 0;
+//        this.width = 0;
+//        this.height = 0;
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -82,7 +82,6 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         }else{
             megaChatApi.addChatRemoteVideoListener(chatId, userHandle, this);
         }
-
 
         return v;
     }
@@ -122,21 +121,11 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
         if (bitmap != null) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
             renderer.DrawBitmap(false);
         }
     }
-
-
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
-
 
     @Override
     public void onAttach(Context context) {
@@ -149,8 +138,6 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         if(fullScreenSurfaceView.getParent()!=null){
             if(fullScreenSurfaceView.getParent().getParent()!=null){
                 ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
-            }else{
-                ((ViewGroup)fullScreenSurfaceView.getParent()).removeAllViewsInLayout();
             }
         }
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
@@ -168,12 +155,17 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         super.onResume();
     }
 
-    public void setVideoFrame(boolean visible){
-        if(visible){
-            fullScreenSurfaceView.setVisibility(View.VISIBLE);
+    public void removeSurfaceView(){
+        log("removeSurfaceView()");
+        if(fullScreenSurfaceView.getParent()!=null){
+            if(fullScreenSurfaceView.getParent().getParent()!=null){
+                ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
+            }
         }
-        else{
-            fullScreenSurfaceView.setVisibility(View.GONE);
+        if(userHandle.equals(megaChatApi.getMyUserHandle())){
+            megaChatApi.removeChatVideoListener(chatId, -1, this);
+        }else{
+            megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         }
     }
 
