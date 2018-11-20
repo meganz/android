@@ -27,23 +27,14 @@
                     android:layout_height="match_parent"
                     android:background="@color/black">
 
-                    <!--&lt;!&ndash;RecyclerView (1-6 users)&ndash;&gt;-->
-                    <!--<mega.privacy.android.app.components.CustomizedGridCallRecyclerView-->
-                        <!--android:id="@+id/recycler_view_cameras"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:scrollbars="horizontal"-->
-                        <!--android:layout_gravity="center_vertical"-->
-                        <!--android:background="@color/blue"-->
-                        <!--android:layout_centerHorizontal="true"-->
-                        <!--android:layout_centerVertical="true"-->
-                        <!--android:layout_centerInParent="true"-->
-                        <!--android:nestedScrollingEnabled="false"/>-->
-
                     <RelativeLayout
                         android:id="@+id/rl_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:paddingRight="0dp"
+                        android:paddingLeft="0dp"
                         android:gravity="center"
                         android:orientation="vertical">
 

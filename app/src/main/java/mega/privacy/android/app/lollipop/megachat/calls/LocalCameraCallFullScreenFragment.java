@@ -136,6 +136,13 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     @Override
     public void onDestroy(){
+        if(localFullScreenSurfaceView.getParent()!=null){
+            if(localFullScreenSurfaceView.getParent().getParent()!=null){
+                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+            }else{
+                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeAllViewsInLayout();
+            }
+        }
         megaChatApi.removeChatVideoListener(chatId, -1, this);
         super.onDestroy();
     }

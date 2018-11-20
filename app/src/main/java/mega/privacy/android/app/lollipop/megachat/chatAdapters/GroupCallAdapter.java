@@ -65,7 +65,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     float scaleH;
     float widthScreenPX, heightScreenPX;
     boolean isCallInProgress = false;
-//    int adapterType;
 
     RecyclerView recyclerViewFragment;
 
@@ -75,20 +74,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     int maxScreenWidth, maxScreenHeight;
     boolean avatarRequested = false;
 
-//    public static class ViewHolderBrowserList extends GroupCallAdapter.ViewHolderGroupCall.ViewHolderBrowserList {
-//
-//        public ViewHolderBrowserList(View v) {
-//            super(v);
-//        }
-//    }
-//
-//    public static class ViewHolderBrowserGrid extends MegaBrowserLollipopAdapter.ViewHolderBrowserGrid {
-//
-//        public ViewHolderBrowserGrid(View v) {
-//            super(v);
-//        }
-//
-//    }
 
 public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress) {
 
@@ -99,7 +84,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         this.peers = peers;
         this.chatId = chatId;
         this.isCallInProgress = isCallInProgress;
-//        this.adapterType = adapterType;
 
         MegaApplication app = (MegaApplication) ((Activity) context).getApplication();
         if (megaApi == null) {
@@ -129,7 +113,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         TextView avatarInitialLetter;
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
-
         public ViewHolderGroupCall(View itemView) {
             super(itemView);
         }
@@ -156,16 +139,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-        maxScreenHeight = parent.getMeasuredHeight();
-        maxScreenWidth = parent.getMeasuredWidth();
-
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
+
+        maxScreenHeight = (int)heightScreenPX;
+        maxScreenWidth = (int)widthScreenPX;
 
         holderGrid = new ViewHolderGroupCallGrid(v);
 
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
-//        holderGrid.rlGeneral.setGravity(RelativeLayout.CENTER_HORIZONTAL);
-//        holderGrid.rlGeneral.setGravity(RelativeLayout.CENTER_VERTICAL);
         holderGrid.greenLayer = (RelativeLayout) v.findViewById(R.id.green_layer);
         holderGrid.surfaceMicroLayout = (RelativeLayout) v.findViewById(R.id.rl_surface_and_micro);
 
@@ -205,10 +186,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         int numPeersOnCall = getItemCount();
 
-        CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) holder.rlGeneral.getLayoutParams();
+        GridLayoutManager.LayoutParams lp = (GridLayoutManager.LayoutParams) holder.rlGeneral.getLayoutParams();
 
         if(numPeersOnCall < 4){
-
             lp.height = maxScreenHeight/numPeersOnCall;
             lp.width = maxScreenWidth;
 
@@ -254,6 +234,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.height = maxScreenWidth;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 2){
@@ -264,6 +246,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.height = maxScreenHeight/numPeersOnCall;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 3){
@@ -274,6 +258,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.height = maxScreenHeight/numPeersOnCall;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 4){
@@ -299,6 +285,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.width = maxScreenWidth/2;
                 layoutParamsSurface.height = maxScreenWidth/2;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 6){
@@ -308,6 +296,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.width = maxScreenWidth/2;
                 layoutParamsSurface.height = maxScreenWidth/2;
                 layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
             }
 
@@ -381,7 +371,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 }
             }
-
 
             holder.surfaceMicroLayout.setVisibility(View.VISIBLE);
 
