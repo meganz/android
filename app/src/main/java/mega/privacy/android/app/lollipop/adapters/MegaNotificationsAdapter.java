@@ -26,6 +26,7 @@ import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLo
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
 
@@ -914,8 +915,19 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
 				String email = alert.getEmail();
+				MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
 
-				String textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
+				String textToShow = "";
+				Spanned result = null;
+				if(node!=null){
+					textToShow = String.format(context.getString(R.string.notification_left_shared_folder), email);
+					holder.itemLayout.setOnClickListener(this);
+				}
+				else{
+					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
+					holder.itemLayout.setOnClickListener(null);
+				}
+
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -923,12 +935,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
-				Spanned result = null;
+
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 				} else {
 					result = Html.fromHtml(textToShow);
 				}
+
 				holder.titleText.setText(result);
 				holder.descriptionText.setVisibility(View.GONE);
 
@@ -951,7 +964,6 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHAREDNODES:{

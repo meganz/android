@@ -2184,6 +2184,7 @@
     <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
 
     <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for a deleted shared folder">[B]Access to folder shared by [/B][A]%s[/A][B] was removed.[/B]</string>
+    <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] has left a shared folder.[/B]</string>
 
     <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]</string>
     <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
