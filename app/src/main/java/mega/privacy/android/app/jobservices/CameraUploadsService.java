@@ -542,19 +542,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         totalUploaded = 0;
         totalToUpload = 0;
         
-        if ((lock != null) && (lock.isHeld()))
-            try {
-                lock.release();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        if ((wl != null) && (wl.isHeld()))
-            try {
-                wl.release();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        
         if (totalUploaded == 0) {
             log("TotalUploaded == 0");
         } else {
@@ -1142,18 +1129,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     private void cancel() {
-        if ((lock != null) && (lock.isHeld()))
-            try {
-                lock.release();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        if ((wl != null) && (wl.isHeld()))
-            try {
-                wl.release();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        releaseLocks();
         
         if (isOverquota) {
             showStorageOverQuotaNotification();
@@ -1333,18 +1309,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private synchronized void transferUpdated(MegaApiJava api,MegaTransfer transfer) {
         if (canceled) {
             log("Transfer cancel: " + transfer.getFileName());
-            
-            if ((lock != null) && (lock.isHeld()))
-                try {
-                    lock.release();
-                } catch (Exception ex) {
-                }
-            if ((wl != null) && (wl.isHeld()))
-                try {
-                    wl.release();
-                } catch (Exception ex) {
-                }
-            
             megaApi.cancelTransfer(transfer);
             cancel();
             return;
@@ -1419,21 +1383,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         if (canceled) {
             log("Image sync cancelled: " + transfer.getFileName());
-            if ((lock != null) && (lock.isHeld())) {
-                try {
-                    lock.release();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            
-            if ((wl != null) && (wl.isHeld())) {
-                try {
-                    wl.release();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
             cancel();
         }
         updateUpload();
@@ -1494,13 +1443,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         log("updateSecondaryTimeStamp " + timeStamp);
         secondaryTimeStamp = timeStamp;
         dbH.setSecSyncTimeStamp(secondaryTimeStamp);
-    }
-    
-    private void deleteFromDBIfFileNotExist(String path,boolean isSecondary) {
-        File f = new File(path);
-        if (!f.exists()) {
-            dbH.deleteSyncRecordByPath(path,isSecondary);
-        }
     }
     
     private boolean isCompressedVideoPending() {
@@ -1911,5 +1853,23 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             log("no possible node found");
             return null;
         }
+    }
+    
+    private void releaseLocks(){
+        if ((lock != null) && (lock.isHeld())) {
+            try {
+                lock.release();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        if ((wl != null) && (wl.isHeld())) {
+            try {
+                wl.release();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    
     }
 }

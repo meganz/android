@@ -717,7 +717,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                         charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
                     }
                     cameraUploadCharging.setChecked(charging);
-                    enableChargingSettings();
                 }else{
 				    disableVideoQualitySettings();
                     dbH.setCameraUploadVideoQuality(ORIGINAL);
@@ -1068,6 +1067,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.addPreference(cameraUploadHow);
 			cameraUploadCategory.addPreference(cameraUploadWhat);
             enableVideoQualitySettings();
+            if(!charging){
+                disableVideoCompressionSizeSettings();
+            }
 			cameraUploadCategory.addPreference(keepFileNames);
 			
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -2489,9 +2491,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				downloadLocationPreference.setSummary(path);
 			}
 		}		
-		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
+		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){//yuan
 			//Local folder to sync
 			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            if(!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
+                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                return;
+            }
+            
 			prefs.setCamSyncLocalPath(cameraPath);
 			camSyncLocalPath = cameraPath;
 			dbH.setCamSyncLocalPath(cameraPath);
@@ -2533,10 +2540,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
 			String secondaryPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            if(!isNewSettingValid(prefs.getCamSyncLocalPath(), secondaryPath, prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
+                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                return;
+            }
 			
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
+			prefs.setLocalPathSecondaryFolder(secondaryPath);
 
 			if (Util.isDeviceSupportParallelUpload()) {
                 cancelAllJobs(context);
@@ -2564,6 +2576,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Mega folder to sync
 			
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
+            if(!isNewSettingValid(prefs.getCamSyncLocalPath(), prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), String.valueOf(handle))){
+                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                return;
+            }
+            
 			if(handle!=-1){
 				dbH.setSecondaryFolderHandle(handle);
 				prefs.setMegaHandleSecondaryFolder(String.valueOf(handle));
@@ -2608,6 +2625,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Mega folder to sync
 			
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
+            if(!isNewSettingValid(prefs.getCamSyncLocalPath(), prefs.getLocalPathSecondaryFolder(), String.valueOf(handle), prefs.getMegaHandleSecondaryFolder())){
+                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                return;
+            }
+            
 			if(handle!=-1){
 				dbH.setCamSyncHandle(handle);
 				prefs.setCamSyncHandle(String.valueOf(handle));
@@ -3464,5 +3486,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         }, 10 * 1000);
     }
     
-    
+    private boolean isNewSettingValid(String primaryPath, String secondaryPath, String primaryHandle, String secondaryHandle){
+	    if(!secondaryUpload || primaryPath == null || primaryHandle == null || secondaryPath == null || secondaryHandle == null){
+	        return true;
+        }else if(primaryHandle.equals(secondaryHandle) && (primaryPath.contains(secondaryPath) || secondaryPath.contains(primaryPath))){
+	        return false;
+        }else{
+            return true;
+        }
+    }
 }
