@@ -4479,12 +4479,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				totalIpc = requests.size();
 			}
 
-			int chatUnread = 0;
-			if(Util.isChatEnabled() && megaChatApi != null) {
-				chatUnread = megaChatApi.getUnreadChats();
-			}
-
-			int totalNotifications = totalHistoric + totalIpc + chatUnread;
+			int totalNotifications = totalHistoric + totalIpc;
 
 			if(totalNotifications==0){
 				if(isFirstNavigationLevel()){
