@@ -623,6 +623,7 @@ public class SearchFragmentLollipop extends Fragment{
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
+				adapter.setListFragment(recyclerView);
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
@@ -675,6 +676,7 @@ public class SearchFragmentLollipop extends Fragment{
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
+				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			adapter.setMultipleSelect(false);
