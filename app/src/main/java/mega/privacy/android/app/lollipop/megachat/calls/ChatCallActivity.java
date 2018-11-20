@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -202,7 +203,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ViewGroup parentLocalFS;
     ViewGroup parentRemoteFS;
 
-    private LocalCameraCallFragment localCameraFragment;
+    private LocalCameraCallFragment localCameraFragment = null;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
 
@@ -397,6 +398,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
         }else{
+            log("updateScreenStatusInProgress() chatId: "+chatId);
 
             callChat = megaChatApi.getChatCall(chatId);
             if (callChat == null){
@@ -404,7 +406,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }else{
                 int callStatus = callChat.getStatus();
                 if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
-                    log("updateScreenStatusInProgress() - RING IN");
+                    log("updateScreenStatusInProgress() - CALL_STATUS_RING_IN");
 
                     relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
@@ -417,11 +419,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     setProfileContactAvatar();
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                    log(" updateScreenStatusInProgress() - IN PROGRESS");
+                    log("updateScreenStatusInProgress() - CALL_STATUS_IN_PROGRESS");
 
                     relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     relativeVideo.requestLayout();
+
                     myAvatarLayout.setVisibility(View.VISIBLE);
                     contactAvatarLayout.setVisibility(View.VISIBLE);
                     flagMyAvatar = true;
@@ -511,7 +514,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 callChat = megaChatApi.getChatCall(chatId);
 
                 if(callChat.getStatus() ==  MegaChatCall.CALL_STATUS_RING_IN){
-                    log(" onNewIntent() CALL_STATUS_RING_IN -> participants: "+callChat.getParticipants().size());
 
                     boolean isMe = false;
                     for(int i = 0; i < callChat.getParticipants().size(); i++){
@@ -641,7 +643,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
-                log("New intent to the activity with a new chatId: "+newChatId);
+                log(" It is not the same: "+newChatId);
                 //Check the new call if in progress
                 chatId = newChatId;
                 chat = megaChatApi.getChatRoom(chatId);
@@ -764,7 +766,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setTitle(null);
         aB.setSubtitle(null);
-//        aB.setTitle(" ");
 
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
@@ -1024,7 +1025,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                         }
                     }else{
-                        log("Incoming individual call");
+                        log(" onCreate()-Incoming individual call");
 
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
@@ -1038,7 +1039,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                    log("InProgress");
+                    log("onCreate()- In Progress");
                     updateScreenStatusInProgress();
                 }else{
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -1069,7 +1070,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         updatePeers(true);
 
                     }else{
-                        log("Outgoing individual call");
+                        log("onCreate()-Outgoing individual call");
 
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -1408,25 +1409,33 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
         clearHandlers();
 
-
         if (localCameraFragment != null) {
-            localCameraFragment.setVideoFrame(false);
+            localCameraFragment.removeSurfaceView();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.remove(localCameraFragment);
             localCameraFragment = null;
         }
+
         if (localCameraFragmentFS != null) {
-            localCameraFragmentFS.setVideoFrame(false);
+            localCameraFragmentFS.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(localCameraFragmentFS);
             localCameraFragmentFS = null;
         }
         if (remoteCameraFragmentFS != null) {
-            remoteCameraFragmentFS.setVideoFrame(false);
+            remoteCameraFragmentFS.removeSurfaceView();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.remove(remoteCameraFragmentFS);
             remoteCameraFragmentFS = null;
         }
+
+        if (bigCameraGroupCallFragment != null) {
+            bigCameraGroupCallFragment.removeSurfaceView();
+            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+            ftFS.remove(bigCameraGroupCallFragment);
+            bigCameraGroupCallFragment = null;
+        }
+
 
 
         peerSelected = null;
@@ -1570,10 +1579,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate() ");
+        log("onChatCallUpdate()");
 
         if(call.getChatid()==chatId){
             this.callChat = call;
+            log("onChatCallUpdate()  call.getChatid() = chatId = "+chatId);
 
             if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
                 log("CHANGE_TYPE_STATUS");
@@ -1612,12 +1622,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             updateLocalAudioStatus();
 
                         }else{
+                            log("onChatCallUpdate() - CALL_STATUS_IN_PROGRESS");
+
                             flagMyAvatar = true;
                             setProfileMyAvatar();
                             flagContactAvatar = false;
                             setProfileContactAvatar();
                             if (localCameraFragmentFS != null) {
-                                localCameraFragmentFS.setVideoFrame(false);
+                                log("remove localCameraFragmentFS");
+                                localCameraFragmentFS.removeSurfaceView();
                                 FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                                 ftFS.remove(localCameraFragmentFS);
                                 localCameraFragmentFS = null;
@@ -1650,7 +1663,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             rtcAudioManager.stop();
                             MegaApplication.activityPaused();
                             if (bigCameraGroupCallFragment != null) {
-                                bigCameraGroupCallFragment.setVideoFrame(false);
+                                bigCameraGroupCallFragment.removeSurfaceView();;
                                 FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                                 ftFS.remove(bigCameraGroupCallFragment);
                                 bigCameraGroupCallFragment = null;
@@ -1663,31 +1676,35 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 super.finish();
                             }
                         }else{
-                            if (localCameraFragment != null) {
-                                localCameraFragment.setVideoFrame(false);
-                                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                                ft.remove(localCameraFragment);
-                                localCameraFragment = null;
-                            }
-                            if (localCameraFragmentFS != null) {
-                                localCameraFragmentFS.setVideoFrame(false);
-                                FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                                ftFS.remove(localCameraFragmentFS);
-                                localCameraFragmentFS = null;
-                            }
-                            if (remoteCameraFragmentFS != null) {
-                                remoteCameraFragmentFS.setVideoFrame(false);
-                                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                                ft.remove(remoteCameraFragmentFS);
-                                remoteCameraFragmentFS = null;
-                            }
+                            log("onChatCallUpdate() - CALL_STATUS_TERMINATING_USER_PARTICIPATION");
 
-                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                super.finishAndRemoveTask();
-                            }
-                            else {
-                                super.finish();
-                            }
+//                            if (localCameraFragment != null) {
+//                                log("CALL_STATUS_TERMINATING_USER_PARTICIPATION localCameraFragment != null");
+//
+//                                localCameraFragment.setVideoFrame(false);
+//                                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//                                ft.remove(localCameraFragment);
+//                                localCameraFragment = null;
+//                            }
+//                            if (localCameraFragmentFS != null) {
+//                                localCameraFragmentFS.setVideoFrame(false);
+//                                FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+//                                ftFS.remove(localCameraFragmentFS);
+//                                localCameraFragmentFS = null;
+//                            }
+//                            if (remoteCameraFragmentFS != null) {
+//                                remoteCameraFragmentFS.setVideoFrame(false);
+//                                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//                                ft.remove(remoteCameraFragmentFS);
+//                                remoteCameraFragmentFS = null;
+//                            }
+//
+//                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                                super.finishAndRemoveTask();
+//                            }
+//                            else {
+//                                super.finish();
+//                            }
                         }
 
 
@@ -1701,6 +1718,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         break;
                     }
                     case MegaChatCall.CALL_STATUS_DESTROYED:{
+                        log("onChatCallUpdate() - CALL_STATUS_DESTROYED");
+
                         log("CALL_STATUS_DESTROYED:TERM code of the call: "+call.getTermCode());
                         //The group call has finished but I can not join again
 
@@ -1719,7 +1738,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_STATUS)){
-                log("#### CHANGE_TYPE_SESSION_STATUS");
+                log("CHANGE_TYPE_SESSION_STATUS");
 
                 if(chat.isGroup()){
 
@@ -1747,7 +1766,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                                }
 //                                if(!peerContain){
 //                                    InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), false,null);
-//                                    log("#### SESSION_STATUS_IN_PROGRESS -> "+userPeer.getName()+" added");
 //                                    peersOnCall.add((peersOnCall.size() == 0 ? 0:(peersOnCall.size()-1)), userPeer);
 //
 ////                                    peersOnCall.add(0, userPeer);
@@ -1795,7 +1813,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //
 //                                for(int i=0;i<peersOnCall.size();i++){
 //                                    if(peersOnCall.get(i).getHandle() == userHandle){
-//                                        log("#### SESSION_STATUS_DESTROYED -> "+peersOnCall.get(i).getName()+" removed");
 //                                        peersOnCall.remove(i);
 //                                        if(peersOnCall.size()<7){
 //
@@ -1840,6 +1857,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         updateLocalAudioStatus();
                     }
                 }else{
+                    log("onChatCallUpdate() - CHANGE_TYPE_SESSION_STATUS");
+
                     if(call.getPeerSessionStatusChange()==chat.getPeerHandle(0)){
                         updateSubTitle();
                     }
@@ -2020,6 +2039,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                         }
                     }
+
                 }
             }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_AUDIO_LEVEL)) {
                 log("onChatCallUpdate()-CHANGE_TYPE_SESSION_AUDIO_LEVEL");
@@ -2494,7 +2514,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             log("is individual");
 
             if (callChat.hasLocalVideo()) {
-                log("Video local connected");
+                log("Video local connected: chatId: "+chatId);
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                 videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
 
@@ -2502,8 +2522,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     log("callStatus: CALL_STATUS_REQUEST_SENT");
 
                     if(localCameraFragmentFS == null){
+                        log("create localCameraFragmentFS");
                         localCameraFragmentFS = LocalCameraCallFullScreenFragment.newInstance(chatId);
-
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
                         ftFS.commitNowAllowingStateLoss();
@@ -2513,15 +2533,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                    log(" callStatus: CALL_STATUS_IN_PROGRESS");
-
-                    log("callStatus: parentLocal.CHILDS: "+parentLocal.getChildCount());
+                    log("callStatus: CALL_STATUS_IN_PROGRESS");
 
                     if(localCameraFragment == null){
+                        log("create localCameraFragment");
                         localCameraFragment = LocalCameraCallFragment.newInstance(chatId);
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
                         ft.commitNowAllowingStateLoss();
+
                     }
                     myAvatarLayout.setVisibility(GONE);
                     parentLocal.setVisibility(View.VISIBLE);
@@ -2529,7 +2549,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else {
-                log("Video local NOT connected");
+                log("Video local NOT connected: chatId: "+chatId);
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                 videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
 
@@ -2537,7 +2557,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     log("callStatus: CALL_STATUS_REQUEST_SENT");
 
                     if (localCameraFragmentFS != null) {
-                        localCameraFragmentFS.setVideoFrame(false);
+                        log("remove localCameraFragmentFS");
+                        localCameraFragmentFS.removeSurfaceView();
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.remove(localCameraFragmentFS);
                         localCameraFragmentFS = null;
@@ -2546,11 +2567,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     fragmentContainerLocalCameraFS.setVisibility(View.GONE);
                     contactAvatarLayout.setVisibility(View.VISIBLE);
 
-
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("callStatus: CALL_STATUS_IN_PROGRESS ");
                     if (localCameraFragment != null) {
-                        localCameraFragment.setVideoFrame(false);
+                        log("remove localCameraFragment");
+                        localCameraFragment.removeSurfaceView();
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.remove(localCameraFragment);
                         localCameraFragment = null;
@@ -2700,14 +2721,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             log("is individual");
             MegaChatSession userSession = callChat.getMegaChatSession(chat.getPeerHandle(0));
 
-            if(isRemoteVideo== REMOTE_VIDEO_NOT_INIT){
+            if(isRemoteVideo == REMOTE_VIDEO_NOT_INIT){
 
                 if(userSession!=null && userSession.hasVideo()){
                     log("Video remote connected");
                     isRemoteVideo = REMOTE_VIDEO_ENABLED;
 
                     if(remoteCameraFragmentFS == null){
-                        log("CREATE remoteCameraFragmentFS");
+                        log("create remoteCameraFragmentFS");
                         remoteCameraFragmentFS = RemoteCameraCallFullScreenFragment.newInstance(chatId, chat.getPeerHandle(0));
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
@@ -2723,8 +2744,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     isRemoteVideo = REMOTE_VIDEO_DISABLED;
                     if (remoteCameraFragmentFS != null) {
-                        log("REMOVE remoteCameraFragmentFS");
-                        remoteCameraFragmentFS.setVideoFrame(false);
+                        log("remove remoteCameraFragmentFS");
+                        remoteCameraFragmentFS.removeSurfaceView();
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.remove(remoteCameraFragmentFS);
                         remoteCameraFragmentFS = null;
@@ -2739,8 +2760,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     isRemoteVideo = REMOTE_VIDEO_DISABLED;
 
                     if (remoteCameraFragmentFS != null) {
-                        log("REMOVE remoteCameraFragmentFS");
-                        remoteCameraFragmentFS.setVideoFrame(false);
+                        log("remove remoteCameraFragmentFS");
+                        remoteCameraFragmentFS.removeSurfaceView();
                         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                         ft.remove(remoteCameraFragmentFS);
                         remoteCameraFragmentFS = null;
@@ -2753,17 +2774,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else if((isRemoteVideo==REMOTE_VIDEO_DISABLED)&&(userSession!=null)&&(userSession.hasVideo())){
                     isRemoteVideo = REMOTE_VIDEO_ENABLED;
 
-                        if(remoteCameraFragmentFS == null){
-                            log("CREATE remoteCameraFragmentFS");
-                            remoteCameraFragmentFS = RemoteCameraCallFullScreenFragment.newInstance(chatId, chat.getPeerHandle(0));
-                            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                            ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
-                            ft.commitNowAllowingStateLoss();
-                        }
-                        contactAvatarLayout.setOnClickListener(null);
-                        contactAvatarLayout.setVisibility(GONE);
-                        parentRemoteFS.setVisibility(View.VISIBLE);
-                        fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
+                    if(remoteCameraFragmentFS == null){
+                        log("create remoteCameraFragmentFS");
+                        remoteCameraFragmentFS = RemoteCameraCallFullScreenFragment.newInstance(chatId, chat.getPeerHandle(0));
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
+                        ft.commitNowAllowingStateLoss();
+                    }
+                    contactAvatarLayout.setOnClickListener(null);
+                    contactAvatarLayout.setVisibility(GONE);
+                    parentRemoteFS.setVisibility(View.VISIBLE);
+                    fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
 
                 }
             }
@@ -3346,7 +3367,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 //First time:
                 //Remove Camera element, because with incoming, avatar is the only showed
                 if (bigCameraGroupCallFragment != null) {
-                    bigCameraGroupCallFragment.setVideoFrame(false);
+                    bigCameraGroupCallFragment.removeSurfaceView();
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(bigCameraGroupCallFragment);
                     bigCameraGroupCallFragment = null;
@@ -3373,7 +3394,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         //Remove big Camera
         if(bigCameraGroupCallFragment != null){
             log("REMOVE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment.setVideoFrame(false);
+            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
@@ -3407,7 +3428,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         //Remove big Camera
         if (bigCameraGroupCallFragment != null) {
             log("REMOVE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment.setVideoFrame(false);
+            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;

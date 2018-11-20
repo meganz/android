@@ -74,6 +74,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
 
+        log("onCreate() addChatLocalVideoListener chatId: "+this.chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
@@ -120,14 +121,6 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     }
 
 
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
-
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -139,8 +132,6 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         if(localFullScreenSurfaceView.getParent()!=null){
             if(localFullScreenSurfaceView.getParent().getParent()!=null){
                 ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
-            }else{
-                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeAllViewsInLayout();
             }
         }
         megaChatApi.removeChatVideoListener(chatId, -1, this);
@@ -153,14 +144,14 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         this.height=0;
         super.onResume();
     }
-
-    public void setVideoFrame(boolean visible){
-        if(visible){
-            localFullScreenSurfaceView.setVisibility(View.VISIBLE);
+    public void removeSurfaceView(){
+        log("removeSurfaceView()");
+        if(localFullScreenSurfaceView.getParent()!=null){
+            if(localFullScreenSurfaceView.getParent().getParent()!=null){
+                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+            }
         }
-        else{
-            localFullScreenSurfaceView.setVisibility(View.GONE);
-        }
+        megaChatApi.removeChatVideoListener(chatId, -1, this);
     }
 
     private static void log(String log) {

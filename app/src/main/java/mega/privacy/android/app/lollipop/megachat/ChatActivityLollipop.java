@@ -7029,25 +7029,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate");
+        log("onChatCallUpdate()");
         if(call.getChatid()==idChat){
-            log(" call.getStatus(): "+call.getStatus());
             if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
-                log("CALL_STATUS_DESTROYED");
                 callInProgressLayout.setVisibility(View.GONE);
                 callInProgressLayout.setOnClickListener(null);
                 invalidateOptionsMenu();
 
             }else if(call.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                log(" CALL_STATUS_IN_PROGRESS");
-
                 callInProgressLayout.setVisibility(View.VISIBLE);
                 callInProgressLayout.setOnClickListener(this);
                 invalidateOptionsMenu();
 
             }else if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-                log("CALL_STATUS_RING_IN");
-
                 long openCallChatId = MegaApplication.getOpenCallChatId();
                 log("openCallId: "+openCallChatId);
                 if(openCallChatId!=-1){
