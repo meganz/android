@@ -536,6 +536,7 @@ public class InboxFragmentLollipop extends Fragment{
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
                 addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+                adapter.setListFragment(recyclerView);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
@@ -580,6 +581,7 @@ public class InboxFragmentLollipop extends Fragment{
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
                 addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setListFragment(recyclerView);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}

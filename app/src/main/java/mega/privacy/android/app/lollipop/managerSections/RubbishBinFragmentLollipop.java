@@ -544,6 +544,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setListFragment(recyclerView);
 //				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -665,6 +666,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setListFragment(recyclerView);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
