@@ -137,6 +137,13 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     @Override
     public void onDestroy(){
         log("onDestroy");
+        if(remoteFullScreenSurfaceView.getParent()!=null){
+            if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
+                ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
+            }else{
+                ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeAllViewsInLayout();
+            }
+        }
         megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         super.onDestroy();
     }

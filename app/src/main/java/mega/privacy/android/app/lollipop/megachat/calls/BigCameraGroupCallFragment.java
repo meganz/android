@@ -146,6 +146,13 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onDestroy(){
+        if(fullScreenSurfaceView.getParent()!=null){
+            if(fullScreenSurfaceView.getParent().getParent()!=null){
+                ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
+            }else{
+                ((ViewGroup)fullScreenSurfaceView.getParent()).removeAllViewsInLayout();
+            }
+        }
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             megaChatApi.removeChatVideoListener(chatId, -1, this);
         }else{

@@ -31,11 +31,11 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     Context context;
     long chatId;
 
-    public SurfaceView localSurfaceView;
+    SurfaceView localSurfaceView = null;
     MegaSurfaceRenderer localRenderer;
 
     public static LocalCameraCallFragment newInstance(long chatId) {
-        log("newInstance");
+        log("#### newInstance: cID: "+chatId);
         LocalCameraCallFragment f = new LocalCameraCallFragment();
 
         Bundle args = new Bundle();
@@ -46,11 +46,13 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        log("onCreate");
+        log("onCreate cID: "+chatId);
         if (megaChatApi == null){
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
-
+        this.width = 0;
+        this.height = 0;
+        this.localSurfaceView = null;
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
 
@@ -60,15 +62,16 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
 
         if (!isAdded()) {
             return null;
         }
 
         View v = inflater.inflate(R.layout.fragment_local_camera_call, container, false);
-
+        this.width = 0;
+        this.height = 0;
         localSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
+
         localSurfaceView.setZOrderOnTop(true);
         SurfaceHolder localSurfaceHolder = localSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
@@ -133,6 +136,15 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     @Override
     public void onDestroy(){
+        log("onDestroy");
+
+        if(localSurfaceView.getParent()!=null){
+            if(localSurfaceView.getParent().getParent()!=null){
+                ((ViewGroup)localSurfaceView.getParent()).removeView(localSurfaceView);
+            }else{
+                ((ViewGroup)localSurfaceView.getParent()).removeAllViewsInLayout();
+            }
+        }
         megaChatApi.removeChatVideoListener(chatId, -1, this);
         super.onDestroy();
     }
@@ -145,6 +157,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     }
 
     public void setVideoFrame(boolean visible){
+        log("setVideoFrame: "+visible);
         if(visible){
             localSurfaceView.setVisibility(View.VISIBLE);
         }
