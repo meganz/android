@@ -298,15 +298,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             }
             case MegaUserAlert.TYPE_NEWSHARE:
             case MegaUserAlert.TYPE_NEWSHAREDNODES:
-            case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:{
+            case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
+            case MegaUserAlert.TYPE_DELETEDSHARE:{
                 log("Go to open corresponding location");
                 if(notif.getNodeHandle()!=-1 && megaApi.getNodeByHandle(notif.getNodeHandle())!=null){
                     ((ManagerActivityLollipop)context).openLocation(notif.getNodeHandle());
                 }
-                break;
-            }
-            case MegaUserAlert.TYPE_DELETEDSHARE:{
-                log("Do not navigate");
                 break;
             }
         }
