@@ -56,7 +56,7 @@
                     android:id="@+id/node_info_versions_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_b_small_version"
+                    android:src="@drawable/ic_versions_small"
                     android:alpha="0.76"
                     android:background="@null"
                     android:layout_marginRight="8dp"
