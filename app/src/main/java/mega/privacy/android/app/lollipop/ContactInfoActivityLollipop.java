@@ -1,11 +1,13 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -14,12 +16,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -74,7 +78,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -148,6 +152,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ChatSettings chatSettings = null;
 	ChatItemPreferences chatPrefs = null;
 	boolean generalChatNotifications = true;
+
+	boolean startVideo = false;
 
 	RelativeLayout sharedFoldersLayout;
 	ImageView sharedFoldersIcon;
@@ -844,6 +850,54 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
+	public boolean checkPermissionsCall(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			if (!hasCameraPermission) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+				return false;
+			}
+
+			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+			if (!hasRecordAudioPermission) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+				return false;
+			}
+
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		switch (requestCode) {
+			case Constants.REQUEST_CAMERA: {
+				log("REQUEST_CAMERA");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
+				}
+				break;
+			}
+			case Constants.RECORD_AUDIO: {
+				log("RECORD_AUDIO");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
+				}
+				break;
+			}
+
+		}
+	}
+
+
 	public void openChat(long chatId, String text){
 		log("openChat: "+chatId);
 
@@ -1148,12 +1202,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
-				startCall(false);
+				startVideo = false;
+				if(checkPermissionsCall()){
+					startCall(false);
+				}
+
+//				startCall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
-				startCall(true);
+				startVideo = true;
+				if(checkPermissionsCall()){
+					startCall(true);
+				}
+//				startCall(true);
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -2461,7 +2524,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int state = megaChatApi.getUserOnlineStatus(user.getHandle());
 
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+				String formattedDate = TimeUtils.lastGreenDate(lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);

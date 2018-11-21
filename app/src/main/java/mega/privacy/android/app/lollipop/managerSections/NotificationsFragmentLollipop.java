@@ -52,7 +52,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     LinearLayoutManager mLayoutManager;
 
     ArrayList<MegaUserAlert> notifications;
-    boolean pendingNotifications = false;
 
     int numberOfClicks = 0;
 
@@ -126,10 +125,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout_notifications);
 
-        if (pendingNotifications) {
-            pendingNotifications = false;
-            updateNotificationsView(notifications);
-        }
+        setNotifications();
 
         return v;
     }
@@ -140,10 +136,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         return fragment;
     }
 
-    public void updateNotificationsView(ArrayList<MegaUserAlert> notifs) {
-        log("updateNotificationsView");
+    public void setNotifications(){
+        log("setNotifications");
 
-        notifications = notifs;
+        notifications = megaApi.getUserAlerts();
+
+        Collections.reverse(notifications);
 
         if(isAdded()) {
             if (adapterList == null){
@@ -190,24 +188,8 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 emptyLayout.setVisibility(View.GONE);
             }
 
-            if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-                megaApi.acknowledgeUserAlerts();
-            }
+            ((ManagerActivityLollipop)context).markNotificationsSeen(false);
         }
-        else {
-            log("fragment not added");
-            pendingNotifications = true;
-        }
-    }
-
-    public void setNotifications(){
-        log("setNotifications");
-
-        notifications = megaApi.getUserAlerts();
-
-        Collections.reverse(notifications);
-
-        updateNotificationsView(notifications);
     }
 
     public void addNotification(MegaUserAlert newAlert){
@@ -228,9 +210,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             listView.smoothScrollToPosition(0);
         }
 
-        if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-            megaApi.acknowledgeUserAlerts();
-        }
+        ((ManagerActivityLollipop)context).markNotificationsSeen(false);
     }
 
     @Override
@@ -307,15 +287,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             }
             case MegaUserAlert.TYPE_NEWSHARE:
             case MegaUserAlert.TYPE_NEWSHAREDNODES:
-            case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:{
+            case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:
+            case MegaUserAlert.TYPE_DELETEDSHARE:{
                 log("Go to open corresponding location");
                 if(notif.getNodeHandle()!=-1 && megaApi.getNodeByHandle(notif.getNodeHandle())!=null){
                     ((ManagerActivityLollipop)context).openLocation(notif.getNodeHandle());
                 }
-                break;
-            }
-            case MegaUserAlert.TYPE_DELETEDSHARE:{
-                log("Do not navigate");
                 break;
             }
         }
@@ -376,23 +353,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     adapterList.notifyItemChanged(indexToReplace);
                 }
 
-                if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-                    megaApi.acknowledgeUserAlerts();
-                }
+                ((ManagerActivityLollipop)context).markNotificationsSeen(false);
             }
             else{
                 addNotification(updatedUserAlerts.get(i));
             }
 
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
-        super.onSaveInstanceState(outState);
-        if(listView.getLayoutManager()!=null){
-            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
     }
 
