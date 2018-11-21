@@ -74,7 +74,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2461,7 +2461,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int state = megaChatApi.getUserOnlineStatus(user.getHandle());
 
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+				String formattedDate = TimeUtils.lastGreenDate(lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);

@@ -108,7 +108,7 @@ import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1471,7 +1471,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+            TimeUtils tc = new TimeUtils(TimeUtils.TIME);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareTime: "+result);
@@ -1489,7 +1489,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+            TimeUtils tc = new TimeUtils(TimeUtils.TIME);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareTime: "+result);
@@ -1507,7 +1507,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous);
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+            TimeUtils tc = new TimeUtils(TimeUtils.TIME);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareTime: "+result);
@@ -1524,7 +1524,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareDate: "+result);
@@ -1543,7 +1543,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareDate: "+result);
@@ -1562,7 +1562,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous);
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareDate: "+result);
@@ -3018,7 +3018,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             for(int i=0;i<messagesSelected.size();i++){
                 AndroidMegaChatMessage messageSelected = messagesSelected.get(i);
                 builder.append("[");
-                String timestamp = TimeChatUtils.formatShortDateTime(messageSelected.getMessage().getTimestamp());
+                String timestamp = TimeUtils.formatShortDateTime(messageSelected.getMessage().getTimestamp());
                 builder.append(timestamp);
                 builder.append("] ");
                 String messageString = chatC.createManagementString(messageSelected, chatRoom);
@@ -6864,7 +6864,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             int state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
 
             if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-                String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+                String formattedDate = TimeUtils.lastGreenDate(lastGreen);
 
                 setLastGreen(formattedDate);
 
