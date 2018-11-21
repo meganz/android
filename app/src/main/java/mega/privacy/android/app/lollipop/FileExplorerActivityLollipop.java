@@ -425,7 +425,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		fabButton = (FloatingActionButton) findViewById(R.id.fab_file_explorer);
 		fabButton.setOnClickListener(this);
-		fabButton.setVisibility(View.GONE);
+		showFabButton(false);
 		//TABS
 		tabLayoutExplorer =  (TabLayout) findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);
@@ -1240,7 +1240,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
 					}
 				}
-				fabButton.setVisibility(View.GONE);
+				showFabButton(false);
 			}
 		}
 		else{
@@ -1262,10 +1262,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
-							fabButton.setVisibility(View.VISIBLE);
+							showFabButton(true);
 						}
 						else{
-							fabButton.setVisibility(View.GONE);
+							showFabButton(false);
 						}
 					}
 					else if(f instanceof CloudDriveExplorerFragmentLollipop){
@@ -1281,7 +1281,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).parentHandle).getName());
 						}
 
-						fabButton.setVisibility(View.GONE);
+						showFabButton(false);
 					}
 				}
 			}
@@ -1318,7 +1318,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 				}
-				fabButton.setVisibility(View.GONE);
+				showFabButton(false);
 			}
 			else if(position == 2){
 
@@ -1337,10 +1337,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
-							fabButton.setVisibility(View.VISIBLE);
+							showFabButton(true);
 						}
 						else{
-							fabButton.setVisibility(View.GONE);
+							showFabButton(false);
 						}
 					}
 					else if(f instanceof IncomingSharesExplorerFragmentLollipop){
@@ -1356,7 +1356,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							aB.setTitle(megaApi.getNodeByHandle(((IncomingSharesExplorerFragmentLollipop)f).parentHandle).getName());
 						}
 
-						fabButton.setVisibility(View.GONE);
+						showFabButton(false);
 					}
 				}
 			}
@@ -1507,6 +1507,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 					case CHAT_FRAGMENT:{
 						if(chatExplorer!=null && chatExplorer.isAdded()){
+							showFabButton(false);
+							chatExplorer.clearSelections();
 							chooseFragment(IMPORT_FRAGMENT);
 						}
 						break;
