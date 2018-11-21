@@ -75,7 +75,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localSurfaceView);
 
-        log("onCreate() addChatLocalVideoListener chatId: "+chatId);
+        log("addChatLocalVideoListener chatId: "+chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;

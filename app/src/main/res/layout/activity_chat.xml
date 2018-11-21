@@ -15,11 +15,6 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-        <!--<FrameLayout-->
-            <!--android:id="@+id/chat_emoji_keyboard"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_alignParentBottom="true" />-->
 
         <RelativeLayout
             android:layout_width="match_parent"
