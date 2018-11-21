@@ -15044,7 +15044,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					horizontalButtonsLayout.setVisibility(View.VISIBLE);
 					verticalButtonsLayout.setVisibility(View.GONE);
 
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>=MegaAccountDetails.ACCOUNT_TYPE_PROIII){
+					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_PROIII){
 						log("show StorageAlmostFull Dialog for USER PRO III");
 						horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
 
@@ -15131,7 +15131,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 					case 4:{
-						body.append(" (PRO "+getString(R.string.my_account_prolite)+")");
+						body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
 						break;
 					}
 				}
@@ -18671,7 +18671,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								break;
 							}
 							case 4:{
-								body.append(" (PRO "+getString(R.string.my_account_prolite)+")");
+								body.append(" ("+getString(R.string.my_account_prolite_feedback_email)+")");
 								break;
 							}
 						}

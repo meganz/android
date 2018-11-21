@@ -846,6 +846,8 @@
     <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II Account</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III Account</string>
 
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
+
     <string name="backup_title" context="Title of the screen to backup the master key">Backup your Recovery Key</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Your password unlocks your Recovery Key</string>
 
