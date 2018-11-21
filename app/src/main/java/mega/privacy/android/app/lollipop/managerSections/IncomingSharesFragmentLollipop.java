@@ -485,7 +485,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 	public void checkScroll () {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -1005,7 +1005,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
-
+				checkScroll();
 				((ManagerActivityLollipop) context).showFabButton();
 			}
 			else{
