@@ -108,7 +108,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -2532,7 +2531,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
 						log("IPC link - go to received request in Contacts");
-						megaApi.acknowledgeUserAlerts();
+						markNotificationsSeen(true);
 						drawerItem=DrawerItem.CONTACTS;
 						indexContacts=2;
 						selectDrawerItemLollipop(drawerItem);
@@ -2575,7 +2574,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 						log("onCreate: ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION");
-						megaApi.acknowledgeUserAlerts();
+						markNotificationsSeen(true);
 
 						drawerItem=DrawerItem.SHARED_ITEMS;
 						indexShares=0;
@@ -2661,7 +2660,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						setIntent(null);
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
-						megaApi.acknowledgeUserAlerts();
+						markNotificationsSeen(true);
 
 						handleInviteContact = getIntent().getLongExtra("handle", 0);
 
@@ -3362,7 +3361,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
 					log("IPC - go to received request in Contacts");
-					megaApi.acknowledgeUserAlerts();
+					markNotificationsSeen(true);
 					drawerItem=DrawerItem.CONTACTS;
 					indexContacts=2;
 					selectDrawerItemLollipop(drawerItem);
@@ -3383,7 +3382,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
 					log("onPostResume: ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION");
-					megaApi.acknowledgeUserAlerts();
+					markNotificationsSeen(true);
 
 					drawerItem=DrawerItem.SHARED_ITEMS;
 					indexShares = 0;
@@ -3391,7 +3390,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
-					megaApi.acknowledgeUserAlerts();
+					markNotificationsSeen(true);
 
 					handleInviteContact = getIntent().getLongExtra("handle", 0);
 
@@ -5142,9 +5141,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		fragmentContainer.setVisibility(View.VISIBLE);
 
-		ArrayList<MegaUserAlert> notifications = megaApi.getUserAlerts();
-		Collections.reverse(notifications);
-
 		if (notificFragment == null){
 			log("New NotificationsFragment");
 			notificFragment = new NotificationsFragmentLollipop();
@@ -5158,8 +5154,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
 			ft.commitNowAllowingStateLoss();
 		}
-
-		notificFragment.updateNotificationsView(notifications);
 
 		setToolbarTitle();
 
@@ -18863,6 +18857,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						fragmentLayout.setLayoutParams(params);
 					}
 				}).start();
+			}
+		}
+	}
+
+	public void markNotificationsSeen(boolean fromAndroidNotification){
+		log("markNotificationsSeen: fromAndroidNotification: "+fromAndroidNotification);
+
+		if(fromAndroidNotification){
+			megaApi.acknowledgeUserAlerts();
+		}
+		else{
+			if(drawerItem == ManagerActivityLollipop.DrawerItem.NOTIFICATIONS && app.isActivityVisible()){
+				megaApi.acknowledgeUserAlerts();
 			}
 		}
 	}
