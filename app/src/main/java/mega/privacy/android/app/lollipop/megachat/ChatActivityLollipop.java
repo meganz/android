@@ -2431,6 +2431,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.call_in_progress_layout:{
                 if(checkPermissionsCall()){
+                    log("call_in_progress_layout clicked");
                     MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                     if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
                         megaChatApi.startChatCall(idChat, false, null);
@@ -7038,19 +7039,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onChatCallUpdate() status: "+call.getStatus());
         if(call.getChatid()==idChat){
             if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
-                log("callInProgressLayout - CALL_STATUS_DESTROYED");
+                log("onChatCallUpdate - CALL_STATUS_DESTROYED");
                 callInProgressLayout.setVisibility(View.GONE);
                 callInProgressLayout.setOnClickListener(null);
                 invalidateOptionsMenu();
 
             }else if(call.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                log("callInProgressLayout - CALL_STATUS_IN_PROGRESS");
+                log("onChatCallUpdate - CALL_STATUS_IN_PROGRESS");
                 callInProgressLayout.setVisibility(View.VISIBLE);
+                callInProgressText.setText(getString(R.string.call_in_progress_layout));
                 callInProgressLayout.setOnClickListener(this);
                 invalidateOptionsMenu();
 
             }else if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-                log("callInProgressLayout  - CALL_STATUS_RING_IN ");
+                log("onChatCallUpdate  - CALL_STATUS_RING_IN ");
                 long openCallChatId = MegaApplication.getOpenCallChatId();
                 log("openCallId: "+openCallChatId);
                 if(openCallChatId!=-1){
@@ -7061,8 +7063,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     startActivity(intent);
                 }
             }else if(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
-                log("callInProgressLayout - CALL_STATUS_USER_NO_PRESENT");
+                log("onChatCallUpdate - CALL_STATUS_USER_NO_PRESENT");
                 callInProgressLayout.setVisibility(View.VISIBLE);
+                callInProgressText.setText(getString(R.string.join_call_layout));
                 callInProgressLayout.setOnClickListener(this);
                 invalidateOptionsMenu();
 

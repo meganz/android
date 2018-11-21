@@ -58,7 +58,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         this.userHandle = args.getLong("userHandle", -1);
-        log("onCreate() chatId: "+this.chatId);
+        log("onCreate() chatId: "+chatId);
 
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
@@ -80,7 +80,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);
 
-        log("addChatRemoteVideoListener chatId: "+this.chatId);
+        log("onCreateView() addChatRemoteVideoListener chatId: "+chatId);
         megaChatApi.addChatRemoteVideoListener(chatId, userHandle, this);
 
         return v;
@@ -138,11 +138,11 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         log("onDestroy");
         if(remoteFullScreenSurfaceView.getParent()!=null){
             if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
-                log("onDestroy() removeView chatId: "+this.chatId);
+                log("onDestroy() removeView chatId: "+chatId);
                 ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
             }
         }
-        log("onDestroy() removeChatVideoListener (REMOTE) chatId: "+this.chatId);
+        log("onDestroy() removeChatVideoListener (REMOTE) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         super.onDestroy();
     }
@@ -159,11 +159,11 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         log("removeSurfaceView()");
         if(remoteFullScreenSurfaceView.getParent()!=null){
             if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
-                log("removeSurfaceView() removeView chatId: "+this.chatId);
+                log("removeSurfaceView() removeView chatId: "+chatId);
                 ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
             }
         }
-        log("**** removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+this.chatId);
+        log("removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, userHandle, this);
     }
 

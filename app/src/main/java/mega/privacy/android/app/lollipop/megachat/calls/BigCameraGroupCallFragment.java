@@ -78,8 +78,10 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         renderer = new MegaSurfaceRendererGroup(fullScreenSurfaceView, userHandle);
 
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
+            log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
             megaChatApi.addChatLocalVideoListener(chatId, this);
         }else{
+            log("onCreateView() addChatRemoteVideoListener chatId: "+chatId);
             megaChatApi.addChatRemoteVideoListener(chatId, userHandle, this);
         }
 
@@ -135,14 +137,18 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onDestroy(){
+        log("onDestroy");
         if(fullScreenSurfaceView.getParent()!=null){
             if(fullScreenSurfaceView.getParent().getParent()!=null){
+                log("onDestroy() removeView chatId: "+chatId);
                 ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
             }
         }
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
+            log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, -1, this);
         }else{
+            log("onDestroy() removeChatVideoListener (REMOTE) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         }
         super.onDestroy();
@@ -159,12 +165,15 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         log("removeSurfaceView()");
         if(fullScreenSurfaceView.getParent()!=null){
             if(fullScreenSurfaceView.getParent().getParent()!=null){
+                log("removeSurfaceView() removeView chatId: "+chatId);
                 ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
             }
         }
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
+            log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, -1, this);
         }else{
+            log("removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         }
     }

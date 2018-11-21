@@ -644,7 +644,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
-                log(" It is not the same: "+newChatId);
+                log("It is not the same: "+newChatId);
                 //Check the new call if in progress
                 chatId = newChatId;
                 chat = megaChatApi.getChatRoom(chatId);
@@ -964,8 +964,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
-
-//                aB.setTitle(chat.getTitle());
                 titleToolbar.setText(chat.getTitle());
                 updateSubTitle();
 
@@ -1963,7 +1961,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                                             if (peersOnCall.size() < 4) {
                                                 log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted range(0 -> "+peersOnCall.size()+")");
-
                                                 recyclerViewLayout.setPadding(0, 0, 0, 0);
                                                 recyclerView.setColumnWidth((int) widthScreenPX);
                                                 adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
@@ -1973,7 +1970,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             }else {
                                                 if (peersOnCall.size() == 4) {
                                                     log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted range(0 -> " + peersOnCall.size() + ")");
-
                                                     recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
                                                     recyclerView.setColumnWidth((int) widthScreenPX / 2);
                                                     adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
@@ -2047,9 +2043,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
                                                 updateSubtitleToolbar();
                                             }else{
+                                                if(peersOnCall.size() == 4){
+                                                    recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
+                                                    recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                }else{
+                                                    recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                }
                                                 log("(1-6) COMPOSITION IN PROGRESS, notifyItemRemoved POS("+i+"), range("+i+" -> "+peersOnCall.size()+") ");
-                                                recyclerViewLayout.setPadding(0, 0, 0, 0);
-                                                recyclerView.setColumnWidth((int) widthScreenPX/2);
                                                 adapterGrid.notifyItemRemoved(i);
                                                 adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
                                                 updateSubtitleToolbar();
