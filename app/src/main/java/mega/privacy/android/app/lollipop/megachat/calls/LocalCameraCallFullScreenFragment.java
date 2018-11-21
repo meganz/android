@@ -37,7 +37,6 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
         log("newInstance");
         LocalCameraCallFullScreenFragment f = new LocalCameraCallFullScreenFragment();
-
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
         f.setArguments(args);
@@ -53,14 +52,12 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
-
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        log("onCreateView");
 
         if (!isAdded()) {
             return null;
@@ -74,7 +71,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
 
-        log("onCreate() addChatLocalVideoListener chatId: "+this.chatId);
+        log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
@@ -129,11 +126,14 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     @Override
     public void onDestroy(){
+        log("onDestroy()");
         if(localFullScreenSurfaceView.getParent()!=null){
             if(localFullScreenSurfaceView.getParent().getParent()!=null){
+                log("onDestroy() removeView chatId: "+chatId);
                 ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
             }
         }
+        log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, -1, this);
         super.onDestroy();
     }
@@ -148,9 +148,11 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         log("removeSurfaceView()");
         if(localFullScreenSurfaceView.getParent()!=null){
             if(localFullScreenSurfaceView.getParent().getParent()!=null){
+                log("removeSurfaceView() removeView chatId: "+chatId);
                 ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
             }
         }
+        log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, -1, this);
     }
 
