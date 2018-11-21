@@ -76,8 +76,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         public TextView textViewFileName;
         public TextView textViewFileSize;
         public TextView textViewState;
-        public long document;
-        public String path;
         public RelativeLayout itemLayout;
     }
 
@@ -188,15 +186,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             else{
                 mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + offNode.getPath() + "/" + offNode.getName());
             }
-            holder.path = offNode.getPath();
         }
         else if (adapterType == Constants.ZIP_ADAPTER) {
             zipFile = (File) getItem(position);
-            holder.path = zipFile.getPath();
         }
         else {
             node = (MegaNode) getItem(position);
-            holder.document = node.getHandle();
         }
 
         Bitmap thumb = null;

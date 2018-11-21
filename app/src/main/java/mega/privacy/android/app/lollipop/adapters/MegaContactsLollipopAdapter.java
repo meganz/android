@@ -1017,7 +1017,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 //		}
 //		notifyItemChanged(positionToflip);
 //
-//		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+//		if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST){
 //			log("adapter type is LIST");
 //			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
 //			if(view!=null){
@@ -1086,7 +1086,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		}
 		notifyItemChanged(pos);
 
-		if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+		if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
 			log("adapter type is LIST");
 			MegaContactsLollipopAdapter.ViewHolderContactsList view = (MegaContactsLollipopAdapter.ViewHolderContactsList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){

@@ -954,7 +954,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
-		//If inserted a placehoder in CloudDriveAdapter,here the position need to be remove the placeholder.
+		//If inserted a placehoder in MegaNodeAdapter,here the position need to be remove the placeholder.
         placeholderCount = intent.getIntExtra("placeholder",0 );
         orderGetChildren = intent.getIntExtra("orderGetChildren", ORDER_DEFAULT_ASC);
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
@@ -1131,7 +1131,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (MimeTypeList.typeForName(mOffList.get(i).getName()).isImage()){
 						mOffListImages.add(mOffList.get(i));
 						positionImage++;
-						if (i == positionG){
+						if (i == positionG && savedInstanceState == null){
 							positionG = positionImage;
 						}
 					}
@@ -1171,7 +1171,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("handle: "+hash);
 					imageHandles.add(hash);
 
-					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi, isFileLink, currentDocument);
+					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
 					viewPager.setOnPageChangeListener(this);
@@ -1235,7 +1235,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				log("F: " + f.getAbsolutePath());
 				if (MimeTypeList.typeForName(f.getName()).isImage()){
 					paths.add(f.getAbsolutePath());
-					if (index == positionG){
+					if (index == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1294,7 +1294,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
-					if (i == positionG){
+					if (i == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1312,7 +1312,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi, false, null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 
 			viewPager.setAdapter(adapterMega);
 
@@ -1343,7 +1343,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
-					if (i == positionG){
+					if (i == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1372,7 +1372,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi,false, null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 
 			viewPager.setAdapter(adapterMega);
 
@@ -1424,7 +1424,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
-					if (i == positionG){
+					if (i == positionG && savedInstanceState == null){
 						positionG = imageNumber;
 					}
 					imageNumber++;
@@ -1454,7 +1454,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi,false, null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
 
 			viewPager.setAdapter(adapterMega);
 
@@ -3230,6 +3230,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}, 300);
 		}
+	}
+
+	public boolean isFolderLink () {
+		return isFolderLink;
+	}
+
+	public boolean isFileLink() {
+		return isFileLink;
+	}
+
+	public MegaNode getCurrentDocument() {
+		return currentDocument;
 	}
 
 	public void setSendToChat (boolean sendToChat) {

@@ -97,7 +97,7 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
         ArrayList<MegaChatMessage> unreadMessages = new ArrayList<>();
-        for(int i=0;i<=unreadHandleList.size();i++){
+        for(int i=0;i<unreadHandleList.size();i++){
             MegaChatMessage message = megaChatApi.getMessage(chatId, unreadHandleList.get(i));
             log("Chat: "+chat.getTitle()+" messagID: "+unreadHandleList.get(i));
             if(message!=null){
@@ -210,103 +210,91 @@ public final class ChatAdvancedNotificationBuilder {
 
 //        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
-        int unreadCount = 0;
-
         for(int i=0; i<chats.size(); i++){
-            if(unreadCount<8){
-                if(MegaApplication.getOpenChatId() != chats.get(i).getChatId()){
-                    MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
+            if(MegaApplication.getOpenChatId() != chats.get(i).getChatId()){
+                MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
 
-                    for(int j=0;j<=handleListUnread.size();j++){
-                        if(unreadCount<8){
-                            log("Get message id: "+handleListUnread.get(j)+" from chatId: "+chats.get(i).getChatId());
-                            MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
-                            if(message!=null){
+                for(int j=0;j<handleListUnread.size();j++){
+                    log("Get message id: "+handleListUnread.get(j)+" from chatId: "+chats.get(i).getChatId());
+                    MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
+                    if(message!=null){
 
-                                String messageContent = "";
+                        String messageContent = "";
 
-                                if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                        if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-                                    MegaNodeList nodeList = message.getMegaNodeList();
-                                    if(nodeList != null) {
-                                        if (nodeList.size() == 1) {
-                                            MegaNode node = nodeList.get(0);
-                                            log("Node Name: " + node.getName());
-                                            messageContent = node.getName();
-                                        }
-                                    }
+                            MegaNodeList nodeList = message.getMegaNodeList();
+                            if(nodeList != null) {
+                                if (nodeList.size() == 1) {
+                                    MegaNode node = nodeList.get(0);
+                                    log("Node Name: " + node.getName());
+                                    messageContent = node.getName();
                                 }
-                                else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            }
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 
-                                    long userCount  = message.getUsersCount();
+                            long userCount  = message.getUsersCount();
 
-                                    if(userCount==1) {
-                                        String name = "";
-                                        name = message.getUserName(0);
-                                        if (name.trim().isEmpty()) {
-                                            name = message.getUserName(0);
-                                        }
-                                        String email = message.getUserName(0);
-                                        log("Contact Name: " + name);
-                                        messageContent = email;
-                                    }
-                                    else{
-                                        StringBuilder name = new StringBuilder("");
-                                        name.append(message.getUserName(0));
-                                        for (int k = 1; k < userCount; k++) {
-                                            name.append(", " + message.getUserName(k));
-                                        }
-                                        messageContent = name.toString();
-                                    }
+                            if(userCount==1) {
+                                String name = "";
+                                name = message.getUserName(0);
+                                if (name.trim().isEmpty()) {
+                                    name = message.getUserName(0);
                                 }
-                                else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                                    log("Type TRUNCATE message");
-                                    messageContent = context.getString(R.string.history_cleared_message);
-                                }
-                                else{
-                                    messageContent = message.getContent();
-                                }
-
-                                CharSequence cs = " ";
-                                String title = chats.get(i).getTitle();
-                                if(chats.get(i).isGroup()){
-                                    long lastMsgSender = message.getUserHandle();
-
-                                    MegaChatRoom chatRoom = megaChatApi.getChatRoom(chats.get(i).getChatId());
-                                    String nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-                                    if(nameAction==null){
-                                        nameAction = "";
-                                    }
-
-                                    if(nameAction.trim().length()<=0){
-                                        ChatController cC = new ChatController(context);
-                                        nameAction = cC.getFirstName(lastMsgSender, chatRoom);
-                                    }
-
-                                    cs = nameAction + " @ " + title + ": " + messageContent;
-                                }
-                                else{
-                                    cs = title +": " + messageContent;
-                                }
-
-                                inboxStyle.addLine(cs);
+                                String email = message.getUserName(0);
+                                log("Contact Name: " + name);
+                                messageContent = email;
                             }
                             else{
-                                log("Message cannot be recovered because unreadCount: "+unreadCount);
-                                break;
+                                StringBuilder name = new StringBuilder("");
+                                name.append(message.getUserName(0));
+                                for (int k = 1; k < userCount; k++) {
+                                    name.append(", " + message.getUserName(k));
+                                }
+                                messageContent = name.toString();
                             }
                         }
-                        else{
-                            break;
+                        else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                            log("Type TRUNCATE message");
+                            messageContent = context.getString(R.string.history_cleared_message);
                         }
+                        else{
+                            messageContent = message.getContent();
+                        }
+
+                        CharSequence cs = " ";
+                        String title = chats.get(i).getTitle();
+                        if(chats.get(i).isGroup()){
+                            long lastMsgSender = message.getUserHandle();
+
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chats.get(i).getChatId());
+                            String nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+                            if(nameAction==null){
+                                nameAction = "";
+                            }
+
+                            if(nameAction.trim().length()<=0){
+                                ChatController cC = new ChatController(context);
+                                nameAction = cC.getFirstName(lastMsgSender, chatRoom);
+                            }
+
+                            cs = nameAction + " @ " + title + ": " + messageContent;
+                        }
+                        else{
+                            cs = title +": " + messageContent;
+                        }
+
+                        inboxStyle.addLine(cs);
                     }
-                }
-                else{
-                    log("Do not show notification - opened chat");
+                    else{
+                        log("Message NULL cannot be recovered");
+                        break;
+                    }
                 }
             }
             else{
-                break;
+                log("Do not show notification - opened chat");
             }
         }
 

@@ -82,7 +82,7 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1279,7 +1279,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             View view = getCurrentFocus();
             if (view != null) {
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                //inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
                 inputMethodManager.restartInput(view);
             }
         }
@@ -3282,7 +3281,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(lastGreen);
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);
 //                Replace on visible MEGA contacts (all my visible contacts)
