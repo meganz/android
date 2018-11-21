@@ -146,7 +146,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 	public void checkScroll() {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -864,6 +864,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
+				checkScroll();
 			}
 			else{
 				//Is FILE
