@@ -887,7 +887,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
 						if (cuFL != null){
 
-							if (cuFL.getAdapterList() != null){
+							if (isListCameraUploads){
 								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = cuFL.getNodesArray();
 								for (int i=0; i<listNodes.size(); i++){
 									if (listNodes.get(i).getHandle() == handle){
@@ -936,7 +936,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
 						if (muFLol != null){
-							if (muFLol.getAdapterList() != null){
+							if (isListCameraUploads){
 								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = muFLol.getNodesArray();
 								for (int i=0; i<listNodes.size(); i++){
 									if (listNodes.get(i).getHandle() == handle){
@@ -5723,9 +5723,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			drawerItem = DrawerItem.SEARCH;
     			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-    			if (sFLol == null) {
-					sFLol = SearchFragmentLollipop.newInstance();
+    			if (sFLol != null) {
+    				getSupportFragmentManager().beginTransaction().remove(sFLol).commit();
+    				getSupportFragmentManager().executePendingTransactions();
 				}
+				sFLol = SearchFragmentLollipop.newInstance();
 
 				tabLayoutContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -8007,33 +8009,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_grid_view_large_small:{
 				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-	        		if (cuFL != null){
-	        			isSmallGridCameraUploads = !isSmallGridCameraUploads;
-	        			dbH.setSmallGridCamera(isSmallGridCameraUploads);
+					isSmallGridCameraUploads = !isSmallGridCameraUploads;
+					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						}else{
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-						}
+					if (isSmallGridCameraUploads){
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					}else{
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+					}
 
-						refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-	        		}
+					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	        	}
-	        	if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-					muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-	        		if (muFLol != null){
-	        			isSmallGridCameraUploads = !isSmallGridCameraUploads;
-						dbH.setSmallGridCamera(isSmallGridCameraUploads);
+	        	else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
+					isSmallGridCameraUploads = !isSmallGridCameraUploads;
+					dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
-						}else{
-							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
-						}
-						refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
-	        		}
+					if (isSmallGridCameraUploads){
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+					}else{
+						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
+					}
+					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 	        	}
 	        	return true;
 	        }

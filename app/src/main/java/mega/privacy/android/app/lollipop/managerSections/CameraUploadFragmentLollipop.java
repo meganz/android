@@ -189,16 +189,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
-		if (adapterList != null && mLayoutManager != null){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return  (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+		if (mLayoutManager != null) {
+			if (((ManagerActivityLollipop) context).isListCameraUploads) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+				}
 			}
-		}
-		else if (mLayoutManager != null){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return  (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+			else {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+				}
 			}
 		}
 
