@@ -653,25 +653,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("BROADCAST TO UPDATE AFTER GET PRICING");
 					//UPGRADE_ACCOUNT_FRAGMENT
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-					if(upAFL!=null && upAFL.isAdded()){
+					if(upAFL!=null){
 						upAFL.setPricing();
 					}
 
 					//MONTHLY_YEARLY_FRAGMENT
 					myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
-					if(myFL!=null && myFL.isAdded()){
+					if(myFL!=null){
 						myFL.setPricing();
 					}
 
 					//CENTILI_FRAGMENT
 					ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
-					if(ctFL!=null && ctFL.isAdded()){
+					if(ctFL!=null){
 						ctFL.getPaymentId();
 					}
 
 					//FORTUMO_FRAGMENT
 					fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
-					if(fFL!=null && fFL.isAdded()){
+					if(fFL!=null){
 						fFL.getPaymentId();
 					}
 				}
@@ -683,18 +683,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						//Check if myAccount section is visible
 						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-						if(maFLol!=null && maFLol.isAdded()){
+						if(maFLol!=null){
 							log("Update the account fragment");
 							maFLol.setAccountDetails();
 						}
 
 						mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-						if(mStorageFLol!=null && mStorageFLol.isAdded()){
+						if(mStorageFLol!=null){
 							log("Update the account fragment");
 							mStorageFLol.setAccountDetails();
 						}
 
-						if(upAFL!=null && upAFL.isAdded()){
+						upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+						if(upAFL!=null){
 							upAFL.showAvailableAccount();
 						}
 
@@ -804,6 +805,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 						if (inSFLol != null && inSFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
 								imageDrag = inSFLol.getImageDrag(position  + placeholderCount);
@@ -1308,11 +1310,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			((MegaApplication) getApplication()).getMyAccountInfo().setInventoryFinished(true);
 
-			if (upAFL != null && upAFL.isAdded()) {
+			upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+			if (upAFL != null) {
 				upAFL.setPricing();
 			}
 
-			if (myFL != null && myFL.isAdded()) {
+			myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
+			if (myFL != null) {
 				myFL.setPricing();
 			}
 
@@ -2142,6 +2146,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				supportInvalidateOptionsMenu();
 				checkScrollElevation();
 				if(position == 1){
+					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if (inSFLol != null && inSFLol.isAdded()){
 						if(inSFLol.isMultipleselect()){
 							inSFLol.actionMode.finish();
@@ -3124,7 +3129,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void deleteCurrentFragment () {
 		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+			getSupportFragmentManager().executePendingTransactions();
 		}
 	}
 
@@ -4239,9 +4245,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ft.detach(muFLol);
 				ft.attach(muFLol);
 			}
+			else if (fTag.equals(FragmentTag.CREDIT_CARD.getTag())) {
+				ft.detach(ccFL);
+				ft.attach(ccFL);
+			}
 
 			ft.commit();
-			getSupportFragmentManager().executePendingTransactions();
+			try {
+				getSupportFragmentManager().executePendingTransactions();
+			} catch (Exception e){}
 		}
 		else {
 			log("Fragment == NULL. Not refresh");
@@ -4974,8 +4986,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		fragmentContainer.setVisibility(View.GONE);
 
-		deleteCurrentFragment();
-
 		tabLayoutContacts.setVisibility(View.VISIBLE);
 		viewPagerContacts.setVisibility(View.VISIBLE);
 
@@ -5686,8 +5696,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				tabLayoutTransfers.setVisibility(View.GONE);
 				viewPagerTransfers.setVisibility(View.GONE);
 
-//    			deleteCurrentFragment();
-
     			if (sttFLol != null && sttFLol.isAdded()){
 					if (openSettingsStorage){
 						sttFLol.goToCategoryStorage();
@@ -5840,6 +5848,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 break;
             }
             case SHARED_ITEMS: {
+				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
                 if (viewPagerShares.getCurrentItem() == 0 && inSFLol != null && inSFLol.isAdded()) {
                     inSFLol.checkScroll();
                 }
@@ -5867,10 +5876,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 break;
             }
             case ACCOUNT: {
-                if (viewPagerMyAccount.getCurrentItem() == 0 && maFLol != null && maFLol.isAdded()) {
+				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
+				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
+                if (viewPagerMyAccount.getCurrentItem() == 0 && maFLol != null) {
                     maFLol.checkScroll();
                 }
-                else if (viewPagerMyAccount.getCurrentItem() == 1 && mStorageFLol != null && mStorageFLol.isAdded()) {
+                else if (viewPagerMyAccount.getCurrentItem() == 1 && mStorageFLol != null) {
                     mStorageFLol.checkScroll();
                 }
                 break;
@@ -5975,29 +5986,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerMyAccount.setVisibility(View.GONE);
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
-		if (!refresh){
-			if (ccFL == null){
-				ccFL = new CreditCardFragmentLollipop();
-			}
+
+		ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
+		if (ccFL == null) {
+			ccFL = new CreditCardFragmentLollipop();
 			ccFL.setInfo(type, payMonth);
 			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
 		}
-		else{
-			Fragment tempF = getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
-			if (tempF != null){
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.detach(tempF);
-				ft.attach(tempF);
-				ft.commitNowAllowingStateLoss();
-			}
-			else{
-				if (ccFL == null){
-					ccFL = new CreditCardFragmentLollipop();
-				}
-				ccFL.setInfo(type, payMonth);
-				replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
-			}
+		else if (refresh) {
+			refreshFragment(FragmentTag.CREDIT_CARD.getTag());
 		}
+		else {
+			ccFL.setInfo(type, payMonth);
+			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
+		}
+
 		fragmentContainer.setVisibility(View.VISIBLE);
 	}
 
@@ -6008,6 +6011,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         if (((MegaApplication) getApplication()).getMyAccountInfo()!= null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
             if (cancelSubscription != null){
                 if (drawerItem == DrawerItem.ACCOUNT){
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
                     if (maFLol != null){
                         cancelSubscription.setVisible(true);
                     }
@@ -6026,6 +6030,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerMyAccount.setVisibility(View.GONE);
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
+
+		fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
 		if (fFL == null){
 			fFL = new FortumoFragmentLollipop();
 		}
@@ -6043,6 +6049,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		viewPagerMyAccount.setVisibility(View.GONE);
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
+
+		ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
 		if (ctFL == null){
 			ctFL = new CentiliFragmentLollipop();
 		}
@@ -6065,6 +6073,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
 
+		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
 		if (myFL == null){
 			myFL = new MonthlyAnnualyFragmentLollipop();
 		}
@@ -6088,6 +6097,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
 
+		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if(upAFL==null){
 			upAFL = new UpgradeAccountFragmentLollipop();
 		}
@@ -6697,6 +6707,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 
+					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if(inSFLol != null && inSFLol.isAdded() && inSFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
 						sortByMenuItem.setVisible(true);
@@ -7120,13 +7131,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 				if(completedTFLol!=null){
-					if(completedTFLol.isAdded()){
-						if(completedTFLol.isAnyTransferCompleted()){
-							clearCompletedTransfers.setVisible(true);
-						}
-						else{
-							clearCompletedTransfers.setVisible(false);
-						}
+					if(completedTFLol.isAnyTransferCompleted()){
+						clearCompletedTransfers.setVisible(true);
+					}
+					else{
+						clearCompletedTransfers.setVisible(false);
 					}
 				}
 
@@ -7555,15 +7564,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								log("Back to MyAccountFragment");
 								setFirstNavigationLevel(true);
 								displayedAccountType=-1;
-								if (upAFL != null){
-									drawerItem = DrawerItem.ACCOUNT;
-									accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
-									selectDrawerItemLollipop(drawerItem);
-									setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-								}
+								drawerItem = DrawerItem.ACCOUNT;
+								accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+								selectDrawerItemLollipop(drawerItem);
+								setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 								return true;
 							}
 							case Constants.CC_FRAGMENT:{
+								ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
 								if (ccFL != null){
 									displayedAccountType = ccFL.getParameterType();
 								}
@@ -7571,7 +7579,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								return true;
 							}
 							case Constants.MONTHLY_YEARLY_FRAGMENT:{
-								if (myFL != null && myFL.isAdded()){
+								myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
+								if (myFL != null){
 									myFL.onBackPressed();
 								}
 								return true;
@@ -9072,6 +9081,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("action menu scan QR code pressed");
 				ScanCodeFragment fragment = new ScanCodeFragment();
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
+				getSupportFragmentManager().executePendingTransactions();
 				Intent intent = new Intent(this, QRCodeActivity.class);
 				intent.putExtra("contacts", true);
 				startActivity(intent);
@@ -9191,11 +9201,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			refreshRubbishBin();
 
 		}else if(drawerItem == DrawerItem.SEARCH){
-			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-			if(sFLol!=null){
-				sFLol.hideMultipleSelect();
-				sFLol.refresh();
-			}
+			refreshSearch();
 			//Refresh Rubbish Fragment
 			refreshRubbishBin();
 		}
@@ -9261,14 +9267,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Refresh Rubbish Fragment
 			refreshRubbishBin();
 		}else if(drawerItem == DrawerItem.SEARCH){
-			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-			if (sFLol != null){
-				sFLol.hideMultipleSelect();
-				sFLol.refresh();
-			}
+			refreshSearch();
 		}
 
 		setToolbarTitle();
+	}
+
+	public void refreshSearch() {
+		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+		if (sFLol != null){
+			sFLol.hideMultipleSelect();
+			sFLol.refresh();
+		}
 	}
 
 	public void refreshAfterRemoving(){
@@ -9298,11 +9308,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			iFLol.refresh();
 		}
 
-		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-		if (sFLol != null){
-			sFLol.hideMultipleSelect();
-			sFLol.refresh();
-		}
+		refreshSearch();
 	}
 
 	@Override
@@ -9496,7 +9502,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		switch(accountFragment){
 
 	    		case Constants.MY_ACCOUNT_FRAGMENT:{
-	    			if (maFLol != null && maFLol.isAdded()){
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
+	    			if (maFLol != null){
 	    				if (maFLol.onBackPressed() == 0){
 							backToDrawerItem(bottomNavigationCurrentItem);
 	    				}
@@ -9506,14 +9513,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 					log("Back to MyAccountFragment");
 					displayedAccountType=-1;
-	    			if (upAFL != null){
-	    				drawerItem = DrawerItem.ACCOUNT;
-						accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
-	    				selectDrawerItemLollipop(drawerItem);
-	    			}
+					drawerItem = DrawerItem.ACCOUNT;
+					accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+					selectDrawerItemLollipop(drawerItem);
 	    			return;
 	    		}
 	    		case Constants.CC_FRAGMENT:{
+					ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
 	    			if (ccFL != null){
 						displayedAccountType = ccFL.getParameterType();
 	    			}
@@ -9521,13 +9527,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			return;
 	    		}
 	    		case Constants.OVERQUOTA_ALERT:{
-	    			if (upAFL != null){
-						backToDrawerItem(bottomNavigationCurrentItem);
-	    			}
+	    			backToDrawerItem(bottomNavigationCurrentItem);
 	    			return;
 	    		}
 	    		case Constants.MONTHLY_YEARLY_FRAGMENT:{
-	    			if (myFL != null && myFL.isAdded()){
+					myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
+	    			if (myFL != null){
 	    				myFL.onBackPressed();
 	    			}
 	    			return;
@@ -12430,7 +12435,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE: {
 						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-						if(maFLol!=null && maFLol.isAdded()){
+						if(maFLol!=null){
 							maFLol.resetPass();
 						}
 						break;
@@ -13251,9 +13256,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                             }
                         }
 
-                        if(inSFLol != null && inSFLol.isAdded()){
-                            inSFLol.refresh();
-                        }
+						refreshIncomingShares();
 
                         if(outSFLol != null && outSFLol.isAdded()){
                             outSFLol.refresh();
@@ -13996,24 +13999,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				if (parentNode != null){
-					if (inSFLol != null && inSFLol.isAdded()){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSFLol.setNodes(nodes);
-						inSFLol.getRecyclerView().invalidate();
-					}
-				}
-				else{
-					if (inSFLol != null && inSFLol.isAdded()){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSFLol.setNodes(nodes);
-						inSFLol.getRecyclerView().invalidate();
-					}
-				}
+				refreshIncomingSharesList();
 			}
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH_STAGING && resultCode == RESULT_OK) {
@@ -14047,24 +14033,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				if (parentNode != null){
-					if (inSFLol != null && inSFLol.isAdded()){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSFLol.setNodes(nodes);
-						inSFLol.getRecyclerView().invalidate();
-					}
-				}
-				else{
-					if (inSFLol != null && inSFLol.isAdded()){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSFLol.setNodes(nodes);
-						inSFLol.getRecyclerView().invalidate();
-					}
-				}
+				refreshIncomingSharesList();
 			}
 
 			if (sttFLol != null) {
@@ -14182,21 +14151,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				}
 //			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
-				if (parentNode != null){
-					if (inSFLol != null && inSFLol.isAdded()){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						//TODO: ojo con los hijos
-//							inSFLol.setNodes(nodes);
-						inSFLol.getRecyclerView().invalidate();
-					}
-				}
-				else{
-					if (inSFLol != null && inSFLol.isAdded()){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						inSFLol.getRecyclerView().invalidate();
-					}
-				}
+				refreshIncomingSharesList();
 			}
 		}
 		else if (requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
@@ -14300,9 +14255,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 fbFLol.refresh(handle);
             }
 
-            if(inSFLol != null && inSFLol.isAdded()){
-                inSFLol.refresh();
-            }
+			refreshIncomingShares();
 
             if(outSFLol != null && outSFLol.isAdded()){
                 outSFLol.refresh();
@@ -14927,6 +14880,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
 			if (cancelSubscription != null){
 				if (drawerItem == DrawerItem.ACCOUNT){
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if (maFLol != null){
 						cancelSubscription.setVisible(true);
 					}
@@ -15468,9 +15422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("The first name has changed");
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null){
-						if(maFLol.isAdded()){
-							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-						}
+						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					}
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 				}
@@ -15504,9 +15456,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("The last name has changed");
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null){
-						if(maFLol.isAdded()){
-							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-						}
+						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					}
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 				}
@@ -15571,9 +15521,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 					if(maFLol!=null){
-						if(maFLol.isAdded()){
-							maFLol.updateAvatar(false);
-						}
+						maFLol.updateAvatar(false);
 					}
 				}
 				else{
@@ -15674,7 +15622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setProfileAvatar();
 					//refresh MyAccountFragment if visible
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null && maFLol.isAdded()){
+					if(maFLol!=null){
 						log("Update the account fragment");
 						maFLol.updateAvatar(false);
 					}
@@ -15696,7 +15644,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//refresh MyAccountFragment if visible
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null && maFLol.isAdded()){
+					if(maFLol!=null){
 						log("Update the account fragment");
 						maFLol.updateAvatar(false);
 					}
@@ -15724,7 +15672,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//refresh MyAccountFragment if visible
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null && maFLol.isAdded()){
+					if(maFLol!=null){
 						log("Update the account fragment");
 						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					}
@@ -15752,7 +15700,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					//refresh MyAccountFragment if visible
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-					if(maFLol!=null && maFLol.isAdded()){
+					if(maFLol!=null){
 						log("Update the account fragment");
 						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					}
@@ -16140,7 +16088,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
-						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
+						if (drawerItem == DrawerItem.TRANSFERS) {
 							pauseTransfersMenuIcon.setVisible(false);
 							playTransfersMenuIcon.setVisible(true);
 						}
@@ -16150,7 +16098,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				log("show PAUSE button");
 					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
-						if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()) {
+						if (drawerItem == DrawerItem.TRANSFERS) {
 							pauseTransfersMenuIcon.setVisible(true);
 							playTransfersMenuIcon.setVisible(false);
 						}
@@ -16166,9 +16114,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
-					if (tFLol.isAdded()){
-						tFLol.changeStatusButton(request.getTransferTag());
-					}
+					tFLol.changeStatusButton(request.getTransferTag());
 				}
 			}
 			else{
@@ -16186,7 +16132,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
-					if (drawerItem == DrawerItem.TRANSFERS && tFLol.isAdded()){
+					if (drawerItem == DrawerItem.TRANSFERS){
 						pauseTransfersMenuIcon.setVisible(false);
 						playTransfersMenuIcon.setVisible(false);
 						cancelAllTransfersMenuItem.setVisible(false);
@@ -16289,10 +16235,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
-    				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-					if (inSFLol != null && inSFLol.isAdded()){
-						inSFLol.getRecyclerView().invalidate();
-					}
+    				refreshIncomingSharesList();
 	        		outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null && outSFLol.isAdded()){
 						outSFLol.getRecyclerView().invalidate();
@@ -16365,12 +16308,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
-					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-					if (inSFLol != null){
-						if(inSFLol.isAdded()) {
-							inSFLol.refresh();
-						}
-					}
+					refreshIncomingShares();
 					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null){
 						if(outSFLol.isAdded()) {
@@ -16532,7 +16470,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			//Refresh My Storage if it is shown
 			mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
-			if(mStorageFLol!=null && mStorageFLol.isAdded()){
+			if(mStorageFLol!=null){
 				mStorageFLol.refreshVersionsInfo();
 			}
 
@@ -16543,7 +16481,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-			if (maFLol != null && maFLol.isAdded()) {
+			if (maFLol != null) {
 				maFLol.initCreateQR(request, e);
 			}
 		}
@@ -16702,11 +16640,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}
 						}
 						//When last contact changes avatar, update view.
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 						if(maFLol != null) {
-						    if(maFLol.isAdded()) {
-								maFLol.updateContactsCount();
-                                maFLol.updateView();
-                            }
+							maFLol.updateContactsCount();
+							maFLol.updateView();
                         }
 					}
 				}
@@ -16824,9 +16761,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 		if(maFLol!=null){
-			if(maFLol.isAdded()){
-				maFLol.updateMailView(email);
-			}
+			maFLol.updateMailView(email);
 		}
 	}
 
@@ -16879,6 +16814,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void refreshIncomingSharesList () {
+		inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+		if (inSFLol != null && inSFLol.isAdded()){
+			inSFLol.getRecyclerView().invalidate();
+		}
+	}
+
+	public void refreshIncomingShares () {
+		inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
+		if (inSFLol != null){
+			if(inSFLol.isAdded()){
+				inSFLol.refresh();
+			}
+		}
+	}
+
 	public void onNodesSharedUpdate() {
 		log("onNodesSharedUpdate");
 
@@ -16889,13 +16840,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					outSFLol.refresh();
 				}
 			}
-
-			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-			if (inSFLol != null){
-				if(inSFLol.isAdded()){
-					inSFLol.refresh();
-				}
-			}
+			refreshIncomingShares();
 		}
 	}
 
@@ -16939,10 +16884,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		onNodesCloudDriveUpdate();
-
-//		if (sFLol != null && sFLol.isAdded()){
-//			sFLol.refresh();
-//		}
 
 		onNodesSearchUpdate();
 
@@ -17090,9 +17031,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						dbH.emptyCompletedTransfers();
 						completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 						if (completedTFLol != null) {
-							if (completedTFLol.isAdded()) {
-								completedTFLol.updateCompletedTransfers();
-							}
+							completedTFLol.updateCompletedTransfers();
 						}
 						supportInvalidateOptionsMenu();
 						break;
@@ -17205,9 +17144,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 		if(completedTFLol!=null){
-			if(completedTFLol.isAdded()){
-				completedTFLol.transferFinish(completedTransfer);
-			}
+			completedTFLol.transferFinish(completedTransfer);
 		}
 	}
 
@@ -17236,9 +17173,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
-					if(tFLol.isAdded()){
-						tFLol.transferStart(transfer);
-					}
+					tFLol.transferStart(transfer);
 				}
 			}
 		}
@@ -17303,9 +17238,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
-					if(tFLol.isAdded()){
-						tFLol.transferFinish(index);
-					}
+					tFLol.transferFinish(index);
 				}
 				else{
 					log("tF is null!");
@@ -17338,9 +17271,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 					if (tFLol != null){
-						if(tFLol.isAdded()){
-							tFLol.transferUpdate(transfer);
-						}
+						tFLol.transferUpdate(transfer);
 					}
 
 				}
