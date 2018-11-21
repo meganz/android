@@ -18,12 +18,15 @@ import android.view.KeyEvent;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Util;
 
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface{
 
   private float emojiSize;
-  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
+  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 180;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
   private Context mContext;
   private DisplayMetrics mOutMetrics;
@@ -60,6 +63,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         a.recycle();
       }
     }
+
     if (mContext instanceof ManagerActivityLollipop) {
       Display display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
       mOutMetrics = new DisplayMetrics ();
@@ -69,28 +73,49 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       }else{
         textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
       }
+      setText(getText());
+
+    }else if(mContext instanceof ChatExplorerActivity){
+      Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
+      mOutMetrics = new DisplayMetrics ();
+      display.getMetrics(mOutMetrics);
+      textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      setText(getText());
+
+    }else if(mContext instanceof ArchivedChatsActivity){
+      Display display = ((ArchivedChatsActivity)mContext).getWindowManager().getDefaultDisplay();
+      mOutMetrics = new DisplayMetrics ();
+      display.getMetrics(mOutMetrics);
+      textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      setText(getText());
+    }else {
+      setText(getText());
     }
-    setText(getText());
   }
   @Override public void setText(CharSequence rawText, BufferType type) {
-    if(rawText.toString().equals("")){
-      super.setText(rawText, type);
-    }else{
+
       CharSequence text = rawText == null ? "" : rawText;
       SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
       Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
       float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
       EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
-      if (mContext instanceof ManagerActivityLollipop) {
-        //format text if too long
-        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-        super.setText(textF, type);
-      }else{
-        super.setText(spannableStringBuilder, type);
-
+      if(mContext != null){
+        if(mContext instanceof ManagerActivityLollipop){
+          CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+          super.setText(textF, type);
+        }else  if(mContext instanceof ChatExplorerActivity) {
+          CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+          super.setText(textF, type);
+        }else if(mContext instanceof ArchivedChatsActivity){
+          CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+          super.setText(textF, type);
+        }else  if(mContext instanceof ChatActivityLollipop){
+          super.setText(spannableStringBuilder, type);
+        }else{
+          super.setText(spannableStringBuilder, type);
+        }
       }
-    }
   }
 
   @Override

@@ -62,7 +62,7 @@
                 android:imeOptions="actionDone"
                 android:inputType="textEmailAddress"
                 android:hint="email@domain.com"
-                android:theme="@style/EditTextStyle"/>
+                android:theme="@style/ColorControlStyle"/>
 
             <TextView
                 android:id="@+id/confirm_email_misspelled"

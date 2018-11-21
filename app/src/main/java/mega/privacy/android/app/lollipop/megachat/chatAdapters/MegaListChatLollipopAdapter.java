@@ -54,7 +54,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -735,12 +735,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void setMultipleSelect(boolean multipleSelect) {
 		log("setMultipleSelect");
+		if (!this.multipleSelect && multipleSelect) {
+			selectedItems = new SparseBooleanArray();
+		}
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-		}
-		if(this.multipleSelect)
-		{
-			selectedItems = new SparseBooleanArray();
 		}
 	}
 
@@ -828,6 +827,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			});
 			view.imageView.startAnimation(flipAnimation);
+		}
+		else {
+			if (selectedItems.size() <= 0){
+				if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
+					((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+				}
+			}
 		}
 	}
 
@@ -1097,7 +1103,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(title!=null){
 				log("ChatRoom title: "+title);
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
@@ -1141,8 +1147,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				log("ChatRoom title: "+chat.getTitle());
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
-				String dateFS = TimeChatUtils.formatDate(chat.getLastTimestamp(), TimeChatUtils.DATE_SHORT_SHORT_FORMAT);
+				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+				String dateFS = TimeUtils.formatDate(chat.getLastTimestamp(), TimeUtils.DATE_SHORT_SHORT_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
 				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;

@@ -1,14 +1,14 @@
 package mega.privacy.android.app;
 
-import java.util.HashMap;
-
-import mega.privacy.android.app.utils.Util;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
+
+import java.util.HashMap;
+
+import mega.privacy.android.app.utils.Util;
 
 
 /*
