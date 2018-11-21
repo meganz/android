@@ -89,6 +89,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -663,8 +664,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
 
         //Modified Layout
-        modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
-        modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
+        modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_created_layout);
+        modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_created);
 
         //Versions Layout
         versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
@@ -1314,13 +1315,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentLayout.setVisibility(View.GONE);
 
 			if (node.getCreationTime() != 0){
-				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+
+				try {addedTextView.setText(TimeUtils.formatLongDateTime(node.getCreationTime()));}catch(Exception ex)	{addedTextView.setText("");}
 
 				if (node.getModificationTime() != 0){
-					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+					try {modifiedTextView.setText(TimeUtils.formatLongDateTime(node.getModificationTime()));}catch(Exception ex)	{modifiedTextView.setText("");}
 				}
 				else{
-					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+					try {modifiedTextView.setText(TimeUtils.formatLongDateTime(node.getCreationTime()));}catch(Exception ex)	{modifiedTextView.setText("");}
 				}
 			}
 			else{
