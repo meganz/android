@@ -204,7 +204,7 @@
     <string name="tour_speed_title">MEGA Speed</string>
     <string name="tour_privacy_title">MEGA Privacy</string>
     <string name="tour_access_title">MEGA Access</string>
-    <string name="tour_space_text">Register now and get 50 GB of free space</string>
+    <string name="tour_space_text">Register now and get 50 GB* of free space</string>
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA’s end-to-end encryption</string>
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
