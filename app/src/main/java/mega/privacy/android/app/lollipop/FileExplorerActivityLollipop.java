@@ -565,7 +565,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commitNow();
+				ft.commit();
+				getSupportFragmentManager().executePendingTransactions();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -594,7 +595,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commitNow();
+				ft.commit();
+				getSupportFragmentManager().executePendingTransactions();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -624,7 +626,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commitNow();
+				ft.commit();
+				getSupportFragmentManager().executePendingTransactions();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -784,7 +787,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 					ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-					ft.commitNow();
+					ft.commit();
+					getSupportFragmentManager().executePendingTransactions();
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -866,42 +870,33 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	public void chooseFragment (int fragment) {
 		importFragmentSelected = fragment;
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (fragment == CLOUD_FRAGMENT) {
 			if(cDriveExplorer==null){
 				cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
 			}
-
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-			ft.commitNow();
 		}
 		else if (fragment == INCOMING_FRAGMENT) {
 			if(iSharesExplorer==null){
 				iSharesExplorer = new IncomingSharesExplorerFragmentLollipop();
 			}
-
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.cloudDriveFrameLayout, iSharesExplorer, "iSharesExplorer");
-			ft.commitNow();
 		}
 		else if (fragment == CHAT_FRAGMENT) {
 			if(chatExplorer==null){
 				chatExplorer = new ChatExplorerFragment();
 			}
-
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.cloudDriveFrameLayout, chatExplorer, "chatExplorer");
-			ft.commitNow();
 		}
 		else if (fragment == IMPORT_FRAGMENT){
 			if(importFileFragment==null){
 				importFileFragment = new ImportFilesFragment();
 			}
-
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.cloudDriveFrameLayout, importFileFragment, "importFileFragment");
-			ft.commitNow();
 		}
+		ft.commit();
+		getSupportFragmentManager().executePendingTransactions();
 		supportInvalidateOptionsMenu();
 		changeTitle();
 	}
