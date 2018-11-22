@@ -75,6 +75,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     boolean avatarRequested = false;
     boolean isGrid = true;
     boolean isManualMode = false;
+    int statusBarHeight = 0;
 
 
 public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, boolean isGrid) {
@@ -144,11 +145,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
 
-        maxScreenHeight = (int)heightScreenPX;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        maxScreenHeight = (int)heightScreenPX - statusBarHeight;
         maxScreenWidth = (int)widthScreenPX;
-
-        log("onCreateViewHolder() maxScreenHeight: "+maxScreenHeight+", maxScreenWidth: "+maxScreenWidth);
-
 
         holderGrid = new ViewHolderGroupCallGrid(v);
 
@@ -475,7 +477,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }else{
                     megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
                 }
-
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     log("peer: "+peer.getHandle()+", VIDEO OFF - getChildCount() == 0");
 
@@ -499,8 +500,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
                 peer.setListener(null);
             }
-
-
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
             //Avatar:
@@ -595,7 +594,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         return null;
     }
 
-   //My AVATAR
+   //My avatar
    public void setProfileMyAvatar(ViewHolderGroupCall holder) {
         log("setProfileMyAvatar");
        Bitmap myBitmap = null;
@@ -629,7 +628,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
            createMyDefaultAvatar(holder);
        }
    }
-    //My Default AVATAR
+    //My Default avatar
     public void createMyDefaultAvatar(ViewHolderGroupCall holder) {
         log("createMyDefaultAvatar");
 
@@ -664,7 +663,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
     }
 
-    //CONTACT AVATAR
+    //Contact avatar
     public void setProfileContactAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
         log("setProfileContactAvatar");
 
@@ -732,7 +731,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             createDefaultAvatar(userHandle, fullName, holder);
         }
     }
-    //CONTACT Default AVATAR
+    //Contact Default avatar
     public void createDefaultAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder) {
         log("createDefaultAvatar");
 
@@ -901,6 +900,55 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
             }
         }
+    }
+
+    public void onDestroy(){
+        log("onDestroy()");
+        ViewHolderGroupCall holder = null;
+        for(int i=0; i<peers.size(); i++){
+            if(holder == null){
+                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
+            }
+            if(holder!=null){
+                log("onDestroy()  holder != null");
+                InfoPeerGroupCall peer = getNodeAt(i);
+                if (peer == null){
+                    return;
+                }
+                //Remove SurfaceView && Listener:
+                if(peer.getListener() != null){
+                    if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                        megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
+                    }else{
+                        megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
+                    }
+                    if(holder.parentSurfaceView.getChildCount() == 0){
+                        if(peer.getListener().getSurfaceView().getParent()!=null){
+                            if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                                ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                            }
+                        }
+                    }else{
+                        holder.parentSurfaceView.removeAllViews();
+                        holder.parentSurfaceView.removeAllViewsInLayout();
+
+                        if(peer.getListener().getSurfaceView().getParent()!=null){
+                            if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                                ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                            }
+                        }
+                    }
+                    peer.setListener(null);
+                }
+
+            }else{
+                log("onDestroy()  holder == null");
+
+//                notifyItemChanged(i);
+            }
+        }
+
+
     }
 
     public ArrayList<InfoPeerGroupCall> getPeers() {

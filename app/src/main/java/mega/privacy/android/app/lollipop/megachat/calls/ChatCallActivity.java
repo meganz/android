@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -39,6 +40,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -110,6 +112,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ChatItemPreferences chatPrefs = null;
     MegaUser myUser;
     Chronometer myChrono;
+    int actionBarHeight = 0;
 
     public static int REMOTE_VIDEO_NOT_INIT = -1;
     public static int REMOTE_VIDEO_ENABLED = 1;
@@ -253,6 +256,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     InfoPeerGroupCall peerSelected = null;
     boolean isManualMode = false;
+    int statusBarHeight = 0;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -691,13 +695,20 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        widthScreenPX = outMetrics.widthPixels;
-        heightScreenPX = outMetrics.heightPixels;
         density = getResources().getDisplayMetrics().density;
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
+
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        }
+
+        widthScreenPX = outMetrics.widthPixels;
+        heightScreenPX = outMetrics.heightPixels - statusBarHeight;
+
 
         MegaApplication app = (MegaApplication) getApplication();
         if (megaApi == null) {
@@ -782,6 +793,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         linearParticipants = (LinearLayout) tB.findViewById(R.id.ll_participants);
         participantText = (TextView) tB.findViewById(R.id.participants_text);
         linearParticipants.setVisibility(View.GONE);
+
 
         myChrono = new Chronometer(context);
 
@@ -920,6 +932,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -1449,10 +1462,20 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             adapterList.updateMode(false);
         }
         isManualMode = false;
-        recyclerView.setAdapter(null);
-        bigRecyclerView.setAdapter(null);
+
+        if(adapterGrid!=null){
+            adapterGrid.onDestroy();
+        }
+        if(adapterList!=null){
+            adapterList.onDestroy();
+        }
+
         peersOnCall.clear();
         peersBeforeCall.clear();
+
+        recyclerView.setAdapter(null);
+        bigRecyclerView.setAdapter(null);
+
         stopAudioSignals();
         mSensorManager.unregisterListener(this);
         MegaApplication.activityPaused();
@@ -3169,8 +3192,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 //1-6
                 if(peersOnCall.size()!=0){
                     if(adapterList!=null){
-                        adapterList =null;
+                        adapterList.onDestroy();
+                        adapterList = null;
                     }
+
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
                     parentBigCameraGroupCall.setOnClickListener(null);
@@ -3196,6 +3221,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }else{
                         if(isNecessaryCreateAdapter){
                             log("(1-6) in progress call - create adapter");
+                            adapterGrid.onDestroy();
                             recyclerView.setAdapter(null);
                             adapterGrid = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag, true);
                             recyclerView.setAdapter(adapterGrid);
@@ -3207,9 +3233,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 }else{
                     if(adapterGrid != null){
+                        adapterGrid.onDestroy();
                         adapterGrid = null;
                     }
                     if(adapterList!=null){
+                        adapterList.onDestroy();
                         adapterList =null;
                     }
                     recyclerView.setAdapter(null);
@@ -3224,6 +3252,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 //7 +
                 if(adapterGrid != null){
+                    adapterGrid.onDestroy();
                     adapterGrid = null;
                 }
                 recyclerView.setAdapter(null);
@@ -3241,6 +3270,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else{
                     if(isNecessaryCreateAdapter){
                         log("(7 +) in progress call - create adapter");
+                        adapterList.onDestroy();
                         bigRecyclerView.setAdapter(null);
                         adapterList = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag, false);
                         bigRecyclerView.setAdapter(adapterList);
@@ -3249,10 +3279,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         adapterList.notifyDataSetChanged();
                     }
                 }
-
                 updateUserSelected(flag);
             }
-
             isNecessaryCreateAdapter = false;
 
         }else{
@@ -3267,8 +3295,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 if(peersBeforeCall.size() != 0){
                     //1-6
-
                     if(adapterList != null){
+                        adapterList.onDestroy();
                         adapterList = null;
                     }
                     bigRecyclerView.setAdapter(null);
@@ -3290,6 +3318,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     if(adapterGrid == null){
                         log("(1-6) incoming call - create adapter");
+                        recyclerView.setAdapter(null);
                         adapterGrid = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag, true);
                         recyclerView.setAdapter(adapterGrid);
                     }else{
@@ -3300,9 +3329,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                  }else{
 
                     if(adapterGrid != null){
+                        adapterGrid.onDestroy();
                         adapterGrid = null;
                     }
                     if(adapterList != null){
+                        adapterList.onDestroy();
                         adapterList = null;
                     }
                     recyclerView.setAdapter(null);
@@ -3317,6 +3348,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 //7 +
                 if(adapterGrid != null){
+                    adapterGrid.onDestroy();
                     adapterGrid = null;
                 }
                 recyclerView.setAdapter(null);
