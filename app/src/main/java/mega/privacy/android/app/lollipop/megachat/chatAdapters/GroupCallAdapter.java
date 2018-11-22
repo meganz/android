@@ -74,6 +74,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     int maxScreenWidth, maxScreenHeight;
     boolean avatarRequested = false;
     boolean isGrid = true;
+    boolean isManualMode = false;
 
 
 public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, boolean isGrid) {
@@ -447,8 +448,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             //Green Layer:
             if(numPeersOnCall < 7){
                 holder.greenLayer.setVisibility(View.GONE);
+                peer.setGreenLayer(false);
             }else{
                 if(peer.hasGreenLayer()){
+                    if(isManualMode){
+                        holder.greenLayer.setBackground(ContextCompat.getDrawable(context, R.drawable.border_green_layer_selected));
+                    }else {
+                        holder.greenLayer.setBackground(ContextCompat.getDrawable(context, R.drawable.border_green_layer));
+                    }
                     holder.greenLayer.setVisibility(View.VISIBLE);
                 }else{
                     holder.greenLayer.setVisibility(View.GONE);
@@ -544,15 +551,22 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
             //Green Layer:
-            if(numPeersOnCall >= 7){
+            if(numPeersOnCall < 7){
+                holder.greenLayer.setVisibility(View.GONE);
+                peer.setGreenLayer(false);
+            }else{
                 if(peer.hasGreenLayer()){
+                    if(isManualMode){
+                        holder.greenLayer.setBackground(ContextCompat.getDrawable(context, R.drawable.border_green_layer_selected));
+                    }else {
+                        holder.greenLayer.setBackground(ContextCompat.getDrawable(context, R.drawable.border_green_layer));
+                    }
                     holder.greenLayer.setVisibility(View.VISIBLE);
                 }else{
                     holder.greenLayer.setVisibility(View.GONE);
                 }
-            }else{
-                holder.greenLayer.setVisibility(View.GONE);
             }
+
         }
     }
 
@@ -840,6 +854,10 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
     }
 
+    public void updateMode(boolean flag){
+        isManualMode = flag;
+    }
+
     public void changesInGreenLayer(int position, ViewHolderGroupCall holder){
         log("changesInGreenLayer()");
         if(holder == null){
@@ -851,10 +869,16 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 return;
             }
             if(peer.hasGreenLayer()){
+                if(isManualMode){
+                    holder.greenLayer.setBackground(ContextCompat.getDrawable(context, R.drawable.border_green_layer_selected));
+                }else {
+                    holder.greenLayer.setBackground(ContextCompat.getDrawable(context, R.drawable.border_green_layer));
+                }
                 holder.greenLayer.setVisibility(View.VISIBLE);
             }else{
                 holder.greenLayer.setVisibility(View.GONE);
             }
+
         }else{
             notifyItemChanged(position);
         }

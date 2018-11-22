@@ -798,6 +798,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         linearFAB.setLayoutParams(layoutCompress);
         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
+        isManualMode = false;
+
         relativeCall = (RelativeLayout) findViewById(R.id.relative_answer_call_fab);
         relativeCall.setVisibility(GONE);
 
@@ -1443,6 +1445,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         peerSelected = null;
+        if(adapterList!=null){
+            adapterList.updateMode(false);
+        }
         isManualMode = false;
         recyclerView.setAdapter(null);
         bigRecyclerView.setAdapter(null);
@@ -1458,7 +1463,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-        super.onBackPressed();
         super.onBackPressed();
 
         if (megaChatApi != null) {
@@ -2987,22 +2991,31 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     public void itemClicked(InfoPeerGroupCall peer){
         log("itemClicked-> "+peer.getName()+", userSelected: "+peerSelected.getName());
-        if(peerSelected.getHandle().equals(peer.getHandle())){
+        if(peerSelected.getHandle() == peer.getHandle()){
             //I touched the same user that is now in big fragment:
             if(isManualMode){
                 isManualMode = false;
+                if(adapterList!=null){
+                    adapterList.updateMode(false);
+                }
                 log("manual mode - False");
             }else{
                 isManualMode = true;
+                if(adapterList!=null){
+                    adapterList.updateMode(true);
+                }
                 log("manual mode - True");
             }
             peerSelected = peer;
             updateUserSelected(true);
 
         }else{
-            if(!peer.getHandle().equals(megaChatApi.getMyUserHandle())){
+            if(peer.getHandle() != megaChatApi.getMyUserHandle()){
                 if(!isManualMode) {
                     isManualMode = true;
+                    if(adapterList!=null){
+                        adapterList.updateMode(true);
+                    }
                     log("manual mode - True");
                 }
                 peerSelected = peer;
@@ -3236,6 +3249,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         adapterList.notifyDataSetChanged();
                     }
                 }
+
                 updateUserSelected(flag);
             }
 
@@ -3320,6 +3334,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     log("(7 +) incoming call - notifyDataSetChanged");
                     adapterList.notifyDataSetChanged();
                 }
+
                 updateUserSelected(flag);
             }
         }
@@ -3330,12 +3345,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(flag){
             //Call IN PROGRESS
             if(peerSelected == null){
+                log("updateUserSelected() peerSelected == null");
+
                 //First case:
                 if(!isManualMode){
-                    log(" is not ManualMode");
 
                     if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                        int position = peersOnCall.size()-2;
+                        int position = 0;
+
                         peerSelected = peersOnCall.get(position);
                         log("updateUserSelected() InProgress - new peerSelected "+peerSelected.getHandle());
 
@@ -3384,6 +3401,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
             }else{
+                log("updateUserSelected() peerSelected != null");
+
                 //find if peerSelected is removed:
                 if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
                     boolean peerContained = false;
@@ -3396,12 +3415,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(!peerContained){
                         //it was removed
                         if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                            int position = peersOnCall.size()-2;
+                            int position = 0;
                             peerSelected = peersOnCall.get(position);
                             log("updateUserSelected() InProgress - new peerSelected: "+peerSelected.getHandle());
 
                             for(int i=0;i<peersOnCall.size();i++){
                                 if(i == position){
+                                    isManualMode = false;
+                                    if(adapterList!=null){
+                                        adapterList.updateMode(false);
+                                    }
                                     if(!peersOnCall.get(position).hasGreenLayer()){
                                         peersOnCall.get(position).setGreenLayer(true);
                                         if(adapterList!=null){
@@ -3446,16 +3469,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
 
                     }else{
-                        log("updateUserSelected() InProgress - same peerSelected: "+peerSelected.getHandle());
+                        log("updateUserSelected() InProgress - peerSelected: "+peerSelected.getHandle());
 
                         for(int i=0; i<peersOnCall.size(); i++){
-                            if(peersOnCall.get(i).getHandle().equals(peerSelected.getHandle())){
-                                if(!peersOnCall.get(i).hasGreenLayer()){
+                            if(peersOnCall.get(i).getHandle() == peerSelected.getHandle()){
                                     peersOnCall.get(i).setGreenLayer(true);
                                     if(adapterList!=null){
                                         adapterList.changesInGreenLayer(i,null);
                                     }
-                                }
+
                             }else{
                                 if(peersOnCall.get(i).hasGreenLayer()){
                                     peersOnCall.get(i).setGreenLayer(false);
