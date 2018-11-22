@@ -5349,7 +5349,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("REcentChatFragment is not null");
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
-			rChatFL.setChats();
+//			rChatFL.setChats();
 			rChatFL.setStatus();
 		}
 		log("show chats");

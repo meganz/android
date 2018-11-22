@@ -766,7 +766,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     menu.findItem(R.id.cab_menu_unarchive).setVisible(false);
 
                     MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-                    if(selected.size()==adapterList.getItemCount()){
+                    ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
+
+                    if(archivedChats!=null && archivedChats.size()>0 && selected.size()==adapterList.getItemCount()-1) {
+                        menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                        unselect.setTitle(getString(R.string.action_unselect_all));
+                        unselect.setVisible(true);
+                    }
+                    else if(selected.size()==adapterList.getItemCount()){
                         menu.findItem(R.id.cab_menu_select_all).setVisible(false);
                         unselect.setTitle(getString(R.string.action_unselect_all));
                         unselect.setVisible(true);
