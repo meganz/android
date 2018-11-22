@@ -2495,7 +2495,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Local folder to sync
 			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if(!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
-                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
                 return;
             }
             
@@ -2541,7 +2541,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Local folder to sync
 			String secondaryPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if(!isNewSettingValid(prefs.getCamSyncLocalPath(), secondaryPath, prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
-                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
                 return;
             }
 			
@@ -2577,7 +2577,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
             if(!isNewSettingValid(prefs.getCamSyncLocalPath(), prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), String.valueOf(handle))){
-                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
                 return;
             }
             
@@ -2626,7 +2626,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			
 			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
             if(!isNewSettingValid(prefs.getCamSyncLocalPath(), prefs.getLocalPathSecondaryFolder(), String.valueOf(handle), prefs.getMegaHandleSecondaryFolder())){
-                Toast.makeText(context, "invalid", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
                 return;
             }
             
