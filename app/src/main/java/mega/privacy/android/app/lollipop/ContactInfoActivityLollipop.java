@@ -164,6 +164,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout shareContactLayout;
 	View dividerShareContactLayout;
 
+	RelativeLayout sharedFilesLayout;
+	View dividerSharedFilesLayout;
+
 	//Toolbar elements
 	ImageView contactStateIcon;
 	TextView firstLineTextToolbar;
@@ -386,6 +389,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			shareContactLayout.setOnClickListener(this);
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
+
+			//Chat Shared Files Layout
+
+			sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_files_shared_layout);
+			sharedFilesLayout.setOnClickListener(this);
+
+			dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
 
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
@@ -1267,6 +1277,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						setUpIndividualChatNotifications();
 					}
 				}
+				break;
+			}
+			case R.id.chat_contact_properties_chat_files_shared_layout:{
+
 				break;
 			}
 		}
