@@ -516,8 +516,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                         boolean isMe = false;
                         for(int i = 0; i < callChat.getParticipants().size(); i++){
-                            Long userHandle = callChat.getParticipants().get(i);
-                            if (userHandle.equals(megaChatApi.getMyUserHandle())) {
+                            long userHandle = callChat.getParticipants().get(i);
+                            if (userHandle == megaChatApi.getMyUserHandle()) {
                                 isMe = true;
                                 break;
                             }
@@ -565,7 +565,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 }else{
                                     boolean changes = false;
                                     for(int i=0; i<callChat.getParticipants().size(); i++){
-                                        Long userHandle = callChat.getParticipants().get(i);
+                                        long userHandle = callChat.getParticipants().get(i);
                                         InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,null);
                                         log("onNewIntent() "+userPeer.getName()+" added in peersBeforeCall");
                                         peersBeforeCall.add((peersBeforeCall.size() == 0 ? 0 : (peersBeforeCall.size() - 1)), userPeer);
@@ -1060,7 +1060,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("onCreate()- In Progress");
                     updateScreenStatusInProgress();
-                }else{
+                }else if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -1072,6 +1072,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                     if(chat.isGroup()){
+
                         log("onCreate()-Outgoing group call");
 
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -1086,7 +1087,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
 
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null);
-                        log("onCreate()- Incoming "+myPeer.getHandle()+" added in peersOnCall");
+                        log("onCreate()- Outgoing "+myPeer.getHandle()+" added in peersOnCall");
                         peersOnCall.add(myPeer);
                         updatePeers(true);
 
@@ -1105,6 +1106,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     updateLocalVideoStatus();
                     updateLocalAudioStatus();
+
+                }else if(callStatus==MegaChatCall.CALL_STATUS_JOINING){
+                    log("onCreate()- Joining");
+                    updateScreenStatusInProgress();
+
+                }else{
+
                 }
             }
         }
@@ -3179,7 +3187,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("updatePeers()");
 
         if(flag){
-            log("updatePeers()  in progress call: peersOnCall("+peersOnCall.size()+")");
+            log("* updatePeers()  in progress call: peersOnCall("+peersOnCall.size()+")");
 
             if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
                 peersBeforeCall.clear();
@@ -3192,10 +3200,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 //1-6
                 if(peersOnCall.size()!=0){
                     if(adapterList!=null){
+                        log("updatePeers()  destroy adapterList)");
                         adapterList.onDestroy();
                         adapterList = null;
                     }
 
+                    if (bigCameraGroupCallFragment != null) {
+                        log("updatePeers()  destroy bigCameraGroupCallFragment)");
+                        bigCameraGroupCallFragment.removeSurfaceView();
+                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+                        ftFS.remove(bigCameraGroupCallFragment);
+                        bigCameraGroupCallFragment = null;
+                    }
+                    avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
                     parentBigCameraGroupCall.setOnClickListener(null);
