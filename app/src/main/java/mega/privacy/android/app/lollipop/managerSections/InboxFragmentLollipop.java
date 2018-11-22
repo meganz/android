@@ -279,7 +279,6 @@ public class InboxFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -296,6 +295,8 @@ public class InboxFragmentLollipop extends Fragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+            checkScroll();
 			return true;
 		}
 
@@ -304,6 +305,8 @@ public class InboxFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+            checkScroll();
 		}
 
 		@Override
@@ -464,7 +467,7 @@ public class InboxFragmentLollipop extends Fragment{
 
 	public void checkScroll () {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -535,9 +538,9 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
-                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
                 adapter.setListFragment(recyclerView);
-				adapter.setNodes(nodes);
+//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
 
@@ -580,9 +583,9 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
-                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setListFragment(recyclerView);
-				adapter.setNodes(nodes);
+//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
@@ -629,7 +632,6 @@ public class InboxFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{
@@ -1016,7 +1018,6 @@ public class InboxFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
