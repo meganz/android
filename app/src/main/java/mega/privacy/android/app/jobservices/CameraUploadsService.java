@@ -22,7 +22,6 @@ import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.provider.DocumentFile;
 import android.text.format.Time;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.io.File;
@@ -1493,8 +1492,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             try{ wl.release(); } catch(Exception ex) {}
 
         if(isOverquota){
-            //TODO Uncomment this
-//            showStorageOverquotaNotification();
+            showStorageOverquotaNotification();
         }
 
         canceled = true;
@@ -1505,6 +1503,34 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             mNotificationManager.cancel(notificationId);
         }
         jobFinished(globalParams, true);
+    }
+
+    private void showStorageOverquotaNotification(){
+        log("showStorageOverquotaNotification");
+
+        String contentText = getString(R.string.download_show_info);
+        String message = getString(R.string.overquota_alert_title);
+
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+            mBuilderCompatO
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentText(contentText)
+                    .setOngoing(false);
+
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
+        }
     }
 
     @Override
@@ -1701,6 +1727,20 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     }
                 }
             }
+            else {
+                log("Error ("+e.getErrorCode()+"): "+request.getType()+" : "+request.getRequestString());
+                if(request.getNodeHandle()!=-1){
+                    MegaNode nodeError = megaApi.getNodeByHandle(request.getNodeHandle());
+                    if(nodeError!=null){
+                        log("Node: "+nodeError.getName());
+                    }
+                }
+
+                if (e.getErrorCode() == MegaError.API_EOVERQUOTA)
+                    isOverquota = true;
+
+                finish();
+            }
         }
     }
 
@@ -1730,7 +1770,8 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         }
 
         if(isOverquota){
-            return;
+            log("After overquota error");
+            isOverquota = false;
         }
 
         final long bytes = transfer.getTransferredBytes();
@@ -1750,7 +1791,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
             isOverquota = true;
 
-            cancel();
+            updateProgressNotification(totalSizeUploaded);
         }
     }
 
@@ -1779,12 +1820,13 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             cancel();
         }
         else{
-
-            if(isOverquota){
-                return;
-            }
-
             if (e.getErrorCode() == MegaError.API_OK) {
+
+                if(isOverquota){
+                    log("After overquota error");
+                    isOverquota = false;
+                }
+
                 log("Image Sync OK: " + transfer.getFileName());
                 totalSizeUploaded += transfer.getTransferredBytes();
                 log("IMAGESYNCFILE: " + transfer.getPath());
@@ -1952,10 +1994,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             }
         }
 
+        String status = isOverquota ? getString(R.string.overquota_alert_title) :
+                getString(R.string.settings_camera_notif_title);
+
         Intent intent = null;
 
         intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
+        intent.setAction(isOverquota ? Constants.ACTION_OVERQUOTA_STORAGE :
+                Constants.ACTION_CANCEL_CAM_SYNC);
 
         String info = Util.getProgressSize(this, progress, totalSizeToUpload);
 
@@ -1977,7 +2023,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOngoing(true)
                     .setContentTitle(message)
                     .setSubText(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
+                    .setContentText(status)
                     .setOnlyAlertOnce(true);
 
             notification = mBuilderCompat.build();
@@ -1990,7 +2036,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOngoing(true)
                     .setContentTitle(message)
                     .setSubText(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
+                    .setContentText(status)
                     .setOnlyAlertOnce(true);
             notification = mBuilder.getNotification();
         }
@@ -2003,7 +2049,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOngoing(true)
                     .setContentTitle(message)
                     .setContentInfo(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
+                    .setContentText(status)
                     .setOnlyAlertOnce(true);
             notification = mBuilder.getNotification();
 //					notification = mBuilder.build();

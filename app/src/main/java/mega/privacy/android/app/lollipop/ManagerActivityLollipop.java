@@ -12847,7 +12847,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			builder.setMessage(getString(R.string.overquota_alert_text));
-			dbH.setCamSyncEnabled(false);
 		}
 
 		if(overquotaDialog==null){
