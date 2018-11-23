@@ -1914,8 +1914,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted range(0 -> "+peersOnCall.size()+")");
                                                 recyclerViewLayout.setPadding(0, 0, 0, 0);
                                                 recyclerView.setColumnWidth((int) widthScreenPX);
-                                                adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                                int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                adapterGrid.notifyItemInserted(posInserted);
+                                                adapterGrid.notifyDataSetChanged();
+//                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
                                                 updateSubtitleToolbar();
 
                                             }else {
@@ -1924,7 +1926,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                     recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
                                                     recyclerView.setColumnWidth((int) widthScreenPX / 2);
                                                     adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                                                    adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                                    adapterGrid.notifyDataSetChanged();
                                                     updateSubtitleToolbar();
                                                 } else {
                                                     recyclerViewLayout.setPadding(0, 0, 0, 0);
@@ -1984,7 +1986,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             recyclerViewLayout.setPadding(0, 0, 0, 0);
                                             recyclerView.setColumnWidth((int) widthScreenPX);
                                             adapterGrid.notifyItemRemoved(i);
-                                            adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                            adapterGrid.notifyDataSetChanged();
                                             updateSubtitleToolbar();
                                         } else {
                                             if(peersOnCall.size() == 6){
@@ -1992,7 +1994,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 recyclerViewLayout.setPadding(0, 0, 0, 0);
                                                 recyclerView.setColumnWidth((int) widthScreenPX/2);
                                                 adapterGrid.notifyItemRemoved(i);
-                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+                                                adapterGrid.notifyDataSetChanged();
                                                 updateSubtitleToolbar();
                                             }else{
                                                 if(peersOnCall.size() == 4){
@@ -2654,6 +2656,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         log("userHandle: "+userHandle+" VS i: "+peersOnCall.get(i).getHandle()+" ("+peersOnCall.get(i).getName()+")");
                         if(peersOnCall.get(i).getHandle() == userHandle){
                             if(!peersOnCall.get(i).isVideoOn()){
+                                log("B "+peersOnCall.get(i).getName());
                                 peersOnCall.get(i).setVideoOn(true);
                                 updateSubtitleToolbar();
                                 log("updateRemoteVideo "+peersOnCall.get(i).getName()+" Connected video");

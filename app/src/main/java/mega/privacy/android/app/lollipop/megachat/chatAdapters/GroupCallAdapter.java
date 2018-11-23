@@ -159,8 +159,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid.surfaceMicroLayout = (RelativeLayout) v.findViewById(R.id.rl_surface_and_micro);
 
         holderGrid.parentSurfaceView = (RelativeLayout) v.findViewById(R.id.parent_surface_view);
-        holderGrid.parentSurfaceView.removeAllViews();
-        holderGrid.parentSurfaceView.removeAllViewsInLayout();
         holderGrid.avatarMicroLayout = (RelativeLayout) v.findViewById(R.id.layout_avatar_micro);
 
         holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
@@ -192,8 +190,15 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             return;
         }
 
+        //Avatar:
+        if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+            setProfileMyAvatar(holder);
+        }else{
+            setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
+        }
+
         int numPeersOnCall = getItemCount();
-        log("onBindViewHolderGrid() - peer: "+peer.getHandle()+", numPeersOnCall: "+numPeersOnCall);
+        log("onBindViewHolderGrid() - peer: "+peer.getName()+", numPeersOnCall: "+numPeersOnCall);
 
         if(isGrid){
             CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) holder.rlGeneral.getLayoutParams();
@@ -337,7 +342,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
             //Listener && SurfaceView
             if(peer.getListener() == null){
-                log("peer: "+peer.getName()+", VIDEO ON- listener == null");
+                log("peer: "+peer.getName()+", VIDEO ON- listener == null   ---> removeAllViews && removeAllViewsInLayout && addView && setSizeFromLayout && h(0)w(0)");
 
                 holder.parentSurfaceView.removeAllViews();
                 holder.parentSurfaceView.removeAllViewsInLayout();
@@ -358,6 +363,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }else{
                     peer.getListener().getLocalRenderer().addListener(this);
                 }
+
                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                 peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
 
@@ -369,13 +375,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
 
             }else{
-                log("peer: "+peer.getHandle()+", VIDEO ON- listener != null");
+                log("peer: "+peer.getName()+", VIDEO ON- listener != null");
 
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     log("peer: "+peer.getName()+", VIDEO ON- getChildCount() == 0");
 
                     if(peer.getListener().getSurfaceView().getParent()!=null){
                         if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                            log("peer: "+peer.getName()+", VIDEO ON- getParent 1 y 2 ---> removeView && addView && setSizeFromLayout && h(0)w(0)");
 
                             ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
 
@@ -388,16 +395,37 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                             if(peer.getListener().getWidth() != 0){
                                 peer.getListener().setWidth(0);
                             }
+
+
                         }else{
+                            log("peer: "+peer.getName()+", VIDEO ON- getParent 1 ---> addView && setSizeFromLayout && h(0)w(0)");
+
                             holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
                             peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                            if(peer.getListener().getHeight() != 0){
+                                peer.getListener().setHeight(0);
+                            }
+                            if(peer.getListener().getWidth() != 0){
+                                peer.getListener().setWidth(0);
+                            }
                         }
+                    }else{
+                        log("peer: "+peer.getName()+", VIDEO ON- getParent 0 ---> nothing");
+                        holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+                        peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+                        if(peer.getListener().getHeight() != 0){
+                            peer.getListener().setHeight(0);
+                        }
+                        if(peer.getListener().getWidth() != 0){
+                            peer.getListener().setWidth(0);
+                        }
+
                     }
                 }else{
-                    log("peer: "+peer.getHandle()+", VIDEO ON- getChildCount() != 0");
+                    log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0");
 
                     if(holder.parentSurfaceView.getChildAt(0).equals(peer.getListener().getSurfaceView())){
-                        log("*peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it's the same");
+                        log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it's the same   -> setSizeFromLayout &&  h(0)w(0)");
 
                         peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
                         if(peer.getListener().getHeight() != 0){
@@ -407,13 +435,17 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                             peer.getListener().setWidth(0);
                         }
                     }else{
-                        log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it is not the same");
+                        log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it is not the same   ---->removeAllViews && removeAllViewsInLayout");
 
                         //Remove items of parent
                         holder.parentSurfaceView.removeAllViews();
+                        holder.parentSurfaceView.removeAllViewsInLayout();
+
                         //Remove parent of Surface
                         if(peer.getListener().getSurfaceView().getParent()!=null){
                             if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                                log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it is not the same - getParent 1 y 2 ---> removeView && addView && setSizeFromLayout && h(0)w(0");
+
                                 ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
 
                                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
@@ -425,6 +457,29 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                                 if(peer.getListener().getWidth() != 0){
                                     peer.getListener().setWidth(0);
                                 }
+                            }else{
+                                log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it is not the same - getParent 1");
+                                holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+                                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+
+                                if(peer.getListener().getHeight() != 0){
+                                    peer.getListener().setHeight(0);
+                                }
+                                if(peer.getListener().getWidth() != 0){
+                                    peer.getListener().setWidth(0);
+                                }
+
+                            }
+                        }else{
+                            log("peer: "+peer.getName()+", VIDEO ON- getChildCount() != 0 - it is not the same - getParent 0");
+                            holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
+                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+
+                            if(peer.getListener().getHeight() != 0){
+                                peer.getListener().setHeight(0);
+                            }
+                            if(peer.getListener().getWidth() != 0){
+                                peer.getListener().setWidth(0);
                             }
                         }
                     }
