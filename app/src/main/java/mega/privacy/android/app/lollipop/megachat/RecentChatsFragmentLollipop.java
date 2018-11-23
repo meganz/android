@@ -744,6 +744,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             if(context instanceof ManagerActivityLollipop){
                 ((ManagerActivityLollipop)context).showFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
             }
         }
 

@@ -78,7 +78,7 @@ public class InboxFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNodeAdapter adapter;
-    NewHeaderItemDecoration headerItemDecoration;
+    public NewHeaderItemDecoration headerItemDecoration;
     private int placeholderCount;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;

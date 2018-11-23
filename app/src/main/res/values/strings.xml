@@ -3,9 +3,9 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.4.1 (213)</string>
-    <string name="sdk_version" context="Not translate">9e45edd</string>
-    <string name="karere_version" context="Not translate">29190c1</string>
+    <string name="app_version" context="Not translate">3.5 (216)</string>
+    <string name="sdk_version" context="Not translate">4911017</string>
+    <string name="karere_version" context="Not translate">b5fadce</string>
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
@@ -205,7 +205,7 @@
     <string name="tour_speed_title">MEGA Speed</string>
     <string name="tour_privacy_title">MEGA Privacy</string>
     <string name="tour_access_title">MEGA Access</string>
-    <string name="tour_space_text">Register now and get 50 GB of free space</string>
+    <string name="tour_space_text">Register now and get 50 GB* of free space</string>
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA’s end-to-end encryption</string>
     <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
@@ -287,6 +287,8 @@
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size</string>
     <string name="file_properties_info_modified" context="when was the file modified">Modified</string>
+    <string name="file_properties_info_added" context="when was the file added in MEGA">Added</string>
+    <string name="file_properties_info_created" context="when the file was created">Created</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -844,6 +846,8 @@
     <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I Account</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II Account</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III Account</string>
+
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
 
     <string name="backup_title" context="Title of the screen to backup the master key">Backup your Recovery Key</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Your password unlocks your Recovery Key</string>
@@ -1482,7 +1486,6 @@
     <string name="file_properties_info_info_file">Info</string>
     <string name="file_properties_info_size" context="Refers to the size of a file.">Total size</string>
     <string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Contains</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
     <string name="file_properties_shared_folder_public_link_name">Link</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
@@ -2185,6 +2188,7 @@
     <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
 
     <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for a deleted shared folder">[B]Access to folder shared by [/B][A]%s[/A][B] was removed.[/B]</string>
+    <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] has left a shared folder.[/B]</string>
 
     <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]</string>
     <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
