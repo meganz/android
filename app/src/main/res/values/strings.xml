@@ -68,6 +68,7 @@
     <!--
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     -->
+    <string name="general_show_info" context="Label of a button/notification to show info about something">Show info</string>
 
     <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
 

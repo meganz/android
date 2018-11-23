@@ -467,188 +467,199 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		if(isOverquota==0){
+        long progressPercent = 0;
+        Collection<MegaTransfer> transfers= mapProgressTransfers.values();
 
-			long progressPercent = 0;
-			Collection<MegaTransfer> transfers= mapProgressTransfers.values();
-			if(sendOriginalAttachments){
+        if(sendOriginalAttachments){
 
+            long total = 0;
+            long inProgress = 0;
 
-				long total = 0;
-				long inProgress = 0;
+            for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
+                MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
+                if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
+                    total = total + currentTransfer.getTotalBytes();
+                    inProgress = inProgress + currentTransfer.getTotalBytes();
+                }
+                else{
+                    total = total + currentTransfer.getTotalBytes();
+                    inProgress = inProgress + currentTransfer.getTransferredBytes();
+                }
+            }
 
-				for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
-					MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
-					if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
-						total = total + currentTransfer.getTotalBytes();
-						inProgress = inProgress + currentTransfer.getTotalBytes();
-					}
-					else{
-						total = total + currentTransfer.getTotalBytes();
-						inProgress = inProgress + currentTransfer.getTransferredBytes();
-					}
-				}
+            long inProgressTemp = 0;
+            if(total>0){
+                inProgressTemp = inProgress *100;
+                progressPercent = inProgressTemp/total;
+            }
+        }
+        else{
+            if(totalVideos>0){
 
-				long inProgressTemp = 0;
-				if(total>0){
-					inProgressTemp = inProgress *100;
-					progressPercent = inProgressTemp/total;
-				}
-			}
-			else{
+                for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
+                    MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
 
-				if(totalVideos>0){
+                    long individualInProgress = currentTransfer.getTransferredBytes();
+                    long individualTotalBytes = currentTransfer.getTotalBytes();
+                    long individualProgressPercent = 0;
 
-					for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
-						MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
+                    if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
+                        if(MimeTypeList.typeForName(currentTransfer.getFileName()).isMp4Video()){
+                            individualProgressPercent = 50;
+                        }
+                        else{
+                            individualProgressPercent = 100;
+                        }
+                    }
+                    else{
+                        if(MimeTypeList.typeForName(currentTransfer.getFileName()).isMp4Video()){
+                            individualProgressPercent = individualInProgress*50 / individualTotalBytes;
+                        }
+                        else{
+                            individualProgressPercent = individualInProgress*100 / individualTotalBytes;
+                        }
+                    }
 
-						long individualInProgress = currentTransfer.getTransferredBytes();
-						long individualTotalBytes = currentTransfer.getTotalBytes();
-						long individualProgressPercent = 0;
+                    progressPercent = progressPercent + individualProgressPercent/totalUploads;
+                }
 
-						if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
-							if(MimeTypeList.typeForName(currentTransfer.getFileName()).isMp4Video()){
-								individualProgressPercent = 50;
-							}
-							else{
-								individualProgressPercent = 100;
-							}
-						}
-						else{
-							if(MimeTypeList.typeForName(currentTransfer.getFileName()).isMp4Video()){
-								individualProgressPercent = individualInProgress*50 / individualTotalBytes;
-							}
-							else{
+                Collection<Integer> values= mapVideoDownsampling.values();
+                int simplePercentage = 50/totalUploads;
+                for (Iterator iterator2 = values.iterator(); iterator2.hasNext();) {
+                    Integer value = (Integer) iterator2.next();
+                    int downsamplingPercent = simplePercentage*value/100;
+                    progressPercent = progressPercent + downsamplingPercent;
+                }
+            }
+            else{
+                long total = 0;
+                long inProgress = 0;
 
-								individualProgressPercent = individualInProgress*100 / individualTotalBytes;
-							}
-						}
+                for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
+                    MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
+                    total = total + currentTransfer.getTotalBytes();
+                    inProgress = inProgress + currentTransfer.getTransferredBytes();
+                }
+                inProgress = inProgress *100;
+                if(total<=0){
+                    progressPercent = 0;
+                }
+                else{
+                    progressPercent = inProgress/total;
+                }
+            }
+        }
 
-						progressPercent = progressPercent + individualProgressPercent/totalUploads;
-					}
+        log("updateProgressNotification: progress: "+progressPercent);
 
-					Collection<Integer> values= mapVideoDownsampling.values();
-					int simplePercentage = 50/totalUploads;
-					for (Iterator iterator2 = values.iterator(); iterator2.hasNext();) {
-						Integer value = (Integer) iterator2.next();
-						int downsamplingPercent = simplePercentage*value/100;
-						progressPercent = progressPercent + downsamplingPercent;
-					}
-				}
-				else{
+        String message = "";
+        if (isOverquota != 0){
+            message = getString(R.string.overquota_alert_title);
+        }
+        else if(totalUploadsCompleted==totalUploads){
+            message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, totalUploadsCompleted, totalUploads);
+        }
+        else{
+            int inProgress = totalUploadsCompleted+1;
+            message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, inProgress, totalUploads);
+        }
 
-					long total = 0;
-					long inProgress = 0;
-
-					for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
-						MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
-						total = total + currentTransfer.getTotalBytes();
-						inProgress = inProgress + currentTransfer.getTransferredBytes();
-					}
-					inProgress = inProgress *100;
-					if(total<=0){
-						progressPercent = 0;
-					}
-					else{
-						progressPercent = inProgress/total;
-					}
-				}
-			}
-
-			log("updateProgressNotification: progress: "+progressPercent);
-
-			String message = "";
-			if(totalUploadsCompleted==totalUploads){
-				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, totalUploadsCompleted, totalUploads);
-			}
-			else{
-				int inProgress = totalUploadsCompleted+1;
-				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, inProgress, totalUploads);
-			}
-
-			Intent intent;
-			intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
-			intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
-
-			PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, 0);
-			Notification notification = null;
-			int currentapiVersion = Build.VERSION.SDK_INT;
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-				channel.setShowBadge(true);
-				channel.setSound(null, null);
-				mNotificationManager.createNotificationChannel(channel);
-
-				NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-
-				mBuilderCompat
-						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setProgress(100, (int)progressPercent, false)
-						.setContentIntent(pendingIntent)
-						.setOngoing(true).setContentTitle(message)
-						.setContentText(getString(R.string.chat_upload_title_notification))
-						.setOnlyAlertOnce(true)
-						.setColor(ContextCompat.getColor(this,R.color.mega));
-
-				notification = mBuilderCompat.build();
-			}
-			else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setProgress(100, (int)progressPercent, false)
-						.setContentIntent(pendingIntent)
-						.setOngoing(true).setContentTitle(message)
-						.setContentText(getString(R.string.chat_upload_title_notification))
-						.setOnlyAlertOnce(true);
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
-				}
-
-				notification = mBuilder.build();
-			}
-			else if (currentapiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
-
-				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setProgress(100, (int)progressPercent, false)
-						.setContentIntent(pendingIntent)
-						.setOngoing(true).setContentTitle(message)
-						.setContentText(getString(R.string.chat_upload_title_notification))
-						.setOnlyAlertOnce(true);
-
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
-				}
-
-				notification = mBuilder.getNotification();
-
-			}
-			else
-			{
-				notification.flags |= Notification.FLAG_ONGOING_EVENT;
-				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
-				notification.contentView.setTextViewText(R.id.status_text, message);
-				notification.contentView.setProgressBar(R.id.status_progress, 100, (int)progressPercent, false);
-			}
-
-			if (!isForeground) {
-				log("starting foreground");
-				try {
-					startForeground(notificationId, notification);
-					isForeground = true;
-				}
-				catch (Exception e){
-					log("startforeground exception: " + e.getMessage());
-					isForeground = false;
-				}
-			} else {
-				mNotificationManager.notify(notificationId, notification);
-			}
+        Intent intent;
+        intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+		switch (isOverquota) {
+			case 0:
+			default:
+				intent.setAction(Constants.ACTION_SHOW_TRANSFERS);
+				break;
+			case 1:
+				intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+				break;
+			case 2:
+				intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+				break;
 		}
+
+		String actionString = isOverquota == 0 ? getString(R.string.chat_upload_title_notification) :
+				getString(R.string.general_show_info);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, 0);
+        Notification notification = null;
+        int currentapiVersion = Build.VERSION.SDK_INT;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+
+            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setProgress(100, (int)progressPercent, false)
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true).setContentTitle(message)
+                    .setContentText(actionString)
+                    .setOnlyAlertOnce(true)
+                    .setColor(ContextCompat.getColor(this,R.color.mega));
+
+            notification = mBuilderCompat.build();
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setProgress(100, (int)progressPercent, false)
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true).setContentTitle(message)
+                    .setContentText(actionString)
+                    .setOnlyAlertOnce(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            }
+
+            notification = mBuilder.build();
+        }
+        else if (currentapiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
+
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setProgress(100, (int)progressPercent, false)
+                    .setContentIntent(pendingIntent)
+                    .setOngoing(true).setContentTitle(message)
+                    .setContentText(getString(R.string.chat_upload_title_notification))
+                    .setOnlyAlertOnce(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            }
+
+            notification = mBuilder.getNotification();
+
+        }
+        else
+        {
+            notification.flags |= Notification.FLAG_ONGOING_EVENT;
+            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+            notification.contentIntent = pendingIntent;
+            notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
+            notification.contentView.setTextViewText(R.id.status_text, message);
+            notification.contentView.setProgressBar(R.id.status_progress, 100, (int)progressPercent, false);
+        }
+
+        if (!isForeground) {
+            log("starting foreground");
+            try {
+                startForeground(notificationId, notification);
+                isForeground = true;
+            }
+            catch (Exception e){
+                log("startforeground exception: " + e.getMessage());
+                isForeground = false;
+            }
+        } else {
+            mNotificationManager.notify(notificationId, notification);
+        }
 	}
 	
 	public static void log(String log) {
@@ -961,10 +972,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						}
 					}
 
-					if (isOverquota!=0) {
-						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-					}
-
 					log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
 					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
 					if (transfer.getPath() != null) {
@@ -1125,8 +1132,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 
 					if(isOverquota!=0){
-						log("after overquota alert");
-						return;
+						log("After overquota error");
+						isOverquota = 0;
 					}
 
 					mapProgressTransfers.put(transfer.getTag(), transfer);
@@ -1158,7 +1165,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					else {
 						log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-						showStorageOverquotaNotification();
+						updateProgressNotification();
 					}
 					break;
 			}
@@ -1327,17 +1334,36 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
 		}
 
-		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify)
-				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(true).setTicker(contentText)
-				.setContentTitle(message).setContentText(contentText)
-				.setOngoing(false);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setShowBadge(true);
+			channel.setSound(null, null);
+			mNotificationManager.createNotificationChannel(channel);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-			mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+			NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+			mBuilderCompatO
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(contentText)
+					.setContentTitle(message).setContentText(contentText)
+					.setOngoing(false);
+
+			mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
 		}
+		else {
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(contentText)
+					.setContentTitle(message).setContentText(contentText)
+					.setOngoing(false);
 
-		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
+
+			mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
+		}
 	}
 }
