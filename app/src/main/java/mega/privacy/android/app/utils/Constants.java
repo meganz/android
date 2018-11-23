@@ -149,7 +149,7 @@ public class Constants {
 	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
-	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
+	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";

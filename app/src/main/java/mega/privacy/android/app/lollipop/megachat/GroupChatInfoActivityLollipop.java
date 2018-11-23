@@ -61,7 +61,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListe
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1534,7 +1534,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(lastGreen);
 
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);
