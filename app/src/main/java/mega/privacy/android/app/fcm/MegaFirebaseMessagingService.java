@@ -17,6 +17,7 @@ package mega.privacy.android.app.fcm;
  */
 
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -27,6 +28,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -169,22 +171,23 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If true - wait until connection finish
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
-                    String gSession = credentials.getSession();
-
-                    if (megaApi.getRootNode() == null) {
-                        log("RootNode = null");
-                        performLoginProccess(gSession);
-                    }
-                    else{
-                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
-//                        String gSession = credentials.getSession();
-                        int ret = megaChatApi.getInitState();
-                        log("result of init ---> " + ret);
-                        int status = megaChatApi.getOnlineStatus();
-                        log("online status ---> "+status);
-                        int connectionState = megaChatApi.getConnectionState();
-                        log("connection state ---> "+connectionState);
-                    }
+                    startService(new Intent(this,IncomingCallService.class));
+                    //                    String gSession = credentials.getSession();
+//
+//                    if (megaApi.getRootNode() == null) {
+//                        log("RootNode = null");
+//                        performLoginProccess(gSession);
+//                    }
+//                    else{
+//                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+////                        String gSession = credentials.getSession();
+//                        int ret = megaChatApi.getInitState();
+//                        log("result of init ---> " + ret);
+//                        int status = megaChatApi.getOnlineStatus();
+//                        log("online status ---> "+status);
+//                        int connectionState = megaChatApi.getConnectionState();
+//                        log("connection state ---> "+connectionState);
+//                    }
 
                 }
                 else if(remoteMessageType.equals("2")){

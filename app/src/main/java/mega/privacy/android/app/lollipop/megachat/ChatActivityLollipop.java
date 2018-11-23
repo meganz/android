@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -80,6 +81,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -108,6 +110,7 @@ import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -520,6 +523,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
+        stopService(new Intent(this,IncomingCallService.class));
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(1086);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -2460,7 +2466,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public static void log(String message) {
-        Util.log("ChatActivityLollipop", message);
+        Util.log("ChatActivityLollipop",message);
     }
 
     @Override
@@ -6024,7 +6030,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         catch (Exception e){
             log("Written message not stored on DB");
         }
-
         super.onStop();
     }
 

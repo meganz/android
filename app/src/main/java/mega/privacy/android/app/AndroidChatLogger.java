@@ -2,6 +2,7 @@ package mega.privacy.android.app;
 
 import android.util.Log;
 
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatLoggerInterface;
 
@@ -18,9 +19,9 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
     public void log(int logLevel, String message) {
         //display to console
         if (Util.DEBUG) {
-            Log.d(TAG,  createMessage(message));
+//            Log.d(TAG,  createMessage(message));
+            TL.log(TAG,  createMessage(message));
         }
-
         //save to log file
         if (isReadyToWriteToFile(Util.getFileLoggerKarere())) {
             fileLogQueue.add(createMessage(message));
