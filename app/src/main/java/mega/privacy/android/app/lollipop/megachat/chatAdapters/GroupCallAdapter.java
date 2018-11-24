@@ -190,13 +190,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             return;
         }
 
-        //Avatar:
-        if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-            setProfileMyAvatar(holder);
-        }else{
-            setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
-        }
-
         int numPeersOnCall = getItemCount();
         log("onBindViewHolderGrid() - peer: "+peer.getName()+", numPeersOnCall: "+numPeersOnCall);
 
@@ -537,6 +530,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         }else{
             log("peer: "+peer.getHandle()+", VIDEO OFF");
+            holder.avatarImage.setImageBitmap(null);
+            //Avatar:
+            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                setProfileMyAvatar(holder);
+            }else{
+                setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
+            }
 
             //Remove SurfaceView && Listener:
             holder.surfaceMicroLayout.setVisibility(GONE);
@@ -573,12 +573,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
-            //Avatar:
-            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                setProfileMyAvatar(holder);
-            }else{
-                setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
-            }
 
             //Micro icon:
             if(numPeersOnCall < 7){
@@ -667,7 +661,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
    //My avatar
    public void setProfileMyAvatar(ViewHolderGroupCall holder) {
-        log("setProfileMyAvatar");
+        log("setProfileMyAvatar()");
        Bitmap myBitmap = null;
        File avatar = null;
        if (context != null) {
@@ -687,35 +681,32 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                if (myBitmap != null) {
                        holder.avatarImage.setImageBitmap(myBitmap);
                        holder.avatarInitialLetter.setVisibility(GONE);
-               }
-               else{
+               }else{
                    createMyDefaultAvatar(holder);
                }
-           }
-           else {
+           }else {
                createMyDefaultAvatar(holder);
            }
-       } else {
+       }else {
            createMyDefaultAvatar(holder);
        }
    }
     //My Default avatar
     public void createMyDefaultAvatar(ViewHolderGroupCall holder) {
-        log("createMyDefaultAvatar");
+        log("createMyDefaultAvatar()");
 
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
         long userHandle = megaChatApi.getMyUserHandle();
 
-        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
         p.setColor(Color.TRANSPARENT);
 
         String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
-
         if(color!=null){
             p.setColor(Color.parseColor(color));
         }else{
@@ -723,11 +714,11 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
 
         int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
+            radius = defaultAvatar.getWidth() / 2;
+        }else {
+            radius = defaultAvatar.getHeight() / 2;
+        }
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         holder.avatarImage.setImageBitmap(defaultAvatar);
         holder.avatarInitialLetter.setText(myFirstLetter);
@@ -736,7 +727,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
     //Contact avatar
     public void setProfileContactAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
-        log("setProfileContactAvatar");
+        log("setProfileContactAvatar()");
 
         Bitmap bitmap = null;
         File avatar = null;
@@ -788,7 +779,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
         }else{
             UserAvatarListener listener = new UserAvatarListener(context);
-
             if(!avatarRequested){
                 avatarRequested = true;
                 if (context.getExternalCacheDir() != null){
@@ -798,7 +788,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
                 }
             }
-
             createDefaultAvatar(userHandle, fullName, holder);
         }
     }
@@ -959,14 +948,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         log("resetSize");
         if(getItemCount()!=0){
             for(InfoPeerGroupCall peer:peers){
-                if(peer.getHandle() == userHandle){
-                    if(peer.getListener()!=null){
-                        if(peer.getListener().getWidth()!=0){
-                            peer.getListener().setWidth(0);
-                        }
-                        if(peer.getListener().getHeight()!=0){
-                            peer.getListener().setHeight(0);
-                        }
+                if(peer.getListener()!=null){
+                    peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
+
+                    if(peer.getListener().getWidth()!=0){
+                        peer.getListener().setWidth(0);
+                    }
+                    if(peer.getListener().getHeight()!=0){
+                        peer.getListener().setHeight(0);
                     }
                 }
             }

@@ -164,6 +164,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     RelativeLayout recyclerViewLayout;
     CustomizedGridCallRecyclerView recyclerView;
 
+    RelativeLayout bigRecyclerViewLayout;
     LinearLayoutManager layoutManager;
     RecyclerView bigRecyclerView;
 
@@ -315,9 +316,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(chat.isGroup()){
             log("updateScreenStatusInProgress() - group chat - chatId: "+chatId);
 
-            relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-            relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-            relativeVideo.requestLayout();
+
 
             if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
                 peersBeforeCall.clear();
@@ -407,9 +406,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if(callStatus == MegaChatCall.CALL_STATUS_RING_IN){
                     log("updateScreenStatusInProgress() - CALL_STATUS_RING_IN");
 
-                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
-                    relativeVideo.requestLayout();
+                    RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                    layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                    layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    linearFAB.setLayoutParams(layoutExtend);
+                    linearFAB.requestLayout();
+                    linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+
                     myAvatarLayout.setVisibility(View.VISIBLE);
                     contactAvatarLayout.setVisibility(View.VISIBLE);
                     flagMyAvatar = true;
@@ -420,9 +424,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("updateScreenStatusInProgress() - CALL_STATUS_IN_PROGRESS");
 
-                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.requestLayout();
+                    RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                    layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    linearFAB.setLayoutParams(layoutExtend);
+                    linearFAB.requestLayout();
+                    linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
                     myAvatarLayout.setVisibility(View.VISIBLE);
                     contactAvatarLayout.setVisibility(View.VISIBLE);
@@ -434,9 +441,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else{
                     log("updateScreenStatusInProgress() - OUTGOING");
 
-                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.requestLayout();
+                    RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                    layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    linearFAB.setLayoutParams(layoutExtend);
+                    linearFAB.requestLayout();
+                    linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+
                     flagMyAvatar = false;
                     setProfileMyAvatar();
                     flagContactAvatar = true;
@@ -508,6 +520,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(callChat.getStatus() ==  MegaChatCall.CALL_STATUS_RING_IN){
                         log("onNewIntent() - group chat - CALL_STATUS_RING_IN");
 
+                        RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                        layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                        layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                        linearFAB.setLayoutParams(layoutExtend);
+                        linearFAB.requestLayout();
+                        linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+
                         boolean isMe = false;
                         for(int i = 0; i < callChat.getParticipants().size(); i++){
                             long userHandle = callChat.getParticipants().get(i);
@@ -574,6 +594,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
                     }else if(callChat.getStatus() ==  MegaChatCall.CALL_STATUS_IN_PROGRESS){
                         log("onNewIntent() CALL_STATUS_IN_PROGRESS -> participants: "+callChat.getParticipants().size());
+
+                        RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                        layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                        linearFAB.setLayoutParams(layoutExtend);
+                        linearFAB.requestLayout();
+                        linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
                         updateSubTitle();
                         if(peersOnCall != null){
                             if(peersOnCall.size() != 0){
@@ -799,23 +827,33 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
         layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         linearFAB.setLayoutParams(layoutCompress);
+        linearFAB.requestLayout();
         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
         isManualMode = false;
 
         relativeCall = (RelativeLayout) findViewById(R.id.relative_answer_call_fab);
+        relativeCall.getLayoutParams().width = Util.scaleWidthPx(48, outMetrics) ;
+        relativeCall.getLayoutParams().height = RelativeLayout.LayoutParams.MATCH_PARENT;
+        relativeCall.requestLayout();
         relativeCall.setVisibility(GONE);
 
         linearArrowCall = (LinearLayout) findViewById(R.id.linear_arrow_call);
+        linearArrowCall.setVisibility(GONE);
         firstArrowCall = (ImageView) findViewById(R.id.first_arrow_call);
         secondArrowCall = (ImageView) findViewById(R.id.second_arrow_call);
         thirdArrowCall = (ImageView) findViewById(R.id.third_arrow_call);
         fourArrowCall = (ImageView) findViewById(R.id.four_arrow_call);
 
         relativeVideo = (RelativeLayout) findViewById(R.id.relative_video_fab);
+        relativeVideo.getLayoutParams().width = Util.scaleWidthPx(48, outMetrics) ;
+        relativeVideo.getLayoutParams().height = RelativeLayout.LayoutParams.MATCH_PARENT;
+        relativeVideo.requestLayout();
         relativeVideo.setVisibility(GONE);
 
+
         linearArrowVideo = (LinearLayout) findViewById(R.id.linear_arrow_video);
+        linearArrowVideo.setVisibility(GONE);
         firstArrowVideo = (ImageView) findViewById(R.id.first_arrow_video);
         secondArrowVideo = (ImageView) findViewById(R.id.second_arrow_video);
         thirdArrowVideo = (ImageView) findViewById(R.id.third_arrow_video);
@@ -845,6 +883,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         //Recycler View for 1-6 peers
         recyclerViewLayout = (RelativeLayout) findViewById(R.id.rl_recycler_view);
+        recyclerViewLayout.setVisibility(GONE);
         recyclerView = (CustomizedGridCallRecyclerView) findViewById(R.id.recycler_view_cameras);
         recyclerView.setPadding(0, 0, 0, 0);
 //        recyclerView.setClipToPadding(false);
@@ -852,12 +891,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         recyclerView.setColumnWidth((int) widthScreenPX);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setVisibility(GONE);
-
-        //Recycler View for 7-8 peers (because 9-10 without video)
-        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        bigRecyclerView = (RecyclerView) findViewById(R.id.big_recycler_view_cameras);
-        bigRecyclerView.setLayoutManager(layoutManager);
-        bigRecyclerView.setVisibility(GONE);
 
         //Big elements group calls
         parentBigCameraGroupCall = (ViewGroup) findViewById(R.id.parent_layout_big_camera_group_call);
@@ -882,6 +915,20 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         avatarBigCameraGroupCallMicro.setVisibility(GONE);
         avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
         parentBigCameraGroupCall.setVisibility(View.GONE);
+
+        //Recycler View for 7-8 peers (because 9-10 without video)
+        bigRecyclerViewLayout = (RelativeLayout) findViewById(R.id.rl_big_recycler_view);
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        bigRecyclerView = (RecyclerView) findViewById(R.id.big_recycler_view_cameras);
+        bigRecyclerView.setLayoutManager(layoutManager);
+        RelativeLayout.LayoutParams bigRecyclerViewParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        bigRecyclerViewParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        bigRecyclerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.parent_layout_big_camera_group_call);
+        bigRecyclerViewParams.addRule(RelativeLayout.BELOW, 0);
+        bigRecyclerViewLayout.setLayoutParams(bigRecyclerViewParams);
+        bigRecyclerViewLayout.requestLayout();
+        bigRecyclerView.setVisibility(GONE);
+        bigRecyclerViewLayout.setVisibility(GONE);
 
         //Local camera small
         parentLocal = (ViewGroup) findViewById(R.id.parent_layout_local_camera);
@@ -985,10 +1032,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     bigElementsIndividualCallLayout.setVisibility(View.GONE);
                     bigElementsGroupCallLayout.setVisibility(View.VISIBLE);
 
+
                 }else{
                     smallElementsIndividualCallLayout.setVisibility(View.VISIBLE);
                     bigElementsIndividualCallLayout.setVisibility(View.VISIBLE);
                     bigElementsGroupCallLayout.setVisibility(View.GONE);
+                    bigRecyclerView.setVisibility(GONE);
+                    bigRecyclerViewLayout.setVisibility(GONE);
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
@@ -1008,10 +1058,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     if(chat.isGroup()){
                         log("onCreate()-Incoming group call");
-
-                        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
-                        relativeVideo.requestLayout();
 
                         //Get all the participants, add them to peersBeforeCall array and show only the avatars
                         if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
@@ -1037,9 +1083,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }else{
                         log("onCreate()-Incoming individual call");
 
-                        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
-                        relativeVideo.requestLayout();
                         myAvatarLayout.setVisibility(View.VISIBLE);
                         contactAvatarLayout.setVisibility(View.VISIBLE);
                         flagMyAvatar = true;
@@ -1049,6 +1092,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
+
                     log("onCreate()- In Progress");
                     updateScreenStatusInProgress();
                 }else if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
@@ -1066,10 +1110,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                         log("onCreate()-Outgoing group call");
 
-                        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        relativeVideo.requestLayout();
-
                         if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
                             peersBeforeCall.clear();
                         }
@@ -1084,10 +1124,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     }else{
                         log("onCreate()-Outgoing individual call");
-
-                        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        relativeVideo.requestLayout();
 
                         flagMyAvatar = false;
                         setProfileMyAvatar();
@@ -1362,6 +1398,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(answerCallFAB.getVisibility() == View.VISIBLE){
             answerCallFAB.hide();
             relativeCall.setVisibility(GONE);
+        }
+
+        if((bigRecyclerViewLayout!=null)&&(bigRecyclerView!=null)&&(parentBigCameraGroupCall!=null)){
+            RelativeLayout.LayoutParams bigRecyclerViewParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            bigRecyclerViewParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+            bigRecyclerViewParams.addRule(RelativeLayout.BELOW, R.id.parent_layout_big_camera_group_call);
+            bigRecyclerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, 0);
+            bigRecyclerViewLayout.setLayoutParams(bigRecyclerViewParams);
+            bigRecyclerViewLayout.requestLayout();
         }
     }
 
@@ -1696,12 +1741,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             stopAudioSignals();
                             rtcAudioManager.stop();
                             MegaApplication.activityPaused();
-                            if (bigCameraGroupCallFragment != null) {
-                                bigCameraGroupCallFragment.removeSurfaceView();;
-                                FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                                ftFS.remove(bigCameraGroupCallFragment);
-                                bigCameraGroupCallFragment = null;
-                            }
+//                            if (bigCameraGroupCallFragment != null) {
+//                                bigCameraGroupCallFragment.removeSurfaceView();;
+//                                FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+//                                ftFS.remove(bigCameraGroupCallFragment);
+//                                bigCameraGroupCallFragment = null;
+//                            }
 
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 super.finishAndRemoveTask();
@@ -1726,12 +1771,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                                ft.remove(remoteCameraFragmentFS);
 //                                remoteCameraFragmentFS = null;
 //                            }
-//                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                                super.finishAndRemoveTask();
-//                            }
-//                            else {
-//                                super.finish();
-//                            }
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                super.finishAndRemoveTask();
+                            }
+                            else {
+                                super.finish();
+                            }
                         }
 
 
@@ -1916,8 +1961,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 recyclerView.setColumnWidth((int) widthScreenPX);
                                                 int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
                                                 adapterGrid.notifyItemInserted(posInserted);
-                                                adapterGrid.notifyDataSetChanged();
-//                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+//                                                adapterGrid.notifyDataSetChanged();
+                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
                                                 updateSubtitleToolbar();
 
                                             }else {
@@ -1926,7 +1971,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                     recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
                                                     recyclerView.setColumnWidth((int) widthScreenPX / 2);
                                                     adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                                                    adapterGrid.notifyDataSetChanged();
+                                                    adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+//                                                    adapterGrid.notifyDataSetChanged();
                                                     updateSubtitleToolbar();
                                                 } else {
                                                     recyclerViewLayout.setPadding(0, 0, 0, 0);
@@ -1934,6 +1980,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                     int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
                                                     log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted POS(" + posInserted + "), range(" + (posInserted - 1) + " -> " + peersOnCall.size() + ") ");
                                                     adapterGrid.notifyItemInserted(posInserted);
+//                                                    adapterGrid.notifyDataSetChanged();
                                                     adapterGrid.notifyItemRangeChanged((posInserted - 1), peersOnCall.size());
                                                     updateSubtitleToolbar();
 
@@ -1952,6 +1999,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 int posInserted=(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
                                                 log("(7 +)COMPOSITION IN PROGRESS, notifyItemInserted POS("+(posInserted-1)+"), range("+posInserted+" -> "+peersOnCall.size()+") ");
                                                 adapterList.notifyItemInserted(posInserted);
+//                                                adapterList.notifyDataSetChanged();
                                                 adapterList.notifyItemRangeChanged((posInserted-1), peersOnCall.size());
                                                 updateUserSelected(true);
                                                 updateSubtitleToolbar();
@@ -1986,7 +2034,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             recyclerViewLayout.setPadding(0, 0, 0, 0);
                                             recyclerView.setColumnWidth((int) widthScreenPX);
                                             adapterGrid.notifyItemRemoved(i);
-                                            adapterGrid.notifyDataSetChanged();
+                                            adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+
+//                                            adapterGrid.notifyDataSetChanged();
                                             updateSubtitleToolbar();
                                         } else {
                                             if(peersOnCall.size() == 6){
@@ -1994,7 +2044,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 recyclerViewLayout.setPadding(0, 0, 0, 0);
                                                 recyclerView.setColumnWidth((int) widthScreenPX/2);
                                                 adapterGrid.notifyItemRemoved(i);
-                                                adapterGrid.notifyDataSetChanged();
+                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
+
+//                                                adapterGrid.notifyDataSetChanged();
                                                 updateSubtitleToolbar();
                                             }else{
                                                 if(peersOnCall.size() == 4){
@@ -2006,6 +2058,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 }
                                                 log("(1-6) COMPOSITION IN PROGRESS, notifyItemRemoved POS("+i+"), range("+i+" -> "+peersOnCall.size()+") ");
                                                 adapterGrid.notifyItemRemoved(i);
+//                                                adapterGrid.notifyDataSetChanged();
                                                 adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
                                                 updateSubtitleToolbar();
                                             }
@@ -2019,6 +2072,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                         if(peersOnCall.size() >= 7){
                                             log("(7 +)COMPOSITION IN PROGRESS, notifyItemRemoved POS("+i+"), range("+i+" -> "+peersOnCall.size()+") ");
                                             adapterList.notifyItemRemoved(i);
+//                                            adapterList.notifyDataSetChanged();
                                             adapterList.notifyItemRangeChanged(i, peersOnCall.size());
                                             updateUserSelected(true);
                                             updateSubtitleToolbar();
@@ -2064,6 +2118,50 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
 
                     }
+                }
+            }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_NETWORK_QUALITY)){
+                log("onChatCallUpdate()-CHANGE_TYPE_SESSION_NETWORK_QUALITY");
+
+                if(chat.isGroup()){
+
+                    if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
+                        peersBeforeCall.clear();
+                    }
+                    long userHandle = call.getPeerSessionStatusChange();
+
+                    MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
+                    if(userSession != null){
+                        if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
+                            log("SESSION_STATUS_IN_PROGRESS");
+
+                            int qualityLevel =  userSession.getNetworkQuality();
+                            log("quealityLevel: "+qualityLevel);
+
+//                            updateSubTitle();
+//                            //contact joined the group call
+//                            log(chat.getPeerFullnameByHandle(userHandle)+" joined in the group call");
+
+                        }else{
+                            log("other ");
+
+                        }
+
+//                        updateRemoteVideoStatus(userHandle);
+//                        updateRemoteAudioStatus(userHandle);
+//                        updateLocalVideoStatus();
+//                        updateLocalAudioStatus();
+                    }
+                }else{
+//                    log("onChatCallUpdate() - CHANGE_TYPE_SESSION_STATUS");
+//
+//                    if(call.getPeerSessionStatusChange()==chat.getPeerHandle(0)){
+//                        updateSubTitle();
+//                    }
+//                    updateRemoteVideoStatus(-1);
+//                    updateRemoteAudioStatus(-1);
+//
+//                    updateLocalVideoStatus();
+//                    updateLocalAudioStatus();
                 }
             }else{
                 log("other: "+call.getChanges());
@@ -2153,6 +2251,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             case R.id.video_fab:{
                 log("onClick video FAB");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                    linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
+                    RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                    layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    linearFAB.setLayoutParams(layoutCompress);
+                    linearFAB.requestLayout();
+                    linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
                     megaChatApi.answerChatCall(chatId, true, this);
                     clearHandlers();
 
@@ -2174,11 +2280,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 break;
             }
             case R.id.micro_fab: {
-
                 if(callChat.hasLocalAudio()){
                     megaChatApi.disableAudio(chatId, this);
-                }
-                else{
+                }else{
                     megaChatApi.enableAudio(chatId, this);
                 }
                 if((callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)||(callChat.getStatus()==MegaChatCall.CALL_STATUS_REQUEST_SENT)){
@@ -2198,6 +2302,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             case R.id.answer_call_fab:{
                 log("Click on answer fab");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                    linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
+                    RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                    layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                    linearFAB.setLayoutParams(layoutCompress);
+                    linearFAB.requestLayout();
+                    linearFAB.setOrientation(LinearLayout.HORIZONTAL);
                     megaChatApi.answerChatCall(chatId, false, this);
                     clearHandlers();
 
@@ -2273,6 +2384,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             microFAB.setVisibility(GONE);
 
             if (callChat.hasVideoInitialCall()) {
+                RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+                linearFAB.setLayoutParams(layoutExtend);
+                linearFAB.requestLayout();
+                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
                 answerCallFAB.setOnClickListener(this);
                 videoFAB.setOnClickListener(null);
@@ -2280,11 +2397,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 linearArrowVideo.setVisibility(View.VISIBLE);
                 videoFAB.startAnimation(shake);
 
-                RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-                layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                linearFAB.setLayoutParams(layoutExtend);
-                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+
 
                 animationAlphaArrows(fourArrowVideo);
                 handlerArrow1 = new Handler();
@@ -2348,12 +2462,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             @Override
                             public void onAnimationEnd(Animation animation) {
 
-                                RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+                                RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                                 layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                                 layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                                 linearFAB.setLayoutParams(layoutCompress);
-                                linearFAB.setOrientation(LinearLayout.HORIZONTAL);
-
+                                linearFAB.requestLayout();
                                 answerVideoCall();
                             }
                         });
@@ -2367,13 +2481,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             }else{
 
-                answerCallFAB.startAnimation(shake);
-
                 RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
                 layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                 layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                 linearFAB.setLayoutParams(layoutExtend);
+                linearFAB.requestLayout();
                 linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+
+                answerCallFAB.startAnimation(shake);
 
                 linearArrowCall.setVisibility(View.VISIBLE);
                 animationAlphaArrows(fourArrowCall);
@@ -2435,11 +2550,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                             @Override
                             public void onAnimationEnd(Animation animation) {
-
-                                RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                                RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                                 layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                                 layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
                                 linearFAB.setLayoutParams(layoutCompress);
+                                linearFAB.requestLayout();
                                 linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
                                 answerAudioCall();
@@ -2468,6 +2583,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             hangFAB.show();
             hangFAB.setVisibility(View.VISIBLE);
         }
+
+        if((bigRecyclerViewLayout!=null)&&(bigRecyclerView!=null)&&(parentBigCameraGroupCall!=null)){
+            RelativeLayout.LayoutParams bigRecyclerViewParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            bigRecyclerViewParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+            bigRecyclerViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.parent_layout_big_camera_group_call);
+            bigRecyclerViewParams.addRule(RelativeLayout.BELOW, 0);
+            bigRecyclerViewLayout.setLayoutParams(bigRecyclerViewParams);
+            bigRecyclerViewLayout.requestLayout();
+        }
+
     }
 
     public void updateLocalVideoStatus(){
@@ -3132,9 +3257,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
+                    bigRecyclerViewLayout.setVisibility(GONE);
+
                     parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
-
+                    recyclerViewLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.VISIBLE);
                     if(peersOnCall.size()< 4){
                         recyclerViewLayout.setPadding(0,0,0,0);
@@ -3176,8 +3303,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     recyclerView.setAdapter(null);
                     recyclerView.setVisibility(View.GONE);
+                    recyclerViewLayout.setVisibility(View.GONE);
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
+                    bigRecyclerViewLayout.setVisibility(GONE);
+
                     parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
                 }
@@ -3191,9 +3321,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
+                recyclerViewLayout.setVisibility(View.GONE);
                 parentBigCameraGroupCall.setOnClickListener(this);
                 parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
+                bigRecyclerViewLayout.setVisibility(View.VISIBLE);
                 bigRecyclerView.setVisibility(View.VISIBLE);
 
                 if(adapterList == null){
@@ -3247,9 +3379,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
+                    bigRecyclerViewLayout.setVisibility(GONE);
+
                     parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
 
+                    recyclerViewLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.VISIBLE);
                     if(peersBeforeCall.size()< 4){
                         recyclerViewLayout.setPadding(0,0,0,0);
@@ -3284,8 +3419,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     recyclerView.setAdapter(null);
                     recyclerView.setVisibility(GONE);
+                    recyclerViewLayout.setVisibility(View.GONE);
+
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
+                    bigRecyclerViewLayout.setVisibility(GONE);
+
                     parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
                 }
@@ -3299,9 +3438,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
+                recyclerViewLayout.setVisibility(View.GONE);
+
                 parentBigCameraGroupCall.setOnClickListener(this);
                 parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
+                bigRecyclerViewLayout.setVisibility(View.VISIBLE);
                 bigRecyclerView.setVisibility(View.VISIBLE);
                 if(adapterList==null){
                     log("(7 +) incoming call - create adapter");
@@ -3526,7 +3668,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void createBigFragment(Long handle){
         log("createBigFragment()");
 
-        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
         //Remove big Camera
         if(bigCameraGroupCallFragment != null){
@@ -3546,22 +3687,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             ftFS.commitNowAllowingStateLoss();
         }
         fragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
-
+        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
         //Remove Avatar
         avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
     }
 
     public void createBigAvatar(Long handle, String fullName){
         log("createBigAvatar()");
-
-        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
-
-        //Create Avatar
-        avatarBigCameraGroupCallLayout.setVisibility(View.VISIBLE);
-        if(!handle.equals(megaChatApi.getMyUserHandle())){
-            setProfileContactAvatarGroupCall(handle,fullName);
-        }
-
         //Remove big Camera
         if (bigCameraGroupCallFragment != null) {
             log("REMOVE bigCameraGroupCallFragment");
@@ -3570,7 +3702,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
         }
+
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
+
+        //Create Avatar
+        avatarBigCameraGroupCallImage.setImageBitmap(null);
+        setProfileContactAvatarGroupCall(handle,fullName);
+        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+        avatarBigCameraGroupCallLayout.setVisibility(View.VISIBLE);
     }
 
     public void setProfileContactAvatarGroupCall(long userHandle,  String fullName){

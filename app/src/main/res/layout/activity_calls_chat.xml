@@ -8,6 +8,7 @@
     android:id="@+id/file_info_fragment_container"
     android:fitsSystemWindows="true"
     android:keepScreenOn="true"
+    android:background="@color/black"
     tools:context=".lollipop.megachat.calls.ChatCallActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -27,6 +28,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/black">
 
+                    <!--Layout Cameras in Group call (1 - 6)-->
                     <RelativeLayout
                         android:id="@+id/rl_recycler_view"
                         android:layout_width="match_parent"
@@ -57,10 +59,8 @@
                         android:id="@+id/parent_layout_big_camera_group_call"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:layout_centerVertical="true"
+                        android:layout_marginTop="96dp"
                         android:layout_centerHorizontal="true"
-                        android:layout_above="@+id/big_recycler_view_cameras"
                         android:background="@android:color/transparent"
                         android:visibility="gone">
 
@@ -124,21 +124,26 @@
                             android:background="@android:color/transparent"
                             android:visibility="gone"
                             android:src="@drawable/ic_mic_off_contact"/>
+                    </RelativeLayout>
+                    <!--RecyclerView (7 + users)-->
+
+                    <RelativeLayout
+                        android:id="@+id/rl_big_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:background="@android:color/transparent"
+                        android:visibility="gone">
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/big_recycler_view_cameras"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"/>
 
                     </RelativeLayout>
 
-                    <!--RecyclerView (7 + users)-->
-                     <android.support.v7.widget.RecyclerView
-                         android:id="@+id/big_recycler_view_cameras"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:layout_alignParentBottom="true"
-                         android:layout_alignParentLeft="true"
-                         android:layout_marginBottom="94dp"
-                         android:orientation="horizontal"
-                         android:visibility="gone"/>
-
                 </RelativeLayout>
+
             <!--End layout for group calls-->
 
             <!-- Background -->
@@ -271,7 +276,6 @@
 
             </android.support.v7.widget.Toolbar>
 
-
             <RelativeLayout
                 android:id="@+id/small_elements_individual_call"
                 android:layout_width="match_parent"
@@ -334,23 +338,24 @@
                 android:id="@+id/linear_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:background="@android:color/transparent">
 
                 <RelativeLayout
                     android:id="@+id/relative_answer_call_fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="bottom"
+                    android:layout_width="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
-                    android:gravity="bottom"
+                    android:gravity="bottom|center_horizontal"
                     android:background="@android:color/transparent">
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/answer_call_fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="bottom"
                         android:layout_marginBottom="24dp"
-                        android:layout_marginTop="12dp"
                         android:layout_below="@+id/linear_arrow_call"
                         android:scaleType="center"
                         android:src="@drawable/ic_phone_white"
@@ -362,12 +367,12 @@
 
                     <LinearLayout
                         android:id="@+id/linear_arrow_call"
-                        android:layout_width="wrap_content"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:orientation="vertical"
-                        android:gravity="bottom"
-                        android:visibility="visible"
+                        android:gravity="bottom|center_horizontal"
+                        android:visibility="gone"
                         android:background="@android:color/transparent">
                         <ImageView
                             android:id="@+id/first_arrow_call"
@@ -403,19 +408,19 @@
 
                 <RelativeLayout
                     android:id="@+id/relative_video_fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="bottom"
+                    android:layout_width="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
-                    android:gravity="bottom"
+                    android:gravity="bottom|center_horizontal"
                     android:background="@android:color/transparent">
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/video_fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="bottom"
                         android:layout_marginBottom="24dp"
-                        android:layout_marginTop="12dp"
                         android:layout_below="@+id/linear_arrow_video"
                         android:scaleType="center"
                         android:src="@drawable/ic_videocam_white"
@@ -427,13 +432,14 @@
 
                     <LinearLayout
                         android:id="@+id/linear_arrow_video"
-                        android:layout_width="wrap_content"
+                        android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:orientation="vertical"
-                        android:gravity="bottom"
+                        android:gravity="bottom|center_horizontal"
                         android:visibility="gone"
                         android:background="@android:color/transparent">
+
                         <ImageView
                             android:id="@+id/first_arrow_video"
                             android:layout_width="wrap_content"
@@ -468,8 +474,8 @@
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/micro_fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="24dp"
                     android:layout_marginRight="36dp"
@@ -483,8 +489,8 @@
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/hang_fab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="24dp"
                     android:scaleType="center"
