@@ -146,6 +146,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     TextView subtitleToobar;
     LinearLayout linearParticipants;
     TextView participantText;
+    TextView infoUsersBar;
 
     ActionBar aB;
     boolean avatarRequested = false;
@@ -814,6 +815,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         linearParticipants.setVisibility(View.GONE);
 
 
+
         myChrono = new Chronometer(context);
 
         smallElementsIndividualCallLayout = (RelativeLayout) findViewById(R.id.small_elements_individual_call);
@@ -830,11 +832,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         linearFAB.requestLayout();
         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
+        infoUsersBar = (TextView) findViewById(R.id.info_users_bar);
+        infoUsersBar.setVisibility(GONE);
+
         isManualMode = false;
 
         relativeCall = (RelativeLayout) findViewById(R.id.relative_answer_call_fab);
-        relativeCall.getLayoutParams().width = Util.scaleWidthPx(48, outMetrics) ;
-        relativeCall.getLayoutParams().height = RelativeLayout.LayoutParams.MATCH_PARENT;
         relativeCall.requestLayout();
         relativeCall.setVisibility(GONE);
 
@@ -846,11 +849,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         fourArrowCall = (ImageView) findViewById(R.id.four_arrow_call);
 
         relativeVideo = (RelativeLayout) findViewById(R.id.relative_video_fab);
-        relativeVideo.getLayoutParams().width = Util.scaleWidthPx(48, outMetrics) ;
-        relativeVideo.getLayoutParams().height = RelativeLayout.LayoutParams.MATCH_PARENT;
         relativeVideo.requestLayout();
         relativeVideo.setVisibility(GONE);
-
 
         linearArrowVideo = (LinearLayout) findViewById(R.id.linear_arrow_video);
         linearArrowVideo.setVisibility(GONE);
@@ -1951,6 +1951,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+userPeer.getHandle()+" added");
                                     updateSubTitle();
                                     peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
+                                    infoUsersBar.setText(userPeer.getName()+" "+getString(R.string.contact_joined_the_call));
+                                    infoUsersBar.setAlpha(1);
+                                    infoUsersBar.setVisibility(View.VISIBLE);
+                                    infoUsersBar.animate().alpha(0).setDuration(3000);
 
                                     if (peersOnCall.size() < 7) {
                                         if (adapterGrid != null) {
@@ -2025,7 +2029,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                             if (!peerContained) {
                                 log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+peersOnCall.get(i).getHandle()+" removed");
+                                infoUsersBar.setText(peersOnCall.get(i).getName()+" "+getString(R.string.contact_left_the_call));
+                                infoUsersBar.setAlpha(1);
+                                infoUsersBar.setVisibility(View.VISIBLE);
+                                infoUsersBar.animate().alpha(0).setDuration(3000);
                                 peersOnCall.remove(i);
+
                                 if (peersOnCall.size() < 7) {
 
                                     if (adapterGrid != null) {
@@ -2396,9 +2405,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 linearArrowVideo.setVisibility(View.VISIBLE);
                 videoFAB.startAnimation(shake);
-
-
-
 
                 animationAlphaArrows(fourArrowVideo);
                 handlerArrow1 = new Handler();

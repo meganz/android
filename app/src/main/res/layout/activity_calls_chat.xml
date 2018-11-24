@@ -53,7 +53,6 @@
                             android:stretchMode="columnWidth"/>
                     </RelativeLayout>
 
-
                     <!--Layout big Camera in Group call (7 + users)-->
                     <RelativeLayout
                         android:id="@+id/parent_layout_big_camera_group_call"
@@ -276,6 +275,20 @@
 
             </android.support.v7.widget.Toolbar>
 
+            <TextView
+                android:id="@+id/info_users_bar"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@+id/call_toolbar"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                android:background="@color/accentColor"
+                android:visibility="gone">
+            </TextView>
+
             <RelativeLayout
                 android:id="@+id/small_elements_individual_call"
                 android:layout_width="match_parent"
@@ -344,7 +357,7 @@
                 <RelativeLayout
                     android:id="@+id/relative_answer_call_fab"
                     android:layout_width="48dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
                     android:gravity="bottom|center_horizontal"
@@ -409,7 +422,7 @@
                 <RelativeLayout
                     android:id="@+id/relative_video_fab"
                     android:layout_width="48dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
                     android:gravity="bottom|center_horizontal"
