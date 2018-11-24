@@ -1954,7 +1954,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     infoUsersBar.setText(userPeer.getName()+" "+getString(R.string.contact_joined_the_call));
                                     infoUsersBar.setAlpha(1);
                                     infoUsersBar.setVisibility(View.VISIBLE);
-                                    infoUsersBar.animate().alpha(0).setDuration(3000);
+                                    infoUsersBar.animate().alpha(0).setDuration(4000);
 
                                     if (peersOnCall.size() < 7) {
                                         if (adapterGrid != null) {
@@ -2032,7 +2032,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 infoUsersBar.setText(peersOnCall.get(i).getName()+" "+getString(R.string.contact_left_the_call));
                                 infoUsersBar.setAlpha(1);
                                 infoUsersBar.setVisibility(View.VISIBLE);
-                                infoUsersBar.animate().alpha(0).setDuration(3000);
+                                infoUsersBar.animate().alpha(0).setDuration(4000);
                                 peersOnCall.remove(i);
 
                                 if (peersOnCall.size() < 7) {
