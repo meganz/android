@@ -356,7 +356,7 @@
 
                 <RelativeLayout
                     android:id="@+id/relative_answer_call_fab"
-                    android:layout_width="48dp"
+                    android:layout_width="54dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
@@ -365,8 +365,8 @@
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/answer_call_fab"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
                         android:layout_gravity="bottom"
                         android:layout_marginBottom="24dp"
                         android:layout_below="@+id/linear_arrow_call"
@@ -380,7 +380,7 @@
 
                     <LinearLayout
                         android:id="@+id/linear_arrow_call"
-                        android:layout_width="48dp"
+                        android:layout_width="54dp"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:orientation="vertical"
@@ -421,7 +421,7 @@
 
                 <RelativeLayout
                     android:id="@+id/relative_video_fab"
-                    android:layout_width="48dp"
+                    android:layout_width="54dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
@@ -430,8 +430,8 @@
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/video_fab"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
                         android:layout_gravity="bottom"
                         android:layout_marginBottom="24dp"
                         android:layout_below="@+id/linear_arrow_video"
@@ -445,7 +445,7 @@
 
                     <LinearLayout
                         android:id="@+id/linear_arrow_video"
-                        android:layout_width="48dp"
+                        android:layout_width="54dp"
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:orientation="vertical"
@@ -487,8 +487,8 @@
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/micro_fab"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="24dp"
                     android:layout_marginRight="36dp"
@@ -502,8 +502,8 @@
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/hang_fab"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="24dp"
                     android:scaleType="center"
