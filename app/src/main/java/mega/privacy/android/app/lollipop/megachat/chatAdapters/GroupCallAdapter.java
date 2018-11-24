@@ -114,6 +114,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         RoundedImageView avatarImage;
         ImageView microAvatar;
         ImageView microSurface;
+        RelativeLayout qualityLayout;
+        RelativeLayout qualityIcon;
         TextView avatarInitialLetter;
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
@@ -168,7 +170,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         holderGrid.microAvatar = (ImageView) v.findViewById(R.id.micro_avatar);
         holderGrid.microSurface = (ImageView) v.findViewById(R.id.micro_surface_view);
-
+        holderGrid.qualityLayout = (RelativeLayout) v.findViewById(R.id.rl_quality);
+        holderGrid.qualityIcon = (RelativeLayout) v.findViewById(R.id.quality_icon);
         holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
         holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
 
@@ -270,6 +273,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
+                RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityLayout.getLayoutParams());
+                paramsQualityLayout.height = maxScreenWidth;
+                paramsQualityLayout.width = maxScreenWidth;
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_LEFT, R.id.parent_surface_view);
+                holder.qualityLayout.setLayoutParams(paramsQualityLayout);
+
             }else if(numPeersOnCall == 2){
 
                 //Surface Layout:
@@ -282,6 +292,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
+                RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityLayout.getLayoutParams());
+                paramsQualityLayout.height = maxScreenHeight/numPeersOnCall;
+                paramsQualityLayout.width = maxScreenHeight/numPeersOnCall;
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_LEFT, R.id.parent_surface_view);
+                holder.qualityLayout.setLayoutParams(paramsQualityLayout);
+
             }else if(numPeersOnCall == 3){
 
                 //Surface Layout:
@@ -293,6 +310,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
+
+                RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityLayout.getLayoutParams());
+                paramsQualityLayout.height = maxScreenHeight/numPeersOnCall;
+                paramsQualityLayout.width = maxScreenHeight/numPeersOnCall;
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_LEFT, R.id.parent_surface_view);
+                holder.qualityLayout.setLayoutParams(paramsQualityLayout);
 
             }else if(numPeersOnCall == 4){
 
@@ -310,6 +334,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
+                RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityLayout.getLayoutParams());
+                paramsQualityLayout.height = maxScreenWidth/2;
+                paramsQualityLayout.width = maxScreenWidth/2;
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_LEFT, R.id.parent_surface_view);
+                holder.qualityLayout.setLayoutParams(paramsQualityLayout);
+
             }else if(numPeersOnCall == 5){
 
                 //Surface Layout:
@@ -321,6 +352,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
 
+                RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityLayout.getLayoutParams());
+                paramsQualityLayout.height = maxScreenWidth/2;
+                paramsQualityLayout.width = maxScreenWidth/2;
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_LEFT, R.id.parent_surface_view);
+                holder.qualityLayout.setLayoutParams(paramsQualityLayout);
+
             }else if(numPeersOnCall == 6){
 
                 //Surface Layout:
@@ -331,6 +369,13 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
                 layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
                 holder.parentSurfaceView.setLayoutParams(layoutParamsSurface);
+
+                RelativeLayout.LayoutParams paramsQualityLayout = new RelativeLayout.LayoutParams(holder.qualityLayout.getLayoutParams());
+                paramsQualityLayout.height = maxScreenWidth/2;
+                paramsQualityLayout.width = maxScreenWidth/2;
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
+                paramsQualityLayout.addRule(RelativeLayout.ALIGN_LEFT, R.id.parent_surface_view);
+                holder.qualityLayout.setLayoutParams(paramsQualityLayout);
             }
 
             //Listener && SurfaceView
@@ -491,6 +536,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                 holder.microSurface.setLayoutParams(paramsMicroSurface);
+
+                RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
+                paramsQuality.height = Util.scaleWidthPx(24, outMetrics);
+                paramsQuality.width = Util.scaleWidthPx(24, outMetrics);
+                paramsQuality.setMargins(Util.scaleWidthPx(15, outMetrics), 0,  0, Util.scaleWidthPx(15, outMetrics));
+                paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT,  RelativeLayout.TRUE);
+                holder.qualityIcon.setLayoutParams(paramsQuality);
             }else{
                 RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
                 paramsMicroSurface.height = Util.scaleWidthPx(15, outMetrics);
@@ -499,6 +552,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, R.id.parent_surface_view);
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                 holder.microSurface.setLayoutParams(paramsMicroSurface);
+
+                RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
+                paramsQuality.height = Util.scaleWidthPx(20, outMetrics);
+                paramsQuality.width = Util.scaleWidthPx(20, outMetrics);
+                paramsQuality.setMargins(Util.scaleWidthPx(7, outMetrics), 0,  0, Util.scaleWidthPx(7, outMetrics));
+                paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT,  RelativeLayout.TRUE);
+                holder.qualityIcon.setLayoutParams(paramsQuality);
             }
 
             if(peer.isAudioOn()){
@@ -508,6 +569,16 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     holder.microSurface.setVisibility(View.VISIBLE);
                 }else{
                     holder.microSurface.setVisibility(View.GONE);
+                }
+            }
+
+            if(peer.isGoodQuality()){
+                holder.qualityLayout.setVisibility(View.GONE);
+            }else{
+                if(isCallInProgress) {
+                    holder.qualityLayout.setVisibility(View.VISIBLE);
+                }else{
+                    holder.qualityLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -537,6 +608,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }else{
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
+            holder.qualityLayout.setVisibility(GONE);
 
             //Remove SurfaceView && Listener:
             holder.surfaceMicroLayout.setVisibility(GONE);
@@ -829,6 +901,48 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
     public void setListFragment(RecyclerView recyclerViewFragment) {
         this.recyclerViewFragment = recyclerViewFragment;
+    }
+
+    public void changesInQuality(int position, ViewHolderGroupCall holder){
+
+        if(holder == null){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+        }
+        if(holder!=null){
+            InfoPeerGroupCall peer = getNodeAt(position);
+            if (peer == null){
+                return;
+            }
+
+            if(peer.isGoodQuality()){
+                holder.qualityLayout.setVisibility(View.GONE);
+            }else{
+                if(peer.isVideoOn()){
+                    if(peers.size() < 7){
+                        RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
+                        paramsQuality.height = Util.scaleWidthPx(24, outMetrics);
+                        paramsQuality.width = Util.scaleWidthPx(24, outMetrics);
+                        paramsQuality.setMargins(Util.scaleWidthPx(15, outMetrics), 0,  0, Util.scaleWidthPx(15, outMetrics));
+                        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT,  RelativeLayout.TRUE);
+                        holder.qualityIcon.setLayoutParams(paramsQuality);
+                    }else{
+                        RelativeLayout.LayoutParams paramsQuality = new RelativeLayout.LayoutParams(holder.qualityIcon.getLayoutParams());
+                        paramsQuality.height = Util.scaleWidthPx(20, outMetrics);
+                        paramsQuality.width = Util.scaleWidthPx(20, outMetrics);
+                        paramsQuality.setMargins(Util.scaleWidthPx(7, outMetrics), 0,  0, Util.scaleWidthPx(7, outMetrics));
+                        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                        paramsQuality.addRule(RelativeLayout.ALIGN_PARENT_LEFT,  RelativeLayout.TRUE);
+                        holder.qualityIcon.setLayoutParams(paramsQuality);
+                    }
+                    holder.qualityLayout.setVisibility(View.VISIBLE);
+                }else{
+                    holder.qualityLayout.setVisibility(View.GONE);
+                }
+            }
+        }else{
+            notifyItemChanged(position);
+        }
     }
 
     public void changesInAudio(int position, ViewHolderGroupCall holder){

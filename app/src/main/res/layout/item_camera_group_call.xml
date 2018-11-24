@@ -35,10 +35,32 @@
             android:background="@android:color/transparent"
             android:visibility="gone"
             android:src="@drawable/ic_mic_off_contact"/>
+        <RelativeLayout
+            android:id="@+id/rl_quality"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent_black2"
+            android:visibility="gone">
+            <RelativeLayout
+                android:id="@+id/quality_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/rl_icon_quality"
+                android:padding="6dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/icon_quality"/>
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+
 
     </RelativeLayout>
-
-
 
     <RelativeLayout
         android:id="@+id/layout_avatar_micro"

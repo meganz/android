@@ -13,8 +13,9 @@ public class InfoPeerGroupCall {
     boolean audioOn;
     boolean greenLayer;
     GroupCallListener listener = null;
+    boolean goodQuality = true;
 
-public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, boolean greenLayer, GroupCallListener listener) {
+public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
 
     this.handle = handle;
     this.name = name;
@@ -22,6 +23,7 @@ public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audi
     this.audioOn = audioOn;
     this.greenLayer = greenLayer;
     this.listener = listener;
+    this.goodQuality = goodQuality;
 }
 
     public Long getHandle() {
@@ -54,6 +56,14 @@ public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audi
 
     public void setAudioOn(boolean audioOn) {
         this.audioOn = audioOn;
+    }
+
+    public boolean isGoodQuality() {
+        return goodQuality;
+    }
+
+    public void setGoodQuality(boolean goodQuality) {
+        this.goodQuality = goodQuality;
     }
 
     public boolean hasGreenLayer() {
