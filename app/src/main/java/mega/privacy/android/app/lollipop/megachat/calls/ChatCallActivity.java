@@ -317,8 +317,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(chat.isGroup()){
             log("updateScreenStatusInProgress() - group chat - chatId: "+chatId);
 
-
-
             if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
                 peersBeforeCall.clear();
             }
@@ -395,8 +393,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
             }
-            updateLocalVideoStatus();
-            updateLocalAudioStatus();
+
+            for(int i=0; i<peersOnCall.size(); i++){
+                if(peersOnCall.get(i).getHandle() == megaChatApi.getMyUserHandle()){
+                    updateLocalVideoStatus();
+                    updateLocalAudioStatus();
+                }else{
+                    updateRemoteVideoStatus(peersOnCall.get(i).getHandle());
+                    updateRemoteAudioStatus(peersOnCall.get(i).getHandle());
+                }
+
+            }
 
 
         }else{
@@ -1585,12 +1592,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 if(request.getFlag()==true){
                     log("Ok answer with video");
-//                    updateLocalVideoStatus();
-
-                }
-                else{
+                }else{
                     log("Ok answer with NO video - ");
-//                    updateLocalVideoStatus();
                 }
                 updateLocalVideoStatus();
                 updateLocalAudioStatus();
@@ -1690,8 +1693,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 peersOnCall.add(myPeer);
                                 updatePeers(true);
                             }
-
-
+                            updateLocalVideoStatus();
+                            updateLocalAudioStatus();
 
                         }else{
                             log("CALL_STATUS_IN_PROGRESS - Individual call");
@@ -1824,6 +1827,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                             log("SESSION_STATUS_IN_PROGRESS");
 
+                            updateRemoteVideoStatus(userHandle);
+                            updateRemoteAudioStatus(userHandle);
+
                             updateSubTitle();
                             //contact joined the group call
                             log(chat.getPeerFullnameByHandle(userHandle)+" joined in the group call");
@@ -1835,11 +1841,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             //contact left the group call
                             log(chat.getPeerFullnameByHandle(userHandle)+" left the group call");
                         }
-
-                        updateRemoteVideoStatus(userHandle);
-                        updateRemoteAudioStatus(userHandle);
-                        updateLocalVideoStatus();
-                        updateLocalAudioStatus();
                     }
                 }else{
                     log("onChatCallUpdate() - CHANGE_TYPE_SESSION_STATUS");
@@ -1992,6 +1993,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 }
                                             }
 
+
                                         }else{
                                             updatePeers(true);
                                         }
@@ -2009,6 +2011,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                                 updateUserSelected(true);
                                                 updateSubtitleToolbar();
                                             }
+
                                         } else {
                                             log("(7 +)COMPOSITION IN PROGRESS, updatePeers");
                                             updatePeers(true);
@@ -2641,7 +2644,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             log("is group");
             if(callChat !=null){
                 if (callChat.hasLocalVideo()) {
-                    log("Video local connected");
                     videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                     videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
                     if ((peersOnCall != null)&& (peersOnCall.size()!=0)) {
@@ -2675,7 +2677,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         int position = peersOnCall.size()-1;
                         InfoPeerGroupCall item = peersOnCall.get(position);
                         if(item.isVideoOn()){
-                            log("remove Local Video fot "+peersOnCall.get(position).getName());
+                            log("desactivate Local Video fot "+peersOnCall.get(position).getName());
                             item.setVideoOn(false);
                             if(peersOnCall.size()<7){
                                 if(adapterGrid!=null){
@@ -2852,10 +2854,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         log("userHandle: "+userHandle+" VS i: "+peersOnCall.get(i).getHandle()+" ("+peersOnCall.get(i).getName()+")");
                         if(peersOnCall.get(i).getHandle() == userHandle){
                             if(!peersOnCall.get(i).isVideoOn()){
-                                log("B "+peersOnCall.get(i).getName());
+                                log("updateRemoteVideo()- "+peersOnCall.get(i).getName()+" Connected video");
                                 peersOnCall.get(i).setVideoOn(true);
                                 updateSubtitleToolbar();
-                                log("updateRemoteVideo "+peersOnCall.get(i).getName()+" Connected video");
                                 if(peersOnCall.size()<7){
                                     if(adapterGrid!=null){
                                         adapterGrid.notifyItemChanged(i);
@@ -2910,8 +2911,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         if(peersOnCall.get(i).getHandle() == userHandle){
                             if(peersOnCall.get(i).isVideoOn()){
                                 peersOnCall.get(i).setVideoOn(false);
+                                log("updateRemoteVideo()- "+peersOnCall.get(i).getName()+" Disconnected video");
                                 updateSubtitleToolbar();
-                                log("updateRemoteVideo "+peersOnCall.get(i).getName()+" Disconnected video");
                                 if(peersOnCall.size()<7){
                                     if(adapterGrid!=null){
                                         adapterGrid.notifyItemChanged(i);
@@ -2952,8 +2953,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             }
                                         }
                                     }
-
-
                                 }
 
                                 break;
@@ -3499,17 +3498,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
                 updateUserSelected(flag);
             }
-            isNecessaryCreateAdapter = false;
-            for(int i=0; i<peersOnCall.size(); i++){
-                if(peersOnCall.get(i).getHandle() == megaChatApi.getMyUserHandle()){
-                    updateLocalVideoStatus();
-                    updateLocalAudioStatus();
-                }else{
-                    updateRemoteVideoStatus(peersOnCall.get(i).getHandle());
-                    updateRemoteAudioStatus(peersOnCall.get(i).getHandle());
-                }
 
-            }
+            isNecessaryCreateAdapter = false;
 
         }else{
 
