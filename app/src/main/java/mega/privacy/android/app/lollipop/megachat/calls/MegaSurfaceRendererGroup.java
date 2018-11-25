@@ -113,7 +113,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        log("****+ surfaceCreated()");
+        log("surfaceCreated()");
         Canvas canvas = holder.lockCanvas();
         if(canvas != null) {
             Rect dst = holder.getSurfaceFrame();
@@ -157,7 +157,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        log("************* surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
+        log("surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
         byteBuffer = null;
