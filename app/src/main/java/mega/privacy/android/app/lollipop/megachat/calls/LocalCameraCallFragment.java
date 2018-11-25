@@ -129,7 +129,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
                 ((ViewGroup)localSurfaceView.getParent()).removeView(localSurfaceView);
             }
         }
-
+        localSurfaceView.setVisibility(View.GONE);
         log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, -1, this);
         super.onDestroy();
@@ -139,6 +139,8 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         log("onResume()");
         this.width=0;
         this.height=0;
+        localSurfaceView.setVisibility(View.VISIBLE);
+
         super.onResume();
     }
     public void removeSurfaceView(){
@@ -149,6 +151,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
                 ((ViewGroup)localSurfaceView.getParent()).removeView(localSurfaceView);
             }
         }
+        localSurfaceView.setVisibility(View.GONE);
         log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(this.chatId, -1, this);
     }
