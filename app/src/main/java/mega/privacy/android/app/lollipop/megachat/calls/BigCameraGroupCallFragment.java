@@ -144,6 +144,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                 ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
             }
         }
+        fullScreenSurfaceView.setVisibility(View.GONE);
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, -1, this);
@@ -158,6 +159,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         log("onResume");
         this.width=0;
         this.height=0;
+        fullScreenSurfaceView.setVisibility(View.VISIBLE);
+
         super.onResume();
     }
 
@@ -169,6 +172,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                 ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
             }
         }
+        fullScreenSurfaceView.setVisibility(View.GONE);
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, -1, this);

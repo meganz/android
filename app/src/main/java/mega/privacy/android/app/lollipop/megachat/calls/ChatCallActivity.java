@@ -28,6 +28,10 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -299,7 +303,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onOptionsItemSelected");
 
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
@@ -346,9 +349,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 peersOnCall.add(myPeer);
                                 changes = true;
                             }
-
                         }
-
                     }
                     for (int i = 0; i < peersOnCall.size(); i++) {
                         boolean peerContained = false;
@@ -368,7 +369,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(changes){
                         updatePeers(true);
                     }
-
                 }else{
                     boolean changes = false;
                     for(int i = 0; i < callChat.getParticipants().size(); i++){
@@ -385,8 +385,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             peersOnCall.add(myPeer);
                             changes = true;
                         }
-
-
                     }
                     if(changes){
                         updatePeers(true);
@@ -402,10 +400,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateRemoteVideoStatus(peersOnCall.get(i).getHandle());
                     updateRemoteAudioStatus(peersOnCall.get(i).getHandle());
                 }
-
             }
-
-
         }else{
             log("updateScreenStatusInProgress() - individual chat - chatId: "+chatId);
             callChat = megaChatApi.getChatCall(chatId);
@@ -1421,6 +1416,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void onPause(){
         log("onPause");
         mSensorManager.unregisterListener(this);
+
         super.onPause();
     }
 
@@ -2151,7 +2147,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                             int qualityLevel =  userSession.getNetworkQuality();
                             if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                                if(qualityLevel < 3){
+                                if(qualityLevel < 2){
                                     //bad quality
 
                                     for(int i=0; i<peersOnCall.size(); i++){
@@ -2897,7 +2893,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                             }
                                         }
                                     }
-
                                 }
                                 break;
                             }
@@ -3972,4 +3967,5 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             handlerArrow6.removeCallbacksAndMessages(null);
         }
     }
+
 }

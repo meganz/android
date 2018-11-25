@@ -8,6 +8,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -1112,6 +1116,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                             }
                         }
                     }
+                    peer.getListener().getSurfaceView().setVisibility(GONE);
                     peer.setListener(null);
                 }
 
@@ -1124,6 +1129,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
 
     }
+
+
+
 
     public ArrayList<InfoPeerGroupCall> getPeers() {
         return peers;

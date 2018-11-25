@@ -143,6 +143,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
             }
         }
         log("onDestroy() removeChatVideoListener (REMOTE) chatId: "+chatId);
+        remoteFullScreenSurfaceView.setVisibility(View.GONE);
         megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         super.onDestroy();
     }
@@ -152,6 +153,8 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         log("onResume");
         this.width=0;
         this.height=0;
+        remoteFullScreenSurfaceView.setVisibility(View.VISIBLE);
+
         super.onResume();
     }
 
@@ -163,6 +166,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
                 ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
             }
         }
+        remoteFullScreenSurfaceView.setVisibility(View.GONE);
         log("removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, userHandle, this);
     }
