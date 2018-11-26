@@ -35,7 +35,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -70,6 +69,7 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -102,9 +102,7 @@ import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
-import android.provider.CallLog;
-
-public class ChatCallActivity extends AppCompatActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
+public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -230,15 +228,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
 
+        boolean returnValue = super.onCreateOptionsMenu(menu);
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_calls_chat, menu);
 
-        return super.onCreateOptionsMenu(menu);
+        return returnValue;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         log("onPrepareOptionsMenu");
+
+        boolean returnValue = super.onPrepareOptionsMenu(menu);
 
         remoteAudioIcon = menu.findItem(R.id.info_remote_audio);
         if(callChat!=null){
@@ -257,7 +259,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         remoteAudioIcon.setEnabled(false);
 
-        return super.onPrepareOptionsMenu(menu);
+        return returnValue;
     }
 
 
@@ -1378,6 +1380,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onClick(View v) {
         log("onClick");
+
+        super.onClick(v);
 
         switch (v.getId()) {
             case R.id.video_fab:{
