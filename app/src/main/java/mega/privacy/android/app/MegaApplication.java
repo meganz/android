@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.TestActivity;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -1668,18 +1669,20 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	public void launchCallActivity(MegaChatCall call){
-		log("launchCallActivity: "+call.getStatus());
-		MegaApplication.setShowPinScreen(false);
-
-		Intent i = new Intent(this, ChatCallActivity.class);
-		i.putExtra("chatHandle", call.getChatid());
-		i.putExtra("callId", call.getId());
-		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-		startActivity(i);
-
-		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-		log("Launch call: "+chatRoom.getTitle());
+//		log("launchCallActivity: "+call.getStatus());
+//		MegaApplication.setShowPinScreen(false);
+//
+//		Intent i = new Intent(this, ChatCallActivity.class);
+//		i.putExtra("chatHandle", call.getChatid());
+//		i.putExtra("callId", call.getId());
+//		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+////            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//		startActivity(i);
+//
+//		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+//		log("Launch call: "+chatRoom.getTitle());
+        Intent i = new Intent(this, TestActivity.class);
+        startActivity(i);
 
 	}
 

@@ -17,10 +17,14 @@ public class TL {
 
     private final static boolean OUTPUT = true;
 
-    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator +
+//    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator +
+//            "MEGA"+ File.separator +
+//            "MEGA Logs"+ File.separator +
+//            "test_log.txt";
+    private static final String LOG_PATH = Environment.getExternalStorageDirectory() + File.separator +
             "MEGA"+ File.separator +
-            "MEGA Logs"+ File.separator +
-            "test_log.txt";
+            "MEGA Logs";
+    private static final String FILE_NAME = "test_log.txt";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd HH:mm:ss.SSS");
 
@@ -35,12 +39,17 @@ public class TL {
             }
         }
         if (OUTPUT) {
-            File log = new File(LOG_FILE);
+            File log = new File(LOG_PATH);
             try {
                 if (!log.exists()) {
-                    log.createNewFile();
+                    log.mkdir();
                 }
-                FileWriter writer = new FileWriter(LOG_FILE,true);
+                
+                File logFile = new File(LOG_PATH + File.separator + FILE_NAME);
+                if (!logFile.exists()){
+                    logFile.createNewFile();
+                }
+                FileWriter writer = new FileWriter(LOG_PATH + File.separator + FILE_NAME,true);
                 writer.write(msg + "\n");
                 writer.close();
             } catch (Exception e) {

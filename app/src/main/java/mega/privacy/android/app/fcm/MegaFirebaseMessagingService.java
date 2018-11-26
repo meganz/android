@@ -17,17 +17,24 @@ package mega.privacy.android.app.fcm;
  */
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import junit.framework.Test;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -35,9 +42,11 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -171,8 +180,29 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If true - wait until connection finish
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
-                    startService(new Intent(this,IncomingCallService.class));
-                    //                    String gSession = credentials.getSession();
+                    WifiManager.WifiLock lock;
+                    PowerManager.WakeLock wl;
+                    int wifiLockMode = WifiManager.WIFI_MODE_FULL;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                        wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
+                    }
+    
+                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
+                    PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                    wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MegaDownloadServicePowerLock:");
+                    
+                    if(!wl.isHeld()){
+                        log("wifi lock acquired");
+                        wl.acquire();
+                    }
+                    if(!lock.isHeld()){
+                        log("wake lock acquired");
+                        lock.acquire();
+                    }
+                    launchCallActivity();
+                    //startService(new Intent(this,IncomingCallService.class));
+//                    String gSession = credentials.getSession();
 //
 //                    if (megaApi.getRootNode() == null) {
 //                        log("RootNode = null");
@@ -427,5 +457,12 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+    }
+    
+    
+    public void launchCallActivity( ){
+        Intent i = new Intent(this, TestActivity.class);
+        startActivity(i);
+        
     }
 }
