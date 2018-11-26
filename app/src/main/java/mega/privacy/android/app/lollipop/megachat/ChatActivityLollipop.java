@@ -1699,22 +1699,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if (permission == MegaChatRoom.PRIV_RO) {
                             clearHistoryMenuItem.setVisible(false);
                             contactInfoMenuItem.setVisible(false);
-                            //callMenuItem.setVisible(false);
-                            //videoMenuItem.setVisible(false);
+                            callMenuItem.setVisible(false);
+                            videoMenuItem.setVisible(false);
                         } else {
                             clearHistoryMenuItem.setVisible(true);
                             contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                             contactInfoMenuItem.setVisible(true);
-                            //callMenuItem.setVisible(true);
-                            //videoMenuItem.setVisible(true);
+
                         }
                         leaveMenuItem.setVisible(false);
                     }
                 }
             }
         }else{
-            log("***** J - Chatroom null");
-
             log("Chatroom NULL on create menu");
             leaveMenuItem.setVisible(false);
             callMenuItem.setVisible(false);
