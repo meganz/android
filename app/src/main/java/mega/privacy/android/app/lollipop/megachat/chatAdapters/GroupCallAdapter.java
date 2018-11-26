@@ -401,12 +401,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                 SurfaceView surfaceView = new SurfaceView(context);
                 surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-
-                if(numPeersOnCall<7){
-                    surfaceView.setZOrderMediaOverlay(true);
-                }else{
-                    surfaceView.setZOrderOnTop(true);
-                }
+                surfaceView.setZOrderMediaOverlay(true);
 
                 GroupCallListener listenerPeer = new GroupCallListener(context, surfaceView, peer.getHandle());
                 peer.setListener(listenerPeer);

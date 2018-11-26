@@ -72,7 +72,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
 
         fullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-        fullScreenSurfaceView.setZOrderMediaOverlay(true);
+        fullScreenSurfaceView.setSecure(true);
+
         SurfaceHolder localSurfaceHolder = fullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         renderer = new MegaSurfaceRendererGroup(fullScreenSurfaceView, userHandle);
@@ -118,8 +119,6 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                 }
             }
         }
-
-
 
         if (bitmap != null) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
@@ -183,6 +182,6 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     }
 
     private static void log(String log) {
-        Util.log("LocalCameraCallFullScreenFragment", log);
+        Util.log("BigCameraGroupCallFragment", log);
     }
 }
