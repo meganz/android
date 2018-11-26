@@ -181,4 +181,7 @@
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
+
+    <color name="permissions_image_background">#1A00BFA5</color>
+    <color name="permissions_image_adapter">#FFEEEEEE</color>
 </resources>
