@@ -866,9 +866,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onClick(View view) {
         log("onClick");
 
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
+        super.onClick(view);
 
         switch (view.getId()) {
 
