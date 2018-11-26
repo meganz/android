@@ -55,8 +55,6 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         this.userHandle = args.getLong("userHandle", -1);
-//        this.width = 0;
-//        this.height = 0;
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -156,10 +154,9 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     @Override
     public void onResume() {
         log("onResume");
-        this.width=0;
-        this.height=0;
+        this.width = 0;
+        this.height = 0;
         fullScreenSurfaceView.setVisibility(View.VISIBLE);
-
         super.onResume();
     }
 

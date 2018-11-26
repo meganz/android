@@ -1570,11 +1570,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onRequestFinish: "+request.getType());
 
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
+            log("onRequestFinish: TYPE_HANG_CHAT_CALL");
+
             MegaApplication.activityPaused();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 super.finishAndRemoveTask();
-            }
-            else {
+            }else {
                 super.finish();
             }
         }
