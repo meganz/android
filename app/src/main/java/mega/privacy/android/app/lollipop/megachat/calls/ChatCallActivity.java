@@ -2147,7 +2147,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                             int qualityLevel =  userSession.getNetworkQuality();
                             if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                                if(qualityLevel < 3){
+                                if(qualityLevel < 2){
                                     //bad quality
 
                                     for(int i=0; i<peersOnCall.size(); i++){
