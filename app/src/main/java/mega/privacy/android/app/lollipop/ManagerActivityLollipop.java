@@ -491,13 +491,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private CentiliFragmentLollipop ctFL;
 	private CreditCardFragmentLollipop ccFL;
 	private CameraUploadFragmentLollipop cuFL;
-
 	private RecentChatsFragmentLollipop rChatFL;
-
 	private NotificationsFragmentLollipop notificFragment;
-
 	private TurnOnNotificationsFragment tonF;
 	private ExportRecoveryKeyFragment eRKeyF;
+	private PermissionsFragment pF;
 
 	ProgressDialog statusDialog;
 
@@ -601,6 +599,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
+
+	private boolean askingPermissions = false;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1628,6 +1628,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
+		outState.putBoolean("askingPermissions", askingPermissions);
 	}
 
 	@Override
@@ -1685,6 +1686,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
+			askingPermissions = savedInstanceState.getBoolean("askingPermissions", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -2870,7 +2872,70 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
+
+		askForAccess();
+
 		log("END onCreate");
+	}
+
+	void askForAccess () {
+		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		if (currentFragment != null){
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+			getSupportFragmentManager().executePendingTransactions();
+		}
+
+		if (pF == null){
+			pF = new PermissionsFragment();
+		}
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, pF, "pF");
+		ft.commit();
+		getSupportFragmentManager().executePendingTransactions();
+
+		askingPermissions = true;
+
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
+		abL.setVisibility(View.GONE);
+
+		fragmentContainer.setVisibility(View.VISIBLE);
+		drawerLayout.closeDrawer(Gravity.LEFT);
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		supportInvalidateOptionsMenu();
+		hideFabButton();
+		showHideBottomNavigationView(true);
+	}
+
+	public void destroyPermissionsFragment () {
+		turnOnNotifications = false;
+
+		tB.setVisibility(View.VISIBLE);
+		abL.setVisibility(View.VISIBLE);
+
+		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		if (currentFragment != null){
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+			getSupportFragmentManager().executePendingTransactions();
+		}
+
+		askingPermissions = false;
+
+		pF = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.setStatusBarColor(0);
+		}
+
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		supportInvalidateOptionsMenu();
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	void setContactStatus() {
@@ -3115,6 +3180,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		supportInvalidateOptionsMenu();
 		hideFabButton();
+		showHideBottomNavigationView(true);
 	}
 
 	@Override
@@ -9561,6 +9627,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (turnOnNotifications){
 			deleteTurnOnNotificationsFragment();
+			return;
+		}
+
+		if (askingPermissions) {
+			destroyPermissionsFragment();
 			return;
 		}
 
