@@ -182,4 +182,5 @@
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
+
 </resources>
