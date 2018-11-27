@@ -397,38 +397,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void onCreate() {
 		super.onCreate();
 
-		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
-		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
-		megaApi = getMegaApi();
-		megaApiFolder = getMegaApiFolder();
-		megaChatApi = getMegaChatApi();
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
-
-			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
-			//			jobInfoBuilder.setMinimumLatency(15000);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				jobInfoBuilder.setPeriodic(schedulerInterval);
-			}
-
-			if (mJobScheduler != null) {
-				int result = mJobScheduler.schedule(jobInfoBuilder.build());
-				if (result == JobScheduler.RESULT_SUCCESS) {
-					log("CameraUploadsService: Job scheduled SUCCESS");
-				} else {
-					log("CameraUploadsService: Job scheduled FAILED");
-				}
-			}
-		}
-
-
-
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
@@ -459,6 +427,36 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
+		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
+
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+		megaApi = getMegaApi();
+		megaApiFolder = getMegaApiFolder();
+		megaChatApi = getMegaChatApi();
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
+
+			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
+			//			jobInfoBuilder.setMinimumLatency(15000);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				jobInfoBuilder.setPeriodic(schedulerInterval);
+			}
+
+			if (mJobScheduler != null) {
+				int result = mJobScheduler.schedule(jobInfoBuilder.build());
+				if (result == JobScheduler.RESULT_SUCCESS) {
+					log("CameraUploadsService: Job scheduled SUCCESS");
+				} else {
+					log("CameraUploadsService: Job scheduled FAILED");
+				}
+			}
+		}
 
 		if (staging){
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
