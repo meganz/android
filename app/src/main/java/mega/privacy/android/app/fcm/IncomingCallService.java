@@ -50,7 +50,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     boolean isLoggingIn = false;
     boolean showMessageNotificationAfterPush = false;
     boolean beep = false;
-
+    WifiManager.WifiLock lock;
+    PowerManager.WakeLock wl;
     String remoteMessageType = "";
 
     private ChatAdvancedNotificationBuilder chatNotificationBuilder;
@@ -78,9 +79,17 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         super.onDestroy();
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.cancel(1086);
+        if(wl != null){
+            log("wifi lock release");
+            wl.release();
+        }
+        if(lock != null){
+            log("wake lock release");
+            lock.release();
+        }
         stopForeground(true);
     }
-
+    
     public static final String NOTIFICATION_CHANNEL_ID = "10099";
     public static final int notificationId = 1086;
 
@@ -124,9 +133,9 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         }
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiManager.WifiLock lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
+        lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaDownloadServicePowerLock");
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaDownloadServicePowerLock");
         if(!wl.isHeld()){
             wl.acquire();
         }

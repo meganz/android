@@ -85,14 +85,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onDestroy() {
         log("onDestroyFCM");
-        if(wl != null){
-            log("wifi lock release");
-            wl.release();
-        }
-        if(lock != null){
-            log("wake lock release");
-            lock.release();
-        }
         super.onDestroy();
     }
 
@@ -185,44 +177,33 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If true - wait until connection finish
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+                    
+                    PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                    log("is in IDLE " + pm.isDeviceIdleMode());
+                    wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaDownloadServicePowerLock:");
+                    wl.acquire();
+                    wl.release();
+                    
+                    startService(new Intent(this,IncomingCallService.class));
 
 //                    launchCallActivity();
-                    //startService(new Intent(this,IncomingCallService.class));
-
-                    int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-                        wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-                    }
-
-                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                    lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
-                    PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                    wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK |PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaDownloadServicePowerLock:");
-
-                    if(!wl.isHeld()){
-                        log("wifi lock acquired");
-                        wl.acquire();
-                    }
-                    if(!lock.isHeld()){
-                        log("wake lock acquired");
-                        lock.acquire();
-                    }
+                    
                     //=======================================
-                    String gSession = credentials.getSession();
-                    if (megaApi.getRootNode() == null) {
-                        log("RootNode = null");
-                        performLoginProccess(gSession);
-                    }
-                    else{
-                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
-//                        String gSession = credentials.getSession();
-                        int ret = megaChatApi.getInitState();
-                        log("result of init ---> " + ret);
-                        int status = megaChatApi.getOnlineStatus();
-                        log("online status ---> "+status);
-                        int connectionState = megaChatApi.getConnectionState();
-                        log("connection state ---> "+connectionState);
-                    }
+//                    String gSession = credentials.getSession();
+//                    if (megaApi.getRootNode() == null) {
+//                        log("RootNode = null");
+//                        performLoginProccess(gSession);
+//                    }
+//                    else{
+//                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+////                        String gSession = credentials.getSession();
+//                        int ret = megaChatApi.getInitState();
+//                        log("result of init ---> " + ret);
+//                        int status = megaChatApi.getOnlineStatus();
+//                        log("online status ---> "+status);
+//                        int connectionState = megaChatApi.getConnectionState();
+//                        log("connection state ---> "+connectionState);
+//                    }
 
                 }
                 else if(remoteMessageType.equals("2")){
