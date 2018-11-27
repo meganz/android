@@ -4,8 +4,10 @@ import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -20,11 +22,43 @@ import mega.privacy.android.app.utils.Util;
 public class TestActivity extends AppCompatActivity {
     
     Ringtone ringtone;
+    PowerManager.WakeLock screenLock;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("FCM fake call UI on create");
         super.onCreate(savedInstanceState);
+    
+        WifiManager.WifiLock lock;
+        PowerManager.WakeLock wl;
+        int wifiLockMode = WifiManager.WIFI_MODE_FULL;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
+        }
+    
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MegaDownloadServicePowerLock:");
+    
+        if(!wl.isHeld()){
+            log("wifi lock acquired");
+            wl.acquire();
+        }
+        if(!lock.isHeld()){
+            log("wake lock acquired");
+            lock.acquire();
+        }
+    
+        screenLock = ((PowerManager)getSystemService(POWER_SERVICE)).newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG:");
+        screenLock.acquire();
+    
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     
         setContentView(R.layout.test_activity_layout);
     
@@ -72,6 +106,7 @@ public class TestActivity extends AppCompatActivity {
     private void dismiss(){
         log("finish");
         stopRing();
+        screenLock.release();
         finish();
     }
     
