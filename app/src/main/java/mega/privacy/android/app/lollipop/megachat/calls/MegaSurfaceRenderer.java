@@ -37,6 +37,7 @@ import android.view.SurfaceHolder.Callback;
 import org.webrtc.Logging;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 
 public class MegaSurfaceRenderer implements Callback {
 
@@ -59,7 +60,7 @@ public class MegaSurfaceRenderer implements Callback {
 
 
     public MegaSurfaceRenderer(SurfaceView view) {
-        Log.d("MegaSurfaceRenderer","MegaSurfaceRenderer() ");
+        log("MegaSurfaceRenderer() ");
 
 //        this.surf = view;
         surfaceHolder = view.getHolder();
@@ -73,7 +74,7 @@ public class MegaSurfaceRenderer implements Callback {
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        Log.d("MegaSurfaceRenderer","changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
+        log("changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -86,6 +87,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     private void adjustAspectRatio() {
+        log("adjustAspectRatio(): ");
 
         if (bitmap != null && dstRect.height() != 0) {
             dstRect.top = 0;
@@ -118,7 +120,7 @@ public class MegaSurfaceRenderer implements Callback {
 
 
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d("MegaSurfaceRenderer","surfaceCreated()");
+        log("surfaceCreated(): ");
 
         Canvas canvas = surfaceHolder.lockCanvas();
         if(canvas != null) {
@@ -144,7 +146,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        Log.d("MegaSurfaceRenderer","surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
+        log("surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
 
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
         changeDestRect(in_width, in_height);
@@ -162,7 +164,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d("MegaSurfaceRenderer","surfaceDestroyed(): ");
+        log("surfaceDestroyed():");
 
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
@@ -170,7 +172,8 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public Bitmap CreateBitmap(int width, int height) {
-        Log.d("MegaSurfaceRenderer","CreateBitmap(): width = "+width+", height = "+height);
+        log("CreateBitmap(): width = "+width+", height = "+height);
+
 
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
@@ -187,12 +190,17 @@ public class MegaSurfaceRenderer implements Callback {
         srcRect.bottom = height;
         srcRect.right = width;
 
+        log("CreateBitmap(): sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+
+
         adjustAspectRatio();
 
         return bitmap;
     }
 
     public ByteBuffer CreateByteBuffer(int width, int height) {
+        log("CreateByteBuffer(): width = "+width+", height = "+height);
+
         Logging.d(TAG, "CreateByteBuffer " + width + ":" + height);
         if (bitmap == null) {
             bitmap = CreateBitmap(width, height);
@@ -203,12 +211,13 @@ public class MegaSurfaceRenderer implements Callback {
 
     // It saves bitmap data to a JPEG picture, this function is for debug only.
     private void saveBitmapToJPEG(int width, int height) {
+        log("saveBitmapToJPEG(): width = "+width+", height = "+height);
+
         ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream);
 
         try{
-            FileOutputStream output = new FileOutputStream(String.format(
-                "/sdcard/render_%d.jpg", System.currentTimeMillis()));
+            FileOutputStream output = new FileOutputStream(String.format("/sdcard/render_%d.jpg", System.currentTimeMillis()));
             output.write(byteOutStream.toByteArray());
             output.flush();
             output.close();
@@ -220,6 +229,8 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void DrawByteBuffer() {
+        log("DrawByteBuffer(): ");
+
         if(byteBuffer == null)
             return;
         byteBuffer.rewind();
@@ -235,11 +246,9 @@ public class MegaSurfaceRenderer implements Callback {
         if (surfaceHolder == null){
             return;
         }
-
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
             canvas.scale(-1, 1);
-//            canvas.translate(-dstRect.width(), 0);
             canvas.translate(-canvas.getWidth(), 0);
             if (flag) {
                 paint.reset();
@@ -253,6 +262,10 @@ public class MegaSurfaceRenderer implements Callback {
 
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    private static void log(String log) {
+        Util.log("MegaSurfaceRendererGroup", log);
     }
 
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {

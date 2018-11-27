@@ -87,6 +87,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
 
 
     public MegaSurfaceRendererGroup(SurfaceView view, Long handle) {
+        log("MegaSurfaceRendererGroup(): ");
 
         surfaceHolder = view.getHolder();
         if(surfaceHolder == null)
@@ -110,7 +111,43 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         dstRect.right = dstWidth;
         dstRect.bottom = dstHeight;
         dstRectf = new RectF(dstRect);
+
+        adjustAspectRatio();
+
     }
+
+    private void adjustAspectRatio() {
+        log("adjustAspectRatio()");
+
+        if (bitmap != null && dstRect.height() != 0) {
+            dstRect.top = 0;
+            dstRect.left = 0;
+            dstRect.right = surfaceWidth;
+            dstRect.bottom = surfaceHeight;
+
+            dstRectf = new RectF(dstRect);
+            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
+            float dstaspectratio = (float) dstRect.width() / dstRect.height();
+
+            if (srcaspectratio != 0 && dstaspectratio != 0) {
+                if (srcaspectratio > dstaspectratio) {
+                    float newHeight = dstRect.width() / srcaspectratio;
+                    float decrease = dstRect.height() - newHeight;
+                    dstRect.top += decrease / 2;
+                    dstRect.bottom -= decrease / 2;
+                    dstRectf = new RectF(dstRect);
+                } else {
+                    float newWidth = dstRect.height() * srcaspectratio;
+                    float decrease = dstRect.width() - newWidth;
+                    dstRect.left += decrease / 2;
+                    dstRect.right -= decrease / 2;
+                    dstRectf = new RectF(dstRect);
+                }
+            }
+        }
+    }
+
+
 
     public void surfaceCreated(SurfaceHolder holder) {
         log("surfaceCreated()");
@@ -138,6 +175,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         }
     }
 
+
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
         log("surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
 
@@ -156,6 +194,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
                 " dstRect.bottom:" + dstRect.bottom);
     }
 
+
     public void surfaceDestroyed(SurfaceHolder holder) {
         log("surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
@@ -164,6 +203,8 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         surfaceWidth = 0;
         surfaceHeight = 0;
     }
+
+
 
     public Bitmap CreateBitmap(int width, int height) {
         log("CreateBitmap(): width = "+width+", height = "+height);
@@ -184,33 +225,78 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             srcRect.bottom = height;
             srcRect.left = 0;
             srcRect.right = width;
-            log("CreateBitmap(): width == height. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+            log(" CreateBitmap(): width == height. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
 
 
         }else if(height > width){
 
-            int newHeight = width;
-            bitmap = Bitmap.createBitmap(width, newHeight, Bitmap.Config.ARGB_8888);
+            bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
             srcRect.top = 0;
-            srcRect.bottom = newHeight;
+            srcRect.bottom = width;
             srcRect.left = 0;
             srcRect.right = width;
             log("CreateBitmap(): height > width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
 
         }else{
-            log("CreateBitmap(): height < width");
 
-            int newWidth = height;
-            bitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888);
+//            bitmap = Bitmap.createBitmap(height, height, Bitmap.Config.ARGB_8888);
+//            srcRect.left = 0;
+//            srcRect.right = height;
+//            srcRect.top = 0;
+//            srcRect.bottom = height;
+//            log("CreateBitmap(): height < width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             srcRect.left = 0;
-            srcRect.right = newWidth;
+            srcRect.right = width;
             srcRect.top = 0;
             srcRect.bottom = height;
             log("CreateBitmap(): height < width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
 
         }
+
+        adjustAspectRatio();
         return bitmap;
     }
+
+    public ByteBuffer CreateByteBuffer(int width, int height) {
+        log("CreateByteBuffer(): width = "+width+", height = "+height);
+
+        Logging.d(TAG, "CreateByteBuffer " + width + ":" + height);
+        if (bitmap == null) {
+            bitmap = CreateBitmap(width, height);
+            byteBuffer = ByteBuffer.allocateDirect(width * height * 2);
+        }
+        return byteBuffer;
+    }
+
+    // It saves bitmap data to a JPEG picture, this function is for debug only.
+    private void saveBitmapToJPEG(int width, int height) {
+        log("saveBitmapToJPEG(): width = "+width+", height = "+height);
+
+        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream);
+
+        try{
+            FileOutputStream output = new FileOutputStream(String.format("/sdcard/render_%d.jpg", System.currentTimeMillis()));
+            output.write(byteOutStream.toByteArray());
+            output.flush();
+            output.close();
+        }
+        catch (FileNotFoundException e) {
+        }
+        catch (IOException e) {
+        }
+    }
+
+    public void DrawByteBuffer() {
+        if(byteBuffer == null)
+            return;
+        byteBuffer.rewind();
+        bitmap.copyPixelsFromBuffer(byteBuffer);
+        DrawBitmap(false);
+    }
+
 
     public void DrawBitmap(boolean flag) {
         if(bitmap == null){
@@ -219,7 +305,6 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         if (surfaceHolder == null){
             return;
         }
-
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
             canvas.scale(-1, 1);
@@ -236,32 +321,48 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = pixels;
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(Color.BLUE);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
+    }
+
+
     private static void log(String log) {
         Util.log("MegaSurfaceRendererGroup", log);
     }
 
     private void notifyStateToAll() {
-        log("notifyStateToAll()");
         for(MegaSurfaceRendererGroupListener listener : listeners)
             notifyState(listener);
     }
 
     public void addListener(MegaSurfaceRendererGroupListener l) {
-        log("addListener()");
-
         listeners.add(l);
         notifyState(l);
     }
 
     private void notifyState(MegaSurfaceRendererGroupListener listener) {
-        log("notifyState()");
-
         if(listener == null)
             return;
         listener.resetSize(handleUser);
     }
 
     public interface MegaSurfaceRendererGroupListener {
-        public void resetSize(Long handle);
+        void resetSize(Long handle);
     }
 }
