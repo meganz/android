@@ -200,6 +200,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("wake lock acquired");
                         lock.acquire();
                     }
+    
+                    PowerManager.WakeLock screenLock = ((PowerManager)getSystemService(POWER_SERVICE)).newWakeLock(
+                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG:");
+                    screenLock.acquire();
+                    screenLock.release();
                     launchCallActivity();
                     //startService(new Intent(this,IncomingCallService.class));
 //                    String gSession = credentials.getSession();
