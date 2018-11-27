@@ -286,6 +286,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			/*SUBTITLE*/
 			secondLineTextToolbar = (TextView) findViewById(R.id.second_line_toolbar);
+			secondLineTextToolbar.setSelected(true);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
@@ -2529,6 +2530,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
+//				secondLineTextToolbar.setText("formattedDate formattedDate formattedDate formattedDate formattedDate");
+				secondLineTextToolbar.setSelected(true);
 				secondLineLengthToolbar.setText(formattedDate);
 
 				log("Date last green: "+formattedDate);
