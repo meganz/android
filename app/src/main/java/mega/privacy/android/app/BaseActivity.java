@@ -24,7 +24,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-public class BaseActivity extends AppCompatActivity{
+public class BaseActivity extends AppCompatActivity {
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
@@ -33,6 +33,7 @@ public class BaseActivity extends AppCompatActivity{
     private AlertDialog sslErrorDialog;
 
     protected boolean callToSuperBack = false;
+    boolean delaySignalPresence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,9 @@ public class BaseActivity extends AppCompatActivity{
 
         LocalBroadcastManager.getInstance(this).registerReceiver(sslErrorReceiver,
                 new IntentFilter(Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(signalPresenceReceiver,
+                new IntentFilter(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
     }
 
     @Override
@@ -62,14 +66,27 @@ public class BaseActivity extends AppCompatActivity{
 
         checkMegaApiObjects();
 
-        retryConnectionsAndSignalPresence();
+        if(megaChatApi.getPresenceConfig()==null){
+            delaySignalPresence = true;
+        }
+        else{
+            if(megaChatApi.getPresenceConfig().isPending()==true){
+                delaySignalPresence = true;
+            }
+            else{
+                delaySignalPresence = false;
+                retryConnectionsAndSignalPresence();
+            }
+        }
     }
 
     @Override
     protected void onDestroy() {
-        log("onDestroy");
+        log("****onDestroy");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
+
         super.onDestroy();
     }
 
@@ -105,6 +122,22 @@ public class BaseActivity extends AppCompatActivity{
                 log("BROADCAST TO MANAGE A SSL VERIFICATION ERROR");
                 if (sslErrorDialog != null && sslErrorDialog.isShowing()) return;
                 showSSLErrorDialog();
+            }
+        }
+    };
+
+    /**
+     * Broadcast to send presence after first launch of app
+     */
+    private BroadcastReceiver signalPresenceReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                if(delaySignalPresence && megaChatApi.getPresenceConfig().isPending()==false){
+                    delaySignalPresence = false;
+                    retryConnectionsAndSignalPresence();
+                }
             }
         }
     };
@@ -188,7 +221,7 @@ public class BaseActivity extends AppCompatActivity{
                 }
 
                 if(!(this instanceof ChatCallActivity)){
-                    log("send signal if needed");
+                    log("Send signal presence if needed");
                     if(megaChatApi.isSignalActivityRequired()){
                         megaChatApi.signalPresenceActivity();
                     }
