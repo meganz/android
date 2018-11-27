@@ -17,14 +17,8 @@ public class TL {
 
     private final static boolean OUTPUT = true;
 
-//    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator +
-//            "MEGA"+ File.separator +
-//            "MEGA Logs"+ File.separator +
-//            "test_log.txt";
-    private static final String LOG_PATH = Environment.getExternalStorageDirectory() + File.separator +
-            "MEGA"+ File.separator +
-            "MEGA Logs";
-    private static final String FILE_NAME = "test_log.txt";
+    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator +
+            "test_log.txt";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd HH:mm:ss.SSS");
 
@@ -39,17 +33,12 @@ public class TL {
             }
         }
         if (OUTPUT) {
-            File log = new File(LOG_PATH);
             try {
-                if (!log.exists()) {
-                    log.mkdir();
+                File log = new File(LOG_FILE);
+                if (!log.exists()){
+                    log.createNewFile();
                 }
-                
-                File logFile = new File(LOG_PATH + File.separator + FILE_NAME);
-                if (!logFile.exists()){
-                    logFile.createNewFile();
-                }
-                FileWriter writer = new FileWriter(LOG_PATH + File.separator + FILE_NAME,true);
+                FileWriter writer = new FileWriter(LOG_FILE,true);
                 writer.write(msg + "\n");
                 writer.close();
             } catch (Exception e) {
@@ -57,9 +46,5 @@ public class TL {
             }
         }
         Log.e("@#@",msg);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new Date(1540165899000L));
     }
 }
