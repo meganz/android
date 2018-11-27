@@ -13222,7 +13222,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onClick(View v) {
 		log("onClick");
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.onClick(v);
 
 		switch(v.getId()){
 //			case R.id.custom_search:{

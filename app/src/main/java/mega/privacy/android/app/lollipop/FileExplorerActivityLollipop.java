@@ -2747,7 +2747,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onClick(View v) {
 		log("onClick");
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.onClick(v);
 
 		switch(v.getId()) {
 			case R.id.fab_file_explorer: {
