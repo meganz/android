@@ -203,7 +203,6 @@ public class InboxFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
@@ -502,8 +501,6 @@ public class InboxFragmentLollipop extends Fragment{
 
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 	    
 		if (((ManagerActivityLollipop) context).isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
@@ -618,7 +615,6 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1028,7 +1024,6 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;

@@ -863,7 +863,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             refreshProperties();
             supportInvalidateOptionsMenu();
 
-            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
         }
 	}
 
@@ -1109,7 +1108,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch (id) {
@@ -1278,7 +1276,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 		}
-		return true;
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void refreshProperties(){
@@ -1713,7 +1711,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
         hideMultipleSelect();
 		switch (v.getId()) {
 			case R.id.file_properties_text_number_versions:{
@@ -2980,17 +2978,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	}
 
-	@Override
-	protected void onResume() {
-		log("onResume-FileInfoActivityLollipop");
-		super.onResume();
-
-        if (adapterType != Constants.OFFLINE_ADAPTER){
-            refreshProperties();
-            supportInvalidateOptionsMenu();
-            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-        }
-	}
+//	@Override
+//	protected void onResume() {
+//		log("onResume-FileInfoActivityLollipop");
+//		super.onResume();
+//
+//        if (adapterType != Constants.OFFLINE_ADAPTER){
+//            refreshProperties();
+//            supportInvalidateOptionsMenu();
+//        }
+//	}
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
@@ -3010,12 +3007,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if(isRemoveOffline){
             Intent intent = new Intent();
             intent.putExtra(NODE_HANDLE, handle);
             setResult(RESULT_OK, intent);
         }
-		super.onBackPressed();
+        super.callToSuperBack = true;
+        super.onBackPressed();
 	}
 
 	public void showSnackbar(String s){
@@ -3172,7 +3173,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     
     public void itemClick(int position) {
         log("itemClick");
-        ((MegaApplication)getApplication()).sendSignalPresenceActivity();
+
         if (adapter.isMultipleSelect()) {
             adapter.toggleSelection(position);
             updateActionModeTitle();

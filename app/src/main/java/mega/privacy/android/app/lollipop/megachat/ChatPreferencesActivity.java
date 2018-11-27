@@ -115,6 +115,7 @@ public class ChatPreferencesActivity extends PinActivityLollipop {
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = true;
         super.onBackPressed();
     }
 

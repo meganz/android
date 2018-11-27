@@ -109,7 +109,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     }
     
     private void toContactInfo(MegaUser contact) {
-        ((MegaApplication)context.getApplication()).sendSignalPresenceActivity();
         Intent i = new Intent(context,ContactInfoActivityLollipop.class);
         i.putExtra("name",contact.getEmail());
         context.startActivity(i);
