@@ -28,25 +28,19 @@ import android.os.PowerManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import junit.framework.Test;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -70,6 +64,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     Handler h;
 
+    WifiManager.WifiLock lock;
+    PowerManager.WakeLock wl;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -88,6 +85,14 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onDestroy() {
         log("onDestroyFCM");
+        if(wl != null){
+            log("wifi lock release");
+            wl.release();
+        }
+        if(lock != null){
+            log("wake lock release");
+            lock.release();
+        }
         super.onDestroy();
     }
 
@@ -180,18 +185,20 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If true - wait until connection finish
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
-                    WifiManager.WifiLock lock;
-                    PowerManager.WakeLock wl;
+
+//                    launchCallActivity();
+                    //startService(new Intent(this,IncomingCallService.class));
+
                     int wifiLockMode = WifiManager.WIFI_MODE_FULL;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
                         wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
                     }
-    
+
                     WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                     lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
                     PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                    wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MegaDownloadServicePowerLock:");
-                    
+                    wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK |PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaDownloadServicePowerLock:");
+
                     if(!wl.isHeld()){
                         log("wifi lock acquired");
                         wl.acquire();
@@ -200,29 +207,22 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("wake lock acquired");
                         lock.acquire();
                     }
-    
-                    PowerManager.WakeLock screenLock = ((PowerManager)getSystemService(POWER_SERVICE)).newWakeLock(
-                            PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "TAG:");
-                    screenLock.acquire();
-                    screenLock.release();
-                    launchCallActivity();
-                    //startService(new Intent(this,IncomingCallService.class));
-//                    String gSession = credentials.getSession();
-//
-//                    if (megaApi.getRootNode() == null) {
-//                        log("RootNode = null");
-//                        performLoginProccess(gSession);
-//                    }
-//                    else{
-//                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
-////                        String gSession = credentials.getSession();
-//                        int ret = megaChatApi.getInitState();
-//                        log("result of init ---> " + ret);
-//                        int status = megaChatApi.getOnlineStatus();
-//                        log("online status ---> "+status);
-//                        int connectionState = megaChatApi.getConnectionState();
-//                        log("connection state ---> "+connectionState);
-//                    }
+                    //=======================================
+                    String gSession = credentials.getSession();
+                    if (megaApi.getRootNode() == null) {
+                        log("RootNode = null");
+                        performLoginProccess(gSession);
+                    }
+                    else{
+                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+//                        String gSession = credentials.getSession();
+                        int ret = megaChatApi.getInitState();
+                        log("result of init ---> " + ret);
+                        int status = megaChatApi.getOnlineStatus();
+                        log("online status ---> "+status);
+                        int connectionState = megaChatApi.getConnectionState();
+                        log("connection state ---> "+connectionState);
+                    }
 
                 }
                 else if(remoteMessageType.equals("2")){
@@ -468,6 +468,5 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     public void launchCallActivity( ){
         Intent i = new Intent(this, TestActivity.class);
         startActivity(i);
-        
     }
 }
