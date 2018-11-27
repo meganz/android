@@ -1561,22 +1561,32 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
 
+
+                    int hours = message.getDuration() / 3600;
                     int minutes = (message.getDuration() % 3600) / 60;
                     int seconds = message.getDuration() % 60;
 
-                    if(minutes == 0){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                    textToShow = context.getString(R.string.call_ended_message);
+
+                    if(hours != 0){
+                        String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                        textToShow = textToShow + textHours;
+                        if((minutes != 0)||(seconds != 0)){
+                            textToShow = textToShow+", ";
+                        }
                     }
-                    else{
-                        if(seconds == 0){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+
+                    if(minutes != 0){
+                        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                        textToShow = textToShow + textMinutes;
+                        if(seconds != 0){
+                            textToShow = textToShow+", ";
                         }
-                        else if (seconds == 1){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
-                        }
-                        else{
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
-                        }
+                    }
+
+                    if(seconds != 0){
+                        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                        textToShow = textToShow + textSeconds;
                     }
 
                     try {
@@ -1801,24 +1811,32 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
 
+                    int hours = message.getDuration() / 3600;
                     int minutes = (message.getDuration() % 3600) / 60;
                     int seconds = message.getDuration() % 60;
 
-                    if(minutes == 0){
-                        textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
-                    }
-                    else{
-                        if(seconds == 0){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
-                        }
-                        else if (seconds == 1){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
-                        }
-                        else{
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                    textToShow = context.getString(R.string.call_ended_message);
+
+                    if(hours != 0){
+                        String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                        textToShow = textToShow + textHours;
+                        if((minutes != 0)||(seconds != 0)){
+                            textToShow = textToShow+", ";
                         }
                     }
 
+                    if(minutes != 0){
+                        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                        textToShow = textToShow + textMinutes;
+                        if(seconds != 0){
+                            textToShow = textToShow+", ";
+                        }
+                    }
+
+                    if(seconds != 0){
+                        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                        textToShow = textToShow + textSeconds;
+                    }
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
@@ -1828,6 +1846,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         textToShow = textToShow.replace("[/C]", "</font>");
                     } catch (Exception e) {
                     }
+
 
                     break;
                 }
