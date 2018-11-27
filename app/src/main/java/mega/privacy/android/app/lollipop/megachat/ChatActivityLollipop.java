@@ -1602,7 +1602,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public boolean onPrepareOptionsMenu(Menu menu){
 //        log("onPrepareOptionsMenu");
 
-        boolean returnValue = super.onPrepareOptionsMenu(menu);
         if(chatRoom!=null){
 
             if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
@@ -1702,18 +1701,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             inviteMenuItem.setVisible(false);
         }
 
-        return returnValue;
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-
-        boolean returnValue = super.onOptionsItemSelected(item);
-
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
 
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
@@ -1780,7 +1773,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
         }
-        return returnValue;
+        return super.onOptionsItemSelected(item);
     }
 
     public void startCall(){
@@ -2445,9 +2438,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onBackPressed() {
 
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
+        super.callToSuperBack = false;
+        super.onBackPressed();
 
         if(emojiKeyboard!=null){
             if((emojiKeyboard.getLetterKeyboardShown())||(emojiKeyboard.getEmojiKeyboardShown())){
@@ -2496,7 +2488,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onClick(View v) {
         log("onClick");
-        super.onClick(v);
 
         switch (v.getId()) {
             case R.id.home:{

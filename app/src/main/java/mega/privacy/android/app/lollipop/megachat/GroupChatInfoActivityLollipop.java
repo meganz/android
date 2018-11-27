@@ -866,8 +866,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onClick(View view) {
         log("onClick");
 
-        super.onClick(view);
-
         switch (view.getId()) {
 
             case R.id.chat_group_contact_properties_edit_icon: {
@@ -1119,12 +1117,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         cC.inviteContact(email);
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        log("onBackPressed");
-//
-//        super.onBackPressed();
-//    }
+    @Override
+    public void onBackPressed() {
+        super.callToSuperBack = true;
+        super.onBackPressed();
+    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

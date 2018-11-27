@@ -587,8 +587,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 			if(Util.isChatEnabled()){
 
 				chatSettings = dbH.getChatSettings();
@@ -747,8 +745,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch(id){
@@ -1166,7 +1162,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
 			case R.id.chat_contact_properties_clear_layout: {
@@ -1784,8 +1779,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		log("onResume-ContactChatInfoActivityLollipop");
 		super.onResume();
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		if(Util.isChatEnabled()){
 			setContactPresenceStatus();
 		} else{
@@ -1849,6 +1842,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onBackPressed() {
+		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 

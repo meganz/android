@@ -228,19 +228,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
 
-        boolean returnValue = super.onCreateOptionsMenu(menu);
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_calls_chat, menu);
 
-        return returnValue;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         log("onPrepareOptionsMenu");
-
-        boolean returnValue = super.onPrepareOptionsMenu(menu);
 
         remoteAudioIcon = menu.findItem(R.id.info_remote_audio);
         if(callChat!=null){
@@ -259,7 +255,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         remoteAudioIcon.setEnabled(false);
 
-        return returnValue;
+        return super.onPrepareOptionsMenu(menu);
     }
 
 
@@ -989,13 +985,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-//		if (overflowMenuLayout != null){
-//			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-//				overflowMenuLayout.setVisibility(View.GONE);
-//				return;
-//			}
-//		}
-//        super.onBackPressed();
+        super.callToSuperBack = false;
         super.onBackPressed();
 
         if (megaChatApi != null) {
@@ -1381,10 +1371,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onClick(View v) {
         log("onClick");
 
-        super.onClick(v);
-
         switch (v.getId()) {
             case R.id.video_fab:{
+                log("Click on video fab");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
                     answerCallFAB.clearAnimation();
@@ -1406,7 +1395,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
             case R.id.micro_fab: {
-
+                log("Click on micro fab");
                 if(callChat.hasLocalAudio()){
                     megaChatApi.disableAudio(chatId, this);
                 }
@@ -1429,10 +1418,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case R.id.answer_call_fab:{
                 log("Click on answer fab");
+                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 megaChatApi.answerChatCall(chatId, false, this);
                 videoFAB.clearAnimation();
-
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 break;
             }
         }

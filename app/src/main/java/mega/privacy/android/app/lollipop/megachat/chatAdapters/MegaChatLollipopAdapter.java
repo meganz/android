@@ -7951,10 +7951,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onClick(View v) {
         log("onClick()");
 
-        //int position = (Integer) v.getTag();
-        log("onClick");
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
         ViewHolderMessageChat holder = (ViewHolderMessageChat) v.getTag();
         int currentPosition = holder.getAdapterPosition();
         log("onClick -> Current position: "+currentPosition);

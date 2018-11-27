@@ -11,26 +11,28 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-public class BaseActivity extends AppCompatActivity implements View.OnClickListener{
+public class BaseActivity extends AppCompatActivity{
 
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private MegaApiAndroid megaApiFolder;
 
     private AlertDialog sslErrorDialog;
+
+    protected boolean callToSuperBack = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,23 +175,6 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
         sslErrorDialog.show();
     }
 
-    @Override
-    public void onClick(View v) {
-        retryConnectionsAndSignalPresence();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
-        retryConnectionsAndSignalPresence();
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        retryConnectionsAndSignalPresence();
-        return super.onOptionsItemSelected(item);
-    }
-
     public void retryConnectionsAndSignalPresence(){
         log("retryConnectionsAndSignalPresence");
         try{
@@ -202,14 +187,33 @@ public class BaseActivity extends AppCompatActivity implements View.OnClickListe
                     megaChatApi.retryPendingConnections(false, null);
                 }
 
-                if(megaChatApi.isSignalActivityRequired()){
-                    megaChatApi.signalPresenceActivity();
+                if(!(this instanceof ChatCallActivity)){
+                    log("send signal if needed");
+                    if(megaChatApi.isSignalActivityRequired()){
+                        megaChatApi.signalPresenceActivity();
+                    }
                 }
             }
         }
         catch (Exception e){
             log("retryPendingConnections:Exception: "+e.getMessage());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        retryConnectionsAndSignalPresence();
+        if(callToSuperBack){
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN ){
+            retryConnectionsAndSignalPresence();
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     /**

@@ -1504,7 +1504,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public void onClick(View v) {
         log("onClick");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser)v.getTag();
         int currentPosition = holder.getAdapterPosition();
@@ -1626,7 +1625,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public boolean onLongClick(View view) {
         log("OnLongCLick");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser)view.getTag();
         int currentPosition = holder.getAdapterPosition();

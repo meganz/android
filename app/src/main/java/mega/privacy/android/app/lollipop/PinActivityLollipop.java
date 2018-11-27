@@ -75,8 +75,6 @@ public class PinActivityLollipop extends BaseActivity {
 		if(MegaApplication.isShowPinScreen()){
 			PinUtil.resume(this);
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public static void log(String message) {

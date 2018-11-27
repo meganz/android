@@ -3122,8 +3122,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onPostResume");
     	super.onPostResume();
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		if (isSearching){
 			selectDrawerItemLollipop(DrawerItem.SEARCH);
 			isSearching = false;
@@ -7407,8 +7405,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaChatApi.retryPendingConnections(false, null);
 		}
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
@@ -9532,25 +9528,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onBackPressed() {
-		log("onBackPressedLollipop");
+		log("onBackPressed");
+
+		super.callToSuperBack = false;
+		super.onBackPressed();
 
 		if (drawerLayout.isDrawerOpen(nV)){
     		drawerLayout.closeDrawer(Gravity.LEFT);
     		return;
     	}
-
-		if (megaApi == null){
-			megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		}
-
-		if (megaApi != null){
-			log("---------retryPendingConnections");
-			megaApi.retryPendingConnections();
-		}
-
-		if (megaChatApi != null){
-			megaChatApi.retryPendingConnections(false, null);
-		}
 
 		try {
 			statusDialog.dismiss();
@@ -9573,12 +9559,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if (fbFLol != null && fbFLol.isAdded()) {
 				if (fbFLol.onBackPressed() == 0) {
+					super.callToSuperBack = true;
 					super.onBackPressed();
 				}
 				return;
 			}
-
-			super.onBackPressed();
+			else{
+				super.callToSuperBack = true;
+				super.onBackPressed();
+			}
 		}
 		else if (drawerItem == DrawerItem.RUBBISH_BIN){
 			if (rubbishBinFLol != null && rubbishBinFLol.isAdded()) {
@@ -9587,7 +9576,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
                 return;
 			}
-			super.onBackPressed();
+			else{
+				super.callToSuperBack = true;
+				super.onBackPressed();
+			}
 		}
 		else if (drawerItem == DrawerItem.TRANSFERS){
 			backToDrawerItem(bottomNavigationCurrentItem);
@@ -9647,6 +9639,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (oFLol.onBackPressed() == 0){
 
 					if (!Util.isOnline(this)){
+						super.callToSuperBack = true;
 						super.onBackPressed();
 						return;
 					}
@@ -9656,6 +9649,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 					}
 					else{
+						super.callToSuperBack = true;
 						super.onBackPressed();
 					}
 					return;
@@ -9790,6 +9784,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     	}
 		else{
+			super.callToSuperBack = true;
 			super.onBackPressed();
 			return;
 		}
@@ -13221,8 +13216,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-
-		super.onClick(v);
 
 		switch(v.getId()){
 //			case R.id.custom_search:{
