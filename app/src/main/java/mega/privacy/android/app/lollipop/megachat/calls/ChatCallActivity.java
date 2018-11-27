@@ -66,6 +66,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1657,9 +1658,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             log("onChatCallUpdate()  call.getChatid() = chatId = "+chatId);
 
             if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-                log("CHANGE_TYPE_STATUS");
 
                 int callStatus = callChat.getStatus();
+                log("onChatCallUpdate()-CHANGE_TYPE_STATUS -> status: "+callStatus);
+
                 switch (callStatus){
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
 
@@ -1812,6 +1814,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_STATUS)){
                 log("CHANGE_TYPE_SESSION_STATUS");
+                log("onChatCallUpdate()-CHANGE_TYPE_SESSION_STATUS");
 
                 if(chat.isGroup()){
 
@@ -1864,8 +1867,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         updateRemoteAudioStatus(-1);
                     }
                 }
-            }
-            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
+            }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
                 log("onChatCallUpdate()-CHANGE_TYPE_LOCAL_AVFLAGS");
                 updateLocalVideoStatus();
                 updateLocalAudioStatus();
@@ -1875,8 +1877,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("onChatCallUpdate()-CHANGE_TYPE_RINGING_STATUS");
 
             }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)){
+                log("CHANGE_TYPE_CALL_COMPOSITION : call.getStatus(): "+call.getStatus());
+
                 if(call.getStatus() ==  MegaChatCall.CALL_STATUS_RING_IN){
-                    log("CHANGE_TYPE_CALL_COMPOSITION  RING IN -> participants: "+call.getParticipants().size());
+                    log("CHANGE_TYPE_CALL_COMPOSITION -CALL_STATUS_RING_IN -> participants: "+call.getParticipants().size());
 
                     boolean isMe = false;
                     for(int i = 0; i < call.getParticipants().size(); i++){
@@ -1901,7 +1905,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                             if(!peerContain){
                                 InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, false,true,null);
-                                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (ring in) "+userPeer.getHandle()+" added");
+                                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (ring in) "+userPeer.getName()+" added");
                                 peersBeforeCall.add((peersBeforeCall.size() == 0 ? 0:(peersBeforeCall.size()-1)), userPeer);
                                 changes = true;
                             }
@@ -1915,7 +1919,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 }
                             }
                             if(!peerContained){
-                                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (ring in) "+peersBeforeCall.get(i).getHandle()+" removed");
+                                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (ring in) "+peersBeforeCall.get(i).getName()+" removed");
                                 peersBeforeCall.remove(i);
                                 changes = true;
                             }
@@ -1927,176 +1931,339 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                     }
                 }else if(call.getStatus() ==  MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                    log("CHANGE_TYPE_CALL_COMPOSITION  IN PROGRESS -> participants: "+call.getParticipants().size());
-                    if((peersOnCall != null)&&(peersOnCall.size() != 0)) {
-                        //Get all participant and check it
-                        for (int i = 0; i < call.getParticipants().size(); i++) {
-                            boolean peerContain = false;
-                            long userHandle = call.getParticipants().get(i);
-                            for (InfoPeerGroupCall peerOnCall : peersOnCall) {
-                                if (peerOnCall.getHandle() == userHandle) {
-                                    peerContain = true;
-                                    break;
+                    log("CHANGE_TYPE_CALL_COMPOSITION -CALL_STATUS_IN_PROGRESS -> participants: "+call.getParticipants().size());
+                    if(peersOnCall != null){
+                        if(peersOnCall.size()!=0){
+                            //Get all participant and check it
+                            for (int i = 0; i < call.getParticipants().size(); i++) {
+                                boolean peerContain = false;
+                                long userHandle = call.getParticipants().get(i);
+                                for (InfoPeerGroupCall peerOnCall : peersOnCall) {
+                                    if (peerOnCall.getHandle() == userHandle) {
+                                        peerContain = true;
+                                        break;
+                                    }
+                                }
+                                if (!peerContain) {
+                                    if (userHandle == megaChatApi.getMyUserHandle()){
+                                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(), megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false, true,null);
+                                        log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+myPeer.getName()+" added");
+                                        peersOnCall.add(myPeer);
+                                        updatePeers(true);
+                                    } else {
+                                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle, chat.getPeerFullnameByHandle(userHandle), false, false, false, true,null);
+                                        log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+userPeer.getName()+" added");
+                                        peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
+                                        infoUsersBar.setText(userPeer.getName()+" "+getString(R.string.contact_joined_the_call));
+                                        infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+                                        infoUsersBar.setAlpha(1);
+                                        infoUsersBar.setVisibility(View.VISIBLE);
+                                        infoUsersBar.animate().alpha(0).setDuration(4000);
+
+                                        if(peersOnCall.size() < 7){
+                                            if (adapterGrid != null) {
+                                                if (peersOnCall.size() < 4) {
+                                                    recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                    recyclerView.setColumnWidth((int) widthScreenPX);
+                                                    int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                    adapterGrid.notifyItemInserted(posInserted);
+                                                    adapterGrid.notifyDataSetChanged();
+                                                    updateSubtitleToolbar();
+                                                }else{
+                                                    if (peersOnCall.size() == 4) {
+                                                        recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                        adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                        adapterGrid.notifyDataSetChanged();
+                                                        updateSubtitleToolbar();
+                                                    } else {
+                                                        recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                        int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                        adapterGrid.notifyItemInserted(posInserted);
+                                                        adapterGrid.notifyItemRangeChanged((posInserted - 1), peersOnCall.size());
+                                                        updateSubtitleToolbar();
+                                                    }
+                                                }
+                                            }else{
+                                                updatePeers(true);
+                                            }
+                                        }else{
+                                            if (adapterList != null) {
+                                                if(peersOnCall.size() == 7){
+                                                    updatePeers(true);
+                                                }else{
+                                                    int posInserted=(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                    adapterList.notifyItemInserted(posInserted);
+                                                    adapterList.notifyItemRangeChanged((posInserted-1), peersOnCall.size());
+                                                    updateUserSelected(true);
+                                                    updateSubtitleToolbar();
+                                                }
+                                            } else {
+                                                updatePeers(true);
+                                            }
+                                        }
+
+                                    }
                                 }
                             }
-                            if (!peerContain) {
-                                if (userHandle == megaChatApi.getMyUserHandle()){
-                                    InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(), megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false, true,null);
-                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+myPeer.getHandle()+" added");
-                                    peersOnCall.add(myPeer);
-                                    updatePeers(true);
-                                } else {
-                                    InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle, chat.getPeerFullnameByHandle(userHandle), false, false, false, true,null);
-                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+userPeer.getHandle()+" added");
-                                    peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
-                                    infoUsersBar.setText(userPeer.getName()+" "+getString(R.string.contact_joined_the_call));
+
+                            for (int i = 0; i < peersOnCall.size(); i++) {
+                                boolean peerContained = false;
+                                for (int j = 0; j < call.getParticipants().size(); j++) {
+                                    long userHandle = call.getParticipants().get(j);
+                                    if (peersOnCall.get(i).getHandle() == userHandle){
+                                        peerContained = true;
+                                        break;
+                                    }
+                                }
+                                if (!peerContained) {
+                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+peersOnCall.get(i).getName()+" removed");
+                                    infoUsersBar.setText(peersOnCall.get(i).getName()+" "+getString(R.string.contact_left_the_call));
                                     infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
                                     infoUsersBar.setAlpha(1);
                                     infoUsersBar.setVisibility(View.VISIBLE);
                                     infoUsersBar.animate().alpha(0).setDuration(4000);
+                                    peersOnCall.remove(i);
 
                                     if (peersOnCall.size() < 7) {
-                                        if (adapterGrid != null) {
 
+                                        if (adapterGrid != null) {
                                             if (peersOnCall.size() < 4) {
-                                                log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted range(0 -> "+peersOnCall.size()+")");
                                                 recyclerViewLayout.setPadding(0, 0, 0, 0);
                                                 recyclerView.setColumnWidth((int) widthScreenPX);
-                                                int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                                                adapterGrid.notifyItemInserted(posInserted);
+                                                adapterGrid.notifyItemRemoved(i);
                                                 adapterGrid.notifyDataSetChanged();
-//                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
-//                                                updateSubtitleToolbar();
-
-                                            }else {
-                                                if (peersOnCall.size() == 4) {
-                                                    log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted range(0 -> " + peersOnCall.size() + ")");
-                                                    recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
-                                                    recyclerView.setColumnWidth((int) widthScreenPX / 2);
-                                                    adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-//                                                    adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
-                                                    adapterGrid.notifyDataSetChanged();
-//                                                    updateSubtitleToolbar();
-                                                } else {
+                                                updateSubtitleToolbar();
+                                            } else {
+                                                if(peersOnCall.size() == 6){
                                                     recyclerViewLayout.setPadding(0, 0, 0, 0);
-                                                    recyclerView.setColumnWidth((int) widthScreenPX / 2);
-                                                    int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                                                    log("(1-6)COMPOSITION IN PROGRESS, notifyItemInserted POS(" + posInserted + "), range(" + (posInserted - 1) + " -> " + peersOnCall.size() + ") ");
-                                                    adapterGrid.notifyItemInserted(posInserted);
-//                                                    adapterGrid.notifyDataSetChanged();
-                                                    adapterGrid.notifyItemRangeChanged((posInserted - 1), peersOnCall.size());
-//                                                    updateSubtitleToolbar();
-
+                                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                    adapterGrid.notifyItemRemoved(i);
+                                                    adapterGrid.notifyDataSetChanged();
+                                                    updateSubtitleToolbar();
+                                                }else{
+                                                    if(peersOnCall.size() == 4){
+                                                        recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                    }else{
+                                                        recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                    }
+                                                    adapterGrid.notifyItemRemoved(i);
+                                                    adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
+                                                    updateSubtitleToolbar();
                                                 }
                                             }
 
-
-                                        }else{
+                                        } else {
                                             updatePeers(true);
                                         }
                                     } else {
                                         if (adapterList != null) {
-                                            if(peersOnCall.size() == 7){
-                                                log("(7 +)COMPOSITION IN PROGRESS, updatePeers");
-                                                updatePeers(true);
-                                            }else{
-                                                int posInserted=(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
-                                                log("(7 +)COMPOSITION IN PROGRESS, notifyItemInserted POS("+(posInserted-1)+"), range("+posInserted+" -> "+peersOnCall.size()+") ");
-                                                adapterList.notifyItemInserted(posInserted);
-//                                                adapterList.notifyDataSetChanged();
-                                                adapterList.notifyItemRangeChanged((posInserted-1), peersOnCall.size());
+                                            if(peersOnCall.size() >= 7){
+                                                adapterList.notifyItemRemoved(i);
+                                                adapterList.notifyItemRangeChanged(i, peersOnCall.size());
                                                 updateUserSelected(true);
-//                                                updateSubtitleToolbar();
+                                                updateSubtitleToolbar();
+                                            }else{
+                                                updatePeers(true);
                                             }
-
                                         } else {
-                                            log("(7 +)COMPOSITION IN PROGRESS, updatePeers");
                                             updatePeers(true);
                                         }
                                     }
-
                                 }
+                            }
+                        }else{
+                            boolean changes = false;
+                            for(int i=0;i<call.getParticipants().size();i++){
+                                if (call.getParticipants().get(i) == megaChatApi.getMyUserHandle()){
+                                    InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(), megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false, true,null);
+                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+myPeer.getName()+" added");
+                                    peersOnCall.add(myPeer);
+                                    changes = true;
+                                }else{
+                                    InfoPeerGroupCall userPeer = new InfoPeerGroupCall(call.getParticipants().get(i),  chat.getPeerFullnameByHandle(call.getParticipants().get(i)), false, false, false, true,null);
+                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+userPeer.getName()+" added");
+                                    peersOnCall.add((peersOnCall.size() == 0 ? 0:(peersOnCall.size()-1)), userPeer);
+                                    changes = true;
+                                }
+                            }
+                            if(changes){
+                                updatePeers(true);
                             }
                         }
 
-                        for (int i = 0; i < peersOnCall.size(); i++) {
-                            boolean peerContained = false;
-                            for (int j = 0; j < call.getParticipants().size(); j++) {
-                                long userHandle = call.getParticipants().get(j);
-                                if (peersOnCall.get(i).getHandle() == userHandle){
-                                    peerContained = true;
-                                    break;
+                    }
+
+                }else if(call.getStatus() ==  MegaChatCall.CALL_STATUS_JOINING){
+                    log("CHANGE_TYPE_CALL_COMPOSITION - CALL_STATUS_JOINING -> participants: "+call.getParticipants().size());
+                    if(peersOnCall != null){
+                        if(peersOnCall.size()!=0){
+                            //Get all participant and check it
+                            for (int i = 0; i < call.getParticipants().size(); i++) {
+                                boolean peerContain = false;
+                                long userHandle = call.getParticipants().get(i);
+                                for (InfoPeerGroupCall peerOnCall : peersOnCall) {
+                                    if (peerOnCall.getHandle() == userHandle) {
+                                        peerContain = true;
+                                        break;
+                                    }
+                                }
+                                if (!peerContain) {
+                                    if (userHandle == megaChatApi.getMyUserHandle()){
+                                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(), megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false, true,null);
+                                        log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (joining) "+myPeer.getName()+" added");
+                                        peersOnCall.add(myPeer);
+                                        updatePeers(true);
+                                    } else {
+                                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle, chat.getPeerFullnameByHandle(userHandle), false, false, false, true,null);
+                                        log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (joining) "+userPeer.getName()+" added");
+                                        peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
+                                        infoUsersBar.setText(userPeer.getName()+" "+getString(R.string.contact_joined_the_call));
+                                        infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+                                        infoUsersBar.setAlpha(1);
+                                        infoUsersBar.setVisibility(View.VISIBLE);
+                                        infoUsersBar.animate().alpha(0).setDuration(4000);
+
+                                        if(peersOnCall.size() < 7){
+                                            if (adapterGrid != null) {
+                                                if (peersOnCall.size() < 4) {
+                                                    recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                    recyclerView.setColumnWidth((int) widthScreenPX);
+                                                    int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                    adapterGrid.notifyItemInserted(posInserted);
+                                                    adapterGrid.notifyDataSetChanged();
+                                                    updateSubtitleToolbar();
+                                                }else{
+                                                    if (peersOnCall.size() == 4) {
+                                                        recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                        adapterGrid.notifyItemInserted(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                        adapterGrid.notifyDataSetChanged();
+                                                        updateSubtitleToolbar();
+                                                    } else {
+                                                        recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                        int posInserted = (peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                        adapterGrid.notifyItemInserted(posInserted);
+                                                        adapterGrid.notifyItemRangeChanged((posInserted - 1), peersOnCall.size());
+                                                        updateSubtitleToolbar();
+                                                    }
+                                                }
+                                            }else{
+                                                updatePeers(true);
+                                            }
+                                        }else{
+                                            if (adapterList != null) {
+                                                if(peersOnCall.size() == 7){
+                                                    updatePeers(true);
+                                                }else{
+                                                    int posInserted=(peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1));
+                                                    adapterList.notifyItemInserted(posInserted);
+                                                    adapterList.notifyItemRangeChanged((posInserted-1), peersOnCall.size());
+                                                    updateUserSelected(true);
+                                                    updateSubtitleToolbar();
+                                                }
+                                            } else {
+                                                updatePeers(true);
+                                            }
+                                        }
+
+                                    }
                                 }
                             }
-                            if (!peerContained) {
-                                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (in progress) "+peersOnCall.get(i).getHandle()+" removed");
-                                infoUsersBar.setText(peersOnCall.get(i).getName()+" "+getString(R.string.contact_left_the_call));
-                                infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
-                                infoUsersBar.setAlpha(1);
-                                infoUsersBar.setVisibility(View.VISIBLE);
-                                infoUsersBar.animate().alpha(0).setDuration(4000);
-                                peersOnCall.remove(i);
 
-                                if (peersOnCall.size() < 7) {
+                            for (int i = 0; i < peersOnCall.size(); i++) {
+                                boolean peerContained = false;
+                                for (int j = 0; j < call.getParticipants().size(); j++) {
+                                    long userHandle = call.getParticipants().get(j);
+                                    if (peersOnCall.get(i).getHandle() == userHandle){
+                                        peerContained = true;
+                                        break;
+                                    }
+                                }
+                                if (!peerContained) {
+                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (joining) "+peersOnCall.get(i).getName()+" removed");
+                                    infoUsersBar.setText(peersOnCall.get(i).getName()+" "+getString(R.string.contact_left_the_call));
+                                    infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+                                    infoUsersBar.setAlpha(1);
+                                    infoUsersBar.setVisibility(View.VISIBLE);
+                                    infoUsersBar.animate().alpha(0).setDuration(4000);
+                                    peersOnCall.remove(i);
 
-                                    if (adapterGrid != null) {
-                                        if (peersOnCall.size() < 4) {
-                                            log("(1-6) COMPOSITION IN PROGRESS, notifyItemRemoved range( 0-> "+peersOnCall.size()+") ");
-                                            recyclerViewLayout.setPadding(0, 0, 0, 0);
-                                            recyclerView.setColumnWidth((int) widthScreenPX);
-                                            adapterGrid.notifyItemRemoved(i);
-//                                            adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
-                                            adapterGrid.notifyDataSetChanged();
-//                                            updateSubtitleToolbar();
-                                        } else {
-                                            if(peersOnCall.size() == 6){
-                                                log("(1-6) COMPOSITION IN PROGRESS, notifyItemRemoved range( 0-> "+peersOnCall.size()+") ");
+                                    if (peersOnCall.size() < 7) {
+
+                                        if (adapterGrid != null) {
+                                            if (peersOnCall.size() < 4) {
                                                 recyclerViewLayout.setPadding(0, 0, 0, 0);
-                                                recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                recyclerView.setColumnWidth((int) widthScreenPX);
                                                 adapterGrid.notifyItemRemoved(i);
-//                                                adapterGrid.notifyItemRangeChanged(0, peersOnCall.size());
                                                 adapterGrid.notifyDataSetChanged();
-//                                                updateSubtitleToolbar();
-                                            }else{
-                                                if(peersOnCall.size() == 4){
-                                                    recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
-                                                    recyclerView.setColumnWidth((int) widthScreenPX / 2);
-                                                }else{
+                                                updateSubtitleToolbar();
+                                            } else {
+                                                if(peersOnCall.size() == 6){
                                                     recyclerViewLayout.setPadding(0, 0, 0, 0);
                                                     recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                    adapterGrid.notifyItemRemoved(i);
+                                                    adapterGrid.notifyDataSetChanged();
+                                                    updateSubtitleToolbar();
+                                                }else{
+                                                    if(peersOnCall.size() == 4){
+                                                        recyclerViewLayout.setPadding(0, Util.scaleWidthPx(136, outMetrics), 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX / 2);
+                                                    }else{
+                                                        recyclerViewLayout.setPadding(0, 0, 0, 0);
+                                                        recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                                    }
+                                                    adapterGrid.notifyItemRemoved(i);
+                                                    adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
+                                                    updateSubtitleToolbar();
                                                 }
-                                                log("(1-6) COMPOSITION IN PROGRESS, notifyItemRemoved POS("+i+"), range("+i+" -> "+peersOnCall.size()+") ");
-                                                adapterGrid.notifyItemRemoved(i);
-//                                                adapterGrid.notifyDataSetChanged();
-                                                adapterGrid.notifyItemRangeChanged(i, peersOnCall.size());
-//                                                updateSubtitleToolbar();
                                             }
-                                        }
 
-                                    } else {
-                                        updatePeers(true);
-                                    }
-                                } else {
-                                    if (adapterList != null) {
-                                        if(peersOnCall.size() >= 7){
-                                            log("(7 +)COMPOSITION IN PROGRESS, notifyItemRemoved POS("+i+"), range("+i+" -> "+peersOnCall.size()+") ");
-                                            adapterList.notifyItemRemoved(i);
-//                                            adapterList.notifyDataSetChanged();
-                                            adapterList.notifyItemRangeChanged(i, peersOnCall.size());
-                                            updateUserSelected(true);
-//                                            updateSubtitleToolbar();
-                                        }else{
-                                            log("(7 +)COMPOSITION IN PROGRESS, updatePeers");
+                                        } else {
                                             updatePeers(true);
                                         }
                                     } else {
-                                        log("(7 +)COMPOSITION IN PROGRESS, updatePeers");
-                                        updatePeers(true);
+                                        if (adapterList != null) {
+                                            if(peersOnCall.size() >= 7){
+                                                adapterList.notifyItemRemoved(i);
+                                                adapterList.notifyItemRangeChanged(i, peersOnCall.size());
+                                                updateUserSelected(true);
+                                                updateSubtitleToolbar();
+                                            }else{
+                                                updatePeers(true);
+                                            }
+                                        } else {
+                                            updatePeers(true);
+                                        }
                                     }
                                 }
                             }
+                        }else{
+                            boolean changes = false;
+                            for(int i=0;i<call.getParticipants().size();i++){
+                                if (call.getParticipants().get(i) == megaChatApi.getMyUserHandle()){
+                                    InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(), megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false, true,null);
+                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (joining) "+myPeer.getName()+" added");
+                                    peersOnCall.add(myPeer);
+                                    changes = true;
+                                }else{
+                                    InfoPeerGroupCall userPeer = new InfoPeerGroupCall(call.getParticipants().get(i),  chat.getPeerFullnameByHandle(call.getParticipants().get(i)), false, false, false, true,null);
+                                    log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION (joining) "+userPeer.getName()+" added");
+                                    peersOnCall.add((peersOnCall.size() == 0 ? 0:(peersOnCall.size()-1)), userPeer);
+                                    changes = true;
+                                }
+                            }
+                            if(changes){
+                                updatePeers(true);
+                            }
                         }
+
                     }
+
 
                 }
             }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_AUDIO_LEVEL)) {
