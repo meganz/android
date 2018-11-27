@@ -124,26 +124,6 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             dstRect.left = 0;
             dstRect.right = surfaceWidth;
             dstRect.bottom = surfaceHeight;
-
-            dstRectf = new RectF(dstRect);
-            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
-            float dstaspectratio = (float) dstRect.width() / dstRect.height();
-
-            if (srcaspectratio != 0 && dstaspectratio != 0) {
-                if (srcaspectratio > dstaspectratio) {
-                    float newHeight = dstRect.width() / srcaspectratio;
-                    float decrease = dstRect.height() - newHeight;
-                    dstRect.top += decrease / 2;
-                    dstRect.bottom -= decrease / 2;
-                    dstRectf = new RectF(dstRect);
-                } else {
-                    float newWidth = dstRect.height() * srcaspectratio;
-                    float decrease = dstRect.width() - newWidth;
-                    dstRect.left += decrease / 2;
-                    dstRect.right -= decrease / 2;
-                    dstRectf = new RectF(dstRect);
-                }
-            }
         }
     }
 
@@ -219,17 +199,13 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         }
 
         if(height == width){
-
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             srcRect.top = 0;
             srcRect.bottom = height;
             srcRect.left = 0;
             srcRect.right = width;
             log(" CreateBitmap(): width == height. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
-
-
         }else if(height > width){
-
             bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
             srcRect.top = 0;
             srcRect.bottom = width;
@@ -238,23 +214,13 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             log("CreateBitmap(): height > width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
 
         }else{
-
-//            bitmap = Bitmap.createBitmap(height, height, Bitmap.Config.ARGB_8888);
-//            srcRect.left = 0;
-//            srcRect.right = height;
-//            srcRect.top = 0;
-//            srcRect.bottom = height;
-//            log("CreateBitmap(): height < width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
-
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             srcRect.left = 0;
-            srcRect.right = width;
+            srcRect.right = height;
             srcRect.top = 0;
             srcRect.bottom = height;
             log("CreateBitmap(): height < width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
-
         }
-
         adjustAspectRatio();
         return bitmap;
     }
