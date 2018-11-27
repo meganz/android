@@ -1571,7 +1571,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(hours != 0){
                         String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
                         textToShow = textToShow + textHours;
-                        if(minutes!=0){
+                        if((minutes != 0)||(seconds != 0)){
                             textToShow = textToShow+", ";
                         }
                     }
@@ -1579,7 +1579,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(minutes != 0){
                         String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
                         textToShow = textToShow + textMinutes;
-                        if(seconds!=0){
+                        if(seconds != 0){
                             textToShow = textToShow+", ";
                         }
                     }
@@ -1820,7 +1820,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(hours != 0){
                         String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
                         textToShow = textToShow + textHours;
-                        if(minutes!=0){
+                        if((minutes != 0)||(seconds != 0)){
                             textToShow = textToShow+", ";
                         }
                     }
@@ -1828,7 +1828,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(minutes != 0){
                         String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
                         textToShow = textToShow + textMinutes;
-                        if(seconds!=0){
+                        if(seconds != 0){
                             textToShow = textToShow+", ";
                         }
                     }
