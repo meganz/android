@@ -46,6 +46,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -188,6 +189,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid.qualityIcon = (RelativeLayout) v.findViewById(R.id.quality_icon);
         holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
         holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
+        holderGrid.avatarImage.setImageBitmap(null);
+        holderGrid.avatarInitialLetter.setText("");
 
         v.setTag(holderGrid);
         return holderGrid;
@@ -268,6 +271,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }else{
             holder.rlGeneral.setOnClickListener(null);
         }
+
+        holder.avatarImage.setImageBitmap(null);
+        holder.avatarInitialLetter.setText("");
 
         if(peer.isVideoOn()) {
             log("peer: "+peer.getHandle()+", VIDEO ON pos: "+position);
@@ -601,13 +607,14 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         }else{
             log("peer: "+peer.getHandle()+", VIDEO OFF");
-            holder.avatarImage.setImageBitmap(null);
+
             //Avatar:
-            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+            if(peer.getHandle() == megaChatApi.getMyUserHandle()){
                 setProfileMyAvatar(holder);
             }else{
-                setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
+                setProfileUserAvatar(peer.getHandle(), peer.getName(), holder);
             }
+
             holder.qualityLayout.setVisibility(GONE);
 
             //Remove SurfaceView && Listener:
@@ -796,81 +803,90 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
     }
 
-    //Contact avatar
-    public void setProfileContactAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
-        log("setProfileContactAvatar()");
 
-        Bitmap bitmap = null;
-        File avatar = null;
+    public void setProfileUserAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
+        log("setProfileUserAvatar()");
         String contactMail = megaChatApi.getContactEmail(userHandle);
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
 
-        if (avatar.exists()) {
-            if (avatar.length() > 0) {
+        createDefaultUserAvatar(userHandle, holder, fullName, contactMail);
+
+        ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
+        File avatar = null;
+
+        if(contactMail == null){
+            if (context.getExternalCacheDir() != null) {
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandle + ".jpg");
+            }else {
+                avatar = new File(context.getCacheDir().getAbsolutePath(), userHandle + ".jpg");
+            }
+        }else{
+            if (context.getExternalCacheDir() != null){
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+            }else{
+                avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+            }
+        }
+        Bitmap bitmap = null;
+        if (avatar.exists()){
+            if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
-                if (bitmap != null) {
-                    holder.avatarImage.setVisibility(View.VISIBLE);
-                    holder.avatarImage.setImageBitmap(bitmap);
-                    holder.avatarInitialLetter.setVisibility(GONE);
-                }else{
-                    UserAvatarListener listener = new UserAvatarListener(context);
+                if (bitmap == null) {
                     avatar.delete();
-                    if(!avatarRequested){
-                        avatarRequested = true;
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                        }
-                    }
-                    createDefaultAvatar(userHandle, fullName, holder);
-                }
-            }else{
-                UserAvatarListener listener = new UserAvatarListener(context);
 
-                if(!avatarRequested){
-                    avatarRequested = true;
+                    if(megaApi==null){
+                        log("setUserAvatar: megaApi is Null in Offline mode");
+                        return;
+                    }
+
                     if (context.getExternalCacheDir() != null){
                         megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
                     }
                     else{
                         megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
                     }
+                }else{
+                    holder.avatarInitialLetter.setVisibility(GONE);
+                    holder.avatarImage.setVisibility(View.VISIBLE);
+                    holder.avatarImage.setImageBitmap(bitmap);
                 }
-                createDefaultAvatar(userHandle, fullName, holder);
-            }
-        }else{
-            UserAvatarListener listener = new UserAvatarListener(context);
-            if(!avatarRequested){
-                avatarRequested = true;
+            }else{
+
+                if(megaApi==null){
+                    log("setUserAvatar: megaApi is Null in Offline mode");
+                    return;
+                }
+
                 if (context.getExternalCacheDir() != null){
                     megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }
-                else{
+                }else{
                     megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
                 }
             }
-            createDefaultAvatar(userHandle, fullName, holder);
+        }else{
+            if(megaApi==null){
+                log("setUserAvatar: megaApi is Null in Offline mode");
+                return;
+            }
+            if (context.getExternalCacheDir() != null){
+                megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+            }
+            else{
+                megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+            }
         }
     }
-    //Contact Default avatar
-    public void createDefaultAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder) {
-        log("createDefaultAvatar");
+
+    //User Default avatar
+    public void createDefaultUserAvatar(long userHandle, ViewHolderGroupCall holder, String fullName, String contactMail){
+        log("createDefaultUserAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        p.setColor(Color.TRANSPARENT);
 
         String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
         if (color != null) {
@@ -885,13 +901,42 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }else {
             radius = defaultAvatar.getHeight() / 2;
         }
+
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         holder.avatarImage.setVisibility(View.VISIBLE);
         holder.avatarImage.setImageBitmap(defaultAvatar);
-        String contactFirstLetter = fullName.charAt(0) + "";
-        contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
-        holder.avatarInitialLetter.setText(contactFirstLetter);
-        holder.avatarInitialLetter.setVisibility(View.VISIBLE);
+
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        boolean setInitialByMail = false;
+        if (fullName != null){
+            if (fullName.trim().length() > 0){
+                String firstLetter = fullName.charAt(0) + "";
+                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                holder.avatarInitialLetter.setText(firstLetter);
+                holder.avatarInitialLetter.setTextColor(Color.WHITE);
+                holder.avatarInitialLetter.setVisibility(View.VISIBLE);
+            }else{
+                setInitialByMail=true;
+            }
+        }else{
+            setInitialByMail=true;
+        }
+        if(setInitialByMail){
+            if (contactMail != null){
+                if (contactMail.length() > 0){
+                    String firstLetter = contactMail.charAt(0) + "";
+                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    holder.avatarInitialLetter.setText(firstLetter);
+                    holder.avatarInitialLetter.setTextColor(Color.WHITE);
+                    holder.avatarInitialLetter.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+//        ((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
+
     }
 
     public RecyclerView getListFragment() {
