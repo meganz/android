@@ -32,7 +32,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     Long userHandle;
 
     public SurfaceView fullScreenSurfaceView;
-    MegaSurfaceRendererGroup renderer;
+    MegaSurfaceRendererGroupBig renderer;
 
     public static BigCameraGroupCallFragment newInstance(long chatId, long userHandle) {
         log("newInstance");
@@ -74,7 +74,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
         SurfaceHolder localSurfaceHolder = fullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        renderer = new MegaSurfaceRendererGroup(fullScreenSurfaceView, userHandle);
+        renderer = new MegaSurfaceRendererGroupBig(fullScreenSurfaceView, userHandle);
 
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             log("onCreateView() addChatLocalVideoListener chatId: "+chatId);

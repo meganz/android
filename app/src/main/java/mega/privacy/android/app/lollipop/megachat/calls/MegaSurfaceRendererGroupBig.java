@@ -1,13 +1,4 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
-/*
- *  Copyright (c) 2012 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree. An additional intellectual property rights grant can be found
- *  in the file PATENTS.  All contributing project authors may
- *  be found in the AUTHORS file in the root of the source tree.
- */
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,7 +8,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -55,21 +45,20 @@ import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder.Callback;
-import android.view.TextureView;
 
 import org.webrtc.Logging;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
-public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListener{
+public class MegaSurfaceRendererGroupBig implements SurfaceHolder.Callback {
 
     private final static String TAG = "WEBRTC";
 
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
     private ByteBuffer byteBuffer = null;
-    private SurfaceTexture surfaceHolder;
+    private SurfaceHolder surfaceHolder;
 
     // Rect of the source bitmap to draw
     private Rect srcRect = new Rect();
@@ -84,16 +73,18 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     int surfaceWidth = 0;
     int surfaceHeight = 0;
     Long handleUser;
-    private TextureView myTexture = null;
 
     protected List<MegaSurfaceRendererGroupListener> listeners;
 
 
-    public MegaSurfaceRendererGroup(TextureView view, Long handle) {
-        log("MegaSurfaceRendererGroup(): ");
+    public MegaSurfaceRendererGroupBig(SurfaceView view, Long handle) {
+        log("MegaSurfaceRendererGroupBig(): ");
 
-        this.myTexture = view;
-        myTexture.setSurfaceTextureListener(this);
+        surfaceHolder = view.getHolder();
+        if(surfaceHolder == null)
+            return;
+
+        surfaceHolder.addCallback(this);
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
@@ -126,6 +117,64 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             dstRect.bottom = surfaceHeight;
         }
     }
+
+
+    public void surfaceCreated(SurfaceHolder holder) {
+        log("surfaceCreated()");
+        Canvas canvas = holder.lockCanvas();
+        if(canvas != null) {
+            Rect dst = holder.getSurfaceFrame();
+            if(dst != null) {
+                notifyStateToAll();
+                changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
+                Logging.d(TAG, "ViESurfaceRender::surfaceCreated" +
+                        " dst.left:" + dst.left +
+                        " dst.top:" + dst.top +
+                        " dst.right:" + dst.right +
+                        " dst.bottom:" + dst.bottom +
+                        " srcRect.left:" + srcRect.left +
+                        " srcRect.top:" + srcRect.top +
+                        " srcRect.right:" + srcRect.right +
+                        " srcRect.bottom:" + srcRect.bottom +
+                        " dstRect.left:" + dstRect.left +
+                        " dstRect.top:" + dstRect.top +
+                        " dstRect.right:" + dstRect.right +
+                        " dstRect.bottom:" + dstRect.bottom);
+            }
+            holder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+
+    public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
+        log("surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
+
+        Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
+        changeDestRect(in_width, in_height);
+
+        Logging.d(TAG, "ViESurfaceRender::surfaceChanged" +
+                " in_width:" + in_width + " in_height:" + in_height +
+                " srcRect.left:" + srcRect.left +
+                " srcRect.top:" + srcRect.top +
+                " srcRect.right:" + srcRect.right +
+                " srcRect.bottom:" + srcRect.bottom +
+                " dstRect.left:" + dstRect.left +
+                " dstRect.top:" + dstRect.top +
+                " dstRect.right:" + dstRect.right +
+                " dstRect.bottom:" + dstRect.bottom);
+    }
+
+
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        log("surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
+        Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
+        bitmap = null;
+        byteBuffer = null;
+        surfaceWidth = 0;
+        surfaceHeight = 0;
+    }
+
+
 
     public Bitmap CreateBitmap(int width, int height) {
         log("CreateBitmap(): width = "+width+", height = "+height);
@@ -209,10 +258,10 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         if(bitmap == null){
             return;
         }
-        if (myTexture == null){
+        if (surfaceHolder == null){
             return;
         }
-        Canvas canvas = myTexture.lockCanvas();
+        Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
             canvas.scale(-1, 1);
             canvas.translate(-canvas.getWidth(), 0);
@@ -225,7 +274,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             } else {
                 canvas.drawBitmap(bitmap, srcRect, dstRect, null);
             }
-            myTexture.unlockCanvasAndPost(canvas);
+            surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
@@ -267,38 +316,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         if(listener == null)
             return;
         listener.resetSize(handleUser);
-    }
-
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int in_width, int in_height) {
-        log("onSurfaceTextureAvailable()");
-        Bitmap textureViewBitmap = myTexture.getBitmap();
-        Canvas canvas = new Canvas(textureViewBitmap);
-        if(canvas != null) {
-            notifyStateToAll();
-            changeDestRect(in_width, in_height);
-        }
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int in_width, int in_height) {
-        log("onSurfaceTextureSizeChanged(): in_width = "+in_width+", in_height = "+in_height);
-        changeDestRect(in_width, in_height);
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        log("onSurfaceTextureDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
-        bitmap = null;
-        byteBuffer = null;
-        surfaceWidth = 0;
-        surfaceHeight = 0;
-        return true;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-
     }
 
     public interface MegaSurfaceRendererGroupListener {
