@@ -144,7 +144,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         Collections.reverse(notifications);
 
         if(isAdded()) {
-
             if (adapterList == null){
                 log("adapterList is NULL");
                 adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);

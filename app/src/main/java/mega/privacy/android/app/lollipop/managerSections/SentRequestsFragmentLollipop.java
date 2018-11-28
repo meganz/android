@@ -88,7 +88,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 			switch(item.getItemId()){
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -117,6 +116,8 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.sent_request_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -125,6 +126,8 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			clearSelections();
 			adapterList.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -206,7 +209,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapterList.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -308,7 +310,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 
 	public void checkScroll () {
 		if (listView != null) {
-			if (listView.canScrollVertically(-1)) {
+			if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -456,7 +458,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			List<MegaContactRequest> users = adapterList.getSelectedRequest();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -25,10 +26,22 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         log("getItem: "+position);
         switch (position){
             case 0: {
-                return IncomingSharesFragmentLollipop.newInstance();
+                IncomingSharesFragmentLollipop isF = (IncomingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.INCOMING_SHARES.getTag());
+                if (isF != null) {
+                    return isF;
+                }
+                else {
+                    return IncomingSharesFragmentLollipop.newInstance();
+                }
             }
             case 1:{
-                return OutgoingSharesFragmentLollipop.newInstance();
+                OutgoingSharesFragmentLollipop osF = (OutgoingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.OUTGOING_SHARES.getTag());
+                if (osF != null)  {
+                    return osF;
+                }
+                else {
+                    return OutgoingSharesFragmentLollipop.newInstance();
+                }
             }
         }
         return null;
