@@ -39,6 +39,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -84,6 +85,7 @@ import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -1648,6 +1650,40 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             else{
                 log("Error changing audio or video: "+e.getErrorString());
 //                showSnackbar(getString(R.string.clear_history_error));
+            }
+        }if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+
+            log("MegaRequest.TYPE_GET_ATTR_USER");
+            if (e.getErrorCode() == MegaError.API_OK) {
+
+
+//                File avatar = null;
+//                if (getExternalCacheDir() != null) {
+//                    avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getC + ".jpg");
+//                } else {
+//                    avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+//                }
+//                Bitmap imBitmap = null;
+//                if (avatar.exists()) {
+//                    if (avatar.length() > 0) {
+//                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
+//                        bOpts.inPurgeable = true;
+//                        bOpts.inInputShareable = true;
+//                        imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+//                        if (imBitmap == null) {
+//                            avatar.delete();
+//                        } else {
+//                            contactPropertiesImage.setImageBitmap(imBitmap);
+//                            imageGradient.setVisibility(View.VISIBLE);
+//
+//                            if (imBitmap != null && !imBitmap.isRecycled()) {
+//                                Palette palette = Palette.from(imBitmap).generate();
+//                                Palette.Swatch swatch =  palette.getDarkVibrantSwatch();
+//                                imageLayout.setBackgroundColor(swatch.getBodyTextColor());
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -4024,86 +4060,93 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     public void setProfileContactAvatarGroupCall(long userHandle,  String fullName){
-        log("setProfileContactAvatarGroupCall");
-        Bitmap bitmap = null;
-        File avatar = null;
-        String contactMail = megaChatApi.getContactEmail(userHandle);
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
+        log("setProfileContactAvatarGroupCall: "+fullName);
 
-        if (avatar.exists()) {
-            if (avatar.length() > 0) {
+        String contactMail = megaChatApi.getContactEmail(userHandle);
+
+        createDefaultAvatarGroupCall(userHandle, fullName, contactMail);
+
+        File avatar = null;
+
+        if(contactMail == null){
+            if (context.getExternalCacheDir() != null) {
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandle + ".jpg");
+            }else {
+                avatar = new File(context.getCacheDir().getAbsolutePath(), userHandle + ".jpg");
+            }
+        }else{
+            if (context.getExternalCacheDir() != null){
+                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+            }else{
+                avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+            }
+        }
+        Bitmap bitmap = null;
+        if (avatar.exists()){
+            if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
-                if (bitmap != null) {
-                    avatarBigCameraGroupCallImage.setVisibility(View.VISIBLE);
-                    avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
-                    avatarBigCameraGroupCallInitialLetter.setVisibility(GONE);
-                }else{
-                    UserAvatarListener listener = new UserAvatarListener(context);
+                if (bitmap == null) {
                     avatar.delete();
-                    if(!avatarRequested){
-                        avatarRequested = true;
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                        }
+
+                    if(megaApi==null){
+                        log("setUserAvatar: megaApi is Null in Offline mode");
+                        return;
                     }
 
-                    createDefaultAvatarGroupCall(userHandle, fullName);
-                }
-            }else{
-                UserAvatarListener listener = new UserAvatarListener(context);
-
-                if(!avatarRequested){
-                    avatarRequested = true;
                     if (context.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                        megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", this);
                     }
                     else{
-                        megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                        megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", this);
                     }
+                }else{
+                    avatarBigCameraGroupCallInitialLetter.setVisibility(GONE);
+                    avatarBigCameraGroupCallImage.setVisibility(View.VISIBLE);
+                    avatarBigCameraGroupCallImage.setImageBitmap(bitmap);
+                }
+            }else{
+
+                if(megaApi==null){
+                    log("setUserAvatar: megaApi is Null in Offline mode");
+                    return;
                 }
 
-                createDefaultAvatarGroupCall(userHandle, fullName);
+                if (context.getExternalCacheDir() != null){
+                    megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", this);
+                }else{
+                    megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", this);
+                }
             }
         }else{
-            UserAvatarListener listener = new UserAvatarListener(context);
-
-            if(!avatarRequested){
-                avatarRequested = true;
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }
-                else{
-                    megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }
+            if(megaApi==null){
+                log("setUserAvatar: megaApi is Null in Offline mode");
+                return;
             }
-            createDefaultAvatarGroupCall(userHandle, fullName);
+            if (context.getExternalCacheDir() != null){
+                megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", this);
+            }
+            else{
+                megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", this);
+            }
         }
     }
 
-    public void createDefaultAvatarGroupCall(long userHandle,  String fullName) {
-        log("createDefaultAvatarGroupCall");
+    public void createDefaultAvatarGroupCall(long userHandle, String fullName, String contactMail) {
+        log("createDefaultAvatarGroupCall: ");
+
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        p.setColor(Color.TRANSPARENT);
 
         String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
         if (color != null) {
             p.setColor(Color.parseColor(color));
-        }else{
-            p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+        } else {
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;
@@ -4112,12 +4155,40 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }else {
             radius = defaultAvatar.getHeight() / 2;
         }
+
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+        avatarBigCameraGroupCallImage.setVisibility(View.VISIBLE);
         avatarBigCameraGroupCallImage.setImageBitmap(defaultAvatar);
-        String contactFirstLetter = fullName.charAt(0) + "";
-        contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
-        avatarBigCameraGroupCallInitialLetter.setText(contactFirstLetter);
-        avatarBigCameraGroupCallInitialLetter.setVisibility(View.VISIBLE);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        boolean setInitialByMail = false;
+        if (fullName != null){
+            if (fullName.trim().length() > 0){
+                String firstLetter = fullName.charAt(0) + "";
+                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                avatarBigCameraGroupCallInitialLetter.setText(firstLetter);
+                avatarBigCameraGroupCallInitialLetter.setTextColor(Color.WHITE);
+                avatarBigCameraGroupCallInitialLetter.setVisibility(View.VISIBLE);
+            }else{
+                setInitialByMail=true;
+            }
+        }else{
+            setInitialByMail=true;
+        }
+        if(setInitialByMail){
+            if (contactMail != null){
+                if (contactMail.length() > 0){
+                    String firstLetter = contactMail.charAt(0) + "";
+                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    avatarBigCameraGroupCallInitialLetter.setText(firstLetter);
+                    avatarBigCameraGroupCallInitialLetter.setTextColor(Color.WHITE);
+                    avatarBigCameraGroupCallInitialLetter.setVisibility(View.VISIBLE);
+                }
+            }
+        }
     }
 
     public void clearHandlers(){
