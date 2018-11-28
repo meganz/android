@@ -183,8 +183,7 @@ public class AccountController implements View.OnClickListener{
             log("Export in: "+path);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
+                if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 }
             }

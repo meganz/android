@@ -2261,10 +2261,10 @@
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you can be able to share them with friends, exchange encrypted messages and make secure calls.</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow acces to photos, media and files</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, videos and files on chat, MEGA needs your permission.</string>
-    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Allow acces to your camera and microphone</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To make encrypted voice and video call, allow MEGA access to your camera and microphone.</string>
-    <string name="allow_acces_notifications_title" cotext="Title of the screen asking permissions for notifications">Enable notifications</string>
-    <string name="allow_acces_notifications_subtitle" context="Subtitle of the screen asking permissions for notifications">MEGA would like to send you notifications so you could receive new messages on your device instantly.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
 
 </resources>

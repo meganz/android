@@ -7,7 +7,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,13 +33,13 @@ public class PermissionsImageAdapter extends PagerAdapter {
         String[] mTitles = new String[] {
                 context.getString(R.string.allow_acces_media_title),
                 context.getString(R.string.allow_acces_camera_title),
-                context.getString(R.string.allow_acces_notifications_title)
+                context.getString(R.string.allow_acces_calls_title)
         };
 
         String[] mSubtitles =  new String[] {
                 context.getString(R.string.allow_acces_media_subtitle),
                 context.getString(R.string.allow_acces_camera_subtitle),
-                context.getString(R.string.allow_acces_notifications_subtitle)
+                context.getString(R.string.allow_acces_calls_subtitle)
         };
 
         ImageView imgDisplay;
