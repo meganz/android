@@ -1596,7 +1596,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
-				if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
+				if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
 
 					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);

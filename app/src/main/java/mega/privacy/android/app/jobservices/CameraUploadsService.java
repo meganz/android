@@ -431,7 +431,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 }
             }
             
-            totalToUpload++;
             String path;
             if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO) {
                 path = file.getNewPath();
@@ -451,11 +450,13 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             
             if (file.isCopyOnly()) {
                 log("copy node " + file.getFileName());
+                totalToUpload++;
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),parent,file.getFileName(),this);
             } else {
                 File toUpload = new File(path);
                 if (toUpload.exists()) {
                     log("upload node " + path);
+                    totalToUpload++;
                     megaApi.startUpload(path,parent,file.getFileName(),this);
                 } else {
                     dbH.deleteSyncRecordByPath(path,isSec);
@@ -1361,12 +1362,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 File src = new File(record.getLocalPath());
                 if (src.exists()) {
                     log("Creating preview");
-                    File previewDir = PreviewUtils.getPreviewFolder(this);
-                    File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                    File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-                    megaApi.createThumbnail(record.getLocalPath(),thumb.getAbsolutePath());
-                    megaApi.createPreview(record.getLocalPath(),preview.getAbsolutePath());
+//                    File previewDir = PreviewUtils.getPreviewFolder(this);
+//                    File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+//                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
+//                    File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+//                    megaApi.createThumbnail(record.getLocalPath(),thumb.getAbsolutePath());
+//                    megaApi.createPreview(record.getLocalPath(),preview.getAbsolutePath());
                 }
                 //delete database record
                 dbH.deleteSyncRecordByPath(path,isSecondary);
@@ -1398,7 +1399,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         
         totalUploaded++;
-        if (totalToUpload == totalUploaded) {
+        if (totalToUpload == totalUploaded || megaApi.getNumPendingUploads() == 0) {
             log("photo upload finished, now checking videos");
             if (isCompressedVideoPending() && !canceled) {
                 log("got pending videos, will start compress");
