@@ -2521,36 +2521,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							}
 						}
 						else {
-							int access = -1;
-							if (handleIntent != -1) {
-								MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
-								if (parentIntentN != null) {
-									access = megaApi.getAccess(parentIntentN);
-									switch (access) {
-										case MegaShare.ACCESS_OWNER:
-										case MegaShare.ACCESS_UNKNOWN: {
-											log("The intent set the parentHandleBrowser to " + handleIntent);
-											parentHandleBrowser = handleIntent;
-											break;
-										}
-										case MegaShare.ACCESS_READ:
-										case MegaShare.ACCESS_READWRITE:
-										case MegaShare.ACCESS_FULL: {
-											log("The intent set the parentHandleIncoming to " + handleIntent);
-											parentHandleIncoming = handleIntent;
-											drawerItem = DrawerItem.SHARED_ITEMS;
-											deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, this);
-											log("After calculate deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
-											break;
-										}
-										default: {
-											log("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
-											parentHandleBrowser = handleIntent;
-											break;
-										}
-									}
-								}
-							}
+							actionOpenFolder(handleIntent);
 						}
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_PASS_CHANGED)){
@@ -3168,6 +3139,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		hideFabButton();
 	}
 
+	void actionOpenFolder (long handleIntent) {
+    	log("actionOpenFolder");
+		int access = -1;
+		if (handleIntent != -1) {
+			MegaNode parentIntentN = megaApi.getNodeByHandle(handleIntent);
+			if (parentIntentN != null) {
+				access = megaApi.getAccess(parentIntentN);
+				switch (access) {
+					case MegaShare.ACCESS_OWNER:
+					case MegaShare.ACCESS_UNKNOWN: {
+						log("The intent set the parentHandleBrowser to " + handleIntent);
+						parentHandleBrowser = handleIntent;
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						break;
+					}
+					case MegaShare.ACCESS_READ:
+					case MegaShare.ACCESS_READWRITE:
+					case MegaShare.ACCESS_FULL: {
+						log("The intent set the parentHandleIncoming to " + handleIntent);
+						parentHandleIncoming = handleIntent;
+						drawerItem = DrawerItem.SHARED_ITEMS;
+						deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(parentIntentN, this);
+						log("After calculate deepBrowserTreeIncoming: "+deepBrowserTreeIncoming);
+						break;
+					}
+					default: {
+						log("DEFAULT: The intent set the parentHandleBrowser to " + handleIntent);
+						parentHandleBrowser = handleIntent;
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	protected void onPostResume() {
 		log("onPostResume");
@@ -3445,6 +3452,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
 					update2FASetting();
+				}
+				else if (getIntent().getAction().equals(Constants.ACTION_OPEN_FOLDER)) {
+					log("Open after LauncherFileExplorerActivityLollipop ");
+					long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+					actionOpenFolder(handleIntent);
+					selectDrawerItemLollipop(drawerItem);
 				}
 
     			intent.setAction(null);
@@ -18368,7 +18381,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		return false;
 	}
-	
+
 	//need to check image existence before use due to android content provider issue.
 	//Can not check query count - still get count = 1 even file does not exist
 	private boolean checkProfileImageExistence(Uri uri){
@@ -18385,7 +18398,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return isFileExist;
 	}
 
