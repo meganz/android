@@ -439,10 +439,4 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
     }
-    
-    
-    public void launchCallActivity( ){
-        Intent i = new Intent(this, TestActivity.class);
-        startActivity(i);
-    }
 }
