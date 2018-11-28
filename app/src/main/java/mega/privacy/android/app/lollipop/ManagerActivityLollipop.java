@@ -344,7 +344,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS;
 
 		public String getTag () {
 			switch (this) {
@@ -374,6 +374,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case CREDIT_CARD: return "ccF";
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
+				case PERMISSIONS: return "pF";
 			}
 			return null;
 		}
@@ -1581,7 +1582,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	break;
 	        }
 			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
-				if (pF != null && pF.isAdded()) {
+				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+				if (pF != null) {
 					if (pF.getCurrentPermission() == 2 && pF.askingForMicrophoneAndWriteCallsLog()) {
 						if (grantResults.length == 1) {
 //							Do nothing, asking for microphone, still need to ask for write call logs
@@ -1681,8 +1683,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
 		outState.putBoolean("onAskingPermissionsFragment", onAskingPermissionsFragment);
-		if (onAskingPermissionsFragment && pF != null && pF.isAdded()) {
-			getSupportFragmentManager().putFragment(outState, "pF", pF);
+		pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+		if (onAskingPermissionsFragment && pF != null) {
+			getSupportFragmentManager().putFragment(outState, FragmentTag.PERMISSIONS.getTag(), pF);
 		}
 	}
 
@@ -1743,7 +1746,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
 			onAskingPermissionsFragment = savedInstanceState.getBoolean("onAskingPermissionsFragment", false);
 			if (onAskingPermissionsFragment) {
-				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "pF");
+				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
 			}
 		}
 		else{
@@ -2945,19 +2948,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		boolean writeCallsGranted = checkPermission(Manifest.permission.WRITE_CALL_LOG);
 
 		if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted || !writeCallsGranted) {
-			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-			if (currentFragment != null) {
-				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-				getSupportFragmentManager().executePendingTransactions();
-			}
+			deleteCurrentFragment();
 
 			if (pF == null) {
 				pF = new PermissionsFragment();
 			}
-			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-			ft.replace(R.id.fragment_container, pF, "pF");
-			ft.commit();
-			getSupportFragmentManager().executePendingTransactions();
+
+			replaceFragment(pF, FragmentTag.PERMISSIONS.getTag());
 
 			onAskingPermissionsFragment = true;
 
@@ -2986,19 +2983,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		tB.setVisibility(View.VISIBLE);
 		abL.setVisibility(View.VISIBLE);
 
-		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-			getSupportFragmentManager().executePendingTransactions();
-		}
+		deleteCurrentFragment();
 
 		onAskingPermissionsFragment = false;
 
 		pF = null;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.setStatusBarColor(0);
-		}
+
+		changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
@@ -5581,29 +5572,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				replaceFragment(cuFL, FragmentTag.CAMERA_UPLOADS.getTag());
 
-
-    			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-						ActivityCompat.requestPermissions(this,
-				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								Constants.REQUEST_WRITE_STORAGE);
-					}
-
-//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//					if (!hasCameraPermission) {
-//						ActivityCompat.requestPermissions(this,
-//				                new String[]{Manifest.permission.CAMERA},
-//				                ManagerActivityLollipop.REQUEST_CAMERA);
-//					}
-
-				}
-
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
 				setToolbarTitle();
     			supportInvalidateOptionsMenu();
 				showFabButton();
-				showHideBottomNavigationView(false);
+				if (!getFirstTimeCam()) {
+					showHideBottomNavigationView(false);
+				}
 				bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
 				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
       			break;
