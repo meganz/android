@@ -127,6 +127,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                     else{
                         log("Awaiting info on listener");
+                        retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("3")){
@@ -142,6 +143,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                     else{
                         log("Awaiting info on listener");
+                        retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("5")) {
@@ -161,6 +163,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                     else{
                         log("Awaiting info on listener");
+                        retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("4")) {
@@ -184,8 +187,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("online status ---> "+status);
                         int connectionState = megaChatApi.getConnectionState();
                         log("connection state ---> "+connectionState);
+                        retryPendingConnections();
                     }
-
                 }
                 else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
@@ -424,5 +427,23 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+    }
+
+    public void retryPendingConnections(){
+        log("retryPendingConnections");
+        try{
+            if (megaApi != null){
+                megaApi.retryPendingConnections();
+            }
+
+            if(Util.isChatEnabled()){
+                if (megaChatApi != null){
+                    megaChatApi.retryPendingConnections(false, null);
+                }
+            }
+        }
+        catch (Exception e){
+            log("retryPendingConnections:Exception: "+e.getMessage());
+        }
     }
 }

@@ -189,16 +189,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
-		if (adapterList != null && mLayoutManager != null){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return  (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+		if (mLayoutManager != null) {
+			if (((ManagerActivityLollipop) context).isListCameraUploads) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+				}
 			}
-		}
-		else if (mLayoutManager != null){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return  (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+			else {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+				}
 			}
 		}
 
@@ -217,7 +219,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<PhotoSyncHolder> documentsList = null;
 			List<MegaNode> documentsGrid = null;
@@ -392,6 +393,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (type == TYPE_CAMERA) {
 				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			}
+			checkScroll();
 			return true;
 		}
 
@@ -423,6 +425,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 				}, 350);
 			}
+			checkScroll();
 			((ManagerActivityLollipop) context).setDrawerLockMode(false);
 		}
 
@@ -690,8 +693,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public void checkScroll () {
+		boolean isMultipleSelect = false;
+		if ((((ManagerActivityLollipop) context).isListCameraUploads && adapterList != null && adapterList.isMultipleSelect()) || (adapterGrid != null && adapterGrid.isMultipleSelect())) {
+			isMultipleSelect = true;
+		}
 		if (listView != null) {
-			if (listView.canScrollVertically(-1)) {
+			if (listView.canScrollVertically(-1) || isMultipleSelect) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -731,7 +738,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    scaleH = Util.getScaleH(outMetrics, density);
 
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
-		((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
 
 		if (type == TYPE_CAMERA) {
 			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
@@ -1620,7 +1626,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
 			case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
@@ -1689,8 +1694,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void itemClick(int position, ImageView imageView, int[] screenPosition) {
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
 
@@ -2024,7 +2027,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if(((ManagerActivityLollipop)context).getFirstTimeCam()){
 			((ManagerActivityLollipop) context).setFirstTimeCam(false);
