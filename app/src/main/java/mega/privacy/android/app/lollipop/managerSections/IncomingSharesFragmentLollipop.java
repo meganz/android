@@ -216,7 +216,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
@@ -512,7 +511,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	    density  = getResources().getDisplayMetrics().density;
 
 		((ManagerActivityLollipop)context).showFabButton();
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -895,7 +893,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
     	log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1489,7 +1486,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		log("onBackPressed deepBrowserTree:"+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;

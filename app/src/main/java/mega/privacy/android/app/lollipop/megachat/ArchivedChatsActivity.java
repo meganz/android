@@ -36,7 +36,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
-public class ArchivedChatsActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
+public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
     Toolbar tB;
     ActionBar aB;
@@ -226,20 +226,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
 
     public static void log(String log) {
         Util.log("ArchivedChatsActivity", log);
-    }
-
-    @Override
-    public void onClick(View v) {
-        log("onClick");
-
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
-        switch(v.getId()) {
-            case R.id.fab_chat_explorer: {
-
-                break;
-            }
-        }
     }
 
     @Override

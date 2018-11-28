@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,10 +16,11 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
-public class ChatPreferencesActivity extends AppCompatActivity {
+public class ChatPreferencesActivity extends PinActivityLollipop {
 
     FrameLayout fragmentContainer;
     SettingsChatFragment sttChat;
@@ -115,6 +115,7 @@ public class ChatPreferencesActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = true;
         super.onBackPressed();
     }
 
@@ -130,7 +131,7 @@ public class ChatPreferencesActivity extends AppCompatActivity {
         return true;
     }
 
-    private static void log(String log) {
+    public static void log(String log) {
         Util.log("ChatPreferencesActivity", log);
     }
 

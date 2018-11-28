@@ -433,9 +433,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		}		
 
 		recyclerView.setAdapter(adapterList);
-
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	void orderZips () {
@@ -665,7 +662,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		log("onItemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		ZipEntry currentNode = zipNodes.get(position);
 		
@@ -714,8 +710,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		log("itemClick: position: "+position);
 		this.screenPosition = screenPosition;
 		this.imageDrag = imageView;
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		ZipEntry currentNode = zipNodes.get(position);
 
@@ -832,10 +826,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		log("Depth: "+depth);
 		
 		log("onBackPressed, currentPath: "+currentPath);
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		
 		if(depth<3){
+			super.callToSuperBack = true;
 			super.onBackPressed();
 			
 		} 

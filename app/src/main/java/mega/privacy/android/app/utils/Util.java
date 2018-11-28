@@ -1854,13 +1854,6 @@ public class Util {
 		return cal;
 	}
 
-	public static Calendar calculateDateFromTimestamp2 (long timestamp){
-		log("calculateTimestamp: "+timestamp);
-		Calendar cal = Calendar.getInstance();
-		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
-		return cal;
-	}
-
 	public static boolean isChatEnabled (){
 		log("isChatEnabled");
 		if (dbH == null){
