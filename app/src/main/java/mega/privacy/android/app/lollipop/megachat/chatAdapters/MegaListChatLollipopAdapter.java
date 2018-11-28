@@ -54,7 +54,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -1103,7 +1103,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(title!=null){
 				log("ChatRoom title: "+title);
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
@@ -1147,8 +1147,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				log("ChatRoom title: "+chat.getTitle());
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
-				String dateFS = TimeChatUtils.formatDate(chat.getLastTimestamp(), TimeChatUtils.DATE_SHORT_SHORT_FORMAT);
+				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+				String dateFS = TimeUtils.formatDate(chat.getLastTimestamp(), TimeUtils.DATE_SHORT_SHORT_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
 				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;
@@ -1927,32 +1927,41 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					switch(termCode){
 						case MegaChatMessage.END_CALL_REASON_ENDED:{
 
+							int hours = duration / 3600;
 							int minutes = (duration % 3600) / 60;
 							int seconds = duration % 60;
 
-							if(minutes == 0){
-								textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
-							}
-							else{
-								if(seconds == 0){
-									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
-								}
-								else if (seconds == 1){
-									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
-								}
-								else{
-									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
-								}
-							}
+							textToShow = context.getString(R.string.call_ended_message);
 
-							try {
+                            if(hours != 0){
+                                String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                                textToShow = textToShow + textHours;
+                                if((minutes != 0)||(seconds != 0)){
+                                    textToShow = textToShow+", ";
+                                }
+                            }
+
+                            if(minutes != 0){
+                                String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                                textToShow = textToShow + textMinutes;
+                                if(seconds != 0){
+                                    textToShow = textToShow+", ";
+                                }
+                            }
+
+                            if(seconds != 0){
+                                String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                                textToShow = textToShow + textSeconds;
+                            }
+
+							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
 								textToShow = textToShow.replace("[B]", "");
 								textToShow = textToShow.replace("[/B]", "");
 								textToShow = textToShow.replace("[C]", "");
 								textToShow = textToShow.replace("[/C]", "");
-							} catch (Exception e) {
+							}catch (Exception e){
 							}
 
 							break;

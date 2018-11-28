@@ -176,8 +176,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 			switch(item.getItemId()){
 				case R.id.action_mode_close_button:{
 					log("on close button");
@@ -299,7 +297,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -319,6 +316,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -329,6 +328,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -530,7 +531,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void checkScroll() {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else if (!isMultipleselect()) {
@@ -577,7 +578,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
 			log("FileBrowserFragmentLollipop isList");
@@ -623,6 +623,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
+				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 //				adapter.setNodes(nodes);
             }
@@ -703,8 +704,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             } else {
                 adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
+                adapter.setListFragment(recyclerView);
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-                adapter.setNodes(nodes);
+//				addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+//                adapter.setNodes(nodes);
             }
 
 //            if (((ManagerActivityLollipop)context).parentHandleBrowser == megaApi.getRootNode().getHandle()) {
@@ -719,7 +722,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             recyclerView.setAdapter(adapter);
             fastScroller.setRecyclerView(recyclerView);
-            addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             setNodes(nodes);
             
             if (adapter.getItemCount() == 0) {
@@ -808,7 +810,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     @Override
     public void onClick(View v) {
         log("onClick");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         switch (v.getId()) {
             
             case R.id.transfers_overview_three_dots_layout: {
@@ -852,7 +853,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         log("item click position: " + position);
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         if (adapter.isMultipleSelect()) {
             log("itemClick:multiselectON");
             adapter.toggleSelection(position);
@@ -860,7 +860,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
             if (selectedNodes.size() > 0) {
                 updateActionModeTitle();
-                ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
             }
 //			else{
 //				hideMultipleSelect();
@@ -1457,7 +1456,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapter.setMultipleSelect(false);
-        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
         
         if (actionMode != null) {
             actionMode.finish();
@@ -1466,7 +1464,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     public int onBackPressed() {
         log("onBackPressed");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         
         if (adapter != null) {
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(adapter.getParentHandle());

@@ -2,8 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -14,8 +12,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -41,6 +37,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private Button bLogin;
     TextView tourText1;
     TextView tourText2;
+    TextView achievementProgramText;
     LinearLayout shapeGrey;
     private LinearLayout tourLoginCreate;
     private LinearLayout optionsLayout;
@@ -81,6 +78,9 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
         tourText2 = (TextView) v.findViewById(R.id.tour_text_2);
         tourText2.setGravity(Gravity.CENTER_VERTICAL);
+
+        achievementProgramText = (TextView) v.findViewById(R.id.text_achievements_program);
+        achievementProgramText.setText("*"+getString(R.string.footnote_achievements));
 
         shapeGrey = (LinearLayout) v.findViewById(R.id.shape_grey);
         optionsLayout = (LinearLayout) v.findViewById(R.id.options_layout);
@@ -127,6 +127,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        achievementProgramText.setVisibility(View.VISIBLE);
                         break;
                     }
                     case 1:{
@@ -134,6 +135,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
                         bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        achievementProgramText.setVisibility(View.GONE);
                         break;
                     }
                     case 2:{
@@ -141,6 +143,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
                         bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        achievementProgramText.setVisibility(View.GONE);
                         break;
                     }
                     case 3:{
@@ -148,6 +151,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+                        achievementProgramText.setVisibility(View.GONE);
                         break;
                     }
                 }

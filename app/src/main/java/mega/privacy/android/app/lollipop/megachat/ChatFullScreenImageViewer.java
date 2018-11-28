@@ -245,8 +245,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		int id = item.getItemId();
 		switch (id) {
 			case android.R.id.home: {
@@ -504,8 +502,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (isDeleteDialogShow && chatId != -1 && messages.get(positionG) != null) {
 			showConfirmationDeleteNode(chatId, messages.get(positionG));
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (savedInstanceState == null && adapterMega!= null){
 			ViewTreeObserver observer = viewPager.getViewTreeObserver();
@@ -1044,7 +1040,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	@Override
 	public void onBackPressed() {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 

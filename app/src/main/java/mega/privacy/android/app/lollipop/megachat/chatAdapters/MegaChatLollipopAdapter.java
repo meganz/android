@@ -71,7 +71,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.RTFFormatter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1167,16 +1167,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getPendingMessage().getUploadTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getPendingMessage().getUploadTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message.getPendingMessage().getUploadTimestamp()));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -1530,16 +1530,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -1561,22 +1561,32 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
 
+
+                    int hours = message.getDuration() / 3600;
                     int minutes = (message.getDuration() % 3600) / 60;
                     int seconds = message.getDuration() % 60;
 
-                    if(minutes == 0){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                    textToShow = context.getString(R.string.call_ended_message);
+
+                    if(hours != 0){
+                        String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                        textToShow = textToShow + textHours;
+                        if((minutes != 0)||(seconds != 0)){
+                            textToShow = textToShow+", ";
+                        }
                     }
-                    else{
-                        if(seconds == 0){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+
+                    if(minutes != 0){
+                        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                        textToShow = textToShow + textMinutes;
+                        if(seconds != 0){
+                            textToShow = textToShow+", ";
                         }
-                        else if (seconds == 1){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
-                        }
-                        else{
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
-                        }
+                    }
+
+                    if(seconds != 0){
+                        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                        textToShow = textToShow + textSeconds;
                     }
 
                     try {
@@ -1732,9 +1742,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -1742,7 +1752,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -1801,24 +1811,32 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
 
+                    int hours = message.getDuration() / 3600;
                     int minutes = (message.getDuration() % 3600) / 60;
                     int seconds = message.getDuration() % 60;
 
-                    if(minutes == 0){
-                        textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
-                    }
-                    else{
-                        if(seconds == 0){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
-                        }
-                        else if (seconds == 1){
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
-                        }
-                        else{
-                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                    textToShow = context.getString(R.string.call_ended_message);
+
+                    if(hours != 0){
+                        String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                        textToShow = textToShow + textHours;
+                        if((minutes != 0)||(seconds != 0)){
+                            textToShow = textToShow+", ";
                         }
                     }
 
+                    if(minutes != 0){
+                        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                        textToShow = textToShow + textMinutes;
+                        if(seconds != 0){
+                            textToShow = textToShow+", ";
+                        }
+                    }
+
+                    if(seconds != 0){
+                        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                        textToShow = textToShow + textSeconds;
+                    }
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
@@ -1828,6 +1846,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         textToShow = textToShow.replace("[/C]", "</font>");
                     } catch (Exception e) {
                     }
+
 
                     break;
                 }
@@ -1918,15 +1937,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -2056,9 +2075,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
 
                         break;
@@ -2067,7 +2086,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -2295,16 +2314,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -2442,9 +2461,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -2452,7 +2471,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -2660,16 +2679,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     switch (messages.get(position - 1).getInfoToShow()) {
                         case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                             ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                            ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                             ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                             break;
                         }
                         case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                             log("CHAT_ADAPTER_SHOW_TIME");
                             ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                            ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                             break;
                         }
                         case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -2902,9 +2921,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                             log("CHAT_ADAPTER_SHOW_ALL");
                             ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                            ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                             ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                            ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                             ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                             break;
                         }
@@ -2912,7 +2931,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             log("CHAT_ADAPTER_SHOW_TIME--");
                             ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                            ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                             ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                             break;
                         }
@@ -3147,16 +3166,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -3526,9 +3545,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -3536,7 +3555,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -3812,16 +3831,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -4304,9 +4323,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -4314,7 +4333,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -4621,16 +4640,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -5007,9 +5026,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeContactText.setText(TimeUtils.formatTime(message));
                         holder.timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -5017,7 +5036,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeContactText.setText(TimeUtils.formatTime(message));
                         holder.timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -5371,16 +5390,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
-                        holder.timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -5543,9 +5562,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeContactText.setText(TimeUtils.formatTime(message));
                         holder.timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -5553,7 +5572,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         holder.dateLayout.setVisibility(View.GONE);
                         holder.titleContactMessage.setVisibility(View.VISIBLE);
-                        holder.timeContactText.setText(TimeChatUtils.formatTime(message));
+                        holder.timeContactText.setText(TimeUtils.formatTime(message));
                         holder.timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -5692,16 +5711,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -5815,9 +5834,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -5825,7 +5844,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -5921,16 +5940,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -6040,9 +6059,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -6050,7 +6069,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -6141,16 +6160,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -6255,9 +6274,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -6265,7 +6284,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -6360,16 +6379,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
                         log("CHAT_ADAPTER_SHOW_TIME");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeUtils.formatTime(message));
                         break;
                     }
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
@@ -6484,9 +6503,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         log("CHAT_ADAPTER_SHOW_ALL");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -6494,7 +6513,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("CHAT_ADAPTER_SHOW_TIME--");
                         ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeUtils.formatTime(message));
                         ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -7950,10 +7969,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public void onClick(View v) {
         log("onClick()");
-
-        //int position = (Integer) v.getTag();
-        log("onClick");
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderMessageChat holder = (ViewHolderMessageChat) v.getTag();
         int currentPosition = holder.getAdapterPosition();
