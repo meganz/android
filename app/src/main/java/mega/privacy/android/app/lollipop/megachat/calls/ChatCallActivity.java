@@ -661,9 +661,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
 
-        checkPermissionsWriteLog();
-
         if(checkPermissions()){
+            checkPermissionsWriteLog();
             showInitialFABConfiguration();
         }
     }
@@ -1426,18 +1425,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public boolean checkPermissionsWriteLog(){
+    public void checkPermissionsWriteLog(){
         log("checkPermissionsWriteLog()");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
             if (!hasWriteLogPermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
-                return false;
             }else{
-                return true;
+
             }
         }
-        return true;
     }
 
     public boolean checkPermissions(){
@@ -1813,6 +1810,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
+                       checkPermissionsWriteLog();
                        showInitialFABConfiguration();
                     }
                 }
@@ -1825,6 +1823,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
+                        checkPermissionsWriteLog();
                         showInitialFABConfiguration();
                     }
                 }
@@ -1837,11 +1836,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             case Constants.WRITE_LOG: {
                 log("WRITE_LOG");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(checkPermissionsWriteLog()){
-                        log("accepted WRITE_LOG permissions");
-                    }else{
-                        log("rejected WRITE_LOG permissions");
-                    }
+                    checkPermissionsWriteLog();
                 }
                 break;
             }
