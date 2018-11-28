@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.PixelCopy;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -61,9 +62,6 @@ import nz.mega.sdk.MegaChatVideoListenerInterface;
 import nz.mega.sdk.MegaNode;
 
 import static android.view.View.GONE;
-import static mega.privacy.android.app.utils.Util.context;
-import static mega.privacy.android.app.utils.Util.deleteFolderAndSubfolders;
-import static mega.privacy.android.app.utils.Util.percScreenLogin;
 
 public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
@@ -403,11 +401,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 log("peer: "+peer.getHandle()+", VIDEO ON- listener == null ");
                 holder.parentSurfaceView.removeAllViews();
 
-                SurfaceView surfaceView = new SurfaceView(context);
-                surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-                surfaceView.setZOrderMediaOverlay(true);
+                TextureView myTexture = new TextureView(context);
+                myTexture.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+                myTexture.setAlpha(1.0f);
+                myTexture.setRotation(0);
 
-                GroupCallListener listenerPeer = new GroupCallListener(context, surfaceView, peer.getHandle());
+                GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getHandle());
                 peer.setListener(listenerPeer);
 
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
@@ -422,13 +421,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
 
                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-                if(peer.getListener().getHeight() != 0){
-                    peer.getListener().setHeight(0);
-                }
-                if(peer.getListener().getWidth() != 0){
-                    peer.getListener().setWidth(0);
-                }
 
             }else{
                 log("peer: "+peer.getHandle()+", VIDEO ON - listener != null");
@@ -443,8 +435,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                             ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
 
                             holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-
                             if(peer.getListener().getHeight() != 0){
                                 peer.getListener().setHeight(0);
                             }
@@ -455,29 +445,15 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                             log("peer: "+peer.getHandle()+", VIDEO ON- getParent 1 ");
 
                             holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-                            if(peer.getListener().getHeight() != 0){
-                                peer.getListener().setHeight(0);
-                            }
-                            if(peer.getListener().getWidth() != 0){
-                                peer.getListener().setWidth(0);
-                            }
                         }
                     }else{
                         log("peer: "+peer.getHandle()+", VIDEO ON- getParent 0 ");
                         holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                        peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-                        if(peer.getListener().getHeight() != 0){
-                            peer.getListener().setHeight(0);
-                        }
-                        if(peer.getListener().getWidth() != 0){
-                            peer.getListener().setWidth(0);
-                        }
+
                     }
                 }else{
                     if(holder.parentSurfaceView.getChildAt(0).equals(peer.getListener().getSurfaceView())){
                         log("peer: "+peer.getHandle()+", VIDEO ON- getChildCount() != 0 it is the same");
-                        peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
                         if(peer.getListener().getHeight() != 0){
                             peer.getListener().setHeight(0);
                         }
@@ -497,7 +473,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                                 ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
 
                                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
                                 if(peer.getListener().getHeight() != 0){
                                     peer.getListener().setHeight(0);
                                 }
@@ -507,24 +482,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                             }else{
                                 log("peer: "+peer.getHandle()+", VIDEO ON- getChildCount() != 0 - it is not the same - getParent 1  ");
                                 holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                                peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-                                if(peer.getListener().getHeight() != 0){
-                                    peer.getListener().setHeight(0);
-                                }
-                                if(peer.getListener().getWidth() != 0){
-                                    peer.getListener().setWidth(0);
-                                }
+
                             }
                         }else{
                             log("peer: "+peer.getHandle()+", VIDEO ON- getChildCount() != 0 - it is not the same - getParent 0 ");
                             holder.parentSurfaceView.addView(peer.getListener().getSurfaceView());
-                            peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-                            if(peer.getListener().getHeight() != 0){
-                                peer.getListener().setHeight(0);
-                            }
-                            if(peer.getListener().getWidth() != 0){
-                                peer.getListener().setWidth(0);
-                            }
+
                         }
                     }
 
@@ -1107,8 +1070,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         if(getItemCount()!=0){
             for(InfoPeerGroupCall peer:peers){
                 if(peer.getListener()!=null){
-                    peer.getListener().getSurfaceView().getHolder().setSizeFromLayout();
-
                     if(peer.getListener().getWidth()!=0){
                         peer.getListener().setWidth(0);
                     }

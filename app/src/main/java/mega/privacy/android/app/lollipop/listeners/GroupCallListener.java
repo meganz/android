@@ -6,6 +6,7 @@ import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
@@ -24,16 +25,16 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     int width;
     int height;
     Bitmap bitmap;
-    SurfaceView surfaceView = null;
+    TextureView myTexture = null;
     MegaSurfaceRendererGroup localRenderer = null;
 
-    public GroupCallListener(Context context, SurfaceView surfaceView, Long peerHandle) {
+    public GroupCallListener(Context context, TextureView myTexture, Long peerHandle) {
         log("GroupCallListener");
         this.context = context;
         this.width = 0;
         this.height = 0;
-        this.surfaceView = surfaceView;
-        this.localRenderer = new MegaSurfaceRendererGroup(surfaceView, peerHandle);
+        this.myTexture = myTexture;
+        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerHandle);
     }
 
     @Override
@@ -46,42 +47,35 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             this.width = width;
             this.height = height;
 
+            int viewWidth = myTexture.getWidth();
+            int viewHeight = myTexture.getHeight();
 
-            SurfaceHolder Sholder = surfaceView.getHolder();
-            Sholder.setFormat(PixelFormat.TRANSPARENT);
+            if ((viewWidth != 0) && (viewHeight != 0)) {
+                int holderWidth = viewWidth < width ? viewWidth : width;
+                int holderHeight = holderWidth * viewHeight / viewWidth;
+                if (holderHeight > viewHeight) {
 
-            if (Sholder != null) {
-                int viewWidth = surfaceView.getWidth();
-                int viewHeight = surfaceView.getHeight();
-
-                if ((viewWidth != 0) && (viewHeight != 0)) {
-                    int holderWidth = viewWidth < width ? viewWidth : width;
-                    int holderHeight = holderWidth * viewHeight / viewWidth;
-                    if (holderHeight > viewHeight) {
-
-                        holderHeight = viewHeight;
-                        holderWidth = holderHeight * viewWidth / viewHeight;
-                    }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
-                    Sholder.setFixedSize(holderWidth, holderHeight);
-                }else{
-                    this.width = -1;
-                    this.height = -1;
+                    holderHeight = viewHeight;
+                    holderWidth = holderHeight * viewWidth / viewHeight;
                 }
+                this.bitmap = localRenderer.CreateBitmap(width, height);
+            }else{
+                this.width = -1;
+                this.height = -1;
             }
+
         }
 
         if (bitmap != null) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
             localRenderer.DrawBitmap(false);
         }
     }
 
-    public SurfaceView getSurfaceView() {
-        return surfaceView;
+    public TextureView getSurfaceView() {
+        return myTexture;
     }
 
     public MegaSurfaceRendererGroup getLocalRenderer() {
