@@ -6,25 +6,22 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+
+import java.util.Timer;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -52,11 +49,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     boolean beep = false;
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
-    String remoteMessageType = "";
 
-    private ChatAdvancedNotificationBuilder chatNotificationBuilder;
-
-    Handler h;
+    private static final int STOP_SELF_AFTER = 60 * 1000;
 
     @Override
     public void onCreate() {
@@ -71,98 +65,109 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
         showMessageNotificationAfterPush = false;
         beep = false;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stop();
+            }
+        }, STOP_SELF_AFTER);
     }
 
     @Override
     public void onDestroy() {
-        log("onDestroyFCM");
+        log("onDestroy incoming call foreground service");
         super.onDestroy();
-        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.cancel(1086);
         if(wl != null){
             log("wifi lock release");
             wl.release();
         }
-        if(lock != null){
+        if (lock != null) {
             log("wake lock release");
             lock.release();
         }
-        stopForeground(true);
+        stop();
     }
-    
+
+    private void stop() {
+        stopForeground(true);
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if(manager != null) {
+            manager.cancel(notificationId);
+        }
+        stopSelf();
+    }
+
     public static final String NOTIFICATION_CHANNEL_ID = "10099";
     public static final int notificationId = 1086;
 
-    public void createNotification(String title,String message) {
+    public void createNotification() {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setContentTitle(title)
-                .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentText(message)
-                .setAutoCancel(false)
-                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+        mBuilder.setSmallIcon(R.drawable.ic_call_started)
+                .setAutoCancel(false);
+//                .setContentText(message)
+//                .setContentTitle(title)
+//                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,"NOTIFICATION_CHANNEL_NAME",importance);
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            notificationChannel.setVibrationPattern(new long[] {100,200,300,400,500,400,300,200,400});
-            assert mNotificationManager != null;
+//            notificationChannel.enableLights(true);
+//            notificationChannel.setLightColor(Color.RED);
+//            notificationChannel.enableVibration(true);
+//            notificationChannel.setVibrationPattern(new long[] {100,200,300,400,500,400,300,200,400});
             mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
-            mNotificationManager.createNotificationChannel(notificationChannel);
-
+            if (mNotificationManager != null) {
+                mNotificationManager.createNotificationChannel(notificationChannel);
+            }
         }
-        assert mNotificationManager != null;
-        Notification notification = mBuilder.build();
-//        mNotificationManager.notify(notificationId,notification);
-        startForeground(notificationId,notification);
+        if (mNotificationManager != null) {
+            Notification notification = mBuilder.build();
+            startForeground(notificationId,notification);
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        TL.log(this,"network available: " + (cm.getActiveNetworkInfo() != null) );
-        if(cm.getActiveNetworkInfo() != null) {
-            TL.log(this,cm.getActiveNetworkInfo().getState());
-            TL.log(this,cm.getActiveNetworkInfo().getDetailedState());
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        log("network available: " + (cm.getActiveNetworkInfo() != null));
+        if (cm.getActiveNetworkInfo() != null) {
+            log(cm.getActiveNetworkInfo().getState() + "");
+            log(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
-        int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        }
-
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ":MegaDownloadServicePowerLock");
-        if(!wl.isHeld()){
+        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        lock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF,"MegaIncomingCallWifiLock");
+        PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,":MegaIncomingCallPowerLock");
+        if (!wl.isHeld()) {
             wl.acquire();
         }
-        if(!lock.isHeld()){
+        if (!lock.isHeld()) {
             lock.acquire();
         }
 
-
-        createNotification("incoming call","incoming call");
+        createNotification();
         log("CALL notification");
         //Leave the flag showMessageNotificationAfterPush as it is
         //If true - wait until connection finish
         //If false, no need to change it
         log("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
         UserCredentials credentials = dbH.getCredentials();
-        String gSession = credentials.getSession();
-        if (megaApi.getRootNode() == null) {
-            log("RootNode = null");
-            performLoginProccess(gSession);
+        if (credentials == null) {
+            log("There are not user credentials");
         } else {
-            log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
-            int ret = megaChatApi.getInitState();
-            log("result of init ---> " + ret);
-            int status = megaChatApi.getOnlineStatus();
-            log("online status ---> " + status);
-            int connectionState = megaChatApi.getConnectionState();
-            log("connection state ---> " + connectionState);
+            String gSession = credentials.getSession();
+            if (megaApi.getRootNode() == null) {
+                log("RootNode = null");
+                performLoginProccess(gSession);
+            } else {
+                log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+                int ret = megaChatApi.getInitState();
+                log("result of init ---> " + ret);
+                int status = megaChatApi.getOnlineStatus();
+                log("online status ---> " + status);
+                int connectionState = megaChatApi.getConnectionState();
+                log("connection state ---> " + connectionState);
+            }
         }
         return START_NOT_STICKY;
     }
@@ -303,7 +308,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     }
 
-    private static void log(Object any) {
-        Util.log("IncomingCallService",any.toString());
+    private static void log(String message) {
+        Util.log("IncomingCallService",message);
     }
 }

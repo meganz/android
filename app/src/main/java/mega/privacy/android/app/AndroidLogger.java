@@ -3,7 +3,6 @@ package mega.privacy.android.app;
 
 import android.util.Log;
 
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaLoggerInterface;
 
@@ -21,8 +20,7 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
     public void log(String time, int logLevel, String source, String message) {
         //display to console
         if (Util.DEBUG) {
-//			Log.d(TAG,createSourceMessage(message) + ": " + createMessage(message));
-            TL.log(TAG, createSourceMessage(message) + ": " + createMessage(message));
+			Log.d(TAG,createSourceMessage(message) + ": " + createMessage(message));
         }
 
         //save to log file
