@@ -6129,7 +6129,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				parentHandleSearch = -1;
 				levelsSearch = -1;
 				drawerItem = DrawerItem.SEARCH;
-				selectDrawerItemLollipop(DrawerItem.SEARCH);
+				selectDrawerItemLollipop(drawerItem);
 				return true;
 			}
 
@@ -6164,10 +6164,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sFLol.setAllowedMultiselect(true);
 					textSubmitted = false;
 				}else if (textsearchQuery) {
-					selectDrawerItemLollipop(DrawerItem.SEARCH);
+//					selectDrawerItemLollipop(DrawerItem.SEARCH);
+					refreshFragment(FragmentTag.SEARCH.getTag());
 				}else{
 					searchQuery = newText;
-					selectDrawerItemLollipop(DrawerItem.SEARCH);
+//					selectDrawerItemLollipop(DrawerItem.SEARCH);
+					refreshFragment(FragmentTag.SEARCH.getTag());
 				}
 				return true;
 			}
@@ -17540,7 +17542,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					case 0:
 					case 1:{
 						lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-						fabButton.setLayoutParams(lp);
 						fabButton.setVisibility(View.VISIBLE);
 						break;
 					}
@@ -17605,6 +17606,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 		}
+		fabButton.setLayoutParams(lp);
 	}
 
 	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
