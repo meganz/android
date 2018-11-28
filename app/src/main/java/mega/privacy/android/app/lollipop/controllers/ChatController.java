@@ -57,6 +57,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.Util.toCDATA;
+
 public class ChatController {
 
     Context context;
@@ -650,7 +652,7 @@ public class ChatController {
                 }else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     log("Message type TRUNCATE");
 
-                    String textToShow = String.format(context.getString(R.string.history_cleared_by), megaChatApi.getMyFullname());
+                    String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
                     try{
                         textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
