@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -233,11 +232,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     public void setNextPermission () {
-        log("setNextPermission: "+numItems);
         if (items != null && items.length > 0) {
-            for (int i=0; i<items.length; i++) {
+            for (int i=0; i<numItems; i++) {
                 if (items[i] == currentPermission) {
-                    if (i+1 < items.length) {
+                    if (i+1 < numItems) {
                         permissionsPosition++;
                         currentPermission = items[i+1];
                         setContent(currentPermission);
