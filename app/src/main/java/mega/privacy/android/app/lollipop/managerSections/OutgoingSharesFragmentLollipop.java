@@ -539,7 +539,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	}
 
 	public void checkScroll () {
-		if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())){
+		if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())){
 			((ManagerActivityLollipop) context).changeActionBarElevation(true);
 		}
 		else {
@@ -1254,7 +1254,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.GONE);
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
-
+				checkScroll();
 				((ManagerActivityLollipop) context).showFabButton();
 			}
 			else{
