@@ -1510,7 +1510,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         if (bigCameraGroupCallFragment != null) {
-            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
@@ -3605,7 +3604,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                     if (bigCameraGroupCallFragment != null) {
                         log("updatePeers()  destroy bigCameraGroupCallFragment)");
-                        bigCameraGroupCallFragment.removeSurfaceView();
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.remove(bigCameraGroupCallFragment);
                         bigCameraGroupCallFragment = null;
@@ -3992,7 +3990,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 //First time:
                 //Remove Camera element, because with incoming, avatar is the only showed
                 if (bigCameraGroupCallFragment != null) {
-                    bigCameraGroupCallFragment.removeSurfaceView();
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(bigCameraGroupCallFragment);
                     bigCameraGroupCallFragment = null;
@@ -4019,7 +4016,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         //Remove big Camera
         if(bigCameraGroupCallFragment != null){
             log("REMOVE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
@@ -4044,7 +4040,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         //Remove big Camera
         if (bigCameraGroupCallFragment != null) {
             log("REMOVE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
