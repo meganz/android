@@ -9,8 +9,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
 
@@ -31,8 +33,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     long chatId;
     Long userHandle;
 
-    public SurfaceView fullScreenSurfaceView;
-    MegaSurfaceRendererGroupBig renderer;
+    public TextureView myTexture;
+    MegaSurfaceRendererGroup renderer;
 
     public static BigCameraGroupCallFragment newInstance(long chatId, long userHandle) {
         log("newInstance");
@@ -67,14 +69,15 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
             return null;
         }
 
-        View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
+        View v = inflater.inflate(R.layout.fragment_camera_full_screen_big, container, false);
+        myTexture = (TextureView) v.findViewById(R.id.texture_view_video);
+        myTexture.setAlpha(1.0f);
+        myTexture.setRotation(0);
+        myTexture.setVisibility(View.VISIBLE);
+        this.width = 0;
+        this.height = 0;
+        renderer = new MegaSurfaceRendererGroup(myTexture, userHandle);
 
-        fullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-        fullScreenSurfaceView.setSecure(true);
-
-        SurfaceHolder localSurfaceHolder = fullScreenSurfaceView.getHolder();
-        localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        renderer = new MegaSurfaceRendererGroupBig(fullScreenSurfaceView, userHandle);
 
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
@@ -97,10 +100,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
             this.width = width;
             this.height = height;
 
-            SurfaceHolder holder = fullScreenSurfaceView.getHolder();
-            if (holder != null) {
-                int viewWidth = fullScreenSurfaceView.getWidth();
-                int viewHeight = fullScreenSurfaceView.getHeight();
+                int viewWidth = myTexture.getWidth();
+                int viewHeight = myTexture.getHeight();
                 if ((viewWidth != 0) && (viewHeight != 0)) {
                     int holderWidth = viewWidth < width ? viewWidth : width;
                     int holderHeight = holderWidth * viewHeight / viewWidth;
@@ -109,13 +110,10 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
                     this.bitmap = renderer.CreateBitmap(width, height);
-                    holder.setFixedSize(holderWidth, holderHeight);
-                }
-                else{
+                }else{
                     this.width = -1;
                     this.height = -1;
                 }
-            }
         }
 
         if (bitmap != null) {
@@ -135,13 +133,12 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     @Override
     public void onDestroy(){
         log("onDestroy");
-        if(fullScreenSurfaceView.getParent()!=null){
-            if(fullScreenSurfaceView.getParent().getParent()!=null){
+        if(myTexture.getParent()!=null){
+            if(myTexture.getParent().getParent()!=null){
                 log("onDestroy() removeView chatId: "+chatId);
-                ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
+                ((ViewGroup)myTexture.getParent()).removeView(myTexture);
             }
         }
-        fullScreenSurfaceView.setVisibility(View.GONE);
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, -1, this);
@@ -154,28 +151,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     @Override
     public void onResume() {
         log("onResume");
-        this.width = 0;
-        this.height = 0;
-        fullScreenSurfaceView.setVisibility(View.VISIBLE);
         super.onResume();
-    }
-
-    public void removeSurfaceView(){
-        log("removeSurfaceView()");
-        if(fullScreenSurfaceView.getParent()!=null){
-            if(fullScreenSurfaceView.getParent().getParent()!=null){
-                log("removeSurfaceView() removeView chatId: "+chatId);
-                ((ViewGroup)fullScreenSurfaceView.getParent()).removeView(fullScreenSurfaceView);
-            }
-        }
-        fullScreenSurfaceView.setVisibility(View.GONE);
-        if(userHandle.equals(megaChatApi.getMyUserHandle())){
-            log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
-            megaChatApi.removeChatVideoListener(chatId, -1, this);
-        }else{
-            log("removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
-            megaChatApi.removeChatVideoListener(chatId, userHandle, this);
-        }
     }
 
     private static void log(String log) {
