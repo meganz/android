@@ -163,7 +163,6 @@ public class SearchFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
 			switch(item.getItemId()){
@@ -259,7 +258,6 @@ public class SearchFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -277,7 +275,8 @@ public class SearchFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
-
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -287,6 +286,8 @@ public class SearchFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -481,7 +482,7 @@ public class SearchFragmentLollipop extends Fragment{
 
 	public void checkScroll () {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -561,8 +562,6 @@ public class SearchFragmentLollipop extends Fragment{
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			if(((ManagerActivityLollipop)context).searchQuery!=null){
@@ -623,6 +622,7 @@ public class SearchFragmentLollipop extends Fragment{
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
+				adapter.setListFragment(recyclerView);
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
@@ -675,6 +675,7 @@ public class SearchFragmentLollipop extends Fragment{
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
+				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			adapter.setMultipleSelect(false);
@@ -703,7 +704,6 @@ public class SearchFragmentLollipop extends Fragment{
 	
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -712,12 +712,12 @@ public class SearchFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 
 			}
 		}
 		else{
-			((ManagerActivityLollipop)context).textSubmitted = true;
+//			((ManagerActivityLollipop)context).textSubmitted = true;
+			((ManagerActivityLollipop)context).setTextSubmitted();
 			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
 				log("is a folder");
@@ -1147,7 +1147,6 @@ public class SearchFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1183,7 +1182,6 @@ public class SearchFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).levelsSearch > 0){
 			log("levels > 0");

@@ -146,7 +146,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 	public void checkScroll() {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -259,7 +259,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -302,6 +301,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+            checkScroll();
 			return true;
 		}
 
@@ -310,6 +311,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+            checkScroll();
 		}
 
 		@Override
@@ -508,8 +511,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if (((ManagerActivityLollipop)context).isList){
 			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
@@ -544,6 +545,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setListFragment(recyclerView);
 //				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -665,6 +667,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setListFragment(recyclerView);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -757,7 +760,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -766,7 +768,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 
 			}
 		}
@@ -1213,7 +1214,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1221,7 +1221,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	}
 	
 	public int onBackPressed(){
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;

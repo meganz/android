@@ -75,6 +75,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
@@ -587,8 +588,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 			if(Util.isChatEnabled()){
 
 				chatSettings = dbH.getChatSettings();
@@ -748,8 +747,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
@@ -821,13 +818,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if(chatRoomTo!=null){
-			if(startVideo){
-				log("Start video call");
-				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+
+			if(megaChatApi.getChatCall(chatRoomTo.getChatId())!=null){
+				Intent i = new Intent(this, ChatCallActivity.class);
+				i.putExtra("chatHandle", chatRoomTo.getChatId());
+				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(i);
 			}
 			else{
-				log("Start audio call");
-				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+				if(startVideo){
+					log("Start video call");
+					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+				}
+				else{
+					log("Start audio call");
+					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+				}
 			}
 		}
 		else{
@@ -1166,7 +1172,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
 			case R.id.chat_contact_properties_clear_layout: {
@@ -1784,8 +1789,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		log("onResume-ContactChatInfoActivityLollipop");
 		super.onResume();
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		if(Util.isChatEnabled()){
 			setContactPresenceStatus();
 		} else{
@@ -1849,6 +1852,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onBackPressed() {
+		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 

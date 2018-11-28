@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
@@ -31,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
@@ -50,7 +50,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 @SuppressLint("NewApi")
-public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener, MegaRequestListenerInterface {
+public class PinLockActivityLollipop extends BaseActivity implements OnClickListener, MegaRequestListenerInterface {
 
 	public static String ACTION_SET_PIN_LOCK = "ACTION_SET";
 	public static String ACTION_RESET_PIN_LOCK = "ACTION_RESET";
@@ -316,7 +316,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 				}
 			}
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	private void addAlphanumericPin(){
@@ -1498,7 +1497,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.button_logout:{
 				attemps=0;
@@ -1518,7 +1516,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 	public void checkPasswordText() {
 		log("checkPasswordText");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
     	if(passwordText.length()!=0){
     		passwordText.setCursorVisible(false);
@@ -1627,8 +1624,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		super.onResume();
 
 		MegaApplication.activityResumed();
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
