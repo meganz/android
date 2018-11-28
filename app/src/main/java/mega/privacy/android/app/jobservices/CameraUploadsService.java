@@ -1,6 +1,5 @@
 package mega.privacy.android.app.jobservices;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,13 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.icu.text.AlphabeticIndex;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StatFs;
@@ -437,6 +434,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             totalToUpload++;
             String path;
             if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO) {
+                path = file.getNewPath();
+                File temp = new File(path);
+                if (!temp.exists()) {
+                    path = file.getLocalPath();
+                }
+            } else if(file.getType() == SyncRecord.TYPE_VIDEO && shouldCompressVideo()) {
                 path = file.getNewPath();
                 File temp = new File(path);
                 if (!temp.exists()) {
@@ -1140,7 +1143,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         stopForeground(true);
         if (mNotificationManager != null) {
             log("cancelling notification id is " + notificationChannelId);
-            mNotificationManager.cancelAll();
+//            mNotificationManager.cancelAll();
+            mNotificationManager.cancel(notificationId);
         } else {
             log("no notification to cancel");
         }
@@ -1160,7 +1164,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         finish();
         return false;
     }
-    
+
     public static void log(String message) {
         Util.log("CameraUploadsService",message);
     }
@@ -1461,7 +1465,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
-        log("total videos are " + fullList.size() + " " + totalPendingSizeInMB + "byte to Conversion");
+        log("total videos are " + fullList.size() + " " + totalPendingSizeInMB + "mbyte to Conversion");
         
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
             Thread t = new Thread(new Runnable() {
@@ -1613,7 +1617,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     private void showProgressNotification(int progressPercent,PendingIntent pendingIntent,String message,String subText,String contentText) {
-        log("showProgressNotification");
+//        log("showProgressNotification");
         mNotification = null;
         mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
         

@@ -3428,6 +3428,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
     
     private void disableVideoCompressionSizeSettings(){
         cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+        restartCameraUpload();
     }
     
     private void enableVideoQualitySettings(){
@@ -3460,6 +3461,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
             }
             cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
         }
+        restartCameraUpload();
     }
     
     private void restartCameraUpload(){

@@ -180,7 +180,9 @@ public class VideoCompressor {
             VideoUpload video = new VideoUpload(path,record.getNewPath(),size);
             try {
                 prepareAndChangeResolutionSingleThread(video);
-                updater.onCompressSuccessful(record);
+                if(isRunning) {
+                    updater.onCompressSuccessful(record);
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
                 updater.onCompressFailed(record);
