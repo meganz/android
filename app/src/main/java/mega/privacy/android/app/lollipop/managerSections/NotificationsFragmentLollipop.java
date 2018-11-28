@@ -166,7 +166,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
                 }
 
-                String textToShow = String.format(getString(R.string.context_empty_notifications), getString(R.string.section_contacts));
+                String textToShow = String.format(getString(R.string.context_empty_notifications));
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
