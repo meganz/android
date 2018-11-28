@@ -64,7 +64,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     Handler h;
 
-    WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
 
     @Override
@@ -177,34 +176,30 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If true - wait until connection finish
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
-                    
-                    PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                    log("is in IDLE " + pm.isDeviceIdleMode());
-                    wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaDownloadServicePowerLock:");
-                    wl.acquire();
-                    wl.release();
-                    
-                    startService(new Intent(this,IncomingCallService.class));
-
-//                    launchCallActivity();
-                    
-                    //=======================================
-//                    String gSession = credentials.getSession();
-//                    if (megaApi.getRootNode() == null) {
-//                        log("RootNode = null");
-//                        performLoginProccess(gSession);
-//                    }
-//                    else{
-//                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
-////                        String gSession = credentials.getSession();
-//                        int ret = megaChatApi.getInitState();
-//                        log("result of init ---> " + ret);
-//                        int status = megaChatApi.getOnlineStatus();
-//                        log("online status ---> "+status);
-//                        int connectionState = megaChatApi.getConnectionState();
-//                        log("connection state ---> "+connectionState);
-//                    }
-
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                        log("is in IDLE " + pm.isDeviceIdleMode());
+                        wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
+                        wl.acquire();
+                        wl.release();
+                        startService(new Intent(this,IncomingCallService.class));
+                    } else {
+                        String gSession = credentials.getSession();
+                        if (megaApi.getRootNode() == null) {
+                            log("RootNode = null");
+                            performLoginProccess(gSession);
+                        }
+                        else{
+                            log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+//                        String gSession = credentials.getSession();
+                            int ret = megaChatApi.getInitState();
+                            log("result of init ---> " + ret);
+                            int status = megaChatApi.getOnlineStatus();
+                            log("online status ---> "+status);
+                            int connectionState = megaChatApi.getConnectionState();
+                            log("connection state ---> "+connectionState);
+                        }
+                    }
                 }
                 else if(remoteMessageType.equals("2")){
                     log("CHAT notification");

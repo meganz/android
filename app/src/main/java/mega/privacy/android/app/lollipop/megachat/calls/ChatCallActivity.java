@@ -378,7 +378,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
-        stopService(new Intent(this,IncomingCallService.class));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calls_chat);
 
