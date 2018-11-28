@@ -177,12 +177,15 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                        log("is in IDLE " + pm.isDeviceIdleMode());
-                        wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
-                        wl.acquire();
-                        wl.release();
-                        startService(new Intent(this,IncomingCallService.class));
+                        if(!MegaApplication.isActivityVisible()) {
+                            log("in background, launch foreground service!");
+                            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                            log("is in IDLE " + pm.isDeviceIdleMode());
+                            wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
+                            wl.acquire();
+                            wl.release();
+                            startService(new Intent(this,IncomingCallService.class));
+                        }
                     } else {
                         String gSession = credentials.getSession();
                         if (megaApi.getRootNode() == null) {
