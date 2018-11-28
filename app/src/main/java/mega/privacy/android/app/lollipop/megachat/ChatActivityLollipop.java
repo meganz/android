@@ -34,6 +34,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -589,6 +590,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
         subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
+        subtitleToobar.setFocusable(true);
+        subtitleToobar.setFocusableInTouchMode(true);
+        subtitleToobar.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        subtitleToobar.setMarqueeRepeatLimit(-1);
+        subtitleToobar.setSingleLine(true);
+        subtitleToobar.setHorizontallyScrolling(true);
         iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
 
         titleToolbar.setText(" ");
@@ -1386,6 +1393,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setLastGreen(String date){
         subtitleToobar.setText(date);
+        subtitleToobar.setSelected(true);
         subtitleToobar.setVisibility(View.VISIBLE);
     }
 
