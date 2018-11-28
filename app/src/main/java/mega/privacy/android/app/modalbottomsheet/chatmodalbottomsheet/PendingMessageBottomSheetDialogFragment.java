@@ -120,16 +120,27 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_delete_layout);
         optionDeleteLayout.setOnClickListener(this);
 
+        LinearLayout separator = (LinearLayout) contentView.findViewById(R.id.separator);
+
         PendingMessageSingle pMsg = dbH.findPendingMessageById(messageId);
         if(pMsg!=null && pMsg.getState()==PendingMessageSingle.STATE_UPLOADING) {
             optionRetryLayout.setVisibility(View.GONE);
             optionRetryLayout.setOnClickListener(null);
             titleSlidingPanel.setText(getString(R.string.title_message_uploading_options));
+            separator.setVisibility(View.GONE);
         }
         else{
-            optionRetryLayout.setVisibility(View.VISIBLE);
-            optionRetryLayout.setOnClickListener(this);
             titleSlidingPanel.setText(getString(R.string.title_message_not_sent_options));
+            if((selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_STANDARD)||(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR)){
+                optionRetryLayout.setVisibility(View.VISIBLE);
+                optionRetryLayout.setOnClickListener(this);
+                separator.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionRetryLayout.setVisibility(View.GONE);
+                optionRetryLayout.setOnClickListener(null);
+                separator.setVisibility(View.GONE);
+            }
         }
 //        if(selectedMessage!=null&&selectedChat!=null){
 //            if(selectedMessage.getMessage().isEdited()){
