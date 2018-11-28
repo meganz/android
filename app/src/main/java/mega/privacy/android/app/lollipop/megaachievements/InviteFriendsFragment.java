@@ -258,8 +258,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			inviteButton.setOnClickListener(this);
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return v;
 	}
 
@@ -413,7 +411,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
 			case R.id.invite_button:{
@@ -438,7 +435,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		((AchievementsActivity) context).showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
 		return 0;

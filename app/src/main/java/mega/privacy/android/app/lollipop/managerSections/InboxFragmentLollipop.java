@@ -203,7 +203,6 @@ public class InboxFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
@@ -279,7 +278,6 @@ public class InboxFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -296,6 +294,8 @@ public class InboxFragmentLollipop extends Fragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+            checkScroll();
 			return true;
 		}
 
@@ -304,6 +304,8 @@ public class InboxFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+            checkScroll();
 		}
 
 		@Override
@@ -464,7 +466,7 @@ public class InboxFragmentLollipop extends Fragment{
 
 	public void checkScroll () {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -502,8 +504,6 @@ public class InboxFragmentLollipop extends Fragment{
 
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 	    
 		if (((ManagerActivityLollipop) context).isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
@@ -535,8 +535,9 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
-                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-				adapter.setNodes(nodes);
+//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+                adapter.setListFragment(recyclerView);
+//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
 
@@ -579,8 +580,9 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
-                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-				adapter.setNodes(nodes);
+//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setListFragment(recyclerView);
+//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
@@ -618,7 +620,6 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -627,7 +628,6 @@ public class InboxFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{
@@ -1015,7 +1015,6 @@ public class InboxFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -1029,7 +1028,6 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;

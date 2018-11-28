@@ -125,6 +125,8 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout_notifications);
 
+        setNotifications();
+
         return v;
     }
 
@@ -134,13 +136,14 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         return fragment;
     }
 
-    public void updateNotificationsView(ArrayList<MegaUserAlert> notifs) {
-        log("updateNotificationsView");
+    public void setNotifications(){
+        log("setNotifications");
 
-        notifications = notifs;
+        notifications = megaApi.getUserAlerts();
+
+        Collections.reverse(notifications);
 
         if(isAdded()) {
-
             if (adapterList == null){
                 log("adapterList is NULL");
                 adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);
@@ -163,7 +166,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
                 }
 
-                String textToShow = String.format(getString(R.string.context_empty_notifications), getString(R.string.section_contacts));
+                String textToShow = String.format(getString(R.string.context_empty_notifications));
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -185,20 +188,8 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 emptyLayout.setVisibility(View.GONE);
             }
 
-            if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-                megaApi.acknowledgeUserAlerts();
-            }
+            ((ManagerActivityLollipop)context).markNotificationsSeen(false);
         }
-    }
-
-    public void setNotifications(){
-        log("setNotifications");
-
-        notifications = megaApi.getUserAlerts();
-
-        Collections.reverse(notifications);
-
-        updateNotificationsView(notifications);
     }
 
     public void addNotification(MegaUserAlert newAlert){
@@ -219,9 +210,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             listView.smoothScrollToPosition(0);
         }
 
-        if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-            megaApi.acknowledgeUserAlerts();
-        }
+        ((ManagerActivityLollipop)context).markNotificationsSeen(false);
     }
 
     @Override
@@ -364,23 +353,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     adapterList.notifyItemChanged(indexToReplace);
                 }
 
-                if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-                    megaApi.acknowledgeUserAlerts();
-                }
+                ((ManagerActivityLollipop)context).markNotificationsSeen(false);
             }
             else{
                 addNotification(updatedUserAlerts.get(i));
             }
 
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        log("onSaveInstanceState");
-        super.onSaveInstanceState(outState);
-        if(listView.getLayoutManager()!=null){
-            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
     }
 

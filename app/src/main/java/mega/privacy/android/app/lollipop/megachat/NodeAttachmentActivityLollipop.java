@@ -129,7 +129,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 			List<MegaNode> documents = adapterList.getSelectedNodes();
 			
 			switch(item.getItemId()){
@@ -377,8 +377,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		adapterList.setMultipleSelect(false);
 
 		listView.setAdapter(adapterList);
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
 
     public void setNodes(){
@@ -473,7 +471,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	protected void onResume() {
     	super.onResume();
     	nodeAttachmentActivity = this;
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     	log("onResume");
 	}
 
@@ -929,8 +926,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		switch(v.getId()){
 			case R.id.folder_link_button_download:{
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

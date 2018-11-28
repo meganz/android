@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -178,7 +176,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         
         if (adapter.isMultipleSelect()) {
             log("multiselect ON");

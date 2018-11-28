@@ -138,6 +138,7 @@ public class Constants {
 	public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
 	public static final int COLOR_STATUS_BAR_SEARCH = 3;
 	public static final int COLOR_STATUS_BAR_ZERO = 4;
+	public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 5;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -149,7 +150,7 @@ public class Constants {
 	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
-	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
+	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
@@ -197,6 +198,7 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
 	public static String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
 	public static String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
+	public static String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

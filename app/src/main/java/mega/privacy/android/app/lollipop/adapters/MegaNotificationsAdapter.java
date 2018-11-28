@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -1394,7 +1394,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		holder.sectionText.setText(section);
 
-		String date = TimeChatUtils.formatDateAndTime(alert.getTimestamp(0), TimeChatUtils.DATE_LONG_FORMAT);
+		String date = TimeUtils.formatDateAndTime(alert.getTimestamp(0), TimeUtils.DATE_LONG_FORMAT);
 		holder.dateText.setText(date);
 
 		if(alert.getSeen()==false){

@@ -588,8 +588,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			ArrayList<MegaUser> users = adapter.getSelectedUsers();
 
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 			switch(item.getItemId()){
 				case R.id.cab_menu_share_folder:{
 
@@ -637,7 +635,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -659,6 +656,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			((ManagerActivityLollipop)context).hideFabButton();
 			MenuItem startChatItem = menu.findItem(R.id.cab_menu_start_conversation);
 			startChatItem.setIcon(Util.mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -669,6 +668,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -724,8 +724,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if(adapter!=null){
 			adapter.setMultipleSelect(false);
 		}
-
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -823,7 +821,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	public void checkScroll () {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -837,8 +835,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		log("onCreateView");
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 //		for (int i=0;i<contacts.size();i++){
 //
@@ -999,6 +995,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				adapter.setContacts(visibleContacts);
+				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
@@ -1090,7 +1087,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
     public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1099,7 +1095,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			List<MegaUser> users = adapter.getSelectedUsers();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{
@@ -1111,7 +1106,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			hideMultipleSelect();

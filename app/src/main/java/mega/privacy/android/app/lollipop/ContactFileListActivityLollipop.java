@@ -580,7 +580,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void showUploadPanel() {
@@ -636,8 +635,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			intent.setAction(null);
 			setIntent(null);
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -1360,13 +1357,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onBackPressed() {
+		super.callToSuperBack = false;
+		super.onBackPressed();
 
 		if (cflF != null){
 			if (cflF.isVisible()){
 				if (cflF.onBackPressed() == 0){
-					log("onBackPressed == 0");
-					finish();
-					return;
+					super.callToSuperBack = true;
+					super.onBackPressed();
 				}
 			}
 		}

@@ -481,12 +481,18 @@ public class AccountController implements View.OnClickListener{
             fMK.delete();
         }
 
-        Intent cancelTransfersIntent = new Intent(context, DownloadService.class);
-        cancelTransfersIntent.setAction(DownloadService.ACTION_CANCEL);
-        context.startService(cancelTransfersIntent);
-        cancelTransfersIntent = new Intent(context, UploadService.class);
-        cancelTransfersIntent.setAction(UploadService.ACTION_CANCEL);
-        context.startService(cancelTransfersIntent);
+        try{
+            Intent cancelTransfersIntent = new Intent(context, DownloadService.class);
+            cancelTransfersIntent.setAction(DownloadService.ACTION_CANCEL);
+            context.startService(cancelTransfersIntent);
+            cancelTransfersIntent = new Intent(context, UploadService.class);
+            cancelTransfersIntent.setAction(UploadService.ACTION_CANCEL);
+            context.startService(cancelTransfersIntent);
+        }
+        catch(IllegalStateException e){
+            //If the application is in a state where the service can not be started (such as not in the foreground in a state when services are allowed) - included in API 26
+            log("Cancelling services not allowed by the OS: "+e.getMessage());
+        }
 
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         dbH.clearCredentials();
