@@ -5,10 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import mega.privacy.android.app.PermissionsImageAdapter;
 import mega.privacy.android.app.R;
@@ -25,6 +26,12 @@ import mega.privacy.android.app.utils.Util;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 
+    public static final int PERMISSIONS_FRAGMENT = 666;
+
+    final int READ_WRITE = 0;
+    final int CAMERA = 1;
+    final int CALLS = 2;
+
     Context context;
 
     LinearLayout setupLayout;
@@ -32,7 +39,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     Button setupButton;
     LinearLayout allowAccessLayout;
     PermissionsImageAdapter adapter;
-    ViewPager viewPager;
+    ImageView imgDisplay;
+    TextView titleDisplay;
+    TextView subtitleDisplay;
+    LinearLayout itemsLayout;
     ImageView firstItem;
     ImageView secondItem;
     ImageView thirdItem;
@@ -40,7 +50,19 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     Button enableButton;
 
     boolean isAllowingAccessShown = false;
+    int permissionsPosition = 0;
+    int numItems = 0;
+    int[] items = new int[3];
+    int currentPermission = 0;
+    boolean writeGranted = false;
+    boolean readGranted = false;
+    boolean cameraGranted = false;
+    boolean microphoneGranted = false;
+    boolean writeCallsGranted = false;
 
+    int[] mImages;
+    String[] mTitles;
+    String[] mSubtitles;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,72 +87,132 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         setupButton = (Button) v.findViewById(R.id.setup_button);
         setupButton.setOnClickListener(this);
         allowAccessLayout = (LinearLayout) v.findViewById(R.id.allow_access_fragment_container);
-        viewPager = (ViewPager) v.findViewById(R.id.pager);
-        adapter = new PermissionsImageAdapter((ManagerActivityLollipop) context);
-        viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(0);
+        imgDisplay = (ImageView) v.findViewById(R.id.image_permissions);
+        titleDisplay = (TextView) v.findViewById(R.id.title_permissions);
+        subtitleDisplay = (TextView) v.findViewById(R.id.subtitle_permissions);
 
+        itemsLayout = (LinearLayout) v.findViewById(R.id.items_layout);
         firstItem = (ImageView) v.findViewById(R.id.first_item);
         secondItem = (ImageView) v.findViewById(R.id.second_item);
         thirdItem = (ImageView) v.findViewById(R.id.third_item);
-        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
 
-        viewPager.getLayoutParams().height = Util.px2dp(428, metrics);
-        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        mImages = new int[] {
+                R.drawable.storage_space,
+                R.drawable.speed,
+                R.drawable.privacy_security,
+        };
 
-            @Override
-            public void onPageSelected (int position){
-                switch(position){
-                    case 0:{
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        break;
-                    }
-                    case 1:{
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        break;
-                    }
-                    case 2:{
-                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                        break;
-                    }
-                }
-            }
-        });
+        mTitles = new String[] {
+                context.getString(R.string.allow_acces_media_title),
+                context.getString(R.string.allow_acces_camera_title),
+                context.getString(R.string.allow_acces_calls_title)
+        };
+
+        mSubtitles =  new String[] {
+                context.getString(R.string.allow_acces_media_subtitle),
+                context.getString(R.string.allow_acces_camera_subtitle),
+                context.getString(R.string.allow_acces_calls_subtitle)
+        };
+
 
         notNow2Button = (Button) v.findViewById(R.id.not_now_button_2);
         notNow2Button.setOnClickListener(this);
         enableButton = (Button) v.findViewById(R.id.enable_button);
         enableButton.setOnClickListener(this);
 
-        if (savedInstanceState != null) {
-            isAllowingAccessShown = savedInstanceState.getBoolean("isAllowingAccessShown", false);
-        }
-        else {
-            isAllowingAccessShown = false;
-        }
 
-        if (isAllowingAccessShown) {
-            showAllowAccessLayout();
-        }
-        else {
-            showSetupLayout();
-        }
 
         return v;
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            numItems = 0;
+            permissionsPosition = 0;
+            readGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            writeGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            cameraGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA);
+            microphoneGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO);
+            writeCallsGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG);
+
+            if (!readGranted || !writeGranted) {
+                numItems++;
+                items[0] = currentPermission = READ_WRITE;
+                if (!cameraGranted) {
+                    numItems++;
+                    items[1] = CAMERA;
+                    if (!microphoneGranted || !writeCallsGranted){
+                        numItems++;
+                        items[2] = CALLS;
+                    }
+                }
+                else if (!microphoneGranted || !writeCallsGranted) {
+                    numItems++;
+                    items[1] = CALLS;
+                }
+
+                setContent(READ_WRITE);
+            }
+            else if (!cameraGranted) {
+                numItems++;
+                items[0] = currentPermission = CAMERA;
+                if (!microphoneGranted || !writeCallsGranted) {
+                    numItems++;
+                    items[1] = CALLS;
+                }
+
+                setContent(CAMERA);
+            }
+            else if (!microphoneGranted || !writeCallsGranted) {
+                numItems++;
+                items[0] = currentPermission = CALLS;
+                setContent(CALLS);
+            }
+
+            showSetupLayout();
+        }
+        else {
+            isAllowingAccessShown = savedInstanceState.getBoolean("isAllowingAccessShown", false);
+            permissionsPosition = savedInstanceState.getInt("permissionsPosition", 0);
+            numItems = savedInstanceState.getInt("numItems", 0);
+            currentPermission = savedInstanceState.getInt("currentPermission", 0);
+            items = savedInstanceState.getIntArray("items");
+            microphoneGranted = savedInstanceState.getBoolean("microphoneGranted", false);
+            writeCallsGranted = savedInstanceState.getBoolean("writeCallsGranted", false);
+
+            setContent(currentPermission);
+
+            if (isAllowingAccessShown) {
+                showAllowAccessLayout();
+            }
+            else {
+                showSetupLayout();
+            }
+        }
+
+        if (numItems == 3) {
+            firstItem.setVisibility(View.VISIBLE);
+            secondItem.setVisibility(View.VISIBLE);
+            thirdItem.setVisibility(View.VISIBLE);
+        }
+        else if (numItems == 2) {
+            firstItem.setVisibility(View.VISIBLE);
+            secondItem.setVisibility(View.VISIBLE);
+            thirdItem.setVisibility(View.GONE);
+        }
+        else if (numItems == 1){
+            itemsLayout.setVisibility(View.GONE);
+        }
+
+        setResaltedItem();
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.not_now_button_2 :
             case R.id.not_now_button: {
                 ((ManagerActivityLollipop) context).destroyPermissionsFragment();
                 break;
@@ -139,72 +221,131 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 showAllowAccessLayout();
                 break;
             }
+            case R.id.not_now_button_2: {
+                setNextPermission();
+                break;
+            }
             case R.id.enable_button: {
-                askForPermission(viewPager.getCurrentItem());
+                askForPermission();
                 break;
             }
         }
     }
 
-    void askForPermission (int page) {
-        switch (page) {
-            case 0: {
+    public void setNextPermission () {
+        log("setNextPermission: "+numItems);
+        if (items != null && items.length > 0) {
+            for (int i=0; i<items.length; i++) {
+                if (items[i] == currentPermission) {
+                    if (i+1 < items.length) {
+                        permissionsPosition++;
+                        currentPermission = items[i+1];
+                        setContent(currentPermission);
+                        setResaltedItem();
+                        break;
+                    }
+                    else {
+                        ((ManagerActivityLollipop) context).destroyPermissionsFragment();
+                    }
+                }
+            }
+        }
+    }
+
+    void setContent (int permission) {
+        imgDisplay.setImageDrawable(ContextCompat.getDrawable(context, mImages[permission]));
+        titleDisplay.setText(mTitles[permission]);
+        subtitleDisplay.setText(mSubtitles[permission]);
+    }
+
+    void setResaltedItem () {
+        switch(permissionsPosition){
+            case 0:{
+                firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                break;
+            }
+            case 1:{
+                firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                break;
+            }
+            case 2:{
+                firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                break;
+            }
+        }
+    }
+
+    void askForPermission () {
+
+        switch (currentPermission) {
+            case READ_WRITE: {
                 askForMediaPermissions();
                 break;
             }
-            case 1: {
-                askForCameraAndMicrophonePermissions();
+            case CAMERA: {
+                askForCameraPermission();
                 break;
             }
-            case 2: {
-                askForNotificationsPermissions();
+            case CALLS: {
+                askForCallsPermissions();
                 break;
             }
         }
     }
 
     void askForMediaPermissions () {
-        boolean askForWrite = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
-        boolean askForRead  = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
-        if (askForWrite && askForRead)  {
+        if (!readGranted && !writeGranted)  {
             log("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                    Constants.REQUEST_READ_WRITE_STORAGE);
+                    PERMISSIONS_FRAGMENT);
         }
-        else if (askForWrite) {
+        else if (!writeGranted) {
             log("WRITE_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    Constants.REQUEST_WRITE_STORAGE);
+                    PERMISSIONS_FRAGMENT);
         }
-        else if (askForRead) {
+        else if (!readGranted) {
             log("READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    Constants.REQUEST_READ_STORAGE);
+                    PERMISSIONS_FRAGMENT);
         }
     }
 
-    void askForCameraAndMicrophonePermissions () {
-        boolean askForCamera = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
-        boolean askForMicrophone = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED;
-        if (askForCamera && askForMicrophone) {
-            log("CAMERA and RECORD_AUDIO");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, Constants.REQUEST_CAMERA);
-        }
-        else if (askForCamera) {
+    void askForCameraPermission() {
+        if (!cameraGranted) {
             log("CAMERA");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
-        }
-        else if (askForMicrophone) {
-            log("RECORD_AUDIO");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_FRAGMENT);
         }
     }
 
-    void askForNotificationsPermissions () {
-
+    void askForCallsPermissions() {
+        if (!microphoneGranted && !writeCallsGranted)  {
+            log("RECORD_AUDIO and WRITE_CALL_LOG");
+            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+                    new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_CALL_LOG},
+                    PERMISSIONS_FRAGMENT);
+        }
+        else if (!microphoneGranted) {
+            log("RECORD_AUDIO");
+            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    PERMISSIONS_FRAGMENT);
+        }
+        else if (!writeCallsGranted) {
+            log("WRITE_CALL_LOG");
+            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+                    new String[]{Manifest.permission.WRITE_CALL_LOG},
+                    PERMISSIONS_FRAGMENT);
+        }
     }
 
     void showSetupLayout () {
@@ -218,11 +359,29 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         allowAccessLayout.setVisibility(View.VISIBLE);
     }
 
+    public boolean askingForMicrophoneAndWriteCallsLog () {
+        if (!microphoneGranted && !writeCallsGranted) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public int getCurrentPermission () {
+        return currentPermission;
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putBoolean("isAllowingAccessShown", isAllowingAccessShown);
+        outState.putInt("permissionsPosition", permissionsPosition);
+        outState.putInt("numItems", numItems);
+        outState.putInt("currentPermission", currentPermission);
+        outState.putIntArray("items", items);
+        outState.putBoolean("microphoneGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO));
+        outState.putBoolean("writeCallsGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG));
     }
 
     @Override

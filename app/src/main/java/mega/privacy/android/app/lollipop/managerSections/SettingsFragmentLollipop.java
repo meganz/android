@@ -2312,16 +2312,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("Camera ON");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				log("Lollipop version");
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
+				if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 					log("No storage permission");
 					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 							Constants.REQUEST_WRITE_STORAGE);
 				}
 
-				boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-				if (!hasCameraPermission){
+				if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
 					log("No camera permission");
 					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 							new String[]{Manifest.permission.CAMERA},
