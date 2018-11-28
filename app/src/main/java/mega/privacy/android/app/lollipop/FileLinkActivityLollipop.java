@@ -238,8 +238,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		else{
 			log("url NULL");
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -262,7 +260,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch (id) {
@@ -279,7 +276,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				break;
 			}
 		}
-		return true;
+		return super.onOptionsItemSelected(item);
 	}
 
 		public void askForDecryptionKeyDialog(){
@@ -386,8 +383,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	protected void onResume() {
     	super.onResume();
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-    	
     	Intent intent = getIntent();
     	
     	if (intent != null){
@@ -399,9 +394,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
     		}
     	}
     	setIntent(null);
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-	}	
+	}
 	
 	private void importLink(String url) {
 
@@ -678,7 +671,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.file_link_button_download:{
 				NodeController nC = new NodeController(this);
@@ -972,7 +965,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
 											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-											NodeController nC = new NodeController(getApplicationContext());
+											NodeController nC = new NodeController(fileLinkActivity);
 											nC.downloadFileLink(document, url);
 										}
 										break;

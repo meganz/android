@@ -508,8 +508,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if (((ManagerActivityLollipop)context).isList){
 			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
@@ -757,7 +755,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1221,7 +1218,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	}
 	
 	public int onBackPressed(){
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;

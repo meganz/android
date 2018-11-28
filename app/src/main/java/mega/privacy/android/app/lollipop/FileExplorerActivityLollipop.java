@@ -524,7 +524,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 
 			afterLoginAndFetch();
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
@@ -1448,12 +1447,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed: "+tabShown);
+		super.callToSuperBack = false;
+		super.onBackPressed();
+
 		String cFTag;
 		if(tabShown==CLOUD_TAB){
 			if(isChatFirst){
@@ -1529,6 +1530,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
+			super.callToSuperBack = true;
 			super.onBackPressed();
 		}
 	}
@@ -1734,7 +1736,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	public void buttonClick(long handle){
 		log("buttonClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (tabShown == INCOMING_TAB){
 			if (deepBrowserTree==0){
@@ -2462,7 +2463,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
@@ -2497,7 +2498,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 		}
-		return true;
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
@@ -2746,8 +2747,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()) {
 			case R.id.fab_file_explorer: {

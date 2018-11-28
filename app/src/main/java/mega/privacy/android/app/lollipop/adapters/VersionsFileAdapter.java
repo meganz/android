@@ -557,7 +557,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderVersion holder = (ViewHolderVersion) v.getTag();
 		int currentPosition = holder.getAdapterPosition();

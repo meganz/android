@@ -488,8 +488,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.setMultipleSelect(false);
 			
 			listView.setAdapter(adapter);
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -533,7 +531,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -672,7 +669,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -692,13 +689,16 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.callToSuperBack = false;
+		super.onBackPressed();
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 		}
 		else{
 			if (parentHandleStack.isEmpty()){
+				super.callToSuperBack = true;
 				super.onBackPressed();
 			}
 			else{
@@ -759,7 +759,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);

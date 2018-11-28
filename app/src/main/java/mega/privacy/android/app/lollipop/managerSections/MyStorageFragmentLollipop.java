@@ -165,8 +165,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		setAccountDetails();
 //
 		refreshAccountInfo();
@@ -435,7 +433,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 //			hideMKLayout();
 //			return 1;
 //		}
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		return 0;
 	}
 
