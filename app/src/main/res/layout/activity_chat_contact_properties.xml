@@ -141,8 +141,11 @@
                         android:layout_below="@+id/first_line_toolbar"
                         android:layout_marginLeft="72dp"
                         android:textColor="@color/white"
-                        android:maxLines="1"
-                        android:ellipsize="end"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
                         android:singleLine="true"
                         android:textAppearance="@style/ToolbarTitle.Secondary"
                         android:paddingBottom="9dp"/>

@@ -2437,7 +2437,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
         switch (id) {
@@ -3731,7 +3730,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if (!onPlaylist){
+            super.callToSuperBack = true;
             super.onBackPressed();
             if (megaApi != null) {
                 megaApi.removeTransferListener(this);

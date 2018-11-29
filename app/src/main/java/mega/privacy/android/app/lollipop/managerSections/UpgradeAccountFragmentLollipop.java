@@ -244,7 +244,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		log("END onCreateView");
 		return v;
 	}
@@ -903,7 +902,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		log("onClick");
 
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){
             case R.id.button_continue:{
 				log("Button button_continue pressed");

@@ -299,7 +299,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -796,7 +795,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	    switch (item.getItemId()) {
 	    // Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
@@ -810,7 +808,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.action_change_password: {
 				if (changePassword) {
@@ -1035,8 +1032,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (!validateForm(false)) {
 			return;

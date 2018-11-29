@@ -13,10 +13,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -36,6 +38,8 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
     public LinearLayout optionRetryLayout;
     public LinearLayout optionDeleteLayout;
     ////
+
+    DatabaseHandler dbH;
 
     DisplayMetrics outMetrics;
 
@@ -85,6 +89,8 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
             selectedChat = megaChatApi.getChatRoom(chatId);
         }
 
+        dbH = DatabaseHandler.getDbHandler(getActivity());
+
 //        if(selectedMessage!=null){
 //            log("selectedMessage content: "+selectedMessage.getMessage().getContent());
 //            log("Temporal id of MS message: "+selectedMessage.getMessage().getTempId());
@@ -113,8 +119,29 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
         optionRetryLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_retry_layout);
         optionDeleteLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_delete_layout);
         optionDeleteLayout.setOnClickListener(this);
-        optionRetryLayout.setOnClickListener(this);
 
+        LinearLayout separator = (LinearLayout) contentView.findViewById(R.id.separator);
+
+        PendingMessageSingle pMsg = dbH.findPendingMessageById(messageId);
+        if(pMsg!=null && pMsg.getState()==PendingMessageSingle.STATE_UPLOADING) {
+            optionRetryLayout.setVisibility(View.GONE);
+            optionRetryLayout.setOnClickListener(null);
+            titleSlidingPanel.setText(getString(R.string.title_message_uploading_options));
+            separator.setVisibility(View.GONE);
+        }
+        else{
+            titleSlidingPanel.setText(getString(R.string.title_message_not_sent_options));
+            if((selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_STANDARD)||(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR)){
+                optionRetryLayout.setVisibility(View.VISIBLE);
+                optionRetryLayout.setOnClickListener(this);
+                separator.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionRetryLayout.setVisibility(View.GONE);
+                optionRetryLayout.setOnClickListener(null);
+                separator.setVisibility(View.GONE);
+            }
+        }
 //        if(selectedMessage!=null&&selectedChat!=null){
 //            if(selectedMessage.getMessage().isEdited()){
 //                log("Message edited : final id: "+selectedMessage.getMessage().getMsgId()+" temp id: "+selectedMessage.getMessage().getTempId());

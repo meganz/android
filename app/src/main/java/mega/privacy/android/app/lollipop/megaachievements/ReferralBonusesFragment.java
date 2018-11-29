@@ -87,9 +87,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 
 		recyclerView.setAdapter(adapter);
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return v;
 	}
 
@@ -118,7 +115,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
 			case R.id.referral_bonuses_layout:{
@@ -137,22 +133,11 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
-//		if(exportMKLayout.getVisibility()==View.VISIBLE){
-//			log("Master Key layout is VISIBLE");
-//			hideMKLayout();
-//			return 1;
-//		}
-
 		return 0;
 	}
-
-
 
 	public static void log(String log) {
 		Util.log("ReferralBonusesFragment", log);
 	}
-
 
 }
