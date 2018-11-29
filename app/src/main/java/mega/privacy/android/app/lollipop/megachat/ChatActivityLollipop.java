@@ -2729,8 +2729,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void attachFromCloud(){
         log("attachFromCloud");
-        ChatController chatC = new ChatController(this);
-        chatC.pickFileToSend();
+        if(megaChatApi.isSignalActivityRequired()){
+            megaChatApi.signalPresenceActivity();
+        }
+
+        if(megaApi!=null && megaApi.getRootNode()!=null){
+            ChatController chatC = new ChatController(this);
+            chatC.pickFileToSend();
+        }
+        else{
+            log("Online but not megaApi");
+            Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        }
     }
 
     public void attachContact(){
