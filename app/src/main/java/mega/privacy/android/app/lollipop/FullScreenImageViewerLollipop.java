@@ -45,9 +45,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -118,7 +115,7 @@ import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
 	int[] screenPosition;
 	int mLeftDelta;
@@ -639,8 +636,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch (id) {
@@ -1379,9 +1374,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			viewPager.setCurrentItem(positionG);
 
 			viewPager.setOnPageChangeListener(this);
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		}else{
 			if (parentNodeHandle == -1){
 				switch(adapterType){
@@ -1461,10 +1453,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			viewPager.setCurrentItem(positionG);
 
 			viewPager.setOnPageChangeListener(this);
-
-			ArrayAdapter<String> arrayAdapter;
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 
 		if (savedInstanceState == null && adapterMega!= null){
@@ -2626,13 +2614,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		Util.log("FullScreenImageViewerLollipop", message);
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		log("onItemClick");
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-	}
-
 	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
 		log("openAdvancedDevices");
 //		handleToDownload = handle;
@@ -3027,10 +3008,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-		super.onBackPressed();
 		setImageDragVisibility(View.VISIBLE);
+		super.callToSuperBack = true;
+		super.onBackPressed();
 	}
 
 	@Override

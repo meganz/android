@@ -10,7 +10,7 @@ public class AndroidMegaChatMessage {
     final public static int CHAT_ADAPTER_SHOW_ALL = 2;
 
     MegaChatMessage message;
-    PendingMessage pendingMessage;
+    PendingMessageSingle pendingMessage;
     int infoToShow=-1;
     boolean showAvatar = true;
     boolean uploading = false;
@@ -21,7 +21,7 @@ public class AndroidMegaChatMessage {
         this.message = message;
     }
 
-    public AndroidMegaChatMessage(PendingMessage pendingMessage, boolean uploading) {
+    public AndroidMegaChatMessage(PendingMessageSingle pendingMessage, boolean uploading) {
         this.pendingMessage = pendingMessage;
         this.uploading = uploading;
     }
@@ -51,11 +51,11 @@ public class AndroidMegaChatMessage {
         this.uploading = uploading;
     }
 
-    public PendingMessage getPendingMessage() {
+    public PendingMessageSingle getPendingMessage() {
         return pendingMessage;
     }
 
-    public void setPendingMessage(PendingMessage pendingMessage) {
+    public void setPendingMessage(PendingMessageSingle pendingMessage) {
         this.pendingMessage = pendingMessage;
     }
 

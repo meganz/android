@@ -721,34 +721,56 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					log("This user is connected");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+					holder.textViewContent.setText(context.getString(R.string.online_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+					holder.textViewContent.setText(context.getString(R.string.away_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+					holder.textViewContent.setText(context.getString(R.string.busy_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 					log("This user is offline");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holder.textViewContent.setText(context.getString(R.string.offline_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_INVALID){
 					log("INVALID status: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
+					holder.textViewContent.setVisibility(View.GONE);
 				}
 				else{
 					log("This user status is: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
+					holder.textViewContent.setVisibility(View.GONE);
+				}
+
+				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+					if(!contact.getLastGreen().isEmpty()){
+						holder.textViewContent.setText(contact.getLastGreen());
+					}
 				}
 			}
 		}
 		else{
 			holder.contactStateIcon.setVisibility(View.GONE);
+
+			ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
+
+			String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
+
+			holder.textViewContent.setText(sharedNodesDescription);
 		}
 
 		holder.textViewContactName.setText(contact.getFullName());
@@ -866,12 +888,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				}
 			}
 		}
-
-		ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
-
-		String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
-
-		holder.textViewContent.setText(sharedNodesDescription);
 		
 		holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);
@@ -1204,8 +1220,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public void onClick(View v) {
 		log("onClick _ adapterType: " + adapterType);
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if (adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT || adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT) {
 			ViewHolderContactsList holder = (ViewHolderContactsList) v.getTag();
 			int currentPosition = holder.getAdapterPosition();
@@ -1262,7 +1276,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderContacts holder = (ViewHolderContacts) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

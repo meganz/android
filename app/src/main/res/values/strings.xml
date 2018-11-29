@@ -1258,6 +1258,7 @@
     <string name="message_option_retry" context="option shown when a message could not be sent">Retry</string>
 
     <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message not sent</string>
+    <string name="title_message_uploading_options" context="title of the menu for an uploading message with attachment">Attachment uploading</string>
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
@@ -1974,26 +1975,6 @@
     <string name="contact_email" context="Indicates that can type a contact email">Contact’s email</string>
     <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">You have already added this contact.</string>
 
-    <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minute[/B]</item>
-        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minutes[/B]</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d second[/B]</item>
-        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d second[/B]</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d seconds[/B]</item>
-        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d seconds[/B]</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
-        <item context="one second" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d second[/B]</item>
-        <item context="more seconds" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d seconds[/B]</item>
-    </plurals>
-
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid message format</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid message signature</string>
 
@@ -2261,11 +2242,29 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
+    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
+
+    <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
+        <item context="one minute" quantity="one">[B]%1$s hour[/B]</item>
+        <item context="more minutes" quantity="other">[B]%1$s hours[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes" context="Message that shows the minutes of a call when it ends">
+        <item context="one minute" quantity="one">[B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[B]%1$s minutes[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds" context="Message that shows the seconds of a call when it ends">
+        <item context="one second" quantity="one">[B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
+    </plurals>
+
+    <string name="last_seen_today" context="Title of the dialog to inform about a SSL error">Last seen today at %1$s</string>
+    <string name="last_seen_long_time_ago" context="Title of the dialog to inform about a SSL error">Last seen a long time ago</string>
+    <string name="last_seen_general" context="Title of the dialog to inform about a SSL error">Last seen %1$s at %2$s</string>
+
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">joined the call</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">left the call</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Error. No more participants are allowed in this group call.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Error. No more video are allowed in this group call.</string>
-
-
 </resources>
