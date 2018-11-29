@@ -30,13 +30,11 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -126,8 +124,6 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 
 			askForPasswordDialog();
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void askForPasswordDialog(){
@@ -293,7 +289,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.file_link_button_download:{
 

@@ -247,11 +247,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		adapter.setMultipleSelect(false);
 
 		listView.setAdapter(adapter);
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -345,7 +341,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		MegaContactDB c = contacts.get(position);
 		if(c!=null){
 			MegaUser contact = megaApi.getContact(c.getMail());
@@ -369,7 +365,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){		
 			case R.id.contact_attachment_chat_option_button:{
 				log("Click on ACTION button");

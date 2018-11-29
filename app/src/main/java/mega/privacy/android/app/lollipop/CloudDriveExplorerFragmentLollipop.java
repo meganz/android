@@ -105,7 +105,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			switch(item.getItemId()){
 
@@ -530,8 +529,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		
 		return v;
 	}
 	
@@ -555,7 +552,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
@@ -640,7 +637,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
     public void itemClick(View view, int position) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (nodes.get(position).isFolder()){
 			if(selectFile) {

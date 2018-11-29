@@ -23,10 +23,13 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
+
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
 public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener{
@@ -914,8 +917,19 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
 				String email = alert.getEmail();
+				MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
 
-				String textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
+				String textToShow = "";
+				Spanned result = null;
+				if(node!=null){
+					textToShow = String.format(context.getString(R.string.notification_left_shared_folder), email);
+					holder.itemLayout.setOnClickListener(this);
+				}
+				else{
+					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
+					holder.itemLayout.setOnClickListener(null);
+				}
+
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -923,12 +937,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
-				Spanned result = null;
+
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
 				} else {
 					result = Html.fromHtml(textToShow);
 				}
+
 				holder.titleText.setText(result);
 				holder.descriptionText.setVisibility(View.GONE);
 
@@ -951,7 +966,6 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHAREDNODES:{
@@ -1239,14 +1253,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 				if(path!=null){
 					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), toCDATA(name));
 					}
 					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
 				}
 
 				try{
@@ -1314,14 +1328,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 				if(path!=null){
 					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), toCDATA(name));
 					}
 					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
 				}
 
                 try{
@@ -1382,7 +1396,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		holder.sectionText.setText(section);
 
-		String date = TimeChatUtils.formatDateAndTime(alert.getTimestamp(0), TimeChatUtils.DATE_LONG_FORMAT);
+		String date = TimeUtils.formatDateAndTime(alert.getTimestamp(0), TimeUtils.DATE_LONG_FORMAT);
 		holder.dateText.setText(date);
 
 		if(alert.getSeen()==false){
