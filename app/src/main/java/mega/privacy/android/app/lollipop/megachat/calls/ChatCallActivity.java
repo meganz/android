@@ -1161,10 +1161,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> develop-studio
         if(checkPermissions()){
             checkPermissionsWriteLog();
             showInitialFABConfiguration();
@@ -1536,10 +1532,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-<<<<<<< HEAD
-=======
         super.callToSuperBack = false;
->>>>>>> develop-studio
         super.onBackPressed();
 
         if (megaChatApi != null) {
@@ -2469,11 +2462,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
             case R.id.video_fab:{
-<<<<<<< HEAD
                 log("onClick video FAB");
-=======
-                log("Click on video fab");
->>>>>>> develop-studio
+
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
                     RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -2504,10 +2494,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 break;
             }
             case R.id.micro_fab: {
-<<<<<<< HEAD
-=======
                 log("Click on micro fab");
->>>>>>> develop-studio
                 if(callChat.hasLocalAudio()){
                     megaChatApi.disableAudio(chatId, this);
                 }else{
@@ -2529,7 +2516,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case R.id.answer_call_fab:{
                 log("Click on answer fab");
-<<<<<<< HEAD
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
                     RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -2556,32 +2542,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-=======
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-                megaChatApi.answerChatCall(chatId, false, this);
-                videoFAB.clearAnimation();
-                break;
-            }
-        }
-    }
-
->>>>>>> develop-studio
     public void checkPermissionsWriteLog(){
         log("checkPermissionsWriteLog()");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
             if (!hasWriteLogPermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
-<<<<<<< HEAD
             }
         }
-
-=======
-            }else{
-
-            }
-        }
->>>>>>> develop-studio
     }
 
     public boolean checkPermissions(){
@@ -3342,12 +3310,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-<<<<<<< HEAD
                         checkPermissionsWriteLog();
-=======
-                       checkPermissionsWriteLog();
->>>>>>> develop-studio
-                       showInitialFABConfiguration();
+                        showInitialFABConfiguration();
                     }
                 }
                 else{
