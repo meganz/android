@@ -170,7 +170,15 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			addAvatarChatPanel(null, chat);
 
             infoChatText.setText(getString(R.string.group_chat_info_label));
-            optionInfoChat.setVisibility(View.VISIBLE);
+
+            if(megaApi!=null && megaApi.getRootNode()!=null){
+                optionInfoChat.setVisibility(View.VISIBLE);
+                separatorInfo.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionInfoChat.setVisibility(View.GONE);
+                separatorInfo.setVisibility(View.GONE);
+            }
 
             if(chat.isActive()){
                 optionLeaveChat.setVisibility(View.VISIBLE);
