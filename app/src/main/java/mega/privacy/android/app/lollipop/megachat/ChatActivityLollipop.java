@@ -140,6 +140,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
@@ -4048,7 +4049,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     usersTypingSync.add(currentUserTyping);
 
-                    String userTyping =  getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
+                    String userTyping =  getResources().getQuantityString(R.plurals.user_typing, 1, toCDATA(usersTypingSync.get(0).getParticipantTyping().getFirstName()));
 
                     userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                     userTyping = userTyping.replace("[/A]", "</font>");
@@ -4107,7 +4108,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         switch (size){
                             case 1:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
-
+                                userTyping = toCDATA(userTyping);
                                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                                 userTyping = userTyping.replace("[/A]", "</font>");
 
@@ -4123,7 +4124,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             case 2:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
-
+                                userTyping = toCDATA(userTyping);
                                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                                 userTyping = userTyping.replace("[/A]", "</font>");
 
@@ -4139,7 +4140,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             default:{
                                 String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
-                                String userTyping = String.format(getString(R.string.more_users_typing), names);
+                                String userTyping = String.format(getString(R.string.more_users_typing),toCDATA(names));
 
                                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                                 userTyping = userTyping.replace("[/A]", "</font>");
@@ -4221,6 +4222,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case 1:{
                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
+                userTyping = toCDATA(userTyping);
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
@@ -4236,6 +4238,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case 2:{
                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
+                userTyping = toCDATA(userTyping);
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
 
@@ -4251,7 +4254,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             default:{
                 String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
-                String userTyping = String.format(getString(R.string.more_users_typing), names);
+                String userTyping = String.format(getString(R.string.more_users_typing), toCDATA(names));
 
                 userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                 userTyping = userTyping.replace("[/A]", "</font>");
