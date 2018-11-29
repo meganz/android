@@ -37,8 +37,10 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
         this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerHandle);
     }
 
+
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
+
         if((width == 0) || (height == 0)){
             return;
         }
