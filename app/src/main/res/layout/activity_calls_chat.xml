@@ -352,7 +352,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:background="@android:color/transparent">
+                android:background="@null">
 
                 <RelativeLayout
                     android:id="@+id/relative_answer_call_fab"
@@ -426,7 +426,7 @@
                     android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginRight="36dp"
                     android:gravity="bottom|center_horizontal"
-                    android:background="@android:color/transparent">
+                    android:background="@null">
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/video_fab"
@@ -437,7 +437,7 @@
                         android:layout_below="@+id/linear_arrow_video"
                         android:scaleType="center"
                         android:src="@drawable/ic_videocam_white"
-                        android:background="@android:color/transparent"
+                        android:background="@null"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
@@ -452,13 +452,14 @@
                         android:orientation="vertical"
                         android:gravity="bottom|center_horizontal"
                         android:visibility="gone"
-                        android:background="@android:color/transparent">
+                        android:background="@null">
 
                         <ImageView
                             android:id="@+id/first_arrow_video"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/ic_expand"
+                            android:background="@null"
                             android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"/>
                         <ImageView
@@ -466,6 +467,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/ic_expand"
+                            android:background="@null"
                             android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"/>
                         <ImageView
@@ -473,6 +475,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/ic_expand"
+                            android:background="@null"
                             android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"/>
                         <ImageView
@@ -480,6 +483,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/ic_expand"
+                            android:background="@null"
                             android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"/>
                     </LinearLayout>
@@ -495,6 +499,7 @@
                     android:layout_marginRight="36dp"
                     android:scaleType="center"
                     android:src="@drawable/ic_record_audio_w"
+                    android:background="@null"
                     app:backgroundTint="@color/accentColor"
                     app:borderWidth="0dp"
                     app:elevation="6dp"
@@ -509,6 +514,7 @@
                     android:layout_marginBottom="24dp"
                     android:scaleType="center"
                     android:src="@drawable/ic_w_end_call"
+                    android:background="@null"
                     app:backgroundTint="@color/delete_account"
                     app:borderWidth="0dp"
                     app:elevation="6dp"
