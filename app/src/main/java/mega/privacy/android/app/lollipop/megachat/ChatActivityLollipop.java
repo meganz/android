@@ -110,7 +110,7 @@ import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -786,7 +786,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
-                emojiKeyboard.showLetterKeyboard();
+                if(emojiKeyboard!=null){
+                    emojiKeyboard.showLetterKeyboard();
+                }
                 return false;
             }
         });
@@ -799,7 +801,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
-                emojiKeyboard.showLetterKeyboard();
+                if(emojiKeyboard!=null) {
+                    emojiKeyboard.showLetterKeyboard();
+                }
                 return false;
             }
         });
@@ -816,7 +820,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         fileStorageLayout.setVisibility(View.GONE);
                     }
-                    emojiKeyboard.showLetterKeyboard();
+                    if(emojiKeyboard!=null){
+                        emojiKeyboard.showLetterKeyboard();
+                    }
+
                 }
                 return false;
             }
@@ -1474,7 +1481,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+            TimeUtils tc = new TimeUtils(TimeUtils.TIME);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareTime: "+result);
@@ -1492,7 +1499,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+            TimeUtils tc = new TimeUtils(TimeUtils.TIME);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareTime: "+result);
@@ -1510,7 +1517,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous);
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.TIME);
+            TimeUtils tc = new TimeUtils(TimeUtils.TIME);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareTime: "+result);
@@ -1527,7 +1534,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareDate: "+result);
@@ -1546,7 +1553,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareDate: "+result);
@@ -1565,7 +1572,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous);
 
-            TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+            TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             int result = tc.compare(cal, previousCal);
             log("RESULTS compareDate: "+result);
@@ -1597,6 +1604,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
 //        log("onPrepareOptionsMenu");
+
         if(chatRoom!=null){
 
             if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
@@ -1702,10 +1710,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
 
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
@@ -2437,11 +2441,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onBackPressed() {
 
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
-        if((emojiKeyboard.getLetterKeyboardShown())||(emojiKeyboard.getEmojiKeyboardShown())){
-            emojiKeyboard.hideBothKeyboard(this);
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
+        if(emojiKeyboard!=null){
+            if((emojiKeyboard.getLetterKeyboardShown())||(emojiKeyboard.getEmojiKeyboardShown())){
+                emojiKeyboard.hideBothKeyboard(this);
+            }else{
+                if(fileStorageLayout.isShown()){
+                    if(fileStorageF != null){
+                        fileStorageF.clearSelections();
+                        fileStorageF.hideMultipleSelect();
+                    }
+                    fileStorageLayout.setVisibility(View.GONE);
+                }else{
+                    if (handlerEmojiKeyboard != null){
+                        handlerEmojiKeyboard.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerKeyboard != null){
+                        handlerKeyboard.removeCallbacksAndMessages(null);
+                    }
+                    finish();
+                }
+            }
         }else{
             if(fileStorageLayout.isShown()){
                 if(fileStorageF != null){
@@ -2456,10 +2478,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (handlerKeyboard != null){
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
-
                 finish();
             }
         }
+
     }
 
     public static void log(String message) {
@@ -2469,9 +2491,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onClick(View v) {
         log("onClick");
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
 
         switch (v.getId()) {
             case R.id.home:{
@@ -2524,23 +2543,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
+                if(emojiKeyboard!=null){
+                    if(emojiKeyboard.getLetterKeyboardShown()){
+                        emojiKeyboard.hideLetterKeyboard();
+                        handlerKeyboard.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                emojiKeyboard.showEmojiKeyboard();
+                            }
+                        },250);
 
-                if(emojiKeyboard.getLetterKeyboardShown()){
-                    emojiKeyboard.hideLetterKeyboard();
-                    handlerKeyboard.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            emojiKeyboard.showEmojiKeyboard();
-                        }
-                    },250);
+                    }else if(emojiKeyboard.getEmojiKeyboardShown()){
+                        emojiKeyboard.showLetterKeyboard();
 
-                }else if(emojiKeyboard.getEmojiKeyboardShown()){
-                    emojiKeyboard.showLetterKeyboard();
+                    }else{
+                        emojiKeyboard.showEmojiKeyboard();
 
-                }else{
-                    emojiKeyboard.showEmojiKeyboard();
-
+                    }
                 }
+
                 break;
             }
 
@@ -2550,8 +2571,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
-                emojiKeyboard.hideBothKeyboard(this);
-
+                if(emojiKeyboard!=null){
+                    emojiKeyboard.hideBothKeyboard(this);
+                }
                 boolean inProgressCall = false;
 
                 MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
@@ -2578,8 +2600,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
-                emojiKeyboard.hideBothKeyboard(this);
-
+                if(emojiKeyboard!=null){
+                    emojiKeyboard.hideBothKeyboard(this);
+                }
                 attachContact();
                 break;
             }
@@ -2589,8 +2612,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
-                emojiKeyboard.hideBothKeyboard(this);
-
+                if(emojiKeyboard!=null){
+                    emojiKeyboard.hideBothKeyboard(this);
+                }
                 attachPhotoVideo();
                 break;
             }
@@ -2600,7 +2624,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
-                emojiKeyboard.hideBothKeyboard(this);
+                if(emojiKeyboard!=null){
+                    emojiKeyboard.hideBothKeyboard(this);
+                }
 
                 attachFromCloud();
                 break;
@@ -2613,7 +2639,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }else{
-                    if(emojiKeyboard.getLetterKeyboardShown()){
+
+                    if((emojiKeyboard!=null)&&(emojiKeyboard.getLetterKeyboardShown())){
                         emojiKeyboard.hideBothKeyboard(this);
                         handlerEmojiKeyboard.postDelayed(new Runnable() {
                             @Override
@@ -2632,7 +2659,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         },250);
                     }else{
-                        emojiKeyboard.hideBothKeyboard(this);
+                        if(emojiKeyboard!=null){
+                            emojiKeyboard.hideBothKeyboard(this);
+                        }
+
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                             if (!hasStoragePermission) {
@@ -3021,7 +3051,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             for(int i=0;i<messagesSelected.size();i++){
                 AndroidMegaChatMessage messageSelected = messagesSelected.get(i);
                 builder.append("[");
-                String timestamp = TimeChatUtils.formatShortDateTime(messageSelected.getMessage().getTimestamp());
+                String timestamp = TimeUtils.formatShortDateTime(messageSelected.getMessage().getTimestamp());
                 builder.append(timestamp);
                 builder.append("] ");
                 String messageString = chatC.createManagementString(messageSelected, chatRoom);
@@ -4717,10 +4747,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
-            if((emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())&&(messages.size()==1)){
-                mLayoutManager.scrollToPosition(messages.size());
+            if(emojiKeyboard !=null){
+                if((emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())&&(messages.size()==1)){
+                    mLayoutManager.scrollToPosition(messages.size());
+                }
             }
-
             log("DONT scroll to end");
             if(typeMessageJump !=  TYPE_MESSAGE_NEW_MESSAGE){
                 messageJumpText.setText(getResources().getString(R.string.message_new_messages));
@@ -6032,7 +6063,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     protected void onDestroy(){
-        emojiKeyboard.hideBothKeyboard(this);
+        if(emojiKeyboard!=null){
+            emojiKeyboard.hideBothKeyboard(this);
+        }
         if (handlerEmojiKeyboard != null){
             handlerEmojiKeyboard.removeCallbacksAndMessages(null);
         }
@@ -6617,9 +6650,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
         }
-
-       emojiKeyboard.hideBothKeyboard(this);
-
+        if(emojiKeyboard!=null){
+            emojiKeyboard.hideBothKeyboard(this);
+        }
         //Update last seen position if different and there is unread messages
        //If the chat is being opened do not update, onLoad will do that
 
@@ -6866,7 +6899,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             int state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
 
             if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-                String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+                String formattedDate = TimeUtils.lastGreenDate(lastGreen);
 
                 setLastGreen(formattedDate);
 
@@ -7243,7 +7276,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (fileStorageLayout.isShown()) {
             hideFileStorageSection();
         }
-        emojiKeyboard.hideBothKeyboard(this);
+        if(emojiKeyboard!=null) {
+            emojiKeyboard.hideBothKeyboard(this);
+        }
 
     }
 

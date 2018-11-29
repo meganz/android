@@ -89,6 +89,7 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -663,8 +664,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
 
         //Modified Layout
-        modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
-        modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
+        modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_created_layout);
+        modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_created);
 
         //Versions Layout
         versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
@@ -862,7 +863,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             refreshProperties();
             supportInvalidateOptionsMenu();
 
-            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
         }
 	}
 
@@ -1108,7 +1108,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
 		switch (id) {
@@ -1277,7 +1276,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 		}
-		return true;
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void refreshProperties(){
@@ -1314,13 +1313,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentLayout.setVisibility(View.GONE);
 
 			if (node.getCreationTime() != 0){
-				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+
+				try {addedTextView.setText(TimeUtils.formatLongDateTime(node.getCreationTime()));}catch(Exception ex)	{addedTextView.setText("");}
 
 				if (node.getModificationTime() != 0){
-					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+					try {modifiedTextView.setText(TimeUtils.formatLongDateTime(node.getModificationTime()));}catch(Exception ex)	{modifiedTextView.setText("");}
 				}
 				else{
-					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+					try {modifiedTextView.setText(TimeUtils.formatLongDateTime(node.getCreationTime()));}catch(Exception ex)	{modifiedTextView.setText("");}
 				}
 			}
 			else{
@@ -1711,7 +1711,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
         hideMultipleSelect();
 		switch (v.getId()) {
 			case R.id.file_properties_text_number_versions:{
@@ -2978,17 +2978,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	}
 
-	@Override
-	protected void onResume() {
-		log("onResume-FileInfoActivityLollipop");
-		super.onResume();
-
-        if (adapterType != Constants.OFFLINE_ADAPTER){
-            refreshProperties();
-            supportInvalidateOptionsMenu();
-            ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-        }
-	}
+//	@Override
+//	protected void onResume() {
+//		log("onResume-FileInfoActivityLollipop");
+//		super.onResume();
+//
+//        if (adapterType != Constants.OFFLINE_ADAPTER){
+//            refreshProperties();
+//            supportInvalidateOptionsMenu();
+//        }
+//	}
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
@@ -3008,12 +3007,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if(isRemoveOffline){
             Intent intent = new Intent();
             intent.putExtra(NODE_HANDLE, handle);
             setResult(RESULT_OK, intent);
         }
-		super.onBackPressed();
+        super.callToSuperBack = true;
+        super.onBackPressed();
 	}
 
 	public void showSnackbar(String s){
@@ -3170,7 +3173,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     
     public void itemClick(int position) {
         log("itemClick");
-        ((MegaApplication)getApplication()).sendSignalPresenceActivity();
+
         if (adapter.isMultipleSelect()) {
             adapter.toggleSelection(position);
             updateActionModeTitle();

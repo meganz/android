@@ -140,8 +140,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int heightFrag = displayMetrics.heightPixels / 2 - getActionBarHeight();
 
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
         rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, heightFrag);
@@ -212,7 +210,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void itemClick(int position) {
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }

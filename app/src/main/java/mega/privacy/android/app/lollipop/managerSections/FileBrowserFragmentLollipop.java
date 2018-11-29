@@ -176,8 +176,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 			switch(item.getItemId()){
 				case R.id.action_mode_close_button:{
 					log("on close button");
@@ -577,7 +575,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
 			log("FileBrowserFragmentLollipop isList");
@@ -808,7 +805,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     @Override
     public void onClick(View v) {
         log("onClick");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         switch (v.getId()) {
             
             case R.id.transfers_overview_three_dots_layout: {
@@ -852,7 +848,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         log("item click position: " + position);
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         if (adapter.isMultipleSelect()) {
             log("itemClick:multiselectON");
             adapter.toggleSelection(position);
@@ -1466,7 +1461,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     public int onBackPressed() {
         log("onBackPressed");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         
         if (adapter != null) {
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(adapter.getParentHandle());

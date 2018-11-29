@@ -588,8 +588,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			ArrayList<MegaUser> users = adapter.getSelectedUsers();
 
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 			switch(item.getItemId()){
 				case R.id.cab_menu_share_folder:{
 
@@ -837,8 +835,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		log("onCreateView");
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 //		for (int i=0;i<contacts.size();i++){
 //
@@ -1090,7 +1086,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
     public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1111,7 +1106,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			hideMultipleSelect();

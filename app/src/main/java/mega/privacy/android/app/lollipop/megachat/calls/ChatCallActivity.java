@@ -35,7 +35,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -70,6 +69,7 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -103,9 +103,7 @@ import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
-import android.provider.CallLog;
-
-public class ChatCallActivity extends AppCompatActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
+public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -988,13 +986,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-//		if (overflowMenuLayout != null){
-//			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-//				overflowMenuLayout.setVisibility(View.GONE);
-//				return;
-//			}
-//		}
-//        super.onBackPressed();
+        super.callToSuperBack = false;
         super.onBackPressed();
 
         if (megaChatApi != null) {
@@ -1382,6 +1374,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         switch (v.getId()) {
             case R.id.video_fab:{
+                log("Click on video fab");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
                     answerCallFAB.clearAnimation();
@@ -1403,7 +1396,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 break;
             }
             case R.id.micro_fab: {
-
+                log("Click on micro fab");
                 if(callChat.hasLocalAudio()){
                     megaChatApi.disableAudio(chatId, this);
                 }
@@ -1426,10 +1419,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             case R.id.answer_call_fab:{
                 log("Click on answer fab");
+                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 megaChatApi.answerChatCall(chatId, false, this);
                 videoFAB.clearAnimation();
-
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 break;
             }
         }
