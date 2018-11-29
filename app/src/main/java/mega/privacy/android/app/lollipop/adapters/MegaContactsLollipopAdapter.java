@@ -769,7 +769,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
 
 			String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
-
+			holder.textViewContent.setVisibility(View.VISIBLE);
 			holder.textViewContent.setText(sharedNodesDescription);
 		}
 

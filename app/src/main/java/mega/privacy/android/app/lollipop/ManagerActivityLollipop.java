@@ -5034,7 +5034,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-				log("onPageScrolled");
 				indexContacts = position;
 			}
 
