@@ -1645,6 +1645,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return null;
     }
 
+    void hidePasswordIfVisible () {
+        if (passwdVisibility) {
+            toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
+            passwdVisibility = false;
+            showHidePassword();
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -1652,12 +1660,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         switch(v.getId()) {
             case R.id.button_login_login: {
                 log("click on button_login_login");
+                hidePasswordIfVisible();
                 loginClicked = true;
                 onLoginClick(v);
                 break;
             }
             case R.id.button_create_account_login:{
                 log("click on button_create_account_login");
+                hidePasswordIfVisible();
                 onRegisterClick(v);
                 break;
             }
@@ -1668,6 +1678,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.button_forgot_pass:{
                 log("click on button_forgot_pass");
+                hidePasswordIfVisible();
                 try {
                     String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
@@ -1694,6 +1705,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.login_text_view:{
+                hidePasswordIfVisible();
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5){
                     MegaAttributes attrs = dbH.getAttributes();
@@ -1727,6 +1739,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.text_newToMega:{
+                hidePasswordIfVisible();
                 numberOfClicksSDK++;
                 if (numberOfClicksSDK == 5){
                     MegaAttributes attrs = dbH.getAttributes();
