@@ -69,8 +69,7 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
-import mega.privacy.android.app.lollipop.megachat.PendingMessage;
-import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
+import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -1557,72 +1556,62 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						MegaChatListItem item = chatListItems.get(i);
 						long idChat = item.getChatId();
 						log("Id chat: "+idChat);
-						long idPendingMsg = dbH.setPendingMessage(idChat+"", Long.toString(timestamp));
-						if(idPendingMsg!=-1){
-							intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idPendingMsg);
-							log("name of the file: "+info.getTitle());
-							log("size of the file: "+info.getSize());
-							PendingNodeAttachment nodeAttachment = null;
+						PendingMessageSingle pMsgSingle = new PendingMessageSingle();
+						pMsgSingle.setChatId(idChat);
+						pMsgSingle.setUploadTimestamp(timestamp);
 
-							if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
+						if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
 
-								if(sendOriginalAttachments || MimeTypeList.typeForName(info.getFileAbsolutePath()).isGIF()){
-									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-									//Add node to db
-									long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
-
-									dbH.setMsgNode(idPendingMsg, idNode);
-
-									nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
-								}
-								else{
-									File previewDir = PreviewUtils.getPreviewFolder(this);
-									String nameFilePreview = info.getTitle();
-									File preview = new File(previewDir, nameFilePreview);
-
-									boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());
-
-									if(isPreview){
-										log("Preview: "+preview.getAbsolutePath());
-										String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
-
-										//Add node to db
-										long idNode = dbH.setNodeAttachment(preview.getAbsolutePath(), info.getTitle(), fingerprint);
-
-										dbH.setMsgNode(idPendingMsg, idNode);
-
-										nodeAttachment = new PendingNodeAttachment(preview.getAbsolutePath(), fingerprint, info.getTitle());
-									}
-									else{
-										log("No preview");
-										String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-										//Add node to db
-										long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
-
-										dbH.setMsgNode(idPendingMsg, idNode);
-
-										nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
-									}
-								}
-							}
-							else{
+							if(sendOriginalAttachments){
 								String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 
-								//Add node to db
-								long idNode = dbH.setNodeAttachment(info.getFileAbsolutePath(), info.getTitle(), fingerprint);
+								pMsgSingle.setFilePath(info.getFileAbsolutePath());
+								pMsgSingle.setName(info.getTitle());
+								pMsgSingle.setFingerprint(fingerprint);
 
-								dbH.setMsgNode(idPendingMsg, idNode);
-
-								nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
 							}
+							else{
+								File previewDir = PreviewUtils.getPreviewFolder(this);
+								String nameFilePreview = info.getTitle();
+								File preview = new File(previewDir, nameFilePreview);
 
-							PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
-//							AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
-//							sendMessageUploading(newNodeAttachmentMsg);
+								boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());
 
-							intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
+								if(isPreview){
+									log("Preview: "+preview.getAbsolutePath());
+									String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
+
+									pMsgSingle.setFilePath(preview.getAbsolutePath());
+									pMsgSingle.setName(info.getTitle());
+									pMsgSingle.setFingerprint(fingerprint);
+								}
+								else{
+									log("No preview");
+									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+
+									pMsgSingle.setFilePath(info.getFileAbsolutePath());
+									pMsgSingle.setName(info.getTitle());
+									pMsgSingle.setFingerprint(fingerprint);
+								}
+							}
+						}
+						else{
+							String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+
+							pMsgSingle.setFilePath(info.getFileAbsolutePath());
+							pMsgSingle.setName(info.getTitle());
+							pMsgSingle.setFingerprint(fingerprint);
+						}
+
+						long idMessage = dbH.addPendingMessage(pMsgSingle);
+						pMsgSingle.setId(idMessage);
+
+						if(idMessage!=-1){
+							intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
+
+							log("name of the file: "+info.getTitle());
+							log("size of the file: "+info.getSize());
+
 							intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
 							startService(intent);

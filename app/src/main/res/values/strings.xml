@@ -1258,6 +1258,7 @@
     <string name="message_option_retry" context="option shown when a message could not be sent">Retry</string>
 
     <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message not sent</string>
+    <string name="title_message_uploading_options" context="title of the menu for an uploading message with attachment">Attachment uploading</string>
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
@@ -2237,6 +2238,8 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
+    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
+
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
     <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
         <item context="one minute" quantity="one">[B]%1$s hour[/B]</item>
@@ -2250,5 +2253,4 @@
         <item context="one second" quantity="one">[B]%1$d second[/B]</item>
         <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
-
 </resources>
