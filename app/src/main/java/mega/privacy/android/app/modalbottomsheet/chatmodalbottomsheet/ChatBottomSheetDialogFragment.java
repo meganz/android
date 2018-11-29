@@ -170,8 +170,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			addAvatarChatPanel(null, chat);
 
             infoChatText.setText(getString(R.string.group_chat_info_label));
-            optionInfoChat.setVisibility(View.GONE);
-            separatorInfo.setVisibility(View.GONE);
+            optionInfoChat.setVisibility(View.VISIBLE);
 
             if(chat.isActive()){
                 optionLeaveChat.setVisibility(View.VISIBLE);
@@ -226,11 +225,19 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 }
                 else{
                     optionInfoChat.setVisibility(View.GONE);
+                    separatorInfo.setVisibility(View.GONE);
                     optionClearHistory.setVisibility(View.GONE);
                 }
             }
             else{
+                MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
+                if(chatRoom!=null){
+                    titleMailContactChatPanel.setText(chatRoom.getPeerEmail(0));
+                    addAvatarChatPanel(chatRoom.getPeerEmail(0), chat);
+                }
+
                 optionInfoChat.setVisibility(View.GONE);
+                separatorInfo.setVisibility(View.GONE);
                 optionClearHistory.setVisibility(View.GONE);
             }
 
