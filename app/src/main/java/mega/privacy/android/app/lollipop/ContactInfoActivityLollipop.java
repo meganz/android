@@ -2529,7 +2529,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int state = megaChatApi.getUserOnlineStatus(user.getHandle());
 
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-				String formattedDate = TimeUtils.lastGreenDate(lastGreen);
+				String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
