@@ -9,7 +9,7 @@ import java.util.TimeZone;
 
 import nz.mega.sdk.MegaChatMessage;
 
-public class TimeChatUtils implements Comparator<Calendar> {
+public class TimeUtils implements Comparator<Calendar> {
 
     public static int TIME=0;
     public static int DATE=TIME+1;
@@ -20,7 +20,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
 
     int type;
 
-    public TimeChatUtils(int type){
+    public TimeUtils(int type){
         this.type = type;
     }
 
@@ -91,7 +91,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
-        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
             String time = formatTime(lastMessage);
             String formattedDate = "Today" + " " + time;
@@ -140,7 +140,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
-        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
             return "Today";
         }
@@ -175,6 +175,16 @@ public class TimeChatUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
+    public static String formatLongDateTime(long timestamp){
+
+        java.text.DateFormat df = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault());
+
+        Calendar cal = Util.calculateDateFromTimestamp(timestamp);
+        Date date = cal.getTime();
+        String formattedDate = df.format(date);
+        return formattedDate;
+    }
+
     public static String formatTime(long ts){
         java.text.DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, Locale.getDefault());
         Calendar cal = Util.calculateDateFromTimestamp(ts);
@@ -193,7 +203,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
-        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         long ts = calGreen.getTimeInMillis();
         log("Ts last green: "+ts);
         if(tc.compare(calGreen, calToday)==0) {
@@ -250,7 +260,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
-        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
             String time = formatTime(ts);
             String formattedDate = "Today" + " " + time;
@@ -280,6 +290,6 @@ public class TimeChatUtils implements Comparator<Calendar> {
     }
 
     private static void log(String message) {
-        Util.log("TimeChatUtils", message);
+        Util.log("TimeUtils", message);
     }
 }
