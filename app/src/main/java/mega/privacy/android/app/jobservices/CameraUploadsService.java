@@ -1348,7 +1348,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     private synchronized void transferFinished(MegaApiJava api,MegaTransfer transfer,MegaError e) {
         String path = transfer.getPath();
-        //todo need to test over quota
         if (isOverquota) {
             return;
         }
@@ -1384,13 +1383,13 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                         temp.delete();
                     }
                 }
-            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-                log("over quota error: " + e.getErrorCode());
-                isOverquota = true;
-                cancel();
-            } else {
-                log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
             }
+        }else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+            log("over quota error: " + e.getErrorCode());
+            isOverquota = true;
+            cancel();
+        } else {
+            log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
         }
         if (canceled) {
             log("Image sync cancelled: " + transfer.getFileName());
