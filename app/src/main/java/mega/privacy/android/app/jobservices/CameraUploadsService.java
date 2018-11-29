@@ -15,6 +15,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StatFs;
@@ -24,9 +25,13 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -1167,7 +1172,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     public static void log(String message) {
-        Util.log("CameraUploadsService",message);
+//        Util.log("CameraUploadsService",message);
+        log("CameraUploadsService",message);
     }
     
     @Override
@@ -1876,5 +1882,37 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
         }
     
+    }
+
+    private final static boolean OUTPUT = false;
+
+    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
+
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM:dd HH:mm:ss");
+
+    public static void log(Object context,Object any) {
+        String msg = (any == null) ? "NULL" : any.toString();
+        String dateStr = DATE_FORMAT.format(new Date());
+        if (context != null) {
+            if (context instanceof String) {
+                msg = "[" + dateStr + "] " + context + "--->" + msg;
+            } else {
+                msg = "[" + dateStr + "] " + context.getClass().getSimpleName() + "--->" + msg;
+            }
+        }
+        if (OUTPUT) {
+            File log = new File(LOG_FILE);
+            try {
+                if (!log.exists()) {
+                    log.createNewFile();
+                }
+                FileWriter writer = new FileWriter(LOG_FILE,true);
+                writer.write(msg + "\n");
+                writer.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        Log.e("@#@",msg);
     }
 }

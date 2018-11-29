@@ -194,6 +194,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
@@ -17456,7 +17457,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-
+                        JobUtil.cancelAllJobs(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
