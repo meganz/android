@@ -770,10 +770,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			
 			int inProgress = totalTransfers - pendingTransfers + 1;
-			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
-			transfersNumberText.setText(progressText);
-			
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
+            String progressText;
+			if(inProgress > 0){
+			    progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
+            }else{
+                progressText = getResources().getQuantityString(R.plurals.text_number_transfers,0,0,0);
+            }
+            
+            transfersNumberText.setText(progressText);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
 			params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
 			linearLayoutRecycler.setLayoutParams(params);
 		} else {
