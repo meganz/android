@@ -20,7 +20,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -485,8 +484,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	@Override
 	public void onClick(View v) {
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if(!Util.isOnline(context)){
 			if(context instanceof ManagerActivityLollipop){
 				((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
@@ -537,8 +534,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderContactsRequestList holder = (ViewHolderContactsRequestList) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

@@ -33,14 +33,14 @@
                     android:id="@+id/scroll_view_tour"
                     xmlns:tools="http://schemas.android.com/tools"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:fillViewport="true"
                     tools:context=".LoginActivityLollipop">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -97,7 +97,7 @@
                             android:id="@+id/tour_login_create"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="left|center_vertical"
+                            android:layout_weight="1"
                             android:orientation="vertical">
 
                             <TextView
@@ -117,11 +117,27 @@
                                 android:layout_marginTop="24dp"
                                 android:layout_marginLeft="24dp"
                                 android:layout_marginRight="24dp"
-                                android:layout_marginBottom="12dp"
+                                android:layout_marginBottom="16dp"
                                 android:text="@string/tour_space_text"
                                 android:textColor="@color/black"
                                 android:textSize="14sp" />
                         </LinearLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/layout_achievements_program"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal|bottom">
+                            <TextView
+                                android:id="@+id/text_achievements_program"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="24dp"
+                                android:layout_marginRight="24dp"
+                                android:layout_marginBottom="12dp"
+                                android:textColor="@color/mail_my_account"
+                                android:textSize="11sp" />
+                        </RelativeLayout>
 
                     </LinearLayout>
 
@@ -131,10 +147,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true">
+
                     <View
                         android:id="@+id/separator"
                         android:layout_width="match_parent"
-                        android:layout_height="1dip"
+                        android:layout_height="1dp"
                         android:background="@color/delimiterColor" />
 
                     <LinearLayout

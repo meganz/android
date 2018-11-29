@@ -528,8 +528,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		final MegaShare s = (MegaShare) getItem(currentPosition);

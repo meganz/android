@@ -322,6 +322,21 @@ public class Util {
 
 		return count;
 	}
+
+    public static String toCDATA(String src) {
+        if (src != null) {
+            //solution from web client
+            src = src.replaceAll("&","&amp;")
+                    .replaceAll("\"","&quot;")
+                    .replaceAll("'","&#39;")
+                    .replaceAll("<","&lt;")
+                    .replaceAll(">","&gt;");
+            //another solution
+//            src = src.replaceAll("]]>", "] ]>");
+//            src = "<![CDATA[" + src + "]]>";
+        }
+        return src;
+    }
 	
 	public static long getFreeExternalMemorySize() {
 		log("getFreeExternalMemorySize");
@@ -1850,13 +1865,6 @@ public class Util {
 		log("calculateTimestamp: "+timestamp);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp*1000);
-		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
-		return cal;
-	}
-
-	public static Calendar calculateDateFromTimestamp2 (long timestamp){
-		log("calculateTimestamp: "+timestamp);
-		Calendar cal = Calendar.getInstance();
 		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
 		return cal;
 	}

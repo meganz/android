@@ -341,7 +341,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -359,6 +358,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.offline_browser_action, menu);
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 		
@@ -368,6 +369,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -480,8 +483,8 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void checkScroll () {
-		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+		if (recyclerView != null ) {
+			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -513,8 +516,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		//Check pathNAvigation
 		if (((ManagerActivityLollipop)context).isList){
@@ -1056,7 +1057,6 @@ public class OfflineFragmentLollipop extends Fragment{
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		//Otherwise out of bounds exception happens.
 		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
 			position -= placeholderCount;
@@ -1069,7 +1069,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
 				if (selectedNodes.size() > 0){
 					updateActionModeTitle();
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 
 				}
 			}
@@ -1522,7 +1521,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		adapter.clearSelections();
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1531,7 +1529,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;
