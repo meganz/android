@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -402,6 +403,36 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void onCreate() {
 		super.onCreate();
 
+		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
+		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
+
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+		megaApi = getMegaApi();
+		megaApiFolder = getMegaApiFolder();
+		megaChatApi = getMegaChatApi();
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
+
+			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
+			//			jobInfoBuilder.setMinimumLatency(15000);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				jobInfoBuilder.setPeriodic(schedulerInterval);
+			}
+
+			if (mJobScheduler != null) {
+				int result = mJobScheduler.schedule(jobInfoBuilder.build());
+				if (result == JobScheduler.RESULT_SUCCESS) {
+					log("CameraUploadsService: Job scheduled SUCCESS");
+				} else {
+					log("CameraUploadsService: Job scheduled FAILED");
+				}
+			}
+		}
+
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
@@ -432,36 +463,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
-		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
-		megaApi = getMegaApi();
-		megaApiFolder = getMegaApiFolder();
-		megaChatApi = getMegaChatApi();
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
-
-			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
-			//			jobInfoBuilder.setMinimumLatency(15000);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				jobInfoBuilder.setPeriodic(schedulerInterval);
-			}
-
-			if (mJobScheduler != null) {
-				int result = mJobScheduler.schedule(jobInfoBuilder.build());
-				if (result == JobScheduler.RESULT_SUCCESS) {
-					log("CameraUploadsService: Job scheduled SUCCESS");
-				} else {
-					log("CameraUploadsService: Job scheduled FAILED");
-				}
-			}
-		}
 
 		if (staging){
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
@@ -1506,7 +1507,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		log("onChatCallUpdate");
-
+        stopService(new Intent(this,IncomingCallService.class));
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
 			log("Call destroyed: "+call.getTermCode());
 		}
@@ -1721,6 +1722,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		log("Launch call: "+chatRoom.getTitle());
+//        TL.log(this,"launch Activity" );
+//        Intent i = new Intent(this, TestActivity.class);
+//        startActivity(i);
 
 	}
 

@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -80,6 +81,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -521,6 +523,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
+//        stopService(new Intent(this,IncomingCallService.class));
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -2483,7 +2486,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public static void log(String message) {
-        Util.log("ChatActivityLollipop", message);
+        Util.log("ChatActivityLollipop",message);
     }
 
     @Override
@@ -6058,7 +6061,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         catch (Exception e){
             log("Written message not stored on DB");
         }
-
         super.onStop();
     }
 
