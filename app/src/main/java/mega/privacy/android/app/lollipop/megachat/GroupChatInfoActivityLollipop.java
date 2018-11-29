@@ -1529,7 +1529,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);

@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -82,7 +81,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
-import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -6950,7 +6948,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             int state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
 
             if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-                String formattedDate = TimeUtils.lastGreenDate(lastGreen);
+                String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
                 setLastGreen(formattedDate);
 

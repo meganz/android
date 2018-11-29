@@ -59,9 +59,12 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -92,6 +95,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	private long handleContactLink = -1;
 	
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	MyAccountInfo myAccountInfo;
 	TextView initialLetter;
 
@@ -795,6 +799,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+			}
+		}
+		else{
+			log("Chat not enabled!");
+		}
+
 		dbH = DatabaseHandler.getDbHandler(context);
 
 		if (savedInstanceState != null){
@@ -1200,8 +1213,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		adapter.notifyDataSetChanged();
 	}
 
-	public void contactStatusUpdate(long userHandle, int status) {
-		log("contactStatusUpdate: "+userHandle);
+	public void contactPresenceUpdate(long userHandle, int status) {
+		log("contactPresenceUpdate: "+userHandle);
 
 		int indexToReplace = -1;
 		ListIterator<MegaContactAdapter> itrReplace = visibleContacts.listIterator();
@@ -1209,6 +1222,13 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			MegaContactAdapter contact = itrReplace.next();
 			if (contact != null) {
 				if (contact.getMegaUser().getHandle() == userHandle) {
+					if(status != MegaChatApi.STATUS_ONLINE && status != MegaChatApi.STATUS_BUSY && status != MegaChatApi.STATUS_INVALID){
+						log("Request last green for user");
+						megaChatApi.requestLastGreen(userHandle, ((ManagerActivityLollipop)context));
+					}
+					else{
+						contact.setLastGreen("");
+					}
 					indexToReplace = itrReplace.nextIndex() - 1;
 					break;
 				}
@@ -1219,6 +1239,38 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if (indexToReplace != -1) {
 			log("Index to replace: " + indexToReplace);
 			adapter.updateContactStatus(indexToReplace);
+		}
+	}
+
+	public void contactLastGreenUpdate(long userHandle, int lastGreen) {
+		log("contactLastGreenUpdate: "+userHandle);
+
+		int state = megaChatApi.getUserOnlineStatus(userHandle);
+
+		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
+			String formattedDate = TimeUtils.lastGreenDate(context, lastGreen);
+
+			int indexToReplace = -1;
+			ListIterator<MegaContactAdapter> itrReplace = visibleContacts.listIterator();
+			while (itrReplace.hasNext()) {
+				MegaContactAdapter contact = itrReplace.next();
+				if (contact != null) {
+					if (contact.getMegaUser().getHandle() == userHandle) {
+						contact.setLastGreen(formattedDate);
+						indexToReplace = itrReplace.nextIndex() - 1;
+						break;
+					}
+				} else {
+					break;
+				}
+			}
+
+			if (indexToReplace != -1) {
+				log("Index to replace: " + indexToReplace);
+				adapter.updateContactStatus(indexToReplace);
+			}
+
+			log("Date last green: "+formattedDate);
 		}
 	}
 

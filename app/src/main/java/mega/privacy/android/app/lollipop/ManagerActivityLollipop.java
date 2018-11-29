@@ -17885,7 +17885,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 					if(cFLol!=null){
 						log("Update Contacts view");
-						cFLol.contactStatusUpdate(userHandle, status);
+						cFLol.contactPresenceUpdate(userHandle, status);
 					}
 				}
 			}
@@ -17937,7 +17937,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-        log("onChatConnectionStateUpdate");
+        log("onChatPresenceLastGreen");
+
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
+		if(cFLol!=null){
+			log("Update Contacts view");
+			cFLol.contactLastGreenUpdate(userhandle, lastGreen);
+		}
     }
 
     public boolean isMkLayoutVisible() {
