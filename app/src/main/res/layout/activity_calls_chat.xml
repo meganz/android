@@ -437,6 +437,7 @@
                         android:layout_below="@+id/linear_arrow_video"
                         android:scaleType="center"
                         android:src="@drawable/ic_videocam_white"
+                        android:background="@android:color/transparent"
                         app:backgroundTint="@color/accentColor"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
