@@ -177,31 +177,34 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if(!MegaApplication.isActivityVisible()) {
-                            log("in background, launch foreground service!");
-                            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                            log("is in IDLE " + pm.isDeviceIdleMode());
+                        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                        boolean isActivityVisible = MegaApplication.isActivityVisible();
+                        boolean isIdle = pm.isDeviceIdleMode();
+                        log("isActivityVisible: " + isActivityVisible);
+                        log("isIdle: " + isIdle);
+                        if(!isActivityVisible || isIdle) {
+                            log("launch foreground service!");
                             wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
                             wl.acquire();
                             wl.release();
                             startService(new Intent(this,IncomingCallService.class));
+                            return;
                         }
+                    }
+                    String gSession = credentials.getSession();
+                    if (megaApi.getRootNode() == null) {
+                        log("RootNode = null");
+                        performLoginProccess(gSession);
                     } else {
-                        String gSession = credentials.getSession();
-                        if (megaApi.getRootNode() == null) {
-                            log("RootNode = null");
-                            performLoginProccess(gSession);
-                        }
-                        else{
-                            log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
+                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
 //                        String gSession = credentials.getSession();
-                            int ret = megaChatApi.getInitState();
-                            log("result of init ---> " + ret);
-                            int status = megaChatApi.getOnlineStatus();
-                            log("online status ---> "+status);
-                            int connectionState = megaChatApi.getConnectionState();
-                            log("connection state ---> "+connectionState);
-                        }
+                        int ret = megaChatApi.getInitState();
+                        log("result of init ---> " + ret);
+                        int status = megaChatApi.getOnlineStatus();
+                        log("online status ---> " + status);
+                        int connectionState = megaChatApi.getConnectionState();
+                        log("connection state ---> " + connectionState);
+
                     }
                 }
                 else if(remoteMessageType.equals("2")){
