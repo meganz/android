@@ -1307,10 +1307,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         log("enableChat: condition ret == OK -- chat correctly initialized");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
                 else{
                     log("2 - Do not init, chat already initialized");
+
                 }
             }
             else{
@@ -1386,6 +1388,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         log("startFastLogin: condition ret == OK -- chat correctly initialized");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     log("After init: "+ret);
                 }
@@ -1565,6 +1568,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
                     log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
                     megaApi.login(lastEmail, lastPassword, this);
+                    megaChatApi.enableGroupChatCalls(true);
                 }
                 else{
                     log("ERROR INIT CHAT: " + ret);

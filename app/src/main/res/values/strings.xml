@@ -2265,7 +2265,7 @@
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">left the call</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Error. No more participants are allowed in this group call.</string>
-    <string name="call_error_too_many_video" context="Message show when a call cannot be established because there are too many video activated in the group call">Error. No more video are allowed in this group call.</string>
+    <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Error. No more video are allowed in this group call.</string>
 
 
 </resources>

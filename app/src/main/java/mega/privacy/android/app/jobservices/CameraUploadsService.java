@@ -1220,6 +1220,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                                     megaChatApi.logout(cameraUploadsService);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
+                                                    megaChatApi.enableGroupChatCalls(true);
                                                 }
                                             }
                                         }
