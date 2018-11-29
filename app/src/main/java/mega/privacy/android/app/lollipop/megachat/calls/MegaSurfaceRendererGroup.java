@@ -12,6 +12,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -94,6 +95,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
         this.myTexture = view;
         myTexture.setSurfaceTextureListener(this);
+        bitmap = myTexture.getBitmap();
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
@@ -166,45 +168,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         return bitmap;
     }
 
-    public ByteBuffer CreateByteBuffer(int width, int height) {
-        log("CreateByteBuffer(): width = "+width+", height = "+height);
-
-        Logging.d(TAG, "CreateByteBuffer " + width + ":" + height);
-        if (bitmap == null) {
-            bitmap = CreateBitmap(width, height);
-            byteBuffer = ByteBuffer.allocateDirect(width * height * 2);
-        }
-        return byteBuffer;
-    }
-
-    // It saves bitmap data to a JPEG picture, this function is for debug only.
-    private void saveBitmapToJPEG(int width, int height) {
-        log("saveBitmapToJPEG(): width = "+width+", height = "+height);
-
-        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream);
-
-        try{
-            FileOutputStream output = new FileOutputStream(String.format("/sdcard/render_%d.jpg", System.currentTimeMillis()));
-            output.write(byteOutStream.toByteArray());
-            output.flush();
-            output.close();
-        }
-        catch (FileNotFoundException e) {
-        }
-        catch (IOException e) {
-        }
-    }
-
-    public void DrawByteBuffer() {
-        if(byteBuffer == null)
-            return;
-        byteBuffer.rewind();
-        bitmap.copyPixelsFromBuffer(byteBuffer);
-        DrawBitmap(false);
-    }
-
-
     public void DrawBitmap(boolean flag) {
         if(bitmap == null){
             return;
@@ -227,30 +190,6 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             }
             myTexture.unlockCanvasAndPost(canvas);
         }
-    }
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-        final float roundPx = pixels;
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.BLUE);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
-    }
-
-
-    private static void log(String log) {
-        Util.log("MegaSurfaceRendererGroup", log);
     }
 
     private void notifyStateToAll() {
@@ -304,4 +243,47 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     public interface MegaSurfaceRendererGroupListener {
         void resetSize(Long handle);
     }
+
+    public ByteBuffer CreateByteBuffer(int width, int height) {
+        log("CreateByteBuffer(): width = "+width+", height = "+height);
+
+        Logging.d(TAG, "CreateByteBuffer " + width + ":" + height);
+        if (bitmap == null) {
+            bitmap = CreateBitmap(width, height);
+            byteBuffer = ByteBuffer.allocateDirect(width * height * 2);
+        }
+        return byteBuffer;
+    }
+
+    // It saves bitmap data to a JPEG picture, this function is for debug only.
+    private void saveBitmapToJPEG(int width, int height) {
+        log("saveBitmapToJPEG(): width = "+width+", height = "+height);
+
+        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream);
+
+        try{
+            FileOutputStream output = new FileOutputStream(String.format("/sdcard/render_%d.jpg", System.currentTimeMillis()));
+            output.write(byteOutStream.toByteArray());
+            output.flush();
+            output.close();
+        }
+        catch (FileNotFoundException e) {
+        }
+        catch (IOException e) {
+        }
+    }
+
+    public void DrawByteBuffer() {
+        if(byteBuffer == null)
+            return;
+        byteBuffer.rewind();
+        bitmap.copyPixelsFromBuffer(byteBuffer);
+        DrawBitmap(false);
+    }
+
+    private static void log(String log) {
+        Util.log("MegaSurfaceRendererGroup", log);
+    }
+
 }

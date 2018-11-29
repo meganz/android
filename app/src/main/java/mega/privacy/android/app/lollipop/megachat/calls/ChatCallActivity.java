@@ -1435,35 +1435,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     protected void onResume() {
         log("onResume()");
+        super.onResume();
         if(peersOnCall!=null){
             if(peersOnCall.size()!=0){
-                if(peersOnCall.size()<7){
-                    for(InfoPeerGroupCall peer :peersOnCall){
-                        if(peer.getListener()!=null){
-                            if(peer.getListener().getHeight() != 0){
-                                peer.getListener().setHeight(0);
-                            }
-                            if(peer.getListener().getWidth() != 0){
-                                peer.getListener().setWidth(0);
-                            }
+                for(InfoPeerGroupCall peer :peersOnCall){
+                    if(peer.getListener()!=null){
+                        if(peer.getListener().getHeight() != 0){
+                            peer.getListener().setHeight(0);
                         }
-                    }
-                }else{
-                    for(InfoPeerGroupCall peer :peersOnCall){
-                        if(peer.getListener()!=null){
-                            if(peer.getListener().getHeight() != 0){
-                                peer.getListener().setHeight(0);
-                            }
-                            if(peer.getListener().getWidth() != 0){
-                                peer.getListener().setWidth(0);
-                            }
+                        if(peer.getListener().getWidth() != 0){
+                            peer.getListener().setWidth(0);
                         }
                     }
                 }
-
             }
         }
-        super.onResume();
 //        adapter.notifyDataSetChanged();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
