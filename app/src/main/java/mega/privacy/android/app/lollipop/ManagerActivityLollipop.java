@@ -7303,7 +7303,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ChatController chatController = new ChatController(this);
 				if (Util.isChatEnabled()) {
 
-					newChatMenuItem.setVisible(true);
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if (rChatFL != null) {
 						if (Util.isOnline(this)) {
@@ -7316,6 +7315,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 
 					//Hide
+					newChatMenuItem.setVisible(false);
 					searchByDate.setVisible(false);
 					addContactMenuItem.setVisible(false);
 					searchMenuItem.setVisible(false);
