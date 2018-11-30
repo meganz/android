@@ -17,7 +17,7 @@ public class JobUtil {
     //todo short time for testing purpose
     public static final long SCHEDULER_INTERVAL = 15 * DateUtils.MINUTE_IN_MILLIS;
     
-    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 5 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 2 * DateUtils.MINUTE_IN_MILLIS;
 
     public static final int START_JOB_FAILED = -1;
 
@@ -25,7 +25,7 @@ public class JobUtil {
 
     public static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
 
-    public static boolean isJobScheduled(Context context,int id) {
+    public static synchronized boolean isJobScheduled(Context context,int id) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
             List<JobInfo> jobs = js.getAllPendingJobs();
@@ -43,7 +43,7 @@ public class JobUtil {
         return startJob(context);
     }
 
-    public static int startJob(Context context) {
+    public static synchronized int startJob(Context context) {
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
@@ -65,7 +65,7 @@ public class JobUtil {
         return START_JOB_FAILED;
     }
 
-    public static void cancelAllJobs(Context context) {
+    public static synchronized void cancelAllJobs(Context context) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
             js.cancelAll();

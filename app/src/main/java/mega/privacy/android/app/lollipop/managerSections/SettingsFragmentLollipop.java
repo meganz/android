@@ -2247,7 +2247,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("KEY_CAMERA_UPLOAD_CHARGING");
 			charging = cameraUploadCharging.isChecked();
 			if(charging){
-                enableVideoCompressionSizeSettings();
+                enableVideoCompressionSizeSettingsAndRestartUpload();
             }else{
                 disableVideoCompressionSizeSettings();
             }
@@ -3461,6 +3461,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
             }
             cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
         }
+    }
+    
+    private void enableVideoCompressionSizeSettingsAndRestartUpload(){
+        enableVideoCompressionSizeSettings();
         restartCameraUpload();
     }
     
