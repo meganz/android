@@ -5700,10 +5700,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerItem = DrawerItem.SEARCH;
     			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
     			if (sFLol != null) {
-    				getSupportFragmentManager().beginTransaction().remove(sFLol).commit();
-					try {
-						getSupportFragmentManager().executePendingTransactions();
-					} catch (Exception e){};
+    				getSupportFragmentManager().beginTransaction().remove(sFLol).commitNowAllowingStateLoss();
 				}
 				sFLol = SearchFragmentLollipop.newInstance();
 
