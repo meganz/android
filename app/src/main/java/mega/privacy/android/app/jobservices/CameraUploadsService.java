@@ -176,6 +176,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 try {
                     initService();
                     int result = shouldRun();
+                    log("onStartJob should run result: " + result + "");
                     Log.d("yuan","onStartJob should run result: " + result + "");
                     if (result == 0) {
                         startCameraUploads();
@@ -1404,6 +1405,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         
         totalUploaded++;
+        log("total To upload is " + totalToUpload + " totalUploaded " + totalUploaded + " pendings are " + megaApi.getNumPendingUploads());
         if (totalToUpload == totalUploaded || megaApi.getNumPendingUploads() == 0) {
             log("photo upload finished, now checking videos");
             if (isCompressedVideoPending() && !canceled) {
