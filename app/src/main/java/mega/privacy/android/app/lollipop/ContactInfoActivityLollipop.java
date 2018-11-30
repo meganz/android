@@ -66,6 +66,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -169,7 +170,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ImageView contactStateIcon;
 	TextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
-	TextView secondLineTextToolbar;
+	MarqueeTextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
 
 	RelativeLayout clearChatLayout;
@@ -286,8 +287,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
-			secondLineTextToolbar = (TextView) findViewById(R.id.second_line_toolbar);
-			secondLineTextToolbar.setSelected(true);
+//			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
+			RelativeLayout titleLayout = (RelativeLayout) findViewById(R.id.layout_title);
+			RelativeLayout.LayoutParams paramsR = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			paramsR.setMargins(Util.px2dp(72, outMetrics), 0, 0, 0);
+			paramsR.addRule(RelativeLayout.BELOW, R.id.first_line_toolbar);
+			secondLineTextToolbar = new MarqueeTextView(this);
+			secondLineTextToolbar.setLayoutParams(paramsR);
+			secondLineTextToolbar.setTextAppearance(R.style.ToolbarTitle_Secondary);
+			secondLineTextToolbar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+			secondLineTextToolbar.setTextColor(ContextCompat.getColor(this, R.color.white));
+			secondLineTextToolbar.setEllipsize(null);
+			secondLineTextToolbar.setSingleLine();
+			secondLineTextToolbar.setPadding(0, 0, 0, Util.px2dp(9, outMetrics));
+			titleLayout.addView(secondLineTextToolbar);
+
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
@@ -2534,10 +2548,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
-//				secondLineTextToolbar.setText("formattedDate formattedDate formattedDate formattedDate formattedDate");
-				secondLineTextToolbar.setSelected(true);
 				secondLineLengthToolbar.setText(formattedDate);
-
+//				secondLineTextToolbar.setText("Large text: " + formattedDate);
+//				secondLineLengthToolbar.setText("Large text: " + formattedDate);
 				log("Date last green: "+formattedDate);
 			}
 		}
