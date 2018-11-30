@@ -850,8 +850,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if(myAccountInfo == null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
-
-
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1232,6 +1230,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				if (contact != null) {
 					if (contact.getMegaUser().getHandle() == userHandle) {
 						contact.setLastGreen(formattedDate);
+						//contact.setLastGreen("Veryyy veryy longg tooo check what happens");
 						indexToReplace = itrReplace.nextIndex() - 1;
 						break;
 					}
