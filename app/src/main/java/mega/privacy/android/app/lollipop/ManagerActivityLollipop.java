@@ -625,6 +625,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
+	public boolean comesFromeNotifications = false;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -1685,6 +1686,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
+		outState.putBoolean("comesFromeNotifications", comesFromeNotifications);
 	}
 
 	@Override
@@ -1742,6 +1744,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
+			comesFromeNotifications = savedInstanceState.getBoolean("comesFromeNotifications", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -16595,6 +16598,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
 			}
 			openFolderRefresh = true;
+			comesFromeNotifications = true;
 			setParentHandleIncoming(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
