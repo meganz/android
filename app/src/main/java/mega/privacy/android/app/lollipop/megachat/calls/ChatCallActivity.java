@@ -416,7 +416,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
 
-            updateSubTitleClock();
+            updateSubtitleToolbar();
         }else{
             log("updateScreenStatusInProgress() - individual chat - chatId: "+chatId);
             callChat = megaChatApi.getChatCall(chatId);
@@ -479,9 +479,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             updateLocalAudioStatus();
             updateRemoteVideoStatus(-1);
             updateRemoteAudioStatus(-1);
-
-            updateSubTitleClock();
-
         }
 
         stopAudioSignals();
@@ -705,6 +702,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 callChat = megaChatApi.getChatCall(chatId);
                 titleToolbar.setText(chat.getTitle());
 
+                updateSubTitleClock();
                 updateScreenStatusInProgress();
 
                 log("Start call Service");
@@ -1110,7 +1108,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     }
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-
                     log("onCreate()- In Progress");
                     updateScreenStatusInProgress();
                 }else if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
@@ -1729,6 +1726,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             updateLocalVideoStatus();
                             updateLocalAudioStatus();
 
+                            updateSubtitleToolbar();
+
                         }else{
                             log("CALL_STATUS_IN_PROGRESS - Individual call");
 
@@ -1760,10 +1759,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         videoFAB.setOnTouchListener(null);
                         videoFAB.setOnClickListener(this);
 
-                        updateSubTitleClock();
                         stopAudioSignals();
                         rtcAudioManager.start(null);
                         showInitialFABConfiguration();
+                        updateSubTitleClock();
                         break;
 
                     }
@@ -1835,6 +1834,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                             log("SESSION_STATUS_IN_PROGRESS");
 
+                            if(call.getPeerSessionStatusChange() == chat.getPeerHandle(0)){
+                                updateSubTitleClock();
+                            }
+
                             updateRemoteVideoStatus(userHandle);
                             updateRemoteAudioStatus(userHandle);
 
@@ -1853,8 +1856,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }else{
                     log("onChatCallUpdate() - CHANGE_TYPE_SESSION_STATUS");
 
-                    if(call.getPeerSessionStatusChange()==chat.getPeerHandle(0)){
-//                        updateSubTitle();
+                    if(call.getPeerSessionStatusChange() == chat.getPeerHandle(0)){
+                        updateSubTitleClock();
                     }
                     updateRemoteVideoStatus(-1);
                     updateRemoteAudioStatus(-1);
@@ -3428,7 +3431,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void startClock(){
-        log("startClock");
         long seconds = 0;
 
         if(callChat!=null){
