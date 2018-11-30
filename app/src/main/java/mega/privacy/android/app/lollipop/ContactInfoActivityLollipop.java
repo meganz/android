@@ -297,7 +297,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			secondLineTextToolbar.setTextAppearance(R.style.ToolbarTitle_Secondary);
 			secondLineTextToolbar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 			secondLineTextToolbar.setTextColor(ContextCompat.getColor(this, R.color.white));
-			secondLineTextToolbar.setEllipsize(null);
 			secondLineTextToolbar.setSingleLine();
 			secondLineTextToolbar.setPadding(0, 0, 0, Util.px2dp(9, outMetrics));
 			titleLayout.addView(secondLineTextToolbar);
@@ -2547,10 +2546,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
-				secondLineTextToolbar.setText(formattedDate);
-				secondLineLengthToolbar.setText(formattedDate);
-//				secondLineTextToolbar.setText("Large text: " + formattedDate);
-//				secondLineLengthToolbar.setText("Large text: " + formattedDate);
+//				secondLineTextToolbar.setText(formattedDate);
+//				secondLineLengthToolbar.setText(formattedDate);
+				secondLineTextToolbar.setText("Large text: " + formattedDate);
+				secondLineTextToolbar.isMarqueeIsNecesary();
+				secondLineLengthToolbar.setText("Large text: " + formattedDate);
 				log("Date last green: "+formattedDate);
 			}
 		}
