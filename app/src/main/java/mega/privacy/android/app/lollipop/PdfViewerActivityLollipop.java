@@ -605,6 +605,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        log("onBackPressed");
+        super.callToSuperBack = true;
+        super.onBackPressed();
+    }
+
     public void runEnterAnimation() {
         final long duration = 400;
         if (aB != null && aB.isShowing()) {
