@@ -100,8 +100,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/contact_list_name"
             android:textSize="14sp"
-            android:ellipsize="end"
-            android:maxLines="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
             android:textColor="@color/file_list_second_row" />
 
     </RelativeLayout>
