@@ -7161,7 +7161,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				unSelectMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				addMenuItem.setEnabled(false);
-				rubbishBinMenuItem.setVisible(true);
+				rubbishBinMenuItem.setVisible(false);
 				clearRubbishBinMenuitem.setVisible(false);
 				importLinkMenuItem.setVisible(false);
 				takePicture.setVisible(false);
