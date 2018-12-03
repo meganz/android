@@ -5220,6 +5220,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("New NotificationsFragment");
 			notificFragment = new NotificationsFragmentLollipop();
 		}
+		else {
+			refreshFragment(FragmentTag.NOTIFICATIONS.getTag());
+		}
         replaceFragment(notificFragment, FragmentTag.NOTIFICATIONS.getTag());
 
 		setToolbarTitle();
