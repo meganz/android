@@ -5220,6 +5220,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("New NotificationsFragment");
 			notificFragment = new NotificationsFragmentLollipop();
 		}
+		else {
+			refreshFragment(FragmentTag.NOTIFICATIONS.getTag());
+		}
         replaceFragment(notificFragment, FragmentTag.NOTIFICATIONS.getTag());
 
 		setToolbarTitle();
@@ -17575,11 +17578,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                             int accessLevel = megaApi.getAccess(node);
 
                             if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                                 fabButton.setVisibility(View.VISIBLE);
                             }
                             else if(accessLevel== MegaShare.ACCESS_READWRITE){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                                 fabButton.setVisibility(View.VISIBLE);
                             }
                             else{
@@ -17587,7 +17590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                             }
                         }
                         else{
-                            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                             fabButton.setVisibility(View.VISIBLE);
                         }
                     }
