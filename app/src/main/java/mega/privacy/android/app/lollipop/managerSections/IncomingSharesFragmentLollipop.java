@@ -1502,38 +1502,38 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop) context).comesFromeNotifications = false;
 				((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
 			}
-			else {
-				log("deepBrowserTree==0");
-				((ManagerActivityLollipop) context).parentHandleIncoming = -1;
-				((ManagerActivityLollipop) context).setToolbarTitle();
-				findNodes();
-				visibilityFastScroller();
-				//				adapterList.setNodes(nodes);
-				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-				int lastVisiblePosition = 0;
-				if (!lastPositionStack.empty()) {
-					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack " + lastVisiblePosition + " position");
-				}
-				log("Scroll to " + lastVisiblePosition + " position");
 
-				if (lastVisiblePosition >= 0) {
-
-					if (((ManagerActivityLollipop) context).isList) {
-						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-					else {
-						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-					}
-				}
-
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-				((ManagerActivityLollipop) context).showFabButton();
-
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+			log("deepBrowserTree==0");
+			((ManagerActivityLollipop) context).parentHandleIncoming = -1;
+			((ManagerActivityLollipop) context).setToolbarTitle();
+			findNodes();
+			visibilityFastScroller();
+			//				adapterList.setNodes(nodes);
+			recyclerView.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
+			int lastVisiblePosition = 0;
+			if (!lastPositionStack.empty()) {
+				lastVisiblePosition = lastPositionStack.pop();
+				log("Pop of the stack " + lastVisiblePosition + " position");
 			}
+			log("Scroll to " + lastVisiblePosition + " position");
+
+			if (lastVisiblePosition >= 0) {
+
+				if (((ManagerActivityLollipop) context).isList) {
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else {
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+			}
+
+			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
+			((ManagerActivityLollipop) context).showFabButton();
+
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+
 			return 3;
 		}
 		else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
