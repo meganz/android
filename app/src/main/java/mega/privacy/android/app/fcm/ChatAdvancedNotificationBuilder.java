@@ -929,7 +929,6 @@ public final class ChatAdvancedNotificationBuilder {
                 NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
                 notificationBuilderO
                         .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentTitle(chatToAnswer.getPeerFullname(0))
                         .setContentText(context.getString(R.string.notification_subtitle_incoming))
                         .setAutoCancel(false)
                         .setVibrate(pattern)
@@ -938,6 +937,13 @@ public final class ChatAdvancedNotificationBuilder {
                         .setColor(ContextCompat.getColor(context, R.color.mega))
                         .setPriority(NotificationManager.IMPORTANCE_HIGH)
                         .setFullScreenIntent(pendingIntentAnswer, true);
+
+                if(chatToAnswer.isGroup()){
+                    notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
+                }
+                else{
+                    notificationBuilderO.setContentTitle(chatToAnswer.getPeerFullname(0));
+                }
 
                 Bitmap largeIcon = setUserAvatar(chatToAnswer);
                 if (largeIcon != null) {
@@ -951,12 +957,18 @@ public final class ChatAdvancedNotificationBuilder {
                 //No sound just vibration
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentTitle(chatToAnswer.getPeerFullname(0))
                         .setContentText(context.getString(R.string.notification_subtitle_incoming))
                         .setAutoCancel(false)
                         .setVibrate(pattern)
                         .addAction(actionIgnore)
                         .addAction(actionAnswer);
+
+                if(chatToAnswer.isGroup()){
+                    notificationBuilder.setContentTitle(chatToAnswer.getTitle());
+                }
+                else{
+                    notificationBuilder.setContentTitle(chatToAnswer.getPeerFullname(0));
+                }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
