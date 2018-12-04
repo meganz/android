@@ -6,6 +6,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class MarqueeTextView extends TextView {
@@ -14,6 +15,7 @@ public class MarqueeTextView extends TextView {
     private long mDelay = 200;
     private int mFirstIndex;
     private int mLastIndex;
+    private int scrollIndex;
     private CharSequence text;
 
     public MarqueeTextView(Context context) {
@@ -28,42 +30,61 @@ public class MarqueeTextView extends TextView {
         super(context, attrs, defStyleAttr);
     }
 
-    public boolean isMarqueeIsNecesary() {
+    public void isMarqueeIsNecessary(Context context) {
         TextPaint textPaint = new TextPaint();
         textPaint.setTextSize(getPaint().getTextSize());
-        text = getText();
-        String[] s = text.toString().split(" ");
-        if (s != null && s.length > 2) {
-            String s1 = s[0] + " " + s[1] + " ";
-            log("s1: "+s1);
-            for (int i=0; i<s1.length(); i++) {
-                text = text + " ";
-            }
+
+        formatString();
+
+        if (context instanceof ChatActivityLollipop) {
+            final  TextPaint textPaint1 = textPaint;
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scroll(textPaint1, getMeasuredWidth());
+                }
+            }, 1000);
+        }
+        else {
+            scroll(textPaint, getMaxWidth());
         }
 
-        if (textPaint.measureText(text.toString()) > getMaxWidth()) {
+
+    }
+
+    private void scroll (TextPaint textPaint, int width) {
+        if (textPaint.measureText(text.toString()) > width) {
             log("Text more large than textview --> Animate");
             mLastIndex = text.length()-1;
-            while (textPaint.measureText(text.subSequence(0, mLastIndex-1).toString()) > getMaxWidth()) {
+            while (textPaint.measureText(text.subSequence(0, mLastIndex-1).toString()) > width) {
                 mLastIndex--;
             }
             animateText();
-            return true;
         }
         else {
             log("Text less large than textview --> Not animate");
-            return false;
+            setText(text);
         }
+    }
+
+    public void formatString () {
+        String stringToFormat = getText().toString();
+        stringToFormat = stringToFormat.replace("[A]", "");
+        scrollIndex = stringToFormat.indexOf("[/A]");
+        stringToFormat = stringToFormat.replace("[/A]", "");
+        text = stringToFormat;
+        setText(text);
     }
 
     private Runnable characterAdder = new Runnable() {
         @Override
         public void run() {
+            text = text + " ";
             setText(text.subSequence(mFirstIndex, mLastIndex));
             mFirstIndex++;
             mLastIndex++;
 
-            if (mLastIndex <= text.length()) {
+            if (mFirstIndex <= scrollIndex) {
                 mHandler.postDelayed(characterAdder, mDelay);
             }
             else {
