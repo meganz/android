@@ -1332,6 +1332,7 @@
         <item context="Plural" quantity="other">%1$d of %2$d files</item>
     </plurals>
 
+	<string name="label_process_finishing" contest="when user stop upload/download, we may still waiting for async response to come back">Process is finishing...</string>
     <string name="option_to_transfer_manager" context="Label of the modal bottom sheet to Transfer Manager section" formatted="false">View</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Resume all transfers</string>
