@@ -287,20 +287,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
-//			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
-			RelativeLayout titleLayout = (RelativeLayout) findViewById(R.id.layout_title);
-			RelativeLayout.LayoutParams paramsR = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			paramsR.setMargins(Util.px2dp(72, outMetrics), 0, 0, 0);
-			paramsR.addRule(RelativeLayout.BELOW, R.id.first_line_toolbar);
-			secondLineTextToolbar = new MarqueeTextView(this);
-			secondLineTextToolbar.setLayoutParams(paramsR);
-			secondLineTextToolbar.setTextAppearance(R.style.ToolbarTitle_Secondary);
-			secondLineTextToolbar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-			secondLineTextToolbar.setTextColor(ContextCompat.getColor(this, R.color.white));
-			secondLineTextToolbar.setSingleLine();
-			secondLineTextToolbar.setPadding(0, 0, 0, Util.px2dp(9, outMetrics));
-			titleLayout.addView(secondLineTextToolbar);
-
+			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
@@ -2546,11 +2533,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
-//				secondLineTextToolbar.setText(formattedDate);
-//				secondLineLengthToolbar.setText(formattedDate);
-				secondLineTextToolbar.setText("Large text: " + formattedDate);
-				secondLineTextToolbar.isMarqueeIsNecesary();
-				secondLineLengthToolbar.setText("Large text: " + formattedDate);
+				secondLineTextToolbar.setText(formattedDate);
+				secondLineTextToolbar.isMarqueeIsNecessary(this);
+				secondLineLengthToolbar.setText(formattedDate);
+//				secondLineTextToolbar.setText("Large: " + formattedDate);
+//				secondLineLengthToolbar.setText("Large: " + formattedDate);
 				log("Date last green: "+formattedDate);
 			}
 		}
