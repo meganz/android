@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -13,6 +14,7 @@ import mega.privacy.android.app.jobservices.CameraUploadsService;
 
 import static mega.privacy.android.app.utils.Util.logJobState;
 
+@TargetApi(21)
 public class JobUtil {
     //todo short time for testing purpose
     public static final long SCHEDULER_INTERVAL = 15 * DateUtils.MINUTE_IN_MILLIS;
@@ -55,7 +57,6 @@ public class JobUtil {
             }else{
                 jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL_ANDROID_5_6);
             }
-            
             jobInfoBuilder.setPersisted(true);
 
             int result = jobScheduler.schedule(jobInfoBuilder.build());
@@ -68,7 +69,8 @@ public class JobUtil {
     public static synchronized void cancelAllJobs(Context context) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
-            js.cancelAll();
+//            js.cancelAll();
+            js.cancel(PHOTOS_UPLOAD_JOB_ID);
         }
     }
 
