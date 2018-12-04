@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -59,6 +62,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 
 public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
@@ -79,14 +83,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
 	GestureDetectorCompat detector;
-	ImageView emptyImage;
-	TextView emptyText;
+	RelativeLayout emptyLayout;
+	TextView emptyTextView;
+	ImageView emptyImageView;
 
 	ArrayList<MegaChatMessage> messages;
 
 	MegaChatRoom chatRoom;
 	
 	NodeAttachmentHistoryAdapter adapter;
+	boolean scrollingUp = false;
+	boolean getMoreHistory=false;
+	boolean isLoadingHistory = false;
 
 	private ActionMode actionMode;
 	
@@ -149,22 +157,23 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 		}
 
-		setContentView(R.layout.activity_versions_file);
+		setContentView(R.layout.activity_node_history);
 
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_versions_file);
+		tB = (Toolbar) findViewById(R.id.toolbar_node_history);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 //			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setTitle(getString(R.string.title_section_versions));
 
-		container = (RelativeLayout) findViewById(R.id.versions_main_layout);
+		aB.setTitle(getString(R.string.title_chat_shared_files_info).toUpperCase());
+
+		container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
 
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
-		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
+		listView = (RecyclerView) findViewById(R.id.node_history_list_view);
 		listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
 		listView.addItemDecoration(new PositionDividerItemDecoration(this, outMetrics));
@@ -173,10 +182,58 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());
 
-		emptyImage = (ImageView) findViewById(R.id.versions_file_empty_image);
-		emptyText = (TextView) findViewById(R.id.versions_file_empty_text);
-		emptyImage.setImageResource(R.drawable.ic_empty_contacts);
-		emptyText.setText(R.string.contacts_list_empty_text);
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+				if(stateHistory!=MegaChatApi.SOURCE_NONE){
+					if (dy > 0) {
+						// Scrolling up
+						scrollingUp = true;
+					} else {
+						// Scrolling down
+						scrollingUp = false;
+					}
+
+					if(!scrollingUp){
+						int pos = mLayoutManager.findFirstVisibleItemPosition();
+
+						if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
+							log("DE->loadMessages:scrolling up");
+							isLoadingHistory = true;
+							stateHistory = megaChatApi.loadMessages(chatId, NUMBER_MESSAGES_TO_LOAD);
+							getMoreHistory = false;
+						}
+					}
+				}
+			}
+		});
+
+		emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
+		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
+		emptyImageView = (ImageView) findViewById(R.id.empty_image_view_node_history);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+		}else{
+			emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+		}
+
+		String textToShow = String.format(getString(R.string.context_empty_shared_files));
+		try{
+			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[/B]", "</font>");
+		}
+		catch (Exception e){}
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		emptyTextView.setText(result);
 
 		if (savedInstanceState != null){
 			chatId = savedInstanceState.getLong("chatId", -1);
@@ -194,18 +251,17 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				messages = new ArrayList<>();
 
 				if (messages.size() != 0){
-					emptyImage.setVisibility(View.GONE);
-					emptyText.setVisibility(View.GONE);
+					emptyLayout.setVisibility(View.GONE);
+
 					listView.setVisibility(View.VISIBLE);
 				}
 				else{
-					emptyImage.setVisibility(View.VISIBLE);
-					emptyText.setVisibility(View.VISIBLE);
+					emptyLayout.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
 				}
 
-				boolean result = megaChatApi.openNodeHistory(chatId, this);
-				if(result){
+				boolean resultOpen = megaChatApi.openNodeHistory(chatId, this);
+				if(resultOpen){
 					log("Node history opened correctly");
 
 					messages = new ArrayList<MegaChatMessage>();
@@ -217,14 +273,13 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					listView.setAdapter(adapter);
 					adapter.setMultipleSelect(false);
 
+					isLoadingHistory = true;
 					stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
 				}
 			}
 			else{
 				log("ERROR: node is NULL");
 			}
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -273,7 +328,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -323,12 +377,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public static void log(String log) {
-		Util.log("VersionsFileActivity", log);
+		Util.log("NodeAttachmentHistoryActivity", log);
 	}
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -342,8 +395,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
+		super.callToSuperBack = true;
 		super.onBackPressed();
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	private void updateActionModeTitle() {
@@ -377,7 +430,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
@@ -524,7 +576,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public void onSaveInstanceState(Bundle outState) {
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(outState);
-		outState.putLong("chatId", chatRoom.getChatId());
+		if(chatRoom!=null){
+			outState.putLong("chatId", chatRoom.getChatId());
+		}
 	}
 
 	//Multiselection
@@ -690,6 +744,66 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	@Override
 	public void onAttachmentLoaded(MegaChatApiJava api, MegaChatMessage msg) {
 		log("onAttachmentLoaded");
+		if(msg!=null){
+			if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+
+				MegaNodeList nodeList = msg.getMegaNodeList();
+				if (nodeList != null) {
+
+					if (nodeList.size() == 1) {
+						MegaNode node = nodeList.get(0);
+						log("---Node Name: " + node.getName());
+						messages.add(0,msg);
+					}
+				}
+			}
+		}
+		else{
+			log("onAttachmentLoaded: msg NULL: end of history");
+			if((messages.size())>=NUMBER_MESSAGES_TO_LOAD){
+				fullHistoryReceivedOnLoad();
+				isLoadingHistory = false;
+			}
+			else{
+				log("onMessageLoaded:lessNumberReceived");
+				if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
+					log("But more history exists --> loadMessages");
+					log("G->loadMessages unread is 0");
+					isLoadingHistory = true;
+					stateHistory = megaChatApi.loadMessages(chatId, NUMBER_MESSAGES_TO_LOAD);
+					log("New state of history: "+stateHistory);
+					getMoreHistory = false;
+					if(stateHistory==MegaChatApi.SOURCE_NONE || stateHistory==MegaChatApi.SOURCE_ERROR){
+						fullHistoryReceivedOnLoad();
+						isLoadingHistory = false;
+					}
+				}
+				else{
+					fullHistoryReceivedOnLoad();
+					isLoadingHistory = false;
+				}
+			}
+		}
+	}
+
+	public void fullHistoryReceivedOnLoad() {
+		log("fullHistoryReceivedOnLoad");
+		if(messages.size()!=0){
+			if(adapter==null){
+				adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setHasStableIds(true);
+				listView.setLayoutManager(mLayoutManager);
+				listView.setAdapter(adapter);
+				adapter.setMessages(messages);
+			}
+			else{
+
+				//adapter.loadPreviousMessages(messages, bufferMessages.size());
+
+			}
+
+		}
+
 	}
 
 	@Override

@@ -687,7 +687,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
-
         textChat.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
             }
@@ -912,9 +911,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    showSnackbar("loadMoreMessages!!!");
 //                }
                         if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
-                            if(megaChatApi.isSignalActivityRequired()){
-                                megaChatApi.signalPresenceActivity();
-                            }
                             log("DE->loadMessages:scrolling up");
                             isLoadingHistory = true;
                             stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);

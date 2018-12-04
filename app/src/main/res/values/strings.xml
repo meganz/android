@@ -2260,4 +2260,7 @@
     <string name="last_seen_today" context="Title of the dialog to inform about a SSL error">Last seen today at %1$s</string>
     <string name="last_seen_long_time_ago" context="Title of the dialog to inform about a SSL error">Last seen a long time ago</string>
     <string name="last_seen_general" context="Title of the dialog to inform about a SSL error">Last seen %1$s at %2$s</string>
+
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
+
 </resources>

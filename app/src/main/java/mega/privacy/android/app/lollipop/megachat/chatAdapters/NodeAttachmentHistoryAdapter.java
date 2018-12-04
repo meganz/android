@@ -301,9 +301,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         }
     }
 
-    public void setNodes(ArrayList<MegaNode> messages) {
-        log("setNodes");
-//		contentTextFragment.setText(getInfoFolder(node));
+    public void setMessages(ArrayList<MegaChatMessage> messages) {
+        this.messages = messages;
         notifyDataSetChanged();
     }
 
