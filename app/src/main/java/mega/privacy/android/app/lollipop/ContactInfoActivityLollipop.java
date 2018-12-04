@@ -75,6 +75,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -1286,7 +1287,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				break;
 			}
 			case R.id.chat_contact_properties_chat_files_shared_layout:{
-
+				Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+				if(chat!=null){
+					nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+				}
+				startActivity(nodeHistoryIntent);
 				break;
 			}
 		}
