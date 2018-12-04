@@ -769,12 +769,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
 			}
 			
+			//this number could be negative - totalTransfers has been reset to 0, however pendingTransfers has not been reset yet due to the wait time of async response
 			int inProgress = totalTransfers - pendingTransfers + 1;
             String progressText;
 			if(inProgress > 0){
 			    progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
             }else{
-                progressText = getResources().getQuantityString(R.plurals.text_number_transfers,0,0,0);
+                progressText = getString(R.string.label_process_finishing);
             }
             
             transfersNumberText.setText(progressText);
