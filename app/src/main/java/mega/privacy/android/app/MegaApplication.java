@@ -52,6 +52,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -71,8 +72,11 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNotificationListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -89,8 +93,10 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
-public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
+
+public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
 	static final public String USER_AGENT = "MEGAAndroid/3.5_216";
@@ -427,8 +433,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			}
 		}
 
-
-
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		boolean staging = false;
@@ -720,6 +724,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				megaChatApi.addChatRequestListener(this);
 				megaChatApi.addChatNotificationListener(this);
 				megaChatApi.addChatCallListener(this);
+				megaChatApi.addChatListener(this);
 				registeredChatListeners = true;
 			}
 		}
@@ -733,6 +738,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				megaChatApi.removeChatRequestListener(this);
 				megaChatApi.removeChatNotificationListener(this);
 				megaChatApi.removeChatCallListener(this);
+				megaChatApi.removeChatListener(this);
 				registeredChatListeners = false;
 			}
 		}
@@ -991,7 +997,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				}
 			}
 
-			String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + name;
+			String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + toCDATA(name);
 			Spanned notificationContent;
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 				notificationContent = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
@@ -1211,6 +1217,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					megaChatApi.removeChatRequestListener(this);
 					megaChatApi.removeChatNotificationListener(this);
 					megaChatApi.removeChatCallListener(this);
+					megaChatApi.removeChatListener(this);
 					registeredChatListeners = false;
 				}
 			}
@@ -1308,6 +1315,42 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
+
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+		if(config.isPending()==false){
+			log("****Launch local broadcast");
+			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		}
+	}
+
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+	}
+
+	@Override
+	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+	}
+
 
 	public void updateAppBadge(){
 		log("updateAppBadge");
@@ -1464,7 +1507,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		log("onChatCallUpdate");
-
+        stopService(new Intent(this,IncomingCallService.class));
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
 			log("Call destroyed: "+call.getTermCode());
 		}
@@ -1679,6 +1722,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		log("Launch call: "+chatRoom.getTitle());
+//        TL.log(this,"launch Activity" );
+//        Intent i = new Intent(this, TestActivity.class);
+//        startActivity(i);
 
 	}
 

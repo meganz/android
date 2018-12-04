@@ -17,8 +17,13 @@ package mega.privacy.android.app.fcm;
  */
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -58,6 +63,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     private ChatAdvancedNotificationBuilder chatNotificationBuilder;
 
     Handler h;
+
+    PowerManager.WakeLock wl;
 
     @Override
     public void onCreate() {
@@ -127,6 +134,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                     else{
                         log("Awaiting info on listener");
+                        retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("3")){
@@ -142,6 +150,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                     else{
                         log("Awaiting info on listener");
+                        retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("5")) {
@@ -161,6 +170,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                     else{
                         log("Awaiting info on listener");
+                        retryPendingConnections();
                     }
                 }
                 else if(remoteMessageType.equals("4")) {
@@ -169,23 +179,36 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     //If true - wait until connection finish
                     //If false, no need to change it
                     log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                        boolean isActivityVisible = MegaApplication.isActivityVisible();
+                        boolean isIdle = pm.isDeviceIdleMode();
+                        log("isActivityVisible: " + isActivityVisible);
+                        log("isIdle: " + isIdle);
+                        if(!isActivityVisible || isIdle) {
+                            log("launch foreground service!");
+                            wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
+                            wl.acquire();
+                            wl.release();
+                            startService(new Intent(this,IncomingCallService.class));
+                            return;
+                        }
+                    }
                     String gSession = credentials.getSession();
-
                     if (megaApi.getRootNode() == null) {
                         log("RootNode = null");
                         performLoginProccess(gSession);
-                    }
-                    else{
+                    } else {
                         log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
 //                        String gSession = credentials.getSession();
                         int ret = megaChatApi.getInitState();
                         log("result of init ---> " + ret);
                         int status = megaChatApi.getOnlineStatus();
-                        log("online status ---> "+status);
+                        log("online status ---> " + status);
                         int connectionState = megaChatApi.getConnectionState();
                         log("connection state ---> "+connectionState);
+                        retryPendingConnections();
                     }
-
                 }
                 else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
@@ -424,5 +447,23 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+    }
+
+    public void retryPendingConnections(){
+        log("retryPendingConnections");
+        try{
+            if (megaApi != null){
+                megaApi.retryPendingConnections();
+            }
+
+            if(Util.isChatEnabled()){
+                if (megaChatApi != null){
+                    megaChatApi.retryPendingConnections(false, null);
+                }
+            }
+        }
+        catch (Exception e){
+            log("retryPendingConnections:Exception: "+e.getMessage());
+        }
     }
 }

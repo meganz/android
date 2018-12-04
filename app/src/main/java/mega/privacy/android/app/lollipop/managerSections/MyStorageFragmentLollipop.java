@@ -165,8 +165,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		setAccountDetails();
 //
 		refreshAccountInfo();
@@ -227,7 +225,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_1_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -241,7 +244,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_2_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -255,7 +263,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_3_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -270,7 +283,12 @@ public class MyStorageFragmentLollipop extends Fragment {
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_lite_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+						}
+						else{
+							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+						}
 					}
 					else{
 						expirationAccountTitle.setText(getString(R.string.expires_on));
@@ -435,7 +453,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 //			hideMKLayout();
 //			return 1;
 //		}
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		return 0;
 	}
 

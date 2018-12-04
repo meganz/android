@@ -658,7 +658,6 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderLollipopProvider holder = (ViewHolderLollipopProvider) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

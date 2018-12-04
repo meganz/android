@@ -182,7 +182,10 @@ public class MyAccountInfo {
     }
 
     public void setAccountInfo(MegaAccountDetails accountInfo) {
+
         this.accountInfo = accountInfo;
+        log("***Renews ts: "+accountInfo.getSubscriptionRenewTime());
+        log("***Renews on: "+Util.getDateString(accountInfo.getSubscriptionRenewTime()));
     }
 
     public int getAccountType() {
