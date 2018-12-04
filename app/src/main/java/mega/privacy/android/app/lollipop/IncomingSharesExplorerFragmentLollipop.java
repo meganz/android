@@ -290,8 +290,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return v;
 	}
 	
@@ -346,7 +344,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
 			case R.id.action_text:{
@@ -435,8 +432,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
     public void itemClick(View view, int position) {
 		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if (nodes.get(position).isFolder()){
 
 			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
@@ -552,8 +547,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		log("deepBrowserTree "+((FileExplorerActivityLollipop)context).deepBrowserTree);
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if(((FileExplorerActivityLollipop)context).deepBrowserTree==0){
 			parentHandle=-1;

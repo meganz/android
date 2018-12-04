@@ -6,23 +6,20 @@ import android.content.Context;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.SwitchPreferenceCompat;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.TwoLineCheckPreference;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-public class SettingsChatFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener
-{
+public class SettingsChatFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
     Context context;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
@@ -34,12 +31,9 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
     public static String KEY_CHAT_SOUND = "settings_chat_sound";
     public static String KEY_CHAT_VIBRATE = "settings_chat_vibrate";
 
-    SwitchPreference chatNotificationsSwitch;
+    SwitchPreferenceCompat chatNotificationsSwitch;
     Preference chatSoundPreference;
-    SwitchPreference chatVibrateSwitch;
-
-    TwoLineCheckPreference chatVibrateCheck;
-    TwoLineCheckPreference chatNotificationsCheck;
+    SwitchPreferenceCompat chatVibrateSwitch;
 
     boolean chatNotifications;
     boolean chatVibration;
@@ -60,26 +54,21 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
         chatSettings = dbH.getChatSettings();
 
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences_chat);
 
         chatSoundPreference = findPreference(KEY_CHAT_SOUND);
         chatSoundPreference.setOnPreferenceClickListener(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            chatNotificationsSwitch = (SwitchPreference) findPreference(KEY_CHAT_NOTIFICATIONS);
-            chatNotificationsSwitch.setOnPreferenceClickListener(this);
+        chatNotificationsSwitch = (SwitchPreferenceCompat) findPreference(KEY_CHAT_NOTIFICATIONS);
+        chatNotificationsSwitch.setOnPreferenceClickListener(this);
 
-            chatVibrateSwitch = (SwitchPreference) findPreference(KEY_CHAT_VIBRATE);
-            chatVibrateSwitch.setOnPreferenceClickListener(this);
+        chatVibrateSwitch = (SwitchPreferenceCompat) findPreference(KEY_CHAT_VIBRATE);
+        chatVibrateSwitch.setOnPreferenceClickListener(this);
 
-        }
-        else{
-            chatVibrateCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_VIBRATE);
-            chatVibrateCheck.setOnPreferenceClickListener(this);
-
-            chatNotificationsCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_NOTIFICATIONS);
-            chatNotificationsCheck.setOnPreferenceClickListener(this);
-        }
 
         if(chatSettings==null){
             log("Chat settings is NULL");
@@ -89,14 +78,8 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
             chatNotifications = true;
             chatVibration = true;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                chatNotificationsSwitch.setChecked(chatNotifications);
-                chatVibrateSwitch.setChecked(chatVibration);
-            }
-            else{
-                chatNotificationsCheck.setChecked(chatNotifications);
-                chatVibrateCheck.setChecked(chatVibration);
-            }
+            chatNotificationsSwitch.setChecked(chatNotifications);
+            chatVibrateSwitch.setChecked(chatVibration);
 
             Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
             Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
@@ -107,41 +90,21 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
             if (chatSettings.getNotificationsEnabled() == null){
                 dbH.setNotificationEnabledChat(true+"");
                 chatNotifications = true;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    chatNotificationsSwitch.setChecked(chatNotifications);
-                }
-                else{
-                    chatNotificationsCheck.setChecked(chatNotifications);
-                }
+                chatNotificationsSwitch.setChecked(chatNotifications);
             }
             else{
                 chatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    chatNotificationsSwitch.setChecked(chatNotifications);
-                }
-                else{
-                    chatNotificationsCheck.setChecked(chatNotifications);
-                }
+                chatNotificationsSwitch.setChecked(chatNotifications);
             }
 
             if (chatSettings.getVibrationEnabled() == null){
                 dbH.setVibrationEnabledChat(true+"");
                 chatVibration = true;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    chatVibrateSwitch.setChecked(chatVibration);
-                }
-                else{
-                    chatVibrateCheck.setChecked(chatVibration);
-                }
+                chatVibrateSwitch.setChecked(chatVibration);
             }
             else{
                 chatVibration = Boolean.parseBoolean(chatSettings.getVibrationEnabled());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    chatVibrateSwitch.setChecked(chatVibration);
-                }
-                else{
-                    chatVibrateCheck.setChecked(chatVibration);
-                }
+                chatVibrateSwitch.setChecked(chatVibration);
             }
 
 //            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -238,25 +201,13 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
             dbH.setNotificationEnabledChat(true+"");
             getPreferenceScreen().addPreference(chatSoundPreference);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getPreferenceScreen().addPreference(chatVibrateSwitch);
-
-            }
-            else{
-                getPreferenceScreen().addPreference(chatNotificationsCheck);
-            }
+            getPreferenceScreen().addPreference(chatVibrateSwitch);
         }
         else{
             dbH.setNotificationEnabledChat(false+"");
             getPreferenceScreen().removePreference(chatSoundPreference);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getPreferenceScreen().removePreference(chatVibrateSwitch);
-
-            }
-            else{
-                getPreferenceScreen().removePreference(chatNotificationsCheck);
-            }
+            getPreferenceScreen().removePreference(chatVibrateSwitch);
         }
     }
 

@@ -114,7 +114,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -322,6 +322,21 @@ public class Util {
 
 		return count;
 	}
+
+    public static String toCDATA(String src) {
+        if (src != null) {
+            //solution from web client
+            src = src.replaceAll("&","&amp;")
+                    .replaceAll("\"","&quot;")
+                    .replaceAll("'","&#39;")
+                    .replaceAll("<","&lt;")
+                    .replaceAll(">","&gt;");
+            //another solution
+//            src = src.replaceAll("]]>", "] ]>");
+//            src = "<![CDATA[" + src + "]]>";
+        }
+        return src;
+    }
 	
 	public static long getFreeExternalMemorySize() {
 		log("getFreeExternalMemorySize");

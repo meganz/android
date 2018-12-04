@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -42,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -434,7 +432,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 	
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -778,7 +775,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 	public int onBackPressed() {
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		parentHandle = adapter.getParentHandle();
 		((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);

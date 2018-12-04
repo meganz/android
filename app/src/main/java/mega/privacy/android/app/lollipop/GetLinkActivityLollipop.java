@@ -208,8 +208,6 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {

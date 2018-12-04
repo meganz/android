@@ -892,8 +892,6 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			return;
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if(adapterType == MegaContactsAttachedLollipopAdapter.ITEM_VIEW_TYPE_CHAT_LIST){
 			ViewHolderContacts holder = (ViewHolderContacts) v.getTag();
 			int currentPosition = holder.getAdapterPosition();
@@ -931,7 +929,6 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderContacts holder = (ViewHolderContacts) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

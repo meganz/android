@@ -1585,13 +1585,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
         switch(id) {
             case android.R.id.home: {
-                onBackPressed();
-                finish();
+                super.callToSuperBack = true;
+                super.onBackPressed();
                 break;
             }
             case R.id.pdf_viewer_share: {
