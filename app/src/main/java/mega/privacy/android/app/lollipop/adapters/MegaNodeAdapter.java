@@ -142,106 +142,36 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     public void toggleAllSelection(int pos) {
         log("toggleAllSelection: " + pos);
-        final int positionToflip = pos;
-
-        if (selectedItems.get(pos,false)) {
-            log("delete pos: " + pos);
-            selectedItems.delete(pos);
-
-        } else {
-            log("PUT pos: " + pos);
-            selectedItems.put(pos,true);
-        }
-
-        if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
-            log("adapter type is LIST");
-            MegaNodeAdapter.ViewHolderBrowserList view = (MegaNodeAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
-            if (view != null) {
-                log("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
-                Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
-                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        log("onAnimationEnd: " + selectedItems.size());
-                        if (selectedItems.size() <= 0) {
-                            log("toggleAllSelection: hideMultipleSelect");
-                            if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                                ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INBOX_ADAPTER) {
-                                ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                                ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                                ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                                ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                                ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-                            }else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                                ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                            } else if (type == Constants.SEARCH_ADAPTER) {
-                                ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                            } else {
-                                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                            }
-                        }
-                        log("toggleAllSelection: notified item changed");
-                        notifyItemChanged(positionToflip);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                view.imageView.startAnimation(flipAnimation);
-            } else {
-                log("NULL view pos: " + positionToflip);
-                notifyItemChanged(pos);
-            }
-        } else {
-            log("adapter type is GRID");
-            if (selectedItems.size() <= 0) {
-                if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                    ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                } else if (type == Constants.INBOX_ADAPTER) {
-                    ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                    ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                    ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                    ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                    ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-                } else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                    ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                } else if (type == Constants.SEARCH_ADAPTER) {
-                    ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                } else {
-                    ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                }
-            }
-            notifyItemChanged(positionToflip);
-        }
+        putOrDeletePostion(pos);
+//        startAnimation(pos, true);
     }
 
     public void toggleSelection(int pos) {
         log("toggleSelection: " + pos);
 
+        putOrDeletePostion(pos);
+//        startAnimation(pos, false);
+    }
+
+    void putOrDeletePostion(int pos) {
+
+        boolean delete;
+
         if (selectedItems.get(pos,false)) {
             log("delete pos: " + pos);
+            delete = true;
             selectedItems.delete(pos);
         } else {
             log("PUT pos: " + pos);
+            delete = false;
             selectedItems.put(pos,true);
         }
-        notifyItemChanged(pos);
+        startAnimation(pos, delete);
+    }
+
+    void startAnimation (int pos, final boolean delete) {
+        final int positionToflip = pos;
+
         if (adapterType == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST) {
             log("adapter type is LIST");
             MegaNodeAdapter.ViewHolderBrowserList view = (MegaNodeAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
@@ -251,31 +181,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-
+                        if (!delete) {
+                            notifyItemChanged(positionToflip);
+                        }
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        if (selectedItems.size() <= 0) {
-                            if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                                ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INBOX_ADAPTER) {
-                                ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                                ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                                ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                                ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                                ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-                            } else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                                ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                            } else if (type == Constants.SEARCH_ADAPTER) {
-                                ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                            } else {
-                                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                            }
+                        hideMultipleSelect();
+                        if (delete) {
+                            notifyItemChanged(positionToflip);
                         }
                     }
 
@@ -287,29 +202,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
                 view.imageView.startAnimation(flipAnimation);
 
-            } else {
+            }
+            else {
                 log("view is null - not animation");
-                if (selectedItems.size() <= 0) {
-                    if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                        ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.INBOX_ADAPTER) {
-                        ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                        ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                        ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                        ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                        ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-                    }else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                        ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                    } else if (type == Constants.SEARCH_ADAPTER) {
-                        ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                    } else {
-                        ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                    }
-                }
+                hideMultipleSelect();
+                notifyItemChanged(positionToflip);
             }
         } else {
             log("adapter type is GRID");
@@ -321,31 +218,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-
+                        if (!delete) {
+                            notifyItemChanged(positionToflip);
+                        }
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        if (selectedItems.size() <= 0) {
-                            if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                                ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INBOX_ADAPTER) {
-                                ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                                ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                                ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                                ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                                ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-                            } else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                                ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                            } else if (type == Constants.SEARCH_ADAPTER) {
-                                ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                            } else {
-                                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                            }
+                        hideMultipleSelect();
+                        if (delete) {
+                            notifyItemChanged(positionToflip);
                         }
                     }
 
@@ -354,36 +236,44 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
                     }
                 });
-                if (view.folderLayout.getVisibility() == View.VISIBLE) {
-                    view.imageViewIcon.startAnimation(flipAnimation);
-                }
-                else {
-                    view.fileGridSelected.startAnimation(flipAnimation);
+                MegaNode node = (MegaNode)getItem(pos);
+                if (node != null) {
+                    if (node.isFolder()) {
+                        view.imageViewIcon.startAnimation(flipAnimation);
+                    }
+                    else {
+                        view.fileGridSelected.startAnimation(flipAnimation);
+                    }
                 }
             }
             else {
                 log("view is null - not animation");
-                if (selectedItems.size() <= 0) {
-                    if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                        ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.INBOX_ADAPTER) {
-                        ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                        ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                        ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                        ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                        ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-                    } else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                        ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                    } else if (type == Constants.SEARCH_ADAPTER) {
-                        ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                    } else {
-                        ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                    }
-                }
+                hideMultipleSelect();
+                notifyItemChanged(positionToflip);
+            }
+        }
+    }
+
+    void hideMultipleSelect () {
+        if (selectedItems.size() <= 0) {
+            if (type == Constants.RUBBISH_BIN_ADAPTER) {
+                ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
+            } else if (type == Constants.INBOX_ADAPTER) {
+                ((InboxFragmentLollipop)fragment).hideMultipleSelect();
+            } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
+                ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
+            } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
+                ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
+            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+                ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
+            } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+                ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
+            } else if (type == Constants.FOLDER_LINK_ADAPTER) {
+                ((FolderLinkActivityLollipop)context).hideMultipleSelect();
+            } else if (type == Constants.SEARCH_ADAPTER) {
+                ((SearchFragmentLollipop)fragment).hideMultipleSelect();
+            } else {
+                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
             }
         }
     }
@@ -742,7 +632,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (type == Constants.FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context,megaApi));
-                setFolderSelected(holder,position,R.drawable.ic_folder_list);
+                setFolderGridSelected(holder,position,R.drawable.ic_folder_list);
             } else {
                 holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context));
             }
@@ -751,7 +641,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
             if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                setFolderSelected(holder,position,R.drawable.ic_folder_incoming);
+                setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0;j < sharesIncoming.size();j++) {
@@ -776,7 +666,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                setFolderSelected(holder,position,R.drawable.ic_folder_outgoing);
+                setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
                 //Show the number of contacts who shared the folder
                 ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                 if (sl != null) {
@@ -786,23 +676,23 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
             } else if (type == Constants.FILE_BROWSER_ADAPTER) {
                 if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderSelected(holder,position,R.drawable.ic_folder_outgoing);
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
                 } else if (node.isInShare()) {
-                    setFolderSelected(holder,position,R.drawable.ic_folder_incoming);
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
                 } else {
                     if (((ManagerActivityLollipop)context).isCameraUploads(node)) {
-                        setFolderSelected(holder,position,R.drawable.ic_folder_image);
+                        setFolderGridSelected(holder,position,R.drawable.ic_folder_image);
                     } else {
-                        setFolderSelected(holder,position,R.drawable.ic_folder);
+                        setFolderGridSelected(holder,position,R.drawable.ic_folder);
                     }
                 }
             } else {
                 if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                    setFolderSelected(holder,position,R.drawable.ic_folder_outgoing);
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
                 } else if (node.isInShare()) {
-                    setFolderSelected(holder,position,R.drawable.ic_folder_incoming);
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
                 } else {
-                    setFolderSelected(holder,position,R.drawable.ic_folder);
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder);
                 }
             }
         } else if (node.isFile()) {
@@ -823,15 +713,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
 
-            if (multipleSelect && isItemChecked(position)) {
+            if (isMultipleSelect() && isItemChecked(position)) {
 //                    holder.itemLayout.setForeground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
-                holder.fileGridSelected.setVisibility(View.VISIBLE);
+                holder.fileGridSelected.setImageResource(R.drawable.ic_select_folder);
+//                holder.fileGridSelected.setVisibility(View.VISIBLE);
 
             } else {
 //                    holder.itemLayout.setForeground(new ColorDrawable());
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
-                holder.fileGridSelected.setVisibility(View.GONE);
+                holder.fileGridSelected.setImageDrawable(null);
+//                holder.fileGridSelected.setVisibility(View.GONE);
             }
 
             if (Util.isVideoFile(node.getName())) {
@@ -951,8 +843,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-    private void setFolderSelected(ViewHolderBrowserGrid holder,int position,int folderDrawableResId) {
-        if (multipleSelect && isItemChecked(position)) {
+    private void setFolderGridSelected(ViewHolderBrowserGrid holder, int position, int folderDrawableResId) {
+        if (isMultipleSelect() && isItemChecked(position)) {
             RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageViewIcon.getLayoutParams();
             paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,context.getResources().getDisplayMetrics());
             paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,24,context.getResources().getDisplayMetrics());
@@ -962,6 +854,22 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else {
             holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
             holder.imageViewIcon.setImageResource(folderDrawableResId);
+        }
+    }
+
+    private void setFolderListSelected (ViewHolderBrowserList holder, int position, int folderDrawableResId) {
+        if (isMultipleSelect() && isItemChecked(position)) {
+            RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
+            paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
+            paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
+            paramsMultiselect.setMargins(0,0,0,0);
+            holder.imageView.setLayoutParams(paramsMultiselect);
+            holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
+            holder.imageView.setImageResource(R.drawable.ic_select_folder);
+        }
+        else {
+            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.imageView.setImageResource(folderDrawableResId);
         }
     }
 
@@ -1009,43 +917,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (type == Constants.FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context,megaApi));
-                if (!multipleSelect) {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                } else {
-
-                    if (this.isItemChecked(position)) {
-                        RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.setMargins(0,0,0,0);
-                        holder.imageView.setLayoutParams(paramsMultiselect);
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                    }
-                }
+                setFolderListSelected(holder, position, R.drawable.ic_folder_list);
             } else if (type == Constants.CONTACT_FILE_ADAPTER|| type == Constants.CONTACT_SHARED_FOLDER_ADAPTER){
-                if (!multipleSelect) {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                } else {
-
-                    if (this.isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
-                        RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.setMargins(0,0,0,0);
-                        holder.imageView.setLayoutParams(paramsMultiselect);
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                    }
-                }
+                setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
 
                 boolean firstLevel;
                 if(type == Constants.CONTACT_FILE_ADAPTER){
@@ -1070,24 +944,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
             } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
-                if (!multipleSelect) {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                } else {
-
-                    if (this.isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
-                        RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.setMargins(0,0,0,0);
-                        holder.imageView.setLayoutParams(paramsMultiselect);
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                    }
-                }
+                setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
 
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -1131,24 +988,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                if (!multipleSelect) {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                } else {
-
-                    if (this.isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
-                        RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.setMargins(0,0,0,0);
-                        holder.imageView.setLayoutParams(paramsMultiselect);
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                    }
-                }
+                setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
                 //Show the number of contacts who shared the folder
                 ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                 if (sl != null) {
@@ -1157,76 +997,25 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == Constants.FILE_BROWSER_ADAPTER) {
-
-                if (!multipleSelect) {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                        holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                    } else if (node.isInShare()) {
-                        holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                    } else {
-                        if (((ManagerActivityLollipop)context).isCameraUploads(node)) {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
-                        } else {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                        }
-                    }
-                } else {
-
-                    if (this.isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
-                        RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.setMargins(0,0,0,0);
-                        holder.imageView.setLayoutParams(paramsMultiselect);
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                        } else if (node.isInShare()) {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                        } else {
-                            if (((ManagerActivityLollipop)context).isCameraUploads(node)) {
-                                holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
-                            } else {
-                                holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                            }
-                        }
-                    }
+                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
+                }
+                else if (node.isInShare()) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
+                }
+                else {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
                 }
 
             } else {
-                if (!multipleSelect) {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                        holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                    } else if (node.isInShare()) {
-                        holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                    } else {
-                        holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                    }
-                } else {
-
-                    if (this.isItemChecked(position)) {
-                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
-                        RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
-                        paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
-                        paramsMultiselect.setMargins(0,0,0,0);
-                        holder.imageView.setLayoutParams(paramsMultiselect);
-                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
-                    } else {
-                        holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-                        } else if (node.isInShare()) {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-                        } else {
-                            holder.imageView.setImageResource(R.drawable.ic_folder_list);
-                        }
-                    }
+                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
+                }
+                else if (node.isInShare()) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
+                }
+                else {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
                 }
             }
         } else {
