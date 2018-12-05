@@ -4228,10 +4228,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			ft.attach(f);
-			ft.commit();
-			try {
-				getSupportFragmentManager().executePendingTransactions();
-			} catch (Exception e){}
+			ft.commitNowAllowingStateLoss();
 		}
 		else {
 			log("Fragment == NULL. Not refresh");
