@@ -207,6 +207,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             getFilesFromMediaStore();
         } catch (Exception e) {
             e.printStackTrace();
+            finish();
         }
     }
     
@@ -300,7 +301,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 if (prefs.getSecSyncTimeStamp() != null) {
                     log("if (prefs.getSecSyncTimeStamp() != null)");
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
-                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY: " + selectionSecondary);
                 }
             }
@@ -1519,8 +1520,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             intent.setAction(Constants.ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
             String title = getString(R.string.title_compression_size_over_limit);
-            String message = getString(R.string.message_compression_size_over_limit);
+            String size = prefs.getChargingOnSize();
+            String message = getString(R.string.message_compression_size_over_limit).replace("$size",size);
             showNotification(title,message,pendingIntent);
+            jobFinished(globalParams,true);
         }
         
     }
@@ -1553,9 +1556,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
-        String message = progress + "% " + getString(R.string.message_compress_video);
-        String subText = getString(R.string.title_compress_video) + " " + currentIndexString;
-        showProgressNotification(progress,mPendingIntent,message,subText,"");
+        log("onCompressUpdateProgress " + progress + "%" + " is canceled = " + canceled);
+        if(!canceled){
+            String message = progress + "% " + getString(R.string.message_compress_video);
+            String subText = getString(R.string.title_compress_video) + " " + currentIndexString;
+            showProgressNotification(progress,mPendingIntent,message,subText,"");
+        }
     }
     
     public synchronized void onCompressSuccessful(SyncRecord record) {
@@ -1610,7 +1616,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         long totalSizeTransferred = megaApi.getTotalUploadedBytes();
         
         int progressPercent = (int)Math.round((double)totalSizeTransferred / totalSizePendingTransfer * 100);
-//        log("updateProgressNotification: " + progressPercent);
         
         String message;
         if (totalTransfers == 0) {
