@@ -19,7 +19,7 @@ public class JobUtil {
     //todo short time for testing purpose
     public static final long SCHEDULER_INTERVAL = 15 * DateUtils.MINUTE_IN_MILLIS;
     
-    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 2 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 3 * DateUtils.MINUTE_IN_MILLIS;
 
     public static final int START_JOB_FAILED = -1;
 
@@ -69,15 +69,8 @@ public class JobUtil {
     public static synchronized void cancelAllJobs(Context context) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
-//            js.cancelAll();
-            js.cancel(PHOTOS_UPLOAD_JOB_ID);
-        }
-    }
-
-    public static void cancelScheduledJob(Context context,int id) {
-        JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (js != null) {
-            js.cancel(id);
+            CameraUploadsService.IS_CANCELLED_BY_USER = true;
+            js.cancelAll();
         }
     }
 }

@@ -12,6 +12,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -74,6 +76,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
     public static String SECONDARY_UPLOADS = "Media Uploads";
+    public static boolean IS_CANCELLED_BY_USER;
     private String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
     private String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
@@ -157,12 +160,13 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         globalParams = params;
         handler = new Handler();
 
-
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             PAGE_SIZE = 500;
         } else {
-            PAGE_SIZE = 200;
+            PAGE_SIZE = 100;
         }
+        IS_CANCELLED_BY_USER = false;
+        
         try {
             log("Start service here");
             task = createWorkerThread();
@@ -1155,19 +1159,13 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         canceled = true;
         running = false;
         stopForeground(true);
-        if (mNotificationManager != null) {
-            log("cancelling notification id is " + notificationChannelId);
-//            mNotificationManager.cancelAll();
-            mNotificationManager.cancel(notificationId);
-        } else {
-            log("no notification to cancel");
-        }
+        cancelNotification();
         jobFinished(globalParams,false);
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        log("onStopJob");
+        log("onStopJob IS_CANCELLED_BY_USER = " + IS_CANCELLED_BY_USER);
         if (megaApi != null) {
             megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
         }
@@ -1175,8 +1173,31 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (mVideoCompressor != null) {
             mVideoCompressor.stop();
         }
-        finish();
-        return false;
+    
+        if (running) {
+            handler.removeCallbacksAndMessages(null);
+            running = false;
+        }
+    
+        running = false;
+        stopForeground(true);
+        cancelNotification();
+        releaseLocks();
+        
+        if(IS_CANCELLED_BY_USER){
+            return false;
+        }else{
+            return true;
+        }
+    }
+    
+    private void cancelNotification(){
+        if (mNotificationManager != null) {
+            log("cancelling notification id is " + notificationChannelId);
+            mNotificationManager.cancel(notificationId);
+        } else {
+            log("no notification to cancel");
+        }
     }
 
     public static void log(String message) {
@@ -1706,7 +1727,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setOngoing(false);
             
             mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilderCompatO.build());
-        } else {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
@@ -1715,6 +1736,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     .setOngoing(false);
             
             mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.build());
+        }else{
+            mBuilder
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentInfo(contentText)
+                    .setColor(ContextCompat.getColor(this,R.color.mega))
+                    .setOngoing(true);
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.getNotification());
         }
     }
     

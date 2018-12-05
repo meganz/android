@@ -756,27 +756,27 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			actionLayout.setOnClickListener(this);
 			
 			updateTransferButton();
-			
-			int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
-			progressBar.setProgress(progressPercent);
-			log("Progress Percent: " + progressPercent);
-			
-			long delay = megaApi.getBandwidthOverquotaDelay();
-			if (delay == 0) {
+            long delay = megaApi.getBandwidthOverquotaDelay();
+            
+            if (delay == 0) {
 //				transfersTitleText.setText(getString(R.string.section_transfers));
-			} else {
-				log("Overquota delay activated until: " + delay);
-				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
-			}
-			
-			//this number could be negative - totalTransfers has been reset to 0, however pendingTransfers has not been reset yet due to the wait time of async response
-			int inProgress = totalTransfers - pendingTransfers + 1;
+            } else {
+                log("Overquota delay activated until: " + delay);
+                transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
+            }
+            
+            //this number could be negative - totalTransfers has been reset to 0, however pendingTransfers has not been reset yet due to the wait time of async response
+            int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
+            int inProgress = totalTransfers - pendingTransfers + 1;
             String progressText;
-			if(inProgress > 0){
-			    progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
+            if(inProgress > 0){
+                progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
             }else{
                 progressText = getString(R.string.label_process_finishing);
+                progressPercent = 100;
             }
+            progressBar.setProgress(progressPercent);
+            log("Progress Percent: " + progressPercent);
             
             transfersNumberText.setText(progressText);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
