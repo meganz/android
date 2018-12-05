@@ -412,6 +412,16 @@ public class ThumbnailUtilsLollipop {
 										log("Thumbnail update");
 									}
 								}
+								else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
+									if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
+										int position = holder.getAdapterPosition();
+										adapter.notifyItemChanged(position);
+										log("Thumbnail update");
+									}
+								}
 							}
 						}
 					}

@@ -25,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_below="@id/toolbar_node_history"
         android:gravity="center_horizontal">
 
         <ImageView
@@ -53,7 +54,8 @@
     <LinearLayout
         android:id="@+id/linear_layout_recycler"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_node_history">
 
         <RelativeLayout
             android:layout_width="wrap_content"

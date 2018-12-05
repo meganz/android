@@ -4768,7 +4768,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
-//        log("onMessageUpdate!: "+ msg.getMsgId());
+        log("onMessageUpdate!: "+ msg.getMsgId());
+
         int resultModify = -1;
         if(msg.isDeleted()){
             log("The message has been deleted");
@@ -5199,7 +5200,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             adapter.setMessages(messages);
         }
         else{
-//            adapter.setPositionClicked(-1);
             adapter.loadPreviousMessages(messages, bufferMessages.size());
 
             log("addMessage: "+messages.size());
