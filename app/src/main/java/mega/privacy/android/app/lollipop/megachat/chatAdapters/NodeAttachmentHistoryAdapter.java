@@ -810,6 +810,40 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         }
     }
 
+    public void loadPreviousMessages(ArrayList<MegaChatMessage> messages, int counter) {
+        log("loadPreviousMessages: " + counter);
+        this.messages = messages;
+        notifyItemRangeInserted(messages.size()-counter, counter);
+    }
+
+    public void addMessage(ArrayList<MegaChatMessage> messages, int position) {
+        log("addMessage: " + position);
+        this.messages = messages;
+        notifyItemInserted(position);
+        if (position == messages.size()) {
+            log("No need to update more");
+        } else {
+            log("Update until end");
+            int itemCount = messages.size() - position;
+            log("itemCount: " + itemCount);
+            notifyItemRangeChanged(position, itemCount + 1);
+        }
+    }
+
+    public void removeMessage(int position, ArrayList<MegaChatMessage> messages) {
+        log("removeMessage: size: " + messages.size());
+        this.messages = messages;
+        notifyItemRemoved(position);
+
+        if (position == messages.size() - 1) {
+            log("No need to update more");
+        } else {
+            log("Update until end");
+            int itemCount = messages.size() - position;
+            log("itemCount: " + itemCount);
+            notifyItemRangeChanged(position, itemCount);
+        }
+    }
 
     private void threeDotsClicked(int currentPosition,MegaChatMessage m) {
         log("onClick: file_list_three_dots: " + currentPosition);
