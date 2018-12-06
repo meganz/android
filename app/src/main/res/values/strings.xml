@@ -696,7 +696,7 @@
         <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
 
-    <string name="settings_camera_upload_charging" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in my device</string>
+    <string name="settings_camera_upload_charging" context="Option to choose that the video compression will only be enable when the device is charging">Require me to plug in</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
@@ -2142,7 +2142,7 @@
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Notice me when size is larger than</string>
 
-	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">When the total size of videos to be converted is larger than</string>
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to convert are larger than</string>
 
 	<string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable Rubbish bin cleaning scheduler or set a longer retention period you need to subscribe to a PRO plan.</string>
 

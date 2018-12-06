@@ -163,7 +163,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             PAGE_SIZE = 500;
         } else {
-            PAGE_SIZE = 100;
+            PAGE_SIZE = 25;
         }
         IS_CANCELLED_BY_USER = false;
         
