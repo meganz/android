@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -48,6 +49,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
+import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -71,6 +74,7 @@ import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
 
+@RequiresApi(21)
 public class CameraUploadsService extends JobService implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
     
     public static String PHOTO_SYNC = "PhotoSync";
@@ -151,27 +155,32 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     Context mContext;
     private VideoCompressor mVideoCompressor;
 
-    private static boolean workingThreadRunning;
-    
     @Override
     public boolean onStartJob(JobParameters params) {
-        Log.d("yuan","onStartJob " + workingThreadRunning);
+        Log.d("yuan","onStartJob ");
+        int result = JobUtil.startDAEMON(this);
+        log("start daemon result: " + result + ", success=" + (result != JobUtil.START_JOB_FAILED));
         cameraUploadsService = this;
         globalParams = params;
         handler = new Handler();
+
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             PAGE_SIZE = 500;
         } else {
             PAGE_SIZE = 25;
         }
-        IS_CANCELLED_BY_USER = false;
-        
         try {
             log("Start service here");
-            task = createWorkerThread();
-            task.start();
-            return true;
+            if(task == null || !task.isAlive()) {
+                log("create working thread.");
+                task = createWorkerThread();
+                task.start();
+                return true;
+            } else {
+                log("Thread is running.");
+                return false;
+            }
         } catch (Exception e) {
             log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
             finish();
@@ -191,24 +200,26 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     if (result == 0) {
                         startCameraUploads();
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
-                    finish();
+//                    finish();
+                    stopForeground(true);
+                    cancelNotification();
+                    jobFinished(globalParams,true);
                 }
             }
         };
     }
     
-    private void startCameraUploads() {
+    private void startCameraUploads() throws Throwable{
         log("startCameraUploads");
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
         startForeground(notificationId,mNotification);
-        try {
+//        try {
             getFilesFromMediaStore();
-        } catch (Exception e) {
-            e.printStackTrace();
-            finish();
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
     
     private boolean shouldCompressVideo() {
@@ -276,7 +287,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (!lock.isHeld()) {
             lock.acquire();
         }
-        
+        int X = 1 / 0 ;
         String projection[] = {
                 MediaStore.MediaColumns.DATA,
                 MediaStore.MediaColumns.DATE_ADDED,
@@ -375,6 +386,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private void prepareUpload(Queue<Media> primaryList,Queue<Media> secondaryList,Queue<Media> primaryVideoList,Queue<Media> secondaryVideoList) {
         log("prepareUpload primaryList " + primaryList.size() + " secondaryList " + secondaryList.size() + " primaryVideoList " + primaryVideoList.size() + " secondaryVideoList " + secondaryVideoList.size());
         pendingUploadsList = getPendingList(primaryList,false,false);
+        log("pendingUploadsList primaryList " + pendingUploadsList.size());
         saveDataToDB(pendingUploadsList);
         pendingVideoUploadsList = getPendingList(primaryVideoList,false,true);
         saveDataToDB(pendingVideoUploadsList);
@@ -906,7 +918,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                                     int r = runLoggedIn();
                                     log("shouldRunAfterLoginDelayed -> " + r);
                                     if (r == 0) {
-                                        startCameraUploads();
+                                        try {
+                                            startCameraUploads();
+                                        } catch (Throwable throwable) {
+                                            throwable.printStackTrace();
+                                            finish();
+                                        }
                                     }
                                 }
                             }
@@ -1149,7 +1166,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         cancel();
     }
-    
+
+    @RequiresApi(21)
     private void cancel() {
         releaseLocks();
         
@@ -1174,24 +1192,26 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (mVideoCompressor != null) {
             mVideoCompressor.stop();
         }
-    
+
         if (running) {
             handler.removeCallbacksAndMessages(null);
             running = false;
         }
-    
+
         running = false;
         stopForeground(true);
         cancelNotification();
         releaseLocks();
-        
+
         if(IS_CANCELLED_BY_USER){
+            log("cancel by user");
             return false;
         }else{
+            log("cancel by system");
             return true;
         }
     }
-    
+
     private void cancelNotification(){
         if (mNotificationManager != null) {
             log("cancelling notification id is " + notificationChannelId);
@@ -1927,9 +1947,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     }
 
-    private final static boolean OUTPUT = false;
+    private final static boolean OUTPUT = true;
 
-    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
+    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator +"camera_upload.txt";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd HH:mm:ss");
 
@@ -1938,7 +1958,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         String dateStr = DATE_FORMAT.format(new Date());
         if (context != null) {
             if (context instanceof String) {
-                msg = "[" + dateStr + "]--->" + msg;
+                msg = "[" + dateStr + "] " + context + "--->" + msg;
             } else {
                 msg = "[" + dateStr + "] " + context.getClass().getSimpleName() + "--->" + msg;
             }
