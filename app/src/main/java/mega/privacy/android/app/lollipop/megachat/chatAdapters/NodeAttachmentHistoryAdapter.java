@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -32,11 +33,16 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 
@@ -47,6 +53,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
     Context context;
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
     //	int positionClicked;
     ArrayList<MegaChatMessage> messages;
@@ -62,6 +69,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     DatabaseHandler dbH = null;
     boolean multipleSelect;
 
+    ChatController cC;
+
     int adapterType;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -70,10 +79,14 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             super(v);
         }
 
+        public ImageView savedOffline;
+        public ImageView publicLinkImage;
         public TextView textViewFileName;
-        public TextView textViewFileSize;
+        public TextView textViewMessageInfo;
         public long document;
         public RelativeLayout itemLayout;
+        String fullNameTitle;
+        boolean nameRequestedAction = false;
     }
 
     public static class ViewHolderBrowserList extends NodeAttachmentHistoryAdapter.ViewHolderBrowser {
@@ -83,6 +96,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         }
         public ImageView imageView;
         public RelativeLayout threeDotsLayout;
+        public ImageView versionsIcon;
+        ImageView threeDotsImageView;
     }
 
     public static class ViewHolderBrowserGrid extends NodeAttachmentHistoryAdapter.ViewHolderBrowser {
@@ -139,7 +154,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                         if (selectedItems.size() <= 0) {
                             log("toggleAllSelection: hideMultipleSelect");
 
-                            ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
+                            ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
                         }
                         log("toggleAllSelection: notified item changed");
                         notifyItemChanged(positionToflip);
@@ -158,7 +173,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else {
             log("adapter type is GRID");
             if (selectedItems.size() <= 0) {
-                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
+                ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
             }
             notifyItemChanged(positionToflip);
         }
@@ -190,7 +205,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         if (selectedItems.size() <= 0) {
-                            ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
+                            ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
                         }
                     }
 
@@ -205,14 +220,14 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             } else {
                 log("view is null - not animation");
                 if (selectedItems.size() <= 0) {
-                    ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
+                    ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
                 }
             }
         } else {
             log("adapter type is GRID");
 
             if (selectedItems.size() <= 0) {
-                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
+                ((NodeAttachmentHistoryActivity)context).hideMultipleSelect();
             }
         }
     }
@@ -299,6 +314,12 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         if (megaApi == null) {
             megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApi();
         }
+
+        if (megaChatApi == null) {
+            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+        }
+
+        cC = new ChatController(context);
     }
 
     public void setMessages(ArrayList<MegaChatMessage> messages) {
@@ -327,14 +348,30 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
             holderList.itemLayout = (RelativeLayout)v.findViewById(R.id.file_list_item_layout);
             holderList.imageView = (ImageView)v.findViewById(R.id.file_list_thumbnail);
-
+            holderList.savedOffline = (ImageView)v.findViewById(R.id.file_list_saved_offline);
+            holderList.publicLinkImage = (ImageView)v.findViewById(R.id.file_list_public_link);
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
-
-            holderList.textViewFileSize = (TextView)v.findViewById(R.id.file_list_filesize);
-
+            holderList.textViewMessageInfo = (TextView)v.findViewById(R.id.file_list_filesize);
             holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);
+            holderList.threeDotsImageView = (ImageView) v.findViewById(R.id.file_list_three_dots);
+            holderList.versionsIcon = (ImageView) v.findViewById(R.id.file_list_versions_icon);
+            holderList.textViewMessageInfo.setVisibility(View.VISIBLE);
 
-            holderList.textViewFileSize.setVisibility(View.VISIBLE);
+            RelativeLayout.LayoutParams paramsThreeDotsIcon = (RelativeLayout.LayoutParams) holderList.threeDotsImageView.getLayoutParams();
+            paramsThreeDotsIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
+            holderList.threeDotsImageView.setLayoutParams(paramsThreeDotsIcon);
+
+            holderList.textViewMessageInfo.setSelected(true);
+            holderList.textViewMessageInfo.setHorizontallyScrolling(true);
+            holderList.textViewMessageInfo.setFocusable(true);
+            holderList.textViewMessageInfo.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            holderList.textViewMessageInfo.setMarqueeRepeatLimit(-1);
+            holderList.textViewMessageInfo.setSingleLine(true);
+            holderList.textViewMessageInfo.setHorizontallyScrolling(true);
+
+            holderList.savedOffline.setVisibility(View.INVISIBLE);
+            holderList.versionsIcon.setVisibility(View.GONE);
+            holderList.publicLinkImage.setVisibility(View.GONE);
 
             holderList.itemLayout.setTag(holderList);
             holderList.itemLayout.setOnClickListener(this);
@@ -361,9 +398,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.textViewFileName = (TextView)v.findViewById(R.id.file_grid_filename);
             holderGrid.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
             holderGrid.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewFileSize = (TextView)v.findViewById(R.id.file_grid_filesize);
+            holderGrid.textViewMessageInfo = (TextView)v.findViewById(R.id.file_grid_filesize);
             holderGrid.imageButtonThreeDots = (ImageButton)v.findViewById(R.id.file_grid_three_dots);
-
+            holderGrid.savedOffline = (ImageView)v.findViewById(R.id.file_grid_saved_offline);
+            holderGrid.publicLinkImage = (ImageView)v.findViewById(R.id.file_grid_public_link);
             holderGrid.separator = (View)v.findViewById(R.id.file_grid_separator);
 
             holderGrid.imageViewVideoIcon = (ImageView)v.findViewById(R.id.file_grid_video_icon);
@@ -372,15 +410,19 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70,outMetrics));
+                holderGrid.textViewMessageInfo.setMaxWidth(Util.scaleWidthPx(70,outMetrics));
             } else {
-                holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(130,outMetrics));
+                holderGrid.textViewMessageInfo.setMaxWidth(Util.scaleWidthPx(130,outMetrics));
             }
-            if (holderGrid.textViewFileSize != null) {
-                holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
+
+            if (holderGrid.textViewMessageInfo != null) {
+                holderGrid.textViewMessageInfo.setVisibility(View.VISIBLE);
             } else {
-                log("textViewFileSize is NULL");
+                log("textViewMessageInfo is NULL");
             }
+
+            holderGrid.savedOffline.setVisibility(View.INVISIBLE);
+            holderGrid.publicLinkImage.setVisibility(View.GONE);
 
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);
@@ -421,7 +463,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         log("Node : " + position + " " + node.getName());
 
         holder.textViewFileName.setText(node.getName());
-        holder.textViewFileSize.setText("");
+        holder.textViewMessageInfo.setText("");
         holder.videoInfoLayout.setVisibility(View.GONE);
 
         holder.itemLayout.setVisibility(View.VISIBLE);
@@ -430,11 +472,11 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.imageViewThumb.setVisibility(View.GONE);
         holder.fileLayout.setVisibility(View.VISIBLE);
         holder.textViewFileName.setVisibility(View.VISIBLE);
-        holder.textViewFileSize.setVisibility(View.GONE);
+        holder.textViewMessageInfo.setVisibility(View.GONE);
 
         holder.textViewFileNameForFile.setText(node.getName());
         long nodeSize = node.getSize();
-        holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+        holder.textViewMessageInfo.setText(Util.getSizeString(nodeSize));
 
         holder.fileGridIconForFile.setVisibility(View.VISIBLE);
         holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
@@ -558,10 +600,52 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         Bitmap thumb = null;
 
         holder.textViewFileName.setText(node.getName());
-        holder.textViewFileSize.setText("");
+        holder.textViewMessageInfo.setText("");
 
-        long nodeSize = node.getSize();
-        holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+        String date = TimeUtils.formatDateAndTime(m.getTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+
+        if (m.getUserHandle() == megaChatApi.getMyUserHandle()) {
+            log("MY message handle!!: " + m.getMsgId());
+            holder.fullNameTitle = megaChatApi.getMyFullname();
+        }
+        else{
+
+            long userHandle = m.getUserHandle();
+            log("Contact message!!: " + userHandle);
+
+            if (((NodeAttachmentHistoryActivity)context).chatRoom.isGroup()) {
+
+                holder.fullNameTitle = cC.getFullName(userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom);
+
+                if (holder.fullNameTitle == null) {
+                    holder.fullNameTitle = "";
+                }
+
+                if (holder.fullNameTitle.trim().length() <= 0) {
+
+                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+                    holder.fullNameTitle = "Unknown name";
+                    if (!(holder.nameRequestedAction)) {
+                        log("3-Call for nonContactName: " + m.getUserHandle());
+                        holder.nameRequestedAction = true;
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle);
+                        megaChatApi.getUserFirstname(userHandle, listener);
+                        megaChatApi.getUserLastname(userHandle, listener);
+                        megaChatApi.getUserEmail(userHandle, listener);
+                    } else {
+                        log("4-Name already asked and no name received: " + m.getUserHandle());
+                    }
+                }
+
+            } else {
+                holder.fullNameTitle = ((NodeAttachmentHistoryActivity)context).chatRoom.getTitle();
+            }
+        }
+
+        String secondRowInfo = context.getString(R.string.second_row_info_item_shard_file_chat, holder.fullNameTitle, date);
+
+        holder.textViewMessageInfo.setText(secondRowInfo);
+        holder.textViewMessageInfo.setVisibility(View.VISIBLE);
 
         if (!multipleSelect) {
             log("Not multiselect");
@@ -872,8 +956,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         int currentPosition = holder.getAdapterPosition();
 //        Toast.makeText(context,"pos:" + currentPosition ,Toast.LENGTH_SHORT ).show();
 
-        ((FileBrowserFragmentLollipop)fragment).activateActionMode();
-        ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,null,null);
+        ((NodeAttachmentHistoryActivity)context).activateActionMode();
+        ((NodeAttachmentHistoryActivity)context).itemClick(currentPosition);
 
         return true;
     }
