@@ -66,6 +66,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath";
     private static final String KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload";
     private static final String KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp";
+    private static final String KEY_CAM_VIDEO_SYNC_TIMESTAMP = "camVideoSyncTimeStamp";
     private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
     private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
     private static final String KEY_CONVERSION_ON_CHARGING = "conversionOnCharging";
@@ -91,6 +92,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_OFF_INCOMING = "incoming";
     private static final String KEY_OFF_HANDLE_INCOMING = "incomingHandle";
     private static final String KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp";
+    private static final String KEY_SEC_VIDEO_SYNC_TIMESTAMP = "secondaryVideoSyncTimeStamp";
     private static final String KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices";
     private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
     private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
@@ -240,7 +242,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
 				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
-                KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT" + ")";
+                KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT," +  KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT," +
+                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT" +")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -628,6 +631,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_ON_CHARGING + " = '" + encrypt("true") + "';");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CHARGING_ON_SIZE + " TEXT;");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT;");
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT;");
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT;");
 //            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + " = " + MegaPreferences.CONVERSION_ON_CHARGING_WHEN_SIZE + ";");
 		}
 	}
@@ -1535,12 +1540,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(prefs.getStorageAskAlways()));
         values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()));
         values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(prefs.getCamSyncTimeStamp()));
+        values.put(KEY_CAM_VIDEO_SYNC_TIMESTAMP, encrypt(prefs.getCamVideoSyncTimeStamp()));
         values.put(KEY_LAST_UPLOAD_FOLDER, encrypt(prefs.getLastFolderUpload()));
         values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(prefs.getLastFolderCloud()));
         values.put(KEY_SEC_FOLDER_ENABLED, encrypt(prefs.getSecondaryMediaFolderEnabled()));
         values.put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(prefs.getLocalPathSecondaryFolder()));
         values.put(KEY_SEC_FOLDER_HANDLE, encrypt(prefs.getMegaHandleSecondaryFolder()));
         values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(prefs.getSecSyncTimeStamp()));
+        values.put(KEY_SEC_VIDEO_SYNC_TIMESTAMP, encrypt(prefs.getSecVideoSyncTimeStamp()));
         values.put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(prefs.getStorageAdvancedDevices()));
         values.put(KEY_PREFERRED_VIEW_LIST, encrypt(prefs.getPreferredViewList()));
         values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(prefs.getPreferredViewListCameraUploads()));
@@ -1596,11 +1603,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String uploadVideoQuality = decrypt(cursor.getString(31));
 			String conversionOnCharging = decrypt(cursor.getString(32));
 			String chargingOnSize = decrypt(cursor.getString(33));
+			String camVideoSyncTimeStamp = decrypt(cursor.getString(34));
+			String secVideoSyncTimeStamp = decrypt(cursor.getString(35));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize);
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,camVideoSyncTimeStamp,
+                    secVideoSyncTimeStamp);
 		}
 		cursor.close();
 
@@ -3185,6 +3195,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
+    public void setCamVideoSyncTimeStamp (long camVideoSyncTimeStamp){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_VIDEO_SYNC_TIMESTAMP + "= '" + encrypt(camVideoSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(camVideoSyncTimeStamp + ""));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
 	public void setSecSyncTimeStamp (long secSyncTimeStamp){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
@@ -3200,6 +3226,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
+
+    public void setSecVideoSyncTimeStamp (long secVideoSyncTimeStamp){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_VIDEO_SYNC_TIMESTAMP + "= '" + encrypt(secVideoSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(secVideoSyncTimeStamp + ""));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
 
 	public void setPinLockEnabled (boolean pinLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;

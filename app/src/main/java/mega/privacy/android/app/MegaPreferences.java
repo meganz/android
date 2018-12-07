@@ -12,6 +12,7 @@ public class MegaPreferences{
 	String camSyncLocalPath = "";
 	String camSyncFileUpload = "";
 	String camSyncTimeStamp = "";
+	String camVideoSyncTimeStamp = "";
 	String pinLockEnabled = "";
 	String pinLockCode = "";
 	String storageAskAlways = "";
@@ -22,6 +23,7 @@ public class MegaPreferences{
 	String localPathSecondaryFolder = "";
 	String megaHandleSecondaryFolder = "";
 	String secSyncTimeStamp = "";
+	String secVideoSyncTimeStamp = "";
 	String keepFileNames = "";
 	String storageAdvancedDevices = "";
 	String preferredViewList = "";
@@ -50,7 +52,7 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize){
+			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -84,6 +86,8 @@ public class MegaPreferences{
 		this.uploadVideoQuality = uploadVideoQuality;
 		this.conversionOnCharging = conversionOnCharging;
 		this.chargingOnSize = chargingOnSize;
+		this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
+		this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
 	}
 
 	public String getFirstTime (){
@@ -359,6 +363,22 @@ public class MegaPreferences{
 
     public void setChargingOnSize(String chargingOnSize) {
         this.chargingOnSize = chargingOnSize;
+    }
+
+    public String getCamVideoSyncTimeStamp() {
+        return camVideoSyncTimeStamp;
+    }
+
+    public void setCamVideoSyncTimeStamp(String camVideoSyncTimeStamp) {
+        this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
+    }
+
+    public String getSecVideoSyncTimeStamp() {
+        return secVideoSyncTimeStamp;
+    }
+
+    public void setSecVideoSyncTimeStamp(String secVideoSyncTimeStamp) {
+        this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
     }
 }
 

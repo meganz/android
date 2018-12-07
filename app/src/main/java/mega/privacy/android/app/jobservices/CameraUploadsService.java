@@ -144,6 +144,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     long currentTimeStamp = 0;
     long secondaryTimeStamp = 0;
+    long currentVideoTimeStamp = 0;
+    long secondaryVideoTimeStamp = 0;
     Notification mNotification;
     Intent mIntent;
     PendingIntent mPendingIntent;
