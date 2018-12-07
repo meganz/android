@@ -720,7 +720,6 @@ public class PDFView extends RelativeLayout {
         else {
             passwdVisible = false;
         }
-
         if(passwdVisible){
             toggleButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_b_shared_read));
             passwordText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
