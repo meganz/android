@@ -92,7 +92,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	ArrayList<MegaChatMessage> messages;
 	ArrayList<MegaChatMessage> bufferMessages;
 
-	MegaChatRoom chatRoom;
+	public MegaChatRoom chatRoom;
 	
 	NodeAttachmentHistoryAdapter adapter;
 	boolean scrollingUp = false;
@@ -359,6 +359,14 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new NodeAttachmentHistoryActivity.ActionBarCallBack());
+		}
 	}
 
 	// Clear all selected items

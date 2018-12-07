@@ -657,7 +657,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             if (holderGrid.textViewFileSize != null) {
                 holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
             } else {
-                log("textViewFileSize is NULL");
+                log("textViewMessageInfo is NULL");
             }
 
             holderGrid.savedOffline.setVisibility(View.INVISIBLE);
