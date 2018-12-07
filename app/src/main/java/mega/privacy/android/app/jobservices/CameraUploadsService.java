@@ -169,9 +169,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         
         try {
             log("Start service here");
-            task = createWorkerThread();
-            task.start();
-            return true;
+            if(task == null || !task.isAlive()) {
+                log("create new thread");
+                task = createWorkerThread();
+                task.start();
+                return true;
+            } else {
+                log("thread exsists");
+                return false;
+            }
         } catch (Exception e) {
             log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
             finish();
@@ -198,17 +204,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
         };
     }
-    
+
     private void startCameraUploads() {
         log("startCameraUploads");
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
         startForeground(notificationId,mNotification);
-        try {
-            getFilesFromMediaStore();
-        } catch (Exception e) {
-            e.printStackTrace();
-            finish();
-        }
+        getFilesFromMediaStore();
     }
     
     private boolean shouldCompressVideo() {
@@ -221,7 +222,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     private void extractMedia(Cursor cursorCamera,boolean isSecondary,boolean isVideo) {
         try {
-            
+
             log("if (cursorCamera != null)");
             String path = isSecondary ? localPathSecondary : localPath;
             
@@ -235,7 +236,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
             
             while (cursorCamera.moveToNext()) {
-                
+
                 Media media = new Media();
                 media.filePath = cursorCamera.getString(dataColumn);
                 long addedTime = cursorCamera.getLong(addedColumn) * 1000;
@@ -276,7 +277,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (!lock.isHeld()) {
             lock.acquire();
         }
-        
+
         String projection[] = {
                 MediaStore.MediaColumns.DATA,
                 MediaStore.MediaColumns.DATE_ADDED,
@@ -1161,7 +1162,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         running = false;
         stopForeground(true);
         cancelNotification();
-        jobFinished(globalParams,false);
+        jobFinished(globalParams,true);
     }
 
     @Override
@@ -1765,6 +1766,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF,"0");
             exif.saveAttributes();
         } catch (IOException e) {
+            log("Exception removeGPSCoordinates :" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1786,6 +1788,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            log("Exception createTempFile: " + ex.getMessage());
         }
         
         String destPath = file.getNewPath();
@@ -1864,6 +1867,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
         } catch (Exception e) {
             e.printStackTrace();
+            log("Exception getGPSCoordinates: " + e.getMessage());
         }
         return output;
     }
