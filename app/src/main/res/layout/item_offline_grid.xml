@@ -95,9 +95,10 @@
 			android:layout_below="@+id/file_grid_thumbnail_layout_for_file">
 			<TextView
 				android:id="@+id/file_grid_filename_for_file"
-				android:layout_width="110dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentLeft="true"
+				android:layout_toLeftOf="@+id/file_grid_three_dots_for_file"
 				android:layout_centerVertical="true"
 				android:layout_marginLeft="8dp"
 				android:ellipsize="middle"
