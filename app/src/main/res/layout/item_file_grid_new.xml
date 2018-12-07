@@ -73,8 +73,7 @@
 				android:layout_alignParentLeft="true"
 				android:layout_alignParentTop="true"
 				android:layout_marginLeft="7dp"
-				android:layout_marginTop="7dp"
-				android:visibility="visible"/>
+				android:layout_marginTop="7dp"/>
 			<ImageView
 				android:id="@+id/file_grid_icon_for_file"
 				android:layout_width="88dp"
