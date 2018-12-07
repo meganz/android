@@ -5042,7 +5042,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-				log("onPageScrolled");
 				indexContacts = position;
 			}
 
@@ -7170,7 +7169,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				unSelectMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				addMenuItem.setEnabled(false);
-				rubbishBinMenuItem.setVisible(true);
+				rubbishBinMenuItem.setVisible(false);
 				clearRubbishBinMenuitem.setVisible(false);
 				importLinkMenuItem.setVisible(false);
 				takePicture.setVisible(false);
