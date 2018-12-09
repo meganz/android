@@ -202,10 +202,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
-//                    finish();
-                    stopForeground(true);
-                    cancelNotification();
-                    jobFinished(globalParams,true);
+                    finish();
+//                    stopForeground(true);
+//                    cancelNotification();
+//                    jobFinished(globalParams,true);
                 }
             }
         };
@@ -287,7 +287,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (!lock.isHeld()) {
             lock.acquire();
         }
-        int X = 1 / 0 ;
         String projection[] = {
                 MediaStore.MediaColumns.DATA,
                 MediaStore.MediaColumns.DATE_ADDED,
@@ -1179,7 +1178,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         running = false;
         stopForeground(true);
         cancelNotification();
-        jobFinished(globalParams,false);
+        jobFinished(globalParams,true);
     }
 
     @Override

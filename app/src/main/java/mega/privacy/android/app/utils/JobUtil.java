@@ -18,9 +18,9 @@ import static mega.privacy.android.app.utils.Util.logJobState;
 @TargetApi(21)
 public class JobUtil {
     //todo short time for testing purpose
-    public static final long SCHEDULER_INTERVAL = 15 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
     
-    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 1 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 5 * DateUtils.MINUTE_IN_MILLIS;
 
     public static final int START_JOB_FAILED = -1;
 
@@ -28,7 +28,7 @@ public class JobUtil {
 
     public static final int DAEMON_JOB_ID = 9979;
 
-    public static final long DAEMON_INTERVAL = DateUtils.HOUR_IN_MILLIS;
+    public static final long DAEMON_INTERVAL = 5 * DateUtils.MINUTE_IN_MILLIS;
 
     public static synchronized boolean isJobScheduled(Context context,int id) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
