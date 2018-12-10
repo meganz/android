@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -82,7 +81,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
-import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -4994,29 +4992,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.notifyItemChanged(positionNewMessagesLayout);
             }
 
-            adapter.removeMessage(indexToChange+1, messages);
-
             if(!messages.isEmpty()){
                 //Update infoToShow of the next message also
                 if (indexToChange == 0) {
                     messages.get(indexToChange).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
+                    //Check if there is more messages and update the following one
+                    if(messages.size()>1){
+                        adjustInfoToShow(indexToChange+1);
+                        setShowAvatar(indexToChange+1);
+                    }
                 }
                 else{
                     //Not first element
                     if(indexToChange==messages.size()){
                         log("The last message removed, do not check more messages");
                         setShowAvatar(indexToChange-1);
-                        adapter.modifyMessage(messages, indexToChange);
                         return;
                     }
 
                     adjustInfoToShow(indexToChange);
                     setShowAvatar(indexToChange);
                     setShowAvatar(indexToChange-1);
-
-                    adapter.modifyMessage(messages, indexToChange+1);
                 }
             }
+
+            adapter.removeMessage(indexToChange+1, messages);
         }
         else{
             log("index to change not found");
