@@ -1492,7 +1492,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if (isEnabled){
 			dbH.setCamSyncTimeStamp(0);
+			dbH.setCamVideoSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecVideoSyncTimeStamp(0);
 			dbH.setCamSyncEnabled(false);
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 			Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
@@ -1520,7 +1522,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								if (prefs.getCamSyncWifi() != null){
 									if (prefs.getCamSyncWifi().compareTo("") != 0){
 										dbH.setCamSyncTimeStamp(0);
+										dbH.setCamVideoSyncTimeStamp(0);
 										dbH.setSecSyncTimeStamp(0);
+										dbH.setSecVideoSyncTimeStamp(0);
 										dbH.setCamSyncEnabled(true);
                                         dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
                                         Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
@@ -1574,7 +1578,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				public void onClick(DialogInterface dialog, int which) {
 					log("onClick AlertDialog");
 					dbH.setCamSyncTimeStamp(0);
+					dbH.setCamVideoSyncTimeStamp(0);
 					dbH.setSecSyncTimeStamp(0);
+					dbH.setSecVideoSyncTimeStamp(0);
 					dbH.setCamSyncEnabled(true);
                     dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);

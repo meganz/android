@@ -1498,7 +1498,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 			cameraUploadWhat.setSummary(fileUpload);
 			dbH.setCamSyncTimeStamp(0);
+			dbH.setCamVideoSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecVideoSyncTimeStamp(0);
 			dbH.saveShouldClearCamsyncRecords(true);
             Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
             
@@ -1805,6 +1807,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecVideoSyncTimeStamp(0);
 			dbH.deleteAllSecondarySyncRecords(TYPE_ANY);
 			secondaryUpload = !secondaryUpload;
 			if (secondaryUpload){
@@ -2438,7 +2441,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);
+			dbH.setCamVideoSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecVideoSyncTimeStamp(0);
             dbH.saveShouldClearCamsyncRecords(true);
             Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
@@ -2507,7 +2512,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
+			dbH.setCamVideoSyncTimeStamp(0);
             dbH.setSecSyncTimeStamp(0);
+            dbH.setSecVideoSyncTimeStamp(0);
             dbH.saveShouldClearCamsyncRecords(true);
             Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
@@ -2548,6 +2555,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecVideoSyncTimeStamp(0);
 			prefs.setLocalPathSecondaryFolder(secondaryPath);
 
 			if (Util.isDeviceSupportParallelUpload()) {
@@ -2591,6 +2599,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
+				dbH.setSecVideoSyncTimeStamp(0);
 
 				if (Util.isDeviceSupportParallelUpload()) {
                     cancelAllJobs(context);
@@ -2639,7 +2648,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
+				dbH.setCamVideoSyncTimeStamp(0);
                 dbH.setSecSyncTimeStamp(0);
+                dbH.setSecVideoSyncTimeStamp(0);
                 dbH.saveShouldClearCamsyncRecords(true);
                 Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
 
@@ -3267,7 +3278,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         log("Camera OFF");
         cameraUpload = false;
         dbH.setCamSyncTimeStamp(0);
+        dbH.setCamVideoSyncTimeStamp(0);
         dbH.setSecSyncTimeStamp(0);
+        dbH.setSecVideoSyncTimeStamp(0);
         dbH.saveShouldClearCamsyncRecords(true);
         handler.postDelayed(new Runnable() {
         

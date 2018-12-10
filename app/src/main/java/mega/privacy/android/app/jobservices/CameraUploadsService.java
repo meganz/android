@@ -81,7 +81,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
     private String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
     public static int PAGE_SIZE = 200;
-    
+    public static int PAGE_SIZE_VIDEO = 10;
+
     private NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
     
@@ -153,19 +154,19 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     Context mContext;
     private VideoCompressor mVideoCompressor;
 
-    private static boolean workingThreadRunning;
-    
     @Override
     public boolean onStartJob(JobParameters params) {
-        Log.d("yuan","onStartJob " + workingThreadRunning);
+        Log.d("yuan","onStartJob ");
         cameraUploadsService = this;
         globalParams = params;
         handler = new Handler();
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
             PAGE_SIZE = 500;
+            PAGE_SIZE_VIDEO = 10;
         } else {
-            PAGE_SIZE = 25;
+            PAGE_SIZE = 50;
+            PAGE_SIZE_VIDEO = 5;
         }
         IS_CANCELLED_BY_USER = false;
         
@@ -201,7 +202,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    finish();
+//                    finish();
+                    handleException();
                 }
             }
         };
@@ -287,30 +289,38 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         };
         
         String selectionCamera = null;
+        String selectionCameraVideo = null;
         String selectionSecondary = null;
+        String selectionSecondaryVideo = null;
         String[] selectionArgs = null;
         prefs = dbH.getPreferences();
-        
+
         if (prefs != null) {
             log("if (prefs != null)");
             if (prefs.getCamSyncTimeStamp() != null) {
                 log("if (prefs.getCamSyncTimeStamp() != null)");
                 currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-                selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
-                log("SELECTION: " + selectionCamera);
+                selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+                log("SELECTION photo: " + selectionCamera);
+
+                currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
+                selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+                log("SELECTION video: " + selectionCameraVideo);
             }
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
                 if (prefs.getSecSyncTimeStamp() != null) {
                     log("if (prefs.getSecSyncTimeStamp() != null)");
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
-                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
-                    log("SELECTION SECONDARY: " + selectionSecondary);
+                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    log("SELECTION SECONDARY photo: " + selectionSecondary);
+
+                    secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
+                    selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    log("SELECTION SECONDARY video: " + selectionSecondaryVideo);
                 }
             }
         }
-        
-        String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
 
         ArrayList<Uri> uris = new ArrayList<>();
         if (prefs.getCamSyncFileUpload() == null) {
@@ -349,7 +359,14 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             boolean isVideo = uri.equals(MediaStore.Video.Media.EXTERNAL_CONTENT_URI) || uri.equals(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
             
             //Primary Media Folder
-            Cursor cursorCamera = app.getContentResolver().query(uri,projection,selectionCamera,selectionArgs,order);
+            Cursor cursorCamera;
+            if (isVideo) {
+                String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+                cursorCamera = app.getContentResolver().query(uri,projection,selectionCameraVideo,selectionArgs,order);
+            } else {
+                String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
+                cursorCamera = app.getContentResolver().query(uri,projection,selectionCamera,selectionArgs,order);
+            }
             if (cursorCamera != null) {
                 extractMedia(cursorCamera,false,isVideo);
             }
@@ -357,7 +374,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             //Secondary Media Folder
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
-                Cursor cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,order);
+                Cursor cursorSecondary;
+                if (isVideo) {
+                    String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondaryVideo,selectionArgs,order);
+                } else {
+                    String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,order);
+                }
+
                 if (cursorSecondary != null) {
                     extractMedia(cursorSecondary,true,isVideo);
                 }
@@ -478,7 +503,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 if (toUpload.exists()) {
                     log("upload node " + path);
                     totalToUpload++;
-                    megaApi.startUpload(path,parent,file.getFileName(),this);
+                    megaApi.startUpload(path,parent,file.getFileName(),file.getTimestamp() / 1000,this);
                 } else {
                     dbH.deleteSyncRecordByPath(path,isSec);
                 }
@@ -693,14 +718,28 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     log("MediaFinalName: " + sourceFile.getName());
                 } else {
                     if(!isSecondary) {
-                        if(media.timestamp > currentTimeStamp) {
-                            currentTimeStamp = media.timestamp;
-                            dbH.setCamSyncTimeStamp(media.timestamp);
+                        if(isVideo) {
+                            if(media.timestamp > currentVideoTimeStamp) {
+                                currentVideoTimeStamp = media.timestamp;
+                                dbH.setCamVideoSyncTimeStamp(media.timestamp);
+                            }
+                        } else {
+                            if(media.timestamp > currentTimeStamp) {
+                                currentTimeStamp = media.timestamp;
+                                dbH.setCamSyncTimeStamp(media.timestamp);
+                            }
                         }
                     } else {
-                        if(media.timestamp > secondaryTimeStamp) {
-                            secondaryTimeStamp = media.timestamp;
-                            dbH.setSecSyncTimeStamp(media.timestamp);
+                        if(isVideo) {
+                            if(media.timestamp > secondaryVideoTimeStamp) {
+                                secondaryVideoTimeStamp = media.timestamp;
+                                dbH.setSecVideoSyncTimeStamp(media.timestamp);
+                            }
+                        } else {
+                            if(media.timestamp > secondaryTimeStamp) {
+                                secondaryTimeStamp = media.timestamp;
+                                dbH.setSecSyncTimeStamp(media.timestamp);
+                            }
                         }
                     }
                     if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
@@ -1142,6 +1181,26 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             dbH.saveShouldClearCamsyncRecords(false);
         }
     }
+
+    private void handleException() {
+        log("handle exception");
+
+        if (running) {
+            handler.removeCallbacksAndMessages(null);
+            running = false;
+        }
+        releaseLocks();
+
+        if (isOverquota) {
+            showStorageOverQuotaNotification();
+        }
+
+        canceled = true;
+        running = false;
+        stopForeground(true);
+        cancelNotification();
+        jobFinished(globalParams,true);
+    }
     
     private void finish() {
         log("finish CameraUploadsService");
@@ -1164,7 +1223,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         running = false;
         stopForeground(true);
         cancelNotification();
-        jobFinished(globalParams,true);
+        jobFinished(globalParams,false);
     }
 
     @Override
@@ -1457,22 +1516,38 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     private void updateTimeStamp() {
         //primary
-        Long timeStampPrimary = dbH.findMaxTimestamp(false);
+        Long timeStampPrimary = dbH.findMaxTimestamp(false,SyncRecord.TYPE_PHOTO);
         if (timeStampPrimary == null) {
             timeStampPrimary = 0L;
         }
         if (timeStampPrimary > currentTimeStamp) {
             updateCurrentTimeStamp(timeStampPrimary);
         }
+
+        Long timeStampPrimaryVideo = dbH.findMaxTimestamp(false,SyncRecord.TYPE_VIDEO);
+        if (timeStampPrimaryVideo == null) {
+            timeStampPrimaryVideo = 0L;
+        }
+        if (timeStampPrimaryVideo > currentVideoTimeStamp) {
+            updateCurrentVideoTimeStamp(timeStampPrimaryVideo);
+        }
         
         //secondary
         if (secondaryEnabled) {
-            Long timeStampSecondary = dbH.findMaxTimestamp(true);
+            Long timeStampSecondary = dbH.findMaxTimestamp(true,SyncRecord.TYPE_PHOTO);
             if (timeStampSecondary == null) {
                 timeStampSecondary = 0L;
             }
             if (timeStampSecondary > secondaryTimeStamp) {
                 updateSecondaryTimeStamp(timeStampSecondary);
+            }
+
+            Long timeStampSecondaryVideo = dbH.findMaxTimestamp(true,SyncRecord.TYPE_VIDEO);
+            if (timeStampSecondaryVideo == null) {
+                timeStampSecondaryVideo = 0L;
+            }
+            if (timeStampSecondaryVideo > secondaryVideoTimeStamp) {
+                updateSecondaryVideoTimeStamp(timeStampSecondaryVideo);
             }
         }
     }
@@ -1482,11 +1557,23 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         currentTimeStamp = timeStamp;
         dbH.setCamSyncTimeStamp(currentTimeStamp);
     }
+
+    private void updateCurrentVideoTimeStamp(long timeStamp) {
+        log("updateCurrentVideoTimeStamp " + timeStamp);
+        currentVideoTimeStamp = timeStamp;
+        dbH.setCamVideoSyncTimeStamp(currentVideoTimeStamp);
+    }
     
     private void updateSecondaryTimeStamp(long timeStamp) {
         log("updateSecondaryTimeStamp " + timeStamp);
         secondaryTimeStamp = timeStamp;
         dbH.setSecSyncTimeStamp(secondaryTimeStamp);
+    }
+
+    private void updateSecondaryVideoTimeStamp(long timeStamp) {
+        log("updateSecondaryVideoTimeStamp " + timeStamp);
+        secondaryVideoTimeStamp = timeStamp;
+        dbH.setSecVideoSyncTimeStamp(secondaryVideoTimeStamp);
     }
     
     private boolean isCompressedVideoPending() {

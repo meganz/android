@@ -940,8 +940,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
-    public Long findMaxTimestamp(Boolean isSecondary) {
-        String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_SYNC_RECORDS + "  WHERE " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
+    public Long findMaxTimestamp(Boolean isSecondary,int type) {
+        String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_SYNC_RECORDS + "  WHERE "
+                + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "' AND "
+                + KEY_SYNC_TYPE + " = " + type;
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
             List<Long> timestamps = new ArrayList<>(cursor.getCount());
@@ -1603,13 +1605,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String uploadVideoQuality = decrypt(cursor.getString(31));
 			String conversionOnCharging = decrypt(cursor.getString(32));
 			String chargingOnSize = decrypt(cursor.getString(33));
-			String camVideoSyncTimeStamp = decrypt(cursor.getString(34));
-			String secVideoSyncTimeStamp = decrypt(cursor.getString(35));
+			String shouldClearCameraSyncRecords = decrypt(cursor.getString(34));
+			String camVideoSyncTimeStamp = decrypt(cursor.getString(35));
+			String secVideoSyncTimeStamp = decrypt(cursor.getString(36));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,camVideoSyncTimeStamp,
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
                     secVideoSyncTimeStamp);
 		}
 		cursor.close();
@@ -3205,7 +3208,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
         }
         else{
-            values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(camVideoSyncTimeStamp + ""));
+            values.put(KEY_CAM_VIDEO_SYNC_TIMESTAMP, encrypt(camVideoSyncTimeStamp + ""));
             db.insert(TABLE_PREFERENCES, null, values);
         }
         cursor.close();
@@ -3237,7 +3240,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
         }
         else{
-            values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(secVideoSyncTimeStamp + ""));
+            values.put(KEY_SEC_VIDEO_SYNC_TIMESTAMP, encrypt(secVideoSyncTimeStamp + ""));
             db.insert(TABLE_PREFERENCES, null, values);
         }
         cursor.close();
