@@ -40,7 +40,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -1402,7 +1402,7 @@ public class ChatController {
                     destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
                 }
                 else{
-                    destination = ((ChatActivityLollipop) context).getFilesDir();
+                    destination = context.getFilesDir();
                 }
 
                 destination.mkdirs();
@@ -1421,6 +1421,12 @@ public class ChatController {
                         }
                         else if (context instanceof PdfViewerActivityLollipop){
                             ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                        }
+                        else if (context instanceof ChatActivityLollipop){
+                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                        }
+                        else if (context instanceof NodeAttachmentHistoryActivity){
+                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.file_already_exists));
                         }
                     }
                     else{
@@ -1452,88 +1458,6 @@ public class ChatController {
             Intent service = new Intent(context, DownloadService.class);
             String serializeString = document.serialize();
             log("serializeString: "+serializeString);
-            service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-            service.putExtra(DownloadService.EXTRA_PATH, path);
-            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
-                service.putExtra("fromMV", true);
-            }
-            context.startService(service);
-        }
-
-    }
-
-    public void saveForOffline(MegaNode node){
-        log("saveForOffline - node");
-
-        File destination = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
-        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-        if (node != null) {
-
-            if (Environment.getExternalStorageDirectory() != null){
-                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
-            }
-            else{
-                destination = context.getFilesDir();
-            }
-
-            destination.mkdirs();
-
-            log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-            if (destination.exists() && destination.isDirectory()){
-
-                File offlineFile = new File(destination, node.getName());
-                if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-                    log("File already exists!");
-                    if (context instanceof ChatFullScreenImageViewer){
-                        ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.file_already_exists));
-                    }
-                    else if (context instanceof AudioVideoPlayerLollipop){
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                    }
-                    else if (context instanceof PdfViewerActivityLollipop){
-                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                    }
-                }
-                else{
-                    dlFiles.put(node, destination.getAbsolutePath());
-                }
-            }
-            else{
-                log("Destination ERROR");
-            }
-        }
-
-
-        double availableFreeSpace = Double.MAX_VALUE;
-        try{
-            StatFs stat = new StatFs(destination.getAbsolutePath());
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        }
-        catch(Exception ex){}
-
-        for (MegaNode document : dlFiles.keySet()) {
-
-            String path = dlFiles.get(document);
-
-            if(availableFreeSpace <document.getSize()){
-                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, ((NodeAttachmentActivityLollipop) context));
-                continue;
-            }
-
-            Intent service = new Intent(context, DownloadService.class);
-            String serializeString = document.serialize();
-            log("serializeString: "+serializeString);
-            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
@@ -1668,9 +1592,6 @@ public class ChatController {
             if(context instanceof ChatActivityLollipop){
                 ((ChatActivityLollipop) context).showSnackbarNotSpace();
             }
-            else if(context instanceof NodeAttachmentActivityLollipop){
-                ((NodeAttachmentActivityLollipop) context).showSnackbarNotSpace();
-            }
             else if(context instanceof ChatFullScreenImageViewer){
                 ((ChatFullScreenImageViewer) context).showSnackbarNotSpace();
             }
@@ -1705,9 +1626,6 @@ public class ChatController {
                 //Show alert
                 if(context instanceof  ChatActivityLollipop){
                     ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-                else if(context instanceof  NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
                 else if(context instanceof ChatFullScreenImageViewer){
                     ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
@@ -1846,9 +1764,6 @@ public class ChatController {
                                         if(context instanceof  ChatActivityLollipop){
                                             ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
                                         }
-                                        else if(context instanceof  NodeAttachmentActivityLollipop){
-                                            ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
-                                        }
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1920,17 +1835,11 @@ public class ChatController {
                                         if(context instanceof  ChatActivityLollipop){
                                             ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                         }
-                                        else if(context instanceof  NodeAttachmentActivityLollipop){
-                                            ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                        }
                                     }
                                 }
                                 catch (Exception e){
                                     if(context instanceof  ChatActivityLollipop){
                                         ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof  NodeAttachmentActivityLollipop){
-                                        ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                             }

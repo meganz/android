@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.OfflineUtils;
@@ -1575,8 +1574,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     ((FolderLinkActivityLollipop)context).itemClick(currentPosition,dimens,imageView);
                 } else if (type == Constants.SEARCH_ADAPTER) {
                     ((SearchFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
-                } else if (type == Constants.NODE_ATTACHMENT_ADAPTER) {
-                    log("Node attachment adapter");
                 } else {
                     log("layout FileBrowserFragmentLollipop!");
                     ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
@@ -1628,8 +1625,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((FolderLinkActivityLollipop)context).showOptionsPanel(n);
             } else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
                 ((ContactSharedFolderFragment) fragment).showOptionsPanel(n);
-            }else if (type == Constants.NODE_ATTACHMENT_ADAPTER) {
-                ((NodeAttachmentActivityLollipop)context).showOptionsPanel(n);
             } else {
                 ((ManagerActivityLollipop)context).showNodeOptionsPanel(n);
             }
@@ -1670,8 +1665,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((SearchFragmentLollipop)fragment).activateActionMode();
                 ((SearchFragmentLollipop)fragment).itemClick(currentPosition,null,null);
             }
-        } else if (type == Constants.NODE_ATTACHMENT_ADAPTER) {
-            log("NODE_ATTACHMENT_ADAPTER - no multiselect");
         } else {
             log("click layout FileBrowserFragmentLollipop!");
             ((FileBrowserFragmentLollipop)fragment).activateActionMode();
