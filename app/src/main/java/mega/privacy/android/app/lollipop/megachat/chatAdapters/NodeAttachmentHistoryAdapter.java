@@ -32,7 +32,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
@@ -864,7 +863,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         switch (v.getId()) {
             case R.id.file_list_three_dots_layout:
             case R.id.file_grid_three_dots: {
-                //threeDotsClicked(currentPosition,n);
+                threeDotsClicked(currentPosition,m);
                 break;
             }
             case R.id.file_grid_three_dots_for_file: {
@@ -931,20 +930,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
     private void threeDotsClicked(int currentPosition,MegaChatMessage m) {
         log("onClick: file_list_three_dots: " + currentPosition);
-        if (!Util.isOnline(context)) {
-            if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            }
-            return;
-        }
-
-        if (multipleSelect) {
-            ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,null,null);
-        }
-        else {
-            //Show panel option
-            //((ManagerActivityLollipop)context).showNodeOptionsPanel(m);
-        }
+        ((NodeAttachmentHistoryActivity)context).showNodeAttachmentBottomSheet(m, currentPosition);
     }
 
     @Override

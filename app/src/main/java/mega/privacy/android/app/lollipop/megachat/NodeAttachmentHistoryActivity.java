@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -109,7 +110,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	Handler handler;
 	int stateHistory;
-	long chatId = -1;
+	public long chatId = -1;
+	public long selectedMessageId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -951,6 +953,21 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		log("onTruncate");
 		invalidateOptionsMenu();
 		messages.clear();
+		adapter.notifyDataSetChanged();
+		listView.setVisibility(View.GONE);
+		emptyLayout.setVisibility(View.VISIBLE);
+	}
+
+	public void showNodeAttachmentBottomSheet(MegaChatMessage message, int position){
+		log("showNodeAttachmentBottomSheet: "+position);
+		//this.selectedPosition = position;
+
+		if(message!=null){
+			this.selectedMessageId = message.getMsgId();
+//            this.selectedChatItem = chat;
+			NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+			bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+		}
 	}
 
 	public void checkScroll () {
