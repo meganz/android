@@ -34,7 +34,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -78,6 +77,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
@@ -228,7 +228,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     LinearLayout toolbarElements;
 
     TextView titleToolbar;
-    TextView subtitleToobar;
+    MarqueeTextView subtitleToobar;
     ImageView iconStateToolbar;
     float scaleH, scaleW;
     float density;
@@ -592,13 +592,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         tB.setOnClickListener(this);
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
-        subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
-        subtitleToobar.setFocusable(true);
-        subtitleToobar.setFocusableInTouchMode(true);
-        subtitleToobar.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        subtitleToobar.setMarqueeRepeatLimit(-1);
-        subtitleToobar.setSingleLine(true);
-        subtitleToobar.setHorizontallyScrolling(true);
+        subtitleToobar = (MarqueeTextView) tB.findViewById(R.id.subtitle_toolbar);
         iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
 
         titleToolbar.setText(" ");
@@ -1396,7 +1390,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setLastGreen(String date){
         subtitleToobar.setText(date);
-        subtitleToobar.setSelected(true);
+        subtitleToobar.isMarqueeIsNecessary(this);
         subtitleToobar.setVisibility(View.VISIBLE);
     }
 
