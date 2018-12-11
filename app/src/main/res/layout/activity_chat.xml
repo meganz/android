@@ -139,6 +139,41 @@
                             android:tint="@color/accentColor"
                             android:src="@drawable/ic_send_black"/>
 
+                        <ImageButton
+                            android:id="@+id/record"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="16dp"
+                            android:layout_centerVertical="true"
+                            android:background="@null"
+                            android:layout_alignBottom="@id/edit_text_chat"
+                            android:src="@drawable/ic_b_mic_on"/>
+
+                        <ImageButton
+                            android:id="@+id/stop"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_remove"
+                            android:background="@null"
+                            android:visibility="gone"
+                            android:layout_centerVertical="true"
+                            android:layout_alignBottom="@id/edit_text_chat"
+                            android:layout_marginRight="10dp"
+                            android:layout_toLeftOf="@+id/record"/>
+
+                        <ImageButton
+                            android:id="@+id/play"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_play"
+                            android:background="@null"
+                            android:visibility="gone"
+                            android:layout_centerVertical="true"
+                            android:layout_alignBottom="@id/edit_text_chat"
+                            android:layout_marginRight="10dp"
+                            android:layout_toLeftOf="@+id/stop"/>
+
                         <mega.privacy.android.app.components.twemoji.EmojiEditText
                             android:id="@id/edit_text_chat"
                             android:layout_width="match_parent"
@@ -150,7 +185,7 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:textSize="14sp"
-                            android:layout_toLeftOf="@+id/send_message_icon_chat"
+                            android:layout_toLeftOf="@+id/play"
                             android:inputType="textMultiLine|textCapSentences"
                             android:maxLines="1"
                             android:ellipsize="end"
@@ -262,6 +297,7 @@
                                 android:src="@drawable/ic_b_select_image"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
+
                     </LinearLayout>
 
                     <mega.privacy.android.app.components.twemoji.EmojiKeyboard

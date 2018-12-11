@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -312,6 +314,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean visibilityMessageJump=false;
     boolean isTurn = false;
     Handler handler;
+
+    private ImageButton play, stop, record;
+    private MediaRecorder myAudioRecorder;
+    private String outputFile;
+    boolean isVoiceClip = false;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -636,6 +643,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
 
+
         linearLayoutTwemoji = (LinearLayout)findViewById(R.id.linear_layout_twemoji);
         rLKeyboardTwemojiButton = (RelativeLayout) findViewById(R.id.rl_keyboard_twemoji_chat);
         rLMediaButton = (RelativeLayout) findViewById(R.id.rl_media_icon_chat);
@@ -657,6 +665,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
         }
+
+
 
         emojiKeyboard = (EmojiKeyboard)findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
@@ -680,12 +690,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileStorageButton.setOnClickListener(this);
         pickCloudDriveButton.setOnClickListener(this);
 
-        messageJumpLayout.setOnClickListener(this);
-
-        fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
-        fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
 
         textChat.addTextChangedListener(new TextWatcher() {
@@ -701,16 +705,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if (s.length() > 0) {
                         String temp = s.toString();
                         if(temp.trim().length()>0){
-                            sendIcon.setEnabled(true);
-                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
+                            sendIcon.setVisibility(View.VISIBLE);
+                            record.setVisibility(View.GONE);
+//                            sendIcon.setEnabled(true);
+//                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
 
                             textChat.setHint(" ");
                             textChat.setMinLines(1);
                             textChat.setMaxLines(5);
 
                         }else{
-                            sendIcon.setEnabled(false);
-                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
+                            sendIcon.setVisibility(View.GONE);
+                            record.setVisibility(View.VISIBLE);
+//                            sendIcon.setEnabled(false);
+//                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                             log("textChat:TextChangedListener:onTextChanged:lengthInvalid1:sendStopTypingNotification");
                             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -725,8 +733,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         }
                     }else {
-                        sendIcon.setEnabled(false);
-                        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
+                        sendIcon.setVisibility(View.GONE);
+                        record.setVisibility(View.VISIBLE);
+//                        sendIcon.setEnabled(false);
+//                        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                         log("textChat:TextChangedListener:onTextChanged:lengthInvalid2:sendStopTypingNotification");
                         megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -740,8 +750,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         textChat.setMaxLines(1);
                     }
                 }else{
-                    sendIcon.setEnabled(false);
-                    sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
+                    sendIcon.setVisibility(View.GONE);
+                    record.setVisibility(View.VISIBLE);
+//                    sendIcon.setEnabled(false);
+//                    sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                     log("textChat:TextChangedListener:onTextChanged:nullText:sendStopTypingNotification");
                     megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -840,8 +852,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_trans));
-        sendIcon.setEnabled(false);
+        sendIcon.setEnabled(true);
+        sendIcon.setVisibility(View.GONE);
+//        sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_trans));
+//        sendIcon.setEnabled(false);
+
+        record = (ImageButton) findViewById(R.id.record);
+        record.setOnClickListener(this);
+        record.setVisibility(View.VISIBLE);
+
+        play = (ImageButton) findViewById(R.id.play);
+        play.setEnabled(false);
+        stop = (ImageButton) findViewById(R.id.stop);
+        stop.setEnabled(false);
+        play.setOnClickListener(null);
+        stop.setOnClickListener(null);
+
+        messageJumpLayout.setOnClickListener(this);
+
+        fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
+        fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
+        fileStorageLayout.setVisibility(View.GONE);
+        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+
 
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);;
@@ -1727,6 +1760,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
+                isVoiceClip = false;
 
                 if (chatRoom.isGroup())
                 {
@@ -1742,6 +1776,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_video_chat:{
+                isVoiceClip = false;
 
                 if (chatRoom.isGroup())
                 {
@@ -1787,6 +1822,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return super.onOptionsItemSelected(item);
     }
 
+    public void startRecord(){
+        try {
+            myAudioRecorder.prepare();
+            myAudioRecorder.start();
+        } catch (IllegalStateException ise) {
+            // make something ...
+        } catch (IOException ioe) {
+            // make something
+        }
+        record.setEnabled(false);
+        record.setOnClickListener(null);
+        stop.setEnabled(true);
+        stop.setOnClickListener(this);
+    }
+    public void playVoiceClip(){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(outputFile);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (Exception e) {
+            // make something
+        }
+    }
+
+    public void stopRecord(){
+        myAudioRecorder.stop();
+        myAudioRecorder.release();
+        myAudioRecorder = null;
+        record.setEnabled(true);
+        record.setOnClickListener(this);
+
+        stop.setEnabled(false);
+        stop.setOnClickListener(null);
+
+        play.setEnabled(true);
+        play.setOnClickListener(this);
+    }
+
     public void startCall(){
         if(startVideo){
             log("Start video call");
@@ -1796,6 +1870,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Start audio call");
             megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
         }
+    }
+
+    public boolean checkPermissionsVoiceClip(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+            if (!hasRecordAudioPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+                return false;
+            }
+            return true;
+        }
+        return true;
     }
 
     public boolean checkPermissionsCall(){
@@ -1880,8 +1966,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case Constants.RECORD_AUDIO: {
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(checkPermissionsCall()){
-                        startCall();
+                    if(isVoiceClip){
+                        if(checkPermissionsVoiceClip()){
+                            outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
+                            myAudioRecorder = new MediaRecorder();
+                            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                            myAudioRecorder.setOutputFile(outputFile);
+                            startRecord();
+                        }
+                    }else{
+                        if(checkPermissionsCall()){
+                            startCall();
+                        }
                     }
                 }
                 break;
@@ -2513,27 +2611,42 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
 
-                if((fileStorageF != null)&&(fileStorageF.isMultipleselect())){
-                    fileStorageF.sendImages();
-                }else{
-
-                    if(!text.isEmpty()) {
-
-                        if (editingMessage) {
-                            log("onClick:send_message_icon_chat:editingMessage");
-                            editMessage(text);
-                            clearSelections();
-                            hideMultipleSelect();
-                            actionMode.invalidate();
-                        } else {
-                            log("onClick:send_message_icon_chat:sendindMessage");
-                            sendMessage(text);
-                        }
-
-//                        textChat.getText().clear();
-                        textChat.setText("", TextView.BufferType.EDITABLE);
+                if(!text.isEmpty()) {
+                    if (editingMessage) {
+                        log("onClick:send_message_icon_chat:editingMessage");
+                        editMessage(text);
+                        clearSelections();
+                        hideMultipleSelect();
+                        actionMode.invalidate();
+                    } else {
+                        log("onClick:send_message_icon_chat:sendindMessage");
+                        sendMessage(text);
                     }
+                    textChat.setText("", TextView.BufferType.EDITABLE);
                 }
+
+
+//                if((fileStorageF != null)&&(fileStorageF.isMultipleselect())){
+//                    fileStorageF.sendImages();
+//                }else{
+//
+//                    if(!text.isEmpty()) {
+//
+//                        if (editingMessage) {
+//                            log("onClick:send_message_icon_chat:editingMessage");
+//                            editMessage(text);
+//                            clearSelections();
+//                            hideMultipleSelect();
+//                            actionMode.invalidate();
+//                        } else {
+//                            log("onClick:send_message_icon_chat:sendindMessage");
+//                            sendMessage(text);
+//                        }
+//
+////                        textChat.getText().clear();
+//                        textChat.setText("", TextView.BufferType.EDITABLE);
+//                    }
+//                }
 
                 break;
             }
@@ -2690,6 +2803,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                        this.attachFromFileStorage();
 //                    }
                 }
+                break;
+            }
+            case R.id.record:{
+                log("onClick:record");
+                isVoiceClip = true;
+                if(checkPermissionsVoiceClip()){
+                    outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
+                    myAudioRecorder = new MediaRecorder();
+                    myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                    myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                    myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                    myAudioRecorder.setOutputFile(outputFile);
+                    startRecord();
+                }
+                break;
+            }
+            case R.id.stop:{
+                log("onClick:stop");
+                isVoiceClip = false;
+                stopRecord();
+                break;
+            }
+            case R.id.play:{
+                log("onClick:play");
+                playVoiceClip();
                 break;
             }
             case R.id.toolbar_chat:{
@@ -7131,33 +7269,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void multiselectActivated(boolean flag){
-        String text = textChat.getText().toString();
-
-        if(flag){
-            //multiselect on
-            if(!text.isEmpty()) {
-                textChat.setTextColor(ContextCompat.getColor(this, R.color.transfer_progress));
-            }
-            if(!sendIcon.isEnabled()){
-                sendIcon.setEnabled(true);
-                sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_black));
-            }
-        }else if(!flag){
-            //multiselect off
-            if(sendIcon.isEnabled()) {
-
-                textChat.setTextColor(ContextCompat.getColor(this, R.color.black));
-                if(!text.isEmpty()) {
-                    sendIcon.setEnabled(true);
-                    sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_black));
-                }else{
-                    sendIcon.setEnabled(false);
-                    sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_trans));
-                }
-            }
-        }
-    }
 
     private void showOverquotaAlert(boolean prewarning){
         log("showOverquotaAlert: prewarning: "+prewarning);
