@@ -5,14 +5,12 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.text.format.DateUtils;
-
 import java.util.List;
-
+import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-
-import static mega.privacy.android.app.utils.Util.logJobState;
 
 @TargetApi(21)
 public class JobUtil {
@@ -33,10 +31,13 @@ public class JobUtil {
             List<JobInfo> jobs = js.getAllPendingJobs();
             for (JobInfo info : jobs) {
                 if (info.getId() == id) {
+                    log("Job already scheduled");
                     return true;
                 }
             }
         }
+        
+        log("no scheduled job found");
         return false;
     }
 
@@ -46,12 +47,15 @@ public class JobUtil {
     }
 
     public static synchronized int startJob(Context context) {
+        log("startJob");
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
         JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
-            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(PHOTOS_UPLOAD_JOB_ID,new ComponentName(context,CameraUploadsService.class));
+            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(PHOTOS_UPLOAD_JOB_ID,new ComponentName(context,CameraUploadStarterService.class));
+            
+            //todo testing purpose need to be removed
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
                 jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL);
             }else{
@@ -60,17 +64,30 @@ public class JobUtil {
             jobInfoBuilder.setPersisted(true);
 
             int result = jobScheduler.schedule(jobInfoBuilder.build());
-            logJobState(result,CameraUploadsService.class.getName());
+            log("job scheduled successfully");
             return result;
         }
+        log("schedule failed");
         return START_JOB_FAILED;
     }
 
     public static synchronized void cancelAllJobs(Context context) {
+        log("cancel all jobs");
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {
-            CameraUploadsService.IS_CANCELLED_BY_USER = true;
+            //stop service
+            Intent stopIntent = new Intent(context, CameraUploadsService.class);
+            stopIntent.setAction(CameraUploadsService.ACTION_STOP);
+            context.startService(stopIntent);
+            log("all job cancelled");
+            
+            //cancel scheduled job
             js.cancelAll();
         }
+    }
+    
+    private static void log(String message){
+        //Util.log("JobUtil", message);
+        CameraUploadsService.log(message);
     }
 }

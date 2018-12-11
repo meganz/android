@@ -2147,16 +2147,6 @@ public class Util {
 		log("Util", message);
 	}
     
-    public static void logJobState(int result, String label){
-        if (result == JobScheduler.RESULT_SUCCESS) {
-            log(label + " SCHEDULED!");
-        }else{
-            log(label + " FAILED TO SCHEDULE!");
-        }
-    
-        Log.d("Yuan", label + " SCHEDULED " + (result == JobScheduler.RESULT_SUCCESS));
-    }
-    
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {

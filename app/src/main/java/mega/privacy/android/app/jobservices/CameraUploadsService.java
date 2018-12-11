@@ -4,24 +4,24 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.app.job.JobParameters;
-import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -71,17 +71,21 @@ import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
 
-public class CameraUploadsService extends JobService implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
+public class CameraUploadsService extends Service implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
     
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
     public static String SECONDARY_UPLOADS = "Media Uploads";
-    public static boolean IS_CANCELLED_BY_USER;
+    public static String ACTION_CANCEL = "CANCEL_SYNC";
+    public static String ACTION_STOP = "STOP_SYNC";
+    public static String ACTION_LOGOUT = "LOGOUT_SYNC";
+    public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER ="PHOTOS_VIDEOS_NEW_FOLDER";
     private String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
     private String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
     public static int PAGE_SIZE = 200;
     public static int PAGE_SIZE_VIDEO = 10;
+    public static boolean isServiceRunning = false;
 
     private NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
@@ -98,7 +102,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
     
-    private boolean isOverquota = false;
+    private boolean isOverQuota = false;
     private boolean canceled;
     
     DatabaseHandler dbH;
@@ -122,9 +126,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     int LOGIN_IN = 12;
     
-    static CameraUploadsService cameraUploadsService;
     static String gSession;
     private boolean isSec;
+    boolean stopped = false;
     
     public class Media {
         public String filePath;
@@ -153,39 +157,58 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private String tempRoot;
     Context mContext;
     private VideoCompressor mVideoCompressor;
-
+    
     @Override
-    public boolean onStartJob(JobParameters params) {
-        Log.d("yuan","onStartJob ");
-        cameraUploadsService = this;
-        globalParams = params;
-        handler = new Handler();
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            PAGE_SIZE = 500;
-            PAGE_SIZE_VIDEO = 10;
-        } else {
-            PAGE_SIZE = 50;
-            PAGE_SIZE_VIDEO = 5;
+    public void onDestroy(){
+        log("onDestroy()");
+        super.onDestroy();
+        isServiceRunning = false;
+    }
+    
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+    
+    @Override
+    public int onStartCommand(Intent intent,int flags,int startId) {
+        log("public int onStartCommand(Intent intent, int flags, int startId)");
+        initService();
+        isServiceRunning = true;
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
+        startForeground(notificationId,mNotification);
+        
+        if (megaApi == null) {
+            log("megaApi is null");
+            finish();
+            return START_NOT_STICKY;
         }
-        IS_CANCELLED_BY_USER = false;
+        
+        if (intent != null && intent.getAction() != null) {
+            if (intent.getAction().equals(ACTION_CANCEL) ||
+                    intent.getAction().equals(ACTION_STOP) ||
+                    intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) ||
+                    intent.getAction().equals(ACTION_LOGOUT)) {
+                log("onStartCommand intent action is" + intent.getAction());
+                stopped = true;
+                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
+                finish();
+                return START_NOT_STICKY;
+            }
+        }
         
         try {
-            log("Start service here");
-            if(task == null || !task.isAlive()) {
-                log("create new thread");
-                task = createWorkerThread();
-                task.start();
-                return true;
-            } else {
-                log("thread exsists");
-                return false;
-            }
+            log("Start service here, creating new thread");
+            task = createWorkerThread();
+            task.start();
         } catch (Exception e) {
             log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
             finish();
         }
-        return false;
+        log("STARTS NOW");
+        
+        return START_NOT_STICKY;
     }
     
     private Thread createWorkerThread(){
@@ -193,16 +216,17 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             @Override
             public void run() {
                 try {
-                    initService();
                     int result = shouldRun();
                     log("onStartJob should run result: " + result + "");
-                    Log.d("yuan","onStartJob should run result: " + result + "");
                     if (result == 0) {
                         startCameraUploads();
+                    } else if (result == LOGIN_IN) {
+                        log("waiting for login");
+                    }else{
+                        finish();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-//                    finish();
                     handleException();
                 }
             }
@@ -300,11 +324,11 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (prefs.getCamSyncTimeStamp() != null) {
                 log("if (prefs.getCamSyncTimeStamp() != null)");
                 currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-                selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+                selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
                 log("SELECTION photo: " + selectionCamera);
 
                 currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
-                selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
+                selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
                 log("SELECTION video: " + selectionCameraVideo);
             }
             if (secondaryEnabled) {
@@ -312,11 +336,11 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 if (prefs.getSecSyncTimeStamp() != null) {
                     log("if (prefs.getSecSyncTimeStamp() != null)");
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
-                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY photo: " + selectionSecondary);
 
                     secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
-                    selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) >= " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) >= " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
+                    selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY video: " + selectionSecondaryVideo);
                 }
             }
@@ -792,7 +816,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 } while (megaApi.getChildNode(uploadNode,photoFinalName) != null);
                 
                 log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                megaApi.renameNode(nodeExists,photoFinalName,cameraUploadsService);
+                megaApi.renameNode(nodeExists,photoFinalName,CameraUploadsService.this);
                 log("RENAMED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
                 
                 return true;
@@ -889,8 +913,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     }
                     
                     gSession = credentials.getSession();
-                    
-                    if (megaApi.getRootNode() == null) {
+                    isLoggingIn = MegaApplication.isLoggingIn();
+                    if (megaApi.getRootNode() == null && !isLoggingIn) {
                         log("RootNode = null");
                         
                         running = true;
@@ -931,14 +955,14 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                                                         log("2 - shouldRun: ERROR----> Switch OFF chat");
                                                         dbH.setEnabledChat(false + "");
                                                     }
-                                                    megaChatApi.logout(cameraUploadsService);
+                                                    megaChatApi.logout(CameraUploadsService.this);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
                                                 }
                                             }
                                         }
-                                        Log.d("Yuan", "camera upload start fast login");
-                                        megaApi.fastLogin(gSession,cameraUploadsService);
+                                        log("camera upload start fast login");
+                                        megaApi.fastLogin(gSession,CameraUploadsService.this);
                                     } else {
                                         log("Another login is processing");
                                     }
@@ -1124,39 +1148,48 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private void initService() {
         log("initService()");
         mContext = getApplicationContext();
+        int wifiLockMode = WifiManager.WIFI_MODE_FULL;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
+        }
+    
+        WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
+        lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
+        PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MegaDownloadServicePowerLock:");
+    
+        if (!wl.isHeld()) {
+            wl.acquire();
+        }
+        if (!lock.isHeld()) {
+            lock.acquire();
+        }
+
         totalUploaded = 0;
         totalToUpload = 0;
         canceled = false;
-        isOverquota = false;
-        
+        isOverQuota = false;
+        running = true;
+        handler = new Handler();
+        PAGE_SIZE = 500;
+        PAGE_SIZE_VIDEO = 10;
+    
         try {
             app = (MegaApplication)getApplication();
         } catch (Exception ex) {
             finish();
         }
-        
+    
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-        
+    
         if (megaApi == null) {
             finish();
             return;
         }
         
-        int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        }
-        
-        WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
-        PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MegaDownloadServicePowerLock:");
-        
         dbH = DatabaseHandler.getDbHandler(mContext);
-        
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        
         String previousIP = app.getLocalIpAddress();
         String currentIP = Util.getLocalIpAddress();
         if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
@@ -1166,7 +1199,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             log("reconnect");
             megaApi.reconnect();
         }
-        
+    
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
@@ -1175,7 +1208,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         if (!root.exists()) {
             root.mkdirs();
         }
-        
+    
         if (dbH.shouldClearCamsyncRecords()) {
             dbH.deleteAllSyncRecords(TYPE_ANY);
             dbH.saveShouldClearCamsyncRecords(false);
@@ -1191,7 +1224,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
         releaseLocks();
 
-        if (isOverquota) {
+        if (isOverQuota) {
             showStorageOverQuotaNotification();
         }
 
@@ -1199,7 +1232,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         running = false;
         stopForeground(true);
         cancelNotification();
-        jobFinished(globalParams,true);
     }
     
     private void finish() {
@@ -1214,44 +1246,20 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     private void cancel() {
         releaseLocks();
-        
-        if (isOverquota) {
+    
+        if (isOverQuota) {
             showStorageOverQuotaNotification();
         }
-        
-        canceled = true;
-        running = false;
-        stopForeground(true);
-        cancelNotification();
-        jobFinished(globalParams,false);
-    }
-
-    @Override
-    public boolean onStopJob(JobParameters params) {
-        log("onStopJob IS_CANCELLED_BY_USER = " + IS_CANCELLED_BY_USER);
-        if (megaApi != null) {
-            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
-        }
-        
+    
         if (mVideoCompressor != null) {
             mVideoCompressor.stop();
         }
     
-        if (running) {
-            handler.removeCallbacksAndMessages(null);
-            running = false;
-        }
-    
+        canceled = true;
         running = false;
         stopForeground(true);
         cancelNotification();
-        releaseLocks();
-        
-        if(IS_CANCELLED_BY_USER){
-            return false;
-        }else{
-            return true;
-        }
+        stopSelf();
     }
     
     private void cancelNotification(){
@@ -1305,7 +1313,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         log("onRequestFinish: " + request.getRequestString());
         requestFinished(api,request,e);
-        
     }
     
     private synchronized void requestFinished(MegaApiJava api,MegaRequest request,MegaError e) {
@@ -1313,18 +1320,16 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (e.getErrorCode() == MegaError.API_OK){
                 log("Fast login OK");
                 log("Calling fetchNodes from CameraSyncService");
-                Log.d("Yuan","logged in fetch nodes");
                 megaApi.fetchNodes(this);
             } else{
                 log("ERROR: " + e.getErrorString());
                 isLoggingIn = false;
                 MegaApplication.setLoggingIn(isLoggingIn);
-                Log.d("Yuan","login error");
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
             if (e.getErrorCode() == MegaError.API_OK){
-                Log.d("Yuan","fetch nodes ok");
+                log("fetch nodes ok");
                 chatSettings = dbH.getChatSettings();
                 if(chatSettings!=null) {
                     boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
@@ -1417,7 +1422,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             return;
         }
         
-        if (isOverquota) {
+        if (isOverQuota) {
             return;
         }
         
@@ -1440,7 +1445,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     
     private synchronized void transferFinished(MegaApiJava api,MegaTransfer transfer,MegaError e) {
         String path = transfer.getPath();
-        if (isOverquota) {
+        if (isOverQuota) {
             return;
         }
         if (e.getErrorCode() == MegaError.API_OK) {
@@ -1478,7 +1483,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
         }else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
             log("over quota error: " + e.getErrorCode());
-            isOverquota = true;
+            isOverQuota = true;
             cancel();
         } else {
             log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
@@ -1613,7 +1618,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             String size = prefs.getChargingOnSize();
             String message = getString(R.string.message_compression_size_over_limit).replace("$size",size);
             showNotification(title,message,pendingIntent);
-            jobFinished(globalParams,true);
         }
         
     }
@@ -1646,7 +1650,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
-        log("onCompressUpdateProgress " + progress + "%" + " is canceled = " + canceled);
         if(!canceled){
             String message = progress + "% " + getString(R.string.message_compress_video);
             String subText = getString(R.string.title_compress_video) + " " + currentIndexString;
@@ -1673,7 +1676,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             StatFs stat = new StatFs(tempRoot);
             double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
             if (availableFreeSpace > srcFile.length()) {
-                Log.d("Yuan","video not supported");
                 log("can not compress but got enough disk space, so should be un-supported format issue");
                 String newPath = record.getNewPath();
                 File temp = new File(newPath);
@@ -1748,7 +1750,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
     
     private void showProgressNotification(int progressPercent,PendingIntent pendingIntent,String message,String subText,String contentText) {
-//        log("showProgressNotification");
         mNotification = null;
         mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
         

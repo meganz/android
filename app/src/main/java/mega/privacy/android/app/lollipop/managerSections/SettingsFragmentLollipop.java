@@ -693,30 +693,49 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					cameraUploadHow.setValueIndex(0);
 				}
 				
-                if(isDeviceSupportCompression()){
+                if(isDeviceSupportCompression() && !getString(R.string.settings_camera_upload_only_photos).equals(fileUpload)){
                     //video quality
                     String uploadQuality = prefs.getUploadVideoQuality();
+                    int quality;
                     if(uploadQuality == null){
                         dbH.setCameraUploadVideoQuality(MEDIUM);
+                        quality = VIDEO_QUALITY_MEDIUM;
                         videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
                     }else{
                         if(Integer.parseInt(uploadQuality) == ORIGINAL){
                             videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+                            quality = VIDEO_QUALITY_ORIGINAL;
                         }else{
+                            quality = VIDEO_QUALITY_MEDIUM;
                             videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
                         }
                     }
                     videoQuality.setSummary(videoQuality.getEntry());
     
-                    //convention on charging
-                    if (prefs.getConversionOnCharging() == null){
-                        dbH.setConversionOnCharging(true);
-                        charging = true;
+                    //require me to charge
+                    if(quality == VIDEO_QUALITY_MEDIUM){
+                        enableChargingSettings();
+                        //convention on charging
+                        if (prefs.getConversionOnCharging() == null){
+                            dbH.setConversionOnCharging(true);
+                            charging = true;
+                        }
+                        else{
+                            charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
+                        }
+                        cameraUploadCharging.setChecked(charging);
+                        
+                        //show charge when size over $MB
+                        if(charging){
+                            enableVideoCompressionSizeSettings();
+                        }else{
+                            disableVideoCompressionSizeSettings();
+                        }
+                        
+                    }else{
+                        disableChargingSettings();
                     }
-                    else{
-                        charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
-                    }
-                    cameraUploadCharging.setChecked(charging);
+                    
                 }else{
 				    disableVideoQualitySettings();
                     dbH.setCameraUploadVideoQuality(ORIGINAL);
@@ -1066,7 +1085,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			keepFileNames.setChecked(fileNames);
 			cameraUploadCategory.addPreference(cameraUploadHow);
 			cameraUploadCategory.addPreference(cameraUploadWhat);
-            enableVideoQualitySettings();
             if(!charging){
                 disableVideoCompressionSizeSettings();
             }
@@ -1531,7 +1549,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
             }, 10 * 1000);
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
             
-            Log.d("Yuan", "video quality selected");
+            log( "video quality selected");
             switch(Integer.parseInt((String)newValue)){
                 case VIDEO_QUALITY_ORIGINAL:{
                     dbH.setCameraUploadVideoQuality(ORIGINAL);
@@ -2252,7 +2270,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if(charging){
                 enableVideoCompressionSizeSettingsAndRestartUpload();
             }else{
-                disableVideoCompressionSizeSettings();
+                disableVideoCompressionSizeSettingsAndRestartUpload();
             }
 			dbH.setConversionOnCharging(charging);
 		}
@@ -2496,7 +2514,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				downloadLocationPreference.setSummary(path);
 			}
 		}		
-		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){//yuan
+		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
 			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if(!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())){
@@ -3435,12 +3453,21 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
     }
     
     private void disableChargingSettings(){
-        cameraUploadCategory.removePreference(cameraUploadCharging);
-        disableVideoCompressionSizeSettings();
+        if(isDeviceSupportCompression()) {
+            charging = false;
+            dbH.setConversionOnCharging(charging);
+            cameraUploadCharging.setChecked(charging);
+            cameraUploadCategory.removePreference(cameraUploadCharging);
+            disableVideoCompressionSizeSettings();
+        }
     }
     
     private void disableVideoCompressionSizeSettings(){
         cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+    }
+    
+    private void disableVideoCompressionSizeSettingsAndRestartUpload(){
+        disableVideoCompressionSizeSettings();
         restartCameraUpload();
     }
     
@@ -3454,6 +3481,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
     
     private void enableChargingSettings(){
         if(isDeviceSupportCompression()) {
+            charging = true;
+            dbH.setConversionOnCharging(charging);
+            cameraUploadCharging.setChecked(charging);
             cameraUploadCategory.addPreference(cameraUploadCharging);
             enableVideoCompressionSizeSettings();
         }
