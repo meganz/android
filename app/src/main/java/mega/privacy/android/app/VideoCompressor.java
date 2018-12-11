@@ -191,6 +191,7 @@ public class VideoCompressor {
             }
         }
         updater.onCompressFinished(totalCount + "/" + totalCount);
+        stop();
     }
 
     private static class ChangerWrapper implements Runnable {
@@ -1102,6 +1103,10 @@ public class VideoCompressor {
             }
         }
         return null;
+    }
+    
+    public boolean isRunning() {
+        return isRunning;
     }
     
     private static void log(String message){

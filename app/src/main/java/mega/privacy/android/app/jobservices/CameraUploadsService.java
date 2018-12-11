@@ -1522,9 +1522,9 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         
         totalUploaded++;
         log("total To upload is " + totalToUpload + " totalUploaded " + totalUploaded + " pendings are " + megaApi.getNumPendingUploads());
-        if (totalToUpload == totalUploaded || megaApi.getNumPendingUploads() == 0) {
+        if (totalToUpload == totalUploaded) {
             log("photo upload finished, now checking videos");
-            if (isCompressedVideoPending() && !canceled) {
+            if (isCompressedVideoPending() && !canceled && isCompressorAvailable()) {
                 log("got pending videos, will start compress");
                 startVideoCompression();
             } else {
@@ -1603,6 +1603,14 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     private boolean isCompressedVideoPending() {
         return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && String.valueOf(VIDEO_QUALITY_MEDIUM).equals(prefs.getUploadVideoQuality());
+    }
+    
+    private boolean isCompressorAvailable(){
+        if(mVideoCompressor == null){
+            return true;
+        }else{
+            return !mVideoCompressor.isRunning();
+        }
     }
     
     private void startVideoCompression() {
