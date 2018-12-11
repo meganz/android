@@ -7044,7 +7044,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.messages = messages;
         notifyItemRemoved(position);
 
-        if (position == messages.size() - 1) {
+        if (position == messages.size()) {
             log("No need to update more");
         } else {
             log("Update until end");
