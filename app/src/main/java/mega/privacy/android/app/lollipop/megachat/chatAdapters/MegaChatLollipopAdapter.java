@@ -6886,7 +6886,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("setMultipleSelect");
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
-            notifyDataSetChanged();
+//            notifyDataSetChanged();
         }
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();
