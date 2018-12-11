@@ -2842,6 +2842,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(!androidMsgSent.isUploading()){
                     while(msg.isUploading()){
                         index--;
+                        if (index == -1) {
+                            break;
+                        }
                         msg = messages.get(index);
                     }
                 }
@@ -2849,6 +2852,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
                     index--;
+                    if (index == -1) {
+                        break;
+                    }
                     msg = messages.get(index);
                 }
 
@@ -5433,40 +5439,72 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
             msg.setShowAvatar(true);
             messages.add(msg);
-        }
-        else{
+        }else{
+
             log("Finding where to append the message");
 
             if(msg.isUploading()){
                 lastIndex++;
                 log("The message is uploading add to index: "+lastIndex);
-            }
-            else{
+            }else{
                 log("status of message: "+msg.getMessage().getStatus());
-                if(lastIndex>=0){
-                    while(messages.get(lastIndex).isUploading()){
+                if(lastIndex>=0) {
+                    while (messages.get(lastIndex).isUploading()) {
                         log("one less index is uploading");
                         lastIndex--;
-                    }
-                    while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
-                        log("one less index is MANUAL SENDING");
-                        lastIndex--;
-                    }
-                    if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
-                        while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){
-                            log("one less index");
-                            lastIndex--;
+                        if(lastIndex==-1){
+                            break;
                         }
                     }
                 }
+                if(lastIndex>=0) {
+                    while (messages.get(lastIndex).getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
+                        log("one less index is MANUAL SENDING");
+                        lastIndex--;
+                        if(lastIndex==-1){
+                            break;
+                        }
+                    }
+                }
+                if(lastIndex>=0) {
+                    if (msg.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_RECEIVED || msg.getMessage().getStatus() == MegaChatMessage.STATUS_NOT_SEEN) {
+                        while (messages.get(lastIndex).getMessage().getStatus() == MegaChatMessage.STATUS_SENDING) {
+                            log("one less index");
+                            lastIndex--;
+                            if(lastIndex==-1){
+                                break;
+                            }
+                        }
+                    }
+                }
+
+//                if(lastIndex>=0){
+//                    while(messages.get(lastIndex).isUploading()){//
+//                        log("one less index is uploading");
+//                        lastIndex--;
+//                    }
+//                    while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){//
+//                        log("one less index is MANUAL SENDING");
+//                        lastIndex--;
+//                    }
+//                    if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED||msg.getMessage().getStatus()==MegaChatMessage.STATUS_NOT_SEEN){
+//                        while(messages.get(lastIndex).getMessage().getStatus()==MegaChatMessage.STATUS_SENDING){//
+//                            log("one less index");
+//                            lastIndex--;
+//                        }
+//                    }
+//                }
                 lastIndex++;
                 log("Append in position: "+lastIndex);
             }
-
-            messages.add(lastIndex, msg);
-            adjustInfoToShow(lastIndex);
-            msg.setShowAvatar(true);
-            setShowAvatar(lastIndex-1);
+            if(lastIndex>=0){
+                messages.add(lastIndex, msg);
+                adjustInfoToShow(lastIndex);
+                msg.setShowAvatar(true);
+                if(lastIndex>0){
+                    setShowAvatar(lastIndex-1);
+                }
+            }
         }
 
         //Create adapter
@@ -5741,7 +5779,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void setShowAvatar(int index){
-        log("setShowAvatar");
+        log("setShowAvatar: "+index);
 
         AndroidMegaChatMessage msg = messages.get(index);
 
@@ -6818,7 +6856,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!messages.isEmpty()){
                 AndroidMegaChatMessage lastMessage = messages.get(messages.size()-1);
                 int index = messages.size()-1;
-                if(lastMessage!=null) {
+                if((lastMessage!=null)&&(lastMessage.getMessage()!=null)){
                     if (!lastMessage.isUploading()) {
                         while (lastMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
                             index--;
@@ -6841,7 +6879,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             lastMessage = messages.get(index);
                         }
-                        if (lastMessage != null) {
+                        if((lastMessage!=null)&&(lastMessage.getMessage()!=null)){
 
                             while (lastMessage.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
                                 index--;
@@ -7197,6 +7235,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
                 index--;
+                if (index == -1) {
+                    break;
+                }
                 msg = messages.get(index);
             }
 
