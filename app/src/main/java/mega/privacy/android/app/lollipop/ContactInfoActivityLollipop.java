@@ -66,7 +66,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -170,7 +169,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ImageView contactStateIcon;
 	TextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
-	MarqueeTextView secondLineTextToolbar;
+	TextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
 
 	RelativeLayout clearChatLayout;
@@ -287,7 +286,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
-			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
+			secondLineTextToolbar = (TextView) findViewById(R.id.second_line_toolbar);
+			secondLineTextToolbar.setSelected(true);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
@@ -2534,10 +2534,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
-				secondLineTextToolbar.isMarqueeIsNecessary(this);
+//				secondLineTextToolbar.setText("formattedDate formattedDate formattedDate formattedDate formattedDate");
+				secondLineTextToolbar.setSelected(true);
 				secondLineLengthToolbar.setText(formattedDate);
-//				secondLineTextToolbar.setText("Large: " + formattedDate);
-//				secondLineLengthToolbar.setText("Large: " + formattedDate);
+
 				log("Date last green: "+formattedDate);
 			}
 		}

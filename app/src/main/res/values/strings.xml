@@ -2255,9 +2255,9 @@
         <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
 
-    <string name="last_seen_today" context="Title of the dialog to inform about a SSL error">[A]Last seen [/A]today at %1$s</string>
-    <string name="last_seen_long_time_ago" context="Title of the dialog to inform about a SSL error">[A]Last seen [/A]a long time ago</string>
-    <string name="last_seen_general" context="Title of the dialog to inform about a SSL error">[A]Last seen [/A]%1$s at %2$s</string>
+    <string name="last_seen_today" context="Title of the dialog to inform about a SSL error">Last seen today at %1$s</string>
+    <string name="last_seen_long_time_ago" context="Title of the dialog to inform about a SSL error">Last seen a long time ago</string>
+    <string name="last_seen_general" context="Title of the dialog to inform about a SSL error">Last seen %1$s at %2$s</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
 
