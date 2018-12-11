@@ -5214,7 +5214,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
 		if (notificFragment == null){
 			log("New NotificationsFragment");
-			notificFragment = new NotificationsFragmentLollipop();
+			notificFragment = NotificationsFragmentLollipop.newInstance();
 		}
 		else {
 			refreshFragment(FragmentTag.NOTIFICATIONS.getTag());
@@ -5353,7 +5353,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 		if (rChatFL == null){
 			log("New REcentChatFragment");
-			rChatFL = new RecentChatsFragmentLollipop();
+			rChatFL = RecentChatsFragmentLollipop.newInstance();
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
 		else{
