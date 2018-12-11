@@ -707,8 +707,10 @@ public final class ChatAdvancedNotificationBuilder {
                 boolean vibrationEnabled = true;
                 ChatSettings chatSettings = dbH.getChatSettings();
                 if (chatSettings != null){
-                    if (chatSettings.getVibrationEnabled().compareTo("false") == 0){
-                        vibrationEnabled = false;
+                    if (chatSettings.getVibrationEnabled()!=null && !chatSettings.getVibrationEnabled().isEmpty()){
+                        if (chatSettings.getVibrationEnabled().compareTo("false") == 0){
+                            vibrationEnabled = false;
+                        }
                     }
                 }
 

@@ -351,14 +351,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     }
 
                     if (node.isShared()) {
-                        if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
-                            log("Visible clear shares - firstNavigationLevel true!");
-                            optionClearShares.setVisibility(View.VISIBLE);
-
-                        } else {
-                            counterShares--;
-                            optionClearShares.setVisibility(View.GONE);
-                        }
+                        optionClearShares.setVisibility(View.VISIBLE);
                     } else {
                         counterShares--;
                         optionClearShares.setVisibility(View.GONE);
