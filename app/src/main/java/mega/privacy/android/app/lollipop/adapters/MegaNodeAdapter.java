@@ -751,7 +751,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
             if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                setFolderSelected(holder,position,R.drawable.ic_folder_incoming);
+
+                if (node.isInShare()) {
+                    setFolderSelected(holder,position,R.drawable.ic_folder_incoming);
+                }
+                else {
+                    setFolderSelected(holder,position,R.drawable.ic_folder);
+                }
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0;j < sharesIncoming.size();j++) {
@@ -776,7 +782,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                setFolderSelected(holder,position,R.drawable.ic_folder_outgoing);
+
+                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                    setFolderSelected(holder,position,R.drawable.ic_folder_outgoing);
+                }
+                else {
+                    setFolderSelected(holder,position,R.drawable.ic_folder);
+                }
                 //Show the number of contacts who shared the folder
                 ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                 if (sl != null) {
@@ -1072,7 +1084,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
                 if (!multipleSelect) {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+                    if (node.isInShare()) {
+                        holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+                    }
+                    else {
+                        holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                    }
                 } else {
 
                     if (this.isItemChecked(position)) {
@@ -1085,7 +1102,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.imageView.setImageResource(R.drawable.ic_select_folder);
                     } else {
                         holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+                        if (node.isInShare()) {
+                            holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+                        }
+                        else {
+                            holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                        }
                     }
                 }
 
@@ -1133,7 +1155,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
                 if (!multipleSelect) {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
-                    holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+                    if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                        holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+                    }
+                    else {
+                        holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                    }
                 } else {
 
                     if (this.isItemChecked(position)) {
@@ -1146,7 +1173,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         holder.imageView.setImageResource(R.drawable.ic_select_folder);
                     } else {
                         holder.itemLayout.setBackgroundColor(Color.WHITE);
-                        holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+
+                        if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                            holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+                        }
+                        else {
+                            holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                        }
                     }
                 }
                 //Show the number of contacts who shared the folder

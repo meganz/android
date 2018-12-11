@@ -376,4 +376,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.callToSuperBack = true;
+        super.onBackPressed();
+    }
 }
