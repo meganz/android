@@ -893,8 +893,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			ft.replace(R.id.cloudDriveFrameLayout, importFileFragment, "importFileFragment");
 		}
-		ft.commit();
-		getSupportFragmentManager().executePendingTransactions();
+		ft.commitNowAllowingStateLoss();
 		supportInvalidateOptionsMenu();
 		changeTitle();
 	}
