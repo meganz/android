@@ -34,6 +34,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -107,7 +108,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		public TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
-        TextView textViewContent;
+        MarqueeTextView textViewContent;
         RelativeLayout itemLayout;
         public String contactMail;
     }
@@ -153,9 +154,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);	
 		    holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 		    holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
-		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
-			holderList.textViewContent.setSelected(true);
-			holderList.textViewContent.setHorizontallyScrolling(true);
+		    holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
@@ -187,9 +186,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);	
 		    holderGrid.contactInitialLetter = (TextView) v.findViewById(R.id.contact_grid_initial_letter);
 		    holderGrid.textViewContactName = (TextView) v.findViewById(R.id.contact_grid_name);
-		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
-			holderGrid.textViewContent.setSelected(true);
-			holderGrid.textViewContent.setHorizontallyScrolling(true);
+		    holderGrid.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_grid_content);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
 
@@ -218,7 +215,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
+			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout.setVisibility(View.GONE);
@@ -232,7 +229,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
 			//Right margin
@@ -257,7 +253,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
+			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 			holderList.declineLayout.setVisibility(View.VISIBLE);
@@ -271,7 +267,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
 			holderList.declineLayout.setTag(holderList);
@@ -363,6 +358,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
 					if(!contact.getLastGreen().isEmpty()){
 						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.formatString();
+						holder.textViewContent.setSelected(true);
 					}
 				}
 			}
@@ -508,6 +505,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
 					if (!contact.getLastGreen().isEmpty()) {
 						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
 					}
 				}
 			}
@@ -644,6 +642,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
 					if (!contact.getLastGreen().isEmpty()) {
 						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
 					}
 				}
 			}
@@ -777,6 +776,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
 					if(!contact.getLastGreen().isEmpty()){
 						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
 					}
 				}
 			}
