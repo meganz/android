@@ -7462,7 +7462,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void hideFileStorageSection(){
-        log("***** hideFileStorageSEctocioon");
+        log("hideFileStorageSEctocioon");
         if (fileStorageF != null) {
             fileStorageF.clearSelections();
             fileStorageF.hideMultipleSelect();
