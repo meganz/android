@@ -9,6 +9,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
@@ -59,6 +61,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+
+	static final float DOWNSCALE_IMAGES_PX = 2000000f;
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
@@ -199,6 +203,30 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		return START_NOT_STICKY;
 	}
 
+	Bitmap.CompressFormat getCompressFormat(String name) {
+		String[] s = name.split("\\.");
+		String ext;
+		if (s != null && s.length > 1) {
+			ext = s[s.length-1];
+			switch (ext) {
+				case "jpeg" :
+				case "jpg":{
+					return Bitmap.CompressFormat.JPEG;
+				}
+				case "png": {
+					return Bitmap.CompressFormat.PNG;
+				}
+				case "webp":{
+					return Bitmap.CompressFormat.WEBP;
+				}
+				default: {
+					return Bitmap.CompressFormat.JPEG;
+				}
+			}
+		}
+		return Bitmap.CompressFormat.JPEG;
+	}
+
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
@@ -236,7 +264,82 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					File file = new File(pendingMsg.getFilePath());
 
-					if(MimeTypeList.typeForName(file.getName()).isMp4Video()&&(!sendOriginalAttachments)){
+                    ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+					boolean isWIFI = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+                    boolean isData = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();
+
+                    if(MimeTypeList.typeForName(file.getName()).isImage() && !MimeTypeList.typeForName(file.getName()).isGIF() && isData){
+						log("DATA connection is Image");
+						BitmapFactory.Options options = new BitmapFactory.Options();
+						Bitmap fileBitmap = BitmapFactory.decodeFile(file.getPath(), options);
+						if (fileBitmap != null) {
+							log("DATA connection file decoded");
+							float width = options.outWidth;
+							float height = options.outHeight;
+							float totalPixels = width * height;
+							float division = DOWNSCALE_IMAGES_PX/totalPixels;
+							float factor = (float) Math.min(Math.sqrt(division), 1);
+							if (factor < 1) {
+								width *= factor;
+								height *= factor;
+								log("DATA connection factor<1 totalPixels: "+totalPixels+" width: "+width+ " height: "+height+" DOWNSCALE_IMAGES_PX/totalPixels: "+division+" Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): "+Math.sqrt(division));
+								Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int)width, (int)height, false);
+								if (scaleBitmap != null) {
+									log("DATA connection scaled Bitmap != null");
+									File defaultDownloadLocation = null;
+									if (Environment.getExternalStorageDirectory() != null) {
+										defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
+									}
+									else{
+										defaultDownloadLocation = getFilesDir();
+									}
+									defaultDownloadLocation.mkdirs();
+									File outFile = new File(defaultDownloadLocation.getAbsolutePath(), file.getName());
+									if (outFile != null) {
+										log("DATA connection new file != null");
+										FileOutputStream fOut;
+										try {
+											fOut = new FileOutputStream(outFile);
+											scaleBitmap.compress(getCompressFormat(file.getName()), 100, fOut);
+											fOut.flush();
+											fOut.close();
+											fileBitmap.recycle();
+											scaleBitmap.recycle();
+											log("DATA connection file compressed");
+											pendingMessages.add(pendingMsg);
+											megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+											log("DATA connection file uploading");
+										} catch (Exception e){
+											pendingMessages.add(pendingMsg);
+											megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+											log("DATA connection Exception compressing: "+ e.getMessage());
+										}
+									}
+									else {
+										pendingMessages.add(pendingMsg);
+										megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+										log("DATA connection new file NULL");
+									}
+								}
+								else {
+									pendingMessages.add(pendingMsg);
+									megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+									log("DATA connection scaled Bitmap NULL");
+								}
+							}
+							else {
+								pendingMessages.add(pendingMsg);
+								megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+								log("DATA connection factor >= 1 totalPixels: "+totalPixels+" width: "+width+ " height: "+height+" DOWNSCALE_IMAGES_PX/totalPixels: "+DOWNSCALE_IMAGES_PX/totalPixels+" Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): "+Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels));
+							}
+						}
+						else {
+							pendingMessages.add(pendingMsg);
+							megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+							log("DATA connection file NULL");
+						}
+                    }
+					else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
 						try {
 							totalVideos++;
 							numberVideosPending++;

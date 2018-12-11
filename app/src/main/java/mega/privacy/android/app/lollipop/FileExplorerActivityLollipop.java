@@ -1560,48 +1560,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						pMsgSingle.setChatId(idChat);
 						pMsgSingle.setUploadTimestamp(timestamp);
 
-						if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
+						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
 
-							if(sendOriginalAttachments){
-								String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-								pMsgSingle.setFilePath(info.getFileAbsolutePath());
-								pMsgSingle.setName(info.getTitle());
-								pMsgSingle.setFingerprint(fingerprint);
-
-							}
-							else{
-								File previewDir = PreviewUtils.getPreviewFolder(this);
-								String nameFilePreview = info.getTitle();
-								File preview = new File(previewDir, nameFilePreview);
-
-								boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());
-
-								if(isPreview){
-									log("Preview: "+preview.getAbsolutePath());
-									String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
-
-									pMsgSingle.setFilePath(preview.getAbsolutePath());
-									pMsgSingle.setName(info.getTitle());
-									pMsgSingle.setFingerprint(fingerprint);
-								}
-								else{
-									log("No preview");
-									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-									pMsgSingle.setFilePath(info.getFileAbsolutePath());
-									pMsgSingle.setName(info.getTitle());
-									pMsgSingle.setFingerprint(fingerprint);
-								}
-							}
-						}
-						else{
-							String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-							pMsgSingle.setFilePath(info.getFileAbsolutePath());
-							pMsgSingle.setName(info.getTitle());
-							pMsgSingle.setFingerprint(fingerprint);
-						}
+						pMsgSingle.setFilePath(info.getFileAbsolutePath());
+						pMsgSingle.setName(info.getTitle());
+						pMsgSingle.setFingerprint(fingerprint);
 
 						long idMessage = dbH.addPendingMessage(pMsgSingle);
 						pMsgSingle.setId(idMessage);
