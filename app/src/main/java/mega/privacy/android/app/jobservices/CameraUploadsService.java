@@ -24,6 +24,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -97,6 +98,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     Thread task;
     
     static public boolean running = false;
+    private boolean preparingFinished = false;
     private Handler handler;
     
     WifiManager.WifiLock lock;
@@ -190,7 +192,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                     intent.getAction().equals(ACTION_STOP) ||
                     intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER) ||
                     intent.getAction().equals(ACTION_LOGOUT)) {
-                log("onStartCommand intent action is" + intent.getAction());
+                log("onStartCommand intent action is " + intent.getAction());
                 stopped = true;
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
                 finish();
@@ -207,7 +209,16 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             finish();
         }
         log("STARTS NOW");
-        
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                if(!preparingFinished) {
+                    log("timeout, finish self.");
+                    finish();
+                }
+            }
+        },3 * DateUtils.MINUTE_IN_MILLIS);
         return START_NOT_STICKY;
     }
     
@@ -235,8 +246,9 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
 
     private void startCameraUploads() {
         log("startCameraUploads");
+        preparingFinished = true;
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
-        startForeground(notificationId,mNotification);
+        //TODO update notification
         getFilesFromMediaStore();
     }
     
@@ -486,7 +498,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                     //show no space notification
                     if (megaApi.getNumPendingUploads() == 0) {
                         log("stop service due to out of space issue");
-                        stopForeground(true);
+                        finish();
                         String title = getString(R.string.title_out_of_space);
                         String message = getString(R.string.error_not_enough_free_space);
                         Intent intent = new Intent(this,ManagerActivityLollipop.class);
@@ -795,7 +807,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
         
         protected Boolean rename(MegaNode nodeExists) {
-            log("RENOMBRAR EL FICHERO: " + media.filePath);
+            log("rename the file: " + media.filePath);
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(media.timestamp);
             log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
@@ -972,11 +984,16 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                                     int r = runLoggedIn();
                                     log("shouldRunAfterLoginDelayed -> " + r);
                                     if (r == 0) {
-                                        startCameraUploads();
+                                        try {
+                                            startCameraUploads();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            handleException();
+                                        }
                                     }
                                 }
                             }
-                        },30000);
+                        },10 * 1000);
                         
                         return LOGIN_IN;
                     }
@@ -1256,6 +1273,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
     
         canceled = true;
+        preparingFinished = false;
         running = false;
         stopForeground(true);
         cancelNotification();
@@ -1371,6 +1389,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                     log("Secondary Folder UPDATED DB");
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());
                 }
+            } else {
+                finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
             log("cancel_transfers received");
@@ -1610,7 +1630,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             t.start();
         } else {
             log("Compression queue bigger than setting, show notification to user.");
-            stopForeground(true);
+            finish();
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
             intent.setAction(Constants.ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
@@ -1641,7 +1661,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     @Override
     public void onInsufficientSpace() {
         log("onInsufficientSpace");
-        stopForeground(true);
+        finish();
         Intent intent = new Intent(this,ManagerActivityLollipop.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
         String title = getResources().getString(R.string.title_out_of_space);
@@ -2021,7 +2041,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     }
 
-    private final static boolean OUTPUT = false;
+    private final static boolean OUTPUT = true;
 
     private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
 
@@ -2032,7 +2052,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         String dateStr = DATE_FORMAT.format(new Date());
         if (context != null) {
             if (context instanceof String) {
-                msg = "[" + dateStr + "]--->" + msg;
+                msg = "[" + dateStr + "] " + context + "--->" + msg;
             } else {
                 msg = "[" + dateStr + "] " + context.getClass().getSimpleName() + "--->" + msg;
             }

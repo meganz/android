@@ -10,17 +10,12 @@ import android.support.annotation.RequiresApi;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraUploadStarterService extends JobService {
+
     @Override
     public boolean onStartJob(JobParameters params) {
         try {
             log("Starter start service here");
-            PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"CameraUploadStarterServiceWakeLock:");
-            if (!wl.isHeld()) {
-                wl.acquire();
-            }
-            
-            if(!CameraUploadsService.isServiceRunning){
+            if (!CameraUploadsService.isServiceRunning) {
                 Intent intent = new Intent(getApplicationContext(),CameraUploadsService.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     log("starter starting on Oreo or above: ");
@@ -29,23 +24,19 @@ public class CameraUploadStarterService extends JobService {
                     log("starter starting on below Oreo: ");
                     startService(intent);
                 }
-            }else{
+            } else {
                 log("camera upload service has been started");
-            }
-            
-            if(wl != null){
-                wl.release();
             }
         } catch (Exception e) {
             log("starter Exception: " + e.getMessage() + "_" + e.getStackTrace());
         }
         return false;
     }
-    
+
     private void log(String s) {
-        CameraUploadsService.log(s);
+        CameraUploadsService.log(this,s);
     }
-    
+
     @Override
     public boolean onStopJob(JobParameters params) {
         log("starter on stop job");

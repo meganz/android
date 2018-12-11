@@ -88,6 +88,6 @@ public class JobUtil {
     
     private static void log(String message){
         //Util.log("JobUtil", message);
-        CameraUploadsService.log(message);
+        CameraUploadsService.log("JobUtil",message);
     }
 }

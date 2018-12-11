@@ -2223,7 +2223,7 @@
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
 
 	<string name="title_out_of_space" context="title of notification. ">Not enough storage space</string>
-	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform Camera Upload.</string>
+	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video conversion.</string>
 	<string name="title_compression_size_over_limit" context="display when compression larger than setting">Video Conversion Size</string>
 	<string name="message_compression_size_over_limit" context="display when compression larger than settin">The total size of the videos to convert exceeds $size MB, please plug in your device to continue.</string>
 	<string name="message_keep_device_name" context="changed file name setting">Setting will take affect from next time Camera Upload run</string>
