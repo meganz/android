@@ -2,11 +2,11 @@ package mega.privacy.android.app.jobservices;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.PowerManager;
 import android.support.annotation.RequiresApi;
+
+import mega.privacy.android.app.utils.JobUtil;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraUploadStarterService extends JobService {
@@ -15,6 +15,8 @@ public class CameraUploadStarterService extends JobService {
     public boolean onStartJob(JobParameters params) {
         try {
             log("Starter start service here");
+            int result = JobUtil.startDaemon(this);
+            log("start daemon result: " + result + ", success=" + (result != JobUtil.START_JOB_FAILED));
             if (!CameraUploadsService.isServiceRunning) {
                 Intent intent = new Intent(getApplicationContext(),CameraUploadsService.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
