@@ -144,6 +144,8 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
+    private final int LOCATION_PERMISSION_REQUEST_CODE = 11;
+
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
 
@@ -257,6 +259,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton pickFileSystemButton;
     ImageButton pickCloudDriveButton;
     ImageButton pickFileStorageButton;
+    ImageButton pickLocationButton;
 
     EmojiKeyboard emojiKeyboard;
     LinearLayout linearLayoutTwemoji;
@@ -267,6 +270,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout rLPickFileSystemButton;
     RelativeLayout rLPickCloudDriveButton;
     RelativeLayout rLPickFileStorageButton;
+    RelativeLayout rLPickLocationButton;
 
     RelativeLayout callInProgressLayout;
 
@@ -312,6 +316,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean visibilityMessageJump=false;
     boolean isTurn = false;
     Handler handler;
+
+    private AlertDialog locationDialog;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -577,7 +583,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
         //Set toolbar
-        tB = (Toolbar) findViewById(R.id.toolbar_chat);
+        tB = (Toolbar) findViewById(R.id.toolbar_maps);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
 //		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -643,6 +649,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         rLPickFileSystemButton = (RelativeLayout) findViewById(R.id.rl_pick_file_system_icon_chat);
         rLPickFileStorageButton = (RelativeLayout) findViewById(R.id.rl_pick_file_storage_icon_chat);
         rLPickCloudDriveButton = (RelativeLayout) findViewById(R.id.rl_pick_cloud_drive_icon_chat);
+        rLPickLocationButton = (RelativeLayout) findViewById(R.id.rl_pick_location_icon_chat);
 
         keyboardTwemojiButton = (ImageButton) findViewById(R.id.keyboard_twemoji_chat);
         mediaButton = (ImageButton) findViewById(R.id.media_icon_chat);
@@ -650,6 +657,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileSystemButton = (ImageButton) findViewById(R.id.pick_file_system_icon_chat);
         pickFileStorageButton = (ImageButton) findViewById(R.id.pick_file_storage_icon_chat);
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
+        pickLocationButton = (ImageButton) findViewById(R.id.pick_location_icon_chat);
 
         textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -672,6 +680,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         rLPickFileSystemButton.setOnClickListener(this);
         rLPickFileStorageButton.setOnClickListener(this);
         rLPickCloudDriveButton.setOnClickListener(this);
+        rLPickLocationButton.setOnClickListener(this);
 
         keyboardTwemojiButton.setOnClickListener(this);
         mediaButton.setOnClickListener(this);
@@ -679,6 +688,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileSystemButton.setOnClickListener(this);
         pickFileStorageButton.setOnClickListener(this);
         pickCloudDriveButton.setOnClickListener(this);
+        pickLocationButton.setOnClickListener(this);
 
         messageJumpLayout.setOnClickListener(this);
 
@@ -1902,6 +1912,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
             }
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                        Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
+                        startActivity(intent);
+                    }
+                }
+                break;
+            }
         }
     }
 
@@ -2680,7 +2699,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 //                        if (!hasStoragePermission) {
-//                            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+//                            ActivityCompat.rmissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
 //
 //                        }else{
 //                            this.attachFromFileStorage();
@@ -2692,7 +2711,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
             }
-            case R.id.toolbar_chat:{
+            case R.id.toolbar_maps:{
                 log("onClick:toolbar_chat");
                 showGroupInfoActivity();
                 break;
@@ -2701,7 +2720,48 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 goToEnd();
                 break;
             }
+            case R.id.pick_location_icon_chat:
+            case R.id.rl_pick_location_icon_chat: {
+                log("onClick: location");
+                getLocationPermission();
+//                showSendLocationDialog();
+                break;
+            }
 		}
+    }
+
+    void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+        else {
+            Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    void showSendLocationDialog () {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.title_activity_maps)
+                .setMessage(R.string.explanation_send_location)
+                .setPositiveButton(getString(R.string.button_continue),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        getLocationPermission();
+                    }
+                })
+                .setNegativeButton(R.string.general_cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            locationDialog.dismiss();
+                        } catch (Exception e){}
+                    }
+                });
+
+        locationDialog = builder.create();
+        locationDialog.show();
     }
 
     public void attachFromFileStorage(){

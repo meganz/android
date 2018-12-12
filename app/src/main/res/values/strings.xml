@@ -261,7 +261,7 @@
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
 
     <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
-	<string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming Shares with</string>
+    <string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming Shares with</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
@@ -301,25 +301,25 @@
     <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
     <string name="contact_invite" context="positive button on dialog to invite a contact">Invite</string>
     <string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
-	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
-	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
-	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
-	<!--
+    <string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
+    <string name="contact_decline" context="option to decline a contact invitation">Decline</string>
+    <string name="contact_accept" context="option to accept a contact invitation">Accept</string>
+    <string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+    <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>	
-	<!--
+    <string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>
+    <!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
-	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
-	
-	<string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
+    <string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
 
-	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
-	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
-	
-	<!--
+    <string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
+
+    <string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
+    <string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
+
+    <!--
     <string name="download_failed" context="Error message">Download failed</string>
     -->
     <!--
@@ -331,7 +331,7 @@
     <!--
 	<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transferring</string>
 	-->
-	<string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
+    <string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
     <string name="download_began" context="message when the download starts">Download has started</string>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
@@ -1169,7 +1169,7 @@
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
+    <string name="message_add_participant" context="chat message when a participant was added to a group chat" formatted="false">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
     <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] was removed from group chat by [/B][C]%2$s[/C]</string>
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]“%2$s”[/C]</string>
@@ -1220,7 +1220,7 @@
     <string name="non_format_text_cleared_history" context="Text shown when a user cleared the history of a chat">%1$s cleared the chat history</string>
     -->
     <string name="non_format_message_permissions_changed" context="chat message when the permissions for a user has been changed">%1$s was changed to %2$s by %3$s</string>
-    <string name="non_format_message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">%1$s was added to this group chat by invitation from %2$s</string>
+    <string name="non_format_message_add_participant" context="chat message when a participant was added to a group chat" formatted="false">%1$s was added to this group chat by invitation from %2$s</string>
     <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s was removed from group chat by %2$s</string>
 
     <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s changed the group chat name to “%2$s”</string>
@@ -1268,8 +1268,8 @@
     </plurals>
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing&#8230;[/A]</string>
-	<string name="label_more" context="button label more">More</string>
-	<string name="label_close" context="button label Close">Close</string>
+    <string name="label_more" context="button label more">More</string>
+    <string name="label_close" context="button label Close">Close</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
 
@@ -1502,7 +1502,7 @@
 
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Remove attachment?</string>
 
-    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1$d deleted)</string>
+    <string name="general_view_with_revoke" context="Menu option" formatted="false">View files (%1$d deleted)</string>
 
     <string name="success_attaching_node_from_cloud" context="Success message when the attachment has been sent to a chat">File sent to %1$s</string>
     <string name="success_attaching_node_from_cloud_chats" context="Success message when the attachment has been sent to a many chats">File sent to %1$d chats</string>
@@ -1525,7 +1525,7 @@
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
 
-    <string name="number_messages_chat_notification" formatted="false" context="messages string in chat notification">%1$d unread chats</string>
+    <string name="number_messages_chat_notification" context="messages string in chat notification" formatted="false">%1$d unread chats</string>
 
     <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Changing permissions</string>
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Removing contact from shared folder</string>
@@ -1746,7 +1746,7 @@
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
 
-    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
+    <plurals name="number_of_versions" context="Number of versions of a file shown on the screen info of the file" formatted="false">
         <item context="version item" quantity="one">%1$d version</item>
         <item context="version items" quantity="other">%1$d versions</item>
     </plurals>
@@ -1784,18 +1784,18 @@
     <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">Current versions</string>
     <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">Previous versions</string>
 
-    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
+    <plurals name="number_of_versions_inside_folder" context="Number of versioned files inside a folder shown on the screen info of the folder" formatted="false">
         <item context="version item" quantity="one">%1$d versioned file</item>
         <item context="version items" quantity="other">%1$d versioned files</item>
     </plurals>
 
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
-    <plurals name="messages_forwarded_partial_error" formatted="false" context="Error message if any of the forwarded messages fails">
+    <plurals name="messages_forwarded_partial_error" context="Error message if any of the forwarded messages fails" formatted="false">
         <item context="message item" quantity="one">Error. %1$d message not successfully forwarded</item>
         <item context="message items" quantity="other">Error. %1$d messages not successfully forwarded</item>
     </plurals>
-    <plurals name="messages_forwarded_error_not_available" formatted="false" context="Error non existing resource after forwarding one or several messages to several chats">
+    <plurals name="messages_forwarded_error_not_available" context="Error non existing resource after forwarding one or several messages to several chats" formatted="false">
         <item context="message item" quantity="one">Error. The resource is no longer available</item>
         <item context="message items" quantity="other">Error. The resources are no longer available</item>
     </plurals>
@@ -2081,7 +2081,7 @@
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Send to&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 
-	<string name="contact_info_button_more" context="More button in contact info page">More</string>
+    <string name="contact_info_button_more" context="More button in contact info page">More</string>
 
     <plurals name="plural_select_file" context="Section title to select a file to perform an action">
         <item context="one file" quantity="one">Choose File</item>
@@ -2204,7 +2204,7 @@
         <item context="Plural of file. 2 files" quantity="other">%d files</item>
     </plurals>
 
-    <plurals name="num_folders_with_parameter"  context="on the section notifications indicates the number of folder added to a shared folder">
+    <plurals name="num_folders_with_parameter" context="on the section notifications indicates the number of folder added to a shared folder">
         <item context="Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
         <item context="Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
     </plurals>
@@ -2260,5 +2260,10 @@
     <string name="last_seen_general" context="Title of the dialog to inform about a SSL error">Last seen %1$s at %2$s</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
+
+    <string name="title_activity_maps">Send location</string>
+    <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
+    <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
 
 </resources>
