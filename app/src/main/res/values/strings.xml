@@ -2266,4 +2266,9 @@
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
 
     <string name="second_row_info_item_shard_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
+
+    <plurals name="messages_forwarded_success_plural" formatted="false" context="Confirmation message after forwarding one or several messages">
+        <item context="version item" quantity="one">Message forwarded</item>
+        <item context="version items" quantity="other">Messages forwarded</item>
+    </plurals>
 </resources>
