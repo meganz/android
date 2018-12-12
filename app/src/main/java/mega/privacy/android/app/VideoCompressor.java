@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
@@ -185,6 +186,7 @@ public class VideoCompressor {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                log(ex.getMessage());
                 updater.onCompressFailed(record);
                 currentFileIndex++;
                 totalRead += size;
@@ -1113,6 +1115,7 @@ public class VideoCompressor {
     }
     
     private static void log(String message){
-        Util.log("video compressor",message);
+//        Util.log("VideoCompressor",message);
+        CameraUploadsService.log("VideoCompressor",message);
     }
 }
