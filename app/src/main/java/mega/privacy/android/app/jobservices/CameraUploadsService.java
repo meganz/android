@@ -213,7 +213,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
 
             @Override
             public void run() {
-                if(!preparingFinished) {
+                if(!preparingFinished && isServiceRunning) {
                     log("timeout, finish self.");
                     finish();
                 }
@@ -287,7 +287,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 
                 //Check files of the Camera Uploads
                 if (checkFile(media,path)) {
-                    log("if (checkFile(media," + path + "))");
+//                    log("if (checkFile(media," + path + "))");
                     if (isSecondary) {
                         if (isVideo) {
                             secondaryVideos.add(media);
