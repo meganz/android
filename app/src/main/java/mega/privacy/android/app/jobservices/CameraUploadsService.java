@@ -2049,7 +2049,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     }
 
-    private final static boolean OUTPUT = true;
+    private final static boolean OUTPUT = false;
 
     private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
 

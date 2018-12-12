@@ -152,7 +152,7 @@ public class VideoCompressor {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return (size * 100 > availableFreeSpace);
+        return (size > availableFreeSpace);
     }
 
     private boolean videoTooSmall() {
