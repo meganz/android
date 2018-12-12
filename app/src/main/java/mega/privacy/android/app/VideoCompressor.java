@@ -152,7 +152,7 @@ public class VideoCompressor {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return (size > availableFreeSpace);
+        return (size * 100 > availableFreeSpace);
     }
 
     private boolean videoTooSmall() {
@@ -838,6 +838,9 @@ public class VideoCompressor {
                 muxing = true;
             }
             int percentage = (int)Math.round((double)totalRead / totalInputSize * 100);
+            if(percentage > 100) {
+                percentage = 99;
+            }
             updater.onCompressUpdateProgress(percentage,currentFileIndex + "/" + totalCount);
         }
     }
