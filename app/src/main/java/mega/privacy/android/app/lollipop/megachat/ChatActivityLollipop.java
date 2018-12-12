@@ -11,7 +11,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -21,6 +24,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -80,6 +84,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
@@ -204,10 +209,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean startVideo = false;
     public boolean activityVisible = false;
-
     boolean setAsRead = false;
 
-//    AndroidMegaChatMessage selectedMessage;
+    //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
     public long selectedMessageId = -1;
     MegaChatRoom chatRoom;
@@ -247,6 +251,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout writingContainerLayout;
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
+    LinearLayout voiceClipLayout;
 
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
@@ -261,7 +266,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton pickFileStorageButton;
 
     EmojiKeyboard emojiKeyboard;
-    LinearLayout linearLayoutTwemoji;
+    LinearLayout linearLayoutOptions;
 
     RelativeLayout rLKeyboardTwemojiButton;
     RelativeLayout rLMediaButton;
@@ -271,6 +276,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout rLPickFileStorageButton;
 
     RelativeLayout callInProgressLayout;
+    LinearLayout bubbleLayout;
+    TextView bubbleText;
 
     EmojiEditText textChat;
     ImageButton sendIcon;
@@ -315,10 +322,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean isTurn = false;
     Handler handler;
 
-    private ImageButton play, stop, record;
+    //VOICE CLIPS:
+    private ImageButton play, stop;
+    private FloatingActionButton record;
     private MediaRecorder myAudioRecorder;
     private String outputFile;
     boolean isVoiceClip = false;
+    boolean recordInvalid = true;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -642,9 +652,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
+        voiceClipLayout = (LinearLayout) findViewById(R.id.rl_voice_clip);
+        voiceClipLayout.setVisibility(View.GONE);
 
-
-        linearLayoutTwemoji = (LinearLayout)findViewById(R.id.linear_layout_twemoji);
+        linearLayoutOptions = (LinearLayout)findViewById(R.id.linear_layout_options);
         rLKeyboardTwemojiButton = (RelativeLayout) findViewById(R.id.rl_keyboard_twemoji_chat);
         rLMediaButton = (RelativeLayout) findViewById(R.id.rl_media_icon_chat);
         rLSendContactButton = (RelativeLayout) findViewById(R.id.rl_send_contact_icon_chat);
@@ -675,6 +686,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
+
+        bubbleLayout = (LinearLayout) findViewById(R.id.bubble_layout);
+        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.grey_achievements_invite_friends));
+        myBubble.setCornerRadius(20);
+        myBubble.setPointerAlignment(BubbleDrawable.RIGHT);
+        myBubble.setPadding(25, 25, 25, 25);
+        bubbleLayout.setBackground(myBubble);
+        bubbleLayout.setVisibility(View.GONE);
+
+        bubbleText = (TextView) findViewById(R.id.bubble_text);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            bubbleText.setMaxWidth(Util.scaleWidthPx(350, outMetrics));
+        }
+        else{
+            bubbleText.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
+        }
 
         rLKeyboardTwemojiButton.setOnClickListener(this);
         rLMediaButton.setOnClickListener(this);
@@ -707,36 +734,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(temp.trim().length()>0){
                             sendIcon.setVisibility(View.VISIBLE);
                             record.setVisibility(View.GONE);
-//                            sendIcon.setEnabled(true);
-//                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
-
                             textChat.setHint(" ");
                             textChat.setMinLines(1);
                             textChat.setMaxLines(5);
-
-                        }else{
+                        }else {
                             sendIcon.setVisibility(View.GONE);
                             record.setVisibility(View.VISIBLE);
-//                            sendIcon.setEnabled(false);
-//                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                             log("textChat:TextChangedListener:onTextChanged:lengthInvalid1:sendStopTypingNotification");
                             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
-                            if(chatRoom.hasCustomTitle()){
+                            if (chatRoom.hasCustomTitle()) {
                                 textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-                            }else{
-                               textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+                            } else {
+                                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                             }
-
                             textChat.setMinLines(1);
                             textChat.setMaxLines(1);
-
                         }
                     }else {
                         sendIcon.setVisibility(View.GONE);
                         record.setVisibility(View.VISIBLE);
-//                        sendIcon.setEnabled(false);
-//                        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                         log("textChat:TextChangedListener:onTextChanged:lengthInvalid2:sendStopTypingNotification");
                         megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -745,15 +762,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }else{
                             textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                         }
-
                         textChat.setMinLines(1);
                         textChat.setMaxLines(1);
                     }
                 }else{
                     sendIcon.setVisibility(View.GONE);
                     record.setVisibility(View.VISIBLE);
-//                    sendIcon.setEnabled(false);
-//                    sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                     log("textChat:TextChangedListener:onTextChanged:nullText:sendStopTypingNotification");
                     megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -762,10 +776,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }else{
                         textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                     }
-
                     textChat.setMinLines(1);
                     textChat.setMaxLines(1);
-
                 }
 
                 if(getCurrentFocus() == textChat){
@@ -854,12 +866,91 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setOnClickListener(this);
         sendIcon.setEnabled(true);
         sendIcon.setVisibility(View.GONE);
-//        sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_trans));
-//        sendIcon.setEnabled(false);
 
-        record = (ImageButton) findViewById(R.id.record);
-        record.setOnClickListener(this);
+        record = (FloatingActionButton) findViewById(R.id.record_fab);
+        record.setImageResource(R.drawable.ic_b_mic_on);
+        record.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
+        record.setCompatElevation(0);
+//        record.setOnClickListener(this);
         record.setVisibility(View.VISIBLE);
+
+        final Handler handlerRecord = new Handler();
+        final Runnable run = new Runnable(){
+            @Override
+            public void run() {
+                log("show padlock ");
+                recordInvalid = false;
+
+            }
+        };
+        record.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(final View view, MotionEvent motion) {
+                switch (motion.getAction() ) {
+                    case MotionEvent.ACTION_DOWN:
+                        handlerRecord.postDelayed(run, 2000); //2 seconds delay to show de padlock
+                        log("ACTION_DOWN");
+//                        startRecord();
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        handlerRecord.removeCallbacks(run);
+                        log("ACTION_UP");
+                        if(recordInvalid){
+                            bubbleLayout.setAlpha(1);
+                            bubbleLayout.setVisibility(View.VISIBLE);
+                            bubbleLayout.animate().alpha(0).setDuration(2000);
+                        }
+//                        stopRecord();
+                        return true;
+                }
+                return false;
+            }});
+
+
+//        record.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//
+//                    case MotionEvent.ACTION_DOWN:
+//                        v.setPressed(true);
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        v.setPressed(false);
+//                        break;
+//                }
+//                return true;
+//            }
+//
+//        });
+
+//        record.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//
+//                    case MotionEvent.ACTION_DOWN:
+//
+//                        if (!pressed) {
+//                            pressed = true;
+//                            try {
+//                                Thread.sleep(500);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//
+//                        pressed = false;
+//
+//                }
+//                return true;
+//            }
+//
+//        });
+
 
         play = (ImageButton) findViewById(R.id.play);
         play.setEnabled(false);
@@ -1823,18 +1914,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void startRecord(){
-        try {
-            myAudioRecorder.prepare();
-            myAudioRecorder.start();
-        } catch (IllegalStateException ise) {
-            // make something ...
-        } catch (IOException ioe) {
-            // make something
-        }
-        record.setEnabled(false);
-        record.setOnClickListener(null);
-        stop.setEnabled(true);
-        stop.setOnClickListener(this);
+        log("startRecord()");
+        textChat.setVisibility(View.GONE);
+        linearLayoutOptions.setVisibility(View.INVISIBLE);
+        record.setImageResource(R.drawable.ic_mic_on);
+        record.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.delete_account)));
+        record.setCompatElevation(Util.px2dp(2, outMetrics));
+        voiceClipLayout.setVisibility(View.VISIBLE);
+
+//        try {
+//            myAudioRecorder.prepare();
+//            myAudioRecorder.start();
+//        } catch (IllegalStateException ise) {
+//            // make something ...
+//        } catch (IOException ioe) {
+//            // make something
+//        }
+//        record.setEnabled(false);
+//        record.setOnClickListener(null);
+//        stop.setEnabled(true);
+//        stop.setOnClickListener(this);
     }
     public void playVoiceClip(){
         MediaPlayer mediaPlayer = new MediaPlayer();
@@ -1848,17 +1947,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void stopRecord(){
-        myAudioRecorder.stop();
-        myAudioRecorder.release();
-        myAudioRecorder = null;
-        record.setEnabled(true);
-        record.setOnClickListener(this);
-
-        stop.setEnabled(false);
-        stop.setOnClickListener(null);
-
-        play.setEnabled(true);
-        play.setOnClickListener(this);
+        log("stopRecord()");
+        textChat.setVisibility(View.VISIBLE);
+        linearLayoutOptions.setVisibility(View.VISIBLE);
+        record.setImageResource(R.drawable.ic_b_mic_on);
+        record.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+        record.setCompatElevation(0);
+        voiceClipLayout.setVisibility(View.GONE);
+//        myAudioRecorder.stop();
+//        myAudioRecorder.release();
+//        myAudioRecorder = null;
+//        record.setEnabled(true);
+//        record.setOnClickListener(this);
+//
+//        stop.setEnabled(false);
+//        stop.setOnClickListener(null);
+//
+//        play.setEnabled(true);
+//        play.setOnClickListener(this);
     }
 
     public void startCall(){
@@ -2805,8 +2911,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
             }
-            case R.id.record:{
-                log("onClick:record");
+            case R.id.record_fab:{
+                log("onClick:record_fab");
                 isVoiceClip = true;
                 if(checkPermissionsVoiceClip()){
                     outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
