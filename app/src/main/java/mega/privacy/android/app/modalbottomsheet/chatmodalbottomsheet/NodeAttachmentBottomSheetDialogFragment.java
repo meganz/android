@@ -376,9 +376,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             switch(v.getId()){
 
                 case R.id.option_forward_layout: {
-                    if(context instanceof ChatActivityLollipop){
-                        ((ChatActivityLollipop)context).prepareMessageToForward(messageId);
-                    }
+                    chatC.prepareMessageToForward(messageId, chatId);
                     break;
                 }
                 case R.id.option_download_layout:{
@@ -388,9 +386,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                         return;
                     }
 
-                    if(context instanceof ChatActivityLollipop){
-                        chatC.prepareForChatDownload(nodeList);
-                    }
+                    chatC.prepareForChatDownload(nodeList);
+
                     break;
                 }
                 case R.id.option_import_layout:{
@@ -400,9 +397,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                         return;
                     }
 
-                    if(context instanceof ChatActivityLollipop){
-                        ((ChatActivityLollipop)context).importNode(messageId);
-                    }
+                    chatC.importNode(messageId, chatId);
 
                     break;
                 }

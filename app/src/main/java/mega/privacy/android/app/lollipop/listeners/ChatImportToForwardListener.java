@@ -5,8 +5,10 @@ import android.content.Context;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -18,19 +20,23 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
 
     Context context;
 
-    public ChatImportToForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context) {
+    public ChatImportToForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context, ChatController chatC, long chatId) {
         super();
         this.actionListener = action;
         this.context = context;
         this.counter = counter;
         this.messagesSelected = messagesSelected;
+        this.chatC = chatC;
+        this.chatId = chatId;
     }
 
     int counter = 0;
     int error = 0;
     int actionListener = -1;
     String message;
+    long chatId;
     ArrayList<AndroidMegaChatMessage> messagesSelected;
+    ChatController chatC;
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
@@ -79,11 +85,13 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                                 ((ChatActivityLollipop) context).removeRequestDialog();
                                 ((ChatActivityLollipop) context).showSnackbar(message);
                             }
+                            else if(context instanceof NodeAttachmentHistoryActivity){
+                                ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
+                                ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
+                            }
                         }
                         else{
-                            if(context instanceof ChatActivityLollipop){
-                                ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
-                            }
+                            chatC.forwardMessages(messagesSelected, chatId);
                         }
                     }
                     break;
