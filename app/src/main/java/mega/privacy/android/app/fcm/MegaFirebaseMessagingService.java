@@ -19,7 +19,6 @@ package mega.privacy.android.app.fcm;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -110,7 +109,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         log("From: " + remoteMessage.getFrom());
 
         remoteMessageType = remoteMessage.getData().get("type");
-
+    
+        log("getOriginalPriority is " + remoteMessage.getOriginalPriority() + " getPriority is " + remoteMessage.getPriority());
+    
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             log("Message data payload: " + remoteMessage.getData());

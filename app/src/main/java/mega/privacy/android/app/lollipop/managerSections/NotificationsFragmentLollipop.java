@@ -323,10 +323,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         for(int i = 0;i<updatedUserAlerts.size();i++){
 
-            if(updatedUserAlerts.get(i).isOwnChange()){
-                log("updateNotifications:isOwnChange");
-                continue;
-            }
+//            if(updatedUserAlerts.get(i).isOwnChange()){
+//                log("updateNotifications:isOwnChange");
+//                continue;
+//            }
 
             long idToUpdate = updatedUserAlerts.get(i).getId();
             int indexToReplace = -1;
