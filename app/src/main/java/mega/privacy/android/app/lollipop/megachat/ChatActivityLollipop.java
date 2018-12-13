@@ -31,6 +31,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -44,6 +45,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,6 +54,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
@@ -86,6 +92,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
+import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -146,6 +153,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
@@ -329,6 +337,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private String outputFile;
     boolean isVoiceClip = false;
     boolean recordInvalid = true;
+    boolean isRecording = false;
+
+    long translationAnimationDuration = 200;
+    long alphaAnimationDuration = 600;
+    GestureDetector gestureDetector;
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -341,7 +354,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     };
 
     private ActionMode actionMode;
-
 
     private class UserTyping {
         MegaChatParticipant participantTyping;
@@ -871,86 +883,142 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setImageResource(R.drawable.ic_b_mic_on);
         record.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
         record.setCompatElevation(0);
-//        record.setOnClickListener(this);
         record.setVisibility(View.VISIBLE);
 
-        final Handler handlerRecord = new Handler();
-        final Runnable run = new Runnable(){
+
+        final Handler handlerPadLock = new Handler();
+        final Runnable runPadLock = new Runnable(){
             @Override
             public void run() {
-                log("show padlock ");
-                recordInvalid = false;
-
+                log("how the padlock");
             }
         };
-        record.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(final View view, MotionEvent motion) {
-                switch (motion.getAction() ) {
-                    case MotionEvent.ACTION_DOWN:
-                        handlerRecord.postDelayed(run, 2000); //2 seconds delay to show de padlock
-                        log("ACTION_DOWN");
-//                        startRecord();
-                        return true;
+        record.setOnTouchListener(new OnSwipeTouchListener(this) {
 
-                    case MotionEvent.ACTION_UP:
-                        handlerRecord.removeCallbacks(run);
-                        log("ACTION_UP");
-                        if(recordInvalid){
-                            bubbleLayout.setAlpha(1);
-                            bubbleLayout.setVisibility(View.VISIBLE);
-                            bubbleLayout.animate().alpha(0).setDuration(2000);
-                        }
-//                        stopRecord();
-                        return true;
+            public void singleTap() {
+                if(!isRecording){
+                    bubbleLayout.setAlpha(1);
+                    bubbleLayout.setVisibility(View.VISIBLE);
+                    bubbleLayout.animate().alpha(0).setDuration(4000);
                 }
-                return false;
-            }});
+             }
+
+            public void longPress() {
+                handlerPadLock.postDelayed(runPadLock, 2000); //2 seconds delay to show de padlock
+                startRecord();
+
+            }
+
+            public void onUp() {
+                if(isRecording){
+                    handlerPadLock.removeCallbacks(runPadLock);
+                    stopRecord();
+                }
+
+            }
+
+            public void down() {
+
+            }
+
+            public void onSwipeLeft() {
+
+                }
+            public void onSwipeRight() {
+
+            }
+            public void onSwipeTop() {
+
+            }
+            public void onSwipeBottom() {
+            }
+        });
 
 
-//        record.setOnTouchListener(new View.OnTouchListener() {
+
+
+//        final Handler handlerRecord = new Handler();
+//        final Runnable run = new Runnable(){
 //            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
+//            public void run() {
+//                recordInvalid = false;
+//                startRecord();
+//                //Cont 2 seconds, and show the padlock
 //
-//                    case MotionEvent.ACTION_DOWN:
-//                        v.setPressed(true);
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        v.setPressed(false);
-//                        break;
-//                }
-//                return true;
 //            }
-//
-//        });
-
+//        };
 //        record.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
+//            public boolean onTouch(final View view, MotionEvent motion) {
 //
-//                    case MotionEvent.ACTION_DOWN:
+//                switch (motion.getAction() ) {
+//                    case MotionEvent.ACTION_DOWN:{
+//                        handlerRecord.postDelayed(run, 1000); //2 seconds delay to show de padlock
+//                        break;
+//                    }
 //
-//                        if (!pressed) {
-//                            pressed = true;
-//                            try {
-//                                Thread.sleep(500);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
+//                    case MotionEvent.ACTION_MOVE:{
+//                        if(isRecording){
+//
+//                        }
+//                            break;
+//                    }
+//
+//                    case MotionEvent.ACTION_UP:{
+//                        handlerRecord.removeCallbacks(run);
+//                        if(recordInvalid){
+//                            bubbleLayout.setAlpha(1);
+//                            bubbleLayout.setVisibility(View.VISIBLE);
+//                            bubbleLayout.animate().alpha(0).setDuration(4000);
+//                        }else{
+//                            stopRecord();
 //                        }
 //                        break;
-//                    case MotionEvent.ACTION_UP:
-//
-//                        pressed = false;
+//                    }
+//                    case MotionEvent.ACTION_CANCEL:{
+//                        break;
+//                    }
+//                    case MotionEvent.ACTION_OUTSIDE:{
+//                        break;
+//                    }
+//                    default:{
+//                        break;
+//                    }
 //
 //                }
+//                voiceClipLayout.invalidate();
 //                return true;
-//            }
-//
-//        });
+//            }});
 
+
+//        record.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(final View view, MotionEvent motion) {
+//                switch (motion.getAction() ) {
+//                    case MotionEvent.ACTION_DOWN: {
+//                        handlerRecord.postDelayed(run, 1000); //2 seconds delay to show de padlock
+////                        startRecord();
+//                        break;
+//                    }
+//
+//                    case MotionEvent.ACTION_UP:{
+//                        handlerRecord.removeCallbacks(run);
+//                        if(recordInvalid){
+//                            bubbleLayout.setAlpha(1);
+//                            bubbleLayout.setVisibility(View.VISIBLE);
+//                            bubbleLayout.animate().alpha(0).setDuration(4000);
+//                        }else{
+
+//
+//                            stopRecord();
+//                        }
+//                        break;
+//                    }
+//                    case MotionEvent.ACTION_MOVE:{
+//                    }
+//                }
+//                return false;
+//            }});
 
         play = (ImageButton) findViewById(R.id.play);
         play.setEnabled(false);
@@ -1915,12 +1983,70 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void startRecord(){
         log("startRecord()");
+        isRecording = true;
         textChat.setVisibility(View.GONE);
         linearLayoutOptions.setVisibility(View.INVISIBLE);
         record.setImageResource(R.drawable.ic_mic_on);
         record.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.delete_account)));
         record.setCompatElevation(Util.px2dp(2, outMetrics));
         voiceClipLayout.setVisibility(View.VISIBLE);
+
+//        record.setOnTouchListener(new OnSwipeTouchListener(this) {
+//            public void onSwipeLeft() {
+////                record.clearAnimation();
+//                int xOffset = voiceClipLayout.getMeasuredWidth();
+//
+//                TranslateAnimation translateAnim = new TranslateAnimation( 0, -xOffset, 0, 0 );
+//                translateAnim.setDuration(translationAnimationDuration);
+//                translateAnim.setFillAfter(true);
+//                translateAnim.setFillBefore(true);
+//                translateAnim.setRepeatCount(0);
+//
+//                AlphaAnimation alphaAnim = new AlphaAnimation(1.0f, 0.0f);
+//                alphaAnim.setDuration(alphaAnimationDuration);
+//                alphaAnim.setFillAfter(true);
+//                alphaAnim.setFillBefore(true);
+//                alphaAnim.setRepeatCount(0);
+//
+//                AnimationSet s = new AnimationSet(false);//false means don't share interpolators
+//                s.addAnimation(translateAnim);
+//                s.addAnimation(alphaAnim);
+//
+//                record.startAnimation(s);
+////                firstArrowVideo.clearAnimation();
+////                secondArrowVideo.clearAnimation();
+////                thirdArrowVideo.clearAnimation();
+////                fourArrowVideo.clearAnimation();
+////                linearArrowVideo.setVisibility(GONE);
+//
+//                translateAnim.setAnimationListener(new Animation.AnimationListener(){
+//                    @Override
+//                    public void onAnimationStart(Animation animation) {
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animation animation) {
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animation animation) {
+//
+////                        RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+////                        layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+////                        layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+////                        linearFAB.setLayoutParams(layoutCompress);
+////                        linearFAB.setOrientation(LinearLayout.HORIZONTAL);
+//
+//                        stopRecord();
+//                    }
+//                });
+//            }
+//            public void onSwipeRight() {}
+//            public void onSwipeTop() {}
+//            public void onSwipeBottom() {}
+//
+//        });
+
 
 //        try {
 //            myAudioRecorder.prepare();
@@ -1954,6 +2080,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
         record.setCompatElevation(0);
         voiceClipLayout.setVisibility(View.GONE);
+        isRecording = false;
+
 //        myAudioRecorder.stop();
 //        myAudioRecorder.release();
 //        myAudioRecorder = null;
@@ -4142,50 +4270,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-//    @Override
-//    public boolean onDown(MotionEvent e) {
-//        return false;
-//    }
-//
-//    @Override
-//    public void onShowPress(MotionEvent e) {
-//
-//    }
-//
-//    @Override
-//    public boolean onSingleTapUp(MotionEvent e) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-//        return false;
-//    }
-//
-//    @Override
-//    public void onLongPress(MotionEvent e) {
-//
-//    }
-//
-//    @Override
-//    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-//        return false;
-//    }
-
-//    @Override
-//    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-////        detector.onTouchEvent(e);
-//        return false;
-//    }
-
-//    @Override
-//    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-//    }
-//
-//    @Override
-//    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-//
-//    }
 
     @Override
     public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom chat) {
@@ -7471,7 +7555,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
-
         hideMessageJump();
     }
 
