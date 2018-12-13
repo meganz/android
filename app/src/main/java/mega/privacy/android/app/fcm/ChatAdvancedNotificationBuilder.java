@@ -1188,6 +1188,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             log("generateChatNotification:POST Android O");
+            Intent myService = new Intent(context, IncomingMessageService.class);
+            context.stopService(myService);
             newGenerateChatNotification(request);
         }
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
