@@ -65,7 +65,12 @@ public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.ViewHolderMap>
     }
 
     public Object getItem(int position) {
-        return addresses.get(position);
+        if (addresses != null && addresses.size() > 0) {
+            return addresses.get(position);
+        }
+        else {
+            return null;
+        }
     }
     @Override
     public int getItemCount() {
@@ -104,6 +109,10 @@ public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.ViewHolderMap>
         log("setAddresses size: "+addresses.size());
         this.addresses = addresses;
         notifyDataSetChanged();
+    }
+
+    public void setMarker (String name, String address) {
+
     }
 
     public static void log(String message) {

@@ -4,9 +4,9 @@ import com.google.android.gms.location.places.Place;
 
 public class MapAddress {
 
-    Place place;
-    String name;
-    String address;
+    private Place place;
+    private String name;
+    private String address;
 
     public MapAddress (String name, String address) {
         this.name = name;
@@ -29,5 +29,13 @@ public class MapAddress {
 
     public Place getPlace() {
         return place;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
