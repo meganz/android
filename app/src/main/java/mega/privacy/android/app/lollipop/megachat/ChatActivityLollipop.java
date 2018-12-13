@@ -21,6 +21,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompatSideChannelService;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
@@ -2449,11 +2450,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 emojiKeyboard.hideBothKeyboard(this);
             }else{
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
+
                 }else{
                     if (handlerEmojiKeyboard != null){
                         handlerEmojiKeyboard.removeCallbacksAndMessages(null);
@@ -2466,11 +2464,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }else{
             if(fileStorageLayout.isShown()){
-                if(fileStorageF != null){
-                    fileStorageF.clearSelections();
-                    fileStorageF.hideMultipleSelect();
-                }
-                fileStorageLayout.setVisibility(View.GONE);
+                hideFileStorageSection();
             }else{
                 if (handlerEmojiKeyboard != null){
                     handlerEmojiKeyboard.removeCallbacksAndMessages(null);
@@ -4994,7 +4988,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Decrease generalUnread:Position where new messages layout is show: " + positionNewMessagesLayout);
                     generalUnreadCount--;
                 }
-
                 adapter.notifyItemChanged(positionNewMessagesLayout);
             }
 
@@ -5116,6 +5109,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         log("---------------Index to change = "+indexToChange);
         if(indexToChange!=-1){
+            log("indexToChange == "+indexToChange);
+
 
 //            if(msg.getMessage().isDeleted()){
 //                messages.remove(indexToChange);
@@ -5194,6 +5189,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }
         else{
+            log("indexToChange == -1");
+
             log("Error, id temp message not found!!");
         }
         return indexToChange;
@@ -5275,7 +5272,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         adapter.setMessages(messages);
-        adapter.notifyDataSetChanged();
     }
 
     public void loadPendingMessages(){
@@ -5442,7 +5438,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             msg.setShowAvatar(true);
             messages.add(msg);
         }else{
-
             log("Finding where to append the message");
 
             if(msg.isUploading()){
@@ -5503,6 +5498,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.add(lastIndex, msg);
                 adjustInfoToShow(lastIndex);
                 msg.setShowAvatar(true);
+                if(!messages.get(lastIndex).isUploading()){
+                    int nextIndex = lastIndex+1;
+                    if(messages.get(nextIndex)!=null) {
+                        if(messages.get(nextIndex).isUploading()){
+                            adjustInfoToShow(nextIndex);
+                        }
+                    }
+                }
                 if(lastIndex>0){
                     setShowAvatar(lastIndex-1);
                 }
@@ -7465,6 +7468,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void hideFileStorageSection(){
+        log("hideFileStorageSEctocioon");
         if (fileStorageF != null) {
             fileStorageF.clearSelections();
             fileStorageF.hideMultipleSelect();
