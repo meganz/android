@@ -21,7 +21,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompatSideChannelService;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
@@ -5500,9 +5499,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 msg.setShowAvatar(true);
                 if(!messages.get(lastIndex).isUploading()){
                     int nextIndex = lastIndex+1;
-                    if(messages.get(nextIndex)!=null) {
-                        if(messages.get(nextIndex).isUploading()){
-                            adjustInfoToShow(nextIndex);
+                    if(nextIndex<messages.size()){
+                        if(messages.get(nextIndex)!=null) {
+                            if(messages.get(nextIndex).isUploading()){
+                                adjustInfoToShow(nextIndex);
+                            }
                         }
                     }
                 }
