@@ -1139,6 +1139,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
+        ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+
         ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
@@ -6886,7 +6888,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("setMultipleSelect");
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
-            notifyDataSetChanged();
+//            notifyDataSetChanged();
         }
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();

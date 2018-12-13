@@ -1821,7 +1821,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			contactStateIcon.setVisibility(View.GONE);
 		}
 
-		requestLastGreen(-1);
+		if(Util.isChatEnabled()){
+			requestLastGreen(-1);
+		}
 	}
 
 	@Override

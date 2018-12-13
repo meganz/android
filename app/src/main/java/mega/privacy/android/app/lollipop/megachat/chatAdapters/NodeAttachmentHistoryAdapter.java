@@ -640,7 +640,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             }
         }
 
-        String secondRowInfo = context.getString(R.string.second_row_info_item_shard_file_chat, holder.fullNameTitle, date);
+        String secondRowInfo = context.getString(R.string.second_row_info_item_shared_file_chat, holder.fullNameTitle, date);
 
         holder.textViewMessageInfo.setText(secondRowInfo);
         holder.textViewMessageInfo.setVisibility(View.VISIBLE);
