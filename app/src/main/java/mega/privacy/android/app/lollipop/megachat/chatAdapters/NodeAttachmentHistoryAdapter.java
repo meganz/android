@@ -34,7 +34,6 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -887,7 +886,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 dimens[2] = imageView.getWidth();
                 dimens[3] = imageView.getHeight();
 
-                ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
+                ((NodeAttachmentHistoryActivity)context).itemClick(currentPosition);
                 break;
             }
         }
