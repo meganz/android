@@ -639,6 +639,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				notificationsLayout.setVisibility(View.GONE);
 				dividerNotificationsLayout.setVisibility(View.GONE);
+
+				sharedFilesLayout.setVisibility(View.GONE);
+				dividerSharedFilesLayout.setVisibility(View.GONE);
 			}
 
 		} else {

@@ -21,7 +21,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompatSideChannelService;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
@@ -928,10 +927,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         userTypingLayout = (RelativeLayout) findViewById(R.id.user_typing_layout);
         userTypingLayout.setVisibility(View.GONE);
         userTypingText = (TextView) findViewById(R.id.user_typing_text);
-
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
 
         Intent newIntent = getIntent();
 
@@ -1902,9 +1897,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void chooseAddParticipantDialog(){
         log("chooseAddContactDialog");
 
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
         if(megaApi!=null && megaApi.getRootNode()!=null){
             ArrayList<MegaUser> contacts = megaApi.getContacts();
             if(contacts==null){
@@ -1932,10 +1924,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void chooseContactsDialog(){
         log("chooseContactsDialog");
-
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
 
         if(megaApi!=null && megaApi.getRootNode()!=null){
             ArrayList<MegaUser> contacts = megaApi.getContacts();
@@ -1974,10 +1962,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         statusDialog.show();
     }
 
-
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         log("forwardMessages");
-        chatC.prepareMessagesToForward(messagesSelected, idChat);
+        chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
     }
 
     @Override
@@ -2958,10 +2945,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
-            if(megaChatApi.isSignalActivityRequired()){
-                megaChatApi.signalPresenceActivity();
-            }
-
             switch(item.getItemId()){
 //                case R.id.cab_menu_select_all:{
 //                    selectAll();
@@ -3449,9 +3432,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         log("itemClick");
         int position = positionInAdapter-1;
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
 
         if(position<messages.size()){
             AndroidMegaChatMessage m = messages.get(position);
