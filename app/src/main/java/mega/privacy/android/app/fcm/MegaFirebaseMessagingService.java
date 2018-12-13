@@ -218,11 +218,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         boolean isIdle = pm.isDeviceIdleMode();
                         log("isActivityVisible: " + app.isActivityVisible());
                         log("isIdle: " + isIdle);
+                        wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingMessageCallLock:");
+                        wl.acquire();
+                        wl.release();
                         if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
                             log("launch foreground service!");
-                            wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingMessageCallLock:");
-                            wl.acquire();
-                            wl.release();
                             Intent intent = new Intent(this,IncomingMessageService.class);
                             intent.putExtra("remoteMessage", remoteMessage);
                             startForegroundService(intent);
