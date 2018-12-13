@@ -12,6 +12,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -67,6 +69,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
@@ -199,7 +202,15 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 return START_NOT_STICKY;
             }
         }
-        
+        final Ringtone ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+        ringtone.play();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ringtone.stop();
+            }
+        }, 3000);
+
         try {
             log("Start service here, creating new thread");
             task = createWorkerThread();
@@ -2049,7 +2060,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     }
 
-    private final static boolean OUTPUT = false;
+    private final static boolean OUTPUT = true;
 
     private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
 
