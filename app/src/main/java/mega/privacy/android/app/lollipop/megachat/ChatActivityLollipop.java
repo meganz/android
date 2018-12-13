@@ -5479,9 +5479,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 msg.setShowAvatar(true);
                 if(!messages.get(lastIndex).isUploading()){
                     int nextIndex = lastIndex+1;
-                    if(messages.get(nextIndex)!=null) {
-                        if(messages.get(nextIndex).isUploading()){
-                            adjustInfoToShow(nextIndex);
+                    if(nextIndex<messages.size()){
+                        if(messages.get(nextIndex)!=null) {
+                            if(messages.get(nextIndex).isUploading()){
+                                adjustInfoToShow(nextIndex);
+                            }
                         }
                     }
                 }
