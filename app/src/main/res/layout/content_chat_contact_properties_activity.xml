@@ -332,7 +332,7 @@
             android:layout_height="1dp"
             android:background="@color/divider_upgrade_account" />
 
-        <!-- SHARE CONTACT LAYOUT -->
+        <!-- SHARED FILES LAYOUT -->
 
         <RelativeLayout
             android:id="@+id/chat_contact_properties_chat_files_shared_layout"

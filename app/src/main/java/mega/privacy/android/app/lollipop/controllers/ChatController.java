@@ -1938,24 +1938,31 @@ public class ChatController {
 
     public void prepareMessageToForward(long idMessage, long idChat) {
         log("prepareMessageToForward");
-        ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
+        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
         MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
-        AndroidMegaChatMessage aM = new AndroidMegaChatMessage(m);
-        messagesSelected.add(aM);
+        messagesSelected.add(m);
 
         prepareMessagesToForward(messagesSelected, idChat);
     }
 
-    public void prepareMessagesToForward(ArrayList<AndroidMegaChatMessage> messagesSelected, long idChat){
+    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
+        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
+        for(int i = 0; i<androidMessagesSelected.size(); i++){
+            messagesSelected.add(androidMessagesSelected.get(i).getMessage());
+        }
+        prepareMessagesToForward(messagesSelected, idChat);
+    }
+
+    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat){
         log ("prepareMessagesToForward");
 
-        ArrayList<AndroidMegaChatMessage> messagesToImport = new ArrayList<>();
+        ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
         long[] idMessages = new long[messagesSelected.size()];
         for(int i=0; i<messagesSelected.size();i++){
-            idMessages[i] = messagesSelected.get(i).getMessage().getMsgId();
+            idMessages[i] = messagesSelected.get(i).getMsgId();
 
-            if(messagesSelected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                if(messagesSelected.get(i).getMessage().getUserHandle()!=megaChatApi.getMyUserHandle()){
+            if(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
                     //Node has to be imported
                     messagesToImport.add(messagesSelected.get(i));
                 }
@@ -1977,11 +1984,11 @@ public class ChatController {
             }
 
             for(int j=0; j<messagesToImport.size();j++){
-                AndroidMegaChatMessage message = messagesToImport.get(j);
+                MegaChatMessage message = messagesToImport.get(j);
 
                 if(message!=null){
 
-                    MegaNodeList nodeList = message.getMessage().getMegaNodeList();
+                    MegaNodeList nodeList = message.getMegaNodeList();
 
                     for(int i=0;i<nodeList.size();i++){
                         MegaNode document = nodeList.get(i);
@@ -2008,12 +2015,12 @@ public class ChatController {
         }
     }
 
-    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, long idChat){
+    public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected, long idChat){
         log ("forwardMessages");
 
         long[] idMessages = new long[messagesSelected.size()];
         for(int i=0; i<messagesSelected.size();i++){
-            idMessages[i] = messagesSelected.get(i).getMessage().getMsgId();
+            idMessages[i] = messagesSelected.get(i).getMsgId();
         }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);

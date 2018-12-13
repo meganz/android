@@ -284,7 +284,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     /*
      * Get list of all selected messages
      */
-    public List<MegaChatMessage> getSelectedMessages() {
+    public ArrayList<MegaChatMessage> getSelectedMessages() {
         ArrayList<MegaChatMessage> messages = new ArrayList<MegaChatMessage>();
 
         for (int i = 0;i < selectedItems.size();i++) {
@@ -303,7 +303,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         this.context = _context;
         this.messages = _messages;
         this.adapterType = adapterType;
-
 
         dbH = DatabaseHandler.getDbHandler(context);
 

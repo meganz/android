@@ -981,7 +981,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
-			final List<MegaChatMessage> nodes = adapter.getSelectedMessages();
+			final ArrayList<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
 			switch (item.getItemId()) {
 				case R.id.cab_menu_select_all: {
@@ -994,8 +994,9 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					actionMode.invalidate();
 					break;
 				}
-				case R.id.action_download_versions: {
-
+				case R.id.chat_cab_menu_forward: {
+					log("Forward message");
+					forwardMessages(messagesSelected);
 					break;
 				}
 				case R.id.action_delete_versions: {
@@ -1144,6 +1145,12 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			}
 			return false;
 		}
+	}
+
+	public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected){
+		log("forwardMessages");
+		ChatController chatC = new ChatController(this);
+		chatC.prepareMessagesToForward(messagesSelected, chatId);
 	}
 
 	@Override

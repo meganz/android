@@ -6,12 +6,12 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -20,7 +20,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
 
     Context context;
 
-    public ChatImportToForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context, ChatController chatC, long chatId) {
+    public ChatImportToForwardListener(int action, ArrayList<MegaChatMessage> messagesSelected, int counter, Context context, ChatController chatC, long chatId) {
         super();
         this.actionListener = action;
         this.context = context;
@@ -35,7 +35,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
     int actionListener = -1;
     String message;
     long chatId;
-    ArrayList<AndroidMegaChatMessage> messagesSelected;
+    ArrayList<MegaChatMessage> messagesSelected;
     ChatController chatC;
 
     @Override
