@@ -1053,16 +1053,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		sortBy();
 
-		if(!visibleContacts.isEmpty()){
-			for (int i=0;i<visibleContacts.size();i++){
-				int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
-				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-					log("Request last green for user");
-					megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
+		if(Util.isChatEnabled()){
+			if(!visibleContacts.isEmpty()){
+				for (int i=0;i<visibleContacts.size();i++){
+					int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
+					if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+						log("Request last green for user");
+						megaChatApi.(visibleContacts.get(i).getMegaUser().getHandle(), null);
+					}
 				}
 			}
 		}
-
 	}
 
 	@Override
