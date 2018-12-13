@@ -3417,13 +3417,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     private void updateActionModeTitle() {
-//        if (actionMode == null || getActivity() == null) {
-//            return;
-//        }
-        List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
-
         try {
-            actionMode.setTitle(messages.size()+"");
+            actionMode.setTitle(adapter.getSelectedItemCount()+"");
             actionMode.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -6614,7 +6609,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onResume");
         super.onResume();
 
-        setNodeAttachmentVisibile();
+        setNodeAttachmentVisible();
 
         MegaApplication.setShowPinScreen(true);
         MegaApplication.setOpenChatId(idChat);
@@ -7346,8 +7341,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return screen;
     }
 
-    public void setNodeAttachmentVisibile() {
-        log("setNodeAttachmentVisibile");
+    public void setNodeAttachmentVisible() {
+        log("setNodeAttachmentVisible");
         if (adapter != null && holder_imageDrag != null && position_imageDrag != -1) {
             adapter.setNodeAttachmentVisibility(true, holder_imageDrag, position_imageDrag);
             holder_imageDrag = null;
