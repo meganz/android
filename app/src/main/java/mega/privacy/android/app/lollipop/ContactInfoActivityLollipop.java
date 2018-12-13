@@ -492,6 +492,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						if(chatHandle==-1){
 							notificationsLayout.setVisibility(View.GONE);
 							dividerNotificationsLayout.setVisibility(View.GONE);
+
+							sharedFilesLayout.setVisibility(View.GONE);
+							dividerSharedFilesLayout.setVisibility(View.GONE);
 						}
 						else{
 							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -500,6 +503,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					else{
 						notificationsLayout.setVisibility(View.GONE);
 						dividerNotificationsLayout.setVisibility(View.GONE);
+
+						sharedFilesLayout.setVisibility(View.GONE);
+						dividerSharedFilesLayout.setVisibility(View.GONE);
 					}
 
 					if (megaChatApi == null){
