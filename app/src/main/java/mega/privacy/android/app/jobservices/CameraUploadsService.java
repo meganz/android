@@ -178,7 +178,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         log("public int onStartCommand(Intent intent, int flags, int startId)");
         initService();
         isServiceRunning = true;
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent, false);
         startForeground(notificationId,mNotification);
         
         if (megaApi == null) {
@@ -247,7 +247,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     private void startCameraUploads() {
         log("startCameraUploads");
         preparingFinished = true;
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent);
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
         //TODO update notification
         getFilesFromMediaStore();
     }
@@ -503,7 +503,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                         String message = getString(R.string.error_not_enough_free_space);
                         Intent intent = new Intent(this,ManagerActivityLollipop.class);
                         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-                        showNotification(title,message,pendingIntent);
+                        showNotification(title,message,pendingIntent,true);
                         return;
                     }
                     newPath = createTempFile(file);
@@ -1645,7 +1645,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             String title = getString(R.string.title_compression_size_over_limit);
             String size = prefs.getChargingOnSize();
             String message = getString(R.string.message_compression_size_over_limit).replace("$size",size);
-            showNotification(title,message,pendingIntent);
+            showNotification(title,message,pendingIntent,true);
         }
         
     }
@@ -1674,7 +1674,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
         String title = getResources().getString(R.string.title_out_of_space);
         String message = getResources().getString(R.string.message_out_of_space);
-        showNotification(title,message,pendingIntent);
+        showNotification(title,message,pendingIntent,true);
     }
     
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
@@ -1755,7 +1755,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         showProgressNotification(progressPercent,pendingIntent,message,info,getString(R.string.settings_camera_notif_title));
     }
     
-    private void showNotification(String title,String content,PendingIntent intent) {
+    private void showNotification(String title,String content,PendingIntent intent, boolean isAutoCancel) {
         log("showNotification");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
@@ -1771,7 +1771,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 .setContentTitle(title)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 .setContentText(content)
-                .setOnlyAlertOnce(true);
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(isAutoCancel);
         mNotification = mBuilder.build();
         
         mNotificationManager.notify(notificationId,mNotification);
