@@ -1310,12 +1310,16 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		if (event.getType() == MegaEvent.EVENT_STORAGE) {
 			log("Storage status changed");
-			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-			intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
-			intent.putExtra("state", event.getNumber());
-			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-			api.getAccountDetails(null);
+			int state = event.getNumber();
+			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
+				api.getAccountDetails(null);
+			}
+			else {
+				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+				intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+				intent.putExtra("state", state);
+				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+			}
 		}
 	}
 
