@@ -609,8 +609,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null){
 				if (intent.getAction() == Constants.ACTION_STORAGE_STATE_CHANGED) {
-					storageState = intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
-					showStorageStatusDialog();
+					int newStorageState =
+							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
+					showStorageStatusDialog(newStorageState);
 					updateAccountDetailsVisibleInfo();
 					return;
 				}
@@ -14980,7 +14981,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	private void showStorageStatusDialog() {
-		switch (storageState) {
+		showStorageStatusDialog(storageState);
+	}
+
+	private void showStorageStatusDialog(int newStorageState) {
+		switch (newStorageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
 				log("STORAGE STATE GREEN");
 				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
@@ -14991,16 +14996,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						showProPanel();
 					}
 				}
+				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
-				showStorageAlmostFullDialog();
+				if (newStorageState > storageState)
+					showStorageAlmostFullDialog();
+				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
 				log("STORAGE STATE RED");
-				showOverquotaAlert(false);
+				if (newStorageState > storageState)
+					showOverquotaAlert(false);
+				storageState = newStorageState;
 				break;
 		}
 	}
