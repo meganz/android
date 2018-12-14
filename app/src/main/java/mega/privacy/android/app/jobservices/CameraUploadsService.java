@@ -345,11 +345,11 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         if (prefs != null) {
             log("if (prefs != null)");
             if (prefs.getCamSyncTimeStamp() != null) {
-                log("if (prefs.getCamSyncTimeStamp() != null)");
                 currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
                 selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
                 log("SELECTION photo: " + selectionCamera);
-
+            }
+            if(prefs.getCamVideoSyncTimeStamp() != null) {
                 currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
                 selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
                 log("SELECTION video: " + selectionCameraVideo);
@@ -357,11 +357,11 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
                 if (prefs.getSecSyncTimeStamp() != null) {
-                    log("if (prefs.getSecSyncTimeStamp() != null)");
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
                     selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY photo: " + selectionSecondary);
-
+                }
+                if(prefs.getSecVideoSyncTimeStamp() != null) {
                     secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
                     selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY video: " + selectionSecondaryVideo);
