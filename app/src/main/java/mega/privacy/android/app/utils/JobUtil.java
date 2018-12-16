@@ -18,9 +18,9 @@ import mega.privacy.android.app.jobservices.DaemonService;
 @TargetApi(21)
 public class JobUtil {
     //todo short time for testing purpose
-    public static final long SCHEDULER_INTERVAL = 15 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
 
-    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 5 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 60 * DateUtils.MINUTE_IN_MILLIS;
 
     public static final int START_JOB_FAILED = -1;
 
