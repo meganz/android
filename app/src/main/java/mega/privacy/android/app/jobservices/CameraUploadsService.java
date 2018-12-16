@@ -12,8 +12,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -69,7 +67,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
@@ -202,14 +199,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 return START_NOT_STICKY;
             }
         }
-        final Ringtone ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-        ringtone.play();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ringtone.stop();
-            }
-        }, 3000);
 
         try {
             log("Start service here, creating new thread");
@@ -249,7 +238,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    handleException();
+                    handleException(e);
                 }
             }
         };
@@ -999,7 +988,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                                             startCameraUploads();
                                         } catch (Exception e) {
                                             e.printStackTrace();
-                                            handleException();
+                                            handleException(e);
                                         }
                                     }
                                 }
@@ -1243,8 +1232,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
     }
 
-    private void handleException() {
-        log("handle exception");
+    private void handleException(Exception e) {
+        log("handle exception: " + e + " / " + e.getMessage());
 
         if (running) {
             handler.removeCallbacksAndMessages(null);
