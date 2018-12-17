@@ -482,6 +482,7 @@
         <activity
             android:name=".lollipop.megachat.MapsActivity"
             android:label="@string/title_activity_maps"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.Megaactionbar.Secondary">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

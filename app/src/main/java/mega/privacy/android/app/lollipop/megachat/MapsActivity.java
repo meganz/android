@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -14,6 +15,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -32,11 +34,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.AutocompletePredictionBufferResponse;
 import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
@@ -47,9 +55,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,8 +76,8 @@ import mega.privacy.android.app.utils.Util;
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener {
 
+    private final int DEFAULT_RADIUS = 50000;
     private final float DEFAULT_ZOOM = 18f;
-    private final float DEFAULT_FULLSCREEN_ZOOM = 19f;
 
     private DisplayMetrics outMetrics;
     private Toolbar tB;
@@ -77,6 +89,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     private RelativeLayout listLayout;
     private FloatingActionButton setFullScreenFab;
     private FloatingActionButton myLocationFab;
+    private TextView noPlacesFound;
     private SupportMapFragment mapFragment;
     private RecyclerView listAddresses;
     private LinearLayoutManager layoutManager;
@@ -93,7 +106,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     MenuItem searchMenuItem;
 
     private boolean isFullScreenEnabled = false;
+    private Bitmap iconMarker;
     private Marker fullScreenMarker;
+    private ArrayList<Marker> placesMarker = new ArrayList<>();
+    private int numMarkers = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +154,8 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         myLocationFabDrawable.setAlpha(143);
         myLocationFab.setImageDrawable(myLocationFabDrawable);
         myLocationFab.setOnClickListener(this);
+        noPlacesFound = (TextView) findViewById(R.id.no_places_found_label);
+        noPlacesFound.setVisibility(View.GONE);
         listAddresses = (RecyclerView) findViewById(R.id.address_list);
         listAddresses.setClipToPadding(false);
         setLayoutManager(true);
@@ -172,6 +190,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         placeDetectionClient = Places.getPlaceDetectionClient(this);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         geocoder = new Geocoder(this, Locale.getDefault());
+        iconMarker = drawableBitmap(getDrawable(R.drawable.ic_map_marker));
     }
 
     void setMapParams (int width, int height) {
@@ -264,11 +283,15 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             @Override
             public void onSuccess(PlaceLikelihoodBufferResponse placeLikelihoods) {
                 int i = 0;
-                Bitmap icon = drawableBitmap(getDrawable(R.drawable.ic_map_marker));
+                placesMarker.clear();
+                if (iconMarker == null) {
+                    iconMarker = drawableBitmap(getDrawable(R.drawable.ic_map_marker));
+                }
+                Marker marker;
                 for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
                     i++;
-//                    https://github.com/googlemaps/android-samples/blob/master/ApiDemos/java/app/src/main/java/com/example/mapdemo/CircleDemoActivity.java
-                    mMap.addMarker(new MarkerOptions().position(placeLikelihood.getPlace().getLatLng()).icon(BitmapDescriptorFactory.fromBitmap(icon)));
+                    marker = mMap.addMarker(new MarkerOptions().position(placeLikelihood.getPlace().getLatLng()).icon(BitmapDescriptorFactory.fromBitmap(iconMarker)));
+                    placesMarker.add(marker);
                     arrayListAddresses.add(i, new MapAddress(placeLikelihood.getPlace()));
                 }
                 setAdapterAddresses();
@@ -371,7 +394,62 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     void onMapSearch(String search) {
         if (search != null && !search.equals("")) {
-
+            noPlacesFound.setVisibility(View.GONE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+            View view = getCurrentFocus();
+            if (view != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+            if (iconMarker == null) {
+                iconMarker = drawableBitmap(getDrawable(R.drawable.ic_map_marker));
+            }
+            if (placesMarker != null && placesMarker.size() > 0) {
+                for (Marker marker : placesMarker) {
+                    marker.remove();
+                }
+                placesMarker.clear();
+            }
+            if (arrayListAddresses != null && arrayListAddresses.size() > 0) {
+                MapAddress address = address = arrayListAddresses.get(0);
+                arrayListAddresses.clear();
+                arrayListAddresses.add(address);
+            }
+            double distanceFromCenterToCorner = DEFAULT_RADIUS * Math.sqrt(2);
+            LatLng southwestCorner = SphericalUtil.computeOffset(myLocation, distanceFromCenterToCorner, 225.0);
+            LatLng northeastCorner = SphericalUtil.computeOffset(myLocation, distanceFromCenterToCorner, 45.0);
+            final LatLngBounds latLngBounds = new LatLngBounds(southwestCorner, northeastCorner);
+            final LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(myLocation);
+//            AutocompleteFilter.Builder autocompleteFilter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS).setCountry("Salamanca");
+            geoDataClient.getAutocompletePredictions(search, latLngBounds, null).addOnSuccessListener(new OnSuccessListener<AutocompletePredictionBufferResponse>() {
+                @Override
+                public void onSuccess(AutocompletePredictionBufferResponse autocompletePredictions) {
+                    final int size = autocompletePredictions.getCount();
+                    if (size == 0) {
+                        noPlacesFound.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        for (AutocompletePrediction autocompletePrediction : autocompletePredictions) {
+                            geoDataClient.getPlaceById(autocompletePrediction.getPlaceId()).addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
+                                @Override
+                                public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+                                    Place place = task.getResult().get(0);
+                                    arrayListAddresses.add(new MapAddress(place));
+                                    Marker marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).icon(BitmapDescriptorFactory.fromBitmap(iconMarker)));
+                                    builder.include(marker.getPosition());
+                                    placesMarker.add(marker);
+                                    numMarkers++;
+                                    if (numMarkers == size) {
+                                        LatLngBounds bounds = builder.build();
+                                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                                        setAdapterAddresses();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
         }
     }
 

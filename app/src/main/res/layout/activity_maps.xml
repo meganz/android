@@ -74,6 +74,15 @@
             android:layout_height="match_parent"
             android:choiceMode="multipleChoice"/>
 
+        <TextView
+            android:id="@+id/no_places_found_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_places_found"
+            android:textSize="16sp"
+            android:textColor="@color/name_my_account"
+            android:layout_centerInParent="true"/>
+
     </RelativeLayout>
 
 </RelativeLayout>
