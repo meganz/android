@@ -32,6 +32,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <ImageView
+            android:id="@+id/fullscreen_marker_icon_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/icon_marker_shadow"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@+id/fullscreen_marker_icon"
+            android:paddingBottom="55dp"/>
+
+        <ImageView
+            android:id="@+id/fullscreen_marker_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_send_location"
+            android:tint="@color/dark_primary_color_secondary"
+            android:layout_centerInParent="true"
+            android:paddingBottom="24dp"/>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/set_fullscreen_fab"
             android:layout_width="wrap_content"

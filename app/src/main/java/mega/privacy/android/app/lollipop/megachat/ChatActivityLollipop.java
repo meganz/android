@@ -12,6 +12,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -144,7 +146,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
-    private final int LOCATION_PERMISSION_REQUEST_CODE = 11;
+
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -1912,11 +1914,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
             }
-            case LOCATION_PERMISSION_REQUEST_CODE: {
+            case Constants.LOCATION_PERMISSION_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                         Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(intent);
+                        startActivityForResult(intent, Constants.REQUEST_CODE_SEND_LOCATION);
                     }
                 }
                 break;
@@ -2224,7 +2226,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("TAKE_PHOTO_CODE--->ERROR!");
             }
 
-        }else{
+        }
+        else  if (requestCode == Constants.REQUEST_CODE_SEND_LOCATION && resultCode == RESULT_OK) {
+            if (intent == null) {
+                return;
+            }
+            byte[] byteArray = intent.getByteArrayExtra("snapshot");
+            if (byteArray != null) {
+                Bitmap snapshot = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                Double latitude = intent.getDoubleExtra("latitude", 0);
+                Double longitude = intent.getDoubleExtra("longitude", 0);
+                String locationName = intent.getStringExtra("name");
+                String locationAddress = intent.getStringExtra("address");
+
+                log("Send location [latitude]: " + latitude + " [longitude]: " + longitude + " [name]: " + locationName + " [address]: " + locationAddress);
+            }
+            else {
+                log("Send location bitmap null");
+            }
+        }
+        else {
             log("Error onActivityResult");
         }
 
@@ -2732,11 +2753,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.LOCATION_PERMISSION_REQUEST_CODE);
         }
         else {
             Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, Constants.REQUEST_CODE_SEND_LOCATION);
         }
     }
 

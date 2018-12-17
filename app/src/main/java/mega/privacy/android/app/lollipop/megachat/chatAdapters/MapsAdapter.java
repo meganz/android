@@ -86,7 +86,9 @@ public class MapsAdapter extends RecyclerView.Adapter<MapsAdapter.ViewHolderMap>
         switch (v.getId()){
             case R.id.item_layout: {
                 int position = holder.getAdapterPosition();
-                ((MapsActivity) context).itemClick(position);
+                if (position>=0 && position<addresses.size()) {
+                    ((MapsActivity) context).itemClick(position);
+                }
                 break;
             }
         }
