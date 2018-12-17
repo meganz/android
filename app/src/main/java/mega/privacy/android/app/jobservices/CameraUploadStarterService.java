@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
+import org.webrtc.EncodedImage;
+
 import mega.privacy.android.app.utils.JobUtil;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -32,7 +34,11 @@ public class CameraUploadStarterService extends JobService {
         } catch (Exception e) {
             log("starter Exception: " + e.getMessage() + "_" + e.getStackTrace());
         }
-        return false;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private void log(String s) {

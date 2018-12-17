@@ -12,8 +12,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -69,7 +67,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
@@ -202,16 +199,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 return START_NOT_STICKY;
             }
         }
-        final Ringtone ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-        ringtone.play();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(ringtone != null) {
-                    ringtone.stop();
-                }
-            }
-        }, 3000);
+        
         try {
             log("Start service here, creating new thread");
             task = createWorkerThread();
@@ -250,7 +238,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    handleException();
+                    handleException(e);
                 }
             }
         };
@@ -346,11 +334,11 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         if (prefs != null) {
             log("if (prefs != null)");
             if (prefs.getCamSyncTimeStamp() != null) {
-                log("if (prefs.getCamSyncTimeStamp() != null)");
                 currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
                 selectionCamera = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
                 log("SELECTION photo: " + selectionCamera);
-
+            }
+            if(prefs.getCamVideoSyncTimeStamp() != null) {
                 currentVideoTimeStamp = Long.parseLong(prefs.getCamVideoSyncTimeStamp());
                 selectionCameraVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPath + "%'";
                 log("SELECTION video: " + selectionCameraVideo);
@@ -358,11 +346,11 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
                 if (prefs.getSecSyncTimeStamp() != null) {
-                    log("if (prefs.getSecSyncTimeStamp() != null)");
                     secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
                     selectionSecondary = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY photo: " + selectionSecondary);
-
+                }
+                if(prefs.getSecVideoSyncTimeStamp() != null) {
                     secondaryVideoTimeStamp = Long.parseLong(prefs.getSecVideoSyncTimeStamp());
                     selectionSecondaryVideo = "((" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryVideoTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryVideoTimeStamp + ") AND " + MediaStore.MediaColumns.DATA + " LIKE '" + localPathSecondary + "%'";
                     log("SELECTION SECONDARY video: " + selectionSecondaryVideo);
@@ -1000,7 +988,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                                             startCameraUploads();
                                         } catch (Exception e) {
                                             e.printStackTrace();
-                                            handleException();
+                                            handleException(e);
                                         }
                                     }
                                 }
@@ -1244,8 +1232,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
     }
 
-    private void handleException() {
-        log("handle exception");
+    private void handleException(Exception e) {
+        log("handle exception: " + e + " / " + e.getMessage());
 
         if (running) {
             handler.removeCallbacksAndMessages(null);
