@@ -411,7 +411,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     if(message!=null){
                         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                         messages.add(message);
-                        chatC.saveForOfflineWithMessages(messages);
+                        chatC.saveForOfflineWithAndroidMessages(messages);
                     }
                     else{
                         log("Message is NULL");
@@ -442,14 +442,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-
     @Override
     public void onAttach(Activity activity) {
         log("onAttach");
         super.onAttach(activity);
         this.context = activity;
     }
-
 
     @Override
     public void onAttach(Context context) {

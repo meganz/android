@@ -33,7 +33,7 @@
     <item
         android:id="@+id/chat_cab_menu_delete"
         android:orderInCategory="110"
-        android:title="@string/context_delete"
+        android:title="@string/context_remove"
         MEGA:showAsAction="never"
         android:icon="@drawable/ic_close_white"/>
 

@@ -221,7 +221,16 @@ public class ChatController {
         }
     }
 
-    public void deleteMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
+    public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
+        log("deleteMessages: "+messages.size());
+        if(messages!=null){
+            for(int i=0; i<messages.size();i++){
+                deleteMessage(messages.get(i), chat.getChatId());
+            }
+        }
+    }
+
+    public void deleteAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
         log("deleteMessages: "+messages.size());
         if(messages!=null){
             for(int i=0; i<messages.size();i++){
@@ -1373,7 +1382,14 @@ public class ChatController {
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
-    public void saveForOfflineWithMessages(ArrayList<AndroidMegaChatMessage> messages){
+    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages){
+        log("saveForOffline - multiple messages");
+        for(int i=0; i<messages.size();i++){
+            saveForOffline(messages.get(i).getMegaNodeList());
+        }
+    }
+
+    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
         log("saveForOffline - multiple messages");
         for(int i=0; i<messages.size();i++){
             saveForOffline(messages.get(i).getMessage().getMegaNodeList());
@@ -1908,16 +1924,32 @@ public class ChatController {
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
             messages.add(aMessage);
-            importNodes(messages);
+            importNodesFromAndroidMessages(messages);
         }
         else{
             log("Message cannot be recovered - null");
         }
     }
 
+    public void importNodesFromMessages(ArrayList<MegaChatMessage> messages){
+        log("importNodesFromMessages");
 
-    public void importNodes(ArrayList<AndroidMegaChatMessage> messages){
-        log("importNodes");
+        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+
+        long[] longArray = new long[messages.size()];
+        for (int i = 0; i < messages.size(); i++) {
+            longArray[i] = messages.get(i).getMsgId();
+        }
+        intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
+
+        if(context instanceof  NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+        }
+    }
+
+    public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
+        log("importNodesFromAndroidMessages");
 
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
@@ -1930,9 +1962,6 @@ public class ChatController {
 
         if(context instanceof  ChatActivityLollipop){
             ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
-        }
-        else if(context instanceof  NodeAttachmentHistoryActivity){
-            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
         }
     }
 
