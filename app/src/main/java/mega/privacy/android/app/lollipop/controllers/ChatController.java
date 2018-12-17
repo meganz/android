@@ -1963,6 +1963,9 @@ public class ChatController {
         if(context instanceof  ChatActivityLollipop){
             ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
         }
+        else if(context instanceof  NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+        }
     }
 
     public void prepareMessageToForward(long idMessage, long idChat) {
