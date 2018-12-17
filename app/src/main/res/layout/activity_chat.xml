@@ -135,14 +135,16 @@
                             <RelativeLayout
                                 android:id="@+id/writing_linear_layout_chat"
                                 android:layout_width="match_parent"
+                                android:background="@android:color/transparent"
                                 android:focusableInTouchMode="true"
-                                android:layout_height="wrap_content">
+                                android:layout_height="48dp">
 
                                 <ImageButton
                                     android:id="@+id/send_message_icon_chat"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_alignParentRight="true"
+                                    android:visibility="gone"
                                     android:layout_marginRight="16dp"
                                     android:layout_centerVertical="true"
                                     android:background="@null"
@@ -150,85 +152,74 @@
                                     android:tint="@color/accentColor"
                                     android:src="@drawable/ic_send_black"/>
 
-                                <LinearLayout
-                                    android:id="@+id/rl_voice_clip"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:background="@android:color/transparent"
-                                    android:layout_centerVertical="true"
-                                    android:gravity="center_vertical"
-                                    android:layout_alignParentLeft="true">
-                                    <TextView
-                                        android:id="@+id/record_time_text"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textColor="@color/delete_account"
-                                        android:textSize="16sp"
-                                        android:textStyle="normal"
-                                        android:fontFamily="Roboto"
-                                        android:layout_marginLeft="16dp"
-                                        android:layout_marginRight="21dp"
-                                        android:layout_centerVertical="true"
-                                        android:gravity="center_vertical"
-                                        android:text="00:16"/>
-                                    <ImageView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:src="@drawable/ic_slide_record_white"
-                                        android:tint="@color/transparent_black"
-                                        android:layout_gravity="center_vertical"/>
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:textColor="@color/name_my_account"
-                                        android:textSize="13sp"
-                                        android:textStyle="normal"
-                                        android:fontFamily="Roboto"
-                                        android:layout_centerVertical="true"
-                                        android:gravity="center_vertical"
-                                        android:text="SLIDE TO CANCEL"/>
-                                </LinearLayout>
+                                <!--<LinearLayout-->
+                                    <!--android:id="@+id/rl_voice_clip"-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content"-->
+                                    <!--android:orientation="horizontal"-->
+                                    <!--android:background="@android:color/transparent"-->
+                                    <!--android:layout_centerVertical="true"-->
+                                    <!--android:gravity="center_vertical"-->
+                                    <!--android:layout_alignParentLeft="true">-->
+                                    <!--<TextView-->
+                                        <!--android:id="@+id/record_time_text"-->
+                                        <!--android:layout_width="wrap_content"-->
+                                        <!--android:layout_height="wrap_content"-->
+                                        <!--android:textColor="@color/delete_account"-->
+                                        <!--android:textSize="16sp"-->
+                                        <!--android:textStyle="normal"-->
+                                        <!--android:fontFamily="Roboto"-->
+                                        <!--android:layout_marginLeft="16dp"-->
+                                        <!--android:layout_marginRight="21dp"-->
+                                        <!--android:layout_centerVertical="true"-->
+                                        <!--android:gravity="center_vertical"-->
+                                        <!--android:text="00:16"/>-->
+                                    <!--<ImageView-->
+                                        <!--android:layout_width="wrap_content"-->
+                                        <!--android:layout_height="wrap_content"-->
+                                        <!--android:src="@drawable/ic_slide_record_white"-->
+                                        <!--android:tint="@color/transparent_black"-->
+                                        <!--android:layout_gravity="center_vertical"/>-->
+                                    <!--<TextView-->
+                                        <!--android:layout_width="wrap_content"-->
+                                        <!--android:layout_height="wrap_content"-->
+                                        <!--android:textColor="@color/name_my_account"-->
+                                        <!--android:textSize="13sp"-->
+                                        <!--android:textStyle="normal"-->
+                                        <!--android:fontFamily="Roboto"-->
+                                        <!--android:layout_centerVertical="true"-->
+                                        <!--android:gravity="center_vertical"-->
+                                        <!--android:text="SLIDE TO CANCEL"/>-->
+                                <!--</LinearLayout>-->
 
-                                <android.support.design.widget.FloatingActionButton
-                                    android:id="@+id/record_fab"
-                                    android:layout_width="wrap_content"
+
+                                <mega.privacy.android.app.components.voiceClip.RecordView
+                                    android:id="@+id/rl_voice_clip"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:visibility="gone"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_toLeftOf="@id/record_fab"
+                                    app:slide_to_cancel_arrow="@drawable/ic_slide_record_white"
+                                    app:slide_to_cancel_arrow_color="@color/transparent_black"
+                                    app:slide_to_cancel_bounds="8dp"
+                                    app:slide_to_cancel_margin_right="10dp"
+                                    app:slide_to_cancel_text="SLIDE TO CANCEL"
+                                    android:background="@android:color/transparent"
+                                    app:counter_time_color="@color/delete_account"/>
+
+                                <mega.privacy.android.app.components.voiceClip.RecordButton
+                                    android:id="@+id/record_fab"
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:visibility="gone"
                                     android:layout_alignParentRight="true"
                                     android:layout_marginRight="4dp"
-                                    android:layout_centerVertical="true"
-                                    android:scaleType="center"
-                                    android:layout_marginBottom="6dp"
-                                    android:src="@drawable/ic_b_mic_on"
-                                    app:backgroundTint="@android:color/transparent"
-                                    app:borderWidth="0dp"
-                                    app:elevation="0dp"
-                                    app:fabSize="normal"
-                                    app:pressedTranslationZ="12dp"/>
-
-                                <ImageButton
-                                    android:id="@+id/stop"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_remove"
+                                    android:layout_alignParentBottom="true"
+                                    android:scaleType="centerInside"
                                     android:background="@null"
-                                    android:visibility="gone"
-                                    android:layout_centerVertical="true"
-                                    android:layout_alignBottom="@id/edit_text_chat"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_toLeftOf="@+id/record_fab"/>
-
-                                <ImageButton
-                                    android:id="@+id/play"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_play"
-                                    android:background="@null"
-                                    android:visibility="gone"
-                                    android:layout_centerVertical="true"
-                                    android:layout_alignBottom="@id/edit_text_chat"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_toLeftOf="@+id/stop"/>
+                                    android:elevation="4dp"
+                                    app:mic_icon="@drawable/ic_b_mic_on"/>
 
                                 <mega.privacy.android.app.components.twemoji.EmojiEditText
                                     android:id="@id/edit_text_chat"
@@ -239,7 +230,7 @@
                                     android:layout_marginRight="10dp"
                                     android:layout_centerVertical="true"
                                     android:textSize="14sp"
-                                    android:layout_toLeftOf="@+id/play"
+                                    android:layout_toLeftOf="@+id/record_fab"
                                     android:inputType="textMultiLine|textCapSentences"
                                     android:maxLines="1"
                                     android:ellipsize="end"

@@ -114,7 +114,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -2161,6 +2161,20 @@ public class Util {
 			}
 		}
 		return true;
+	}
+
+	public static float toPixel(float dp, Context context){
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+		return px;
+	}
+
+	public static float toDp(float px, Context context){
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+		return dp;
 	}
 
 	private static void log(String message) {

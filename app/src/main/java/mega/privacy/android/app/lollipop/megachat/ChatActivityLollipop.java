@@ -95,6 +95,11 @@ import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
+import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
+import mega.privacy.android.app.components.voiceClip.OnRecordListener;
+import mega.privacy.android.app.components.voiceClip.RecordButton;
+import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -153,9 +158,12 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.toCDATA;
+
+import java.util.concurrent.TimeUnit;
+
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
@@ -259,7 +267,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout writingContainerLayout;
     RelativeLayout writingLayout;
     RelativeLayout disabledWritingLayout;
-    LinearLayout voiceClipLayout;
+    RecordView voiceClipLayout;
 
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
@@ -331,8 +339,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     Handler handler;
 
     //VOICE CLIPS:
-    private ImageButton play, stop;
-    private FloatingActionButton record;
+//    private ImageButton play, stop;
+    private RecordButton record;
     private MediaRecorder myAudioRecorder;
     private String outputFile;
     boolean isVoiceClip = false;
@@ -664,7 +672,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         disabledWritingLayout = (RelativeLayout) findViewById(R.id.writing_disabled_linear_layout_chat);
-        voiceClipLayout = (LinearLayout) findViewById(R.id.rl_voice_clip);
+        voiceClipLayout = (RecordView) findViewById(R.id.rl_voice_clip);
         voiceClipLayout.setVisibility(View.GONE);
 
         linearLayoutOptions = (LinearLayout)findViewById(R.id.linear_layout_options);
@@ -879,60 +887,111 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setEnabled(true);
         sendIcon.setVisibility(View.GONE);
 
-        record = (FloatingActionButton) findViewById(R.id.record_fab);
-        record.setImageResource(R.drawable.ic_b_mic_on);
-        record.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
-        record.setCompatElevation(0);
+        record = (RecordButton) findViewById(R.id.record_fab);
+        record.setBackground(null);
+        record.setElevation(0);
+        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        record.setRecordView(voiceClipLayout);
+        record.setListenForRecord(true);
 
-
-        final Handler handlerPadLock = new Handler();
-        final Runnable runPadLock = new Runnable(){
+        //ListenForRecord must be false ,otherwise onClick will not be called
+        record.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
-            public void run() {
-                log("how the padlock");
-            }
-        };
-        record.setOnTouchListener(new OnSwipeTouchListener(this) {
-
-            public void singleTap() {
-                if(!isRecording){
-                    bubbleLayout.setAlpha(1);
-                    bubbleLayout.setVisibility(View.VISIBLE);
-                    bubbleLayout.animate().alpha(0).setDuration(4000);
-                }
-             }
-
-            public void longPress() {
-                handlerPadLock.postDelayed(runPadLock, 2000); //2 seconds delay to show de padlock
-                startRecord();
-
-            }
-
-            public void onUp() {
-                if(isRecording){
-                    handlerPadLock.removeCallbacks(runPadLock);
-                    stopRecord();
-                }
-
-            }
-
-            public void down() {
-
-            }
-
-            public void onSwipeLeft() {
-
-                }
-            public void onSwipeRight() {
-
-            }
-            public void onSwipeTop() {
-
-            }
-            public void onSwipeBottom() {
+            public void onClick(View v) {
             }
         });
+
+        //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 8
+        voiceClipLayout.setCancelBounds(8);
+
+        //prevent recording under one Second
+        voiceClipLayout.setLessThanSecondAllowed(false);
+        voiceClipLayout.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
+
+        voiceClipLayout.setOnRecordListener(new OnRecordListener() {
+            @Override
+            public void onStart() {
+                log("voiceClipLayout.setOnRecordListener() -> onStart()");
+                isVoiceClip = true;
+                startRecordVoiceClip();
+            }
+            @Override
+            public void onCancel() {
+                log("voiceClipLayout.setOnRecordListener() -> onCancel()");
+                cancelRecord();
+            }
+            @Override
+            public void onFinish(long recordTime) {
+                String time = getHumanTimeText(recordTime);
+                log("voiceClipLayout.setOnRecordListener() -> onFinish() at "+time);
+                stopRecord();
+            }
+            @Override
+            public void onLessThanSecond() {
+                log("voiceClipLayout.setOnRecordListener() -> onLessThanSecond()");
+                showBubble();
+                cancelRecord();
+            }
+        });
+
+//        voiceClipLayout.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+//            @Override
+//            public void onAnimationEnd() {
+//                log("voiceClipLayout.setOnBasketAnimationEndListener()");
+//                //cancelRecord();
+//            }
+//        });
+
+
+
+//        final Handler handlerPadLock = new Handler();
+//        final Runnable runPadLock = new Runnable(){
+//            @Override
+//            public void run() {
+//                log("how the padlock");
+//            }
+//        };
+//        record.setOnTouchListener(new OnSwipeTouchListener(this) {
+//
+//            public void singleTap() {
+//                if(!isRecording){
+//                    bubbleLayout.setAlpha(1);
+//                    bubbleLayout.setVisibility(View.VISIBLE);
+//                    bubbleLayout.animate().alpha(0).setDuration(4000);
+//                }
+//             }
+//
+//            public void longPress() {
+//                handlerPadLock.postDelayed(runPadLock, 2000); //2 seconds delay to show de padlock
+//                startRecord();
+//
+//            }
+//
+//            public void onUp() {
+//                if(isRecording){
+//                    handlerPadLock.removeCallbacks(runPadLock);
+//                    stopRecord();
+//                }
+//
+//            }
+//
+//            public void down() {
+//
+//            }
+//
+//            public void onSwipeLeft() {
+//
+//                }
+//            public void onSwipeRight() {
+//
+//            }
+//            public void onSwipeTop() {
+//
+//            }
+//            public void onSwipeBottom() {
+//            }
+//        });
 
 
 
@@ -1020,12 +1079,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                return false;
 //            }});
 
-        play = (ImageButton) findViewById(R.id.play);
-        play.setEnabled(false);
-        stop = (ImageButton) findViewById(R.id.stop);
-        stop.setEnabled(false);
-        play.setOnClickListener(null);
-        stop.setOnClickListener(null);
+//        play = (ImageButton) findViewById(R.id.play);
+//        play.setEnabled(false);
+//        stop = (ImageButton) findViewById(R.id.stop);
+//        stop.setEnabled(false);
+//        play.setOnClickListener(null);
+//        stop.setOnClickListener(null);
 
         messageJumpLayout.setOnClickListener(this);
 
@@ -1986,10 +2045,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         isRecording = true;
         textChat.setVisibility(View.GONE);
         linearLayoutOptions.setVisibility(View.INVISIBLE);
-        record.setImageResource(R.drawable.ic_mic_on);
-        record.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.delete_account)));
-        record.setCompatElevation(Util.px2dp(2, outMetrics));
+        record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
+        record.setElevation(Util.px2dp(3, outMetrics));
+        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
         voiceClipLayout.setVisibility(View.VISIBLE);
+
+        try {
+            if(myAudioRecorder!=null){
+                log("myAudioRecorder -> START");
+                myAudioRecorder.prepare();
+                myAudioRecorder.start();
+            }
+        } catch (IllegalStateException ise) {
+            // make something ...
+        } catch (IOException ioe) {
+            // make something
+        }
 
 //        record.setOnTouchListener(new OnSwipeTouchListener(this) {
 //            public void onSwipeLeft() {
@@ -2072,41 +2143,71 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void stopRecord(){
-        log("stopRecord()");
+    public void cancelRecord(){
+        log("cancelRecord()");
+        isVoiceClip = false;
         textChat.setVisibility(View.VISIBLE);
         linearLayoutOptions.setVisibility(View.VISIBLE);
-        record.setImageResource(R.drawable.ic_b_mic_on);
-        record.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
-        record.setCompatElevation(0);
-        voiceClipLayout.setVisibility(View.GONE);
+        record.setBackground(null);
+        record.setElevation(0);
+        record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
+        record.setVisibility(View.VISIBLE);
         isRecording = false;
-
-//        myAudioRecorder.stop();
-//        myAudioRecorder.release();
-//        myAudioRecorder = null;
-//        record.setEnabled(true);
-//        record.setOnClickListener(this);
-//
-//        stop.setEnabled(false);
-//        stop.setOnClickListener(null);
-//
-//        play.setEnabled(true);
-//        play.setOnClickListener(this);
+        voiceClipLayout.setVisibility(View.GONE);
+        if(myAudioRecorder!=null){
+            log("myAudioRecorder -> CANCEL ");
+            myAudioRecorder.reset();
+            myAudioRecorder = null;
+        }
+    }
+    public void sendVoiceClip(){
+        log("sendVoiceClip()");
     }
 
+    public void stopRecord(){
+        log("stopRecord()");
+        isVoiceClip = false;
+        textChat.setVisibility(View.VISIBLE);
+        linearLayoutOptions.setVisibility(View.VISIBLE);
+        record.setBackground(null);
+        record.setElevation(0);
+        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
+        record.setVisibility(View.VISIBLE);
+        isRecording = false;
+        voiceClipLayout.setVisibility(View.GONE);
+        if(myAudioRecorder!=null) {
+            log("myAudioRecorder -> STOP ");
+            myAudioRecorder.stop();
+            myAudioRecorder.release();
+            sendVoiceClip();
+        }
+     }
+
+    public void startRecordVoiceClip(){
+        log("startRecordVoiceClip() ");
+        isVoiceClip = true;
+        if(checkPermissionsVoiceClip()){
+            outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/raquel.opus";
+            myAudioRecorder = new MediaRecorder();
+            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+            myAudioRecorder.setOutputFile(outputFile);
+            startRecord();
+        }
+    }
     public void startCall(){
         if(startVideo){
             log("Start video call");
             megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
-        }
-        else{
+        }else{
             log("Start audio call");
             megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
         }
     }
 
     public boolean checkPermissionsVoiceClip(){
+        log("checkPermissionsVoiceClip()");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
             if (!hasRecordAudioPermission) {
@@ -2120,19 +2221,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public boolean checkPermissionsCall(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
             if (!hasCameraPermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
                 return false;
             }
-
             boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
             if (!hasRecordAudioPermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
                 return false;
             }
-
             return true;
         }
         return true;
@@ -2142,19 +2240,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("checkPermissionsCall");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
             if (!hasCameraPermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
                 return false;
             }
-
             boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasRecordAudioPermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 return false;
             }
-
             return true;
         }
         return true;
@@ -2162,15 +2257,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public boolean checkPermissionsReadStorage(){
         log("checkPermissionsReadStorage");
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
             boolean hasReadStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasReadStoragePermission) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.REQUEST_READ_STORAGE);
                 return false;
             }
-
             return true;
         }
         return true;
@@ -2188,8 +2280,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(checkPermissionsCall()){
                             startCall();
                         }
-                    }
-                    else{
+                    }else{
                         if(checkPermissionsTakePicture()){
                             takePicture();
                         }
@@ -2201,15 +2292,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(isVoiceClip){
-                        if(checkPermissionsVoiceClip()){
-                            outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
-                            myAudioRecorder = new MediaRecorder();
-                            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                            myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                            myAudioRecorder.setOutputFile(outputFile);
-                            startRecord();
-                        }
+                        startRecordVoiceClip();
                     }else{
                         if(checkPermissionsCall()){
                             startCall();
@@ -3037,31 +3120,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                        this.attachFromFileStorage();
 //                    }
                 }
-                break;
-            }
-            case R.id.record_fab:{
-                log("onClick:record_fab");
-                isVoiceClip = true;
-                if(checkPermissionsVoiceClip()){
-                    outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gp";
-                    myAudioRecorder = new MediaRecorder();
-                    myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                    myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                    myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                    myAudioRecorder.setOutputFile(outputFile);
-                    startRecord();
-                }
-                break;
-            }
-            case R.id.stop:{
-                log("onClick:stop");
-                isVoiceClip = false;
-                stopRecord();
-                break;
-            }
-            case R.id.play:{
-                log("onClick:play");
-                playVoiceClip();
                 break;
             }
             case R.id.toolbar_chat:{
@@ -7761,6 +7819,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             position_imageDrag = -1;
         }
     }
+    public void showBubble(){
+        bubbleLayout.setAlpha(1);
+        bubbleLayout.setVisibility(View.VISIBLE);
+        bubbleLayout.animate().alpha(0).setDuration(4000);
+    }
 
     public void hideFileStorageSection(){
         if (fileStorageF != null) {
@@ -7770,4 +7833,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
     }
+        private String getHumanTimeText(long milliseconds) {
+            return String.format("%02d:%02d",
+                    TimeUnit.MILLISECONDS.toMinutes(milliseconds),
+                    TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
+        }
 }
