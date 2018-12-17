@@ -1602,7 +1602,7 @@
     <string name="context_new_file_name" context="Input field description in the create file dialog.">File Name</string>
 
     <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Link name</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">link.url</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog.">Link URL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">SUBJECT</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">CONTENT</string>
@@ -2185,7 +2185,7 @@
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
 
-    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (subscription)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
@@ -2197,7 +2197,7 @@
     <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Invalid value for auto-away, it should be greater than 0.</string>
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
-    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d file</item>
