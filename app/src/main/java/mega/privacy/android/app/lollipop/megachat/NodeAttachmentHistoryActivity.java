@@ -996,11 +996,44 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				}
 				case R.id.chat_cab_menu_forward: {
 					log("Forward message");
+					clearSelections();
+					hideMultipleSelect();
 					forwardMessages(messagesSelected);
 					break;
 				}
-				case R.id.action_delete_versions: {
-					//showConfirmationRemoveVersions(nodes);
+				case R.id.chat_cab_menu_delete:{
+					clearSelections();
+					hideMultipleSelect();
+					//Delete
+					showConfirmationDeleteMessages(messagesSelected, chatRoom);
+					break;
+				}
+				case R.id.chat_cab_menu_download:{
+					clearSelections();
+					hideMultipleSelect();
+
+					ArrayList<MegaNodeList> list = new ArrayList<>();
+					for(int i = 0; i<messagesSelected.size();i++){
+
+						MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
+						list.add(megaNodeList);
+					}
+					ChatController chatC = new ChatController(nodeAttachmentHistoryActivity);
+					chatC.prepareForChatDownload(list);
+					break;
+				}
+				case R.id.chat_cab_menu_import:{
+					clearSelections();
+					hideMultipleSelect();
+					ChatController chatC = new ChatController(nodeAttachmentHistoryActivity);
+					chatC.importNodesFromMessages(messagesSelected);
+					break;
+				}
+				case R.id.chat_cab_menu_offline:{
+					clearSelections();
+					hideMultipleSelect();
+					ChatController chatC = new ChatController(nodeAttachmentHistoryActivity);
+					chatC.saveForOfflineWithMessages(messagesSelected);
 					break;
 				}
 			}
@@ -1145,6 +1178,43 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			}
 			return false;
 		}
+	}
+
+	public void showConfirmationDeleteMessages(final ArrayList<MegaChatMessage> messages, final MegaChatRoom chat){
+		log("showConfirmationDeleteMessages");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						ChatController cC = new ChatController(nodeAttachmentHistoryActivity);
+						cC.deleteMessages(messages, chat);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			builder = new AlertDialog.Builder(this);
+		}
+
+		if(messages.size()==1){
+			builder.setMessage(R.string.confirmation_delete_one_message);
+		}
+		else{
+			builder.setMessage(R.string.confirmation_delete_several_messages);
+		}
+		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected){

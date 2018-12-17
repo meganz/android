@@ -3023,13 +3023,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     clearSelections();
                     hideMultipleSelect();
 
-                    chatC.importNodes(messagesSelected);
+                    chatC.importNodesFromAndroidMessages(messagesSelected);
                     break;
                 }
                 case R.id.chat_cab_menu_offline:{
                     clearSelections();
                     hideMultipleSelect();
-                    chatC.saveForOfflineWithMessages(messagesSelected);
+                    chatC.saveForOfflineWithAndroidMessages(messagesSelected);
                     break;
                 }
             }
@@ -3322,7 +3322,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         ChatController cC = new ChatController(chatActivity);
-                        cC.deleteMessages(messages, chat);
+                        cC.deleteAndroidMessages(messages, chat);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
