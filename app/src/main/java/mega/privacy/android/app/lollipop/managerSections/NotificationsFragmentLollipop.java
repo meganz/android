@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,11 +29,18 @@ import java.util.ListIterator;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 public class NotificationsFragmentLollipop extends Fragment implements View.OnClickListener {
@@ -40,6 +48,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     MegaApiAndroid megaApi;
+    MegaChatApiAndroid megaChatApi;
 
     DatabaseHandler dbH;
 
@@ -72,6 +81,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if(Util.isChatEnabled()){
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
         }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
@@ -240,10 +255,47 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         switch (alertType) {
 
             case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:
+            case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
+            {
+                MegaUser contact = megaApi.getContact(notif.getEmail());
+                if(contact!=null){
+                    if(Util.isChatEnabled()){
+                        log("Go to chat");
+                        MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getHandle());
+                        if(chat==null){
+                            log("No chat, create it!");
+                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                            peers.addPeer(contact.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                            megaChatApi.createChat(false, peers, ((ManagerActivityLollipop) context));
+                        }
+                        else{
+                            log("There is already a chat, open it!");
+                            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.CHAT);
+                            Intent intentOpenChat = new Intent(context, ChatActivityLollipop.class);
+                            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+                            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+                            intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            context.startActivity(intentOpenChat);
+                        }
+                    }
+                    else{
+                        log("Go to contact info");
+                        Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
+                        intent.putExtra("name", notif.getEmail());
+                        startActivity(intent);
+                    }
+                }
+                else{
+                    log("Go to Received requests");
+                    ((ManagerActivityLollipop)context).navigateToContacts(2);
+                }
+                break;
+            }
             case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:
             case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:
             case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:
-            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
             case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:{
                 log("Go to Received requests");
                 ((ManagerActivityLollipop)context).navigateToContacts(2);
@@ -254,9 +306,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 ((ManagerActivityLollipop)context).navigateToContacts(1);
                 break;
             }
-            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:
             case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:
-            case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:
             case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:
             case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
                 log("Go to Contacts");
