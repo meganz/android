@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+	<item
+		android:id="@+id/action_select"
+		android:orderInCategory="110"
+		android:title="@string/action_select_all"
+		MEGA:showAsAction="never" />
+
+	<item
+		android:id="@+id/action_unselect"
+		android:orderInCategory="110"
+		android:title="@string/action_unselect_all"
+		MEGA:showAsAction="never" />
+
+	<item
+		android:id="@+id/action_grid"
+		android:orderInCategory="120"
+		android:title="@string/action_grid"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="always" />
+</menu>

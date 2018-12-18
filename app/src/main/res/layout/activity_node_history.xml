@@ -52,7 +52,7 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/linear_layout_recycler"
+        android:id="@+id/linear_layout_recycler_list"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_node_history">
@@ -68,4 +68,31 @@
                 android:choiceMode="multipleChoice" />
         </RelativeLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_layout_recycler_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_node_history"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <mega.privacy.android.app.components.NewGridRecyclerView
+                android:id="@+id/file_grid_view_browser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:choiceMode="multipleChoice"
+                android:columnWidth ="172dp"
+
+                android:paddingRight="4dp"
+                android:paddingLeft="4dp"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+
 </RelativeLayout>

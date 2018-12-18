@@ -52,6 +52,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -101,10 +102,14 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
 	MegaChatMessage selectedMessage;
     DatabaseHandler dbH = null;
+    MegaPreferences prefs = null;
+    public boolean isList = true;
 
 	int selectedPosition;
 
 	RelativeLayout container;
+	LinearLayout linearLayoutList;
+	LinearLayout linearLayoutGrid;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
 	GestureDetectorCompat detector;
@@ -113,6 +118,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	ImageView emptyImageView;
 
 	MenuItem importIcon;
+    private MenuItem thumbViewMenuItem;
 
 	ArrayList<MegaChatMessage> messages;
 	ArrayList<MegaChatMessage> bufferMessages;
@@ -192,6 +198,23 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		setContentView(R.layout.activity_node_history);
 
+		if (savedInstanceState != null){
+			chatId = savedInstanceState.getLong("chatId", -1);
+		}
+
+        prefs = dbH.getPreferences();
+        if (prefs == null){
+            isList=true;
+        }
+        else{
+            if (prefs.getPreferredViewList() == null){
+                isList = true;
+            }
+            else{
+                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
+            }
+        }
+
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_node_history);
 		setSupportActionBar(tB);
@@ -205,42 +228,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
 
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-
-		listView = (RecyclerView) findViewById(R.id.node_history_list_view);
-		listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(16, outMetrics));
-		listView.setClipToPadding(false);
-		listView.addItemDecoration(new PositionDividerItemDecoration(this, outMetrics));
-		mLayoutManager = new LinearLayoutManager(this);
-		listView.setLayoutManager(mLayoutManager);
-		listView.addOnItemTouchListener(this);
-		listView.setItemAnimator(new DefaultItemAnimator());
-
-		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-				if(stateHistory!=MegaChatApi.SOURCE_NONE){
-					if (dy > 0) {
-						// Scrolling up
-						scrollingUp = true;
-					} else {
-						// Scrolling down
-						scrollingUp = false;
-					}
-
-					if(scrollingUp){
-						int pos = mLayoutManager.findFirstVisibleItemPosition();
-
-						if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
-							log("DE->loadAttachments:scrolling down");
-							isLoadingHistory = true;
-							stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
-							getMoreHistory = false;
-						}
-					}
-				}
-			}
-		});
 
 		emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
 		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
@@ -268,9 +255,60 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		}
 		emptyTextView.setText(result);
 
-		if (savedInstanceState != null){
-			chatId = savedInstanceState.getLong("chatId", -1);
+		linearLayoutList = (LinearLayout) findViewById(R.id.linear_layout_recycler_list);
+		linearLayoutGrid = (LinearLayout) findViewById(R.id.linear_layout_recycler_grid);
+
+		if(isList){
+			linearLayoutList.setVisibility(View.VISIBLE);
+			linearLayoutGrid.setVisibility(View.GONE);
+
+			listView = (RecyclerView) findViewById(R.id.node_history_list_view);
+			listView.addItemDecoration(new PositionDividerItemDecoration(this, outMetrics));
+			mLayoutManager = new LinearLayoutManager(this);
+			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+			listView.setLayoutManager(mLayoutManager);
+			listView.addOnItemTouchListener(this);
+			listView.setItemAnimator(new DefaultItemAnimator());
 		}
+		else{
+			linearLayoutList.setVisibility(View.GONE);
+			linearLayoutGrid.setVisibility(View.VISIBLE);
+
+			listView = (NewGridRecyclerView)findViewById(R.id.file_grid_view_browser);
+		}
+
+		listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(16, outMetrics));
+		listView.setClipToPadding(false);
+		listView.setHasFixedSize(true);
+
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+				if(stateHistory!=MegaChatApi.SOURCE_NONE){
+					if (dy > 0) {
+						// Scrolling up
+						scrollingUp = true;
+					} else {
+						// Scrolling down
+						scrollingUp = false;
+					}
+
+					if(scrollingUp){
+						int pos = mLayoutManager.findFirstVisibleItemPosition();
+
+						if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
+							log("DE->loadAttachments:scrolling down");
+							isLoadingHistory = true;
+							stateHistory = megaChatApi.loadAttachments(chatId, NUMBER_MESSAGES_TO_LOAD);
+							getMoreHistory = false;
+						}
+					}
+				}
+				checkScroll();
+			}
+		});
+
 
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
@@ -299,21 +337,19 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 					messages = new ArrayList<MegaChatMessage>();
 
-					if (adapter == null){
-						adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
+					if(isList){
+						if (adapter == null){
+							adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
+						}
+					}
+					else{
+						if (adapter == null){
+							adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID);
+						}
 					}
 
 					listView.setAdapter(adapter);
 					adapter.setMultipleSelect(false);
-					listView.setLayoutManager(mLayoutManager);
-					listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
-					listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-						@Override
-						public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-							super.onScrolled(recyclerView, dx, dy);
-							checkScroll();
-						}
-					});
 
 					adapter.setMessages(messages);
 
@@ -354,12 +390,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
+	    inflater.inflate(R.menu.activity_node_history, menu);
 
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
-
-		menu.findItem(R.id.action_folder_contacts_list_share_folder).setVisible(false);
+        thumbViewMenuItem= menu.findItem(R.id.action_grid);
 
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -368,6 +403,15 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		selectMenuItem.setVisible(true);
 		unSelectMenuItem.setVisible(false);
+        if (isList){
+            thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+            thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+        }
+        else{
+            thumbViewMenuItem.setTitle(getString(R.string.action_list));
+            thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+        }
+
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -384,6 +428,20 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		    	selectAll();
 		    	return true;
 		    }
+            case R.id.action_grid:{
+                isList = !isList;
+                dbH.setPreferredViewList(isList);
+
+                if (isList){
+                    thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+                }
+                else{
+                    thumbViewMenuItem.setTitle(getString(R.string.action_list));
+                }
+
+                adapter.notifyDataSetChanged();
+                return true;
+            }
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
@@ -1501,6 +1559,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					}
 				}
 				else{
+					log("New state of history: "+stateHistory);
 					fullHistoryReceivedOnLoad();
 					isLoadingHistory = false;
 				}

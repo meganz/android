@@ -860,12 +860,12 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         }
         switch (v.getId()) {
             case R.id.file_list_three_dots_layout:
-            case R.id.file_grid_three_dots: {
+            case R.id.file_grid_three_dots:{
                 threeDotsClicked(currentPosition,m);
                 break;
             }
             case R.id.file_grid_three_dots_for_file: {
-                //threeDotsClicked(currentPosition,n);
+                threeDotsClicked(currentPosition,m);
                 break;
             }
             case R.id.file_list_item_layout:
