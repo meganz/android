@@ -126,7 +126,9 @@ public class Util {
 	public static String chatTempDIR = "MEGA/MEGA Temp/Chat";
 	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
 	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
-	
+	public static String voiceNotesDIR ="MEGA/MEGA Voice Notes";
+
+
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
 	public static String base64EncodedPublicKey_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
@@ -1109,6 +1111,37 @@ public class Util {
 		}
 		
 		return speedString;
+	}
+
+	public static String getVoiceNoteName(long timestamp, String fileName) {
+		log("getVoiceNoteName() - timestamp: "+timestamp+", fileName: "+fileName);
+		String nameResult = "";
+		String extension = "";
+		String dateTime = "";
+
+		//Get extension:
+		String[] s = fileName.split("\\.");
+		if (s != null){
+			if (s.length > 0){
+				extension = s[s.length-1];
+			}
+		}
+
+		//Get date time:
+		try{
+			Calendar calendar = Calendar.getInstance();
+			TimeZone tz = TimeZone.getDefault();
+			calendar.setTimeInMillis(timestamp * 1000L);
+			calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+			Date currenTimeZone = (Date) calendar.getTime();
+			dateTime = sdf.format(currenTimeZone);
+
+		}catch (Exception e) {
+		}
+		nameResult = dateTime+"."+extension;
+
+		return nameResult;
 	}
 	
 	public static String getPhotoSyncName (long timeStamp, String fileName){

@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.Util;
 
 public class RecordView extends RelativeLayout {
 
-    public static final int DEFAULT_CANCEL_BOUNDS = 8; //8dp
+    public static final int DEFAULT_CANCEL_BOUNDS = 1; //8dp
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
     private TextView slideToCancel;
@@ -172,19 +172,15 @@ public class RecordView extends RelativeLayout {
     protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
         log("onActionDown()");
 
-        if (recordListener != null) {
-            recordListener.onStart();
-        }
-
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
 
         slideToCancelLayout.startShimmerAnimation();
         initialX = recordBtn.getX();
+        playSound(RECORD_START);
 
         basketInitialY = basketImg.getY() + 90;
-        playSound(RECORD_START);
 
         showViews();
 
@@ -193,6 +189,11 @@ public class RecordView extends RelativeLayout {
         startTime = System.currentTimeMillis();
         counterTime.start();
         isSwiped = false;
+
+        if (recordListener != null) {
+            recordListener.onStart();
+        }
+
     }
 
 
@@ -200,23 +201,20 @@ public class RecordView extends RelativeLayout {
         log("onActionMove()");
 
         long time = System.currentTimeMillis() - startTime;
-
         if (!isSwiped) {
             log("onActionMove() - !isSwiped - slideToCancelLayout.getX(): "+slideToCancelLayout.getX()+", counterTime.getRight("+counterTime.getRight()+") + cancelBounds("+cancelBounds+"): "+(counterTime.getRight() + cancelBounds));
 
             //Swipe To Cancel
             if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
-                log("onActionMove() - Swipe To Cancel");
-
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
-                    log("less than one second --> no basket animation");
+                    log(" onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
                     hideViews(true);
                     animationHelper.clearAlphaAnimation(false);
                     animationHelper.onAnimationEnd();
 
                 } else {
-                    log("more than one second --> start basket animation");
+                    log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
                     hideViews(false);
                     animationHelper.animateBasket(basketInitialY);
                 }
@@ -243,7 +241,6 @@ public class RecordView extends RelativeLayout {
 
                     if (difX == 0) {
                         difX = (initialX - slideToCancelLayout.getX());
-
                     }
 
                     slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
@@ -254,7 +251,6 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionUp(RecordButton recordBtn) {
         log("onActionUp()");
-
         elapsedTime = System.currentTimeMillis() - startTime;
 
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {

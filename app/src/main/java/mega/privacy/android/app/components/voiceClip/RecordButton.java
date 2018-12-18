@@ -87,7 +87,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         if (isListenForRecord()) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
-                    log("onTouch() - ACTION_DOWN");
+                    log(" onTouch() - ACTION_DOWN");
                     recordView.onActionDown((RecordButton) v, event);
                     break;
                 }
