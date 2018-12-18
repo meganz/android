@@ -850,8 +850,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		if(myAccountInfo == null){
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
-
-
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1055,16 +1053,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		sortBy();
 
-		if(!visibleContacts.isEmpty()){
-			for (int i=0;i<visibleContacts.size();i++){
-				int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
-				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-					log("Request last green for user");
-					megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
+		if(Util.isChatEnabled()){
+			if(!visibleContacts.isEmpty()){
+				for (int i=0;i<visibleContacts.size();i++){
+					int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
+					if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+						log("Request last green for user");
+						megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
+					}
 				}
 			}
 		}
-
 	}
 
 	@Override
@@ -1232,6 +1231,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				if (contact != null) {
 					if (contact.getMegaUser().getHandle() == userHandle) {
 						contact.setLastGreen(formattedDate);
+						//contact.setLastGreen("Veryyy veryy longg tooo check what happens");
 						indexToReplace = itrReplace.nextIndex() - 1;
 						break;
 					}
