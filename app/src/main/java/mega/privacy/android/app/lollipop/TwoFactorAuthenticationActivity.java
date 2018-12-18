@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,13 +21,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -85,6 +91,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private ScrollView scrollContainer2FAEnabled;
     private RelativeLayout qrSeedContainer;
     private RelativeLayout confirmContainer;
+    private TextView explainSeed;
     private Button setup2FAButton;
     private Button openWithButton;
     private Button next2FAButton;
@@ -139,6 +146,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     DisplayMetrics outMetrics;
     String url;
 
+    AlertDialog noAppsDialog;
+    boolean isNoAppsDialogShown = false;
+    AlertDialog helpDialog;
+    boolean isHelpDialogShown = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,6 +164,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
         }
 
         tB = (Toolbar) findViewById(R.id.toolbar);
@@ -182,6 +201,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (qrByteArray != null){
                 qr = BitmapFactory.decodeByteArray(qrByteArray, 0, qrByteArray.length);
             }
+            isNoAppsDialogShown = savedInstanceState.getBoolean("isNoAppsDialogShown", false);
+            isHelpDialogShown = savedInstanceState.getBoolean("isHelpDialogShown", false);
         }
         else {
             rkSaved = false;
@@ -191,12 +212,24 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (getIntent() != null) {
                 newAccount = getIntent().getBooleanExtra("newAccount", false);
             }
+            isNoAppsDialogShown = false;
+            isHelpDialogShown = false;
         }
 
         container2FA = (RelativeLayout) findViewById(R.id.container_2fa);
         scrollContainer2FA = (ScrollView) findViewById(R.id.scroll_container_2fa);
         scrollContainerVerify = (ScrollView) findViewById(R.id.scroll_container_verify);
         scrollContainer2FAEnabled = (ScrollView) findViewById(R.id.container_2fa_enabled);
+
+        explainSeed = (TextView) findViewById(R.id.explain_qr_seed_2fa_2);
+        SpannableString text =  new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
+        Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_b_question_mark);
+        questionMarck.setBounds(0, 0, questionMarck.getIntrinsicWidth(), questionMarck.getIntrinsicHeight());
+        ImageSpan imageSpan =  new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
+        text.setSpan(imageSpan, text.length()-2,text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        explainSeed.setText(text);
+        explainSeed.setOnClickListener(this);
+
         setup2FAButton = (Button) findViewById(R.id.button_enable_2fa);
         setup2FAButton.setOnClickListener(this);
         openWithButton = (Button) findViewById(R.id.button_open_with_2fa);
@@ -626,6 +659,14 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         else {
             megaApi.multiFactorAuthGetCode(this);
         }
+
+        if (isNoAppsDialogShown) {
+            showAlertNotAppAvailable();
+        }
+
+        if (isHelpDialogShown) {
+            showAlertHelp();
+        }
     }
 
     @Override
@@ -638,6 +679,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if (confirm2FAIsShown) {
             confirm2FAIsShown = false;
             showScanOrCopyLayout();
@@ -653,6 +697,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 update2FASetting();
             }
             else {
+                super.callToSuperBack = true;
                 super.onBackPressed();
             }
         }
@@ -860,6 +905,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         outState.putBoolean("isErrorShown", isErrorShown);
         outState.putBoolean("firstTime", firstTime);
         outState.putBoolean("rkSaved", rkSaved);
+        outState.putBoolean("isNoAppsDialogShown", isNoAppsDialogShown);
+        outState.putBoolean("isHelpDialogShown", isHelpDialogShown);
 
         if (scanOrCopyIsShown){
             log("scanOrCopyIsShown");
@@ -962,37 +1009,102 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 this.finish();
                 break;
             }
+            case R.id.cancel_button_no_app: {
+                try {
+                    noAppsDialog.dismiss();
+                }catch (Exception e){}
+                isNoAppsDialogShown = false;
+                break;
+            }
+            case R.id.open_button_no_app: {
+                try {
+                    noAppsDialog.dismiss();
+                }catch (Exception e){}
+                isNoAppsDialogShown = false;
+                openPlayStore();
+                break;
+            }
+            case R.id.explain_qr_seed_2fa_2: {
+                showAlertHelp();
+                break;
+            }
+            case R.id.cancel_button_help: {
+                try {
+                    helpDialog.dismiss();
+                }catch (Exception e){}
+                isHelpDialogShown = false;
+                break;
+            }
+            case R.id.play_store_button_help: {
+                try {
+                    helpDialog.dismiss();
+                }catch (Exception e){}
+                isHelpDialogShown = false;
+                openPlayStore();
+                break;
+            }
         }
     }
 
-    void showAlertNotAppAvailable () {
+    void openPlayStore() {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
+        startActivity(intent);
+    }
+
+    void showAlertHelp () {
+        log("showAlertHelp");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(15, outMetrics), Util.scaleWidthPx(15, outMetrics), 0);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_2fa_help, null);
+        builder.setView(v);
 
-        final TextView text = new TextView(this);
-        text.setText(getString(R.string.intent_not_available_2fa)+".\n\n"+getString(R.string.open_play_store_2fa));
-        text.setTextSize(15);
-        text.setGravity(Gravity.CENTER_HORIZONTAL);
-        text.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
-        confirmationLayout.addView(text, params);
-        builder.setView(confirmationLayout);
+        Button cancelButton = (Button) v.findViewById(R.id.cancel_button_help);
+        cancelButton.setOnClickListener(this);
+        Button playStoreButton = (Button) v.findViewById(R.id.play_store_button_help);
+        playStoreButton.setOnClickListener(this);
 
-        builder.setPositiveButton(getString(R.string.context_open_link),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
-                        startActivity(intent);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
+        helpDialog = builder.create();
+        helpDialog.setCanceledOnTouchOutside(false);
+        helpDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isHelpDialogShown = false;
             }
         });
-        builder.create().show();
+        try {
+            helpDialog.show();
+        }catch (Exception e){}
+
+        isHelpDialogShown = true;
+    }
+
+    void showAlertNotAppAvailable () {
+        log("showAlertNotAppAvailable");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_no_authentication_apps, null);
+        builder.setView(v);
+
+        Button cancelButton = (Button) v.findViewById(R.id.cancel_button_no_app);
+        cancelButton.setOnClickListener(this);
+        Button openButton = (Button) v.findViewById(R.id.open_button_no_app);
+        openButton.setOnClickListener(this);
+
+        noAppsDialog = builder.create();
+        noAppsDialog.setCanceledOnTouchOutside(false);
+        noAppsDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isNoAppsDialogShown = false;
+            }
+        });
+        try {
+            noAppsDialog.show();
+        }catch (Exception e){}
+
+        isNoAppsDialogShown = true;
     }
 
     @Override

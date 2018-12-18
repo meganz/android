@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -69,6 +70,8 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 	public ActionMode actionMode;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if(!adapter.isMultipleSelect()){
@@ -85,6 +88,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -153,7 +157,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
 
 			switch (item.getItemId()) {
 				case R.id.action_mode_close_button: {
@@ -177,6 +180,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
 
@@ -201,7 +205,8 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		lastPositionStack = new Stack<>();
 		
 		parentHandle = -1;
-		dbH = DatabaseHandler.getDbHandler(context);		
+		dbH = DatabaseHandler.getDbHandler(context);
+		handler = new Handler();
 	}
 
 	@Override
@@ -286,8 +291,14 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		
 		return v;
 	}
-	
-//	public void setMode(int mode){
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
+	}
+
+	//	public void setMode(int mode){
 //		log("setMode: "+mode);
 //		modeCloud=mode;
 //		log("setMode: "+modeCloud);
@@ -362,7 +373,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 				hashes = new long[1];
 				hashes[0]=n.getHandle();
-				((FileProviderActivity) context).downloadAndAttach(n.getSize(), hashes);
+				((FileProviderActivity) context).downloadAndAttachAfterClick(n.getSize(), hashes);
 			}
 		}
 

@@ -19,7 +19,9 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -36,6 +38,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 public class FortumoFragmentLollipop extends Fragment implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
@@ -45,6 +48,8 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 	Context context;
 	private ActionBar aB;
 	MyAccountInfo myAccountInfo;
+
+	DatabaseHandler dbH;
 	
 	@Override
 	public void onDestroy(){
@@ -63,7 +68,9 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 		}
 		
 		megaApi.addGlobalListener(this);
-		
+
+		dbH = DatabaseHandler.getDbHandler(context);
+
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -114,13 +121,25 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(context);
+		}
+
+		MegaAttributes attributes = dbH.getAttributes();
+
 		ArrayList<Product> p = myAccountInfo.getProductAccounts();
 		for (int i=0;i<p.size();i++){
 			Product account = p.get(i);
 			if ((account.getLevel()==4) && (account.getMonths()==1)){
 				long planHandle = account.getHandle();
-				megaApi.getPaymentId(planHandle, this);
-				log("megaApi.getPaymentId(" + planHandle + ")");
+				long lastPublicHandle = Util.getLastPublicHandle(attributes);
+				if (lastPublicHandle == -1){
+					megaApi.getPaymentId(planHandle, this);
+				}
+				else{
+					megaApi.getPaymentId(planHandle, lastPublicHandle, this);
+				}
+				log("megaApi.getPaymentId(" + planHandle + ", " + lastPublicHandle + ")");
 			}
 		}
 	}
@@ -188,6 +207,11 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
 	}
 
 	@Override
