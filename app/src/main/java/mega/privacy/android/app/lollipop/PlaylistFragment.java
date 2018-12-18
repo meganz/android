@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -132,7 +133,7 @@ public class PlaylistFragment extends Fragment{
             Window window = ((AudioVideoPlayerLollipop)context).getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(0);
+            window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
         }
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
             ((AudioVideoPlayerLollipop)context).requestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -20,7 +20,6 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
         if (Util.DEBUG) {
             Log.d(TAG,  createMessage(message));
         }
-
         //save to log file
         if (isReadyToWriteToFile(Util.getFileLoggerKarere())) {
             fileLogQueue.add(createMessage(message));

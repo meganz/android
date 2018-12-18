@@ -188,7 +188,6 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 //	@Override
@@ -214,7 +213,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch (item.getItemId()) {
 		// Respond to the action bar's Up/Home button
 			case android.R.id.home: {
@@ -237,7 +236,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_email);
 		}
-		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return getString(R.string.error_invalid_email);
 		}
 		return null;
@@ -250,8 +249,6 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 	public void itemClick(View view, int position) {
 		log("on item click");
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		final PhoneContactInfo contact = (PhoneContactInfo) adapter.getItem(position);
 		if(contact == null)

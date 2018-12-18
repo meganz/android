@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import java.util.regex.Pattern;
+
 public class Constants {
 
 	public static String PIN_4 = "4";
@@ -35,7 +37,8 @@ public class Constants {
 	public static int ACTION_SEARCH_BY_DATE = 1024;
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
-	public static int REQUEST_CODE_REFRESH_STAGING = 1027;
+	public static int REQUEST_CODE_FILE_INFO = 1027;
+	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
@@ -109,6 +112,7 @@ public class Constants {
 
 	final public static int GO_OFFLINE = 9006;
 	final public static int GO_ONLINE = 9007;
+	final public static int START_RECONNECTION = 9008;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
@@ -122,14 +126,19 @@ public class Constants {
 	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
 	public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
+	public static final int WRITE_LOG = 10;
+
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
 	public static final int PRO_II = 2;
 	public static final int PRO_III = 3;
 
-	public static final int COLOR_STATUS_BAR_RED = 1;
-	public static final int COLOR_STATUS_BAR_TRANSPARENT_BLACK = 2;
+	public static final int COLOR_STATUS_BAR_ACCENT = 1;
+	public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
+	public static final int COLOR_STATUS_BAR_SEARCH = 3;
+	public static final int COLOR_STATUS_BAR_ZERO = 4;
+	public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 5;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -141,7 +150,7 @@ public class Constants {
 	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
-	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
+	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
@@ -186,6 +195,10 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
 	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
+	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
+	public static String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
+	public static String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
+	public static String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -208,6 +221,9 @@ public class Constants {
 	final public static int SEARCH_BY_ADAPTER = 2018;
 	final public static int FILE_LINK_ADAPTER = 2019;
 	final public static int FROM_CHAT = 2020;
+	final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
+    final public static int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
+	final public static int GENERAL_OTHERS_ADAPTER = 2023;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -241,6 +257,33 @@ public class Constants {
 	public static int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
+	public static int NOTIFICATION_CHAT_UPLOAD = 15;
+
+	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA Upload";
+	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
+	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
+	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID = "ChatSummaryNotificationNoVibrate";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME = "MEGA Chat Summary (no vibration)";
+	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID = "InProgressMissedCallNotification";
+	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME = "MEGA In Progress and Missed Calls";
+	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_ID = "ChatIncomingCallNotification";
+	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME = "MEGA Incoming Calls";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_ID = "ContactSummaryNotification";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_NAME = "MEGA Contact Summary";
+	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_ID = "CloudDriveNotification";
+	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
+	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
+
 
 	public static String CHAT_FOLDER = "My chat files";
 
@@ -261,4 +304,22 @@ public class Constants {
 	public static long BUFFER_COMP = 1073741824;      // 1 GB
 	public static int MAX_BUFFER_16MB = 16777216; // 16 MB
 	public static int MAX_BUFFER_32MB = 33554432; // 32 MB
+
+	public static String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
+
+	public static String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+
+	public static final Pattern EMAIL_ADDRESS
+			= Pattern.compile(
+			"[a-zA-Z0-9\\+\\.\\_\\%\\-\\&\\+]{1,256}" +
+					"\\@" +
+					"[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+					"(" +
+					"\\." +
+					"[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+					")+"
+	);
+
+	public static int FROM_INCOMING_SHARES= 140;
+	public static int FROM_INBOX= 150;
 }

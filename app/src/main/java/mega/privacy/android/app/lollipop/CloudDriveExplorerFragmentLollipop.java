@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -80,6 +81,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	Stack<Integer> lastPositionStack;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -102,7 +105,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			switch(item.getItemId()){
 
@@ -124,6 +126,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -132,6 +135,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -204,6 +208,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		parentHandle = -1;
 		dbH = DatabaseHandler.getDbHandler(context);
 		lastPositionStack = new Stack<>();
+		handler = new Handler();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
 	}
 
 	@Override
@@ -236,6 +247,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				if (listView.canScrollVertically(-1)){
+					((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
@@ -506,8 +529,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		
 		return v;
 	}
 	
@@ -531,7 +552,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		switch(v.getId()){
 			case R.id.action_text:{
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
@@ -616,7 +637,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
     public void itemClick(View view, int position) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (nodes.get(position).isFolder()){
 			if(selectFile) {

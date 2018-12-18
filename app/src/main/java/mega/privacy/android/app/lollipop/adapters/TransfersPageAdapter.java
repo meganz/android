@@ -7,8 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
 
@@ -41,10 +39,10 @@ public class TransfersPageAdapter extends FragmentPagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.title_tab_in_progress_transfers);
+                return context.getString(R.string.title_tab_in_progress_transfers).toLowerCase();
             }
             case 1:{
-                return context.getString(R.string.title_tab_completed_transfers);
+                return context.getString(R.string.title_tab_completed_transfers).toLowerCase();
             }
         }
         return null;

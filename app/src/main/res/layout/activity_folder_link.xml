@@ -18,7 +18,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:elevation="8dp"
-            app:titleTextAppearance="@style/ToolbarTitle"
+            app:titleTextAppearance="@style/ToolbarTitle.Secondary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             tools:context=".FolderLinkActivityLollipop" />
@@ -95,7 +95,7 @@
                 android:minWidth="0dp"
                 android:layout_marginRight="16dp"
                 android:background="@color/participants_layout"
-                android:text="@string/general_download"/>
+                android:text="@string/general_save_to_device"/>
         </LinearLayout>
 
         <View

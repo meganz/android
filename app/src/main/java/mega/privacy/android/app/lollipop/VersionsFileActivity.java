@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -57,6 +58,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 public class VersionsFileActivity extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
 
@@ -94,6 +96,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
+
+	Handler handler;
 
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
@@ -182,6 +186,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 			menu.findItem(R.id.action_download_versions).setVisible(false);
 			menu.findItem(R.id.action_delete_versions).setVisible(false);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 		
@@ -190,6 +195,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			log("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -259,6 +265,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		}
 		
 		megaApi.addGlobalListener(this);
+
+		handler = new Handler();
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -348,8 +356,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			else{
 				log("ERROR: node is NULL");
 			}
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -372,6 +378,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
     		megaApi.removeGlobalListener(this);
     		megaApi.removeRequestListener(this);
     	}
+    	handler.removeCallbacksAndMessages(null);
     }
 	
 	@Override
@@ -398,7 +405,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -488,7 +494,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -502,8 +507,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
+		super.callToSuperBack = true;
 		super.onBackPressed();
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	private void updateActionModeTitle() {
@@ -537,7 +542,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
@@ -560,6 +564,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUserupdate");
 
+	}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
 	}
 
 	@Override

@@ -98,4 +98,22 @@
         <attr name="fastscroll__handleColor" format="color" />
         <attr name="fastscroll__bubbleTextAppearance" format="reference" />
     </declare-styleable>
+
+    <attr name="emojiSize" format="dimension"/>
+
+    <declare-styleable name="EmojiEditText">
+        <attr name="emojiSize"/>
+    </declare-styleable>
+
+    <declare-styleable name="EmojiTextView">
+        <attr name="emojiSize"/>
+    </declare-styleable>
+
+    <declare-styleable name="EmojiKeyboard">
+        <attr name="exampleString" format="string" />
+        <attr name="exampleDimension" format="dimension" />
+        <attr name="exampleColor" format="color" />
+        <attr name="exampleDrawable" format="color|reference" />
+    </declare-styleable>
+
 </resources>
