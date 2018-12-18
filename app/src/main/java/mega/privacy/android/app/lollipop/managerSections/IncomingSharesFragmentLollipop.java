@@ -1496,12 +1496,14 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
+        if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationsLevel == (((ManagerActivityLollipop)context).deepBrowserTreeIncoming + 1)) {
+            ((ManagerActivityLollipop) context).comesFromNotifications = false;
+            ((ManagerActivityLollipop) context).comesFromNotificationsLevel = 0;
+            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+        }
+
 		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
 			//In the beginning of the navigation
-			if (((ManagerActivityLollipop) context).comesFromeNotifications) {
-				((ManagerActivityLollipop) context).comesFromeNotifications = false;
-				((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
-			}
 
 			log("deepBrowserTree==0");
 			((ManagerActivityLollipop) context).parentHandleIncoming = -1;
