@@ -19,7 +19,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -36,11 +35,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -55,9 +56,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 
-public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
+public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
     float scaleH, scaleW;
     float density;
@@ -211,8 +213,19 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
         switch (item.getItemId()){
             case android.R.id.home: {
-                if (loginFragment != null) {
-                    loginFragment.returnToLogin();
+                switch (visibleFragment) {
+                    case Constants.LOGIN_FRAGMENT: {
+                        if (loginFragment != null && loginFragment.isAdded()) {
+                            loginFragment.returnToLogin();
+                        }
+                        break;
+                    }
+                    case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
+                        if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
+                            chooseAccountFragment.onFreeClick(null);
+                        }
+                        break;
+                    }
                 }
                 break;
             }
@@ -283,7 +296,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     Window window = this.getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
                 }
                 break;
             }
@@ -304,6 +317,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
                 }
                 break;
+
             }
             case Constants.TOUR_FRAGMENT: {
                 log("Show TOUR_FRAGMENT");
@@ -485,10 +499,13 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //					dbH.setPinLockEnabled(false);
 //					dbH.setPinLockCode("");
 //					dbH.setCamSyncEnabled(false);
-        Intent stopIntent = null;
-        stopIntent = new Intent(this, CameraSyncService.class);
-        stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-        startService(stopIntent);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Intent stopIntent = null;
+            stopIntent = new Intent(this, CameraSyncService.class);
+            stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+            startService(stopIntent);
+        }
     }
 
     public void startCameraSyncService(boolean firstTimeCam, int time) {
@@ -506,7 +523,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    startService(new Intent(getApplicationContext(), CameraSyncService.class));
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
+                    }
                 }
             }, time);
         }
@@ -547,8 +566,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-        builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+        builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+        builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 
         builder.show();
     }
@@ -556,6 +575,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     @Override
     public void onBackPressed() {
         log("onBackPressed");
+        super.callToSuperBack = false;
+        super.onBackPressed();
 
         int valueReturn = -1;
 
@@ -579,12 +600,15 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 break;
             }
             case Constants.CHOOSE_ACCOUNT_FRAGMENT: {
-                //nothing to do
+                if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
+                    chooseAccountFragment.onFreeClick(null);
+                }
                 break;
             }
         }
 
         if (valueReturn == 0) {
+            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }
@@ -600,14 +624,13 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
                     log("ACTION_CANCEL_CAM_SYNC");
+                    String title = getString(R.string.cam_sync_syncing);
+                    String text = getString(R.string.cam_sync_cancel_sync);
+
                     Intent tempIntent = null;
-                    String title = null;
-                    String text = null;
-                    if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                         tempIntent = new Intent(this, CameraSyncService.class);
                         tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-                        title = getString(R.string.cam_sync_syncing);
-                        text = getString(R.string.cam_sync_cancel_sync);
                     }
 
                     final Intent cancelIntent = tempIntent;
@@ -616,16 +639,32 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     builder.setPositiveButton(getString(R.string.cam_sync_stop),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    startService(cancelIntent);
+                                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                        startService(cancelIntent);
+                                    }
+                                    else {
+                                        if (megaApi != null) {
+                                            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, loginActivity);
+                                        }
+
+                                        if (dbH == null){
+                                            dbH = DatabaseHandler.getDbHandler(loginActivity);
+                                        }
+
+                                        dbH.setCamSyncEnabled(false);
+                                    }
+
+                                    Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+                                    intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+                                    intent.putExtra(SettingsFragmentLollipop.CAMERA_UPLOADS_STATUS, false);
+                                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                                 }
                             });
                     builder.setNegativeButton(getString(R.string.general_cancel), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();
-                    } catch (Exception ex) {
-                        startService(cancelIntent);
-                    }
+                    } catch (Exception ex) { }
                 }
                 else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();
@@ -794,6 +833,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         this.firstNameTemp = firstNameTemp;
     }
 
+    public void setLastNameTemp(String lastNameTemp) {
+        this.lastNameTemp = lastNameTemp;
+    }
+
     public String getFirstNameTemp() {
         return this.firstNameTemp;
     }
@@ -836,6 +879,11 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
+    }
+
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+        log("onUserAlertsUpdate");
     }
 
     @Override
@@ -952,9 +1000,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     public void showAB(Toolbar tB){
         setSupportActionBar(tB);
-        if (aB == null){
-            aB = getSupportActionBar();
-        }
+        aB = getSupportActionBar();
         aB.show();
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
@@ -963,7 +1009,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+            if (visibleFragment == Constants.LOGIN_FRAGMENT) {
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+            }
         }
     }
 

@@ -318,23 +318,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-		try {
-			myZipFile = new ZipFile(pathZip);			
-	
-			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-			while (zipEntries.hasMoreElements()) {
-				
-				ZipEntry element = zipEntries.nextElement();	
-				
-				log(element.getName());
-			}
-				
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		} 
-
 			
 		String[] parts = pathZip.split("/");
 		if(parts.length>0){
@@ -440,6 +423,19 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				e.printStackTrace();
 			} 	
 		}
+		orderZips();
+		if (adapterList == null){
+			adapterList = new ZipListAdapterLollipop(this, recyclerView, aB, zipNodes, currentFolder);
+		}
+		else{
+//			adapterList.setParentHandle(parentHandle);
+//			adapterList.setNodes(nodes);
+		}		
+
+		recyclerView.setAdapter(adapterList);
+	}
+
+	void orderZips () {
 		Collections.sort(zipNodes, new Comparator<ZipEntry>(){
 
 			public int compare(ZipEntry z1, ZipEntry z2) {
@@ -452,18 +448,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				return res;
 			}
 		});
-		if (adapterList == null){
-			adapterList = new ZipListAdapterLollipop(this, recyclerView, aB, zipNodes, currentFolder);
-		}
-		else{
-//			adapterList.setParentHandle(parentHandle);
-//			adapterList.setNodes(nodes);
-		}		
-
-		recyclerView.setAdapter(adapterList);
-
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	@Override
@@ -549,8 +533,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 			}
 
-//			mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-			mediaIntent.putExtra("FILENAME", currentNode.getName());
+			int index = currentNode.getName().lastIndexOf('/');
+			String name = currentNode.getName().substring(index+1);
+			mediaIntent.putExtra("FILENAME", name);
 			mediaIntent.putExtra("path", currentFile.getAbsolutePath());
 			mediaIntent.putExtra("adapterType", Constants.ZIP_ADAPTER);
 			mediaIntent.putExtra("position", position);
@@ -677,7 +662,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		log("onItemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		ZipEntry currentNode = zipNodes.get(position);
 		
@@ -727,8 +711,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		this.screenPosition = screenPosition;
 		this.imageDrag = imageView;
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		ZipEntry currentNode = zipNodes.get(position);
 
 		currentPath=currentNode.getName();
@@ -739,6 +721,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			depth=depth+1;
 			listDirectory(currentPath);
 			this.setFolder(currentPath);
+			orderZips();
 			adapterList.setNodes(zipNodes);
 		}
 		else{
@@ -843,10 +826,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		log("Depth: "+depth);
 		
 		log("onBackPressed, currentPath: "+currentPath);
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		
 		if(depth<3){
+			super.callToSuperBack = true;
 			super.onBackPressed();
 			
 		} 

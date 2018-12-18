@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -65,18 +66,22 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 log("reconnect and retryPendingConnections");
                 megaApi.reconnect();
 
-                if (megaChatApi != null){
-                    megaChatApi.retryPendingConnections(true, null);
-                }
+//                if (megaChatApi != null){
+//                    megaChatApi.retryPendingConnections(true, null);
+//                }
             }
             else{
 
                 log("retryPendingConnections");
                 megaApi.retryPendingConnections();
 
-                if (megaChatApi != null){
-                    megaChatApi.retryPendingConnections(false, null);
-                }
+//                if (megaChatApi != null){
+//                    megaChatApi.retryPendingConnections(false, null);
+//                }
+            }
+
+            if (megaChatApi != null){
+                megaChatApi.retryPendingConnections(true, null);
             }
 
             connected = true;
@@ -84,8 +89,10 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
                 @Override
                 public void run() {
-                    log("Start CameraSyncService");
-                    c.startService(new Intent(c, CameraSyncService.class));
+                    log("Now I start the service");
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                        c.startService(new Intent(c, CameraSyncService.class));
+                    }
                     handler.removeCallbacksAndMessages(null);
                 }
             }, 2 * 1000);

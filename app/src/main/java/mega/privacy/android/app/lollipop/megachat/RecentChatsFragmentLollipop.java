@@ -125,8 +125,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    public void checkScroll() {
+        if (listView != null) {
+            if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+            }
+            else {
+                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+            }
+        }
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -145,6 +156,15 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
+        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (context instanceof ManagerActivityLollipop) {
+                    checkScroll();
+                }
+            }
+        });
 //        listView.setClipToPadding(false);
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
@@ -645,13 +665,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
-                    }
-                    else if(context instanceof ArchivedChatsActivity){
-                        ((ArchivedChatsActivity)context).changeStatusBarColor();
-                    }
-
                     selectAll();
                     actionMode.invalidate();
                     break;
@@ -711,6 +724,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             adapterList.setMultipleSelect(true);
             if(context instanceof ManagerActivityLollipop){
                 ((ManagerActivityLollipop)context).hideFabButton();
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+                checkScroll();
+            }
+            else if(context instanceof ArchivedChatsActivity){
+                ((ArchivedChatsActivity)context).changeStatusBarColor(1);
             }
             return true;
         }
@@ -721,6 +740,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             adapterList.setMultipleSelect(false);
             if(context instanceof ManagerActivityLollipop){
                 ((ManagerActivityLollipop)context).showFabButton();
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+                checkScroll();
+            }
+            else if(context instanceof ArchivedChatsActivity){
+                ((ArchivedChatsActivity)context).changeStatusBarColor(0);
             }
         }
 
@@ -741,7 +766,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     menu.findItem(R.id.cab_menu_unarchive).setVisible(false);
 
                     MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-                    if(selected.size()==adapterList.getItemCount()){
+                    ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
+
+                    if(archivedChats!=null && archivedChats.size()>0 && selected.size()==adapterList.getItemCount()-1) {
+                        menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                        unselect.setTitle(getString(R.string.action_unselect_all));
+                        unselect.setVisible(true);
+                    }
+                    else if(selected.size()==adapterList.getItemCount()){
                         menu.findItem(R.id.cab_menu_select_all).setVisible(false);
                         unselect.setTitle(getString(R.string.action_unselect_all));
                         unselect.setVisible(true);
@@ -882,12 +914,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
-        if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
-        }
-        else if(context instanceof ArchivedChatsActivity){
-            ((ArchivedChatsActivity)context).changeStatusBarColor();
-        }
 
         if (actionMode != null) {
             actionMode.finish();
@@ -919,12 +945,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
             if (chats.size() > 0){
                 updateActionModeTitle();
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
-                }
-                else if(context instanceof ArchivedChatsActivity){
-                    ((ArchivedChatsActivity)context).changeStatusBarColor();
-                }
             }
         }
         else{
@@ -1367,23 +1387,45 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         if(!Util.isOnline(context)){
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
-                        else{
-                            aB.setSubtitle(null);
+                        else {
+                            if(megaChatApi == null){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.CONNECTING){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                            }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.DISCONNECTED){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
+                            else{
+                                aB.setSubtitle(null);
+                            }
                         }
                         break;
                     }
                     default:{
 
-                        if(!Util.isOnline(context)){
+                        if(!Util.isOnline(context) || megaApi == null || megaApi.getRootNode()==null){
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
                         else{
-                            int initStatus = megaChatApi.getInitState();
-                            if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE){
+                            if(megaChatApi == null){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.CONNECTING){
                                 aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                             }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.DISCONNECTED){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
                             else{
-                                aB.setSubtitle(null);
+                                int initStatus = megaChatApi.getInitState();
+                                if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE){
+                                    aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                                }
+                                else{
+                                    aB.setSubtitle(null);
+                                }
                             }
                         }
                         break;

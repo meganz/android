@@ -65,6 +65,9 @@ public class MegaApiUtils {
 
         for (int i=0;i<nodes.size();i++){
             MegaNode n = nodes.get(i);
+            if(n == null) {
+                continue;
+            }
             if (n.isFolder()){
                 numFolders++;
             }
@@ -284,7 +287,7 @@ public class MegaApiUtils {
                 if(!chatItem.isGroup()){
                     long peer = chatItem.getPeerHandle();
                     MegaUser user = megaApi.getContact(MegaApiJava.userHandleToBase64(peer));
-                    if(user!=null){
+                    if(user!=null && user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                         lastContacted.add(user);
                     }
                 }

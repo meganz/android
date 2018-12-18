@@ -17,15 +17,17 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <LinearLayout
+            android:id="@+id/fragment_layout"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="56dp">
 
             <android.support.design.widget.AppBarLayout
                 android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+                android:theme="@style/Theme.Megaactionbar">
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -33,56 +35,37 @@
                     android:layout_height="wrap_content"
                     android:minHeight="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:popupTheme="@style/Theme.Megaactionbar"
                     app:titleTextAppearance="@style/ToolbarTitle"
-                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                    tools:context=".ManagerActivityLollipop" />
-
-
-                    <android.support.design.widget.TabLayout
-                        android:id="@+id/sliding_tabs_cloud_drive"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/mega"
-                        style="@style/MyCustomTabLayout"/>
+                    app:theme="@style/Theme.Megaactionbar"
+                    tools:context=".ManagerActivityLollipop"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_contacts"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
+                        android:layout_gravity="center_horizontal"
                         style="@style/MyCustomTabLayout"/>
-
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_shares"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_my_account"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_transfers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
             </android.support.design.widget.AppBarLayout>
-
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/cloud_drive_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/contact_tabs_pager"
@@ -118,6 +101,12 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/container_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize">
+
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
@@ -127,7 +116,20 @@
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white"
-                android:layout_gravity="bottom|right|end"/>
+                android:layout_above="@+id/bottom_navigation_view"
+                android:layout_alignParentRight="true"/>
+
+            <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+                android:id="@+id/bottom_navigation_view"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/dark_primary_color"
+                android:layout_alignParentBottom="true"
+                app:itemIconTint="@drawable/bottom_navigation_item_tint"
+                app:itemTextColor="@drawable/bottom_navigation_item_tint"
+                app:menu="@menu/bottom_navigation_items"/>
+
+        </RelativeLayout>
 
         <include
             android:layout_width="fill_parent"
@@ -185,7 +187,8 @@
                 app:elevation="6dp"
                 app:backgroundTint="@color/accentColor"
                 app:pressedTranslationZ="12dp"
-                android:src="@drawable/ic_chat_white"/>
+                android:tint="@color/white"
+                android:src="@drawable/ic_chat"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/main_fab_chat"
@@ -206,73 +209,16 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="#ffffff"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp"
-        app:itemBackground="@drawable/navigation_view_item_background"
-        app:itemIconTint="@color/drawer_item_text"
-        app:itemTextColor="@color/drawer_item_text"
-        app:menu="@menu/navigation_drawer_items" >
+        android:clipToPadding="false">
 
         <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="-70dp">
-
-        <RelativeLayout
-            android:id="@+id/nv_used_space_layout"
             android:layout_width="match_parent"
-            android:clickable="true"
-            android:layout_height="80dp"
-            android:background="#ffffff">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/navigation_drawer_used_space_text"
-                style="@style/NavDrawerAccountUsedSpaceText"
-                android:text="@string/my_account_used_space"
-                android:layout_marginLeft="6dp"
-                tools:fontFamily="roboto"
-                android:lineSpacingMultiplier="1.71" />
+            <include layout="@layout/navigation_view_layout"/>
 
-
-            <ProgressBar
-                android:id="@+id/manager_used_space_bar"
-                style="@style/UsedSpaceProgressBar"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_below="@id/navigation_drawer_used_space_text"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="4dp"/>
-
-            <TextView
-                android:id="@+id/navigation_drawer_used_space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/manager_used_space_bar"
-                android:paddingLeft="16dp"
-                android:text="0"
-                android:lineSpacingMultiplier="1.17"
-                android:textColor="#ff9e9e9e"
-                android:textSize="12sp"
-                tools:fontFamily="roboto"/>
-
-            <TextView
-                android:id="@+id/navigation_drawer_total_space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/manager_used_space_bar"
-                android:paddingRight="16dp"
-                android:text="50GB"
-                android:lineSpacingMultiplier="1.17"
-                android:textColor="#ff9e9e9e"
-                android:textSize="12sp"
-                tools:fontFamily="roboto" />
-        </RelativeLayout>
         </ScrollView>
+
     </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

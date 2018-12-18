@@ -128,6 +128,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				if (listView.canScrollVertically(-1)){
+					((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
@@ -278,8 +290,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		}
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return v;
 	}
 	
@@ -334,7 +344,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		switch(v.getId()){
 			case R.id.action_text:{
@@ -423,8 +432,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
     public void itemClick(View view, int position) {
 		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if (nodes.get(position).isFolder()){
 
 			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
@@ -533,14 +540,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}		
 			}
 		}
+		((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 	}	
 
 	public int onBackPressed(){
 
 		log("deepBrowserTree "+((FileExplorerActivityLollipop)context).deepBrowserTree);
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if(((FileExplorerActivityLollipop)context).deepBrowserTree==0){
 			parentHandle=-1;
@@ -598,7 +604,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyTextViewFirst.setText(result);
 
 			}
-
+			((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 			return 3;
 		}
 		else if (((FileExplorerActivityLollipop)context).deepBrowserTree>0){
@@ -674,6 +680,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
 				}
+				((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 				return 2;
 			}
 
@@ -695,6 +702,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 			((FileExplorerActivityLollipop)context).deepBrowserTree=0;
+			((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 			return 0;
 		}
 	}
@@ -788,10 +796,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	public RecyclerView getListView(){
 		return listView;
-	}
-
-	public int getDeepBrowserTree() {
-		return ((FileExplorerActivityLollipop)context).deepBrowserTree;
 	}
 
 	public void activateButton(boolean show){
