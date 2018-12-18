@@ -624,7 +624,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
             if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
+                if (node.isInShare()) {
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder_incoming);
+                }
+                else {
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder);
+                }
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0;j < sharesIncoming.size();j++) {
@@ -649,7 +654,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
+                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder_outgoing);
+                }
+                else {
+                    setFolderGridSelected(holder,position,R.drawable.ic_folder);
+                }
                 //Show the number of contacts who shared the folder
                 ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                 if (sl != null) {
@@ -901,7 +911,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
             } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
-                setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
+
+                if (node.isInShare()) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_incoming_list);
+                }
+                else {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
+                }
 
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -945,7 +961,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
+                if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_outgoing_list);
+                }
+                else {
+                    setFolderListSelected(holder, position, R.drawable.ic_folder_list);
+                }
                 //Show the number of contacts who shared the folder
                 ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                 if (sl != null) {
