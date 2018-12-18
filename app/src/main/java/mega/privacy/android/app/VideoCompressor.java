@@ -102,7 +102,7 @@ public class VideoCompressor {
 
     public void stop() {
         isRunning = false;
-        Log.d("Yuan","video compressor stopped");
+        log("video compressor stopped");
     }
 
     public VideoCompressor(Context context) {

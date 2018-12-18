@@ -40,7 +40,6 @@
 	        android:entries="@array/settings_camera_upload_file_upload_entries"
 	        android:entryValues="@array/settings_camera_upload_file_upload_values" />
 
-	    <!--yuan new setting-->
 	    <ListPreference
 		    android:key="settings_video_upload_quality"
 		    android:title="@string/settings_video_upload_quality"

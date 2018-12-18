@@ -842,7 +842,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 log("Extras is NULL");
             }
     
-            //Yuan
             listView = (RecyclerView)findViewById(R.id.file_info_contact_list_view);
             //listView.addOnItemTouchListener(this);
             listView.setItemAnimator(new DefaultItemAnimator());

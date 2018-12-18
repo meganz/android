@@ -49,6 +49,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -128,6 +130,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     int LOGIN_IN = 12;
     
+    private long lastUpdated = 0;
     static String gSession;
     private boolean isSec;
     boolean stopped = false;
@@ -480,6 +483,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             } else {
                 parent = cameraUploadNode;
             }
+            
             if (file.getType() == SyncRecord.TYPE_PHOTO && !file.isCopyOnly()) {
                 String newPath = createTempFile(file);
                 //IOException occurs.
@@ -658,7 +662,13 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             //Source file
             File sourceFile = new File(media.filePath);
             String localFingerPrint = megaApi.getFingerprint(media.filePath);
-            MegaNode nodeExists = getPossibleNodeFromCloud(localFingerPrint,uploadNode);
+            MegaNode nodeExists = null;
+            
+            try {
+                nodeExists = getPossibleNodeFromCloud(localFingerPrint,uploadNode);
+            } catch (Exception e) {
+                log("Exception, can not get possible nodes from cloud");
+            }
             
             if (nodeExists == null) {
                 log("if(nodeExists == null)");
@@ -1181,15 +1191,22 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         if (!lock.isHeld()) {
             lock.acquire();
         }
-
+    
+        lastUpdated = 0;
         totalUploaded = 0;
         totalToUpload = 0;
         canceled = false;
         isOverQuota = false;
         running = true;
         handler = new Handler();
-        PAGE_SIZE = 500;
-        PAGE_SIZE_VIDEO = 10;
+        
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            PAGE_SIZE = 500;
+            PAGE_SIZE_VIDEO = 50;
+        }else{
+            PAGE_SIZE = 200;
+            PAGE_SIZE_VIDEO = 10;
+        }
     
         try {
             app = (MegaApplication)getApplication();
@@ -1330,7 +1347,13 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         log("onRequestFinish: " + request.getRequestString());
-        requestFinished(api,request,e);
+        
+        try{
+            requestFinished(api,request,e);
+        } catch (Throwable th) {
+            log("onTransferFinish error: " + th.getMessage());
+            th.printStackTrace();
+        }
     }
     
     private synchronized void requestFinished(MegaApiJava api,MegaRequest request,MegaError e) {
@@ -1410,8 +1433,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             if (e.getErrorCode() == MegaError.API_OK) {
                 MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
                 String fingerPrint = node.getFingerprint();
-                boolean isSecondarty = node.getParentHandle() == secondaryUploadHandle;
-                dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint,isSecondarty);
+                boolean isSecondary = node.getParentHandle() == secondaryUploadHandle;
+                dbH.deleteSyncRecordByFingerprint(fingerPrint,fingerPrint,isSecondary);
             }
             updateUpload();
         } else if (request.getType() == MegaRequest.TYPE_RENAME) {
@@ -1459,8 +1482,13 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
         log("transfer.getPath:" + transfer.getPath());
         log("transfer.getNodeHandle:" + transfer.getNodeHandle());
-        
-        transferFinished(api,transfer,e);
+    
+        try{
+            transferFinished(api,transfer,e);
+        } catch (Throwable th) {
+            log("onTransferFinish error: " + th.getMessage());
+            th.printStackTrace();
+        }
     }
     
     private synchronized void transferFinished(MegaApiJava api,MegaTransfer transfer,MegaError e) {
@@ -1730,6 +1758,15 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     }
     
     private synchronized void updateProgressNotification() {
+    
+        //refresh UI every 2 seconds to avoid too much workload on main thread
+        long now = System.currentTimeMillis();
+        if(now - lastUpdated > 2000){
+            lastUpdated = now;
+        }else {
+            return;
+        }
+        
         int pendingTransfers = megaApi.getNumPendingUploads();
         int totalTransfers = megaApi.getTotalUploads();
         long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
@@ -1871,7 +1908,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentInfo(contentText)
                     .setColor(ContextCompat.getColor(this,R.color.mega))
-                    .setOngoing(true);
+                    .setOngoing(false);
             mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.getNotification());
         }
     }
