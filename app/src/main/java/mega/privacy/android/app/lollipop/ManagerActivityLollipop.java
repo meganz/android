@@ -625,7 +625,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
-	public boolean comesFromeNotifications = false;
+	public boolean comesFromNotifications = false;
+	public int comesFromNotificationsLevel = 0;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -1686,7 +1687,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
-		outState.putBoolean("comesFromeNotifications", comesFromeNotifications);
+		outState.putBoolean("comesFromNotifications", comesFromNotifications);
+		outState.putInt("comesFromNotificationsLevel", comesFromNotificationsLevel);
 	}
 
 	@Override
@@ -1744,7 +1746,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
-			comesFromeNotifications = savedInstanceState.getBoolean("comesFromeNotifications", false);
+			comesFromNotifications = savedInstanceState.getBoolean("comesFromNotifications", false);
+			comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
 		}
 		else{
 			log("Bundle is NULL");
@@ -16595,10 +16598,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			drawerItem = DrawerItem.SHARED_ITEMS;
 			indexShares = 0;
 			if (parent != null){
-				deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
+				comesFromNotificationsLevel = deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
 			}
 			openFolderRefresh = true;
-			comesFromeNotifications = true;
+			comesFromNotifications = true;
 			setParentHandleIncoming(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
