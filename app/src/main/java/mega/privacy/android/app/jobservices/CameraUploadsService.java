@@ -181,7 +181,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         log("public int onStartCommand(Intent intent, int flags, int startId)");
         initService();
         isServiceRunning = true;
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initialising_title),null, false);
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null, false);
         startForeground(notificationId,mNotification);
         
         if (megaApi == null) {
