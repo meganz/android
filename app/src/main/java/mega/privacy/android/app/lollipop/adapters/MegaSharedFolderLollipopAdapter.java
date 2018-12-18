@@ -64,7 +64,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	RecyclerView listFragment;
 	
 	AlertDialog permissionsDialog;
-	private SparseBooleanArray selectedItems;
+	SparseBooleanArray selectedItems;
 	
 	final MegaSharedFolderLollipopAdapter megaSharedFolderAdapter;
 	
@@ -528,8 +528,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		final MegaShare s = (MegaShare) getItem(currentPosition);
@@ -559,7 +557,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		notifyDataSetChanged();
 	}
 	
-	private static void log(String log) {
+	protected static void log(String log) {
 		Util.log("MegaSharedFolderLollipopAdapter", log);
 	}
 	

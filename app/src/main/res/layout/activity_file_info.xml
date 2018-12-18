@@ -23,8 +23,8 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:background="@drawable/full_gradient_shape_2"
-                app:contentScrim="@color/lollipop_primary_color"
-                app:collapsedTitleTextAppearance="@style/ToolbarTitle"
+                app:contentScrim="?attr/colorPrimary"
+                app:collapsedTitleTextAppearance="@style/ToolbarTitle.Secondary"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText">
 
@@ -99,6 +99,9 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
+                    app:titleTextAppearance="@style/ToolbarTitle"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     app:layout_collapseMode="pin"/>
 
                 <!--android:background="@drawable/gradient_shape"-->

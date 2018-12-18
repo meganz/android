@@ -93,6 +93,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 
 @SuppressLint("NewApi") 
@@ -156,7 +157,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	EditText et_user;
 	EditText et_password;
 	TextView bRegisterLol;
-	TextView bLoginLol;
+	Button bLoginLol;
 
 	RelativeLayout relativeLayout;
 	
@@ -582,7 +583,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		});
 
 		
-		bLoginLol = (TextView) findViewById(R.id.button_login_login);
+		bLoginLol = (Button) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
 
 		bLoginLol.setOnClickListener(this);
@@ -1133,6 +1134,24 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
+	public void downloadAndAttachAfterClick(long size, long [] hashes){
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+
+		progressTransfersFinish = 0;
+		clipDataTransfers = null;
+
+		downloadAndAttach(size, hashes);
+	}
+
 	public void downloadAndAttach(long size, long [] hashes){
 		
 		log("downloadAndAttach");
@@ -1385,7 +1404,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_email);
 		}
-		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return getString(R.string.error_invalid_email);
 		}
 		return null;
@@ -1720,10 +1739,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-					Intent stopIntent = null;
-					stopIntent = new Intent(this, CameraSyncService.class);
-					stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-					startService(stopIntent);
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						Intent stopIntent = null;
+						stopIntent = new Intent(this, CameraSyncService.class);
+						stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+						startService(stopIntent);
+					}
 				}
 			}
 			else{
@@ -1985,8 +2006,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		// TODO Auto-generated method stub
-		
+		log("onUsersUpdate");
+	}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
 	}
 
 	@Override

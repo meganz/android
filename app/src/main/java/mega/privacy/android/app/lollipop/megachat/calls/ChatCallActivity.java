@@ -35,7 +35,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -70,11 +69,13 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -102,7 +103,7 @@ import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
-public class ChatCallActivity extends AppCompatActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
+public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaChatVideoListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -263,7 +264,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
 
-
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
@@ -363,7 +363,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
             }
         }
     }
@@ -587,7 +592,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
 
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -636,6 +646,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     setProfileMyAvatar();
                     flagContactAvatar = true;
                     setProfileContactAvatar();
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -652,6 +663,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         if(checkPermissions()){
+            checkPermissionsWriteLog();
             showInitialFABConfiguration();
         }
     }
@@ -677,6 +689,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {}
 
     public void createDefaultAvatar(long userHandle,  String fullName) {
+        log("createDefaultAvatar");
+
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -794,6 +808,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void createMyDefaultAvatar() {
+        log("createMyDefaultAvatar()");
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
@@ -925,12 +940,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onPause(){
+        log("onPause()");
+
         mSensorManager.unregisterListener(this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        log("onResume()");
+
         this.width=0;
         this.height=0;
         super.onResume();
@@ -946,6 +965,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onDestroy(){
+        log("onDestroy()");
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
@@ -965,13 +985,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-//		if (overflowMenuLayout != null){
-//			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
-//				overflowMenuLayout.setVisibility(View.GONE);
-//				return;
-//			}
-//		}
-//        super.onBackPressed();
+        super.callToSuperBack = false;
         super.onBackPressed();
 
         if (megaChatApi != null) {
@@ -993,16 +1007,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        log("Type: "+request.getType());
+        log("onRequestStart()");
     }
 
     @Override
     public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+        log("onRequestUpdate()");
 
     }
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish()");
+
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             MegaApplication.activityPaused();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1315,6 +1332,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         if (this.width != width || this.height != height) {
+            log("onChatVideoData");
             this.width = width;
             this.height = height;
 
@@ -1355,7 +1373,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         switch (v.getId()) {
             case R.id.video_fab:{
-
+                log("Click on video fab");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
                     answerCallFAB.clearAnimation();
@@ -1377,7 +1395,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 break;
             }
             case R.id.micro_fab: {
-
+                log("Click on micro fab");
                 if(callChat.hasLocalAudio()){
                     megaChatApi.disableAudio(chatId, this);
                 }
@@ -1400,16 +1418,28 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             case R.id.answer_call_fab:{
                 log("Click on answer fab");
+                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 megaChatApi.answerChatCall(chatId, false, this);
                 videoFAB.clearAnimation();
-
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 break;
             }
         }
     }
 
+    public void checkPermissionsWriteLog(){
+        log("checkPermissionsWriteLog()");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
+            if (!hasWriteLogPermission) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
+            }else{
+
+            }
+        }
+    }
+
     public boolean checkPermissions(){
+        log("checkPermissions()");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -1646,7 +1676,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         int callStatus = callChat.getStatus();
 
         if (callChat.hasLocalVideo()) {
-
             log("Video local connected");
             if (myAvatarLayout.getVisibility() == View.VISIBLE) {
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
@@ -1654,6 +1683,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
                     if(localCameraFragmentFS == null){
+                        log("Create local camera fragment full screen");
                         localCameraFragmentFS = new LocalCameraCallFullScreenFragment();
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
@@ -1664,11 +1694,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
 
                 }else{
-                    localCameraFragment = new LocalCameraCallFragment();
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                    ft.commitNowAllowingStateLoss();
-
+                    if(localCameraFragment == null){
+                        log("Create local camera fragment");
+                        localCameraFragment = new LocalCameraCallFragment();
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+                        ft.commitNowAllowingStateLoss();
+                    }
                     myAvatarLayout.setVisibility(GONE);
                     parent.setVisibility(View.VISIBLE);
                     fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
@@ -1684,11 +1716,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parentFS.setVisibility(View.GONE);
                 fragmentContainerLocalCameraFS.setVisibility(View.GONE);
                 if (localCameraFragmentFS != null) {
+                    log("Remove local camera fragment full screen");
                     localCameraFragmentFS.setVideoFrame(false);
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(localCameraFragmentFS);
                     localCameraFragmentFS = null;
-
                 }
                 contactAvatarLayout.setVisibility(View.VISIBLE);
 
@@ -1696,6 +1728,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parent.setVisibility(View.GONE);
                 fragmentContainerLocalCamera.setVisibility(View.GONE);
                 if (localCameraFragment != null) {
+                    log("Create local camera fragment");
                     localCameraFragment.setVideoFrame(false);
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.remove(localCameraFragment);
@@ -1778,6 +1811,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
+                       checkPermissionsWriteLog();
                        showInitialFABConfiguration();
                     }
                 }
@@ -1790,11 +1824,20 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
+                        checkPermissionsWriteLog();
                         showInitialFABConfiguration();
                     }
                 }
                 else{
                     hangFAB.setVisibility(View.VISIBLE);
+                }
+                break;
+            }
+
+            case Constants.WRITE_LOG: {
+                log("WRITE_LOG");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkPermissionsWriteLog();
                 }
                 break;
             }
