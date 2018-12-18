@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -43,6 +44,45 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
     boolean itemsVisibles = false;
 
     OnItemClickListener mItemClickListener;
+
+    class ThumbnailsTask extends AsyncTask<Object, Void, Void> {
+
+        ShareInfo file;
+        ViewHolderImportFiles holder;
+        Uri uri;
+
+        @Override
+        protected Void doInBackground(Object... objects) {
+
+            file = (ShareInfo) objects[0];
+            holder = (ViewHolderImportFiles) objects[1];
+
+            File childThumbDir = new File(ThumbnailUtils.getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
+            if(!childThumbDir.exists()){
+                childThumbDir.mkdirs();
+            }
+            File thumb = new File(childThumbDir, file.getTitle() + ".jpg");
+            if (thumb != null && thumb.exists()) {
+                uri = Uri.parse(thumb.getAbsolutePath());
+
+            }
+            else {
+                boolean thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
+                if (thumbnailCreated) {
+                    uri = Uri.parse(thumb.getAbsolutePath());
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (uri != null) {
+                holder.thumbnail.setImageURI(uri);
+            }
+        }
+    }
 
     public ImportFilesAdapter (Context context, Object fragment, List<ShareInfo> files, HashMap<String, String> names) {
         this.context = context;
@@ -86,27 +126,8 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         holder.editButton.setOnClickListener(holder);
 
         holder.thumbnail.setImageResource(MimeTypeList.typeForName(file.getTitle()).getIconResourceId());
-        File childThumbDir = new File(ThumbnailUtils.getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
-        if(!childThumbDir.exists()){
-            childThumbDir.mkdirs();
-        }
-        File thumb = new File(childThumbDir, file.getTitle() + ".jpg");
-        if (thumb != null && thumb.exists()) {
-            Uri uri = Uri.parse(thumb.getAbsolutePath());
-            if (uri != null) {
-                holder.thumbnail.setImageURI(uri);
-            }
-        }
-        else {
-            boolean thumbnailCreated = false;
-            thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
-            if (thumbnailCreated) {
-                Uri uri = Uri.parse(thumb.getAbsolutePath());
-                if (uri != null) {
-                    holder.thumbnail.setImageURI(uri);
-                }
-            }
-        }
+
+        new ThumbnailsTask().execute(new Object[]{file, holder});
 
         holder.currentPosition = position;
 
