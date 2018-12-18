@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -63,6 +64,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
 
@@ -120,6 +122,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
 
+	Handler handler;
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
@@ -146,7 +150,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					
 					//Change permissions
 	
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileContactListActivityLollipop);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileContactListActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
 	
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					
@@ -273,6 +277,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
+			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
 			return true;
 		}
 		
@@ -282,6 +287,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 0);
 		}
 
 		@Override
@@ -368,6 +374,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 		
 		megaApi.addGlobalListener(this);
+
+		handler = new Handler();
 		
 		listContacts = new ArrayList<MegaShare>();
 		
@@ -480,8 +488,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.setMultipleSelect(false);
 			
 			listView.setAdapter(adapter);
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -504,6 +510,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
     		megaApi.removeGlobalListener(this);
     		megaApi.removeRequestListener(this);
     	}
+    	handler.removeCallbacksAndMessages(null);
     }
 	
 	@Override
@@ -511,17 +518,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
-	    
-//	    permissionButton = menu.findItem(R.id.action_file_contact_list_permissions);
-//	    deleteShareButton = menu.findItem(R.id.action_file_contact_list_delete);
-	    addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-	    	    
-//	    permissionButton.setVisible(false);
-//	    deleteShareButton.setVisible(false);
-	    addSharingContact.setVisible(true);
-		menu.findItem(R.id.action_folder_contacts_list_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
+	    inflater.inflate(R.menu.activity_folder_contact_list_without_share_action, menu);
 	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
@@ -534,27 +531,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
 		    	onBackPressed();
 		    	return true;
 		    }
-		    case R.id.action_folder_contacts_list_share_folder:{
-		    	//Option add new contact to share
-				removeShare = false;
-				changeShare = false;
-
-		    	Intent intent = new Intent();
-		    	intent.setClass(this, AddContactActivityLollipop.class);
-		    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
-				intent.putExtra("MULTISELECT", 0);
-		    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
-		    	
-	        	return true;
-	        }
 		    case R.id.action_select:{
 		    	
 		    	selectAll();
@@ -687,7 +669,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -707,13 +689,16 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.callToSuperBack = false;
+		super.onBackPressed();
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 		}
 		else{
 			if (parentHandleStack.isEmpty()){
+				super.callToSuperBack = true;
 				super.onBackPressed();
 			}
 			else{
@@ -774,7 +759,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
@@ -809,7 +794,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void changePermissions(){
 		log("changePermissions");
 		notifyDataSetChanged();
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 		dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 		final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 		dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
@@ -865,13 +850,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		});
 		permissionsDialog = dialogBuilder.create();
 		permissionsDialog.show();
-//				Resources resources = permissionsDialog.getContext().getResources();
-//				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-//				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-//		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-//				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-//				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 	}
 	
 	public void setPositionClicked(int positionClicked){
@@ -942,7 +920,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if(node!=null)
 			{
 				if (node.isFolder()){
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -1017,6 +995,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUserupdate");
 
+	}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
 	}
 
 	@Override

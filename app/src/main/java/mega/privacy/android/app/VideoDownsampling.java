@@ -46,14 +46,16 @@ public class VideoDownsampling {
     private class VideoUpload{
         String original;
         String outFile;
+        long idPendingMessage;
         int percentage;
         long sizeInputFile, sizeRead;
-        public VideoUpload(String original, String outFile, long sizeInputFile) {
+        public VideoUpload(String original, String outFile, long sizeInputFile, long idMessage) {
             this.original = original;
             this.outFile = outFile;
             this.percentage = 0;
             this.sizeRead = 0;
             this.sizeInputFile = sizeInputFile;
+            this.idPendingMessage = idMessage;
         }
     }
 
@@ -62,10 +64,10 @@ public class VideoDownsampling {
         queue = new ConcurrentLinkedQueue<VideoUpload>();
     }
 
-    public void changeResolution(File f, String inputFile) throws Throwable {
+    public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
         log("changeResolution");
 
-        queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length()));
+        queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length(), idMessage));
 
         ChangerWrapper.changeResolutionInSeparatedThread(this);
     }
@@ -92,7 +94,7 @@ public class VideoDownsampling {
             } catch (Throwable th) {
                 mThrowable = th;
                 if(out!=null){
-                    ((ChatUploadService)context).finishDownsampling(out, false);
+                    ((ChatUploadService)context).finishDownsampling(out, false, video.idPendingMessage);
                 }
             }
         }
@@ -269,7 +271,7 @@ public class VideoDownsampling {
             throw exception;
         }
         else{
-            ((ChatUploadService)context).finishDownsampling(mOutputFile, true);
+            ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
         }
     }
 

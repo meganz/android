@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -52,7 +53,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -96,7 +97,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	DisplayMetrics outMetrics;
 
 	ArrayList<MegaNode> nodes;
-	MegaBrowserLollipopAdapter adapterList;
+	MegaNodeAdapter adapterList;
 
 	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
 
@@ -114,6 +115,8 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	
 	private ActionMode actionMode;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapterList.isMultipleSelect()){
@@ -126,7 +129,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 			List<MegaNode> documents = adapterList.getSelectedNodes();
 			
 			switch(item.getItemId()){
@@ -172,6 +175,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
+			Util.changeStatusBarColorActionMode(nodeAttachmentActivity, getWindow(), handler, 1);
 			return true;
 		}
 
@@ -181,6 +185,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(nodeAttachmentActivity, getWindow(), handler, 0);
 		}
 
 		@Override
@@ -240,6 +245,8 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
+
+		handler = new Handler();
 
 		if(megaApi==null||megaApi.getRootNode()==null){
 			log("Refresh session - sdk");
@@ -360,7 +367,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		}
 
 		if (adapterList == null){
-			adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, -1, listView, aB, Constants.NODE_ATTACHMENT_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			adapterList = new MegaNodeAdapter(this, null, nodes, -1, listView, aB, Constants.NODE_ATTACHMENT_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 		}
 		else{
 //			adapterList.setParentHandle(parentHandle);
@@ -370,8 +377,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		adapterList.setMultipleSelect(false);
 
 		listView.setAdapter(adapterList);
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     }
 
     public void setNodes(){
@@ -385,6 +390,12 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 				nodes.add(nodesTemp.get(i));
 			}
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
 	}
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -412,7 +423,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 //				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -460,7 +471,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	protected void onResume() {
     	super.onResume();
     	nodeAttachmentActivity = this;
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
     	log("onResume");
 	}
 
@@ -536,7 +546,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;
@@ -916,8 +926,6 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		switch(v.getId()){
 			case R.id.folder_link_button_download:{
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

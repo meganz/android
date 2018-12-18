@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -53,8 +52,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	LinearLayoutManager mLayoutManager;
 
 	private ActionMode actionMode;
@@ -81,13 +78,11 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 			List<MegaContactRequest> requests = adapterList.getSelectedRequest();
 
 			switch(item.getItemId()){
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -122,6 +117,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.received_request_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -130,6 +127,8 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
             clearSelections();
 			adapterList.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -210,7 +209,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		if(adapterList!=null){
 			adapterList.setMultipleSelect(false);
 		}
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -234,13 +232,11 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapterList.isMultipleSelect()){
 			adapterList.toggleSelection(position);
 			List<MegaContactRequest> users = adapterList.getSelectedRequest();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 			}
 		}
 		else{
@@ -269,6 +265,17 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		
     }
 
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {                
         log("onCreateView");
@@ -292,7 +299,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 				}
 			});
 		}
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
     	if (isList){
      
@@ -303,23 +309,23 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.empty_text_contacts_requests);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.empty_text_contacts_requests_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_requests_list_content_text_layout);
-
-			contentText = (TextView) v.findViewById(R.id.contact_requests_list_content_text);
 			
 			if (adapterList == null){
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
-			}
-
-			if (contacts.size() > 0) {
-				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
 			}
 		
 			adapterList.setPositionClicked(-1);
@@ -329,7 +335,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 				log("adapterList.getCount() == 0");
 
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -358,7 +363,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			else{
 				log("adapterList.getCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -400,17 +404,12 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		else{
 			adapterList.setContacts(contacts);
 		}
-
-		if (contacts.size() > 0) {
-			contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
-		}
 	
 		adapterList.setPositionClicked(-1);
 		
 		if (adapterList.getItemCount() == 0){				
 			log("adapterList.getCount() == 0");
 			listView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -438,7 +437,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		else{
 			log("adapterList.getCount() NOT = 0");
 			listView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}		

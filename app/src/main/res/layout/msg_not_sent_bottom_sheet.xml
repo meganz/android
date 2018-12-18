@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/msg_not_sent_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -33,7 +29,6 @@
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
-                android:text="@string/title_message_not_sent_options"
                 android:textColor="@color/transparent_black"
                 android:textSize="16sp"/>
         </LinearLayout>
@@ -78,6 +73,14 @@
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
+                    android:orientation="vertical"
+                    android:background="@color/chat_sliding_panel_separator"/>
 
 
                 <!--Delete-->

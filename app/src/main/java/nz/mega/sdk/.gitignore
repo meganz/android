@@ -56,6 +56,7 @@
 /MegaChatRoomList.java
 /MegaChatVideoListener.java
 /MegaChatListItem.java
+/MegaChatNodeHistoryListener.java
 /megachat.java
 /megachatJNI.java
 
@@ -77,3 +78,7 @@
 
 /MegaBackupListener.java
 /MegaBackup.java
+
+/MegaTimeZoneDetails.java
+/MegaUserAlert.java
+/MegaUserAlertList.java

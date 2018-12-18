@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/fragment_container_file_browser_grid"
-    android:background="@color/new_background_fragment"
+    android:background="@color/white"
     tools:context=".FileBrowserGridFragment" >
 
     <RelativeLayout
         android:id="@+id/content_grid_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="36dp"
-        android:background="@color/new_background_fragment" >
+        android:background="@color/white"
+        android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -50,7 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/transparent"
         android:gravity="center"
         android:visibility="gone">
 

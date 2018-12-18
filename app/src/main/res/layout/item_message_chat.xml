@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/message_chat_item_layout"
     android:layout_width="match_parent"
@@ -71,7 +70,7 @@
                     android:layout_marginLeft="16dp"
                     android:visibility="gone"/>
 
-                <TextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/own_management_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -98,7 +97,7 @@
                 android:background="@android:color/transparent">
 
                 <!-- text message-->
-                <mega.privacy.android.app.components.WrapEmojiconTextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_own_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -142,7 +141,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/background_text_rich_link" >
 
-                        <mega.privacy.android.app.components.WrapEmojiconTextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_own_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -408,8 +407,7 @@
                             android:layout_width="152dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
-                            android:background="@drawable/gradient_chat_video" />
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait" />
 
                         <ImageView
                             android:id="@+id/video_icon_own_message_thumb_portrait"
@@ -471,7 +469,7 @@
 
                     </RelativeLayout>
 
-                     <!--triangle icon with preview portrait-->
+                    <!--triangle icon with preview portrait-->
                     <RelativeLayout
                         android:id="@+id/error_uploading_portrait"
                         android:layout_width="wrap_content"
@@ -518,91 +516,90 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent">
 
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@android:color/transparent"
+                        android:id="@+id/preview_frame_landscape_rl">
+
+                        <!--Image with preview-->
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/content_own_message_thumb_landscape"
+                            android:layout_width="212dp"
+                            android:layout_height="152dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:background="@android:color/transparent" />
+
+                        <!-- Video elements -->
                         <RelativeLayout
+                            android:id="@+id/gradient_own_message_thumb_landscape"
+                            android:layout_width="212dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape" />
+
+                        <ImageView
+                            android:id="@+id/video_icon_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
-                            android:background="@android:color/transparent"
-                            android:id="@+id/preview_frame_landscape_rl">
+                            android:src="@drawable/ic_play_arrow_white_24dp"
+                            android:background="@null"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignLeft="@+id/content_own_message_thumb_landscape"/>
+                        <TextView
+                            android:id="@+id/video_time_own_message_thumb_landscape"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
+                            android:layout_alignRight="@+id/content_own_message_thumb_landscape"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginRight="10dp"
+                            android:text="00:00"/>
 
-                            <!--Image with preview-->
-                            <mega.privacy.android.app.components.RoundedImageView
-                                android:id="@+id/content_own_message_thumb_landscape"
-                                android:layout_width="212dp"
-                                android:layout_height="152dp"
-                                android:layout_gravity="center_horizontal|center_vertical"
-                                android:background="@android:color/transparent" />
+                        <!--Icon to PDF with preview-->
 
-                            <!-- Video elements -->
-                            <RelativeLayout
-                                android:id="@+id/gradient_own_message_thumb_landscape"
-                                android:layout_width="212dp"
-                                android:layout_height="30dp"
-                                android:layout_gravity="center_horizontal|center_vertical"
-                                android:background="@drawable/gradient_chat_video"
-                                android:layout_alignBottom="@+id/content_own_message_thumb_landscape" />
+                        <ImageView
+                            android:id="@+id/own_attachment_type_icon_lands"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_pdf_list"
+                            android:background="@null"
+                            android:layout_marginBottom="6dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentLeft="true"/>
 
-                            <ImageView
-                                android:id="@+id/video_icon_own_message_thumb_landscape"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_play_arrow_white_24dp"
-                                android:background="@null"
-                                android:layout_marginBottom="5dp"
-                                android:layout_marginLeft="5dp"
-                                android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
-                                android:layout_alignLeft="@+id/content_own_message_thumb_landscape"/>
-                            <TextView
-                                android:id="@+id/video_time_own_message_thumb_landscape"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="@color/white"
-                                android:textSize="14sp"
-                                android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
-                                android:layout_alignRight="@+id/content_own_message_thumb_landscape"
-                                android:layout_marginBottom="5dp"
-                                android:layout_marginRight="10dp"
-                                android:text="00:00"/>
+                        <!--Transparent coat-->
+                        <RelativeLayout
+                            android:id="@+id/transparent_coating_landscape"
+                            android:layout_width="212dp"
+                            android:layout_height="152dp"
+                            android:background="@drawable/shape_images_chat_transparent"/>
 
-                            <!--Icon to PDF with preview-->
+                        <!-- Progress bar-->
+                        <RelativeLayout
+                            android:id="@+id/uploadingProgressBarLand"
+                            android:layout_width="212dp"
+                            android:layout_height="152dp"
+                            android:background="@android:color/transparent">
 
-                            <ImageView
-                                android:id="@+id/own_attachment_type_icon_lands"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_pdf_list"
-                                android:background="@null"
-                                android:layout_marginBottom="6dp"
+                            <ProgressBar
+                                android:id="@+id/uploadingProgressBarLand_im"
+                                android:indeterminate="true"
                                 android:layout_alignParentBottom="true"
-                                android:layout_alignParentLeft="true"/>
-
-                            <!--Transparent coat-->
-                            <RelativeLayout
-                                android:id="@+id/transparent_coating_landscape"
-                                android:layout_width="212dp"
-                                android:layout_height="152dp"
-                                android:background="@drawable/shape_images_chat_transparent"/>
-
-                            <!-- Progress bar-->
-                            <RelativeLayout
-                                android:id="@+id/uploadingProgressBarLand"
-                                android:layout_width="212dp"
-                                android:layout_height="152dp"
-                                android:background="@android:color/transparent">
-
-                                <ProgressBar
-                                    android:id="@+id/uploadingProgressBarLand_im"
-                                    android:indeterminate="true"
-                                    android:layout_alignParentBottom="true"
-                                    android:layout_alignParentRight="true"
-                                    android:paddingRight="5dp"
-                                    android:paddingBottom="5dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-                            </RelativeLayout>
+                                android:layout_alignParentRight="true"
+                                android:paddingRight="5dp"
+                                android:paddingBottom="5dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
                         </RelativeLayout>
+                    </RelativeLayout>
 
                     <!-- triangle icon with preview landscape-->
                     <RelativeLayout
@@ -770,8 +767,8 @@
 
                         <TextView
                             android:id="@+id/content_own_message_contact_initial_letter"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:gravity="center_horizontal|center_vertical"
                             android:paddingBottom="3dp"/>
@@ -943,8 +940,8 @@
                         android:src="@drawable/ic_call_started"
                         android:visibility="gone"/>
 
-                    <TextView
-                        android:id="@+id/contact_management_message_text"
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/contact_management_message_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
@@ -995,7 +992,7 @@
                 </RelativeLayout>
 
                 <!-- text message-->
-                <mega.privacy.android.app.components.WrapEmojiconTextView
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -1022,7 +1019,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/contact_background_text_rich_link" >
 
-                        <mega.privacy.android.app.components.WrapEmojiconTextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/url_contact_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1190,8 +1187,7 @@
                             android:layout_width="152dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center_horizontal|center_vertical"
-                            android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
-                            android:background="@drawable/gradient_chat_video" />
+                            android:layout_alignBottom="@+id/content_contact_message_thumb_portrait" />
 
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_portrait"
@@ -1273,8 +1269,7 @@
                             android:layout_width="212dp"
                             android:layout_height="30dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@drawable/gradient_chat_video" />
+                            android:layout_gravity="center_horizontal|center_vertical"/>
 
                         <ImageView
                             android:id="@+id/video_icon_contact_message_thumb_landscape"
@@ -1445,8 +1440,8 @@
                             rounded:corner_radius="20dp"/>
                         <TextView
                             android:id="@+id/content_contact_message_contact_initial_letter"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:gravity="center_horizontal|center_vertical"
                             android:paddingBottom="3dp"/>
