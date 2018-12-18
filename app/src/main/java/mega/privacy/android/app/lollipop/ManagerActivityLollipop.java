@@ -4234,10 +4234,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			ft.attach(f);
-			ft.commit();
-			try {
-				getSupportFragmentManager().executePendingTransactions();
-			} catch (Exception e){}
+			ft.commitNowAllowingStateLoss();
 		}
 		else {
 			log("Fragment == NULL. Not refresh");
@@ -5223,7 +5220,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
 		if (notificFragment == null){
 			log("New NotificationsFragment");
-			notificFragment = new NotificationsFragmentLollipop();
+			notificFragment = NotificationsFragmentLollipop.newInstance();
+		}
+		else {
+			refreshFragment(FragmentTag.NOTIFICATIONS.getTag());
 		}
         replaceFragment(notificFragment, FragmentTag.NOTIFICATIONS.getTag());
 
@@ -5359,7 +5359,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 		if (rChatFL == null){
 			log("New REcentChatFragment");
-			rChatFL = new RecentChatsFragmentLollipop();
+			rChatFL = RecentChatsFragmentLollipop.newInstance();
 			replaceFragment(rChatFL, FragmentTag.RECENT_CHAT.getTag());
 		}
 		else{
@@ -5705,10 +5705,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			drawerItem = DrawerItem.SEARCH;
     			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
     			if (sFLol != null) {
-    				getSupportFragmentManager().beginTransaction().remove(sFLol).commit();
-					try {
-						getSupportFragmentManager().executePendingTransactions();
-					} catch (Exception e){};
+    				getSupportFragmentManager().beginTransaction().remove(sFLol).commitNowAllowingStateLoss();
 				}
 				sFLol = SearchFragmentLollipop.newInstance();
 
@@ -7167,7 +7164,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				unSelectMenuItem.setVisible(false);
 				thumbViewMenuItem.setVisible(false);
 				addMenuItem.setEnabled(false);
-				rubbishBinMenuItem.setVisible(true);
+				rubbishBinMenuItem.setVisible(false);
 				clearRubbishBinMenuitem.setVisible(false);
 				importLinkMenuItem.setVisible(false);
 				takePicture.setVisible(false);
@@ -17584,11 +17581,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                             int accessLevel = megaApi.getAccess(node);
 
                             if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                                 fabButton.setVisibility(View.VISIBLE);
                             }
                             else if(accessLevel== MegaShare.ACCESS_READWRITE){
-                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                                 fabButton.setVisibility(View.VISIBLE);
                             }
                             else{
@@ -17596,7 +17593,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                             }
                         }
                         else{
-                            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                             fabButton.setVisibility(View.VISIBLE);
                         }
                     }

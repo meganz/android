@@ -593,7 +593,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			    adapter.setRecylerView(recyclerView);
 //				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
-		
+
 			return v;
 		}
 		else{
@@ -753,7 +753,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 
 		if(adapter!=null){
-			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 
 			adapter.setPositionClicked(-1);
@@ -853,7 +852,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 		if (adapter!= null) {
-			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 		}
 //		contentText.setText(getInfoFolder(mOffList));
@@ -925,7 +923,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 		if (adapter!= null) {
-			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 		}
 //		contentText.setText(getInfoFolder(mOffList));
@@ -1164,7 +1161,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 				}
 //				contentText.setText(getInfoFolder(mOffList));
-				addSectionTitle(mOffList);
 				adapter.setNodes(mOffList);
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1610,7 +1606,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		this.mOffList = _mOff;
 
 		if (adapter != null){
-			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
