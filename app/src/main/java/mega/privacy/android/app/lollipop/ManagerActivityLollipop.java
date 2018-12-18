@@ -339,8 +339,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	boolean newAccount = false;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_GREEN;
-	private boolean showStorageOverquotaDialog = true;
-	private boolean showStorageAlmostFullDialog = true;
+	private boolean isStorageStatusDialogShown = false;
 
     int orientationSaved;
 
@@ -506,7 +505,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog renameDialog;
 	private AlertDialog newFolderDialog;
 	private AlertDialog addContactDialog;
-	private AlertDialog overquotaDialog;
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
 	private AlertDialog openLinkDialog;
@@ -518,7 +516,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog generalDialog;
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
-	private AlertDialog alertDialogStorageAlmostFull;
+	private AlertDialog alertDialogStorageStatus;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -611,7 +609,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (intent.getAction() == Constants.ACTION_STORAGE_STATE_CHANGED) {
 					int newStorageState =
 							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
-					showStorageStatusDialog(newStorageState);
+					checkStorageStatus(newStorageState, false);
 					updateAccountDetailsVisibleInfo();
 					return;
 				}
@@ -1636,6 +1634,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
 		outState.putInt("storageState", storageState);
+		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 	}
 
 	@Override
@@ -1694,6 +1693,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
 			storageState = savedInstanceState.getInt("storageState", -1);
+			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -2873,7 +2873,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}
 
-			showStorageStatusDialog();
+			checkStorageStatus(true);
 
 	        //INITIAL FRAGMENT
 			if(selectDrawerItemPending){
@@ -4164,7 +4164,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaChatApi.removeChatCallListener(this);
 		}
 
-		showStorageAlmostFullDialog = true;
+		isStorageStatusDialogShown = false;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
@@ -4585,7 +4585,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					}		updateAccountDetailsVisibleInfo();
 
 					updateAccountDetailsVisibleInfo();
-					showStorageStatusDialog();
+					checkStorageStatus(false);
 				} else {
 					log("showOnlineMode - Root is NULL");
 					if (getApplicationContext() != null) {
@@ -12865,56 +12865,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return -1;
 	}
 
-	private void showOverquotaAlert(boolean prewarning){
-		log("showOverquotaAlert: prewarning: "+prewarning);
-
-		if(!showStorageOverquotaDialog){
-			log("Storage overquota dialog already shown");
-			return;
-		}
-
-		showStorageOverquotaDialog = false;
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.overquota_alert_title));
-
-		if(prewarning){
-			builder.setMessage(getString(R.string.pre_overquota_alert_text));
-		}
-		else{
-			builder.setMessage(getString(R.string.overquota_alert_text));
-		}
-
-		if(overquotaDialog==null){
-
-			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					showStorageOverquotaDialog = true;
-					//Show UpgradeAccountActivity
-					drawerItem = DrawerItem.ACCOUNT;
-					accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
-					selectDrawerItemAccount();
-				}
-			});
-			builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-					showStorageOverquotaDialog = true;
-					overquotaDialog=null;
-				}
-			});
-
-			overquotaDialog = builder.create();
-			overquotaDialog.setCanceledOnTouchOutside(false);
-		}
-
-		overquotaDialog.show();
-	}
-
 	public void updateAccountDetailsVisibleInfo(){
 		log("updateAccountDetailsVisibleInfo");
 		if(isFinishing()){
@@ -14980,11 +14930,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		alertDialogTransferOverquota.show();
 	}
 
-	private void showStorageStatusDialog() {
-		showStorageStatusDialog(storageState);
+	/**
+	 * Check the current storage state.
+	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
+	 */
+	private void checkStorageStatus(boolean onCreate) {
+		checkStorageStatus(storageState, onCreate);
 	}
 
-	private void showStorageStatusDialog(int newStorageState) {
+	/**
+	 * Check the storage state provided as first parameter.
+	 * @param newStorageState Storage state to check.
+	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
+	 */
+	private void checkStorageStatus(int newStorageState, boolean onCreate) {
 		switch (newStorageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
 				log("STORAGE STATE GREEN");
@@ -15001,155 +14960,219 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
-				if (newStorageState > storageState)
+				if (onCreate && isStorageStatusDialogShown) {
+					isStorageStatusDialogShown = false;
 					showStorageAlmostFullDialog();
+				} else if (newStorageState > storageState) {
+					showStorageAlmostFullDialog();
+				}
 				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
 				log("STORAGE STATE RED");
-				if (newStorageState > storageState)
-					showOverquotaAlert(false);
+				if (onCreate && isStorageStatusDialogShown) {
+					isStorageStatusDialogShown = false;
+					showStorageFullDialog();
+				} else if (newStorageState > storageState) {
+					showStorageFullDialog();
+				}
 				storageState = newStorageState;
 				break;
 		}
 	}
 
+	/**
+	 * Show a dialog to indicate that the storage space is almost full.
+	 */
 	public void showStorageAlmostFullDialog(){
 		log("showStorageAlmostFullDialog");
+		showStorageStatusDialog(MegaApiJava.STORAGE_STATE_ORANGE, false, false);
+	}
+
+	/**
+	 * Show a dialog to indicate that the storage space is full.
+	 */
+	public void showStorageFullDialog(){
+		log("showStorageFullDialog");
+		showStorageStatusDialog(MegaApiJava.STORAGE_STATE_RED, false, false);
+	}
+
+	/**
+	 * Show an overquota alert dialog.
+	 * @param preWarning Flag to indicate if is a pre-overquota alert or not.
+	 */
+	public void showOverquotaAlert(boolean preWarning){
+		log("showOverquotaAlert: preWarning: "+preWarning);
+		showStorageStatusDialog(
+				preWarning ? MegaApiJava.STORAGE_STATE_ORANGE : MegaApiJava.STORAGE_STATE_RED,
+				true, preWarning);
+	}
+
+	/**
+	 * Method to show a dialog to indicate the storage status.
+	 * @param storageState Storage status.
+	 * @param overquotaAlert Flag to indicate that is an overquota alert or not.
+	 * @param preWarning Flag to indicate if is a pre-overquota alert or not.
+	 */
+	private void showStorageStatusDialog(int storageState, boolean overquotaAlert, boolean preWarning){
+		log("showStorageStatusDialog");
 
 		if(((MegaApplication) getApplication()).getMyAccountInfo()==null || ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==-1){
 			log("Do not show dialog, not info of the account received yet");
 			return;
 		}
 
-		if(!showStorageAlmostFullDialog){
-			log("Storage almost full dialog already shown");
+		if(isStorageStatusDialogShown){
+			log("Storage status dialog already shown");
 			return;
 		}
-
-		showStorageAlmostFullDialog = false;
 
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
 		LayoutInflater inflater = this.getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.storage_almost_full_layout, null);
+		View dialogView = inflater.inflate(R.layout.storage_status_dialog_layout, null);
 		dialogBuilder.setView(dialogView);
 
-		TextView title = (TextView) dialogView.findViewById(R.id.storage_almost_full_title);
+		TextView title = (TextView) dialogView.findViewById(R.id.storage_status_title);
 		title.setText(getString(R.string.action_upgrade_account));
 
-		TextView text = (TextView) dialogView.findViewById(R.id.text_storage_almost_full);
-		text.setText(getString(R.string.text_almost_full_warning));
+		ImageView image = (ImageView) dialogView.findViewById(R.id.image_storage_status);
+		TextView text = (TextView) dialogView.findViewById(R.id.text_storage_status);
 
-		LinearLayout horizontalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.horizontal_buttons_storage_almost_full_layout);
-		LinearLayout verticalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.vertical_buttons_storage_almost_full_layout);
-		Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_dissmiss);
-		Button horizontalDismissButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_dissmiss);
-		Button verticalActionButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_action);
-		Button horizontalActionButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_payment);
-		Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_achievements);
+		switch (storageState) {
+			case MegaApiJava.STORAGE_STATE_GREEN:
+				log("STORAGE STATE GREEN");
+				return;
 
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-			log("show StorageAlmostFull Dialog for FREE USER");
+			case MegaApiJava.STORAGE_STATE_ORANGE:
+				image.setImageResource(R.drawable.ic_storage_almost_full);
+				text.setText(getString(R.string.text_almost_full_warning));
+				break;
 
-			if(megaApi.isAchievementsEnabled()){
-				horizontalButtonsLayout.setVisibility(View.GONE);
-				verticalButtonsLayout.setVisibility(View.VISIBLE);
-				verticalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+			case MegaApiJava.STORAGE_STATE_RED:
+				image.setImageResource(R.drawable.ic_storage_full);
+				text.setText(getString(R.string.text_storage_full_warning));
+				break;
 
-				verticalDismissButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-					}
+			default:
+				log("STORAGE STATE INVALID VALUE: " + storageState);
+				return;
+		}
 
-				});
+		if (overquotaAlert) {
+			if (!preWarning)
+				title.setText(getString(R.string.overquota_alert_title));
 
-				achievementsButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-						log("Go to achievements section");
-						navigateToAchievements();
-					}
+			text.setText(getString(preWarning ? R.string.pre_overquota_alert_text :
+					R.string.overquota_alert_text));
+		}
 
-				});
+		LinearLayout horizontalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.horizontal_buttons_storage_status_layout);
+		LinearLayout verticalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.vertical_buttons_storage_status_layout);
 
-				verticalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-						navigateToUpgradeAccount();
-					}
-
-				});
+		final OnClickListener dismissClickListener = new OnClickListener() {
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
 			}
-			else{
-				horizontalButtonsLayout.setVisibility(View.VISIBLE);
-				verticalButtonsLayout.setVisibility(View.GONE);
+		};
+
+		final OnClickListener upgradeClickListener = new OnClickListener(){
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
+				navigateToUpgradeAccount();
+			}
+		};
+
+		final OnClickListener achievementsClickListener = new OnClickListener(){
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
+				log("Go to achievements section");
+				navigateToAchievements();
+			}
+		};
+
+		final OnClickListener customPlanClickListener = new OnClickListener(){
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
+				askForCustomizedPlan();
+			}
+		};
+
+		Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_dissmiss);
+		verticalDismissButton.setOnClickListener(dismissClickListener);
+		Button horizontalDismissButton = (Button) dialogView.findViewById(R.id.horizontal_storage_status_button_dissmiss);
+		horizontalDismissButton.setOnClickListener(dismissClickListener);
+
+		Button verticalActionButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_action);
+		Button horizontalActionButton = (Button) dialogView.findViewById(R.id.horizontal_storage_status_button_payment);
+
+		Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_achievements);
+		achievementsButton.setOnClickListener(achievementsClickListener);
+
+		switch (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()) {
+			case MegaAccountDetails.ACCOUNT_TYPE_PROIII:
+				log("showStorageStatusDialog for USER PRO III");
+				if (!overquotaAlert) {
+					if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+						text.setText(getString(R.string.text_almost_full_warning_pro3_account));
+					} else if (storageState == MegaApiJava.STORAGE_STATE_RED){
+						text.setText(getString(R.string.text_storage_full_warning_pro3_account));
+					}
+				}
+				horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
+				horizontalActionButton.setOnClickListener(customPlanClickListener);
+				verticalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
+				verticalActionButton.setOnClickListener(customPlanClickListener);
+				break;
+
+			case MegaAccountDetails.ACCOUNT_TYPE_LITE:
+			case MegaAccountDetails.ACCOUNT_TYPE_PROI:
+			case MegaAccountDetails.ACCOUNT_TYPE_PROII:
+				log("showStorageStatusDialog for USER PRO");
+				if (!overquotaAlert) {
+					if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+						text.setText(getString(R.string.text_almost_full_warning_pro_account));
+					} else if (storageState == MegaApiJava.STORAGE_STATE_RED){
+						text.setText(getString(R.string.text_storage_full_warning_pro_account));
+					}
+				}
+				horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
+				horizontalActionButton.setOnClickListener(upgradeClickListener);
+				verticalActionButton.setText(getString(R.string.my_account_upgrade_pro));
+				verticalActionButton.setOnClickListener(upgradeClickListener);
+				break;
+
+			case MegaAccountDetails.ACCOUNT_TYPE_FREE:
+			default:
+				log("showStorageStatusDialog for FREE USER");
 				horizontalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+				horizontalActionButton.setOnClickListener(upgradeClickListener);
+				verticalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+				verticalActionButton.setOnClickListener(upgradeClickListener);
+				break;
+		}
 
-				horizontalDismissButton.setOnClickListener(new OnClickListener() {
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-					}
-				});
-
-				horizontalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-						navigateToUpgradeAccount();
-					}
-				});
-			}
+		if(megaApi.isAchievementsEnabled()){
+			horizontalButtonsLayout.setVisibility(View.GONE);
+			verticalButtonsLayout.setVisibility(View.VISIBLE);
 		}
 		else{
 			horizontalButtonsLayout.setVisibility(View.VISIBLE);
 			verticalButtonsLayout.setVisibility(View.GONE);
-
-			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>=MegaAccountDetails.ACCOUNT_TYPE_PROIII){
-				log("show StorageAlmostFull Dialog for USER PRO III");
-				horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
-
-				horizontalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-						askForCustomizedPlan();
-					}
-				});
-			}
-			else{
-				log("show StorageAlmostFull Dialog for USER PRO");
-				horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
-
-				horizontalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						showStorageAlmostFullDialog = true;
-						navigateToUpgradeAccount();
-					}
-				});
-			}
-
-			horizontalDismissButton.setOnClickListener(new OnClickListener(){
-				public void onClick(View v) {
-					alertDialogStorageAlmostFull.dismiss();
-					showStorageAlmostFullDialog = true;
-				}
-
-			});
-
 		}
 
-		alertDialogStorageAlmostFull = dialogBuilder.create();
+		alertDialogStorageStatus = dialogBuilder.create();
+		alertDialogStorageStatus.setCancelable(false);
+		alertDialogStorageStatus.setCanceledOnTouchOutside(false);
 
-		alertDialogStorageAlmostFull.setCancelable(false);
-		alertDialogStorageAlmostFull.setCanceledOnTouchOutside(false);
-		alertDialogStorageAlmostFull.show();
+		isStorageStatusDialogShown = true;
+
+		alertDialogStorageStatus.show();
 	}
 
 	public void askForCustomizedPlan(){
