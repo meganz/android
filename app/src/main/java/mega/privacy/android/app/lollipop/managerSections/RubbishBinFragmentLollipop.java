@@ -57,7 +57,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
@@ -76,7 +76,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
-	CloudDriveAdapter adapter;
+	MegaNodeAdapter adapter;
 	private int placeholderCount;
 	public NewHeaderItemDecoration headerItemDecoration;
 
@@ -115,7 +115,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -127,7 +127,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null){
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null){
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -146,7 +146,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 	public void checkScroll() {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -172,7 +172,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
         }
         String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
         String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
-        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
@@ -259,7 +259,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -302,6 +301,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+            checkScroll();
 			return true;
 		}
 
@@ -310,6 +311,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+            checkScroll();
 		}
 
 		@Override
@@ -508,8 +511,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		if (((ManagerActivityLollipop)context).isList){
 			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
@@ -538,14 +539,15 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
 			
-//			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+//			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, Constants.RUBBISH_BIN_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, Constants.RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setListFragment(recyclerView);
 //				adapter.setNodes(nodes);
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			if(megaApi.getRubbishNode()!=null){
@@ -659,14 +661,15 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);
 			
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, Constants.RUBBISH_BIN_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, Constants.RUBBISH_BIN_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
+				adapter.setListFragment(recyclerView);
 				adapter.setNodes(nodes);
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			if(megaApi.getRubbishNode()!=null){
@@ -757,7 +760,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -766,7 +768,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 
 			}
 		}
@@ -864,6 +865,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
+				checkScroll();
 			}
 			else{
 				//Is FILE
@@ -1213,7 +1215,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1221,7 +1222,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	}
 	
 	public int onBackPressed(){
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (adapter == null){
 			return 0;
@@ -1311,10 +1311,10 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 		this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 		}
 		else {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 		}
 		
 		if (adapter != null){

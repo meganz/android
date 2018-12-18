@@ -50,7 +50,8 @@
                     android:layout_marginTop="12dp"
                     android:textSize="16sp"
                     android:imeOptions="actionNext"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:theme="@style/ColorControlStyle" />
 
                 <RelativeLayout
                     android:layout_width="fill_parent"
@@ -92,7 +93,8 @@
                         android:textSize="16sp"
                         android:layout_marginTop="24dp"
                         android:fontFamily="sans-serif"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:theme="@style/ColorControlStyle" />
 
                     <ImageView
                         android:id="@+id/toggle_button"
@@ -133,24 +135,32 @@
 
                 </RelativeLayout>
 
-                <TextView
+                <Button
                     android:id="@+id/button_login_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginTop="40dp"
+                    android:background="@drawable/background_accent_button"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
                     android:layout_marginLeft="3dp"
-                    android:layout_marginBottom="44dp"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="34dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    style="@style/ButtonStyle"
+                    android:elevation="8dp"/>
 
                 <TextView
                     android:id="@+id/button_forgot_pass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
                     android:layout_marginLeft="3dp"
                     android:layout_marginBottom="94dp"
                     android:textColor="@color/accentColor"
@@ -181,7 +191,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
                     android:layout_marginBottom="24dp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp" />
 
@@ -195,12 +206,12 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/toolbar_login"
                 app:title="@string/login_verification"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                android:background="@color/lollipop_primary_color"
+                android:background="@color/dark_primary_color"
                 android:elevation="4dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:titleTextAppearance="@style/ToolbarTitle.Secondary"
@@ -245,7 +256,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_second_login"
@@ -256,7 +268,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_third_login"
@@ -267,7 +280,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fouth_login"
@@ -278,7 +292,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fifth_login"
@@ -289,7 +304,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_sixth_login"
@@ -300,7 +316,8 @@
                         android:textColor="@color/name_my_account"
                         android:imeOptions="actionNext"
                         android:inputType="number"
-                        android:maxLength="1" />
+                        android:maxLength="1"
+                        android:theme="@style/ColorControlStyle" />
                 </LinearLayout>
 
                 <TextView

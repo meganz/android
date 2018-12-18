@@ -1,27 +1,18 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -31,15 +22,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
@@ -77,6 +64,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private ImageView nodeThumb;
     private TextView nodeName;
     private TextView nodeInfo;
+    private ImageView nodeVersionsIcon;
     private RelativeLayout nodeIconLayout;
     private ImageView nodeIcon;
     private LinearLayout optionDownload;
@@ -184,6 +172,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_name_text);
         nodeInfo = (TextView) contentView.findViewById(R.id.node_info_text);
+        nodeVersionsIcon = (ImageView) contentView.findViewById(R.id.node_info_versions_icon);
         nodeIconLayout = (RelativeLayout) contentView.findViewById(R.id.node_relative_layout_icon);
         nodeIcon = (ImageView) contentView.findViewById(R.id.node_icon);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
@@ -266,6 +255,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 if (node.isFolder()) {
                     nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+                    nodeVersionsIcon.setVisibility(View.GONE);
+
                     if (node.isInShare()) {
                         nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                     } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
@@ -284,6 +275,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 } else {
                     long nodeSize = node.getSize();
                     nodeInfo.setText(Util.getSizeString(nodeSize));
+
+                    if(megaApi.hasVersions(node)){
+                        nodeVersionsIcon.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        nodeVersionsIcon.setVisibility(View.GONE);
+                    }
 
                     if (node.hasThumbnail()) {
                         log("Node has thumbnail");
@@ -353,14 +351,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     }
 
                     if (node.isShared()) {
-                        if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
-                            log("Visible clear shares - firstNavigationLevel true!");
-                            optionClearShares.setVisibility(View.VISIBLE);
-
-                        } else {
-                            counterShares--;
-                            optionClearShares.setVisibility(View.GONE);
-                        }
+                        optionClearShares.setVisibility(View.VISIBLE);
                     } else {
                         counterShares--;
                         optionClearShares.setVisibility(View.GONE);

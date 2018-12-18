@@ -33,7 +33,7 @@ SQLITE_SHA1="22632bf0cfacedbeddde9f92695f71cab8d8c0a5"
 
 CURL=curl
 CURL_VERSION=7.48.0
-C_ARES_VERSION=1.11.0
+C_ARES_VERSION=1.15.0
 CURL_EXTRA="--disable-smb --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
@@ -44,7 +44,7 @@ ARES_SOURCE_FILE=c-ares-${C_ARES_VERSION}.tar.gz
 ARES_SOURCE_FOLDER=c-ares-${C_ARES_VERSION}
 ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
-ARES_SHA1="8c20b2680099ac73861a780c731edd59e010383a"
+ARES_SHA1="74a50c02b7f051c4fb66c0f60f187350f196d908"
 
 OPENSSL=openssl
 OPENSSL_VERSION=1.0.2h

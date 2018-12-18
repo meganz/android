@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -163,6 +164,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
         }
 
         tB = (Toolbar) findViewById(R.id.toolbar);
@@ -671,6 +679,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if (confirm2FAIsShown) {
             confirm2FAIsShown = false;
             showScanOrCopyLayout();
@@ -686,6 +697,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 update2FASetting();
             }
             else {
+                super.callToSuperBack = true;
                 super.onBackPressed();
             }
         }

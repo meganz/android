@@ -59,7 +59,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -88,7 +88,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	boolean allFiles = true;
 
-	CloudDriveAdapter adapter;
+	MegaNodeAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 	RelativeLayout transfersOverViewLayout;
 
@@ -105,7 +105,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		
 	ArrayList<MegaNode> nodes;
 	
-	NewHeaderItemDecoration headerItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	public ActionMode actionMode;
 
@@ -126,7 +126,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -151,7 +151,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             }
         }
 
-        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
@@ -190,7 +190,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -221,7 +221,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			
 			switch(item.getItemId()){
@@ -332,7 +331,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -351,6 +349,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -361,6 +361,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+		    checkScroll();
 		}
 
 		@Override
@@ -537,7 +539,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	}
 
 	public void checkScroll () {
-		if (recyclerView.canScrollVertically(-1)){
+		if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())){
 			((ManagerActivityLollipop) context).changeActionBarElevation(true);
 		}
 		else {
@@ -563,7 +565,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	    density  = getResources().getDisplayMetrics().density;		
 
 		((ManagerActivityLollipop)context).showFabButton();
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -598,13 +599,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersOverViewLayout.setVisibility(View.GONE);
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
 				log("Creating the adapter: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, Constants.OUTGOING_SHARES_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, Constants.OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setListFragment(recyclerView);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
@@ -728,13 +730,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, Constants.OUTGOING_SHARES_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, Constants.OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setListFragment(recyclerView);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			if (((ManagerActivityLollipop)context).parentHandleOutgoing == -1){
@@ -1139,7 +1142,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
     	if (adapter.isMultipleSelect()){
 			log("multiselect ON");
 			adapter.toggleSelection(position);
@@ -1147,7 +1149,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{
@@ -1253,7 +1254,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyImageView.setVisibility(View.GONE);
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
-
+				checkScroll();
 				((ManagerActivityLollipop) context).showFabButton();
 			}
 			else{
@@ -1751,7 +1752,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -1759,9 +1759,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	
 	public int onBackPressed(){
-
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		log("deepBrowserTree "+((ManagerActivityLollipop) context).deepBrowserTreeOutgoing);
 					

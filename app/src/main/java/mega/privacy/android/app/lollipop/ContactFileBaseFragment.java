@@ -78,8 +78,6 @@ public class ContactFileBaseFragment extends Fragment{
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-    
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
     }
     
     @Override

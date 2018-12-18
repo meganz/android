@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -50,10 +49,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
-import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -65,7 +64,6 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -300,27 +298,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
-		if(myAccountInfo!=null){
-			log("myAccountInfo!=NULL");
-			if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
-				log("MyName is:"+ myAccountInfo.getFullName());
-				nameView.setText(myAccountInfo.getFullName());
-			}
-			else{
-				myAccountInfo.setFirstName(false);
-				myAccountInfo.setLastName(false);
-
-				megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_FIRSTNAME, (ManagerActivityLollipop)context);
-				megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_LASTNAME, (ManagerActivityLollipop)context);
-			}
-		}
-		else{
-			log("myAccountInfo is NULL");
-			myAccountInfo.setFirstName(false);
-			myAccountInfo.setLastName(false);
-
-			megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_FIRSTNAME, (ManagerActivityLollipop)context);
-			megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_LASTNAME, (ManagerActivityLollipop)context);
+		if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
+			log("MyName is:"+ myAccountInfo.getFullName());
+			nameView.setText(myAccountInfo.getFullName());
 		}
 
 		this.updateAvatar(true);
@@ -340,8 +320,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		setAccountDetails();
 
 		refreshAccountInfo();
-
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
 	}
@@ -575,7 +553,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
 			case R.id.logout_button:{
@@ -706,8 +683,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return 0;
 	}
 
@@ -828,6 +803,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
 
 		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
+
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){

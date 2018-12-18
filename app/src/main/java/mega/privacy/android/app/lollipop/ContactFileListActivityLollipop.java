@@ -580,7 +580,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	public void showUploadPanel() {
@@ -636,8 +635,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			intent.setAction(null);
 			setIntent(null);
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -1214,7 +1211,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
 			if (parent.isFolder()){
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -1360,13 +1357,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onBackPressed() {
+		super.callToSuperBack = false;
+		super.onBackPressed();
 
 		if (cflF != null){
 			if (cflF.isVisible()){
 				if (cflF.onBackPressed() == 0){
-					log("onBackPressed == 0");
-					finish();
-					return;
+					super.callToSuperBack = true;
+					super.onBackPressed();
 				}
 			}
 		}

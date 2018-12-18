@@ -8,7 +8,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -650,7 +649,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;

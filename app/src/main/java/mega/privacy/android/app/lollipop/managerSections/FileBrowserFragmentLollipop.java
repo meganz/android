@@ -63,7 +63,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -90,7 +90,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-    CloudDriveAdapter adapter;
+    MegaNodeAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 
 	ProgressBar progressBar;
@@ -141,7 +141,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -153,7 +153,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == MegaNodeAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -176,8 +176,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 			switch(item.getItemId()){
 				case R.id.action_mode_close_button:{
 					log("on close button");
@@ -299,7 +297,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -319,6 +316,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			checkScroll();
 			return true;
 		}
 
@@ -329,6 +328,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			checkScroll();
 		}
 
 		@Override
@@ -530,7 +531,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void checkScroll() {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1)) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else if (!isMultipleselect()) {
@@ -577,7 +578,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		if (((ManagerActivityLollipop)context).isList){
 			log("FileBrowserFragmentLollipop isList");
@@ -619,11 +619,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			transfersOverViewLayout.setOnClickListener(this);
 
 			if (adapter == null){
-				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleBrowser, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleBrowser, recyclerView, aB, Constants.FILE_BROWSER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setListFragment(recyclerView);
+				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 //				adapter.setNodes(nodes);
             }
 
@@ -700,11 +701,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //            contentText = (TextView)v.findViewById(R.id.content_grid_text);
             
             if (adapter == null) {
-                adapter = new CloudDriveAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+                adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
             } else {
                 adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-                adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
-                adapter.setNodes(nodes);
+                adapter.setListFragment(recyclerView);
+                adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+//				addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+//                adapter.setNodes(nodes);
             }
 
 //            if (((ManagerActivityLollipop)context).parentHandleBrowser == megaApi.getRootNode().getHandle()) {
@@ -719,7 +722,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             recyclerView.setAdapter(adapter);
             fastScroller.setRecyclerView(recyclerView);
-            addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
             setNodes(nodes);
             
             if (adapter.getItemCount() == 0) {
@@ -814,7 +816,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     @Override
     public void onClick(View v) {
         log("onClick");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         switch (v.getId()) {
             
             case R.id.transfers_overview_three_dots_layout: {
@@ -858,7 +859,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         log("item click position: " + position);
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         if (adapter.isMultipleSelect()) {
             log("itemClick:multiselectON");
             adapter.toggleSelection(position);
@@ -866,7 +866,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
             if (selectedNodes.size() > 0) {
                 updateActionModeTitle();
-                ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
             }
 //			else{
 //				hideMultipleSelect();
@@ -1377,7 +1376,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             emptyImageView.setVisibility(View.GONE);
             emptyTextView.setVisibility(View.GONE);
         }
-        
+        checkScroll();
         setOverviewLayout();
     }
     
@@ -1463,7 +1462,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapter.setMultipleSelect(false);
-        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
         
         if (actionMode != null) {
             actionMode.finish();
@@ -1472,7 +1470,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     public int onBackPressed() {
         log("onBackPressed");
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         
         if (adapter != null) {
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(adapter.getParentHandle());
@@ -1544,7 +1541,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         }
 
-        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
@@ -1587,10 +1584,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         visibilityFastScroller();
         this.nodes = nodes;
 		if (((ManagerActivityLollipop)context).isList) {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 		}
 		else {
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 		}
 
 		if (adapter != null) {

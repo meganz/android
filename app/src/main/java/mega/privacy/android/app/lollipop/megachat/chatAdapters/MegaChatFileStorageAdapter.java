@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -25,7 +24,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -67,7 +65,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         public ImageView photo;
         public RelativeLayout thumbLayout;
         public ImageView photoSelected;
-        public RelativeLayout photoUnselected;
+//        public RelativeLayout photoUnselected;
     }
 
     public void toggleSelection(int pos) {
@@ -191,8 +189,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         holderGrid.photo = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
         holderGrid.photoSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
         holderGrid.photoSelected.setVisibility(View.GONE);
-        holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
-        holderGrid.photoUnselected.setVisibility(View.GONE);
+//        holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
+//        holderGrid.photoUnselected.setVisibility(View.GONE);
 
         holderGrid.photoSelected.setMaxHeight(dimPhotos);
         holderGrid.photoSelected.setMaxWidth(dimPhotos);
@@ -231,17 +229,17 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
         if (!multipleSelect) {
             holder.photoSelected.setVisibility(View.GONE);
-            holder.photoUnselected.setVisibility(View.GONE);
+//            holder.photoUnselected.setVisibility(View.GONE);
 
         }else {
 
             if(this.isItemChecked(position)){
                 holder.photoSelected.setVisibility(View.VISIBLE);
-                holder.photoUnselected.setVisibility(View.GONE);
+//                holder.photoUnselected.setVisibility(View.GONE);
 
             }else{
                 holder.photoSelected.setVisibility(View.GONE);
-                holder.photoUnselected.setVisibility(View.VISIBLE);
+//                holder.photoUnselected.setVisibility(View.VISIBLE);
             }
         }
 
@@ -285,7 +283,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onClick(View v) {
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
@@ -308,8 +305,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public boolean onLongClick(View view) {
-
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
         int currentPosition = holder.getAdapterPosition();

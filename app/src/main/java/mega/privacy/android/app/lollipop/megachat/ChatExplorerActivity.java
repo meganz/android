@@ -165,7 +165,9 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         inflater.inflate(R.menu.file_explorer_action, menu);
 
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+        createFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
         newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
+        newChatMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 
         createFolderMenuItem.setVisible(false);
         newChatMenuItem.setVisible(true);
@@ -321,8 +323,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     public void onClick(View v) {
         log("onClick");
 
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
         switch(v.getId()) {
             case R.id.fab_chat_explorer: {
                 if(chatExplorerFragment!=null){
@@ -375,5 +375,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.callToSuperBack = true;
+        super.onBackPressed();
     }
 }

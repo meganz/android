@@ -1,137 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.preference.PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:key="general_preference_screen"
-    android:background="@color/white">
-    
-     <PreferenceCategory
-        android:key="settings_pin_lock"
-        android:title="@string/settings_pin_lock">
- <!--        android:textColor="@color/pressed_mega">  -->
-        
-		 <mega.privacy.android.app.components.TwoLineCheckPreference
-			 android:key="settings_pin_lock_enable"
-			 android:title="@string/settings_pin_lock_switch"
-			 android:defaultValue="false"/>
-		
-		<Preference
-	        android:key="settings_pin_lock_code"
-	        android:title="@string/settings_reset_lock_code"/>
-    </PreferenceCategory>
+	android:background="@color/white">
 
-    <PreferenceCategory 
-        android:key="settings_camera_upload"
-        android:title="@string/section_photo_sync"
-        android:textColor="@color/pressed_mega">
-        
-		<Preference
-	        android:key="settings_camera_upload_on"
-	        android:title="@string/settings_camera_upload_on" />
-		
-		<ListPreference
-	        android:key="settings_camera_upload_how_to_upload"
-	        android:title="@string/settings_camera_upload_how_to_upload"
-	        android:entries="@array/settings_camera_upload_how_to_entries"
-	        android:entryValues="@array/settings_camera_upload_how_to_values" />
-		
-		<ListPreference
-	        android:key="settings_camera_upload_what_to_upload"
-	        android:title="@string/settings_camera_upload_what_to_upload" 
-	        android:entries="@array/settings_camera_upload_file_upload_entries"
-	        android:entryValues="@array/settings_camera_upload_file_upload_values" />
+	<android.support.v7.preference.PreferenceCategory
+		android:key="settings_pin_lock"
+		android:title="@string/settings_pin_lock">
+		<!--        android:textColor="@color/pressed_mega">  -->
 
-	    <ListPreference
-		    android:key="settings_video_upload_quality"
-		    android:title="@string/settings_video_upload_quality"
-		    android:entries="@array/settings_video_upload_quality_entries"
-		    android:entryValues="@array/settings_video_upload_quality_values" />
+		<android.support.v7.preference.SwitchPreferenceCompat
+			android:key="settings_pin_lock_enable"
+			android:title="@string/settings_pin_lock_switch"
+			android:defaultValue="false"/>
 
-	    <SwitchPreference
-		    android:key="settings_camera_upload_charging"
-		    android:title="@string/settings_camera_upload_charging"/>
+		<android.support.v7.preference.Preference
+			android:key="settings_pin_lock_code"
+			android:title="@string/settings_reset_lock_code"/>
+	</android.support.v7.preference.PreferenceCategory>
 
-	    <Preference
-		    android:key="video_compression_queue_size"
-		    android:title="@string/settings_video_compression_queue_size_title" />
-		
+	<android.support.v7.preference.PreferenceCategory
+		android:key="settings_camera_upload"
+		android:title="@string/section_photo_sync">
+
+		<android.support.v7.preference.Preference
+			android:key="settings_camera_upload_on"
+			android:title="@string/settings_camera_upload_on" />
+
+		<android.support.v7.preference.ListPreference
+			android:key="settings_camera_upload_how_to_upload"
+			android:title="@string/settings_camera_upload_how_to_upload"
+			android:entries="@array/settings_camera_upload_how_to_entries"
+			android:entryValues="@array/settings_camera_upload_how_to_values" />
+
+		<android.support.v7.preference.ListPreference
+			android:key="settings_camera_upload_what_to_upload"
+			android:title="@string/settings_camera_upload_what_to_upload"
+			android:entries="@array/settings_camera_upload_file_upload_entries"
+			android:entryValues="@array/settings_camera_upload_file_upload_values" />
+
+		<android.support.v7.preference.ListPreference
+			android:key="settings_video_upload_quality"
+			android:title="@string/settings_video_upload_quality"
+			android:entries="@array/settings_video_upload_quality_entries"
+			android:entryValues="@array/settings_video_upload_quality_values" />
+
+		<android.support.v7.preference.SwitchPreferenceCompat
+			android:key="settings_camera_upload_charging"
+			android:title="@string/settings_camera_upload_charging"
+			android:defaultValue="true"/>
+
+		<android.support.v7.preference.Preference
+			android:key="video_compression_queue_size"
+			android:title="@string/settings_video_compression_queue_size_title" />
+
 		<mega.privacy.android.app.components.TwoLineCheckPreference
-            android:key="settings_keep_file_names"
-        	android:title="@string/settings_keep_file_names" />
-		
-		<Preference
-	        android:key="settings_local_camera_upload_folder"
-	        android:title="@string/settings_local_camera_upload_folder" />
-		
-		<Preference
-		    android:key="settings_local_camera_upload_folder_sdcard"
-		    android:title="@string/settings_local_camera_upload_folder" />
-		
-		<Preference
-	        android:key="settings_mega_camera_folder"
-	        android:title="@string/settings_mega_camera_upload_folder" />
-		
-		<Preference
-	        android:key="settings_secondary_media_folder_on"
-	        android:title="@string/settings_secondary_upload_on" />
-		
-		<Preference
-	        android:key="settings_local_secondary_media_folder"
-	        android:title="@string/settings_local_secondary_folder" />
-		
-		<Preference
-	        android:key="settings_mega_secondary_media_folder"
-	        android:title="@string/settings_mega_secondary_folder" />
-	</PreferenceCategory>
+			android:key="settings_keep_file_names"
+			android:title="@string/settings_keep_file_names" />
 
-	<PreferenceCategory
+		<android.support.v7.preference.Preference
+			android:key="settings_local_camera_upload_folder"
+			android:title="@string/settings_local_camera_upload_folder" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_local_camera_upload_folder_sdcard"
+			android:title="@string/settings_local_camera_upload_folder" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_mega_camera_folder"
+			android:title="@string/settings_mega_camera_upload_folder" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_secondary_media_folder_on"
+			android:title="@string/settings_secondary_upload_on" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_local_secondary_media_folder"
+			android:title="@string/settings_local_secondary_folder" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_mega_secondary_media_folder"
+			android:title="@string/settings_mega_secondary_folder" />
+	</android.support.v7.preference.PreferenceCategory>
+
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_chat"
 		android:title="@string/section_chat">
 		<!--        android:textColor="@color/pressed_mega">  -->
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_chat_enable"
 			android:title="@string/section_chat"
 			android:defaultValue="true"/>
 
-		<ListPreference
+		<android.support.v7.preference.ListPreference
 			android:key="settings_chat_list_status"
 			android:title="@string/set_status_option_label"
 			android:entries="@array/settings_status_entries"
 			android:entryValues="@array/settings_chat_status_values" />
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_last_green_chat_switch"
 			android:title="@string/option_enable_last_green_chat"
 			android:summary="@string/subtitle_option_enable_last_green_chat"
 			android:defaultValue="false"/>
 
-		<ListPreference
+		<android.support.v7.preference.ListPreference
 			android:key="settings_chat_send_originals"
 			android:title="@string/settings_chat_upload_quality"
 			android:entries="@array/settings_chat_upload_quality_entries"
 			android:entryValues="@array/settings_chat_upload_quality_values" />
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_rich_links_enable"
 			android:title="@string/option_enable_chat_rich_preview"
 			android:defaultValue="false"/>
 
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_autoaway_chat"
 		android:title="@string/settings_autoaway_title">
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_autoaway_chat_switch"
 			android:title="@string/settings_autoaway_title"/>
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_autoaway_chat_preference"
 			android:title="@string/settings_autoaway_subtitle" />
 
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_persistence_chat"
 		android:title="@string/settings_persistence_title">
 
@@ -139,187 +140,180 @@
 			android:key="settings_persistence_chat_checkpreference"
 			android:title="@string/settings_persistence_subtitle" />
 
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_notifications_chat"
 		android:title="@string/title_properties_chat_contact_notifications">
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_nested_notifications_chat"
 			android:title="@string/section_chat" />
 
-	</PreferenceCategory>
-	
-    <PreferenceCategory 
-        android:key="settings_storage"
-        android:title="@string/settings_storage"
-        android:textColor="@color/pressed_mega">
-		
-        <mega.privacy.android.app.components.TwoLineCheckPreference
-            android:key="settings_storage_ask_me_always"
-        	android:title="@string/settings_storage_ask_me_always" />
-        
-        <mega.privacy.android.app.components.TwoLineCheckPreference
-            android:key="settings_storage_advanced_devices"
-        	android:title="@string/settings_storage_advanced_devices" />
-        
-        <Preference 
-            android:key="settings_storage_download_location_sd_card_preference"
-            android:title="@string/settings_storage_download_location"/>
-        
-		<Preference
-	        android:key="settings_storage_download_location"
-	        android:title="@string/settings_storage_download_location" />
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
+		android:key="settings_storage"
+		android:title="@string/settings_storage">
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_storage_ask_me_always"
+			android:title="@string/settings_storage_ask_me_always" />
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_storage_advanced_devices"
+			android:title="@string/settings_storage_advanced_devices" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_storage_download_location_sd_card_preference"
+			android:title="@string/settings_storage_download_location"/>
+
+		<android.support.v7.preference.Preference
+			android:key="settings_storage_download_location"
+			android:title="@string/settings_storage_download_location" />
+	</android.support.v7.preference.PreferenceCategory>
+
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_file_management"
-		android:textColor="@color/pressed_mega"
 		android:title="@string/settings_file_management_category">
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_file_management_offline"
 			android:title="@string/settings_advanced_features_offline" />
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_file_management_rubbish"
 			android:title="@string/context_clear_rubbish" />
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_rb_scheduler_switch"
 			android:title="@string/settings_rb_scheduler_enable_title"/>
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_days_rb_scheduler"
 			android:title="@string/settings_rb_scheduler_select_days_title" />
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_file_versioning_switch"
 			android:title="@string/settings_enable_file_versioning_title"
 			android:summary="@string/settings_enable_file_versioning_subtitle"/>
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_file_management_file_version"
 			android:title="@string/settings_file_management_file_versions_title" />
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_file_management_clear_version"
 			android:layout="@layout/delete_versions_preferences"
 			android:title="@string/settings_file_management_delete_versions"/>
 
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_security"
-		android:title="@string/settings_security_options_title"
-		android:textColor="@color/pressed_mega">
+		android:title="@string/settings_security_options_title">
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_recovery_key"
 			android:title="@string/settings_recovery_key_title"
 			android:summary="@string/settings_recovery_key_summary" />
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_change_password"
 			android:title="@string/my_account_change_password"/>
 
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_2fa"
-		android:title="@string/settings_2fa"
-		android:textColor="@color/pressed_mega">
+		android:title="@string/settings_2fa">
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_2fa_activated"
 			android:title="@string/settings_2fa"
 			android:summary="@string/setting_subtitle_2fa"/>
 
-	</PreferenceCategory>
+	</android.support.v7.preference.PreferenceCategory>
 
-	<PreferenceCategory
+	<android.support.v7.preference.PreferenceCategory
 		android:key="settings_qrcode"
-		android:title="@string/section_qr_code"
-		android:textColor="@color/pressed_mega">
+		android:title="@string/section_qr_code">
 
-		<mega.privacy.android.app.components.TwoLineCheckPreference
+		<android.support.v7.preference.SwitchPreferenceCompat
 			android:key="settings_qrcode_autoaccept"
 			android:title="@string/settings_qrcode_autoaccept"
 			android:summary="@string/setting_subtitle_qrcode_autoccept"/>
 
-	</PreferenceCategory>
-	
-	<PreferenceCategory
-	    android:key="advanced_features"
-	    android:textColor="@color/pressed_mega"
-	    android:title="@string/settings_advanced_features" >
+	</android.support.v7.preference.PreferenceCategory>
+
+	<android.support.v7.preference.PreferenceCategory
+		android:key="advanced_features"
+		android:title="@string/settings_advanced_features" >
 
 		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_use_https_only"
 			android:title="@string/setting_title_use_https_only"
 			android:summary="@string/setting_subtitle_use_https_only"/>
 
-		<Preference
-	        android:key="settings_advanced_features_cache"
-	        android:title="@string/settings_advanced_features_cache" />
+		<android.support.v7.preference.Preference
+			android:key="settings_advanced_features_cache"
+			android:title="@string/settings_advanced_features_cache" />
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_advanced_features_cancel_account"
 			android:layout="@layout/cancel_account_preferences"
 			android:title="@string/settings_advanced_features_cancel_account"/>
-	</PreferenceCategory>
 
-	<PreferenceCategory
+	</android.support.v7.preference.PreferenceCategory>
+
+	<android.support.v7.preference.PreferenceCategory
 		android:key="advanced_help"
-		android:title="@string/settings_help"
-		android:textColor="@color/pressed_mega">
+		android:title="@string/settings_help" >
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_help_send_feedfack"
 			android:title="@string/settings_help_preference" />
 
-	</PreferenceCategory>
-	
-    <PreferenceCategory 
-        android:key="settings_about"
-        android:title="@string/settings_about"
-        android:textColor="@color/pressed_mega">
-		
-        <Preference
-            android:key="settings_about_privacy_policy"
-        	android:title="@string/settings_about_privacy_policy"
-        	android:summary="" />
-        
-        <Preference
-            android:key="settings_about_terms_of_service"
-        	android:title="@string/settings_about_terms_of_service"
-        	android:summary="" />
+	</android.support.v7.preference.PreferenceCategory>
 
-		<Preference
+	<android.support.v7.preference.PreferenceCategory
+		android:key="settings_about"
+		android:title="@string/settings_about">
+
+		<android.support.v7.preference.Preference
+			android:key="settings_about_privacy_policy"
+			android:title="@string/settings_about_privacy_policy"
+			android:summary="" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_about_terms_of_service"
+			android:title="@string/settings_about_terms_of_service"
+			android:summary="" />
+
+		<android.support.v7.preference.Preference
 			android:key="settings_about_gdpr"
 			android:title="@string/settings_about_gdpr"
 			android:summary="" />
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_about_code_link"
 			android:title="@string/settings_about_code_link_title" />
 
-        <Preference
-            android:key="settings_about_sdk_version"
-        	android:title="@string/settings_about_sdk_version"
-        	android:summary="@string/sdk_version" />
+		<android.support.v7.preference.Preference
+			android:key="settings_about_sdk_version"
+			android:title="@string/settings_about_sdk_version"
+			android:summary="@string/sdk_version" />
 
-		<Preference
+		<android.support.v7.preference.Preference
 			android:key="settings_about_karere_version"
 			android:title="@string/settings_about_karere_version"
 			android:summary="@string/karere_version" />
-		
-        <Preference
-            android:key="settings_about_app_version"
-        	android:title="@string/settings_about_app_version"
-        	android:summary="@string/app_version" />
+
+		<android.support.v7.preference.Preference
+			android:key="settings_about_app_version"
+			android:title="@string/settings_about_app_version"
+			android:summary="@string/app_version" />
 
 
-	</PreferenceCategory>
-</PreferenceScreen>
+	</android.support.v7.preference.PreferenceCategory>
+</android.support.v7.preference.PreferenceScreen>
