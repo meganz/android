@@ -27,8 +27,8 @@
         android:id="@+id/chat_cab_menu_offline"
         android:orderInCategory="105"
         android:title="@string/save_for_offline"
-        MEGA:showAsAction="never"
-        android:icon="@drawable/ic_saved_for_offline"/>
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_b_save_offline"/>
 
     <item
         android:id="@+id/chat_cab_menu_edit"

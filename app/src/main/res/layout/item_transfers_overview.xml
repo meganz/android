@@ -3,7 +3,8 @@
     android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
     android:background="@drawable/statelist_item_layout"
-    android:id="@+id/transfers_overview_item_layout" >
+    android:id="@+id/transfers_overview_item_layout"
+	android:visibility="gone">
 
 	<RelativeLayout
 		android:id="@+id/transfers_overview_three_dots_layout"
@@ -43,11 +44,9 @@
 		android:id="@+id/transfers_overview_title"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-        android:text="@string/section_transfers"
 		android:layout_marginTop="15dp"
 		android:layout_marginLeft="72dp"
 		android:textColor="@color/file_list_first_row"
-		android:maxLines="1"
 		android:singleLine="true"
 		android:ellipsize="middle"
 		android:textSize="16sp"/>

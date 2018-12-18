@@ -52,7 +52,8 @@
         android:id="@+id/contact_list_decline"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -65,40 +66,44 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/contact_list_name"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/contact_list_relative_layout_avatar"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="13dp"
-        android:textColor="@color/file_list_first_row"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:textSize="16sp"/>
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="13dp">
 
-    <ImageView
-        android:id="@+id/contact_list_drawable_state"
-        android:layout_width="6dp"
-        android:layout_height="6dp"
-        android:layout_alignTop="@id/contact_list_name"
-        android:layout_toRightOf="@id/contact_list_name"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="6dp"
-        android:background="@null"
-        android:src="@drawable/circle_status_contact_offline" />
+        <TextView
+            android:id="@+id/contact_list_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/file_list_first_row"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="16sp"/>
 
-    <TextView
-        android:id="@+id/contact_list_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/contact_list_name"
-        android:layout_toRightOf="@id/contact_list_relative_layout_avatar"
-        android:layout_marginLeft="13dp"
-        android:textSize="14sp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="@color/file_list_second_row" />
+        <ImageView
+            android:id="@+id/contact_list_drawable_state"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_alignTop="@id/contact_list_name"
+            android:layout_toRightOf="@id/contact_list_name"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="6dp"
+            android:background="@null"
+            android:src="@drawable/circle_status_contact_offline" />
+
+        <TextView
+            android:id="@+id/contact_list_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_list_name"
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/file_list_second_row" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

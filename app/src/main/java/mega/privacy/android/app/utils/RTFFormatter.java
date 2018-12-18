@@ -377,7 +377,7 @@ public class RTFFormatter {
             messageContent = sb.toString();
         }
         else{
-            start = messageContent.indexOf(" ```");
+            start = messageContent.indexOf("```");
 
             if(start==-1){
                 log("Check if there is emoji at the beginning of the string");
@@ -402,13 +402,18 @@ public class RTFFormatter {
                 }
             }
             else{
-                start++;
+                boolean insertLine = false;
+                if (messageContent.charAt(start-1) != '\n'){
+                    insertLine = true;
+                }
                 substring = messageContent.substring(0, start);
                 ssb.append(substring);
 
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.delete(0, start+3);
-                sb.insert(0, '\n');
+                if (insertLine) {
+                    sb.insert(0, '\n');
+                }
                 messageContent = sb.toString();
             }
         }

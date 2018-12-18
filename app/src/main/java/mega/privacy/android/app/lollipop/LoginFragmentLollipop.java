@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,7 +42,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 
 import java.util.Locale;
 
@@ -91,7 +91,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private EditText et_user;
     private EditText et_password;
     private TextView bRegister;
-    private TextView bLogin;
+    private Button bLogin;
     private TextView bForgotPass;
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
@@ -355,7 +355,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
-        bLogin = (TextView) v.findViewById(R.id.button_login_login);
+        bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
         bLogin.setOnClickListener(this);
 
@@ -469,7 +469,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
-        tB  =(Toolbar) v.findViewById(R.id.toolbar);
+        tB  =(Toolbar) v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
@@ -971,7 +971,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         }
 
-                        ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+                        }
 
                         log("Empty completed transfers data");
                         dbH.emptyCompletedTransfers();
@@ -1033,7 +1035,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     {
                         if (prefs.getCamSyncEnabled() != null){
                             if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                }
                             }
                         }
                     }
@@ -1624,7 +1628,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;
@@ -1998,11 +2002,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (prefs != null){
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                        ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                    }
                                 }
                             }
                             else{
-                                ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                    ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                }
                                 initialCam = true;
                             }
                         }
@@ -2419,7 +2427,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
-                if (error.getErrorCode() == MegaError.API_ENOENT){
+                if (error.getErrorCode() == MegaError.API_ENOENT || error.getErrorCode() == MegaError.API_EKEY){
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
                 }
                 else{
@@ -2948,6 +2956,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
 
     }
 

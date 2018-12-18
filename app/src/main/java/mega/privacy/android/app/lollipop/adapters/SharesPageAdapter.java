@@ -3,10 +3,10 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -26,10 +26,22 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         log("getItem: "+position);
         switch (position){
             case 0: {
-                return IncomingSharesFragmentLollipop.newInstance();
+                IncomingSharesFragmentLollipop isF = (IncomingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.INCOMING_SHARES.getTag());
+                if (isF != null) {
+                    return isF;
+                }
+                else {
+                    return IncomingSharesFragmentLollipop.newInstance();
+                }
             }
             case 1:{
-                return OutgoingSharesFragmentLollipop.newInstance();
+                OutgoingSharesFragmentLollipop osF = (OutgoingSharesFragmentLollipop) ((ManagerActivityLollipop) context).getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.OUTGOING_SHARES.getTag());
+                if (osF != null)  {
+                    return osF;
+                }
+                else {
+                    return OutgoingSharesFragmentLollipop.newInstance();
+                }
             }
         }
         return null;
@@ -45,10 +57,10 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         // Generate title based on item position
         switch (position){
             case 0: {
-                return context.getString(R.string.tab_incoming_shares);
+                return context.getString(R.string.tab_incoming_shares).toLowerCase();
             }
             case 1:{
-                return context.getString(R.string.tab_outgoing_shares);
+                return context.getString(R.string.tab_outgoing_shares).toLowerCase();
             }
         }
         return null;

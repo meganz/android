@@ -36,7 +36,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 
-public class ArchivedChatsActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
+public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
     Toolbar tB;
     ActionBar aB;
@@ -182,13 +182,18 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
         snackbar.show();
     }
 
-    public void changeStatusBarColor() {
+    public void changeStatusBarColor(int option) {
         log("changeStatusBarColor");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final Window window = this.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+            if (option == 1){
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.accentColorDark));
+            }
+            else {
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+            }
         }
     }
 
@@ -221,20 +226,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
 
     public static void log(String log) {
         Util.log("ArchivedChatsActivity", log);
-    }
-
-    @Override
-    public void onClick(View v) {
-        log("onClick");
-
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
-        switch(v.getId()) {
-            case R.id.fab_chat_explorer: {
-
-                break;
-            }
-        }
     }
 
     @Override
@@ -313,6 +304,11 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
 
     }
 }

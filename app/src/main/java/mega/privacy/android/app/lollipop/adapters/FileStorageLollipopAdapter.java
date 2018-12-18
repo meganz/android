@@ -21,7 +21,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -429,8 +428,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	@Override
 	public void onClick(View v) {
 		log("click!");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		ViewHolderFileStorage holder = (ViewHolderFileStorage) v.getTag();
 
 		int currentPosition = holder.getAdapterPosition();
