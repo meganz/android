@@ -356,8 +356,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			else{
 				log("ERROR: node is NULL");
 			}
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -407,7 +405,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -497,7 +494,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -511,8 +507,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
+		super.callToSuperBack = true;
 		super.onBackPressed();
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 	
 	private void updateActionModeTitle() {
@@ -546,7 +542,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);

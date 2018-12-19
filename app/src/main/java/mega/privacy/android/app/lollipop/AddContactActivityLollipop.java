@@ -1217,7 +1217,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
         switch(id) {
@@ -1386,8 +1385,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("onCreate");
 
         super.onCreate(savedInstanceState);
-
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", Constants.CONTACT_TYPE_MEGA);
@@ -2556,7 +2553,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public void itemClick(String email, int adapter){
 
         log("itemClick");
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             if (createNewGroup || comesFromChat) {
@@ -2782,7 +2778,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     @Override
     public void onClick(View v) {
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
         switch (v.getId()) {
             case R.id.scan_qr_button:
             case R.id.layout_scan_qr: {
@@ -2849,6 +2844,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if (onNewGroup) {
             returnToAddContacts();
         }
@@ -2867,6 +2865,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             containerAddedContactsRecyclerView.setVisibility(View.GONE);
         }
         else {
+            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }
@@ -3281,7 +3280,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);
 //                Replace on visible MEGA contacts (all my visible contacts)

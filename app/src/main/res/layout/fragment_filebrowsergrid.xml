@@ -84,8 +84,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
 
             <mega.privacy.android.app.components.NewGridRecyclerView
                 android:id="@+id/file_grid_view_browser"

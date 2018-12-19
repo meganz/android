@@ -2,35 +2,17 @@ package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -41,7 +23,7 @@ import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-public class InfoAchievementsFragment extends Fragment implements OnClickListener{
+public class InfoAchievementsFragment extends Fragment{
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -232,8 +214,6 @@ public class InfoAchievementsFragment extends Fragment implements OnClickListene
 //            secondParagraph.setVisibility(View.GONE);
 //        }
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return v;
 	}
 
@@ -251,15 +231,6 @@ public class InfoAchievementsFragment extends Fragment implements OnClickListene
 		super.onAttach(context);
 		this.context = context;
 		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
-	}
-
-	@Override
-	public void onClick(View v) {
-		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-		switch (v.getId()) {
-
-		}
 	}
 
 	public static void log(String log) {

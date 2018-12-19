@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 216
-        versionName "3.5 (216)"
+        versionCode 220
+        versionName "3.5.1 (220)"
         multiDexEnabled true
     }
 
@@ -80,7 +80,7 @@ dependencies {
     implementation "com.android.support:support-emoji:27.1.1"
     implementation 'com.android.support:support-emoji-appcompat:27.1.1'
     implementation 'com.android.support:support-emoji-bundled:27.1.1'
-
+    implementation 'com.android.support:preference-v7:27.1.1'
 
 }
 

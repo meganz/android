@@ -138,6 +138,7 @@ public class Constants {
 	public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
 	public static final int COLOR_STATUS_BAR_SEARCH = 3;
 	public static final int COLOR_STATUS_BAR_ZERO = 4;
+	public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 5;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -199,6 +200,7 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
 	public static String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
 	public static String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
+	public static String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

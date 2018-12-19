@@ -283,7 +283,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onClick(View v) {
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
@@ -306,8 +305,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public boolean onLongClick(View view) {
-
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
         int currentPosition = holder.getAdapterPosition();
