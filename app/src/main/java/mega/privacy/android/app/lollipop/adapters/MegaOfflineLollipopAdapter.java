@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -431,7 +430,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         
         this.positionClicked = -1;
         //After this.listFragment = listView;
-        this.mOffList = insertPlaceHolderNode(_mOffList);
+//        this.mOffList = insertPlaceHolderNode(_mOffList);
+		setNodes(_mOffList);
     }
     
     public void setRecylerView(RecyclerView recylerView) {
@@ -471,6 +471,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}		
 		
 		this.mOffList = insertPlaceHolderNode(mOffList);
+		((OfflineFragmentLollipop) fragment).addSectionTitle(this.mOffList);
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
@@ -633,29 +634,29 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.itemLayout.setVisibility(View.INVISIBLE);
 			return;
 		}
-		if(currentNode.getHandle().equals("0")){
-			//The node is the MasterKey File
-			holder.textViewFileName.setText(currentNode.getName());
-			
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			long nodeSize;
-			if(file.exists()){
-				nodeSize = file.length();
-				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			}
-			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
-			holder.iconView.setVisibility(View.VISIBLE);
-			holder.imageView.setVisibility(View.GONE);
-			holder.imageButtonThreeDots.setTag(holder);
-			holder.imageButtonThreeDots.setOnClickListener(this);
-
-			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-
-//			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			return;
-		}
+//		if(currentNode.getHandle().equals("0")){
+//			//The node is the MasterKey File
+//			holder.textViewFileName.setText(currentNode.getName());
+//
+//			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+//			File file= new File(path);
+//			long nodeSize;
+//			if(file.exists()){
+//				nodeSize = file.length();
+//				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+//			}
+//			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
+//			holder.iconView.setVisibility(View.VISIBLE);
+//			holder.imageView.setVisibility(View.GONE);
+//			holder.imageButtonThreeDots.setTag(holder);
+//			holder.imageButtonThreeDots.setOnClickListener(this);
+//
+//			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+//			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+//
+////			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+//			return;
+//		}
 
 		String path=null;
 		
@@ -725,11 +726,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.imageView.setVisibility(View.GONE);
 		holder.iconView.setVisibility(View.VISIBLE);
 
-		if (currentFile.isFile()){
+		if (currentFile.isFile() || currentNode.getHandle().equals("0")){
 			holder.itemLayout.setVisibility(View.VISIBLE);
 			holder.folderLayout.setVisibility(View.GONE);
 			holder.fileLayout.setVisibility(View.VISIBLE);
-			
+
 			holder.itemLayout.setVisibility(View.VISIBLE);
 			holder.folderLayout.setVisibility(View.GONE);
 //			holder.imageViewThumb.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -1104,7 +1105,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderOffline holder = (ViewHolderOffline) v.getTag();
 		
@@ -1150,7 +1150,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public boolean onLongClick(View view) {
 		log("OnLongCLick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		ViewHolderOffline holder = (ViewHolderOffline) view.getTag();
 		int currentPosition = holder.getAdapterPosition();

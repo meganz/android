@@ -64,7 +64,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -178,7 +177,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -530,7 +529,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		path.mkdirs();
 		changeFolder(path);
 		log("Path to show: "+path);
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -720,7 +718,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onClick(View v) {		
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
@@ -853,7 +850,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	public void itemClick(int position) {
 		log("itemClick: position: "+position);
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		FileDocument document = adapter.getDocumentAt(position);
 		if(document == null)
@@ -939,11 +935,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.callToSuperBack = false;
+		super.onBackPressed();
 
 		// Finish activity if at the root
 		if (path.equals(root)) {
-			log("Root: "+root);
+			super.callToSuperBack = true;
 			super.onBackPressed();
 		// Go one level higher otherwise
 		} else {

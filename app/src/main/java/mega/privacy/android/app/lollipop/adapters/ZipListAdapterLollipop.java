@@ -10,19 +10,13 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
 import java.util.zip.ZipEntry;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
@@ -163,7 +157,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
 		int[] screenPosition = new int[2];

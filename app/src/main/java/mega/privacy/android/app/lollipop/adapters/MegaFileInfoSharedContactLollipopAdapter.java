@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.view.animation.AnimationUtils;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import nz.mega.sdk.MegaNode;
@@ -23,7 +21,6 @@ public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLo
     @Override
     public void onClick(View v) {
         log("onClick");
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
         
         ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
         int currentPosition = holder.currentPosition;

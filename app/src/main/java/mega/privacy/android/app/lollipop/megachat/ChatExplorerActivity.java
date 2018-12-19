@@ -323,8 +323,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     public void onClick(View v) {
         log("onClick");
 
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
         switch(v.getId()) {
             case R.id.fab_chat_explorer: {
                 if(chatExplorerFragment!=null){
@@ -377,5 +375,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.callToSuperBack = true;
+        super.onBackPressed();
     }
 }

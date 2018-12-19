@@ -44,10 +44,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-/**
- * Created by mega on 12/01/18.
- */
-
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
     private static int REQUEST_DOWNLOAD_FOLDER = 1000;
@@ -230,7 +226,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
         switch(id) {

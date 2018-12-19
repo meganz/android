@@ -29,7 +29,6 @@
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
-                android:text="@string/title_message_not_sent_options"
                 android:textColor="@color/transparent_black"
                 android:textSize="16sp"/>
         </LinearLayout>
