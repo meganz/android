@@ -219,6 +219,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 if(!preparingFinished && isServiceRunning) {
                     log("timeout, finish self.");
                     finish();
+                }else{
+                    log("preparingFinished is " + preparingFinished + " isServiceRunning is " + isServiceRunning);
                 }
             }
         },3 * DateUtils.MINUTE_IN_MILLIS);
@@ -250,8 +252,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     private void startCameraUploads() {
         log("startCameraUploads");
         preparingFinished = true;
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
-        //TODO update notification
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),mPendingIntent,false);
         getFilesFromMediaStore();
     }
     
