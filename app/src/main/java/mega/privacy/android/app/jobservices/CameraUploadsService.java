@@ -1754,7 +1754,11 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         if (!canceled) {
             log("preparing to upload compressed video");
             ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(STATUS_PENDING));
-            startParallelUpload(compressedList,true);
+            if(compressedList.size() > 0){
+                startParallelUpload(compressedList,true);
+            }else{
+                onQueueComplete();
+            }
         }
     }
     
@@ -2091,7 +2095,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     }
 
-    private final static boolean OUTPUT = false;
+    private final static boolean OUTPUT = true;
 
     private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
 
