@@ -845,6 +845,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							log("Transfer API_EEXIST: "+transfer.getNodeHandle());
 						}
 						else{
+							if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
+								isOverquota = 1;
+							}
+							else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+								isOverquota = 2;
+							}
+
 							String[] parts = appData.split(">");
 							int last = parts.length-1;
 							String idFound = parts[last];
