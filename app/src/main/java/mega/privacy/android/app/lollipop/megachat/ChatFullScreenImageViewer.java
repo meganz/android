@@ -243,6 +243,23 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	}
 
 	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		switch(requestCode){
+			case Constants.REQUEST_WRITE_STORAGE:{
+				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (hasStoragePermission) {
+					MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
+					ChatController chatC = new ChatController(this);
+					chatC.prepareForChatDownload(node);
+				}
+				break;
+			}
+		}
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
 		int id = item.getItemId();
@@ -261,6 +278,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
 						handleListM.add(node.getHandle());
+						break;
 					}
 				}
 
