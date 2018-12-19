@@ -9546,8 +9546,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					long rootHandle = megaApi.getRootNode().getHandle();
+					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
+						parentHandleBrowser = rootHandle;
+						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+						if (fbFLol != null) {
+							fbFLol.scrollToFirstPosition();
+						}
+					}
+				}
+				else {
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
