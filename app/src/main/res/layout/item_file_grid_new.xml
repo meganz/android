@@ -58,14 +58,16 @@
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout_for_file"
 			android:layout_width="match_parent"
-			android:layout_height="172dp"
-			android:layout_margin="1dp">
+			android:layout_height="172dp">
 			<ImageView
 				android:id="@+id/file_grid_thumbnail"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_centerInParent="true"
-				android:scaleType="fitXY"/>
+				android:scaleType="fitXY"
+				android:paddingTop="1dp"
+				android:paddingRight="1dp"
+				android:paddingLeft="1dp"/>
 			<ImageView
 				android:id="@+id/file_grid_selected"
 				android:layout_width="23dp"
@@ -87,7 +89,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
-				android:layout_marginBottom="3dp"
 				android:background="@drawable/gradient_cam_uploads">
 				<TextView
 					android:id="@+id/file_grid_title_video_duration"

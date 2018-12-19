@@ -183,7 +183,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					}else if(getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 						holder.iconView.setVisibility(View.GONE);
 						holder.imageView.setVisibility(View.VISIBLE);
-						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
 					}
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
@@ -743,7 +743,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if (currentFile.exists()){
 					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
-						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
 						holder.imageView.setImageBitmap(thumb);
 						holder.imageView.setVisibility(View.VISIBLE);
 						holder.iconView.setVisibility(View.GONE);
