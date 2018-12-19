@@ -18,5 +18,5 @@
 		android:orderInCategory="120"
 		android:title="@string/action_grid"
 		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="always" />
+		MEGA:showAsAction="never" />
 </menu>
