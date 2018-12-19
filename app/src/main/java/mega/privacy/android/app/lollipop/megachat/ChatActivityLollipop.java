@@ -344,7 +344,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean isRecording = false;
     LinearLayout bubbleLayout;
     TextView bubbleText;
-    View layoutLock;
+//    View layoutLock;
 
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
@@ -716,8 +716,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             bubbleText.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
         }
 
-        layoutLock = (View) findViewById(R.id.layout_lock);
-        layoutLock.setVisibility(View.GONE);
+//        layoutLock = (View) findViewById(R.id.layout_lock);
+//        layoutLock.setVisibility(View.GONE);
 
         rLKeyboardTwemojiButton.setOnClickListener(this);
         rLMediaButton.setOnClickListener(this);
@@ -885,7 +885,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         record = (RecordButton) findViewById(R.id.record_fab);
         record.setBackground(null);
-        record.setElevation(0);
+//        record.setElevation(0);
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
         record.setRecordView(voiceClipLayout);
@@ -2032,11 +2032,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void startRecord(){
         log("startRecord()");
-        textChat.setVisibility(View.GONE);
+//        textChat.setVisibility(View.GONE);
         linearLayoutOptions.setVisibility(View.INVISIBLE);
         record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
-        record.setElevation(Util.px2dp(3, outMetrics));
+//        record.setElevation(Util.px2dp(3, outMetrics));
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
+        record.setVisibility(View.VISIBLE);
         voiceClipLayout.setVisibility(View.VISIBLE);
 
         Handler handler = new Handler();
@@ -2075,10 +2076,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("cancelRecord()");
         isVoiceClip = false;
         isRecording = false;
-        textChat.setVisibility(View.VISIBLE);
+//        textChat.setVisibility(View.VISIBLE);
         linearLayoutOptions.setVisibility(View.VISIBLE);
         record.setBackground(null);
-        record.setElevation(0);
+//        record.setElevation(0);
         record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
         voiceClipLayout.setVisibility(View.GONE);
@@ -2094,20 +2095,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void stopRecord(){
         log(" stopRecord()");
-        layoutLock.setVisibility(View.GONE);
+//        layoutLock.setVisibility(View.GONE);
         isVoiceClip = false;
-        textChat.setVisibility(View.VISIBLE);
+//        textChat.setVisibility(View.VISIBLE);
         linearLayoutOptions.setVisibility(View.VISIBLE);
         record.setBackground(null);
-        record.setElevation(0);
+//        record.setElevation(0);
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
         isRecording = false;
         voiceClipLayout.setVisibility(View.GONE);
         if(myAudioRecorder!=null) {
             log("myAudioRecorder -> STOP ");
+
             myAudioRecorder.stop();
             myAudioRecorder.release();
+            myAudioRecorder = null;
             sendVoiceClip();
         }
      }
