@@ -59,12 +59,14 @@
 			android:layout_width="match_parent"
 			android:layout_height="172dp">
 			<ImageView
-				android:padding="0.5dp"
 				android:id="@+id/file_grid_thumbnail"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_centerInParent="true"
-				android:scaleType="fitXY"/>
+				android:scaleType="fitXY"
+				android:paddingTop="1dp"
+				android:paddingRight="1dp"
+				android:paddingLeft="1dp"/>
 			<ImageView
 				android:id="@+id/file_grid_selected"
 				android:layout_width="23dp"
