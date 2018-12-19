@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -335,6 +336,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (!isOffLine && type != Constants.ZIP_ADAPTER) {
             app = (MegaApplication) getApplication();
             megaApi = app.getMegaApi();
+            if (isFolderLink) {
+                megaApiFolder = app.getMegaApiFolder();
+            }
 
             if (Util.isChatEnabled()) {
                 megaChatApi = app.getMegaChatApi();
@@ -419,7 +423,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
 
             if (isFolderLink){
-                megaApiFolder = app.getMegaApiFolder();
                 log("Folder link node");
                 MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
                 if (currentDocumentAuth == null){
@@ -703,7 +706,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else {
-
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;
@@ -761,12 +763,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             if (!isOffLine && type != Constants.ZIP_ADAPTER){
                 app = (MegaApplication)getApplication();
-                if (isFolderLink){
-                    megaApi = app.getMegaApiFolder();
-                }
-                else {
-                    megaApi = app.getMegaApi();
-                }
+                megaApi = app.getMegaApi();
 
                 if(Util.isChatEnabled()){
                     megaChatApi = app.getMegaChatApi();
@@ -1031,24 +1028,22 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public void download(){
 
         if (type == Constants.FILE_LINK_ADAPTER){
-            MegaNode node = megaApi.getNodeByHandle(currentDocument.getHandle());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            Constants.REQUEST_WRITE_STORAGE);
-
-                    handleListM.add(node.getHandle());
-                }
-            }
-
             if (nC == null) {
                 nC = new NodeController(this);
             }
             nC.downloadFileLink(currentDocument, uri.toString());
         }
         else if (fromChat){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                    handleListM.add(nodeChat.getHandle());
+                    return;
+                }
+            }
             if (chatC == null){
                 chatC = new ChatController(this);
             }
@@ -1066,6 +1061,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             Constants.REQUEST_WRITE_STORAGE);
 
                     handleListM.add(node.getHandle());
+                    return;
                 }
             }
 
@@ -1076,6 +1072,39 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 nC = new NodeController(this, isFolderLink);
             }
             nC.prepareForDownload(handleList, false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case Constants.REQUEST_WRITE_STORAGE:{
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (hasStoragePermission) {
+                    if (type == Constants.FILE_LINK_ADAPTER) {
+                        if(nC==null){
+                            nC = new NodeController(this, isFolderLink);
+                        }
+                        nC.downloadFileLink(currentDocument, uri.toString());
+                    }
+                    else if (fromChat) {
+                        if (chatC == null){
+                            chatC = new ChatController(this);
+                        }
+                        if (nodeChat != null){
+                            chatC.prepareForChatDownload(nodeChat);
+                        }
+                    }
+                    else{
+                        if(nC==null){
+                            nC = new NodeController(this, isFolderLink);
+                        }
+                        nC.prepareForDownload(handleListM, false);
+                    }
+                }
+                break;
+            }
         }
     }
 
