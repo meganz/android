@@ -2466,7 +2466,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
-				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					isOverquota = true;
+				}
+
+				CameraSyncService.this.cancel();
 			}
 		}
 	}

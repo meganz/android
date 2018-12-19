@@ -858,6 +858,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				} else {
 					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
+					if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
+						isOverquota = 1;
+					}
+					else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+						isOverquota = 2;
+					}
+
 					if (!transfer.isFolderTransfer()) {
 						errorCount++;
 					}
