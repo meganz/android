@@ -202,18 +202,18 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			chatId = savedInstanceState.getLong("chatId", -1);
 		}
 
-        prefs = dbH.getPreferences();
-        if (prefs == null){
-            isList=true;
-        }
-        else{
-            if (prefs.getPreferredViewList() == null){
-                isList = true;
-            }
-            else{
-                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-            }
-        }
+//        prefs = dbH.getPreferences();
+//        if (prefs == null){
+//            isList=true;
+//        }
+//        else{
+//            if (prefs.getPreferredViewList() == null){
+//                isList = true;
+//            }
+//            else{
+//                isList = Boolean.parseBoolean(prefs.getPreferredViewList());
+//            }
+//        }
 
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_node_history);
@@ -401,16 +401,24 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		selectMenuItem.setVisible(true);
-		unSelectMenuItem.setVisible(false);
-        if (isList){
-            thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-            thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+
+        if(messages.size()>0){
+            selectMenuItem.setVisible(true);
+            //        if (isList){
+//            thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//            thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+//        }
+//        else{
+//            thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//            thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+//        }
         }
         else{
-            thumbViewMenuItem.setTitle(getString(R.string.action_list));
-            thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+            selectMenuItem.setVisible(false);
         }
+
+		unSelectMenuItem.setVisible(false);
+		thumbViewMenuItem.setVisible(false);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -429,17 +437,17 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		    	return true;
 		    }
             case R.id.action_grid:{
-                isList = !isList;
-                dbH.setPreferredViewList(isList);
-
-                if (isList){
-                    thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-                }
-                else{
-                    thumbViewMenuItem.setTitle(getString(R.string.action_list));
-                }
-
-                adapter.notifyDataSetChanged();
+//                isList = !isList;
+//                dbH.setPreferredViewList(isList);
+//
+//                if (isList){
+//                    thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//                }
+//                else{
+//                    thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//                }
+//
+//                adapter.notifyDataSetChanged();
                 return true;
             }
 		    default:{
@@ -1608,6 +1616,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		log("fullHistoryReceivedOnLoad:getMoreHistoryTRUE");
 		getMoreHistory = true;
 
+        invalidateOptionsMenu();
 	}
 
 	@Override
@@ -1664,6 +1673,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		emptyLayout.setVisibility(View.GONE);
 		listView.setVisibility(View.VISIBLE);
+
+        invalidateOptionsMenu();
 	}
 
 	@Override
@@ -1699,6 +1710,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		else{
 			log("Index to remove not found");
 		}
+
+        invalidateOptionsMenu();
 	}
 
 	@Override
@@ -1791,12 +1804,12 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	public void changeActionBarElevation(boolean whitElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//			if (whitElevation) {
-//				abL.setElevation(Util.px2dp(4, outMetrics));
-//			}
-//			else {
-//				abL.setElevation(0);
-//			}
+			if (whitElevation) {
+				tB.setElevation(Util.px2dp(4, outMetrics));
+			}
+			else {
+				tB.setElevation(0);
+			}
 		}
 	}
 }
