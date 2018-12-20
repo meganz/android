@@ -154,6 +154,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
 			}
 
+			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setTag(holderList);
 			v.setTag(holderList);
 			return holderList;
@@ -624,7 +625,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 
 		switch (v.getId()){
-			case R.id.participant_list_three_dots_layout:{
+			case R.id.participant_list_three_dots_layout:
+			case R.id.participant_list_item_layout:{
 				log("contact_list_three_dots");
 				ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
 				int currentPosition = holder.currentPosition;
