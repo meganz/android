@@ -32,13 +32,9 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
@@ -261,31 +257,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             {
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null){
-                    if(Util.isChatEnabled()){
-                        log("Go to chat");
-                        MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getHandle());
-                        if(chat==null){
-                            log("No chat, create it!");
-                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                            peers.addPeer(contact.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                            megaChatApi.createChat(false, peers, ((ManagerActivityLollipop) context));
-                        }
-                        else{
-                            log("There is already a chat, open it!");
-                            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.CHAT);
-                            Intent intentOpenChat = new Intent(context, ChatActivityLollipop.class);
-                            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-                            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-                            intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            context.startActivity(intentOpenChat);
-                        }
-                    }
-                    else{
-                        log("Go to contact info");
-                        Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                        intent.putExtra("name", notif.getEmail());
-                        startActivity(intent);
-                    }
+                    log("Go to contact info");
+                    Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
+                    intent.putExtra("name", notif.getEmail());
+                    startActivity(intent);
                 }
                 else{
                     log("Go to Received requests");
