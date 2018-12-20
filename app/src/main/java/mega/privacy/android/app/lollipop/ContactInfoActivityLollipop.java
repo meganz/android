@@ -76,6 +76,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -165,6 +166,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	RelativeLayout shareContactLayout;
 	View dividerShareContactLayout;
+
+	RelativeLayout sharedFilesLayout;
+	View dividerSharedFilesLayout;
 
 	//Toolbar elements
 	ImageView contactStateIcon;
@@ -389,6 +393,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
+			//Chat Shared Files Layout
+
+			sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_files_shared_layout);
+			sharedFilesLayout.setOnClickListener(this);
+
+			dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
+
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
@@ -481,6 +492,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						if(chatHandle==-1){
 							notificationsLayout.setVisibility(View.GONE);
 							dividerNotificationsLayout.setVisibility(View.GONE);
+
+							sharedFilesLayout.setVisibility(View.GONE);
+							dividerSharedFilesLayout.setVisibility(View.GONE);
 						}
 						else{
 							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -489,6 +503,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					else{
 						notificationsLayout.setVisibility(View.GONE);
 						dividerNotificationsLayout.setVisibility(View.GONE);
+
+						sharedFilesLayout.setVisibility(View.GONE);
+						dividerSharedFilesLayout.setVisibility(View.GONE);
 					}
 
 					if (megaChatApi == null){
@@ -622,6 +639,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				notificationsLayout.setVisibility(View.GONE);
 				dividerNotificationsLayout.setVisibility(View.GONE);
+
+				sharedFilesLayout.setVisibility(View.GONE);
+				dividerSharedFilesLayout.setVisibility(View.GONE);
 			}
 
 		} else {
@@ -1273,6 +1293,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						setUpIndividualChatNotifications();
 					}
 				}
+				break;
+			}
+			case R.id.chat_contact_properties_chat_files_shared_layout:{
+				Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+				if(chat!=null){
+					nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+				}
+				startActivity(nodeHistoryIntent);
 				break;
 			}
 		}

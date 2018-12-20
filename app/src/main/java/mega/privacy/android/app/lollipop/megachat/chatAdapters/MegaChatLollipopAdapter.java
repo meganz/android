@@ -7992,7 +7992,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.forward_contact_preview_landscape:{
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 messageArray.add(messages.get(currentPosition - 1));
-                ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
+                ((ChatActivityLollipop) context).forwardMessages(messageArray);
                 break;
             }
             case R.id.content_own_message_text:

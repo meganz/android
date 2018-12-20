@@ -2239,6 +2239,8 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
+    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared files</string>
+
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
@@ -2259,7 +2261,21 @@
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">Last seen a long time ago</string>
     <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">Last seen %1$s %2$s</string>
 
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
+
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
+
+    <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
+
+    <plurals name="messages_forwarded_success_plural" formatted="false" context="Confirmation message after forwarding one or several messages">
+        <item context="version item" quantity="one">Message forwarded</item>
+        <item context="version items" quantity="other">Messages forwarded</item>
+    </plurals>
+
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Type password</string>
+    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is protected. Enter the document opening password.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Wrong password. Try again.</string>
+    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
