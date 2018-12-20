@@ -2,15 +2,15 @@
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
 	android:id="@+id/contact_grid_item_layout"
-	android:background="@drawable/background_item_grid"
+	android:background="@drawable/background_item_grid_new"
 	android:layout_margin="6dp"
+	android:padding="1dp"
 	android:descendantFocusability="blocksDescendants" >
 
 	<RelativeLayout
 		android:id="@+id/contact_grid_relative_layout_avatar"
 		android:layout_width="match_parent"
-		android:layout_height="172dp"
-		android:background="@drawable/background_item_grid">
+		android:layout_height="172dp">
 		<ImageView
 			android:id="@+id/contact_grid_thumbnail"
 			android:layout_width="match_parent"
@@ -46,48 +46,52 @@
 		android:layout_below="@id/contact_grid_relative_layout_avatar"
 		android:background="@color/new_background_fragment"/>
 
-	<ImageButton
-		android:id="@+id/contact_grid_three_dots"
-		android:layout_width="wrap_content"
+	<RelativeLayout
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:src="@drawable/ic_dots_vertical_grey"
-		android:layout_below="@id/contact_grid_separator"
-		android:background="@null"
-		android:paddingLeft="2dp"
-		android:paddingRight="8dp"
-		android:paddingTop="23dp"
-		android:layout_alignParentRight="true"/>
+		android:layout_below="@id/contact_grid_separator">
 
-	<TextView
-		android:id="@+id/contact_grid_name"
-		android:layout_width="120dp"
-		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_below="@id/contact_grid_separator"
-		android:layout_toLeftOf="@+id/contact_grid_three_dots"
-		android:layout_marginLeft="13dp"
-		android:layout_marginTop="16dp"
-		android:textColor="@color/name_my_account"
-		android:ellipsize="end"
-		android:textSize="16sp"
-		android:maxLines="1"
-		android:singleLine="true"/>
+		<ImageButton
+			android:id="@+id/contact_grid_three_dots"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/ic_dots_vertical_grey"
+			android:background="@null"
+			android:padding="3dp"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true"/>
 
-	<TextView
-		android:id="@+id/contact_grid_content"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_marginBottom="16dp"
-		android:layout_marginLeft="13dp"
-		android:focusable="true"
-		android:focusableInTouchMode="true"
-		android:ellipsize="marquee"
-		android:marqueeRepeatLimit="marquee_forever"
-		android:scrollHorizontally="true"
-		android:textColor="@color/mail_my_account"
-		android:layout_below="@id/contact_grid_name"
-		android:textSize="12sp" />
+		<TextView
+			android:id="@+id/contact_grid_name"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_marginLeft="13dp"
+			android:layout_marginTop="16dp"
+			android:textColor="@color/name_my_account"
+			android:ellipsize="end"
+			android:textSize="16sp"
+			android:maxLines="1"
+			android:singleLine="true"/>
+
+		<TextView
+			android:id="@+id/contact_grid_content"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_marginBottom="16dp"
+			android:layout_marginLeft="13dp"
+			android:focusable="true"
+			android:focusableInTouchMode="true"
+			android:ellipsize="marquee"
+			android:marqueeRepeatLimit="marquee_forever"
+			android:scrollHorizontally="true"
+			android:textColor="@color/mail_my_account"
+			android:layout_below="@id/contact_grid_name"
+			android:textSize="12sp" />
+
+
+	</RelativeLayout>
 </RelativeLayout>
 
 
