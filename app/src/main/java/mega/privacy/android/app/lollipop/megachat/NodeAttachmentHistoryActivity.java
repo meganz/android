@@ -53,7 +53,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -88,7 +87,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
+public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
 	public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -112,7 +111,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	LinearLayout linearLayoutGrid;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
+//	GestureDetectorCompat detector;
 	RelativeLayout emptyLayout;
 	TextView emptyTextView;
 	ImageView emptyImageView;
@@ -181,12 +180,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		megaChatApi.addNodeHistoryListener(chatId,this);
 
 		handler = new Handler();
-		outMetrics = new DisplayMetrics ();
 
         dbH = DatabaseHandler.getDbHandler(this);
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -227,7 +225,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
 
-		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
+//		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
 		emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
 		emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
@@ -263,7 +261,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			linearLayoutGrid.setVisibility(View.GONE);
 
 			listView = (RecyclerView) findViewById(R.id.node_history_list_view);
-			listView.addItemDecoration(new PositionDividerItemDecoration(this, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 			mLayoutManager = new LinearLayoutManager(this);
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			listView.setLayoutManager(mLayoutManager);
@@ -890,39 +888,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		return false;
-	}
-
-	@Override
 	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
+//		detector.onTouchEvent(e);
 		return false;
 	}
 
@@ -1114,7 +1081,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 			importIcon = menu.findItem(R.id.chat_cab_menu_import);
 			menu.findItem(R.id.chat_cab_menu_offline).setIcon(Util.mutateIconSecondary(nodeAttachmentHistoryActivity, R.drawable.ic_b_save_offline, R.color.white));
-
+			changeActionBarElevation(true);
 			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
@@ -1124,6 +1091,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			log("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
+			checkScroll();
 			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
@@ -1805,10 +1773,10 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public void changeActionBarElevation(boolean whitElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (whitElevation) {
-				tB.setElevation(Util.px2dp(4, outMetrics));
+				aB.setElevation(Util.px2dp(4, outMetrics));
 			}
 			else {
-				tB.setElevation(0);
+				aB.setElevation(0);
 			}
 		}
 	}
