@@ -215,7 +215,6 @@ public class Constants {
 	final public static int INCOMING_REQUEST_ADAPTER = 2012;
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
-	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
