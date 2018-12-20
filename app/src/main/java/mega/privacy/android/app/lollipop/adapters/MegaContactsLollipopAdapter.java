@@ -71,7 +71,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private ContactsFragmentLollipop fragment;
 	private int adapterType;
 	private SparseBooleanArray selectedContacts;
-	
+
+	DisplayMetrics outMetrics;
 
 	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaContactAdapter> _contacts, RecyclerView _listView, int adapterType) {
 		this.context = _context;
@@ -139,7 +140,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		log("onCreateViewHolder");
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
 	    dbH = DatabaseHandler.getDbHandler(context);
@@ -376,10 +377,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holder.textViewContent.setVisibility(View.VISIBLE);
 			holder.textViewContent.setText(sharedNodesDescription);
 		}
+
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.textViewContactName.getLayoutParams();
+		if (holder.textViewContent.getVisibility() == View.VISIBLE) {
+			params.setMargins(Util.px2dp(13, outMetrics), Util.px2dp(16, outMetrics), 0, 0);
+		}
+		else if (holder.textViewContent.getVisibility() == View.GONE) {
+			params.setMargins(Util.px2dp(13, outMetrics), Util.px2dp(24, outMetrics), 0, Util.px2dp(24, outMetrics));
+		}
+		holder.textViewContactName.setLayoutParams(params);
 		
 		if (!multipleSelect) {
 
-			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_new));
 		} 
 		else {
 
@@ -387,7 +397,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_long_click_lollipop));
 			}
 			else{
-				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_new));
 			}
 		}
 
