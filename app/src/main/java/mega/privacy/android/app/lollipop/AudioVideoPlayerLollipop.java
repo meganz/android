@@ -140,6 +140,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -1154,6 +1155,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     log("playerListener: onPlayerStateChanged: " + playbackState);
+
+                    if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
+                        MegaHandleList handleList = megaChatApi.getChatCalls();
+                        if(handleList!=null && handleList.size()>0) {
+                            //Not allow to play content when a call is in progress
+                            player.setPlayWhenReady(false);
+                            showSnackbar(getString(R.string.not_allow_play_alert));
+                        }
+                    }
+
                     playbackStateSaved = playbackState;
                     if (playbackState == Player.STATE_BUFFERING) {
                         audioContainer.setVisibility(View.GONE);
