@@ -7044,7 +7044,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             builder.setMessage(getString(R.string.overquota_alert_text));
-            dbH.setCamSyncEnabled(false);
         }
 
         if(overquotaDialog==null){
