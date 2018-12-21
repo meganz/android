@@ -252,7 +252,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     private void startCameraUploads() {
         log("startCameraUploads");
         preparingFinished = true;
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),mPendingIntent,false);
+        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
         getFilesFromMediaStore();
     }
     
@@ -477,6 +477,10 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
 
     private void startParallelUpload(List<SyncRecord> finalList,boolean isCompressedVideo) {
         for (SyncRecord file : finalList) {
+    
+            if (!running) {
+                break;
+            }
             isSec = file.isSecondary();
             MegaNode parent;
             if (isSec) {
