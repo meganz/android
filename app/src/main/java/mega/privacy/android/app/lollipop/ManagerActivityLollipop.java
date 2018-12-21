@@ -442,7 +442,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TransfersPageAdapter mTabsAdapterTransfers;
 	ViewPager viewPagerTransfers;
 
-	boolean firstTime = true;
+	boolean firstTimeAfterInstallation = true;
 //	String pathNavigation = "/";
 	SearchView searchView;
 	boolean searchExpand = false;
@@ -464,7 +464,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	boolean firstTimeCam = false;
+	boolean firstLogin = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -622,7 +622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private ProgressBar verify2faProgressBar;
 	private RelativeLayout lostYourDeviceButton;
 
-	private boolean isFirstTime = true;
+	private boolean isFirstTime2fa = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
 
@@ -1513,12 +1513,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 	        case Constants.REQUEST_WRITE_STORAGE:{
 				log("REQUEST_WRITE_STORAGE PERMISSIONS");
-	        	if (firstTimeCam){
+	        	if (firstLogin){
 					log("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
-//						if (firstTimeCam){
-//							firstTimeCam = false;
+//						if (firstLogin){
+//							firstLogin = false;
 //						}
 
 						if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
@@ -1621,7 +1621,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
-		outState.putBoolean("firstTimeCam",firstTimeCam);
+		outState.putBoolean("firstLogin", firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -1719,7 +1719,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
 			searchDate = savedInstanceState.getLongArray("searchDate");
-			firstTimeCam = savedInstanceState.getBoolean("firstTimeCam");
+			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
@@ -1871,7 +1871,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    prefs = dbH.getPreferences();
 		if (prefs == null){
-			firstTime = true;
+			firstTimeAfterInstallation = true;
 			isList=true;
 			isListCameraUploads=false;
 			isSmallGridCameraUploads = false;
@@ -1879,10 +1879,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 
 			if (prefs.getFirstTime() == null){
-				firstTime = true;
+				firstTimeAfterInstallation = true;
 				isListCameraUploads=false;
 			}else{
-				firstTime = Boolean.parseBoolean(prefs.getFirstTime());
+				firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
 			}
 			if (prefs.getPreferredViewList() == null){
 				isList = true;
@@ -2743,8 +2743,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						switch (accountType){
 							case 0:{
-								log("intent firstTime==true");
-								firstTimeCam = true;
+								log("intent firstTimeAfterInstallation==true");
+								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								setIntent(null);
 								displayedAccountType = -1;
@@ -2785,9 +2785,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 	        		}
 	        		else{
-						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", firstTimeCam);
-						if (firstTimeCam){
-							log("intent firstTimeCam==true");
+						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
+						if (firstLogin){
+							log("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -2804,15 +2804,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
-					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
+					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 
 						switch (accountType){
 							case Constants.FREE:{
-								log("intent firstTime==true");
-								firstTimeCam = true;
+								log("intent firstTimeAfterInstallation==true");
+								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								displayedAccountType = -1;
 								setIntent(null);
@@ -2853,19 +2853,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						if (firstTimeCam) {
+						if (firstLogin) {
 							log("intent firstTimeCam2==true");
 							if (prefs != null){
 								if (prefs.getCamSyncEnabled() != null){
-									firstTimeCam = false;
+									firstLogin = false;
 								}
 								else{
-									firstTimeCam = true;
+									firstLogin = true;
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								}
 							}
 							else{
-								firstTimeCam = true;
+								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
 							setIntent(null);
@@ -4256,7 +4256,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
 
-		if (!firstTime){
+		if (!firstTimeAfterInstallation){
 			log("Its NOT first time");
 			drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -4276,7 +4276,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Fill the contacts DB
 			FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 			fillDBContactsTask.execute();
-			firstTime = false;
+			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
 	}
@@ -6256,7 +6256,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(true);
 				log("createFolderMenuItem.setVisible_14");
 				createFolderMenuItem.setVisible(true);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6264,7 +6264,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				rubbishBinMenuItem.setVisible(true);
 				upgradeAccountMenuItem.setVisible(true);
 				importLinkMenuItem.setVisible(true);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					takePicture.setVisible(true);
 				}else{
 					takePicture.setVisible(false);
@@ -6311,7 +6311,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
 				log("onCreateOptionsMenuLollipop: in Rubbish");
 				//Show
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6368,7 +6368,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				log("onCreateOptionsMenuLollipop: in Offline");
 				//Show
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6427,7 +6427,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 
 				if(firstNavigationLevel){
-					if(!firstTimeCam){
+					if(!firstLogin){
 						searchByDate.setVisible(true);
 					}else{
 						searchByDate.setVisible(false);
@@ -6446,7 +6446,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				unSelectMenuItem.setVisible(false);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					searchMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 				}else{
@@ -6484,7 +6484,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
 
-					if(!firstTimeCam) {
+					if(!firstLogin) {
 						gridSmallLargeMenuItem.setVisible(true);
 					}else{
 						gridSmallLargeMenuItem.setVisible(false);
@@ -6510,7 +6510,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 
 				if(firstNavigationLevel){
-					if(!firstTimeCam){
+					if(!firstLogin){
 						searchByDate.setVisible(true);
 					}else{
 						searchByDate.setVisible(false);
@@ -6529,7 +6529,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				unSelectMenuItem.setVisible(false);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6566,7 +6566,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
 
-					if(!firstTimeCam) {
+					if(!firstLogin) {
 						gridSmallLargeMenuItem.setVisible(true);
 					}else{
 						gridSmallLargeMenuItem.setVisible(false);
@@ -6607,7 +6607,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				searchMenuItem.setVisible(true);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6644,7 +6644,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (index == 0) {
 						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 						log("onCreateOptionsMenuLollipop: in Incoming");
-						if (!firstTimeCam) {
+						if (!firstLogin) {
 							thumbViewMenuItem.setVisible(true);
 						}
 						else {
@@ -6728,7 +6728,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 						log("onCreateOptionsMenuLollipop: in Outgoing");
 
-						if (!firstTimeCam) {
+						if (!firstLogin) {
 							thumbViewMenuItem.setVisible(true);
 						}
 						else {
@@ -6798,7 +6798,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//Show
 					addContactMenuItem.setVisible(true);
-					if(!firstTimeCam){
+					if(!firstLogin){
 						thumbViewMenuItem.setVisible(true);
 					}else{
 						thumbViewMenuItem.setVisible(false);
@@ -6980,7 +6980,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(sFLol != null && sFLol.getNodes()!=null){
 						if(sFLol.getNodes().size()!=0){
 							selectMenuItem.setVisible(true);
-							if(!firstTimeCam){
+							if(!firstLogin){
 								thumbViewMenuItem.setVisible(true);
 							}else{
 								thumbViewMenuItem.setVisible(false);
@@ -8026,7 +8026,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstTimeCam) {
+						if(!firstLogin) {
 							gridSmallLargeMenuItem.setVisible(true);
 						}else{
 							gridSmallLargeMenuItem.setVisible(false);
@@ -8049,7 +8049,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstTimeCam) {
+						if(!firstLogin) {
 							gridSmallLargeMenuItem.setVisible(true);
 						}else{
 							gridSmallLargeMenuItem.setVisible(false);
@@ -9528,8 +9528,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	void isFirstTimeCam() {
-		if(firstTimeCam){
-			firstTimeCam = false;
+		if(firstLogin){
+			firstLogin = false;
 			dbH.setCamSyncEnabled(false);
 			bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
 		}
@@ -10358,7 +10358,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					secondPin.requestFocus();
 					secondPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick){
+					if (isFirstTime2fa && !pinLongClick){
 						secondPin.setText("");
 						thirdPin.setText("");
 						fourthPin.setText("");
@@ -10401,7 +10401,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thirdPin.requestFocus();
 					thirdPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						thirdPin.setText("");
 						fourthPin.setText("");
 						fifthPin.setText("");
@@ -10443,7 +10443,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fourthPin.requestFocus();
 					fourthPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
@@ -10484,7 +10484,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fifthPin.requestFocus();
 					fifthPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						fifthPin.setText("");
 						sixthPin.setText("");
 					}
@@ -10524,7 +10524,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sixthPin.requestFocus();
 					sixthPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						sixthPin.setText("");
 					}
 					else if (pinLongClick) {
@@ -10696,7 +10696,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	void verifyShowError(){
 		log("Pin not correct verifyShowError");
-		isFirstTime = false;
+		isFirstTime2fa = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
 		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
@@ -12421,7 +12421,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setInitialCloudDrive (){
 		drawerItem = DrawerItem.CLOUD_DRIVE;
 		setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
-		firstTime = true;
+		//firstTimeAfterInstallation = true;
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -17268,11 +17268,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.isSmallGridCameraUploads = isSmallGridCameraUploads;
 	}
 
-	public boolean getFirstTimeCam() {
-		return firstTimeCam;
+	public boolean getFirstLogin() {
+		return firstLogin;
 	}
-	public void setFirstTimeCam(boolean flag){
-		firstTimeCam = flag;
+	public void setFirstLogin(boolean flag){
+		firstLogin = flag;
 	}
 
 	public void setListCameraUploads(boolean isListCameraUploads) {

@@ -1997,7 +1997,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (firstTime){
                         log("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
-                        intent.putExtra("firstTimeCam", true);
+                        intent.putExtra("firstLogin", true);
                         if (action != null){
                             log("Action not NULL");
                             if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
@@ -2029,7 +2029,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         else{
                             intent = new Intent(context,ManagerActivityLollipop.class);
-                            intent.putExtra("firstTimeCam", true);
+                            intent.putExtra("firstLogin", true);
                             initialCam = true;
                         }
 
