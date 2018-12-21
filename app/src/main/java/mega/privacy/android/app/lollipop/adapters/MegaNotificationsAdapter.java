@@ -251,7 +251,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -369,7 +369,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -488,7 +488,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -547,7 +547,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -664,7 +664,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED: {
@@ -722,7 +722,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:{
@@ -838,7 +838,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHARE:{
