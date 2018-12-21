@@ -5390,7 +5390,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	log("selectDrawerItemLollipop: "+item);
 
 		((MegaApplication)getApplication()).setRecentChatVisible(false);
-		drawerItem = item;
 
     	switch (item){
 			case CLOUD_DRIVE:{
