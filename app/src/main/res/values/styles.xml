@@ -248,4 +248,10 @@
         <item name="cardUseCompatPadding">true</item>
         <item name="contentPadding">0dp</item>
     </style>
+
+    <style name="MySeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">@color/status_bar_login</item>
+        <item name="android:progressTint">@android:color/white</item>
+        <item name="android:colorControlActivated">@android:color/white</item>
+    </style>
 </resources>

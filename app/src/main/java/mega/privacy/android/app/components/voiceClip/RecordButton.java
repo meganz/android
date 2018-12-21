@@ -30,17 +30,13 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         super(context);
         init(context, null);
     }
-
     public RecordButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
-
     public RecordButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
-
-
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -53,8 +49,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             }
             typedArray.recycle();
         }
-
-//        scaleAnim = new ScaleAnim(this);
         this.setOnTouchListener(this);
         this.setOnClickListener(this);
     }

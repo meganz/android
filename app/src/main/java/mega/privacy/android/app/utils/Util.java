@@ -1113,7 +1113,7 @@ public class Util {
 		return speedString;
 	}
 
-	public static String getVoiceNoteName(long timestamp, String fileName) {
+	public static String getVoiceClipName(long timestamp, String fileName) {
 		log("getVoiceNoteName() - timestamp: "+timestamp+", fileName: "+fileName);
 		String nameResult = "";
 		String extension = "";
@@ -1769,6 +1769,30 @@ public class Util {
 		
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
 		
+	}
+
+	public static boolean isVoiceClip(String path) {
+		log("isVoiceClip: "+path);
+		try{
+			String extension = "";
+			String[] s = path.split("\\.");
+			if (s != null){
+				if (s.length > 0){
+					extension = s[s.length-1];
+					log("isVoiceClip: extension"+extension);
+
+				}
+			}
+
+			if(extension.equals("opus")){
+				return true;
+			}else{
+				return false;
+			}
+		}catch(Exception e){
+			log("Exception: "+e.getMessage());
+			return false;
+		}
 	}
 	
 	public static boolean isVideoFile(String path) {

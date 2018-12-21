@@ -48,6 +48,7 @@ public class RecordView extends RelativeLayout {
     private int RECORD_ERROR = R.raw.record_error;
     private MediaPlayer player;
     private AnimationHelper animationHelper;
+    private View layoutLock;
 
 
     public RecordView(Context context) {
@@ -82,6 +83,8 @@ public class RecordView extends RelativeLayout {
         counterTime = view.findViewById(R.id.counter_tv);
         basketImg = view.findViewById(R.id.basket_img);
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
+        layoutLock = view.findViewById(R.id.layout_lock);
+        layoutLock.setVisibility(View.GONE);
 
         hideViews(true);
 
@@ -139,8 +142,17 @@ public class RecordView extends RelativeLayout {
         counterTime.setVisibility(VISIBLE);
     }
 
+    public void showLock(boolean flag){
+        log("showLock() -> "+flag);
+        if(flag){
+            layoutLock.setVisibility(View.VISIBLE);
+        }else{
+            layoutLock.setVisibility(View.GONE);
+        }
+    }
+
     private boolean isLessThanOneSecond(long time) {
-        return time <= 1000;
+        return time <= 1500;
     }
 
     private void playSound(int soundRes) {
@@ -192,6 +204,7 @@ public class RecordView extends RelativeLayout {
 
         if (recordListener != null) {
             recordListener.onStart();
+
         }
 
     }
@@ -208,7 +221,7 @@ public class RecordView extends RelativeLayout {
             if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
-                    log(" onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
+                    log("onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
                     hideViews(true);
                     animationHelper.clearAlphaAnimation(false);
                     animationHelper.onAnimationEnd();
@@ -252,7 +265,6 @@ public class RecordView extends RelativeLayout {
     protected void onActionUp(RecordButton recordBtn) {
         log("onActionUp()");
         elapsedTime = System.currentTimeMillis() - startTime;
-
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
             log("onActionUp() - less than a second");
             if (recordListener != null){

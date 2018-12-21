@@ -178,6 +178,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     String mOutputFilePath;
 
+    String outputFileVoiceNotes;
+
     boolean newVisibility = false;
     boolean getMoreHistory=false;
 
@@ -336,7 +338,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean isTurn = false;
     Handler handler;
 
-
     //VOICE CLIPS:
     private RecordButton record;
     private MediaRecorder myAudioRecorder;
@@ -344,8 +345,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean isRecording = false;
     LinearLayout bubbleLayout;
     TextView bubbleText;
-//    View layoutLock;
-
 
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
@@ -686,6 +685,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
+        textChat.setVisibility(View.VISIBLE);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             textChat.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
         }else{
@@ -715,9 +715,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             bubbleText.setMaxWidth(Util.scaleWidthPx(250, outMetrics));
         }
-
-//        layoutLock = (View) findViewById(R.id.layout_lock);
-//        layoutLock.setVisibility(View.GONE);
 
         rLKeyboardTwemojiButton.setOnClickListener(this);
         rLMediaButton.setOnClickListener(this);
@@ -876,6 +873,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
+
         chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
@@ -910,7 +908,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //            @Override
 //            public void run() {
 //                if(isRecording){
-////                    layoutLock.setVisibility(View.VISIBLE);
+//                    log("show lock ");
+//                    voiceClipLayout.showLock(true);
 //                }
 //            }
 //        };
@@ -2030,93 +2029,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return super.onOptionsItemSelected(item);
     }
 
-    public void startRecord(){
-        log("startRecord()");
-//        textChat.setVisibility(View.GONE);
-        linearLayoutOptions.setVisibility(View.INVISIBLE);
-        record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
-//        record.setElevation(Util.px2dp(3, outMetrics));
-        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
-        record.setVisibility(View.VISIBLE);
-        voiceClipLayout.setVisibility(View.VISIBLE);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                log("myAudioRecorder -> START");
-
-                try {
-                    if(myAudioRecorder!=null){
-                        myAudioRecorder.prepare();
-                        myAudioRecorder.start();
-                        isRecording = true;
-                    }
-                } catch (IllegalStateException ise) {
-
-                } catch (IOException ioe) {
-
-                }
-            }
-        }, 1000);   //wait 1 second
-
-
-    }
-    public void playVoiceClip(){
-//        MediaPlayer mediaPlayer = new MediaPlayer();
-//        try {
-//            mediaPlayer.setDataSource(outputFileVoiceNotes);
-//            mediaPlayer.prepare();
-//            mediaPlayer.start();
-//        } catch (Exception e) {
-//            // make something
-//        }
-    }
-
-    public void cancelRecord(){
-        log("cancelRecord()");
-        isVoiceClip = false;
-        isRecording = false;
-//        textChat.setVisibility(View.VISIBLE);
-        linearLayoutOptions.setVisibility(View.VISIBLE);
-        record.setBackground(null);
-//        record.setElevation(0);
-        record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
-        record.setVisibility(View.VISIBLE);
-        voiceClipLayout.setVisibility(View.GONE);
-        if(myAudioRecorder!=null){
-            log("myAudioRecorder -> CANCEL ");
-            myAudioRecorder.reset();
-            myAudioRecorder = null;
-        }
-    }
-    public void sendVoiceClip(){
-        log(" sendVoiceClip()");
-    }
-
-    public void stopRecord(){
-        log(" stopRecord()");
-//        layoutLock.setVisibility(View.GONE);
-        isVoiceClip = false;
-//        textChat.setVisibility(View.VISIBLE);
-        linearLayoutOptions.setVisibility(View.VISIBLE);
-        record.setBackground(null);
-//        record.setElevation(0);
-        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
-        record.setVisibility(View.VISIBLE);
-        isRecording = false;
-        voiceClipLayout.setVisibility(View.GONE);
-        if(myAudioRecorder!=null) {
-            log("myAudioRecorder -> STOP ");
-
-            myAudioRecorder.stop();
-            myAudioRecorder.release();
-            myAudioRecorder = null;
-            sendVoiceClip();
-        }
-     }
 
     public void startRecordVoiceClip(){
-        log(" startRecordVoiceClip() ");
+        log("startRecordVoiceClip() ");
         isVoiceClip = true;
         if(checkPermissionsVoiceClip()){
 
@@ -2124,10 +2040,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             File newFolder = new File(path);
             newFolder.mkdirs();
 
-            String outputFileVoiceNotes = path + "/note_voice.opus";
+            outputFileVoiceNotes = path + "/note_voice.opus";
             long timeStamp = System.currentTimeMillis()/1000;
             File voiceFile = new File(outputFileVoiceNotes);
-            String name = Util.getVoiceNoteName(timeStamp, voiceFile.getAbsolutePath());
+            String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
             outputFileVoiceNotes = path + "/note_voice"+name;
 
             myAudioRecorder = new MediaRecorder();
@@ -2139,6 +2055,98 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             startRecord();
         }
     }
+
+    public void startRecord(){
+        log("startRecord()");
+        final Handler handlerPadLock = new Handler();
+        final Runnable runPadLock = new Runnable(){
+            @Override
+            public void run() {
+                if(isRecording){
+                    log("show lock ");
+                    voiceClipLayout.showLock(true);
+                }
+            }
+        };
+
+        record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
+//        record.setElevation(Util.px2dp(3, outMetrics));
+        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
+        record.setVisibility(View.VISIBLE);
+        textChat.setVisibility(View.GONE);
+        voiceClipLayout.setVisibility(View.VISIBLE);
+
+        try {
+            if(!isRecording){
+                if(myAudioRecorder!=null){
+                    log("myAudioRecorder -> START - isRecording = TRUE");
+                    myAudioRecorder.prepare();
+                    myAudioRecorder.start();
+                    isRecording = true;
+                    handlerPadLock.postDelayed(runPadLock, 3000); //3 seconds delay to show de padlock
+                }
+            }
+        }catch(IllegalStateException ise){}catch (IOException ioe){}
+    }
+
+ //   public void playVoiceClip(){
+//        MediaPlayer mediaPlayer = new MediaPlayer();
+//        try {
+//            mediaPlayer.setDataSource(outputFileVoiceNotes);
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
+//        } catch (Exception e) {
+//            // make something
+//        }
+ //   }
+
+    public void cancelRecord(){
+        log("cancelRecord()");
+        voiceClipLayout.showLock(false);
+        isVoiceClip = false;
+        record.setBackground(null);
+        record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
+        record.setVisibility(View.VISIBLE);
+        voiceClipLayout.setVisibility(View.GONE);
+        textChat.setVisibility(View.VISIBLE);
+
+        if(isRecording){
+            if(myAudioRecorder!=null){
+                log("myAudioRecorder -> CANCEL - isRecording = FALSE");
+                myAudioRecorder.reset();
+                myAudioRecorder = null;
+                isRecording = false;
+            }
+        }
+    }
+    public void sendVoiceClip(){
+        log("sendVoiceClip()");
+        uploadVoiceNote(outputFileVoiceNotes);
+    }
+
+    public void stopRecord(){
+        log("stopRecord()");
+        voiceClipLayout.showLock(false);
+        isVoiceClip = false;
+        record.setBackground(null);
+        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
+        record.setVisibility(View.VISIBLE);
+        voiceClipLayout.setVisibility(View.GONE);
+        textChat.setVisibility(View.VISIBLE);
+
+        if(isRecording){
+            if(myAudioRecorder!=null) {
+                log("myAudioRecorder -> STOP - isRecording = FALSE");
+                myAudioRecorder.stop();
+                myAudioRecorder.release();
+                myAudioRecorder = null;
+                isRecording = false;
+                sendVoiceClip();
+            }
+        }
+
+     }
+
     public void startCall(){
         if(startVideo){
             log("Start video call");
@@ -7457,6 +7465,57 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Error when adding pending msg to the database");
+        }
+    }
+
+    public void uploadVoiceNote(String path){
+        log("uploadVoiceNote() - Path: "+path);
+
+        File selfie = new File(path);
+
+        Intent intent = new Intent(this, ChatUploadService.class);
+
+        PendingMessageSingle pMsgSingle = new PendingMessageSingle();
+        pMsgSingle.setChatId(idChat);
+        long timestamp = System.currentTimeMillis()/1000;
+        pMsgSingle.setUploadTimestamp(timestamp);
+
+        if (MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudio()) {
+            log("uploadVoiceNote - isAUdio");
+            String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
+            pMsgSingle.setFilePath(selfie.getAbsolutePath());
+            pMsgSingle.setName(selfie.getName());
+            pMsgSingle.setFingerprint(fingerprint);
+        }else{
+            String fingerprint = megaApi.getFingerprint(selfie.getAbsolutePath());
+
+            pMsgSingle.setFilePath(selfie.getAbsolutePath());
+            pMsgSingle.setName(selfie.getName());
+            pMsgSingle.setFingerprint(fingerprint);
+        }
+
+        long idMessage = dbH.addPendingMessage(pMsgSingle);
+        pMsgSingle.setId(idMessage);
+
+        if(idMessage!=-1){
+            log("uploadVoiceNote()- put message");
+
+            intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
+
+            if(!isLoadingHistory){
+                AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(pMsgSingle, true);
+                sendMessageToUI(newNodeAttachmentMsg);
+            }
+
+//                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
+//                filePaths.add("/home/jfjf.jpg");
+
+            intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
+
+            startService(intent);
+        }
+        else{
+            log("uploadVoiceNote()- Error when adding pending msg to the database");
         }
     }
 
