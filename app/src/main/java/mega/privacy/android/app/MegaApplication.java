@@ -99,7 +99,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.5_216";
+	static final public String USER_AGENT = "MEGAAndroid/3.5.1_220";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -1313,7 +1313,21 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
+		log("onEvent: " + event.getText());
 
+		if (event.getType() == MegaEvent.EVENT_STORAGE) {
+			log("Storage status changed");
+			int state = event.getNumber();
+			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
+				api.getAccountDetails(null);
+			}
+			else {
+				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+				intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+				intent.putExtra("state", state);
+				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+			}
+		}
 	}
 
 

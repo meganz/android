@@ -967,6 +967,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
 
+			setContacts(megaApi.getContacts());
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -979,7 +980,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			recyclerView.setAdapter(adapter);
-						
+
 			if (adapter.getItemCount() == 0){
 
                 recyclerView.setVisibility(View.GONE);
@@ -1053,16 +1054,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		sortBy();
 
-		if(!visibleContacts.isEmpty()){
-			for (int i=0;i<visibleContacts.size();i++){
-				int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
-				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-					log("Request last green for user");
-					megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
+		if(Util.isChatEnabled()){
+			if(!visibleContacts.isEmpty()){
+				for (int i=0;i<visibleContacts.size();i++){
+					int userStatus = megaChatApi.getUserOnlineStatus(visibleContacts.get(i).getMegaUser().getHandle());
+					if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+						log("Request last green for user");
+						megaChatApi.requestLastGreen(visibleContacts.get(i).getMegaUser().getHandle(), null);
+					}
 				}
 			}
 		}
-
 	}
 
 	@Override

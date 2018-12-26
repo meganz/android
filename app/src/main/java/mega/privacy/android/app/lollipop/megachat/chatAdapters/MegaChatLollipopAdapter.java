@@ -1114,7 +1114,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void onBindViewHolderUploading(RecyclerView.ViewHolder holder, int position) {
-        log("onBindViewHolderUploading(): " + position);
+        log("onBindViewHolderUploading(): position" + position);
 
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1138,6 +1138,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
+
+        ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
@@ -3812,7 +3814,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 
     public void bindNormalMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        log("bindNormalMessage()");
+        log("bindNormalMessage()  position: "+position);
 
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
@@ -7044,7 +7046,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.messages = messages;
         notifyItemRemoved(position);
 
-        if (position == messages.size() - 1) {
+        if (position == messages.size()) {
             log("No need to update more");
         } else {
             log("Update until end");
@@ -7990,7 +7992,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.forward_contact_preview_landscape:{
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 messageArray.add(messages.get(currentPosition - 1));
-                ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
+                ((ChatActivityLollipop) context).forwardMessages(messageArray);
                 break;
             }
             case R.id.content_own_message_text:
