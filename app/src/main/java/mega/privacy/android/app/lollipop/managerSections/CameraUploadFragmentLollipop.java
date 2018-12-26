@@ -740,7 +740,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
 
 		if (type == TYPE_CAMERA) {
-			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
+			if (((ManagerActivityLollipop) context).getFirstLogin()) {
 				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
@@ -1429,7 +1429,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@SuppressLint("NewApi")
 	private void cameraOnOffFirstTime(){
-		((ManagerActivityLollipop) context).setFirstTimeCam(false);
+		((ManagerActivityLollipop) context).setFirstLogin(false);
 //		firstTimeCam = false;
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setCamSyncEnabled(true);
@@ -1605,7 +1605,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 //		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 //		        		if (hasCameraPermission){
-		        			if (((ManagerActivityLollipop) context).getFirstTimeCam()){
+		        			if (((ManagerActivityLollipop) context).getFirstLogin()){
 		        				this.cameraOnOffFirstTime();
 		        			}
 		        			else{		        			
@@ -1685,7 +1685,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				break;
 			}
 			case R.id.cam_sync_button_skip:{
-				((ManagerActivityLollipop) context).setFirstTimeCam(false);
+				((ManagerActivityLollipop) context).setFirstLogin(false);
 				dbH.setCamSyncEnabled(false);
 				((ManagerActivityLollipop)context).setInitialCloudDrive();
 				break;
@@ -2028,8 +2028,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public int onBackPressed(){
 		log("onBackPressed");
 
-		if(((ManagerActivityLollipop)context).getFirstTimeCam()){
-			((ManagerActivityLollipop) context).setFirstTimeCam(false);
+		if(((ManagerActivityLollipop)context).getFirstLogin()){
+			((ManagerActivityLollipop) context).setFirstLogin(false);
 			dbH.setCamSyncEnabled(false);
 			((ManagerActivityLollipop) context).refreshMenu();
 		}
@@ -2369,11 +2369,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-//	public void setFirstTimeCam(boolean firstTimeCam){
+//	public void setFirstLogin(boolean firstTimeCam){
 //		this.firstTimeCam = firstTimeCam;
 //	}
 //
-//	public boolean getFirstTimeCam(){
+//	public boolean getFirstLogin(){
 //		return firstTimeCam;
 //	}
 

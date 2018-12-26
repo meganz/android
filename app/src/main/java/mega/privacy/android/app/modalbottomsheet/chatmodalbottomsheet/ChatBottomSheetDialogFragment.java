@@ -170,8 +170,15 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			addAvatarChatPanel(null, chat);
 
             infoChatText.setText(getString(R.string.group_chat_info_label));
-            optionInfoChat.setVisibility(View.GONE);
-            separatorInfo.setVisibility(View.GONE);
+
+            if(megaApi!=null && megaApi.getRootNode()!=null){
+                optionInfoChat.setVisibility(View.VISIBLE);
+                separatorInfo.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionInfoChat.setVisibility(View.GONE);
+                separatorInfo.setVisibility(View.GONE);
+            }
 
             if(chat.isActive()){
                 optionLeaveChat.setVisibility(View.VISIBLE);
@@ -226,11 +233,19 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 }
                 else{
                     optionInfoChat.setVisibility(View.GONE);
+                    separatorInfo.setVisibility(View.GONE);
                     optionClearHistory.setVisibility(View.GONE);
                 }
             }
             else{
+                MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
+                if(chatRoom!=null){
+                    titleMailContactChatPanel.setText(chatRoom.getPeerEmail(0));
+                    addAvatarChatPanel(chatRoom.getPeerEmail(0), chat);
+                }
+
                 optionInfoChat.setVisibility(View.GONE);
+                separatorInfo.setVisibility(View.GONE);
                 optionClearHistory.setVisibility(View.GONE);
             }
 
@@ -296,6 +311,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             archiveChatText.setText(getString(R.string.unarchive_chat_option));
             archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
             optionInfoChat.setVisibility(View.GONE);
+            separatorInfo.setVisibility(View.GONE);
             optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.GONE);
             optionClearHistory.setVisibility(View.GONE);

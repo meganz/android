@@ -67,6 +67,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaTransfer;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -2202,14 +2203,19 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else{
 			log("Camera OFF");
-			dbH.setCamSyncEnabled(false);
-			dbH.setSecondaryUploadEnabled(false);
 			secondaryUpload = false;
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 				Intent stopIntent = null;
 				stopIntent = new Intent(context, CameraSyncService.class);
 				stopIntent.setAction(CameraSyncService.ACTION_STOP);
 				context.startService(stopIntent);
+			}
+			else {
+				dbH.setCamSyncEnabled(false);
+				dbH.setSecondaryUploadEnabled(false);
+				if (megaApi != null) {
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+				}
 			}
 
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));

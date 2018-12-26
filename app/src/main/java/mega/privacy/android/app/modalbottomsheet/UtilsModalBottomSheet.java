@@ -86,6 +86,8 @@ public class UtilsModalBottomSheet {
     public static void openWith (MegaApiAndroid megaApi, Context context, MegaNode node) {
         log("openWith");
 
+        boolean isError = false;
+
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
         log("FILENAME: " + node.getName());
 
@@ -130,14 +132,24 @@ public class UtilsModalBottomSheet {
 
             String url = megaApi.httpServerGetLocalLink(node);
 
-            mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+            if(url==null){
+                isError=true;
+            }
+            else{
+                mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+            }
         }
 
-        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-            context.startActivity(mediaIntent);
+        if(isError){
+            Toast.makeText(context, context.getResources().getString(R.string.error_open_file_with), Toast.LENGTH_LONG).show();
         }
         else{
-            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                context.startActivity(mediaIntent);
+            }
+            else{
+                Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            }
         }
     }
 

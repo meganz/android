@@ -234,19 +234,20 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		return nodes;
 	}
 
-	public void toggleAllSelection(int pos) {
-		log("toggleAllSelection: " + pos);
-		final int positionToflip = pos;
-
-		if (selectedItems.get(pos,false)) {
-			log("delete pos: " + pos);
+	boolean putOrDeletePosition (int pos) {
+		if (selectedItems.get(pos, false)) {
+			log("toggleSelection delete pos: "+pos);
 			selectedItems.delete(pos);
-
-		} else {
-			log("PUT pos: " + pos);
-			selectedItems.put(pos,true);
+			return true;
 		}
+		else {
+			log("toggleSelection PUT pos: "+pos);
+			selectedItems.put(pos, true);
+			return false;
+		}
+	}
 
+	void startAnimation (final int pos, final boolean delete) {
 		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
 		if (view != null) {
 			log("toggleSelection Start animation: " + pos);
@@ -255,6 +256,9 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 				@Override
 				public void onAnimationStart(Animation animation) {
 					log("toggleSelection onAnimationStart");
+					if (!delete) {
+						notifyItemChanged(pos);
+					}
 				}
 
 				@Override
@@ -263,48 +267,8 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 					if (selectedItems.size() <= 0) {
 						((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
 					}
-					notifyItemChanged(positionToflip);
-				}
-
-				@Override
-				public void onAnimationRepeat(Animation animation) {
-
-				}
-			});
-			view.imageView.startAnimation(flipAnimation);
-		}
-		else {
-			notifyItemChanged(pos);
-		}
-	}
-	
-	public void toggleSelection(int pos) {
-		log("toggleSelection");
-		if (selectedItems.get(pos, false)) {
-			log("toggleSelection delete pos: "+pos);
-			selectedItems.delete(pos);
-		}
-		else {
-			log("toggleSelection PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
-		notifyItemChanged(pos);
-
-		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
-		if (view != null) {
-			log("toggleSelection Start animation: " + pos);
-			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-				@Override
-				public void onAnimationStart(Animation animation) {
-					log("toggleSelection onAnimationStart");
-				}
-
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					log("toggleSelection onAnimationEnd");
-					if (selectedItems.size() <= 0) {
-						((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
+					if (delete) {
+						notifyItemChanged(pos);
 					}
 				}
 
@@ -319,7 +283,20 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			if (selectedItems.size() <= 0) {
 				((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
 			}
+			notifyItemChanged(pos);
 		}
+	}
+
+	public void toggleAllSelection(int pos) {
+		log("toggleAllSelection: " + pos);
+
+		startAnimation(pos, putOrDeletePosition(pos));
+	}
+	
+	public void toggleSelection(final int pos) {
+		log("toggleSelection");
+
+		startAnimation(pos, putOrDeletePosition(pos));
 	}
 	
 	private boolean isItemChecked(int position) {
