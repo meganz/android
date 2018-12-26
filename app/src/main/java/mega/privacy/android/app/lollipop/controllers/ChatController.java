@@ -33,6 +33,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -40,7 +41,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -220,7 +221,16 @@ public class ChatController {
         }
     }
 
-    public void deleteMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
+    public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
+        log("deleteMessages: "+messages.size());
+        if(messages!=null){
+            for(int i=0; i<messages.size();i++){
+                deleteMessage(messages.get(i), chat.getChatId());
+            }
+        }
+    }
+
+    public void deleteAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
         log("deleteMessages: "+messages.size());
         if(messages!=null){
             for(int i=0; i<messages.size();i++){
@@ -1372,7 +1382,14 @@ public class ChatController {
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
-    public void saveForOfflineWithMessages(ArrayList<AndroidMegaChatMessage> messages){
+    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages){
+        log("saveForOffline - multiple messages");
+        for(int i=0; i<messages.size();i++){
+            saveForOffline(messages.get(i).getMegaNodeList());
+        }
+    }
+
+    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
         log("saveForOffline - multiple messages");
         for(int i=0; i<messages.size();i++){
             saveForOffline(messages.get(i).getMessage().getMegaNodeList());
@@ -1402,7 +1419,7 @@ public class ChatController {
                     destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
                 }
                 else{
-                    destination = ((ChatActivityLollipop) context).getFilesDir();
+                    destination = context.getFilesDir();
                 }
 
                 destination.mkdirs();
@@ -1421,6 +1438,12 @@ public class ChatController {
                         }
                         else if (context instanceof PdfViewerActivityLollipop){
                             ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                        }
+                        else if (context instanceof ChatActivityLollipop){
+                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                        }
+                        else if (context instanceof NodeAttachmentHistoryActivity){
+                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.file_already_exists));
                         }
                     }
                     else{
@@ -1452,88 +1475,6 @@ public class ChatController {
             Intent service = new Intent(context, DownloadService.class);
             String serializeString = document.serialize();
             log("serializeString: "+serializeString);
-            service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-            service.putExtra(DownloadService.EXTRA_PATH, path);
-            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
-                service.putExtra("fromMV", true);
-            }
-            context.startService(service);
-        }
-
-    }
-
-    public void saveForOffline(MegaNode node){
-        log("saveForOffline - node");
-
-        File destination = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
-        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-        if (node != null) {
-
-            if (Environment.getExternalStorageDirectory() != null){
-                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
-            }
-            else{
-                destination = context.getFilesDir();
-            }
-
-            destination.mkdirs();
-
-            log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-            if (destination.exists() && destination.isDirectory()){
-
-                File offlineFile = new File(destination, node.getName());
-                if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-                    log("File already exists!");
-                    if (context instanceof ChatFullScreenImageViewer){
-                        ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.file_already_exists));
-                    }
-                    else if (context instanceof AudioVideoPlayerLollipop){
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                    }
-                    else if (context instanceof PdfViewerActivityLollipop){
-                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                    }
-                }
-                else{
-                    dlFiles.put(node, destination.getAbsolutePath());
-                }
-            }
-            else{
-                log("Destination ERROR");
-            }
-        }
-
-
-        double availableFreeSpace = Double.MAX_VALUE;
-        try{
-            StatFs stat = new StatFs(destination.getAbsolutePath());
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        }
-        catch(Exception ex){}
-
-        for (MegaNode document : dlFiles.keySet()) {
-
-            String path = dlFiles.get(document);
-
-            if(availableFreeSpace <document.getSize()){
-                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, ((NodeAttachmentActivityLollipop) context));
-                continue;
-            }
-
-            Intent service = new Intent(context, DownloadService.class);
-            String serializeString = document.serialize();
-            log("serializeString: "+serializeString);
-            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
@@ -1668,9 +1609,6 @@ public class ChatController {
             if(context instanceof ChatActivityLollipop){
                 ((ChatActivityLollipop) context).showSnackbarNotSpace();
             }
-            else if(context instanceof NodeAttachmentActivityLollipop){
-                ((NodeAttachmentActivityLollipop) context).showSnackbarNotSpace();
-            }
             else if(context instanceof ChatFullScreenImageViewer){
                 ((ChatFullScreenImageViewer) context).showSnackbarNotSpace();
             }
@@ -1679,6 +1617,9 @@ public class ChatController {
             }
             else if (context instanceof AudioVideoPlayerLollipop){
                 ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
+            }
+            else if (context instanceof NodeAttachmentHistoryActivity){
+                ((NodeAttachmentHistoryActivity) context).showSnackbarNotSpace();
             }
             log("Not enough space");
             return;
@@ -1706,9 +1647,6 @@ public class ChatController {
                 if(context instanceof  ChatActivityLollipop){
                     ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if(context instanceof  NodeAttachmentActivityLollipop){
-                    ((NodeAttachmentActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
                 else if(context instanceof ChatFullScreenImageViewer){
                     ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
@@ -1717,6 +1655,9 @@ public class ChatController {
                 }
                 else if (context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                }
+                else if (context instanceof NodeAttachmentHistoryActivity){
+                    ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
                 }
             }
             else{
@@ -1846,8 +1787,8 @@ public class ChatController {
                                         if(context instanceof  ChatActivityLollipop){
                                             ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
                                         }
-                                        else if(context instanceof  NodeAttachmentActivityLollipop){
-                                            ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        else if(context instanceof  NodeAttachmentHistoryActivity){
+                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.intent_not_available));
                                         }
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1920,8 +1861,8 @@ public class ChatController {
                                         if(context instanceof  ChatActivityLollipop){
                                             ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                         }
-                                        else if(context instanceof  NodeAttachmentActivityLollipop){
-                                            ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        else if(context instanceof  NodeAttachmentHistoryActivity){
+                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                         }
                                     }
                                 }
@@ -1929,15 +1870,15 @@ public class ChatController {
                                     if(context instanceof  ChatActivityLollipop){
                                         ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
-                                    else if(context instanceof  NodeAttachmentActivityLollipop){
-                                        ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    else if(context instanceof  NodeAttachmentHistoryActivity){
+                                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                             }
 
                         }
                         return;
-                    }
+                    }//localPath found
                     else{
                         log("localPath is NULL");
                     }
@@ -1972,6 +1913,157 @@ public class ChatController {
                     log("node NOT fOUND!!!!!");
                 }
             }
+        }
+    }
+
+    public void importNode(long idMessage, long idChat) {
+        log("importNode");
+        ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
+
+        if(m!=null){
+            AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
+            messages.add(aMessage);
+            importNodesFromAndroidMessages(messages);
+        }
+        else{
+            log("Message cannot be recovered - null");
+        }
+    }
+
+    public void importNodesFromMessages(ArrayList<MegaChatMessage> messages){
+        log("importNodesFromMessages");
+
+        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+
+        long[] longArray = new long[messages.size()];
+        for (int i = 0; i < messages.size(); i++) {
+            longArray[i] = messages.get(i).getMsgId();
+        }
+        intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
+
+        if(context instanceof  NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+        }
+    }
+
+    public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
+        log("importNodesFromAndroidMessages");
+
+        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+
+        long[] longArray = new long[messages.size()];
+        for (int i = 0; i < messages.size(); i++) {
+            longArray[i] = messages.get(i).getMessage().getMsgId();
+        }
+        intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
+
+        if(context instanceof  ChatActivityLollipop){
+            ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+        }
+        else if(context instanceof  NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+        }
+    }
+
+    public void prepareMessageToForward(long idMessage, long idChat) {
+        log("prepareMessageToForward");
+        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
+        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
+        messagesSelected.add(m);
+
+        prepareMessagesToForward(messagesSelected, idChat);
+    }
+
+    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
+        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
+        for(int i = 0; i<androidMessagesSelected.size(); i++){
+            messagesSelected.add(androidMessagesSelected.get(i).getMessage());
+        }
+        prepareMessagesToForward(messagesSelected, idChat);
+    }
+
+    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat){
+        log ("prepareMessagesToForward");
+
+        ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
+        long[] idMessages = new long[messagesSelected.size()];
+        for(int i=0; i<messagesSelected.size();i++){
+            idMessages[i] = messagesSelected.get(i).getMsgId();
+
+            if(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
+                    //Node has to be imported
+                    messagesToImport.add(messagesSelected.get(i));
+                }
+            }
+        }
+
+        if(messagesToImport.isEmpty()){
+            log("Proceed to forward");
+            forwardMessages(messagesSelected, idChat);
+        }
+        else{
+            log("Proceed to import nodes to own Cloud");
+            ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+
+            MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
+            if(target==null){
+                log("Error no chat folder - return");
+                return;
+            }
+
+            for(int j=0; j<messagesToImport.size();j++){
+                MegaChatMessage message = messagesToImport.get(j);
+
+                if(message!=null){
+
+                    MegaNodeList nodeList = message.getMegaNodeList();
+
+                    for(int i=0;i<nodeList.size();i++){
+                        MegaNode document = nodeList.get(i);
+                        if (document != null) {
+                            log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+
+                            megaApi.copyNode(document, target, listener);
+                        }
+                        else{
+                            log("DOCUMENT: null");
+                        }
+                    }
+                }
+                else{
+                    log("MESSAGE is null");
+                    if(context instanceof  ChatActivityLollipop){
+                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
+                    }
+                    else if(context instanceof  NodeAttachmentHistoryActivity){
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
+                    }
+                }
+            }
+        }
+    }
+
+    public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected, long idChat){
+        log ("forwardMessages");
+
+        long[] idMessages = new long[messagesSelected.size()];
+        for(int i=0; i<messagesSelected.size();i++){
+            idMessages[i] = messagesSelected.get(i).getMsgId();
+        }
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("ID_MESSAGES", idMessages);
+        i.putExtra("ID_CHAT_FROM", idChat);
+        i.setAction(Constants.ACTION_FORWARD_MESSAGES);
+        if(context instanceof  ChatActivityLollipop){
+            ((ChatActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+        else if(context instanceof  NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 
