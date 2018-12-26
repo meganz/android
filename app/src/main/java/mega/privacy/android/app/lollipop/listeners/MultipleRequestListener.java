@@ -10,7 +10,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -298,14 +298,15 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             else if(context instanceof ContactAttachmentActivityLollipop){
                 ((ContactAttachmentActivityLollipop) context).showSnackbar(message);
             }
-            else if(context instanceof NodeAttachmentActivityLollipop){
-                ((NodeAttachmentActivityLollipop) context).showSnackbar(message);
-            }
             else if(context instanceof AchievementsActivity){
                 ((AchievementsActivity) context).showInviteConfirmationDialog();
             }
             else if(context instanceof AddContactActivityLollipop){
                 ((AddContactActivityLollipop) context).showSnackbar(message);
+            }
+            else if(context instanceof NodeAttachmentHistoryActivity){
+                ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
+                ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
             }
         }
     }
