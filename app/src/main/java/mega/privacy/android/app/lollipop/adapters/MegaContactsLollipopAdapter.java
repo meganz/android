@@ -34,6 +34,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -71,7 +72,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private ContactsFragmentLollipop fragment;
 	private int adapterType;
 	private SparseBooleanArray selectedContacts;
-	
+
+	DisplayMetrics outMetrics;
 
 	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaContactAdapter> _contacts, RecyclerView _listView, int adapterType) {
 		this.context = _context;
@@ -107,7 +109,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		public TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
-        TextView textViewContent;
+        MarqueeTextView textViewContent;
         RelativeLayout itemLayout;
         public String contactMail;
     }
@@ -139,7 +141,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		log("onCreateViewHolder");
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
 	    dbH = DatabaseHandler.getDbHandler(context);
@@ -153,8 +155,9 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);	
 		    holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 		    holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
-		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
-		    holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
+		    holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
+			holderList.textViewContent.setHorizontallyScrolling(true);
+			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 
@@ -185,7 +188,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);	
 		    holderGrid.contactInitialLetter = (TextView) v.findViewById(R.id.contact_grid_initial_letter);
 		    holderGrid.textViewContactName = (TextView) v.findViewById(R.id.contact_grid_name);
-		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
+		    holderGrid.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_grid_content);
+			holderGrid.textViewContent.setHorizontallyScrolling(true);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
 
@@ -214,7 +218,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
+			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout.setVisibility(View.GONE);
@@ -228,7 +232,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
 			//Right margin
@@ -253,7 +256,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
+			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_list_content);
 			holderList.contactStateIcon = (ImageView) v.findViewById(R.id.contact_list_drawable_state);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 			holderList.declineLayout.setVisibility(View.VISIBLE);
@@ -267,7 +270,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
-			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
 			holderList.declineLayout.setTag(holderList);
@@ -321,39 +323,71 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					log("This user is connected");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
+					holder.textViewContent.setText(context.getString(R.string.online_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
+					holder.textViewContent.setText(context.getString(R.string.away_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
+					holder.textViewContent.setText(context.getString(R.string.busy_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 					log("This user is offline");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
+					holder.textViewContent.setText(context.getString(R.string.offline_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_INVALID){
 					log("INVALID status: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
+					holder.textViewContent.setVisibility(View.GONE);
 				}
 				else{
 					log("This user status is: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
+					holder.textViewContent.setVisibility(View.GONE);
+				}
+
+				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+					if(!contact.getLastGreen().isEmpty()){
+						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
+					}
 				}
 			}
 		}
 		else{
 			holder.contactStateIcon.setVisibility(View.GONE);
+
+			ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
+
+			String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
+			holder.textViewContent.setVisibility(View.VISIBLE);
+			holder.textViewContent.setText(sharedNodesDescription);
 		}
+
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.textViewContactName.getLayoutParams();
+		if (holder.textViewContent.getVisibility() == View.VISIBLE) {
+			params.setMargins(Util.px2dp(13, outMetrics), Util.px2dp(16, outMetrics), 0, 0);
+		}
+		else if (holder.textViewContent.getVisibility() == View.GONE) {
+			params.setMargins(Util.px2dp(13, outMetrics), Util.px2dp(24, outMetrics), 0, Util.px2dp(24, outMetrics));
+		}
+		holder.textViewContactName.setLayoutParams(params);
 		
 		if (!multipleSelect) {
 
-			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_new));
 		} 
 		else {
 
@@ -361,7 +395,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_long_click_lollipop));
 			}
 			else{
-				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_new));
 			}
 		}
 
@@ -418,13 +452,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				megaApi.getUserAvatar(contact.getMegaUser(), context.getCacheDir().getAbsolutePath() + "/" + contact.getMegaUser().getEmail() + ".jpg", listener);
 			}
 		}
-		
-		ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
-		
-		String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
-		
-		holder.textViewContent.setText(sharedNodesDescription);
-		
+
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);	
 	}
@@ -488,6 +516,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
 					if (!contact.getLastGreen().isEmpty()) {
 						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
 					}
 				}
 			}
@@ -624,6 +653,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
 					if (!contact.getLastGreen().isEmpty()) {
 						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
 					}
 				}
 			}
@@ -633,8 +663,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holder.textViewContent.setVisibility(View.VISIBLE);
 			holder.contactStateIcon.setVisibility(View.GONE);
 		}
-
-
 
 		holder.textViewContactName.setText(contact.getFullName());
 
@@ -721,34 +749,57 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					log("This user is connected");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+					holder.textViewContent.setText(context.getString(R.string.online_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+					holder.textViewContent.setText(context.getString(R.string.away_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+					holder.textViewContent.setText(context.getString(R.string.busy_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 					log("This user is offline");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+					holder.textViewContent.setText(context.getString(R.string.offline_status));
+					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_INVALID){
 					log("INVALID status: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
+					holder.textViewContent.setVisibility(View.GONE);
 				}
 				else{
 					log("This user status is: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
+					holder.textViewContent.setVisibility(View.GONE);
+				}
+
+				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+					if(!contact.getLastGreen().isEmpty()){
+						holder.textViewContent.setText(contact.getLastGreen());
+						holder.textViewContent.isMarqueeIsNecessary(context);
+					}
 				}
 			}
 		}
 		else{
 			holder.contactStateIcon.setVisibility(View.GONE);
+
+			ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
+
+			String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
+			holder.textViewContent.setVisibility(View.VISIBLE);
+			holder.textViewContent.setText(sharedNodesDescription);
 		}
 
 		holder.textViewContactName.setText(contact.getFullName());
@@ -866,12 +917,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				}
 			}
 		}
-
-		ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
-
-		String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
-
-		holder.textViewContent.setText(sharedNodesDescription);
 		
 		holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);

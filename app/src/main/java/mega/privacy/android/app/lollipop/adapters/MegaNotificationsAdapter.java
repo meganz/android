@@ -29,6 +29,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.Util.toCDATA;
+
 
 public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener{
 
@@ -249,7 +251,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -367,7 +369,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -486,7 +488,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -545,7 +547,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 
 				break;
 			}
@@ -662,7 +664,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED: {
@@ -720,7 +722,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:{
@@ -836,7 +838,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					}
 				}
 
-				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHARE:{
@@ -915,17 +917,24 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
 				String email = alert.getEmail();
-				MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
 
 				String textToShow = "";
 				Spanned result = null;
-				if(node!=null){
-					textToShow = String.format(context.getString(R.string.notification_left_shared_folder), email);
-					holder.itemLayout.setOnClickListener(this);
+				//TYPE_DELETEDSHARE (0: value 1 if access for this user was removed by the share owner, otherwise
+				//value 0 if someone left the folder)
+				if(alert.getNumber(0)==0){
+					MegaNode node = megaApi.getNodeByHandle(alert.getNodeHandle());
+					if(node!=null){
+						holder.itemLayout.setOnClickListener(this);
+						textToShow = String.format(context.getString(R.string.notification_left_shared_folder_with_name), email, node.getName());
+					}
+					else{
+						holder.itemLayout.setOnClickListener(null);
+						textToShow = String.format(context.getString(R.string.notification_left_shared_folder), email);
+					}
 				}
 				else{
 					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
-					holder.itemLayout.setOnClickListener(null);
 				}
 
 				try{
@@ -1251,14 +1260,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 				if(path!=null){
 					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), toCDATA(name));
 					}
 					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), toCDATA(name));
 				}
 
 				try{
@@ -1326,14 +1335,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 				if(path!=null){
 					if(Util.isFile(path)){
-						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), toCDATA(name));
 					}
 					else{
-						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
 					}
 				}
 				else{
-					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), toCDATA(name));
 				}
 
                 try{

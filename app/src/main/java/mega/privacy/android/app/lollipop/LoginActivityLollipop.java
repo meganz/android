@@ -513,7 +513,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         Intent intent = null;
         if (firstTimeCam) {
             intent = new Intent(this, ManagerActivityLollipop.class);
-            intent.putExtra("firstTimeCam", true);
+            intent.putExtra("firstLogin", true);
             startActivity(intent);
             finish();
         } else {

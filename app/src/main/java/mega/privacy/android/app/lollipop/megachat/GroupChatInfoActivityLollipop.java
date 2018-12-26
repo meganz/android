@@ -131,6 +131,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     TextView notificationsTitle;
     TextView notificationSelectedText;
 
+    RelativeLayout sharedFilesLayout;
+    View dividerSharedFilesLayout;
+
     RelativeLayout clearChatLayout;
     View dividerClearLayout;
     RelativeLayout leaveChatLayout;
@@ -288,6 +291,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnClickListener(this);
+
+            //Chat Shared Files Layout
+
+            sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_chat_files_shared_layout);
+            sharedFilesLayout.setOnClickListener(this);
+
+            dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
 
             //Clear chat Layout
             clearChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_clear_layout);
@@ -906,6 +916,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 break;
 
+            }
+            case R.id.chat_group_contact_properties_chat_files_shared_layout:{
+                Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+                if(chat!=null){
+                    nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+                }
+                startActivity(nodeHistoryIntent);
+                break;
             }
         }
 
@@ -1529,7 +1547,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);

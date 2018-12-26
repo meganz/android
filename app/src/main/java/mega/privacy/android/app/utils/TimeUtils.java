@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -7,6 +9,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaChatMessage;
 
 public class TimeUtils implements Comparator<Calendar> {
@@ -195,7 +198,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String lastGreenDate (int minutesAgo){
+    public static String lastGreenDate (Context context, int minutesAgo){
 //        minutesAgo = 1442;
         Calendar calGreen = Calendar.getInstance();
         calGreen.add(Calendar.MINUTE, -minutesAgo);
@@ -206,7 +209,11 @@ public class TimeUtils implements Comparator<Calendar> {
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         long ts = calGreen.getTimeInMillis();
         log("Ts last green: "+ts);
-        if(tc.compare(calGreen, calToday)==0) {
+        if(minutesAgo>=65535){
+            String formattedDate = context.getString(R.string.last_seen_long_time_ago);
+            return formattedDate;
+        }
+        else if(tc.compare(calGreen, calToday)==0) {
 
             TimeZone tz = calGreen.getTimeZone();
 
@@ -215,7 +222,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
             String time = df.format(calGreen.getTime());
 
-            String formattedDate = "Last seen today at" + " " + time;
+            String formattedDate =  context.getString(R.string.last_seen_today, time);
 
             return formattedDate;
         }
@@ -235,13 +242,17 @@ public class TimeUtils implements Comparator<Calendar> {
         else{
             TimeZone tz = calGreen.getTimeZone();
 
-            java.text.DateFormat df = new SimpleDateFormat("dd MMM yy HH:mm", Locale.getDefault());
+            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
             df.setTimeZone(tz);
 
-            String formattedDate = "Last seen " + df.format(calGreen.getTime());
+            String time =df.format(calGreen.getTime());
+
+            df = new SimpleDateFormat("dd MMM", Locale.getDefault());
+            String day =df.format(calGreen.getTime());
+
+            String formattedDate =  context.getString(R.string.last_seen_general, day, time);
             return formattedDate;
         }
-
     }
 
     public static String formatDateAndTime(long ts, int format){

@@ -466,7 +466,7 @@ public class InboxFragmentLollipop extends Fragment{
 
 	public void checkScroll () {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else {
@@ -662,6 +662,7 @@ public class InboxFragmentLollipop extends Fragment{
 				setContentText();
 
 				recyclerView.scrollToPosition(0);
+				checkScroll();
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){

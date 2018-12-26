@@ -531,7 +531,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void checkScroll() {
 		if (recyclerView != null) {
-			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
+			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
 				((ManagerActivityLollipop) context).changeActionBarElevation(true);
 			}
 			else if (!isMultipleselect()) {
@@ -1370,7 +1370,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             emptyImageView.setVisibility(View.GONE);
             emptyTextView.setVisibility(View.GONE);
         }
-        
+        checkScroll();
         setOverviewLayout();
     }
     
