@@ -338,7 +338,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
 
-	boolean showStorageAlmostFullDialog = true;
+	private int storageState = MegaApiJava.STORAGE_STATE_GREEN;
+	private boolean isStorageStatusDialogShown = false;
 
     int orientationSaved;
 
@@ -444,7 +445,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TransfersPageAdapter mTabsAdapterTransfers;
 	ViewPager viewPagerTransfers;
 
-	boolean firstTime = true;
+	boolean firstTimeAfterInstallation = true;
 //	String pathNavigation = "/";
 	SearchView searchView;
 	boolean searchExpand = false;
@@ -466,7 +467,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	boolean firstTimeCam = false;
+	boolean firstLogin = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -543,7 +544,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog renameDialog;
 	private AlertDialog newFolderDialog;
 	private AlertDialog addContactDialog;
-	private AlertDialog overquotaDialog;
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
 	private AlertDialog openLinkDialog;
@@ -555,7 +555,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog generalDialog;
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
-	private AlertDialog alertDialogStorageAlmostFull;
+	private AlertDialog alertDialogStorageStatus;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -624,7 +624,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private ProgressBar verify2faProgressBar;
 	private RelativeLayout lostYourDeviceButton;
 
-	private boolean isFirstTime = true;
+	private boolean isFirstTime2fa = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
 
@@ -644,11 +644,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-
-			int actionType;
-
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				if (intent.getAction() == Constants.ACTION_STORAGE_STATE_CHANGED) {
+					int newStorageState =
+							intent.getIntExtra("state", MegaApiJava.STORAGE_STATE_GREEN);
+					checkStorageStatus(newStorageState, false);
+					updateAccountDetailsVisibleInfo();
+					return;
+				}
+
+				int actionType = intent.getIntExtra("actionType", -1);
 
 				if(actionType == Constants.UPDATE_GET_PRICING){
 					log("BROADCAST TO UPDATE AFTER GET PRICING");
@@ -1515,12 +1520,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 	        case Constants.REQUEST_WRITE_STORAGE:{
 				log("REQUEST_WRITE_STORAGE PERMISSIONS");
-	        	if (firstTimeCam){
+	        	if (firstLogin){
 					log("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
-//						if (firstTimeCam){
-//							firstTimeCam = false;
+//						if (firstLogin){
+//							firstLogin = false;
 //						}
 
 						if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
@@ -1623,7 +1628,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
-		outState.putBoolean("firstTimeCam",firstTimeCam);
+		outState.putBoolean("firstLogin", firstLogin);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -1688,6 +1693,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
 		outState.putFloat("elevation", abL.getElevation());
+		outState.putInt("storageState", storageState);
+		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 	}
 
 	@Override
@@ -1722,7 +1729,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
 			searchDate = savedInstanceState.getLongArray("searchDate");
-			firstTimeCam = savedInstanceState.getBoolean("firstTimeCam");
+			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
@@ -1746,6 +1753,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
 			elevation = savedInstanceState.getFloat("elevation", 0);
+			storageState = savedInstanceState.getInt("storageState", -1);
+			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -1762,10 +1771,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			this.setPathNavigationOffline("/");
 		}
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
-		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate2FA, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-		LocalBroadcastManager.getInstance(this).registerReceiver(networkReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+		LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+		if (localBroadcastManager != null) {
+			localBroadcastManager.registerReceiver(receiverUpdatePosition,
+					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+
+			IntentFilter filter = new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+			filter.addAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+			localBroadcastManager.registerReceiver(updateMyAccountReceiver, filter);
+
+			localBroadcastManager.registerReceiver(receiverUpdate2FA,
+					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
+
+			localBroadcastManager.registerReceiver(networkReceiver,
+					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+		}
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -1875,7 +1895,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    prefs = dbH.getPreferences();
 		if (prefs == null){
-			firstTime = true;
+			firstTimeAfterInstallation = true;
 			isList=true;
 			isListCameraUploads=false;
 			isSmallGridCameraUploads = false;
@@ -1883,10 +1903,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 
 			if (prefs.getFirstTime() == null){
-				firstTime = true;
+				firstTimeAfterInstallation = true;
 				isListCameraUploads=false;
 			}else{
-				firstTime = Boolean.parseBoolean(prefs.getFirstTime());
+				firstTimeAfterInstallation = Boolean.parseBoolean(prefs.getFirstTime());
 			}
 			if (prefs.getPreferredViewList() == null){
 				isList = true;
@@ -2747,8 +2767,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						switch (accountType){
 							case 0:{
-								log("intent firstTime==true");
-								firstTimeCam = true;
+								log("intent firstTimeAfterInstallation==true");
+								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								setIntent(null);
 								displayedAccountType = -1;
@@ -2789,9 +2809,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 	        		}
 	        		else{
-						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", firstTimeCam);
-						if (firstTimeCam){
-							log("intent firstTimeCam==true");
+						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
+						if (firstLogin){
+							log("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -2808,15 +2828,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
-					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
+					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 
 						switch (accountType){
 							case Constants.FREE:{
-								log("intent firstTime==true");
-								firstTimeCam = true;
+								log("intent firstTimeAfterInstallation==true");
+								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								displayedAccountType = -1;
 								setIntent(null);
@@ -2857,19 +2877,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						if (firstTimeCam) {
+						if (firstLogin) {
 							log("intent firstTimeCam2==true");
 							if (prefs != null){
 								if (prefs.getCamSyncEnabled() != null){
-									firstTimeCam = false;
+									firstLogin = false;
 								}
 								else{
-									firstTimeCam = true;
+									firstLogin = true;
 									drawerItem = DrawerItem.CAMERA_UPLOADS;
 								}
 							}
 							else{
-								firstTimeCam = true;
+								firstLogin = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
 							setIntent(null);
@@ -2886,7 +2906,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}
 
-			showStorageAlmostFullDialog();
+			checkStorageStatus(true);
 
 	        //INITIAL FRAGMENT
 			if(selectDrawerItemPending){
@@ -4183,7 +4203,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaChatApi.removeChatCallListener(this);
 		}
 
-		showStorageAlmostFullDialog = true;
+		isStorageStatusDialogShown = false;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
@@ -4260,7 +4280,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
 
-		if (!firstTime){
+		if (!firstTimeAfterInstallation){
 			log("Its NOT first time");
 			drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -4280,7 +4300,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Fill the contacts DB
 			FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 			fillDBContactsTask.execute();
-			firstTime = false;
+			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
 	}
@@ -4654,6 +4674,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					}		updateAccountDetailsVisibleInfo();
 
 					updateAccountDetailsVisibleInfo();
+					checkStorageStatus(false);
 				} else {
 					log("showOnlineMode - Root is NULL");
 					if (getApplicationContext() != null) {
@@ -6260,7 +6281,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(true);
 				log("createFolderMenuItem.setVisible_14");
 				createFolderMenuItem.setVisible(true);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6268,7 +6289,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				rubbishBinMenuItem.setVisible(true);
 				upgradeAccountMenuItem.setVisible(true);
 				importLinkMenuItem.setVisible(true);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					takePicture.setVisible(true);
 				}else{
 					takePicture.setVisible(false);
@@ -6315,7 +6336,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
 				log("onCreateOptionsMenuLollipop: in Rubbish");
 				//Show
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6372,7 +6393,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				log("onCreateOptionsMenuLollipop: in Offline");
 				//Show
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6431,7 +6452,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 
 				if(firstNavigationLevel){
-					if(!firstTimeCam){
+					if(!firstLogin){
 						searchByDate.setVisible(true);
 					}else{
 						searchByDate.setVisible(false);
@@ -6450,7 +6471,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				unSelectMenuItem.setVisible(false);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					searchMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 				}else{
@@ -6488,7 +6509,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
 
-					if(!firstTimeCam) {
+					if(!firstLogin) {
 						gridSmallLargeMenuItem.setVisible(true);
 					}else{
 						gridSmallLargeMenuItem.setVisible(false);
@@ -6514,7 +6535,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				takePicture.setVisible(false);
 
 				if(firstNavigationLevel){
-					if(!firstTimeCam){
+					if(!firstLogin){
 						searchByDate.setVisible(true);
 					}else{
 						searchByDate.setVisible(false);
@@ -6533,7 +6554,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				addMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(false);
 				unSelectMenuItem.setVisible(false);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6570,7 +6591,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 					}
 
-					if(!firstTimeCam) {
+					if(!firstLogin) {
 						gridSmallLargeMenuItem.setVisible(true);
 					}else{
 						gridSmallLargeMenuItem.setVisible(false);
@@ -6611,7 +6632,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				searchMenuItem.setVisible(true);
-				if(!firstTimeCam){
+				if(!firstLogin){
 					thumbViewMenuItem.setVisible(true);
 				}else{
 					thumbViewMenuItem.setVisible(false);
@@ -6648,7 +6669,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (index == 0) {
 						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 						log("onCreateOptionsMenuLollipop: in Incoming");
-						if (!firstTimeCam) {
+						if (!firstLogin) {
 							thumbViewMenuItem.setVisible(true);
 						}
 						else {
@@ -6732,7 +6753,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 						log("onCreateOptionsMenuLollipop: in Outgoing");
 
-						if (!firstTimeCam) {
+						if (!firstLogin) {
 							thumbViewMenuItem.setVisible(true);
 						}
 						else {
@@ -6802,7 +6823,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//Show
 					addContactMenuItem.setVisible(true);
-					if(!firstTimeCam){
+					if(!firstLogin){
 						thumbViewMenuItem.setVisible(true);
 					}else{
 						thumbViewMenuItem.setVisible(false);
@@ -6984,7 +7005,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(sFLol != null && sFLol.getNodes()!=null){
 						if(sFLol.getNodes().size()!=0){
 							selectMenuItem.setVisible(true);
-							if(!firstTimeCam){
+							if(!firstLogin){
 								thumbViewMenuItem.setVisible(true);
 							}else{
 								thumbViewMenuItem.setVisible(false);
@@ -8030,7 +8051,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstTimeCam) {
+						if(!firstLogin) {
 							gridSmallLargeMenuItem.setVisible(true);
 						}else{
 							gridSmallLargeMenuItem.setVisible(false);
@@ -8053,7 +8074,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if(!firstTimeCam) {
+						if(!firstLogin) {
 							gridSmallLargeMenuItem.setVisible(true);
 						}else{
 							gridSmallLargeMenuItem.setVisible(false);
@@ -9532,8 +9553,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	void isFirstTimeCam() {
-		if(firstTimeCam){
-			firstTimeCam = false;
+		if(firstLogin){
+			firstLogin = false;
 			dbH.setCamSyncEnabled(false);
 			bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
 		}
@@ -10375,7 +10396,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					secondPin.requestFocus();
 					secondPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick){
+					if (isFirstTime2fa && !pinLongClick){
 						secondPin.setText("");
 						thirdPin.setText("");
 						fourthPin.setText("");
@@ -10418,7 +10439,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thirdPin.requestFocus();
 					thirdPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						thirdPin.setText("");
 						fourthPin.setText("");
 						fifthPin.setText("");
@@ -10460,7 +10481,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fourthPin.requestFocus();
 					fourthPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
@@ -10501,7 +10522,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fifthPin.requestFocus();
 					fifthPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						fifthPin.setText("");
 						sixthPin.setText("");
 					}
@@ -10541,7 +10562,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sixthPin.requestFocus();
 					sixthPin.setCursorVisible(true);
 
-					if (isFirstTime && !pinLongClick) {
+					if (isFirstTime2fa && !pinLongClick) {
 						sixthPin.setText("");
 					}
 					else if (pinLongClick) {
@@ -10713,7 +10734,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	void verifyShowError(){
 		log("Pin not correct verifyShowError");
-		isFirstTime = false;
+		isFirstTime2fa = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
 		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
@@ -12438,7 +12459,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setInitialCloudDrive (){
 		drawerItem = DrawerItem.CLOUD_DRIVE;
 		setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
-		firstTime = true;
+		//firstTimeAfterInstallation = true;
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -12559,48 +12580,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return -1;
 	}
 
-	private void showOverquotaAlert(boolean prewarning){
-		log("showOverquotaAlert: prewarning: "+prewarning);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.overquota_alert_title));
-
-		if(prewarning){
-			builder.setMessage(getString(R.string.pre_overquota_alert_text));
-		}
-		else{
-			builder.setMessage(getString(R.string.overquota_alert_text));
-			dbH.setCamSyncEnabled(false);
-		}
-
-		if(overquotaDialog==null){
-
-			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					//Show UpgradeAccountActivity
-					drawerItem = DrawerItem.ACCOUNT;
-					accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
-					selectDrawerItemAccount();
-				}
-			});
-			builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-					overquotaDialog=null;
-				}
-			});
-
-			overquotaDialog = builder.create();
-			overquotaDialog.setCanceledOnTouchOutside(false);
-		}
-
-		overquotaDialog.show();
-	}
-
 	public void updateAccountDetailsVisibleInfo(){
 		log("updateAccountDetailsVisibleInfo");
 		if(isFinishing()){
@@ -12666,25 +12645,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
-		showStorageAlmostFullDialog();
+		switch (storageState) {
+			case MegaApiJava.STORAGE_STATE_GREEN:
+				usedSpacePB.setProgressDrawable(getResources().getDrawable(
+						R.drawable.custom_progress_bar_horizontal_ok));
+				break;
 
-		if (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() < 90){
-			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
-//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
-		}
-		else if ((((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() >= 90) && (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() <= 95)){
-			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
-//		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        	usedSpaceWarning.setVisibility(View.VISIBLE);
-		}
-		else{
-			if (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() > 100){
+			case MegaApiJava.STORAGE_STATE_ORANGE:
+				usedSpacePB.setProgressDrawable(getResources().getDrawable(
+						R.drawable.custom_progress_bar_horizontal_warning));
+				break;
+
+			case MegaApiJava.STORAGE_STATE_RED:
 				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
-			}
-			usedSpacePB.setProgressDrawable(ContextCompat.getDrawable(this, R.drawable.custom_progress_bar_horizontal_exceed));
-//		        	wordtoSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//		        	usedSpaceWarning.setVisibility(View.VISIBLE);
+				usedSpacePB.setProgressDrawable(getResources().getDrawable(
+						R.drawable.custom_progress_bar_horizontal_exceed));
+				break;
 		}
 	}
 
@@ -14615,149 +14591,249 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		alertDialogTransferOverquota.show();
 	}
 
+	/**
+	 * Check the current storage state.
+	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
+	 */
+	private void checkStorageStatus(boolean onCreate) {
+		checkStorageStatus(storageState, onCreate);
+	}
+
+	/**
+	 * Check the storage state provided as first parameter.
+	 * @param newStorageState Storage state to check.
+	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
+	 */
+	private void checkStorageStatus(int newStorageState, boolean onCreate) {
+		switch (newStorageState) {
+			case MegaApiJava.STORAGE_STATE_GREEN:
+				log("STORAGE STATE GREEN");
+				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
+				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
+					log("ACCOUNT TYPE FREE");
+					if(Util.showMessageRandom()){
+						log("Show message random: TRUE");
+						showProPanel();
+					}
+				}
+				storageState = newStorageState;
+				break;
+
+			case MegaApiJava.STORAGE_STATE_ORANGE:
+				log("STORAGE STATE ORANGE");
+				if (onCreate && isStorageStatusDialogShown) {
+					isStorageStatusDialogShown = false;
+					showStorageAlmostFullDialog();
+				} else if (newStorageState > storageState) {
+					showStorageAlmostFullDialog();
+				}
+				storageState = newStorageState;
+				break;
+
+			case MegaApiJava.STORAGE_STATE_RED:
+				log("STORAGE STATE RED");
+				if (onCreate && isStorageStatusDialogShown) {
+					isStorageStatusDialogShown = false;
+					showStorageFullDialog();
+				} else if (newStorageState > storageState) {
+					showStorageFullDialog();
+				}
+				storageState = newStorageState;
+				break;
+		}
+	}
+
+	/**
+	 * Show a dialog to indicate that the storage space is almost full.
+	 */
 	public void showStorageAlmostFullDialog(){
 		log("showStorageAlmostFullDialog");
+		showStorageStatusDialog(MegaApiJava.STORAGE_STATE_ORANGE, false, false);
+	}
+
+	/**
+	 * Show a dialog to indicate that the storage space is full.
+	 */
+	public void showStorageFullDialog(){
+		log("showStorageFullDialog");
+		showStorageStatusDialog(MegaApiJava.STORAGE_STATE_RED, false, false);
+	}
+
+	/**
+	 * Show an overquota alert dialog.
+	 * @param preWarning Flag to indicate if is a pre-overquota alert or not.
+	 */
+	public void showOverquotaAlert(boolean preWarning){
+		log("showOverquotaAlert: preWarning: "+preWarning);
+		showStorageStatusDialog(
+				preWarning ? MegaApiJava.STORAGE_STATE_ORANGE : MegaApiJava.STORAGE_STATE_RED,
+				true, preWarning);
+	}
+
+	/**
+	 * Method to show a dialog to indicate the storage status.
+	 * @param storageState Storage status.
+	 * @param overquotaAlert Flag to indicate that is an overquota alert or not.
+	 * @param preWarning Flag to indicate if is a pre-overquota alert or not.
+	 */
+	private void showStorageStatusDialog(int storageState, boolean overquotaAlert, boolean preWarning){
+		log("showStorageStatusDialog");
 
 		if(((MegaApplication) getApplication()).getMyAccountInfo()==null || ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==-1){
 			log("Do not show dialog, not info of the account received yet");
 			return;
 		}
 
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc()>=95){
-			if(showStorageAlmostFullDialog){
+		if(isStorageStatusDialogShown){
+			log("Storage status dialog already shown");
+			return;
+		}
 
-				showStorageAlmostFullDialog = false;
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.storage_status_dialog_layout, null);
+		dialogBuilder.setView(dialogView);
 
-				LayoutInflater inflater = this.getLayoutInflater();
-				View dialogView = inflater.inflate(R.layout.storage_almost_full_layout, null);
-				dialogBuilder.setView(dialogView);
+		TextView title = (TextView) dialogView.findViewById(R.id.storage_status_title);
+		title.setText(getString(R.string.action_upgrade_account));
 
-				TextView title = (TextView) dialogView.findViewById(R.id.storage_almost_full_title);
-				title.setText(getString(R.string.action_upgrade_account));
+		ImageView image = (ImageView) dialogView.findViewById(R.id.image_storage_status);
+		TextView text = (TextView) dialogView.findViewById(R.id.text_storage_status);
 
-				TextView text = (TextView) dialogView.findViewById(R.id.text_storage_almost_full);
+		switch (storageState) {
+			case MegaApiJava.STORAGE_STATE_GREEN:
+				log("STORAGE STATE GREEN");
+				return;
+
+			case MegaApiJava.STORAGE_STATE_ORANGE:
+				image.setImageResource(R.drawable.ic_storage_almost_full);
 				text.setText(getString(R.string.text_almost_full_warning));
+				break;
 
-				LinearLayout horizontalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.horizontal_buttons_storage_almost_full_layout);
-				LinearLayout verticalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.vertical_buttons_storage_almost_full_layout);
-				Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_dissmiss);
-				Button horizontalDismissButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_dissmiss);
-				Button verticalActionButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_action);
-				Button horizontalActionButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_payment);
-				Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_achievements);
+			case MegaApiJava.STORAGE_STATE_RED:
+				image.setImageResource(R.drawable.ic_storage_full);
+				text.setText(getString(R.string.text_storage_full_warning));
+				break;
 
-				if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-					log("show StorageAlmostFull Dialog for FREE USER");
+			default:
+				log("STORAGE STATE INVALID VALUE: " + storageState);
+				return;
+		}
 
-					if(megaApi.isAchievementsEnabled()){
-						horizontalButtonsLayout.setVisibility(View.GONE);
-						verticalButtonsLayout.setVisibility(View.VISIBLE);
-						verticalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+		if (overquotaAlert) {
+			if (!preWarning)
+				title.setText(getString(R.string.overquota_alert_title));
 
-						verticalDismissButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-							}
+			text.setText(getString(preWarning ? R.string.pre_overquota_alert_text :
+					R.string.overquota_alert_text));
+		}
 
-						});
+		LinearLayout horizontalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.horizontal_buttons_storage_status_layout);
+		LinearLayout verticalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.vertical_buttons_storage_status_layout);
 
-						achievementsButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-								log("Go to achievements section");
-								navigateToAchievements();
-							}
-
-						});
-
-						verticalActionButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-								navigateToUpgradeAccount();
-							}
-
-						});
-					}
-					else{
-						horizontalButtonsLayout.setVisibility(View.VISIBLE);
-						verticalButtonsLayout.setVisibility(View.GONE);
-						horizontalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
-
-						horizontalDismissButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-							}
-						});
-
-						horizontalActionButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-								navigateToUpgradeAccount();
-							}
-
-						});
-					}
-
-				}
-				else{
-					horizontalButtonsLayout.setVisibility(View.VISIBLE);
-					verticalButtonsLayout.setVisibility(View.GONE);
-
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_PROIII){
-						log("show StorageAlmostFull Dialog for USER PRO III");
-						horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
-
-						horizontalActionButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-								askForCustomizedPlan();
-							}
-
-						});
-					}
-					else{
-						log("show StorageAlmostFull Dialog for USER PRO");
-						horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
-
-						horizontalActionButton.setOnClickListener(new OnClickListener(){
-							public void onClick(View v) {
-								alertDialogStorageAlmostFull.dismiss();
-								navigateToUpgradeAccount();
-							}
-
-						});
-					}
-
-					horizontalDismissButton.setOnClickListener(new OnClickListener(){
-						public void onClick(View v) {
-							alertDialogStorageAlmostFull.dismiss();
-						}
-
-					});
-
-				}
-
-				alertDialogStorageAlmostFull = dialogBuilder.create();
-
-				alertDialogStorageAlmostFull.setCancelable(false);
-				alertDialogStorageAlmostFull.setCanceledOnTouchOutside(false);
-				alertDialogStorageAlmostFull.show();
+		final OnClickListener dismissClickListener = new OnClickListener() {
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
 			}
-			else{
-				log("Storage almost full dialog already shown");
+		};
+
+		final OnClickListener upgradeClickListener = new OnClickListener(){
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
+				navigateToUpgradeAccount();
 			}
+		};
+
+		final OnClickListener achievementsClickListener = new OnClickListener(){
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
+				log("Go to achievements section");
+				navigateToAchievements();
+			}
+		};
+
+		final OnClickListener customPlanClickListener = new OnClickListener(){
+			public void onClick(View v) {
+				alertDialogStorageStatus.dismiss();
+				isStorageStatusDialogShown = false;
+				askForCustomizedPlan();
+			}
+		};
+
+		Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_dissmiss);
+		verticalDismissButton.setOnClickListener(dismissClickListener);
+		Button horizontalDismissButton = (Button) dialogView.findViewById(R.id.horizontal_storage_status_button_dissmiss);
+		horizontalDismissButton.setOnClickListener(dismissClickListener);
+
+		Button verticalActionButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_action);
+		Button horizontalActionButton = (Button) dialogView.findViewById(R.id.horizontal_storage_status_button_payment);
+
+		Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_status_button_achievements);
+		achievementsButton.setOnClickListener(achievementsClickListener);
+
+		switch (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()) {
+			case MegaAccountDetails.ACCOUNT_TYPE_PROIII:
+				log("showStorageStatusDialog for USER PRO III");
+				if (!overquotaAlert) {
+					if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+						text.setText(getString(R.string.text_almost_full_warning_pro3_account));
+					} else if (storageState == MegaApiJava.STORAGE_STATE_RED){
+						text.setText(getString(R.string.text_storage_full_warning_pro3_account));
+					}
+				}
+				horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
+				horizontalActionButton.setOnClickListener(customPlanClickListener);
+				verticalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
+				verticalActionButton.setOnClickListener(customPlanClickListener);
+				break;
+
+			case MegaAccountDetails.ACCOUNT_TYPE_LITE:
+			case MegaAccountDetails.ACCOUNT_TYPE_PROI:
+			case MegaAccountDetails.ACCOUNT_TYPE_PROII:
+				log("showStorageStatusDialog for USER PRO");
+				if (!overquotaAlert) {
+					if (storageState == MegaApiJava.STORAGE_STATE_ORANGE) {
+						text.setText(getString(R.string.text_almost_full_warning_pro_account));
+					} else if (storageState == MegaApiJava.STORAGE_STATE_RED){
+						text.setText(getString(R.string.text_storage_full_warning_pro_account));
+					}
+				}
+				horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
+				horizontalActionButton.setOnClickListener(upgradeClickListener);
+				verticalActionButton.setText(getString(R.string.my_account_upgrade_pro));
+				verticalActionButton.setOnClickListener(upgradeClickListener);
+				break;
+
+			case MegaAccountDetails.ACCOUNT_TYPE_FREE:
+			default:
+				log("showStorageStatusDialog for FREE USER");
+				horizontalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+				horizontalActionButton.setOnClickListener(upgradeClickListener);
+				verticalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+				verticalActionButton.setOnClickListener(upgradeClickListener);
+				break;
+		}
+
+		if(megaApi.isAchievementsEnabled()){
+			horizontalButtonsLayout.setVisibility(View.GONE);
+			verticalButtonsLayout.setVisibility(View.VISIBLE);
 		}
 		else{
-			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-				log("usedSpacePerc<95");
-				if(Util.showMessageRandom()){
-					log("Random: TRUE");
-					showProPanel();
-				}
-			}
+			horizontalButtonsLayout.setVisibility(View.VISIBLE);
+			verticalButtonsLayout.setVisibility(View.GONE);
 		}
+
+		alertDialogStorageStatus = dialogBuilder.create();
+		alertDialogStorageStatus.setCancelable(false);
+		alertDialogStorageStatus.setCanceledOnTouchOutside(false);
+
+		isStorageStatusDialogShown = true;
+
+		alertDialogStorageStatus.show();
 	}
 
 	public void askForCustomizedPlan(){
@@ -17240,10 +17316,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-			log("API_EOVERQUOTA error!!");
-			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-			if (fbFLol != null){
-				fbFLol.setOverviewLayout();
+			if (e.getValue() != 0) {
+				log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+				if (fbFLol != null){
+					fbFLol.setOverviewLayout();
+				}
+			}
+			else {
+				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
 			}
 		}
 	}
@@ -17285,11 +17366,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.isSmallGridCameraUploads = isSmallGridCameraUploads;
 	}
 
-	public boolean getFirstTimeCam() {
-		return firstTimeCam;
+	public boolean getFirstLogin() {
+		return firstLogin;
 	}
-	public void setFirstTimeCam(boolean flag){
-		firstTimeCam = flag;
+	public void setFirstLogin(boolean flag){
+		firstLogin = flag;
 	}
 
 	public void setListCameraUploads(boolean isListCameraUploads) {
