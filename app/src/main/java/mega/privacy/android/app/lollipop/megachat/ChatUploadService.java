@@ -929,7 +929,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	public void attachVoiceClips(MegaTransfer transfer){
-		log("attachVoiceClips");
+		log("attachVoiceClips()");
 		//Find the pending message
 		String appData = transfer.getAppData();
 		String[] parts = appData.split(">");

@@ -1771,29 +1771,29 @@ public class Util {
 		
 	}
 
-	public static boolean isVoiceClip(String path) {
-		log("isVoiceClip: "+path);
-		try{
-			String extension = "";
-			String[] s = path.split("\\.");
-			if (s != null){
-				if (s.length > 0){
-					extension = s[s.length-1];
-					log("isVoiceClip: extension"+extension);
-
-				}
-			}
-
-			if(extension.equals("opus")){
-				return true;
-			}else{
-				return false;
-			}
-		}catch(Exception e){
-			log("Exception: "+e.getMessage());
-			return false;
-		}
-	}
+//	public static boolean isVoiceClip(String path) {
+//		log("isVoiceClip: "+path);
+//		try{
+//			String extension = "";
+//			String[] s = path.split("\\.");
+//			if (s != null){
+//				if (s.length > 0){
+//					extension = s[s.length-1];
+//					log("isVoiceClip: extension"+extension);
+//
+//				}
+//			}
+//
+//			if(extension.equals("opus")){
+//				return true;
+//			}else{
+//				return false;
+//			}
+//		}catch(Exception e){
+//			log("Exception: "+e.getMessage());
+//			return false;
+//		}
+//	}
 	
 	public static boolean isVideoFile(String path) {
 		log("isVideoFile: "+path);

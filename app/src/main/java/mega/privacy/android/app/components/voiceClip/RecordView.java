@@ -204,9 +204,7 @@ public class RecordView extends RelativeLayout {
 
         if (recordListener != null) {
             recordListener.onStart();
-
         }
-
     }
 
 

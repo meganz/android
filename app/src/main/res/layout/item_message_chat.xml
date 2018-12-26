@@ -749,28 +749,16 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:orientation="horizontal">
-                        <FrameLayout
+
+                        <ImageView
+                            android:id="@+id/content_own_message_voice_clip_play_pause"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:src="@drawable/ic_play_grey"
+                            android:background="@null"
                             android:layout_gravity="center_vertical"
-                            android:layout_alignParentLeft="true">
-                            <ImageView
-                                android:id="@+id/content_own_message_voice_clip_play"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_play_white"
-                                android:tint="@color/black"
-                                android:background="@null"
-                                android:visibility="gone"/>
-                            <ImageView
-                                android:id="@+id/content_own_message_voice_clip_pause"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_pause_white"
-                                android:tint="@color/black"
-                                android:background="@null"
-                                android:visibility="gone"/>
-                        </FrameLayout>
+                            android:layout_alignParentLeft="true"
+                            android:visibility="gone"/>
 
                         <SeekBar
                             android:id="@+id/content_own_message_voice_clip_seekBar"

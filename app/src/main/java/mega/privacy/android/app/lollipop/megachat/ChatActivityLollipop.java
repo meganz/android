@@ -893,6 +893,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
+                log("record.setOnRecordClickListener()");
             }
         });
 
@@ -925,6 +926,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onCancel() {
                 log("voiceClipLayout.setOnRecordListener() -> onCancel()");
+
+                if(isRecording){
+                    if(myAudioRecorder!=null){
+                        log("myAudioRecorder -> CANCEL - isRecording = FALSE");
+                        myAudioRecorder.reset();
+                        myAudioRecorder = null;
+                        isRecording = false;
+                        voiceClipLayout.showLock(false);
+
+                    }
+                }
             }
             @Override
             public void onFinish(long recordTime) {
@@ -2041,10 +2053,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             newFolder.mkdirs();
 
             outputFileVoiceNotes = path + "/note_voice.opus";
-            long timeStamp = System.currentTimeMillis()/1000;
-            File voiceFile = new File(outputFileVoiceNotes);
-            String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
-            outputFileVoiceNotes = path + "/note_voice"+name;
+//            long timeStamp = System.currentTimeMillis()/1000;
+//            File voiceFile = new File(outputFileVoiceNotes);
+//            String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
+//            outputFileVoiceNotes = path + "/note_voice"+name;
 
             myAudioRecorder = new MediaRecorder();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -2089,20 +2101,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }catch(IllegalStateException ise){}catch (IOException ioe){}
     }
 
- //   public void playVoiceClip(){
+    public void playVoiceClip(){
+
+
+//        String pathVoiceClip = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR + "/note_voice.opus";
 //        MediaPlayer mediaPlayer = new MediaPlayer();
 //        try {
-//            mediaPlayer.setDataSource(outputFileVoiceNotes);
+//            mediaPlayer.setDataSource(pathVoiceClip);
 //            mediaPlayer.prepare();
 //            mediaPlayer.start();
 //        } catch (Exception e) {
 //            // make something
 //        }
- //   }
+    }
 
     public void cancelRecord(){
         log("cancelRecord()");
-        voiceClipLayout.showLock(false);
         isVoiceClip = false;
         record.setBackground(null);
         record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
@@ -2116,6 +2130,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.reset();
                 myAudioRecorder = null;
                 isRecording = false;
+                voiceClipLayout.showLock(false);
+
             }
         }
     }
@@ -2141,6 +2157,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.release();
                 myAudioRecorder = null;
                 isRecording = false;
+                voiceClipLayout.showLock(false);
                 sendVoiceClip();
             }
         }
@@ -3217,6 +3234,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 //Not first element
                 //Find where to add in the queue
+                log(" NOT First element!");
 
                 AndroidMegaChatMessage msg = messages.get(index);
 
@@ -5132,7 +5150,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
 
         if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)){
-            log("Change access of the message");
+            log("onMessageUpdate() Change access of the message");
 
             MegaNodeList nodeList = msg.getMegaNodeList();
             int revokedCount = 0;
@@ -5186,7 +5204,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT)){
-            log("Change content of the message");
+            log("onMessageUpdate() Change content of the message");
 
             if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("TRUNCATE MESSAGE");
@@ -5206,11 +5224,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_STATUS)){
 
             int statusMsg = msg.getStatus();
-            log("Status change: "+statusMsg + "T emporal id: "+msg.getTempId() + " Final id: "+msg.getMsgId());
+            log("onMessageUpdate() Status change: "+statusMsg + "T emporal id: "+msg.getTempId() + " Final id: "+msg.getMsgId());
 
             if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
-                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                    log("Modify my message and node attachment");
+                if((msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(msg.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
+                    log("onMessageUpdate() Modify my message and node attachment");
 
                     long idMsg =  dbH.findPendingMessageByIdTempKarere(msg.getTempId());
                     log("----The id of my pending message is: "+idMsg);
@@ -7503,6 +7521,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
 
             if(!isLoadingHistory){
+                log("uploadVoiceNote()- !isLoadingHistory  -> sendMessageToUI");
+
                 AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(pMsgSingle, true);
                 sendMessageToUI(newNodeAttachmentMsg);
             }
@@ -7822,6 +7842,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
     public void showBubble(){
+        log("showBubble()");
+        if(isRecording){
+            if(myAudioRecorder!=null){
+                log("myAudioRecorder -> CANCEL - isRecording = FALSE");
+                myAudioRecorder.reset();
+                myAudioRecorder = null;
+                isRecording = false;
+            }
+        }
         bubbleLayout.setAlpha(1);
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleLayout.animate().alpha(0).setDuration(4000);
