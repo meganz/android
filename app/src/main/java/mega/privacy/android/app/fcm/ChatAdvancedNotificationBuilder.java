@@ -820,6 +820,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void removeAllChatNotifications(){
+        log("removeAllChatNotifications");
         notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_CHAT);
         notificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
     }
@@ -1237,11 +1238,13 @@ public final class ChatAdvancedNotificationBuilder {
                 if (!(chats.isEmpty())) {
                     lastChatId = chats.get(0).getChatId();
                 } else {
-                    log("ERROR:chatsEMPTY:return");
+                    log("ERROR:chatsEMPTY:removeAllChatNotifications");
+                    removeAllChatNotifications();
                     return;
                 }
             } else {
-                log("ERROR:chatsNULL:return");
+                log("ERROR:chatsNULL:removeAllChatNotifications");
+                removeAllChatNotifications();
                 return;
             }
 
@@ -1371,6 +1374,7 @@ public final class ChatAdvancedNotificationBuilder {
         log("should beep: "+beep);
 
         MegaHandleList chatHandleList = request.getMegaHandleList();
+        log("size chatHandleList: "+chatHandleList.size());
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
         for(int i=0; i<chatHandleList.size(); i++){
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
@@ -1389,13 +1393,14 @@ public final class ChatAdvancedNotificationBuilder {
             }
         });
 
-        log("generateChatNotification for: "+chats.size()+" chats");
+        log("generateChatNotificationPreN for: "+chats.size()+" chats");
         long lastChatId = -1;
         if(chats!=null && (!(chats.isEmpty()))){
             lastChatId = chats.get(0).getChatId();
+            showChatNotificationPreN(request, beep, lastChatId);
+        }else{
+            removeAllChatNotifications();
         }
-
-        showChatNotificationPreN(request, beep, lastChatId);
     }
 
     public void showChatNotificationPreN(MegaChatRequest request, boolean beep, long lastChatId){

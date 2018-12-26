@@ -29,6 +29,7 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -91,7 +92,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
     	RoundedImageView imageView;
 		TextView contactInitialLetter;
-		TextView textViewContent;
+		MarqueeTextView textViewContent;
 		RelativeLayout threeDotsLayout;
 		ImageView imageButtonThreeDots;
 		ImageView statusImage;
@@ -138,7 +139,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.participant_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.participant_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.participant_list_name);
-			holderList.textViewContent = (TextView) v.findViewById(R.id.participant_list_content);
+			holderList.textViewContent = (MarqueeTextView) v.findViewById(R.id.participant_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.participant_list_three_dots_layout);
 			holderList.imageButtonThreeDots = (ImageView) v.findViewById(R.id.participant_list_three_dots);
 			holderList.permissionsIcon = (ImageView) v.findViewById(R.id.participant_list_permissions);
@@ -154,6 +155,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
 			}
 
+			holderList.itemLayout.setOnClickListener(this);
 			holderList.itemLayout.setTag(holderList);
 			v.setTag(holderList);
 			return holderList;
@@ -243,6 +245,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
 				if(!participant.getLastGreen().isEmpty()){
 					((ViewHolderParticipantsList)holder).textViewContent.setText(participant.getLastGreen());
+					((ViewHolderParticipantsList)holder).textViewContent.isMarqueeIsNecessary(context);
 				}
 			}
 
@@ -624,7 +627,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 
 		switch (v.getId()){
-			case R.id.participant_list_three_dots_layout:{
+			case R.id.participant_list_three_dots_layout:
+			case R.id.participant_list_item_layout:{
 				log("contact_list_three_dots");
 				ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
 				int currentPosition = holder.currentPosition;
