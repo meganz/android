@@ -2248,7 +2248,7 @@
     <string name="general_setup_mega" context="Permissions screen title">Setup MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you can be able to share them with friends, exchange encrypted messages and make secure calls.</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow acces to photos, media and files</string>
-    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, videos and files on chat, MEGA needs your permission.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, videos and files MEGA needs your permission.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
     <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>

@@ -2926,7 +2926,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		setContactStatus();
 
-		askForAccess();
+		if (firstTimeAfterInstallation) {
+			askForAccess();
+		}
 
 		log("END onCreate");
 	}

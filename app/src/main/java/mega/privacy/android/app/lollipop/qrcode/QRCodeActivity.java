@@ -224,6 +224,13 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     @Override
+    public void onBackPressed() {
+        log("onBackPressed");
+        super.callToSuperBack = true;
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
 

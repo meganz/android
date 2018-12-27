@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="218dp"
         android:layout_margin="8dp"
-        android:background="@color/permissions_image_background">
+        android:background="@color/white">
 
         <ImageView
             android:id="@+id/image_permissions"

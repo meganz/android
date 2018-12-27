@@ -96,9 +96,9 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         thirdItem = (ImageView) v.findViewById(R.id.third_item);
 
         mImages = new int[] {
-                R.drawable.storage_space,
-                R.drawable.speed,
-                R.drawable.privacy_security,
+                R.drawable.photos,
+                R.drawable.enable_camera,
+                R.drawable.calls,
         };
 
         mTitles = new String[] {
