@@ -320,21 +320,25 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     public void updateSubTitle(){
         log("updateSubTitle");
-        if(callChat.getStatus()<=MegaChatCall.CALL_STATUS_RING_IN){
-            aB.setSubtitle(getString(R.string.call_starting));
-        }
-        else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-            long sessionStatus = callChat.getSessionStatus(chat.getPeerHandle(0));
-            log("sessionStatus: "+sessionStatus);
-            if(sessionStatus==MegaChatCall.SESSION_STATUS_IN_PROGRESS){
-                startClock();
+        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+            aB.setSubtitle(getString(R.string.outgoing_call_starting));
+        }else{
+            if(callChat.getStatus()<=MegaChatCall.CALL_STATUS_RING_IN){
+                aB.setSubtitle(getString(R.string.incoming_call_starting));
+
+            }else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                long sessionStatus = callChat.getSessionStatus(chat.getPeerHandle(0));
+                log("sessionStatus: "+sessionStatus);
+                if(sessionStatus==MegaChatCall.SESSION_STATUS_IN_PROGRESS){
+                    startClock();
+                }
+                else{
+                    aB.setSubtitle(getString(R.string.chat_connecting));
+                }
             }
             else{
-                aB.setSubtitle(getString(R.string.chat_connecting));
+                aB.setSubtitle(null);
             }
-        }
-        else{
-            aB.setSubtitle(null);
         }
     }
 
