@@ -2292,4 +2292,12 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Wrong password. Try again.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
 
+    <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access.</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">Encrypted chat</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">Create your network</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA.</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">Your photos in the cloud</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we got you covered.\nCreate your account now.</string>
 </resources>
