@@ -198,7 +198,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean pendingMessagesLoaded = false;
 
-    boolean isFirstTimeStorage = true;
+//    boolean isFirstTimeStorage = true;
 
     boolean startVideo = false;
     public boolean activityVisible = false;
@@ -2705,15 +2705,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void attachFromFileStorage(){
-        if (isFirstTimeStorage) {
+//        if (isFirstTimeStorage) {
             fileStorageF = ChatFileStorageFragment.newInstance();
 
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF")
                     .commitNowAllowingStateLoss();
-            isFirstTimeStorage = false;
-        }
+//            isFirstTimeStorage = false;
+//        }
         fileStorageLayout.setVisibility(View.VISIBLE);
         pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
 
