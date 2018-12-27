@@ -410,7 +410,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public boolean turnOnNotifications = false;
 
 	static DrawerItem drawerItem = null;
-	static DrawerItem lastDrawerItem = null;
+	DrawerItem drawerItemPreUpgradeAccount = null;
 	static MenuItem drawerMenuItem = null;
 	LinearLayout fragmentLayout;
 	BottomNavigationViewEx bNV;
@@ -627,6 +627,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean pinLongClick = false;
 	public boolean comesFromNotifications = false;
 	public int comesFromNotificationsLevel = 0;
+	public long comesFromNotificationHandle = -1;
+	public long comesFromNotificationHandleSaved = -1;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -1694,6 +1696,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("searchExpand", searchExpand);
 		outState.putBoolean("comesFromNotifications", comesFromNotifications);
 		outState.putInt("comesFromNotificationsLevel", comesFromNotificationsLevel);
+		outState.putLong("comesFromNotificationHandle", comesFromNotificationHandle);
+		outState.putLong("comesFromNotificationHandleSaved", comesFromNotificationHandleSaved);
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 	}
@@ -1755,6 +1759,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
 			comesFromNotifications = savedInstanceState.getBoolean("comesFromNotifications", false);
 			comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
+			comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", -1);
+			comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", -1);
 			storageState = savedInstanceState.getInt("storageState", -1);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 		}
@@ -2645,6 +2651,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_UPGRADE_ACCOUNT)){
 						log("intent from chat - show my account");
+						drawerItemPreUpgradeAccount = drawerItem;
 						drawerItem=DrawerItem.ACCOUNT;
 						accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 						selectDrawerItemLollipop(drawerItem);
@@ -7463,6 +7470,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
 							backToDrawerItem(CLOUD_DRIVE_BNV);
 						}
+						else if (drawerItem == DrawerItem.ACCOUNT) {
+							if (comesFromNotifications) {
+								comesFromNotifications = false;
+								selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+							}
+							else {
+								backToDrawerItem(bottomNavigationCurrentItem);
+							}
+						}
 						else {
 							backToDrawerItem(bottomNavigationCurrentItem);
 						}
@@ -9456,7 +9472,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 	    			if (maFLol != null){
 	    				if (maFLol.onBackPressed() == 0){
-							backToDrawerItem(bottomNavigationCurrentItem);
+	    					if (comesFromNotifications) {
+	    						comesFromNotifications = false;
+	    						selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+							}
+							else {
+								backToDrawerItem(bottomNavigationCurrentItem);
+							}
 	    				}
 	    			}
 	    			return;
@@ -12889,6 +12911,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
+		comesFromNotifications = true;
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -16644,11 +16667,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(node == null){
 			return;
 		}
+		comesFromNotifications = true;
+		comesFromNotificationHandle = nodeHandle;
 		MegaNode parent = nC.getParent(node);
 		if (parent.getHandle() == megaApi.getRootNode().getHandle()){
 			//Cloud Drive
 			drawerItem = DrawerItem.CLOUD_DRIVE;
 			openFolderRefresh = true;
+			comesFromNotificationHandleSaved = parentHandleBrowser;
 			setParentHandleBrowser(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -16656,6 +16682,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Rubbish
 			drawerItem = DrawerItem.RUBBISH_BIN;
 			openFolderRefresh = true;
+			comesFromNotificationHandleSaved = parentHandleRubbish;
 			setParentHandleRubbish(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -16663,6 +16690,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Inbox
 			drawerItem = DrawerItem.INBOX;
 			openFolderRefresh = true;
+			comesFromNotificationHandleSaved = parentHandleInbox;
 			setParentHandleInbox(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -16674,7 +16702,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				comesFromNotificationsLevel = deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
 			}
 			openFolderRefresh = true;
-			comesFromNotifications = true;
 			setParentHandleIncoming(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
