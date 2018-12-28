@@ -140,6 +140,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             String text = "";
                             if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
                                 text = meta.getRichPreview().getText();
+                            }else{
                             }
                             if(chatHandles[0]==idChat){
                                 ((ChatActivityLollipop) context).sendMessage(text);
@@ -240,6 +241,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                 String text = "";
                                 if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
                                     text = meta.getRichPreview().getText();
+                                }else{
                                 }
                                 if(chatHandles[k]==idChat){
                                     ((ChatActivityLollipop) context).sendMessage(text);
