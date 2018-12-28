@@ -596,8 +596,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_account_type_button:{
 				log("Upgrade Account button");
+				((ManagerActivityLollipop) context).setAccountFragmentPreUpgradeAccount(Constants.MY_ACCOUNT_FRAGMENT);
 				((ManagerActivityLollipop)context).showUpAF();
-
 				break;
 			}
 			case R.id.my_account_achievements_layout:{
