@@ -2261,4 +2261,6 @@
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
 
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Message contains invalid meta</string>
+
 </resources>

@@ -3812,6 +3812,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         String url = meta.getRichPreview().getUrl();
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                                         startActivity(browserIntent);
+                                    }else{
                                     }
 //                                }else{
 
