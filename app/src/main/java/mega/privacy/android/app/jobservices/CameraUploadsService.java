@@ -286,7 +286,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 
                 //Check files of the Camera Uploads
                 if (checkFile(media,path)) {
-//                    log("if (checkFile(media," + path + "))");
                     if (isSecondary) {
                         if (isVideo) {
                             secondaryVideos.add(media);
@@ -2094,7 +2093,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         
     }
     
-    private final static boolean OUTPUT = true;
+    private final static boolean OUTPUT = false;
     
     private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
     
