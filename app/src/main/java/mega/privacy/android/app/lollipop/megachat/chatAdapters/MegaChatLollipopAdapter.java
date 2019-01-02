@@ -2632,6 +2632,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaChatContainsMeta meta = message.getContainsMeta();
         if (meta == null) {
             bindNoTypeMessage(holder, androidMessage, position);
+
         } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
             String urlString = meta.getRichPreview().getUrl();
             try {
