@@ -222,6 +222,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private boolean createNewGroup = false;
     private String title = "";
 
+    private boolean queryPermissions = true;
+
     @Override
     public List<ShareContactInfo> getAdapterData() {
         if (inputString != null && !inputString.equals("")) {
@@ -241,44 +243,48 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 getVisibleMEGAContacts();
             }
             else if (contactType == Constants.CONTACT_TYPE_DEVICE) {
-                phoneContacts.clear();
-                filteredContactsPhone.clear();
-                phoneContacts = getPhoneContacts();
-                addedContactsPhone.clear();
-                for (int i = 0; i < phoneContacts.size(); i++) {
-                    filteredContactsPhone.add(phoneContacts.get(i));
-                }
-                getVisibleMEGAContacts();
+                if (queryPermissions) {
+                    phoneContacts.clear();
+                    filteredContactsPhone.clear();
+                    phoneContacts = getPhoneContacts();
+                    addedContactsPhone.clear();
+                    for (int i = 0; i < phoneContacts.size(); i++) {
+                        filteredContactsPhone.add(phoneContacts.get(i));
+                    }
+                    getVisibleMEGAContacts();
 
-                boolean found;
-                PhoneContactInfo contactPhone;
-                MegaContactAdapter contactMEGA;
+                    boolean found;
+                    PhoneContactInfo contactPhone;
+                    MegaContactAdapter contactMEGA;
 
-                if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                    for (int i=0; i<filteredContactsPhone.size(); i++) {
-                        found = false;
-                        contactPhone = filteredContactsPhone.get(i);
-                        for (int j=0; j<visibleContactsMEGA.size(); j++) {
-                            contactMEGA = visibleContactsMEGA.get(j);
-                            if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))){
-                                found = true;
-                                break;
+                    if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
+                        for (int i = 0; i < filteredContactsPhone.size(); i++) {
+                            found = false;
+                            contactPhone = filteredContactsPhone.get(i);
+                            for (int j = 0; j < visibleContactsMEGA.size(); j++) {
+                                contactMEGA = visibleContactsMEGA.get(j);
+                                if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))) {
+                                    found = true;
+                                    break;
+                                }
                             }
-                        }
-                        if (found) {
-                            filteredContactsPhone.remove(contactPhone);
-                            i--;
+                            if (found) {
+                                filteredContactsPhone.remove(contactPhone);
+                                i--;
+                            }
                         }
                     }
                 }
             }
             else {
-                phoneContacts.clear();
-                filteredContactsPhone.clear();
-                addedContactsPhone.clear();
-                phoneContacts = getPhoneContacts();
-                for (int i = 0; i < phoneContacts.size(); i++) {
-                    filteredContactsPhone.add(phoneContacts.get(i));
+                if (queryPermissions) {
+                    phoneContacts.clear();
+                    filteredContactsPhone.clear();
+                    addedContactsPhone.clear();
+                    phoneContacts = getPhoneContacts();
+                    for (int i = 0; i < phoneContacts.size(); i++) {
+                        filteredContactsPhone.add(phoneContacts.get(i));
+                    }
                 }
                 getVisibleMEGAContacts();
 
@@ -509,11 +515,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             else {
-                phoneContacts.clear();
-                filteredContactsPhone.clear();
-                phoneContacts = getPhoneContacts();
-                for (int i = 0; i < phoneContacts.size(); i++) {
-                    filteredContactsPhone.add(phoneContacts.get(i));
+                if (queryPermissions) {
+                    phoneContacts.clear();
+                    filteredContactsPhone.clear();
+                    phoneContacts = getPhoneContacts();
+                    for (int i = 0; i < phoneContacts.size(); i++) {
+                        filteredContactsPhone.add(phoneContacts.get(i));
+                    }
                 }
                 getVisibleMEGAContacts();
 
@@ -907,7 +915,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     void setPhoneAdapterContacts (ArrayList<PhoneContactInfo> contacts) {
-        if(filteredContactsPhone!=null){
+        if(queryPermissions &&filteredContactsPhone!=null){
             if (filteredContactsPhone.size() == 0){
                 headerContacts.setVisibility(View.GONE);
                 String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
@@ -931,6 +939,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
         else{
+            if (!queryPermissions) {
+                emptyTextView.setText(R.string.no_contacts_permissions);
+            }
             log("PhoneContactsTask: Phone contacts null");
             boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
             if (!hasReadContactsPermission) {
@@ -1204,6 +1215,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
 
+        if (!queryPermissions && contactType == Constants.CONTACT_TYPE_DEVICE) {
+            searchMenuItem.setVisible(false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -1308,6 +1323,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("isConfirmAddShown", isConfirmAddShown);
         outState.putString("confirmAddMail", confirmAddMail);
         outState.putBoolean("createNewGroup", createNewGroup);
+        outState.putBoolean("queryPermissions", queryPermissions);
 
         saveContactsAdded(outState);
     }
@@ -1598,6 +1614,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
             confirmAddMail = savedInstanceState.getString("confirmAddMail");
             createNewGroup = savedInstanceState.getBoolean("createNewGroup", false);
+            queryPermissions = savedInstanceState.getBoolean("queryPermissions", true);
 
             if (contactType == Constants.CONTACT_TYPE_MEGA || contactType == Constants.CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
@@ -1608,15 +1625,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     newGroupChatButton.setVisibility(View.GONE);
                 }
 
-                if (savedaddedContacts == null && contactType == Constants.CONTACT_TYPE_MEGA) {
+                if (savedaddedContacts == null && (contactType == Constants.CONTACT_TYPE_MEGA || contactType == Constants.CONTACT_TYPE_BOTH)) {
                     setAddedAdapterContacts();
                     getContactsTask = new GetContactsTask();
                     getContactsTask.execute();
                 }
-                else if (savedaddedContacts == null && contactType == Constants.CONTACT_TYPE_BOTH) {
-                    setAddedAdapterContacts();
-                    queryIfHasReadContactsPermissions();
-                }
+//                else if (savedaddedContacts == null && contactType == Constants.CONTACT_TYPE_BOTH) {
+//                    setAddedAdapterContacts();
+//                    queryIfHasReadContactsPermissions();
+//                }
                 else {
                     recoverContactsTask = new RecoverContactsTask();
                     recoverContactsTask.execute();
@@ -1629,7 +1646,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                 setAddedAdapterContacts();
 
-                if (filteredContactsPhone == null && phoneContacts == null) {
+                if (queryPermissions && filteredContactsPhone == null && phoneContacts == null) {
                     queryIfHasReadContactsPermissions();
                 }
                 else {
@@ -3071,14 +3088,24 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
                 else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_DENIED);
+                    queryPermissions = false;
+                    supportInvalidateOptionsMenu();
                     if (hasReadContactsPermissions && contactType == Constants.CONTACT_TYPE_DEVICE) {
                         log("Permission denied");
+                        setTitleAB();
                         filteredContactsPhone.clear();
                         emptyImageView.setVisibility(View.VISIBLE);
                         emptyTextView.setVisibility(View.VISIBLE);
                         emptyTextView.setText(R.string.no_contacts_permissions);
 
                         progressBar.setVisibility(View.GONE);
+                    }
+                    else{
+                        progressBar.setVisibility(View.VISIBLE);
+                        emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
+
+                        getContactsTask = new GetContactsTask();
+                        getContactsTask.execute();
                     }
                 }
                 break;
