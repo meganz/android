@@ -3466,23 +3466,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (adapter.isMultipleSelect()) {
                 if (!m.isUploading()) {
                     if (m.getMessage() != null) {
-                        log("Message id: " + m.getMessage().getMsgId());
-                        log("Timestamp: " + m.getMessage().getTimestamp());
+                        MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
+                        if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+                        }else{
+                            log("Message id: " + m.getMessage().getMsgId());
+                            log("Timestamp: " + m.getMessage().getTimestamp());
+
+                            adapter.toggleSelection(positionInAdapter);
+                            List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
+                            if (messages.size() > 0) {
+                                updateActionModeTitle();
+                            }
+                        }
+
                     }
 
-                    adapter.toggleSelection(positionInAdapter);
+//                    adapter.toggleSelection(positionInAdapter);
 
-                    List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
-                    if (messages.size() > 0) {
-                        updateActionModeTitle();
-//                adapter.notifyDataSetChanged();
-                    }
-//                    else {
-//                        hideMultipleSelect();
+//                    List<AndroidMegaChatMessage> messages = adapter.getSelectedMessages();
+//                    if (messages.size() > 0) {
+//                        updateActionModeTitle();
+////                adapter.notifyDataSetChanged();
 //                    }
+////                    else {
+////                        hideMultipleSelect();
+////                    }
                 }
             }else{
-
                 if(m!=null){
                     if(m.isUploading()){
                         showUploadingAttachmentBottomSheet(m, position);
@@ -3781,7 +3791,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                                 log("TYPE_CONTACT_ATTACHMENT");
-
                                 log("show contact attachment panel");
                                 if (Util.isOnline(this)) {
                                     if (m != null) {
@@ -3803,17 +3812,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTAINS_META){
                                 log("TYPE_CONTAINS_META");
-
                                 log("open rich link");
 
 //                                if(!adapter.getforwardOwnRichLinksB()){
                                     MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
-                                    if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                                        String url = meta.getRichPreview().getUrl();
-                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                        startActivity(browserIntent);
+                                    if((meta != null) && (meta.getType()!= MegaChatContainsMeta.CONTAINS_META_INVALID)){
+                                        if(meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
+                                            String url = meta.getRichPreview().getUrl();
+                                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                            startActivity(browserIntent);
+                                        }
                                     }else{
+
                                     }
+
+
 //                                }else{
 
 //                                    ArrayList<AndroidMegaChatMessage> message = new ArrayList<>();
@@ -3823,7 +3836,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                             }else if((m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL) && (m.getRichLinkMessage()!=null)){
                                 log("TYPE_NORMAL");
-
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
                                 String url = richLinkMessage.getUrl();
 
