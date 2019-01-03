@@ -8228,24 +8228,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         switch (v.getId()) {
             case R.id.content_own_message_voice_clip_play_pause:{
                 log("onClick() content_own_message_voice_clip_play_pause");
+                int[] screenPosition = new int[2];
+                int [] dimens = new int[4];
+                ((ChatActivityLollipop) context).itemClick(currentPosition, dimens);
 
-                if(holder.mediaPlayerVoiceNotes.isPlaying()){
-                    log("Click PAUSE");
-                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                    holder.mediaPlayerVoiceNotes.pause();
-                }else{
-                    log("Click PLAY");
-                    try {
-                        holder.mediaPlayerVoiceNotes.prepare();
-                        holder.mediaPlayerVoiceNotes.start();
-                        holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                        changeSeekbar(holder);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
+//                if(holder.mediaPlayerVoiceNotes.isPlaying()){
+//                    log("Click PAUSE");
+//                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+//                    holder.mediaPlayerVoiceNotes.pause();
+//                }else{
+//                    log("Click PLAY");
+//                    try {
+//                        holder.mediaPlayerVoiceNotes.prepare();
+//                        holder.mediaPlayerVoiceNotes.start();
+//                        holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+//                        changeSeekbar(holder);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//
+//                }
                 break;
             }
 

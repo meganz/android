@@ -1126,7 +1126,6 @@ public class Util {
 				extension = s[s.length-1];
 			}
 		}
-
 		//Get date time:
 		try{
 			Calendar calendar = Calendar.getInstance();
@@ -1140,7 +1139,6 @@ public class Util {
 		}catch (Exception e) {
 		}
 		nameResult = dateTime+"."+extension;
-
 		return nameResult;
 	}
 	
