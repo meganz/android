@@ -123,6 +123,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	MenuItem unSelectMenuItem;
 
 	Handler handler;
+	DisplayMetrics outMetrics;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -380,7 +381,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		listContacts = new ArrayList<MegaShare>();
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 	    
@@ -1277,6 +1278,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(coordinatorLayout, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();

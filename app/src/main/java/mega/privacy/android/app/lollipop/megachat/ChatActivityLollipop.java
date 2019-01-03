@@ -2005,7 +2005,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
 
-                Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                showSnackbar(getString(R.string.error_server_connection_problem));
                 return;
             }
 
@@ -2084,7 +2084,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
 
-                Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                showSnackbar(getString(R.string.error_server_connection_problem));
                 return;
             }
 
@@ -2155,19 +2155,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 megaApi.copyNode(document, target, this);
                             } else {
                                 log("TARGET: null");
-                                Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                               showSnackbar(getString(R.string.import_success_error));
                             }
                         }
                         else{
                             log("DOCUMENT: null");
-                            Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                            showSnackbar(getString(R.string.import_success_error));
                         }
                     }
 
                 }
                 else{
                     log("MESSAGE is null");
-                    Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(getString(R.string.import_success_error));
                 }
             }
         }
@@ -2199,7 +2199,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     log("MESSAGE is null");
-                    Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(getString(R.string.import_success_error));
                 }
             }
         }
@@ -2995,8 +2995,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", text);
                         clipboard.setPrimaryClip(clip);
                     }
-
-                    Snackbar.make(fragmentContainer, getString(R.string.messages_copied_clipboard), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(getString(R.string.messages_copied_clipboard));
 
                     break;
                 }
@@ -5929,6 +5928,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
@@ -5943,6 +5947,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showSnackbarNotSpace(){
         log("showSnackbarNotSpace");
         Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
         mySnackbar.show();
     }
@@ -6347,11 +6356,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else
                 {
-                    Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                    showSnackbar(getString(R.string.import_success_error));
                 }
 
             }else{
-                Snackbar.make(fragmentContainer, getString(R.string.import_success_message), Snackbar.LENGTH_LONG).show();
+                showSnackbar(getString(R.string.import_success_message));
             }
         }
     }
@@ -6443,7 +6452,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onIntentProcessedLollipop");
 
         if (infos == null) {
-            Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
+            showSnackbar(getString(R.string.upload_can_not_open));
         }
         else {
             log("Launch chat upload with files "+infos.size());

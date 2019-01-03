@@ -1168,11 +1168,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						if (MegaApiUtils.isIntentAvailable(this, intent)) {
 							startActivity(intent);
 						} else {
-							Snackbar.make(fragmentContainer, getString(R.string.intent_not_available), Snackbar.LENGTH_LONG).show();
+						    showSnackbar(getString(R.string.intent_not_available));
 						}
 					}
 					catch(Exception e){
-						Snackbar.make(fragmentContainer, getString(R.string.intent_not_available), Snackbar.LENGTH_LONG).show();
+						showSnackbar(getString(R.string.intent_not_available));
 					}
 				}
 				break;
@@ -1730,7 +1730,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", node.getPublicLink());
 					clipboard.setPrimaryClip(clip);
 				}
-				Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.file_properties_get_link));
 				break;
 			}
 			case R.id.file_properties_shared_layout:
@@ -2334,11 +2334,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
+			    showSnackbar(getString(R.string.context_correctly_renamed));
 				collapsingToolbar.setTitle(megaApi.getNodeByHandle(request.getNodeHandle()).getName());
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_no_renamed));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -2349,22 +2349,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
+				    showSnackbar(getString(R.string.context_correctly_moved));
 					finish();
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+				    showSnackbar(getString(R.string.context_no_moved));
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
+				    showSnackbar(getString(R.string.context_correctly_moved));
 					finish();
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+				    showSnackbar(getString(R.string.context_no_moved));
 				}
 				log("move nodes request finished");
 			}
@@ -2376,7 +2376,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				finish();
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
+			    showSnackbar(getString(R.string.context_no_removed));
 			}
 
 		}
@@ -2388,10 +2388,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (request.getEmail() != null){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied_contact), Snackbar.LENGTH_LONG).show();
+				    showSnackbar( getString(R.string.context_correctly_copied_contact));
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+				    showSnackbar(getString(R.string.context_correctly_copied));
 				}
 			}
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -2410,7 +2410,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 finish();
             }
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+			    showSnackbar(getString(R.string.context_no_copied));
 			}
 			log("copy nodes request finished");
 		}else if (request.getType() == MegaRequest.TYPE_SHARE){
@@ -2456,11 +2456,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 			catch (Exception ex) {}
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_shared), Snackbar.LENGTH_LONG).show();
+			    showSnackbar(getString(R.string.context_correctly_shared));
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_shared), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_no_shared));
 			}
 		}
 
@@ -2592,7 +2592,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					log("cN == null, i = " + i + " of " + copyHandles.length);
 					try {
 						statusDialog.dismiss();
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+						showSnackbar(getString(R.string.context_no_copied));
 					}
 					catch (Exception ex) {}
 				}
@@ -3022,6 +3022,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -3167,6 +3172,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     public void showSnackbarNotSpace(){
         log("showSnackbarNotSpace");
         Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
         mySnackbar.show();
     }

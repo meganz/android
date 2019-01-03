@@ -4,12 +4,15 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -60,6 +63,8 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    DisplayMetrics outMetrics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -96,6 +101,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
 
         setContentView(R.layout.activity_chat_explorer);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_chat_explorer);
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
@@ -273,6 +282,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();

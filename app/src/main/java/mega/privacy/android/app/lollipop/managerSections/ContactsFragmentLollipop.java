@@ -679,6 +679,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaUser> selected = adapter.getSelectedUsers();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+			menu.findItem(R.id.cab_menu_send_file).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);

@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -83,6 +84,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 	MegaContactsAttachedLollipopAdapter adapter;
 
+	DisplayMetrics outMetrics;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
@@ -116,7 +119,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
 		cC = new ChatController(this);
@@ -429,6 +432,11 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(container, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();

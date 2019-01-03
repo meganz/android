@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -736,7 +737,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				else {
 					log("Mode.PICK_FILE");
 					if(adapter.getSelectedCount()<=0){
-						Snackbar.make(viewContainer, getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
+						Snackbar snackbar = Snackbar.make(viewContainer, getString(R.string.error_no_selection), Snackbar.LENGTH_LONG);
+						Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+						snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+						final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+						params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+						snackbarLayout.setLayoutParams(params);
+						snackbar.show();
 						break;
 					}
 					new AsyncTask<Void, Void, Void>()

@@ -375,7 +375,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				megaApi.createFolder(title, parentNode, this);
 			}
 			else{
-				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_folder_already_exists));
 			}
 		}
 		else{
@@ -405,7 +405,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					megaApi.createFolder(title, parentNode, this);
 				}
 				else{
-					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_folder_already_exists));
 				}
 			}
 			else{
@@ -1714,6 +1714,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	public void showSnackbar(String s, View view){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -1928,6 +1933,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");
 		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
 		mySnackbar.show();
 	}
