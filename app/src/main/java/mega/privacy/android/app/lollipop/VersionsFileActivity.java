@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -98,6 +99,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	MenuItem unSelectMenuItem;
 
 	Handler handler;
+	DisplayMetrics outMetrics;
 
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
@@ -269,7 +271,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		handler = new Handler();
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -816,6 +818,11 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(container, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();

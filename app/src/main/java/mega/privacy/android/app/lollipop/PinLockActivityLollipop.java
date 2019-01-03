@@ -8,6 +8,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
@@ -626,12 +627,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                         	log("PIN NOT match - show snackBar");
                         	secondRound = false;
 //                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                        	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                        	View view = snack.getView();
-    			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                        	params.gravity = Gravity.TOP;
-                        	view.setLayoutParams(params);
-                        	snack.show();
+							showSnackbar(getString(R.string.pin_lock_not_match));
 
                             //Re-enter pass
                             passFirstLetter.setText("");
@@ -660,6 +656,17 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
             public void onTextChanged(CharSequence s, int start, int before, int count){}
         });
+	}
+
+	void showSnackbar (String s) {
+		Snackbar snackbar = Snackbar.make(coordinatorLayout, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		params.gravity = Gravity.TOP;
+		snackbarLayout.setLayoutParams(params);
+		snackbar.show();
 	}
 
 	private void add4DigitsPin(){
@@ -855,12 +862,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                         	log("PIN NOT match - show snackBar");
                         	secondRound = false;
 //                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                        	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                        	View view = snack.getView();
-    			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                        	params.gravity = Gravity.TOP;
-                        	view.setLayoutParams(params);
-                        	snack.show();
+							showSnackbar(getString(R.string.pin_lock_not_match));
 
                             //Re-enter pass
                             passFirstLetter.setText("");
@@ -980,13 +982,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+		            	showSnackbar(message);
 
 			            //Re-enter pass
 			            passFirstLetter.setText("");
@@ -1087,12 +1083,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+			        	showSnackbar(message);
 
 			            //Re-enter pass
 			            passFirstLetter.setText("");
@@ -1192,12 +1183,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+			        	showSnackbar(message);
 
 			            //Re-enter pass
 			        	passwordText.setText("");
@@ -1284,12 +1270,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
-			        	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-			        	params.gravity = Gravity.TOP;
-			        	view.setLayoutParams(params);
-			        	snack.show();
+			        	showSnackbar(message);
 
 			            //Re-enter pass
 			        	passwordText.setText("");
@@ -1573,12 +1554,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                 	log("Alphanumeric PIN NOT match - show snackBar");
                 	secondRound = false;
 //                	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                	View view = snack.getView();
-		        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                	params.gravity = Gravity.TOP;
-                	view.setLayoutParams(params);
-                	snack.show();
+                	showSnackbar(getString(R.string.pin_lock_not_match));
 
                     //Re-enter pass
                 	passwordText.setText("");

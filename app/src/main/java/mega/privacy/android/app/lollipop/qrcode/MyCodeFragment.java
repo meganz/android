@@ -24,7 +24,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -98,6 +100,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     private boolean copyLink = true;
     private boolean createQR = false;
+
+    DisplayMetrics outMetrics;
 
     public static MyCodeFragment newInstance() {
         log("newInstance");
@@ -173,6 +177,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         log("onCreateView");
 
         v = inflater.inflate(R.layout.fragment_mycode, container, false);
+
+        Display display = ((QRCodeActivity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
 
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();

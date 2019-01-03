@@ -370,6 +370,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 
