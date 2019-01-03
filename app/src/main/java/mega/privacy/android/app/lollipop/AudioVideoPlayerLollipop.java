@@ -3623,7 +3623,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         Snackbar snackbar = Snackbar.make(containerAudioVideoPlayer, s, Snackbar.LENGTH_LONG);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
         params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
@@ -3902,6 +3902,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void showSnackbarNotSpace(){
         log("showSnackbarNotSpace");
         Snackbar mySnackbar = Snackbar.make(containerAudioVideoPlayer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
         mySnackbar.show();
     }
