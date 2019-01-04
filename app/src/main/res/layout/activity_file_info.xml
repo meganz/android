@@ -17,16 +17,19 @@
             android:background="@color/content_text_background"
             android:fitsSystemWindows="true">
 
-            <android.support.design.widget.CollapsingToolbarLayout
+            <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
                 android:id="@+id/file_info_collapse_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/white"
                 android:fitsSystemWindows="true"
-                android:background="@drawable/full_gradient_shape_2"
                 app:contentScrim="?attr/colorPrimary"
-                app:collapsedTitleTextAppearance="@style/ToolbarTitle.Secondary"
+                app:maxLines="3"
+                app:lineSpacingMultiplier="1.2"
+                app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText">
+                app:expandedTitleTextAppearance="@style/ToolbarTitle"
+                android:theme="@style/Theme.Megaactionbar.InfoScreens">
 
                 <RelativeLayout
                     android:id="@+id/file_info_icon_layout"
@@ -75,16 +78,6 @@
                         android:background="@drawable/actionbar_gradient_dark" />
                 </RelativeLayout>
 
-                <ImageView
-                    android:id="@+id/file_properties_public_link_image_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.30"
-                    android:src="@drawable/link_ic"
-                    android:layout_gravity="left|bottom"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="35dp" />
-
                 <TextView
                     android:id="@+id/file_properties_permission_info"
                     android:layout_width="wrap_content"
@@ -106,7 +99,7 @@
 
                 <!--android:background="@drawable/gradient_shape"-->
 
-            </android.support.design.widget.CollapsingToolbarLayout>
+            </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
         <include layout="@layout/content_file_info_activity" />

@@ -2065,6 +2065,14 @@ public class Util {
 					}
 				}, 500);
 			}
+			else if (option == 3) {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
+					}
+				}, 500);
+			}
 			else {
 				handler.postDelayed(new Runnable() {
 					@Override
