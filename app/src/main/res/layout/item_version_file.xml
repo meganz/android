@@ -2,12 +2,12 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:background="@drawable/statelist_item_layout">
+    android:background="@color/white">
 
 	<RelativeLayout
 		android:layout_width="match_parent"
-		android:layout_height="48dp"
-		android:background="@color/color_background_versions"
+		android:layout_height="36dp"
+		android:background="@color/white"
 		android:id="@+id/version_file_header_layout">
 
 		<TextView
@@ -16,12 +16,12 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:layout_centerVertical="true"
-			android:layout_marginLeft="72dp"
-			android:textColor="@color/mail_my_account"
+			android:layout_marginLeft="16dp"
+			android:textColor="@color/name_my_account"
 			android:maxLines="1"
 			android:singleLine="true"
 			android:ellipsize="end"
-			android:textSize="16sp"/>
+			android:textSize="14sp"/>
 
 		<TextView
 			android:id="@+id/version_file_header_size"

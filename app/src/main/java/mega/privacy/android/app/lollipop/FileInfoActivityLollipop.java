@@ -21,12 +21,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -62,6 +62,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -132,15 +134,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	ArrayList<MegaNode> nodeVersions;
 
+	NestedScrollView nestedScrollView;
+
 	RelativeLayout iconToolbarLayout;
 	ImageView iconToolbarView;
-	ImageView iconToolbarViewLink;
 
-	Drawable upArrow;
-	Drawable drawableRemoveLink;
-	Drawable drawableLink;
-	Drawable drawableShare;
-	Drawable drawableDots;
+    Drawable upArrow;
+    Drawable drawableRemoveLink;
+    Drawable drawableLink;
+    Drawable drawableShare;
+    Drawable drawableDots;
+    Drawable drawableDownload;
+    Drawable drawableLeave;
 
 	RelativeLayout imageToolbarLayout;
 	ImageView imageToolbarView;
@@ -170,9 +175,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	RelativeLayout publicLinkLayout;
 	RelativeLayout publicLinkCopyLayout;
 	TextView publicLinkText;
-	ImageView shareIcon;
-	ImageView infoIcon;
-	TextView infoTittle;
 	RelativeLayout sharedLayout;
 	Button usersSharedWithTextButton;
 	View dividerSharedLayout;
@@ -186,7 +188,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	TextView availableOfflineView;
 
-	ImageView publicLinkIcon;
 	Button publicLinkButton;
 
 	RelativeLayout versionsLayout;
@@ -547,13 +548,27 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         setSupportActionBar(toolbar);
         aB = getSupportActionBar();
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
+        collapsingToolbar.setMaxLines(3);
+
+        nestedScrollView = (NestedScrollView) findViewById(R.id.nested_layout);
+        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if ((v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE)) {
+                    aB.setElevation(Util.px2dp(4, outMetrics));
+                }
+                else {
+                    aB.setElevation(0);
+                }
+            }
+        });
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
         }else{
             collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
         }
-        collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
+        collapsingToolbar.setExpandedTitleMarginStart(Util.px2dp(72, outMetrics));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         aB.setHomeButtonEnabled(true);
@@ -563,7 +578,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
         iconToolbarView.setImageResource(imageId);
-        iconToolbarViewLink=(ImageView) findViewById(R.id.file_properties_public_link_image_title);
 
         imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
         imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
@@ -578,7 +592,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         //Share with Layout
         sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
         sharedLayout.setOnClickListener(this);
-        shareIcon = (ImageView) findViewById(R.id.file_properties_shared_image);
         usersSharedWithTextButton = (Button) findViewById(R.id.file_properties_shared_info_button);
         usersSharedWithTextButton.setOnClickListener(this);
         dividerSharedLayout = findViewById(R.id.divider_shared_layout);
@@ -618,8 +631,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         ownerLayout.setVisibility(View.GONE);
 
         //Info Layout
-        infoTittle = (TextView) findViewById(R.id.file_properties_info_menu_info);
-        infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
 
         //Size Layout
         sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
@@ -654,7 +665,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
 
         publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
-        publicLinkIcon = (ImageView) findViewById(R.id.file_properties_public_link_image);
         publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
@@ -673,8 +683,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         separatorVersions = (View) findViewById(R.id.separator_versions);
 
         if (adapterType == Constants.OFFLINE_ADAPTER){
-            iconToolbarViewLink.setVisibility(View.GONE);
-            collapsingToolbar.setTitle(getIntent().getStringExtra("name"));
+            collapsingToolbar.setTitle(getIntent().getStringExtra("name").toUpperCase());
             availableOfflineLayout.setVisibility(View.GONE);
             sharedLayout.setVisibility(View.GONE);
             dividerSharedLayout.setVisibility(View.GONE);
@@ -759,7 +768,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 String name = node.getName();
 
-                collapsingToolbar.setTitle(name);
+                collapsingToolbar.setTitle(name.toUpperCase());
                 if (nC == null) {
                     nC = new NodeController(this);
                 }
@@ -833,7 +842,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             else{
                 log("Extras is NULL");
             }
-    
+
             //Yuan
             listView = (RecyclerView)findViewById(R.id.file_info_contact_list_view);
             //listView.addOnItemTouchListener(this);
@@ -842,22 +851,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
             listView.setLayoutManager(mLayoutManager);
             listView.addOnItemTouchListener(this);
-    
+
             detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
-    
+
             //get shared contact list and max number can be displayed in the list is five
             setContactList();
-    
+
             moreButton = (Button)findViewById(R.id.more_button);
             moreButton.setOnClickListener(this);
             setMoreButtonText();
-    
+
             //setup adapter
             adapter = new MegaFileInfoSharedContactLollipopAdapter(this,node,listContacts,listView);
             adapter.setShareList(listContacts);
             adapter.setPositionClicked(-1);
             adapter.setMultipleSelect(false);
-    
+
             listView.setAdapter(adapter);
 
             refreshProperties();
@@ -869,17 +878,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
-		drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
-		drawableDots = drawableDots.mutate();
-		upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
-		upArrow = upArrow.mutate();
+        drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+        drawableDots = drawableDots.mutate();
+        upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+        upArrow = upArrow.mutate();
 
-		drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link_w);
-		drawableRemoveLink = drawableRemoveLink.mutate();
-		drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
-		drawableLink = drawableLink.mutate();
-		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
-		drawableShare = drawableShare.mutate();
+        drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link_w);
+        drawableRemoveLink = drawableRemoveLink.mutate();
+        drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
+        drawableLink = drawableLink.mutate();
+        drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+        drawableShare = drawableShare.mutate();
+        drawableDownload = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_download_white);
+        drawableDownload = drawableDownload.mutate();
+        drawableLeave = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_leave_share_w);
+        drawableLeave = drawableLeave.mutate();
 
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
@@ -917,7 +930,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 while (megaApi.getParentNode(parent) != null) {
                     parent = megaApi.getParentNode(parent);
-
                 }
                 if (parent.getHandle() == megaApi.getRubbishNode().getHandle()) {
                     downloadMenuItem.setVisible(false);
@@ -1049,55 +1061,99 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
 
                 if (node.hasPreview() || node.hasThumbnail()) {
-
-                    upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                    getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-                    drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                    toolbar.setOverflowIcon(drawableDots);
-
-                    if (removeLinkMenuItem != null) {
-                        drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                        removeLinkMenuItem.setIcon(drawableRemoveLink);
-                    }
-                    if (getLinkMenuItem != null) {
-                        drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                        getLinkMenuItem.setIcon(drawableLink);
-                    }
-
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-                    collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
-
-                    if (iconToolbarViewLink.getVisibility() == View.VISIBLE) {
-                        iconToolbarViewLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                        iconToolbarViewLink.setAlpha(0.8f);
-                    }
-                }
-			/*Folder*/
-                else {
-
                     appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
                         @Override
                         public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
                             if (offset < -200) {
-                                upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
                                 getSupportActionBar().setHomeAsUpIndicator(upArrow);
-                                drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+
+                                drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
                                 toolbar.setOverflowIcon(drawableDots);
+
+                                if (removeLinkMenuItem != null) {
+                                    drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                                    removeLinkMenuItem.setIcon(drawableRemoveLink);
+                                }
+                                if (getLinkMenuItem != null) {
+                                    drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                                    getLinkMenuItem.setIcon(drawableLink);
+                                }
+                                if (downloadMenuItem != null) {
+                                    drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                                    downloadMenuItem.setIcon(drawableDownload);
+                                }
+                                if (shareMenuItem != null) {
+                                    drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                                    shareMenuItem.setIcon(drawableShare);
+                                }
+                                if (leaveMenuItem != null) {
+                                    drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                                    leaveMenuItem.setIcon(drawableLeave);
+                                }
                             } else {
                                 upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
                                 getSupportActionBar().setHomeAsUpIndicator(upArrow);
-                                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
                                 drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
                                 toolbar.setOverflowIcon(drawableDots);
+
+                                if (removeLinkMenuItem != null) {
+                                    drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                    removeLinkMenuItem.setIcon(drawableRemoveLink);
+                                }
+                                if (getLinkMenuItem != null) {
+                                    drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                    getLinkMenuItem.setIcon(drawableLink);
+                                }
+                                if (downloadMenuItem != null) {
+                                    drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                    downloadMenuItem.setIcon(drawableDownload);
+                                }
+                                if (shareMenuItem != null) {
+                                    drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                    shareMenuItem.setIcon(drawableShare);
+                                }
+                                if (leaveMenuItem != null) {
+                                    drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+                                    leaveMenuItem.setIcon(drawableLeave);
+                                }
                             }
                         }
                     });
 
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+                    collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
+                }
+			/*Folder*/
+                else {
+                    upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                    getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+                    drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                    toolbar.setOverflowIcon(drawableDots);
+
+                    if (removeLinkMenuItem != null) {
+                        drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                        removeLinkMenuItem.setIcon(drawableRemoveLink);
+                    }
+                    if (getLinkMenuItem != null) {
+                        drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                        getLinkMenuItem.setIcon(drawableLink);
+                    }
+                    if (downloadMenuItem != null) {
+                        drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                        downloadMenuItem.setIcon(drawableDownload);
+                    }
+                    if (shareMenuItem != null) {
+                        drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                        shareMenuItem.setIcon(drawableShare);
+                    }
+                    if (leaveMenuItem != null) {
+                        drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+                        leaveMenuItem.setIcon(drawableLeave);
+                    }
                 }
             }
         }
@@ -1139,10 +1195,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						offlineFile = new File(destination, node.getName());
 						if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 							availableOfflineBoolean = true;
+							availableOfflineView.setText(R.string.context_delete_offline);
 							offlineSwitch.setChecked(true);
 						}
 						else{
 							availableOfflineBoolean = false;
+                            availableOfflineView.setText(R.string.save_for_offline);
 							offlineSwitch.setChecked(false);
 							mOffDelete = dbH.findByHandle(node.getHandle());
 							OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
@@ -1151,6 +1209,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					}
 					else{
 						availableOfflineBoolean = false;
+                        availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(node.getHandle());
                         OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
@@ -1292,14 +1351,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			publicLink=true;
 			publicLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkCopyLayout.setVisibility(View.VISIBLE);
-			iconToolbarViewLink.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
 		}
 		else{
 			publicLink=false;
 			publicLinkLayout.setVisibility(View.GONE);
 			publicLinkCopyLayout.setVisibility(View.GONE);
-			iconToolbarViewLink.setVisibility(View.GONE);
 		}
 
 		if (node.isFile()){
@@ -1603,21 +1660,25 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					if (offlineFile.exists()) {
 						log("FOUND!!!: " + node.getHandle() + " " + node.getName());
 						availableOfflineBoolean = true;
+                        availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 					} else {
 						log("Not found: " + node.getHandle() + " " + node.getName());
 						availableOfflineBoolean = false;
+                        availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 					}
 				} else {
 					log("Not found offLineFile is NULL");
 					availableOfflineBoolean = false;
+                    availableOfflineView.setText(R.string.save_for_offline);
 					offlineSwitch.setChecked(false);
 				}
 			}
 			else{
 				log("offLineNode is NULL");
 				availableOfflineBoolean = false;
+                availableOfflineView.setText(R.string.save_for_offline);
 				offlineSwitch.setChecked(false);
 			}
 
@@ -1625,6 +1686,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		else{
 			log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
 			availableOfflineBoolean = false;
+            availableOfflineView.setText(R.string.save_for_offline);
 			offlineSwitch.setChecked(false);
 		}
 	}
@@ -1705,7 +1767,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         } else {
             sharedContactLayout.setVisibility(View.VISIBLE);
         }
-    
+
         isShareContactExpanded = !isShareContactExpanded;
     }
 
@@ -1753,6 +1815,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         isRemoveOffline = true;
                         handle = node.getHandle();
 						availableOfflineBoolean = false;
+                        availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(handle);
                         OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
@@ -1763,6 +1826,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         isRemoveOffline = false;
                         handle = -1;
 						availableOfflineBoolean = true;
+                        availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 
 						File destination = null;
@@ -1820,6 +1884,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 					if (!isChecked){
 						availableOfflineBoolean = false;
+                        availableOfflineView.setText(R.string.save_for_offline);
 						offlineSwitch.setChecked(false);
 						mOffDelete = dbH.findByHandle(node.getHandle());
                         OfflineUtils.removeOffline(mOffDelete, dbH, this, from);
@@ -1827,6 +1892,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					}
 					else{
 						availableOfflineBoolean = true;
+                        availableOfflineView.setText(R.string.context_delete_offline);
 						offlineSwitch.setChecked(true);
 
 						supportInvalidateOptionsMenu();
@@ -2335,7 +2401,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if (e.getErrorCode() == MegaError.API_OK){
 			    showSnackbar(getString(R.string.context_correctly_renamed));
-				collapsingToolbar.setTitle(megaApi.getNodeByHandle(request.getNodeHandle()).getName());
+				collapsingToolbar.setTitle(megaApi.getNodeByHandle(request.getNodeHandle()).getName().toUpperCase());
 			}
 			else{
 				showSnackbar(getString(R.string.context_no_renamed));
@@ -2836,7 +2902,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			publicLink=true;
 			publicLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkCopyLayout.setVisibility(View.VISIBLE);
-			iconToolbarViewLink.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
 			supportInvalidateOptionsMenu();
 
@@ -2846,7 +2911,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			publicLink=false;
 			publicLinkLayout.setVisibility(View.GONE);
 			publicLinkCopyLayout.setVisibility(View.GONE);
-			iconToolbarViewLink.setVisibility(View.GONE);
 			supportInvalidateOptionsMenu();
 
 		}
@@ -2961,11 +3025,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     		megaApi.removeRequestListener(this);
     	}
 
-		upArrow.setColorFilter(null);
-		drawableRemoveLink.setColorFilter(null);
-		drawableLink.setColorFilter(null);
-		drawableShare.setColorFilter(null);
-		drawableDots.setColorFilter(null);
+        upArrow.setColorFilter(null);
+        drawableRemoveLink.setColorFilter(null);
+        drawableLink.setColorFilter(null);
+        drawableShare.setColorFilter(null);
+        drawableDots.setColorFilter(null);
+        drawableDownload.setColorFilter(null);
+        drawableLeave.setColorFilter(null);
     }
 
 	public static void log(String message) {
