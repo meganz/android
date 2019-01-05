@@ -1,37 +1,23 @@
-/local.properties
+local.properties
 
-/build/
-/app/build/
-/app/src/main/obj/
-/app/src/main/jniLibs/
-/app/src/main/libs/
+build/
+app/build/
+app/src/main/obj/
+app/src/main/jniLibs/
+app/src/main/libs/
 
 ### Android Studio files ###
 *.iml
 
 # User-specific stuff:
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
-
-# Sensitive or high-churn files:
-.idea/dataSources.ids
-.idea/dataSources.xml
-.idea/sqlDataSources.xml
-.idea/dynamic.xml
-.idea/uiDesigner.xml
+.idea/
 
 # Gradle:
-.idea/gradle.xml
-.idea/libraries
-.idea/encodings.xml
-.gradle
+.gradle/
 
-#Captures
-captures
+# Captures
+captures/
 
 ## File-based project format:
 *.ipr
 *.iws
-/.idea/codeStyles/Project.xml
-/.idea/caches/build_file_checksums.ser

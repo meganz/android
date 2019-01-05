@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
         minSdkVersion 21
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 219
         versionName "3.5.1 (219)"
         multiDexEnabled true
@@ -20,17 +20,18 @@ android {
             exclude '**/MegaApiSwing.java'
         }
         jni.srcDirs = [] //disable automatic ndk-build
-        jniLibs.srcDir 'src/main/libs' // This is not necessary unless you have precompiled libraries in your project.
+        jniLibs.srcDir 'src/main/libs'
+        // This is not necessary unless you have precompiled libraries in your project.
     }
 
     buildTypes {
         debug {
-            //  minifyEnabled false
-            //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            //  minifyEnabled false
-            //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -41,47 +42,70 @@ android {
         // abortOnError false
     }
 
-    dexOptions{
-        jumboMode = true
+    compileOptions {
+        encoding = 'UTF-8'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
-//    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
-//        workingDir 'src/main/jni'
-//        commandLine './build.sh', 'all'
-//    }
-//
-//    tasks.withType(JavaCompile) {
-//        compileTask -> compileTask.dependsOn megaSDK
-//    }
+    dexOptions {
+        jumboMode = true
+    }
+/*
+    task megaSDK(type: Exec, description: 'Compile MEGA SDK via NDK') {
+        workingDir 'src/main/jni'
+        commandLine './build.sh', 'all'
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn megaSDK
+    }
+*/
+}
+
+ext {
+    supportLibVersion = '28.0.0'
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.google.android.gms:play-services-wallet:16.0.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.github.nirhart:parallaxscroll:1.0'
-    implementation 'com.android.support:palette-v7:27.1.1'
-    implementation 'io.github.rockerhieu:emojicon:1.4.1'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    implementation 'com.google.firebase:firebase-core:16.0.5'
-    implementation 'com.android.support:cardview-v7:27.1.1'
-    implementation 'com.vdurmont:emoji-java:3.3.0'
-    implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
-    implementation 'com.google.zxing:core:3.3.2'
-    implementation 'com.budiyev.android:code-scanner:1.8.3'
-    implementation "com.squareup.picasso:picasso:2.4.0"
-    implementation 'me.leolin:ShortcutBadger:1.1.21@aar'
-    implementation 'com.brandongogetap:stickyheaders:0.5.1'
-    implementation 'com.github.bumptech.glide:glide:3.8.0'
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation "com.android.support:support-emoji:27.1.1"
-    implementation 'com.android.support:support-emoji-appcompat:27.1.1'
-    implementation 'com.android.support:support-emoji-bundled:27.1.1'
-    implementation 'com.android.support:preference-v7:27.1.1'
+    // Eventually replace local libraries with these
+    implementation 'com.github.barteksc:android-pdf-viewer:3.1.0-beta.1'
+    implementation 'com.github.barteksc:pdfium-android:1.9.0'
+    //implementation 'org.webrtc:google-webrtc:1.0.25821'
 
+    // Support libraries
+    implementation "com.android.support:design:${supportLibVersion}"
+    implementation "com.android.support:support-emoji:${supportLibVersion}"
+    implementation "com.android.support:support-emoji-appcompat:${supportLibVersion}"
+    implementation "com.android.support:support-emoji-bundled:${supportLibVersion}"
+    implementation "com.android.support:support-media-compat:${supportLibVersion}"
+    implementation "com.android.support:support-v4:${supportLibVersion}"
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:cardview-v7:${supportLibVersion}"
+    implementation "com.android.support:palette-v7:${supportLibVersion}"
+    implementation "com.android.support:preference-v7:${supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
+    implementation 'com.android.support:multidex:1.0.3'
+
+    // Google libraries
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.android.gms:play-services-analytics:16.0.6'
+    implementation 'com.google.android.gms:play-services-wallet:16.0.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.6.1' //2.9.3
+    implementation 'com.google.zxing:core:3.3.3'
+
+    // Other
+    implementation 'com.github.nirhart:parallaxscroll:1.0'
+    implementation 'io.github.rockerhieu:emojicon:1.4.2' //Discontinued
+    implementation 'com.vdurmont:emoji-java:3.3.0' //4.0.0
+    implementation 'com.budiyev.android:code-scanner:1.8.4' //2.1.0
+    implementation 'com.squareup.picasso:picasso:2.4.0' //2.71828
+    implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
+    implementation 'com.brandongogetap:stickyheaders:0.5.1'
+    implementation 'com.github.bumptech.glide:glide:3.8.0' //4.8.0
+    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4' //2.0.2
 }
 
 apply plugin: 'com.google.gms.google-services'

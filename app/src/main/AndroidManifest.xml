@@ -1,30 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
-    android:installLocation="internalOnly"
-    android:versionCode="219"
-    android:versionName="3.5.1 (219)" >
+    android:installLocation="internalOnly">
 
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-    <uses-feature android:name="android.hardware.camera" android:required="false"/>
-    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
-    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
-    <uses-feature android:name="android.hardware.sensor.proximity" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.sensor.proximity"
+        android:required="false" />
 
-    <supports-screens android:resizeable="true"
-        android:smallScreens="true"
-        android:normalScreens="true"
+    <supports-screens
+        android:anyDensity="true"
         android:largeScreens="true"
-        android:xlargeScreens="true"
-        android:anyDensity="true"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="com.google.android.apps.photos.permission.GOOGLE_PHOTOS"/>
+    <uses-permission android:name="com.google.android.apps.photos.permission.GOOGLE_PHOTOS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -34,44 +46,42 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
     <uses-permission android:name="android.permission.FLAG_SHOW_WHEN_LOCKED" />
-    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
-    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
-    <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
 
     <application
-        android:name="mega.privacy.android.app.MegaApplication"
+        android:name=".MegaApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Megaactionbar" >
+        android:theme="@style/Theme.Megaactionbar">
 
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="fontProviderRequests"
             android:value="Noto Color Emoji Compat" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.LoginActivityLollipop"
+            android:name=".lollipop.LoginActivityLollipop"
             android:label="@string/login_text"
             android:screenOrientation="locked"
-            android:windowSoftInputMode="stateAlwaysHidden">
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity
             android:name="WebViewActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop" >
-        </activity>
+            android:launchMode="singleTop" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.WebViewActivityLollipop"
+            android:name=".lollipop.WebViewActivityLollipop"
             android:label="@string/app_name"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"
+            android:name=".lollipop.ManagerActivityLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing">
@@ -79,93 +89,111 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <meta-data android:name="android.app.searchable"
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity"
+            android:name=".lollipop.megaachievements.AchievementsActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
-        <activity android:name="OpenLinkActivity" android:launchMode="singleTask" android:screenOrientation="portrait" >
+        <activity
+            android:name="OpenLinkActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-                <category android:name="android.intent.category.BROWSABLE" ></category>
-                <data android:host="mega.co.nz" android:scheme="https" > </data>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="mega.co.nz"
+                    android:scheme="https" />
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-                <category android:name="android.intent.category.BROWSABLE" ></category>
-                <data android:host="www.mega.co.nz" android:scheme="https" > </data>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.mega.co.nz"
+                    android:scheme="https" />
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-                <category android:name="android.intent.category.BROWSABLE" ></category>
-                <data android:host="mega.nz" android:scheme="https" > </data>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="mega.nz"
+                    android:scheme="https" />
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-                <category android:name="android.intent.category.BROWSABLE" ></category>
-                <data android:host="www.mega.nz" android:scheme="https" > </data>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.mega.nz"
+                    android:scheme="https" />
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-                <category android:name="android.intent.category.BROWSABLE" ></category>
-                <data android:scheme="mega" > </data>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="mega" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
+            android:name=".lollipop.FullScreenImageViewerLollipop"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.Back">
-        </activity>
+            android:theme="@style/Theme.Swipe.Back"
+            android:uiOptions="splitActionBarWhenNarrow" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer"
+            android:name=".lollipop.megachat.ChatFullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.Back">
-        </activity>
+            android:theme="@style/Theme.Swipe.Back"
+            android:uiOptions="splitActionBarWhenNarrow" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ContactFileListActivityLollipop"
+            android:name=".lollipop.ContactFileListActivityLollipop"
             android:label="@string/contact_properties_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FileContactListActivityLollipop"
+            android:name=".lollipop.FileContactListActivityLollipop"
+            android:configChanges="orientation|screenSize"
             android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
-            android:launchMode="singleTask"
+            android:name=".lollipop.FileExplorerActivityLollipop"
             android:label="@string/app_name"
-           android:theme="@style/Theme.Megaactionbar"
-           android:windowSoftInputMode="adjustNothing">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Megaactionbar"
+            android:windowSoftInputMode="adjustNothing">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -184,186 +212,167 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity"
+            android:name=".lollipop.megachat.ChatExplorerActivity"
             android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
+
+        <activity
+            android:name=".providers.PinFileProviderActivity"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name=".providers.FileProviderActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="locked"
             android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
-
-        <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
-            android:label="@string/app_name">
-        </activity>
-
-        <activity android:name="mega.privacy.android.app.providers.FileProviderActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary"
-            android:screenOrientation="locked">
 
             <intent-filter>
-                <action
-                    android:name="android.intent.action.PICK"/>
-                <category
-                    android:name="android.intent.category.DEFAULT"/>
-                <category
-                    android:name="android.intent.category.OPENABLE"/>
-                <data android:mimeType="text/*"/>
-                <data android:mimeType="application/*"/>
-                <data android:mimeType="audio/*"/>
-                <data android:mimeType="video/*"/>
-                <data android:mimeType="image/*"/>
-                <data android:mimeType="x-conference/*"/>
-                <data android:mimeType="model/*"/>
-                <data android:mimeType="chemical/*"/>
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="text/*" />
+                <data android:mimeType="application/*" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="x-conference/*" />
+                <data android:mimeType="model/*" />
+                <data android:mimeType="chemical/*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
+
                 <category android:name="android.intent.category.OPENABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/*"/>
-                <data android:mimeType="application/*"/>
-                <data android:mimeType="audio/*"/>
-                <data android:mimeType="video/*"/>
-                <data android:mimeType="image/*"/>
-                <data android:mimeType="x-conference/*"/>
-                <data android:mimeType="model/*"/>
-                <data android:mimeType="chemical/*"/>
+
+                <data android:mimeType="text/*" />
+                <data android:mimeType="application/*" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="x-conference/*" />
+                <data android:mimeType="model/*" />
+                <data android:mimeType="chemical/*" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FileStorageActivityLollipop"
-            android:label="@string/app_name"
+            android:name=".lollipop.FileStorageActivityLollipop"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.PhoneContactsActivityLollipop"
-            android:label="@string/app_name">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.FolderLinkActivityLollipop"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop"
+            android:name=".lollipop.PhoneContactsActivityLollipop"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name=".lollipop.FolderLinkActivityLollipop"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop"
+            android:name=".lollipop.megachat.NodeAttachmentActivityLollipop"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.TestPasswordActivity"
+            android:name=".lollipop.megachat.ContactAttachmentActivityLollipop"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FileLinkActivityLollipop"
+            android:name=".lollipop.TestPasswordActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
+
+        <activity
+            android:name=".lollipop.FileLinkActivityLollipop"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.OpenPasswordLinkActivity"
+            android:name=".OpenPasswordLinkActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop"
+            android:name=".lollipop.ChangePasswordActivityLollipop"
             android:label="@string/my_account_change_password"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:name=".lollipop.GetLinkActivityLollipop"
             android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
+            android:name=".lollipop.SearchByDateActivityLollipop"
             android:label="@string/action_search_by_date"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
+            android:name=".lollipop.PinLockActivityLollipop"
             android:label="@string/settings_pin_lock"
-            android:windowSoftInputMode="stateVisible"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary"
+            android:windowSoftInputMode="stateVisible" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
-            android:label="@string/zip_browser_activity"
+            android:name=".lollipop.ZipBrowserActivityLollipop"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:label="@string/zip_browser_activity"
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.AddContactActivityLollipop"
+            android:name=".lollipop.AddContactActivityLollipop"
             android:label="@string/app_name"
             android:theme="@style/Theme.Add.Contacts"
-            android:windowSoftInputMode="adjustNothing">
-        </activity>
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop"
+            android:name=".lollipop.megachat.ChatActivityLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity"
+            android:name=".lollipop.megachat.ArchivedChatsActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
+            android:name=".lollipop.ContactInfoActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.FileInfoActivityLollipop"
+            android:name=".lollipop.FileInfoActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
+            android:name=".lollipop.VersionsFileActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop"
+            android:name=".lollipop.megachat.GroupChatInfoActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.PdfViewerActivityLollipop"
+            android:name=".lollipop.PdfViewerActivityLollipop"
             android:label="@string/pdf_app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -373,24 +382,30 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="http" />
                 <data android:host="*" />
                 <data android:pathPattern=".*\\.pdf" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="http" />
                 <data android:host="*" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:scheme="file" />
                 <data android:host="*" />
                 <data android:pathPattern=".*\\.pdf" />
@@ -398,117 +413,105 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
+            android:name=".lollipop.AudioVideoPlayerLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Swipe.Back">
-        </activity>
+            android:theme="@style/Theme.Swipe.Back" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
+            android:name=".lollipop.qrcode.QRCodeActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity"
+            android:name=".lollipop.TwoFactorAuthenticationActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity"
-            android:screenOrientation="portrait"
+            android:name=".lollipop.megachat.calls.ChatCallActivity"
+            android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:label="@string/app_name">
-        </activity>
+            android:screenOrientation="portrait" />
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity"
+            android:name=".lollipop.megachat.ChatPreferencesActivity"
             android:label="@string/contact_properties_activity"
-            android:theme="@style/Theme.Megaactionbar.Secondary"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Megaactionbar.Secondary" />
 
         <service
-            android:name="CameraSyncService"
-            android:exported="false" >
-        </service>
+            android:name=".CameraSyncService"
+            android:exported="false" />
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
-            android:exported="false" >
-        </service>
+            android:name=".lollipop.megachat.ChatUploadService"
+            android:exported="false" />
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallService"
-            android:exported="false" >
-        </service>
+            android:name=".lollipop.megachat.calls.CallService"
+            android:exported="false" />
 
         <service
-            android:name="DownloadService"
-            android:exported="false" >
-        </service>
+            android:name=".DownloadService"
+            android:exported="false" />
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
-            android:exported="false" >
-        </service>
+            android:name=".lollipop.megachat.calls.CallNotificationIntentService"
+            android:exported="false" />
 
         <service
             android:name="UploadService"
-            android:exported="false" >
-        </service>
+            android:exported="false" />
 
         <service
-            android:name="MegaStreamingService"
-            android:exported="false" >
-        </service>
+            android:name=".MegaStreamingService"
+            android:exported="false" />
 
-        <service
-            android:name=".fcm.MegaFirebaseMessagingService">
+        <service android:name=".fcm.MegaFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <service
-            android:name=".fcm.MegaFirebaseInstanceIDService">
+        <service android:name=".fcm.MegaFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
         <!-- Used for Google Play Store Campaign Measurement-->
-        <service
-            android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
 
         <service
             android:name=".jobservices.CameraUploadsService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false" />
-        <service android:name=".fcm.IncomingCallService" android:exported="true"/>
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".fcm.IncomingCallService"
+            android:exported="true" />
+
         <receiver
-            android:name="mega.privacy.android.app.receivers.CustomInstallReferrerReceiver"
+            android:name=".receivers.CustomInstallReferrerReceiver"
             android:exported="true">
             <intent-filter>
-                <action
-                    android:name="com.android.vending.INSTALL_REFERRER" />
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name="mega.privacy.android.app.receivers.CameraEventReceiver"
-            android:enabled="true" >
+            android:name=".receivers.CameraEventReceiver"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />
                 <action android:name="android.hardware.action.NEW_PICTURE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name="mega.privacy.android.app.receivers.NetworkStateReceiver"
+            android:name=".receivers.NetworkStateReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
@@ -516,7 +519,7 @@
         </receiver>
 
         <receiver
-            android:name="mega.privacy.android.app.receivers.ChargeEventReceiver"
+            android:name=".receivers.ChargeEventReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
@@ -527,7 +530,7 @@
         </receiver>
 
         <receiver
-            android:name="mega.privacy.android.app.receivers.BootEventReceiver"
+            android:name=".receivers.BootEventReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -537,8 +540,8 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="mega.privacy.android.app.providers.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
