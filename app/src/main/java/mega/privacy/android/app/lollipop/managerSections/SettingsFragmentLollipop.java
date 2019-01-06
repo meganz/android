@@ -86,6 +86,7 @@ import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
 //import android.support.v4.preference.PreferenceFragment;
+import nz.mega.sdk.MegaTransfer;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -2186,8 +2187,36 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				startActivity(intent);
 			}
 		}
-		
-		return true;
+		else{
+			log("Camera OFF");
+			secondaryUpload = false;
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent stopIntent = null;
+				stopIntent = new Intent(context, CameraSyncService.class);
+				stopIntent.setAction(CameraSyncService.ACTION_STOP);
+				context.startService(stopIntent);
+			}
+			else {
+				dbH.setCamSyncEnabled(false);
+				dbH.setSecondaryUploadEnabled(false);
+				if (megaApi != null) {
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+				}
+			}
+
+			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+			cameraUploadCategory.removePreference(cameraUploadHow);
+			cameraUploadCategory.removePreference(cameraUploadWhat);
+			cameraUploadCategory.removePreference(localCameraUploadFolder);
+			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+			cameraUploadCategory.removePreference(cameraUploadCharging);
+			cameraUploadCategory.removePreference(keepFileNames);
+			cameraUploadCategory.removePreference(megaCameraFolder);
+			cameraUploadCategory.removePreference(secondaryMediaFolderOn);
+			cameraUploadCategory.removePreference(localSecondaryFolder);
+			cameraUploadCategory.removePreference(megaSecondaryFolder);
+		}
 	}
 
 	/**

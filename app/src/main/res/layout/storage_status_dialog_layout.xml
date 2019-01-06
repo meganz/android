@@ -13,7 +13,7 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/storage_almost_full_title"
+                android:id="@+id/storage_status_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
@@ -22,7 +22,7 @@
                 android:layout_gravity="center_horizontal"/>
 
             <ImageView
-                android:id="@+id/image_storage_almost_full"
+                android:id="@+id/image_storage_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -30,7 +30,7 @@
                 android:layout_gravity="center_horizontal"/>
 
             <TextView
-                android:id="@+id/text_storage_almost_full"
+                android:id="@+id/text_storage_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="25dp"
@@ -42,7 +42,7 @@
                 android:layout_gravity="center_horizontal"/>
 
             <LinearLayout
-                android:id="@+id/horizontal_buttons_storage_almost_full_layout"
+                android:id="@+id/horizontal_buttons_storage_status_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
@@ -51,7 +51,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/horizontal_storage_almost_full_button_dissmiss"
+                    android:id="@+id/horizontal_storage_status_button_dissmiss"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"
@@ -62,7 +62,7 @@
                     android:stateListAnimator="@null"/>
 
                 <Button
-                    android:id="@+id/horizontal_storage_almost_full_button_payment"
+                    android:id="@+id/horizontal_storage_status_button_payment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"
@@ -76,7 +76,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/vertical_buttons_storage_almost_full_layout"
+                android:id="@+id/vertical_buttons_storage_status_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
@@ -87,7 +87,7 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/vertical_storage_almost_full_button_action"
+                    android:id="@+id/vertical_storage_status_button_action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"
@@ -97,7 +97,7 @@
                     android:stateListAnimator="@null"/>
 
                 <Button
-                    android:id="@+id/vertical_storage_almost_full_button_achievements"
+                    android:id="@+id/vertical_storage_status_button_achievements"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"
@@ -109,7 +109,7 @@
                     android:stateListAnimator="@null"/>
 
                 <Button
-                    android:id="@+id/vertical_storage_almost_full_button_dissmiss"
+                    android:id="@+id/vertical_storage_status_button_dissmiss"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/accentColor"

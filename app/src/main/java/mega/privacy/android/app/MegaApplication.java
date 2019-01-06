@@ -1297,8 +1297,58 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
+		log("onEvent: " + event.getText());
+
+		if (event.getType() == MegaEvent.EVENT_STORAGE) {
+			log("Storage status changed");
+			int state = event.getNumber();
+			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
+				api.getAccountDetails(null);
+			}
+			else {
+				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+				intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+				intent.putExtra("state", state);
+				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+			}
+		}
+	}
+
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 
 	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+		if(config.isPending()==false){
+			log("****Launch local broadcast");
+			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		}
+	}
+
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+	}
+
+	@Override
+	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+	}
+
 
 
 	@Override

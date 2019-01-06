@@ -967,6 +967,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
 
+			setContacts(megaApi.getContacts());
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -979,7 +980,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			recyclerView.setAdapter(adapter);
-						
+
 			if (adapter.getItemCount() == 0){
 
                 recyclerView.setVisibility(View.GONE);

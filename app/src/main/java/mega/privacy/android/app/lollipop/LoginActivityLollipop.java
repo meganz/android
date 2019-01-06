@@ -61,7 +61,6 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
 
-
 public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
     float scaleH, scaleW;
@@ -515,7 +514,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         Intent intent = null;
         if (firstTimeCam) {
             intent = new Intent(this, ManagerActivityLollipop.class);
-            intent.putExtra("firstTimeCam", true);
+            intent.putExtra("firstLogin", true);
             startActivity(intent);
             finish();
         } else {

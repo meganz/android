@@ -134,6 +134,8 @@ public class Constants {
 
 	public static final int WRITE_LOG = 13;
 
+	public static final int WRITE_LOG = 10;
+
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
@@ -196,6 +198,8 @@ public class Constants {
 	public static String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
 	public static String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
 
+	public static String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
+
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
@@ -221,7 +225,6 @@ public class Constants {
 	final public static int INCOMING_REQUEST_ADAPTER = 2012;
 	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	final public static int CAMERA_UPLOAD_ADAPTER = 2014;
-	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
