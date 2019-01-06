@@ -134,8 +134,6 @@ public class Constants {
 
 	public static final int WRITE_LOG = 13;
 
-	public static final int WRITE_LOG = 10;
-
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;

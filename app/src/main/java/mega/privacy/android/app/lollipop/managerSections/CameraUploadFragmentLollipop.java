@@ -1436,7 +1436,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@SuppressLint("NewApi")
 	public void cameraOnOffFirstTime(){
-		((ManagerActivityLollipop) context).setFirstTimeCam(false);
+		((ManagerActivityLollipop) context).setFirstLogin(false);
 //		firstTimeCam = false;
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setCamSyncEnabled(true);

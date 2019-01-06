@@ -161,6 +161,36 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		intent.putExtra("actionType", Constants.GO_OFFLINE);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
+    
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api,MegaChatListItem item) {
+    
+    }
+    
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api,int newState) {
+    
+    }
+    
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api,long userhandle,int status,boolean inProgress) {
+    
+    }
+    
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api,MegaChatPresenceConfig config) {
+    
+    }
+    
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api,long chatid,int newState) {
+    
+    }
+    
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api,long userhandle,int lastGreen) {
+    
+    }
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -1313,78 +1343,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			}
 		}
 	}
-
-
-	@Override
-	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-	}
-
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-	}
-
-	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-	}
-
-	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		if(config.isPending()==false){
-			log("****Launch local broadcast");
-			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
-			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-		}
-	}
-
-	@Override
-	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-	}
-
-	@Override
-	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-	}
-
-
-
-	@Override
-	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-	}
-
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-	}
-
-	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-	}
-
-	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		if(config.isPending()==false){
-			log("****Launch local broadcast");
-			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
-			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-		}
-	}
-
-	@Override
-	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-	}
-
-	@Override
-	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-	}
-
 
 	public void updateAppBadge(){
 		log("updateAppBadge");

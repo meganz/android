@@ -2217,6 +2217,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			cameraUploadCategory.removePreference(localSecondaryFolder);
 			cameraUploadCategory.removePreference(megaSecondaryFolder);
 		}
+		return true;
 	}
 
 	/**
