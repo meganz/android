@@ -135,6 +135,7 @@ import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -757,6 +758,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	};
+	
+	private BroadcastReceiver cameraUploadLauncherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            try {
+                log("cameraUploadLauncherReceiver: start service here");
+                if (!CameraUploadsService.isServiceRunning) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        log("cameraUploadLauncherReceiver: starting on Oreo or above: ");
+                        Intent newIntent = new Intent(getApplicationContext(),CameraUploadsService.class);
+                        startForegroundService(newIntent);
+                    } else {
+                        log("cameraUploadLauncherReceiver: below Oreo doing nothing ");
+                    }
+                } else {
+                    log("cameraUploadLauncherReceiver: camera upload service has been started");
+                }
+            } catch (Exception e) {
+                log("cameraUploadLauncherReceiver: Exception: " + e.getMessage() + "_" + e.getStackTrace());
+            }
+        }
+    };
 
 	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
 		@Override
@@ -1802,8 +1825,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 		}
-
-		nC = new NodeController(this);
+        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+        
+        
+        nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 
@@ -4249,6 +4274,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+		unregisterReceiver(cameraUploadLauncherReceiver);
 
     	super.onDestroy();
 	}

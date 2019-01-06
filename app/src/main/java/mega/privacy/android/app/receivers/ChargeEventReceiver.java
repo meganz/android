@@ -1,39 +1,37 @@
 package mega.privacy.android.app.receivers;
 
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.utils.Util;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
+import android.os.Build;
 
-import static mega.privacy.android.app.utils.JobUtil.startJob;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
+import mega.privacy.android.app.utils.Util;
 
 
 public class ChargeEventReceiver extends BroadcastReceiver {
 	
-	Handler handler = new Handler();
-	
 	public ChargeEventReceiver() {}
 
 	@Override
-	public void onReceive(Context context, Intent intent){
+	public void onReceive(final Context context,Intent intent){
 	    
 		log("ChargeEventReceiver");
-		final Context c = context;
-		
-		handler.postDelayed(new Runnable() {
-			
-			@Override
-			public void run() {
-				log("Now I start the service");
-				if (Util.isDeviceSupportParallelUpload()) {
-                    startJob(c);
+        try {
+            if (!CameraUploadsService.isServiceRunning) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    log("ChargeEventReceiver: starting on below Oreo: ");
+                    Intent newIntent = new Intent(context,CameraUploadsService.class);
+                    context.startService(newIntent);
                 } else {
-                    c.startService(new Intent(c, CameraSyncService.class));
+                    log("ChargeEventReceiver: above Oreo do nothing ");
                 }
-			}
-		}, 5 * 1000);
+            } else {
+                log("ChargeEventReceiver: camera upload service has been started");
+            }
+        } catch (Exception e) {
+            log("ChargeEventReceiver: Exception: " + e.getMessage() + "_" + e.getStackTrace());
+        }
 	}
 	
 	public static void log(String message) {
