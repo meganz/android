@@ -440,15 +440,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
+            android:minHeight="56dp"
             android:layout_marginLeft="72dp"
             android:layout_marginRight="10dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_location"
