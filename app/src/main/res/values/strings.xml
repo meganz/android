@@ -2572,6 +2572,8 @@
 	        context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">
 		Last seen today %1$s
 	</string>
+	<string name="label_today" context="label today">Today</string>
+	<string name="label_yesterday" context="label yesterday">Yesterday</string>
 	<string name="last_seen_long_time_ago"
 	        context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">
 		Last seen a long time ago
