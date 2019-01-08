@@ -2282,5 +2282,6 @@
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is protected. Enter the document opening password.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Wrong password. Try again.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
-
+    
+    <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 </resources>
