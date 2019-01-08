@@ -1132,7 +1132,7 @@ public class Util {
 			TimeZone tz = TimeZone.getDefault();
 			calendar.setTimeInMillis(timestamp * 1000L);
 			calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
 			Date currenTimeZone = (Date) calendar.getTime();
 			dateTime = sdf.format(currenTimeZone);
 

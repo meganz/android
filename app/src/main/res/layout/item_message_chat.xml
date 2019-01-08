@@ -740,29 +740,26 @@
                     android:layout_height="56dp"
                     android:background="@drawable/dark_rounded_chat_own_message"
                     android:layout_marginRight="16dp"
-                    android:gravity="right"
-                    android:layout_alignParentRight="true"
-                    android:paddingRight="12dp"
-                    android:paddingLeft="7dp">
+                    android:layout_alignParentRight="true">
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
                         android:orientation="horizontal">
 
                         <ImageView
                             android:id="@+id/content_own_message_voice_clip_play_pause"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_play_grey"
-                            android:background="@null"
                             android:layout_gravity="center_vertical"
-                            android:layout_alignParentLeft="true"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
                             android:visibility="gone"/>
 
                         <SeekBar
                             android:id="@+id/content_own_message_voice_clip_seekBar"
-                            android:layout_width="142dp"
+                            android:layout_width="145dp"
                             android:layout_height="wrap_content"
                             android:theme="@style/MySeekBar"
                             android:thumbTint="@color/white"
@@ -782,7 +779,6 @@
                             android:textAlignment="center"
                             android:background="@null"
                             android:textColor="@android:color/white"
-                            android:layout_alignParentRight="true"
                             android:layout_gravity="center_vertical"
                             android:textSize="13sp"/>
                     </LinearLayout>
@@ -1482,6 +1478,55 @@
                     </RelativeLayout>
                 </RelativeLayout>
                 <!--End RelativeLayout file-->
+
+                <!--Received a voice clip-->
+                <RelativeLayout
+                    android:id="@+id/content_contact_message_voice_clip_layout"
+                    android:layout_width="230dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/rounded_text_view_chat_contact_message"
+                    android:gravity="left"
+                    android:layout_alignParentLeft="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:id="@+id/content_contact_message_voice_clip_play_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
+                            android:visibility="gone"/>
+                        <SeekBar
+                            android:id="@+id/content_contact_message_voice_clip_seekBar"
+                            android:layout_width="145dp"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/MySeekBar"
+                            android:thumbTint="@color/accentColor"
+                            android:max="200"
+                            android:progress="0"
+                            android:background="@null"
+                            android:layout_gravity="center_vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                        <TextView
+                            android:id="@+id/content_contact_message_voice_clip_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textAlignment="center"
+                            android:background="@null"
+                            android:textColor="@android:color/black"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                </RelativeLayout>
 
                 <!-- Received a contact-->
                 <RelativeLayout
