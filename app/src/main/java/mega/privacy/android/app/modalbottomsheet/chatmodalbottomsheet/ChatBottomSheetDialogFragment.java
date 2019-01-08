@@ -311,6 +311,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             archiveChatText.setText(getString(R.string.unarchive_chat_option));
             archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
             optionInfoChat.setVisibility(View.GONE);
+            separatorInfo.setVisibility(View.GONE);
             optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.GONE);
             optionClearHistory.setVisibility(View.GONE);

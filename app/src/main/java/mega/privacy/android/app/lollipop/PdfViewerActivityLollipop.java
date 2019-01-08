@@ -158,6 +158,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     DefaultScrollHandle defaultScrollHandle;
 
     Uri uri;
+    String password;
+    int maxIntents = 3;
     String pdfFileName;
     boolean inside = false;
     long handle = -1;
@@ -255,6 +257,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             renamed = savedInstanceState.getBoolean("renamed");
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
             toolbarVisible = savedInstanceState.getBoolean("toolbarVisible", toolbarVisible);
+            password = savedInstanceState.getString("password");
+            maxIntents = savedInstanceState.getInt("maxIntents", 3);
         }
         else {
             currentPage = 1;
@@ -918,6 +922,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putBoolean("renamed", renamed);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
         outState.putBoolean("toolbarVisible", toolbarVisible);
+        outState.putString("password", password);
+        outState.putInt("maxIntents", maxIntents);
     }
 
     @Override
@@ -993,6 +999,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         .scrollHandle(defaultScrollHandle)
                         .spacing(10) // in dp
                         .onPageError(PdfViewerActivityLollipop.this)
+                        .password(password)
                         .load();
             } catch (Exception e) {
 
@@ -1004,7 +1011,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    private void loadStreamPDF() {
+    public void reloadPDFwithPassword (String password) {
+        this.password = password;
+        maxIntents--;
+        if (isUrl) {
+            loadStreamPDF();
+        }
+        else {
+            loadLocalPDF();
+        }
+    }
+
+    public void loadStreamPDF() {
         log("loadStreamPDF loading: "+loading);
         new LoadPDFStream().execute(uri.toString());
     }
@@ -1022,6 +1040,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     .scrollHandle(defaultScrollHandle)
                     .spacing(10) // in dp
                     .onPageError(this)
+                    .password(password)
                     .load();
         } catch (Exception e) {
 
@@ -2496,6 +2515,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
+    public String getPdfFileName () {
+        return pdfFileName;
+    }
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
@@ -2928,14 +2950,16 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-            log("API_EOVERQUOTA error!!");
+            if (e.getValue() != 0) {
+                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 
-            if(alertDialogTransferOverquota==null){
-                showTransferOverquotaDialog();
-            }
-            else {
-                if (!(alertDialogTransferOverquota.isShowing())) {
+                if(alertDialogTransferOverquota==null){
                     showTransferOverquotaDialog();
+                }
+                else {
+                    if (!(alertDialogTransferOverquota.isShowing())) {
+                        showTransferOverquotaDialog();
+                    }
                 }
             }
         }
@@ -3146,7 +3170,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         downloadConfirmationDialog.show();
     }
 
+    public Uri getUri() {
+        return uri;
+    }
+
+    public String getPassword () {
+        return password;
+    }
+
     public void setSendToChat (boolean sendToChat) {
         this.sendToChat = sendToChat;
+    }
+
+    public int getMaxIntents() {
+        return maxIntents;
     }
 }

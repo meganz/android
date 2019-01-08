@@ -80,7 +80,7 @@
                             android:layout_alignParentTop="true"
                             android:visibility="gone"/>
                     </RelativeLayout>
-                    <TextView
+                    <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -88,8 +88,7 @@
                         android:textSize="12sp"
                         android:visibility="gone"
                         android:singleLine="true"
-                        android:maxLines="1"
-                        android:ellipsize="end"
+                        android:ellipsize="none"
                         android:layout_marginRight="0dp"/>
                 </LinearLayout>
 
