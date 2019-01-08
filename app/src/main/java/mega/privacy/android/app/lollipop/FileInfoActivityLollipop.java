@@ -14,6 +14,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -178,6 +179,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	RelativeLayout sharedLayout;
 	Button usersSharedWithTextButton;
 	View dividerSharedLayout;
+	View dividerLinkLayout;
 
     RelativeLayout folderVersionsLayout;
     RelativeLayout folderCurrentVersionsLayout;
@@ -547,8 +549,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         aB = getSupportActionBar();
+
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
-        collapsingToolbar.setMaxLines(3);
 
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_layout);
         nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
@@ -563,12 +565,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             }
         });
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
-        }else{
-            collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
-        }
-        collapsingToolbar.setExpandedTitleMarginStart(Util.px2dp(72, outMetrics));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         aB.setHomeButtonEnabled(true);
@@ -578,6 +574,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
         iconToolbarView.setImageResource(imageId);
+        CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
+        Rect rect = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+        params.setMargins(Util.px2dp(16, outMetrics), Util.px2dp(107, outMetrics) + rect.top, 0, Util.px2dp(14, outMetrics));
+        iconToolbarLayout.setLayoutParams(params);
 
         imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
         imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
@@ -661,6 +662,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
         contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
 
+        dividerLinkLayout = (View) findViewById(R.id.divider_link_layout);
         publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
         publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
 
@@ -687,6 +689,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             availableOfflineLayout.setVisibility(View.GONE);
             sharedLayout.setVisibility(View.GONE);
             dividerSharedLayout.setVisibility(View.GONE);
+            dividerLinkLayout.setVisibility(View.GONE);
             publicLinkLayout.setVisibility(View.GONE);
             publicLinkCopyLayout.setVisibility(View.GONE);
             contentLayout.setVisibility(View.GONE);
@@ -1064,59 +1067,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
                         @Override
                         public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-                            if (offset < -200) {
-                                upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-                                drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                toolbar.setOverflowIcon(drawableDots);
-
-                                if (removeLinkMenuItem != null) {
-                                    drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                    removeLinkMenuItem.setIcon(drawableRemoveLink);
+                            if (offset == 0) {
+                                // Expanded
+                                setColorFilterWhite();
+                            }
+                            else {
+                                if (offset<0 && Math.abs(offset)>=appBarLayout.getTotalScrollRange()/2) {
+                                    // Collapsed
+                                    setColorFilterBlack();
                                 }
-                                if (getLinkMenuItem != null) {
-                                    drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                    getLinkMenuItem.setIcon(drawableLink);
-                                }
-                                if (downloadMenuItem != null) {
-                                    drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                    downloadMenuItem.setIcon(drawableDownload);
-                                }
-                                if (shareMenuItem != null) {
-                                    drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                    shareMenuItem.setIcon(drawableShare);
-                                }
-                                if (leaveMenuItem != null) {
-                                    drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                                    leaveMenuItem.setIcon(drawableLeave);
-                                }
-                            } else {
-                                upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-                                drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                toolbar.setOverflowIcon(drawableDots);
-
-                                if (removeLinkMenuItem != null) {
-                                    drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                    removeLinkMenuItem.setIcon(drawableRemoveLink);
-                                }
-                                if (getLinkMenuItem != null) {
-                                    drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                    getLinkMenuItem.setIcon(drawableLink);
-                                }
-                                if (downloadMenuItem != null) {
-                                    drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                    downloadMenuItem.setIcon(drawableDownload);
-                                }
-                                if (shareMenuItem != null) {
-                                    drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                    shareMenuItem.setIcon(drawableShare);
-                                }
-                                if (leaveMenuItem != null) {
-                                    drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
-                                    leaveMenuItem.setIcon(drawableLeave);
+                                else {
+                                   setColorFilterWhite();
                                 }
                             }
                         }
@@ -1128,38 +1089,71 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
 			/*Folder*/
                 else {
-                    upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                    getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-                    drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                    toolbar.setOverflowIcon(drawableDots);
-
-                    if (removeLinkMenuItem != null) {
-                        drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                        removeLinkMenuItem.setIcon(drawableRemoveLink);
-                    }
-                    if (getLinkMenuItem != null) {
-                        drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                        getLinkMenuItem.setIcon(drawableLink);
-                    }
-                    if (downloadMenuItem != null) {
-                        drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                        downloadMenuItem.setIcon(drawableDownload);
-                    }
-                    if (shareMenuItem != null) {
-                        drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                        shareMenuItem.setIcon(drawableShare);
-                    }
-                    if (leaveMenuItem != null) {
-                        drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
-                        leaveMenuItem.setIcon(drawableLeave);
-                    }
+                   setColorFilterBlack();
                 }
             }
         }
 
 		return super.onCreateOptionsMenu(menu);
 	}
+
+	void setColorFilterBlack () {
+        upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+        drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+        toolbar.setOverflowIcon(drawableDots);
+
+        if (removeLinkMenuItem != null) {
+            drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            removeLinkMenuItem.setIcon(drawableRemoveLink);
+        }
+        if (getLinkMenuItem != null) {
+            drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            getLinkMenuItem.setIcon(drawableLink);
+        }
+        if (downloadMenuItem != null) {
+            drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            downloadMenuItem.setIcon(drawableDownload);
+        }
+        if (shareMenuItem != null) {
+            drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            shareMenuItem.setIcon(drawableShare);
+        }
+        if (leaveMenuItem != null) {
+            drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            leaveMenuItem.setIcon(drawableLeave);
+        }
+    }
+
+    void setColorFilterWhite () {
+        upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+        drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+        toolbar.setOverflowIcon(drawableDots);
+
+        if (removeLinkMenuItem != null) {
+            drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            removeLinkMenuItem.setIcon(drawableRemoveLink);
+        }
+        if (getLinkMenuItem != null) {
+            drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getLinkMenuItem.setIcon(drawableLink);
+        }
+        if (downloadMenuItem != null) {
+            drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            downloadMenuItem.setIcon(drawableDownload);
+        }
+        if (shareMenuItem != null) {
+            drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            shareMenuItem.setIcon(drawableShare);
+        }
+        if (leaveMenuItem != null) {
+            drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            leaveMenuItem.setIcon(drawableLeave);
+        }
+    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -1349,12 +1343,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		if(node.isExported()){
 			publicLink=true;
+            dividerLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkCopyLayout.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
 		}
 		else{
 			publicLink=false;
+            dividerLinkLayout.setVisibility(View.GONE);
 			publicLinkLayout.setVisibility(View.GONE);
 			publicLinkCopyLayout.setVisibility(View.GONE);
 		}
@@ -2900,6 +2896,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		if(node.isExported()){
 			log("Node HAS public link");
 			publicLink=true;
+            dividerLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkLayout.setVisibility(View.VISIBLE);
 			publicLinkCopyLayout.setVisibility(View.VISIBLE);
 			publicLinkText.setText(node.getPublicLink());
@@ -2909,6 +2906,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}else{
 			log("Node NOT public link");
 			publicLink=false;
+            dividerLinkLayout.setVisibility(View.GONE);
 			publicLinkLayout.setVisibility(View.GONE);
 			publicLinkCopyLayout.setVisibility(View.GONE);
 			supportInvalidateOptionsMenu();
