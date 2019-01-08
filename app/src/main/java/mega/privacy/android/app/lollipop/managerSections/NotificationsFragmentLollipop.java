@@ -257,7 +257,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:
             {
                 MegaUser contact = megaApi.getContact(notif.getEmail());
-                if(contact!=null){
+                if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     log("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                     intent.putExtra("name", notif.getEmail());
@@ -281,7 +281,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             }
             case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:{
                 MegaUser contact = megaApi.getContact(notif.getEmail());
-                if(contact!=null){
+                if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     log("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                     intent.putExtra("name", notif.getEmail());
