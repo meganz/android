@@ -195,6 +195,14 @@ public class ChatController {
                 megaChatApi.archiveChat(chat.getChatId(), true, (GroupChatInfoActivityLollipop) context);
             }
         }
+        else if(context instanceof ChatActivityLollipop){
+            if(chat.isArchived()){
+                megaChatApi.archiveChat(chat.getChatId(), false,(ChatActivityLollipop) context);
+            }
+            else{
+                megaChatApi.archiveChat(chat.getChatId(), true, (ChatActivityLollipop) context);
+            }
+        }
     }
 
     public void archiveChats(ArrayList<MegaChatListItem> chats){
@@ -695,7 +703,12 @@ public class ChatController {
                     }else{
                        return "";
                     }
-                } else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
+                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";
                     switch(message.getTermCode()){
                         case MegaChatMessage.END_CALL_REASON_ENDED:{
@@ -879,6 +892,10 @@ public class ChatController {
                     }else{
                         return "";
                     }
+                }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
+                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    builder.append(textToShow);
+                    return builder.toString();
                 }
                 else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";
