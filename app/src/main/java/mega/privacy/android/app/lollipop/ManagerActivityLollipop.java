@@ -338,7 +338,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
 
-	private int storageState = MegaApiJava.STORAGE_STATE_GREEN;
+	private int storageState = -1; //Default value (-1) indicates that is not initialized
 	private boolean isStorageStatusDialogShown = false;
 
     int orientationSaved;
@@ -2910,7 +2910,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}
 
-			checkStorageStatus(true);
+			checkCurrentStorageStatus(true);
 
 	        //INITIAL FRAGMENT
 			if(selectDrawerItemPending){
@@ -4678,7 +4678,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					}		updateAccountDetailsVisibleInfo();
 
 					updateAccountDetailsVisibleInfo();
-					checkStorageStatus(false);
+					checkCurrentStorageStatus(false);
 				} else {
 					log("showOnlineMode - Root is NULL");
 					if (getApplicationContext() != null) {
@@ -14586,8 +14586,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * Check the current storage state.
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
-	private void checkStorageStatus(boolean onCreate) {
-		checkStorageStatus(storageState, onCreate);
+	private void checkCurrentStorageStatus(boolean onCreate) {
+		// If the current storage state is not initialized (-1) is because the app received the
+		// event informing about the storage state  during login, the ManagerActivityLollipop
+		// wasn't active and for this reason the value is stored in the MegaApplication object.
+		int storageStateToCheck = (storageState != -1) ? storageState :
+				((MegaApplication)getApplication()).getStorageState();
+
+		checkStorageStatus(storageStateToCheck, onCreate);
 	}
 
 	/**
@@ -14596,6 +14602,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
+
 		switch (newStorageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
 				log("STORAGE STATE GREEN");
@@ -14607,7 +14614,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						showProPanel();
 					}
 				}
-				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
@@ -14618,7 +14624,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				} else if (newStorageState > storageState) {
 					showStorageAlmostFullDialog();
 				}
-				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
@@ -14629,9 +14634,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				} else if (newStorageState > storageState) {
 					showStorageFullDialog();
 				}
-				storageState = newStorageState;
 				break;
+
+			default:
+				return;
 		}
+
+		storageState = newStorageState;
 	}
 
 	/**
