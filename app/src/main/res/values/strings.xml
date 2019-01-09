@@ -29,416 +29,297 @@
     <!-- This string is commented in FileStorageActivityLollipop.java
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     -->
-	<string name="general_download"
-	        context="Item menu option upon right click on one or multiple files.">Download
-	</string>
-	<string name="general_add" context="button">Add</string>
-	<string name="general_move" context="button">Move</string>
-	<string name="general_remove" context="button">Remove</string>
-	<string name="general_share" context="button">Share</string>
-	<string name="general_leave" context="button">Leave</string>
-	<string name="general_decryp" context="button">Decrypt</string>
-	<string name="general_export" context="button">Export</string>
-	<string name="general_retry" context="Button to try retry some action">Retry</string>
-	<string name="general_open_browser" context="Button to open the default web browser">Open
-		browser
-	</string>
-	<string name="general_loading" context="state previous to import a file">Loading</string>
-	<string name="general_importing" context="state while importing the file">Importing</string>
-	<string name="general_forwarding" context="state while importing the file">Forwarding</string>
-	<string name="general_import"
-	        context="Import button. When the user clicks this button the file will be imported to his account.">
-		Import
-	</string>
-	<string name="general_storage"
-	        context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">
-		Storage
-	</string>
-	<string name="general_bandwidth"
-	        context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">
-		Transfer Quota
-	</string>
-	<string name="general_subscribe"
-	        context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">
-		Subscribe
-	</string>
-	<string name="general_error_word" context="It will be followed by the error message">Error
-	</string>
-	<string name="general_not_yet_implemented"
-	        context="when clicking into a menu whose functionality is not yet implemented">Not yet
-		implemented
-	</string>
-	<string name="error_no_selection" context="when any file or folder is selected">No file or
-		folder selected
-	</string>
-	<string name="general_already_downloaded"
-	        context="when trying to download a file that is already downloaded in the device">
-		Already downloaded
-	</string>
-	<string name="general_already_uploaded"
-	        context="when trying to upload a file that is already uploaded in the folder">already
-		uploaded
-	</string>
-	<string name="general_file_info"
-	        context="Label of the option menu. When clicking this button, the app shows the info of the file">
-		File info
-	</string>
-	<string name="general_folder_info"
-	        context="Label of the option menu. When clicking this button, the app shows the info of the folder">
-		Folder info
-	</string>
-	<string name="general_show_info"
-	        context="Label of a button/notification to show info about something">Show info
-	</string>
-	<string name="error_general_nodes" context="Error getting the root node">Error. Please, try
-		again.
-	</string>
-	<string name="secondary_media_service_error_local_folder"
-	        context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">
-		The secondary media folder does not exist, please choose a new folder
-	</string>
-	<string name="no_external_SD_card_detected" context="when no external card exists">No external
-		storage detected
-	</string>
-	<string name="no_permissions_upload"
-	        context="On clicking menu item upload in a incoming shared folder read only">This folder
-		is read only. You do not have permission to upload
-	</string>
-	<string name="remove_key_confirmation"
-	        context="confirmation message before removing the previously downloaded MasterKey file">
-		You are removing the previously exported Recovery Key file
-	</string>
-	<string name="confirmation_add_contact"
-	        context="confirmation message before sending an invitation to a contact">Do you want to
-		send an invitation to %s?
-	</string>
-	<string name="action_logout" context="Button where the user can sign off or logout">Logout
-	</string>
-	<string name="action_add" context="Menu item">Upload</string>
-	<string name="action_create_folder" context="Menu item">Create new folder</string>
-	<string name="action_open_link" context="Menu item">Open link</string>
-	<string name="action_settings" context="Menu item">Settings</string>
-	<string name="action_search" context="Search button">Search</string>
-	<string name="action_play" context="Search button">Play</string>
-	<string name="action_pause" context="Search button">Pause</string>
-	<string name="action_refresh" context="Menu item">Refresh</string>
-	<string name="action_sort_by" context="Menu item">Sort by</string>
-	<string name="action_help" context="Menu item">Help</string>
-	<string name="action_upgrade_account" context="Change from a free account to paying MEGA">
-		Upgrade account
-	</string>
-	<string name="upgrading_account_message"
-	        context="Message while proceeding to upgrade the account">Upgrading account
-	</string>
-	<string name="action_select_all" context="Menu item to select all the elements of a list">Select
-		all
-	</string>
-	<string name="action_unselect_all" context="Menu item to unselect all the elements of a list">
-		Clear selection
-	</string>
-	<string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail
-		view
-	</string>
-	<string name="action_list" context="Menu item to change from grid view to list view">List view
-	</string>
-	<string name="action_export_master_key"
-	        context="Menu item to let the user export the MasterKey">Backup Recovery Key
-	</string>
-	<string name="action_remove_master_key"
-	        context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove
-		Recovery Key
-	</string>
-	<string name="action_cancel_subscriptions"
-	        context="Menu item to let the user cancel subscriptions">Cancel subscription
-	</string>
-	<string name="toast_master_key_removed"
-	        context="success message when the MasterKey file has been removed">The Recovery Key file
-		has been removed
-	</string>
-	<string name="cancel_subscription_ok"
-	        context="success message when the subscription has been canceled correctly">The
-		subscription has been cancelled
-	</string>
-	<string name="cancel_subscription_error"
-	        context="error message when the subscription has not been canceled successfully">We were
-		unable to cancel your subscription. Please contact support&#64;mega.nz for assistance
-	</string>
-	<string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close
-		other sessions
-	</string>
-	<string name="success_kill_all_sessions" context="Message after kill all opened sessions">The
-		remaining sessions have been closed
-	</string>
-	<string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error
-		when closing the opened sessions
-	</string>
-	<plurals name="general_num_files"
-	         context="this is used for example when downloading 1 file or 2 files">
-		<item context="Singular of file. 1 file" quantity="one">file</item>
-		<item context="Plural of file. 2 files" quantity="other">files</item>
-	</plurals>
-	<plurals name="general_num_contacts">
-		<item context="referring to a contact in the contact list of the user" quantity="one">
-			contact
-		</item>
-		<item context="Title of the contact list" quantity="other">contacts</item>
-	</plurals>
-	<plurals name="general_num_folders">
-		<item context="Singular of folder/directory. 1 folder" quantity="one">folder</item>
-		<item context="Plural of folder/directory. 2 folders" quantity="other">folders</item>
-	</plurals>
-	<plurals name="general_num_shared_folders">
-		<item context="Title of the incoming shared folders of a user in singular" quantity="one">
-			shared folder
-		</item>
-		<item context="Title of the incoming shared folders of a user in plural." quantity="other">
-			shared folders
-		</item>
-	</plurals>
-	<plurals name="general_num_users"
-	         context="used for example when a folder is shared with 1 user or 2 users">
-		<item context="used for example when a folder is shared with 1 user" quantity="one">
-			contact
-		</item>
-		<item context="used for example when a folder is shared with 2 or more users"
-		      quantity="other">contacts
-		</item>
-	</plurals>
-	<string name="alert_larger_file"
-	        context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">
-		%s will be downloaded.
-	</string>
-	<string name="alert_no_app" context="Alert text before download">There is no app to open the
-		file %s. Do you want to continue with the download?
-	</string>
-	<string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show
-		again
-	</string>
-	<string name="login_text" context="Login button">Login</string>
-	<string name="email_text" context="email label">Email</string>
-	<string name="password_text" context="password label">Password</string>
-	<string name="confirm_password_text"
-	        context="label shown in the confirmation of the password when creating an account">
-		Confirm password
-	</string>
-	<string name="abc"
-	        context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">
-		ABC
-	</string>
-	<string name="new_to_mega"
-	        context="This question applies to users that do not have an account on MEGA yet">New to
-		MEGA?
-	</string>
-	<string name="create_account" context="label and text button when creating the account">Create
-		account
-	</string>
-	<string name="error_enter_email"
-	        context="when the user tries to log in MEGA without typing the email">Please enter your
-		email address
-	</string>
-	<string name="error_invalid_email"
-	        context="error when logging in to MEGA with an invalid email">Invalid email address
-	</string>
-	<string name="error_enter_password"
-	        context="when the user tries to log in MEGA without typing the password">Please enter
-		your password
-	</string>
-	<string name="error_server_connection_problem"
-	        context="when the user tries to log in to MEGA without a network connection">No network
-		connection
-	</string>
-	<string name="error_server_expired_session"
-	        context="when the user tries to log in to MEGA without a valid session">You have been
-		logged out on this device from another location
-	</string>
-	<string name="login_generating_key"
-	        context="the first step when logging in is calculate the private and public encryption keys">
-		Calculating encryption keys
-	</string>
-	<string name="login_connecting_to_server"
-	        context="Message displayed while the app is connecting to a MEGA server">Connecting to
-		the server
-	</string>
-	<string name="download_updating_filelist" context="Status text when updating the file manager">
-		Updating file list
-	</string>
-	<string name="login_confirm_account"
-	        context="title of the screen after creating an account when the user has to confirm the password to confirm the account">
-		Confirm account
-	</string>
-	<string name="login_querying_signup_link"
-	        context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">
-		Checking validation link
-	</string>
-	<string name="login_confirming_account"
-	        context="Attempting to activate a MEGA account for a user.">Activating account
-	</string>
-	<string name="login_preparing_filelist"
-	        context="After login, updating the file list, the file list should be processed before showing it to the user">
-		Preparing file list
-	</string>
-	<string name="login_before_share"
-	        context="when the user tries to share something to MEGA without being logged">Please log
-		in to share with MEGA
-	</string>
-	<string name="tour_space_title">MEGA Space</string>
-	<string name="tour_speed_title">MEGA Speed</string>
-	<string name="tour_privacy_title">MEGA Privacy</string>
-	<string name="tour_access_title">MEGA Access</string>
-	<string name="tour_space_text">Register now and get 50 GB* of free space</string>
-	<string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
-	<string name="tour_privacy_text">Keep all your files safe with MEGA’s end-to-end encryption
-	</string>
-	<string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
-	<string name="create_account_text" context="button that allows the user to create an account">
-		Create account
-	</string>
-	<string name="name_text" context="Name of the user">Name</string>
-	<string name="lastname_text" context="Last name of the user">Last Name</string>
-	<string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">
-		I agree with MEGA’s [A]Terms of Service[/A]
-	</string>
-	<string name="already_account" context="Does the user already have a MEGA account">Already have
-		an account?
-	</string>
-	<string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of
-		Service
-	</string>
-	<string name="error_enter_username" context="Warning dialog">Please enter your name</string>
-	<string name="error_enter_userlastname" context="Warning dialog">Please enter your last name.
-	</string>
-	<string name="error_short_password" context="when creating the account">Password is too short
-	</string>
-	<string name="error_passwords_dont_match" context="when creating the account">Passwords do not
-		match
-	</string>
-	<string name="error_email_registered" contect="when creating the account">This email address has
-		already registered an account with MEGA
-	</string>
-	<string name="create_account_creating_account">Connecting to the server: Creating account
-	</string>
-	<string name="cancel_transfer_confirmation">Delete this transfer?</string>
-	<string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
-	<string name="section_cloud_drive"
-	        context="The name of every users root drive in the cloud of MEGA.">
-		Cloud drive
-	</string>
-	<string name="section_secondary_media_uploads"
-	        context="title of the screen where the secondary media images are uploaded">Media
-		uploads
-	</string>
-	<string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
-	<string name="section_saved_for_offline"
-	        context="title of the screen that shows the files saved for offline in the device">Saved
-		for Offline
-	</string>
-	<string name="section_saved_for_offline_new"
-	        context="title of the screen that shows the files saved for offline in the device">
-		Offline
-	</string>
-	<string name="section_shared_items"
-	        context="title of the screen that shows all the shared items">Shared folders
-	</string>
-	<string name="section_rubbish_bin"
-	        context="The title of the trash bin in the tree of the file manager.">Rubbish bin
-	</string>
-	<string name="section_contacts" context="Title of the contact list">Contacts</string>
-	<string name="section_contacts_with_notification"
-	        context="Item of the navigation title for the contacts section when there is any pending incoming request">
-		Contacts [A](%1$d)[/A]
-	</string>
-	<string name="sent_requests_empty"
-	        context="the user has not sent any contact request to other users">No sent requests
-	</string>
-	<string name="received_requests_empty"
-	        context="the user has not received any contact request from other users">No received
-		requests
-	</string>
-	<string name="section_transfers"
-	        context="Title for the file transfer screen (with the up &amp; download)">Transfers
-	</string>
-	<string name="section_account" context="button to the settings of the user\'s account">My
-		Account
-	</string>
-	<string name="section_photo_sync"
-	        context="title of the screen where the camera images are uploaded">Camera uploads
-	</string>
-	<string name="tab_incoming_shares"
-	        context="Capital letters. Incoming shared folders. The title of a tab">INCOMING
-	</string>
-	<string name="tab_outgoing_shares"
-	        context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING
-	</string>
-	<string name="title_incoming_shares_explorer"
-	        context="Title of the file explorer in tab INCOMING">Incoming Shares
-	</string>
-	<string name="title_incoming_shares_with_explorer"
-	        context="Title of the share with file explorer">Incoming shares with
-	</string>
-	<string name="file_browser_empty_cloud_drive"
-	        context="message when there are no files in the Cloud drive">No files in your Cloud
-		Drive
-	</string>
-	<string name="file_browser_empty_folder"
-	        context="Text that indicates that a folder is currently empty">Empty Folder
-	</string>
-	<string name="choose_account_fragment" context="Title of the fragment Choose Account">CHOOSE
-		ACCOUNT
-	</string>
-	<string name="file_properties_available_offline"
-	        context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">
-		Available offline
-	</string>
-	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Size
-	</string>
-	<string name="file_properties_info_modified" context="when was the file modified">Modified
-	</string>
-	<string name="file_properties_info_added" context="when was the file added in MEGA">Created
-	</string>
-	<string name="file_properties_info_created" context="when the file was created">Created</string>
-	<string name="file_properties_shared_folder_public_link"
-	        context="the label when a folder can be accesed by public users">Public link
-	</string>
-	<string name="file_properties_shared_folder_permissions"
-	        context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">
-		Permissions
-	</string>
-	<string name="dialog_select_permissions"
-	        context="Title of the dialog to choose permissions when sharing.">Share Permissions
-	</string>
-	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change
-		permissions
-	</string>
-	<string name="file_properties_shared_folder_select_contact"
-	        context="when listing all the contacts that shares a folder">Shared with
-	</string>
-	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">
-		Send to
-	</string>
-	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">
-		Owner
-	</string>
-	<string name="contact_invite" context="positive button on dialog to invite a contact">Invite
-	</string>
-	<string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="general_add" context="button">Add</string>
+    <string name="general_move" context="button">Move</string>
+    <string name="general_remove" context="button">Remove</string>
+    <string name="general_share" context="button">Share</string>
+    <!--
+    <string name="general_confirm" context="button">Confirm</string>
+    -->
+    <string name="general_leave" context="button">Leave</string>
+    <string name="general_decryp" context="button">Decrypt</string>
+
+    <string name="general_export" context="button">Export</string>
+
+    <string name="general_retry" context="Button to try retry some action">Retry</string>
+    <string name="general_open_browser" context="Button to open the default web browser">Open browser</string>
+
+    <!--
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
+    -->
+    <string name="general_loading" context="state previous to import a file">Loading</string>
+    <string name="general_importing" context="state while importing the file">Importing</string>
+    <string name="general_forwarding" context="state while importing the file">Forwarding</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Import</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Transfer Quota</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>
+    <!--
+    <string name="general_continue" context="Text placed inside the button the user clicks when clicking into the FREE account. Meaning: Continue to the main screen">Continue</string>
+    -->
+    <string name="general_error_word" context="It will be followed by the error message">Error</string>
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
+    <string name="error_no_selection" context="when any file or folder is selected">No file or folder selected</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Already downloaded</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">already uploaded</string>
+    <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">File info</string>
+    <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
+    <!--
+    <string name="general_menu" context="Title when the left menu is opened">Menu</string>
+    -->
+    <string name="general_show_info" context="Label of a button/notification to show info about something">Show info</string>
+
+    <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
+
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder</string>
+    <string name="no_external_SD_card_detected" context="when no external card exists">No external storage detected</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You do not have permission to upload</string>
+
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are removing the previously exported Recovery Key file</string>
+    <!--
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string>
+    -->
+
+    <!--
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options</string>
+    -->
+    <string name="confirmation_add_contact" context="confirmation message before sending an invitation to a contact">Do you want to send an invitation to %s?</string>
+    <!--
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Remove these %d contacts?</string>
+
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to rubbish bin?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
+
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
+
+    <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
+    -->
+
+    <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
+    <string name="action_add" context="Menu item">Upload</string>
+    <string name="action_create_folder" context="Menu item">Create new folder</string>
+    <string name="action_open_link" context="Menu item">Open link</string>
+    <!--
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
+    -->
+
+    <string name="action_settings" context="Menu item">Settings</string>
+    <string name="action_search" context="Search button">Search</string>
+    <string name="action_play" context="Search button">Play</string>
+    <string name="action_pause" context="Search button">Pause</string>
+    <string name="action_refresh" context="Menu item">Refresh</string>
+    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_help" context="Menu item">Help</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade account</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrading account</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Select all</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Clear selection</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup Recovery Key</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove Recovery Key</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The Recovery Key file has been removed</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close other sessions</string>
+    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been closed</string>
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>
+
+    <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">file</item>
+        <item context="Plural of file. 2 files" quantity="other">files</item>
+    </plurals>
+
+    <plurals name="general_num_contacts">
+        <item context="referring to a contact in the contact list of the user" quantity="one">contact</item>
+        <item context="Title of the contact list" quantity="other">contacts</item>
+    </plurals>
+
+    <plurals name="general_num_folders">
+        <item context="Singular of folder/directory. 1 folder" quantity="one">folder</item>
+        <item context="Plural of folder/directory. 2 folders" quantity="other">folders</item>
+    </plurals>
+
+    <plurals name="general_num_shared_folders">
+        <item context="Title of the incoming shared folders of a user in singular" quantity="one">shared folder</item>
+        <item context="Title of the incoming shared folders of a user in plural." quantity="other">shared folders</item>
+    </plurals>
+
+    <!--
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item context="Item menu option upon clicking on one or multiple files. Singular" quantity="one">download</item>
+        <item context="Item menu option upon clicking on one or multiple files. Plural" quantity="other">downloads</item>
+    </plurals>
+    -->
+
+    <!--
+    <plurals name="general_num_uploads">
+        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Singular" quantity="one">upload</item>
+        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Plural" quantity="other">uploads</item>
+    </plurals>
+    -->
+
+    <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item context="used for example when a folder is shared with 1 user" quantity="one">contact</item>
+        <item context="used for example when a folder is shared with 2 or more users" quantity="other">contacts</item>
+    </plurals>
+
+    <!--
+    <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
+    -->
+    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s will be downloaded.</string>
+    <string name="alert_no_app" context="Alert text before download">There is no app to open the file %s. Do you want to continue with the download?</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show again</string>
+
+    <string name="login_text" context="Login button">Login</string>
+    <string name="email_text" context="email label">Email</string>
+    <string name="password_text" context="password label">Password</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirm password</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
+    <!--
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
+    -->
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">New to MEGA?</string>
+    <string name="create_account" context="label and text button when creating the account">Create account</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Please enter your email address</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">No network connection</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
+    <string name="download_updating_filelist" context="Status text when updating the file manager">Updating file list</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Confirm account</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Checking validation link</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
+    <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please log in to share with MEGA</string>
+    <!--
+    <string name="session_problem" context="if a link to a folder cannot be fetched">Problem of retrieving files from the folder</string>
+    -->
+
+    <string name="tour_space_title">MEGA Space</string>
+    <string name="tour_speed_title">MEGA Speed</string>
+    <string name="tour_privacy_title">MEGA Privacy</string>
+    <string name="tour_access_title">MEGA Access</string>
+    <string name="tour_space_text">Register now and get 50 GB* of free space</string>
+    <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
+    <string name="tour_privacy_text">Keep all your files safe with MEGA’s end-to-end encryption</string>
+    <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
+
+    <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
+    <string name="name_text" context="Name of the user">Name</string>
+    <string name="lastname_text" context="Last name of the user">Last Name</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA’s [A]Terms of Service[/A]</string>
+    <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
+
+    <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service</string>
+    <string name="error_enter_username" context="Warning dialog">Please enter your name</string>
+    <string name="error_enter_userlastname" context="Warning dialog">Please enter your last name.</string>
+    <string name="error_short_password" context="when creating the account">Password is too short</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Passwords do not match</string>
+    <string name="error_email_registered" contect="when creating the account">This email address has already registered an account with MEGA</string>
+
+    <!--
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
+    -->
+    <!--
+    <string name="create_account_confirm" context="">Please check your e-mail and click the link to login and confirm your account</string>
+    -->
+    <string name="create_account_creating_account">Connecting to the server: Creating account</string>
+
+    <!--<string name="cancel_transfer_title">Delete Transfer</string>
+    -->
+    <string name="cancel_transfer_confirmation">Delete this transfer?</string>
+    <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud drive</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
+    <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
+    <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">Offline</string>
+    <!--
+    <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
+    -->
+    <string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
+    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish bin</string>
+    <string name="section_contacts" context="Title of the contact list">Contacts</string>
+
+    <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacts [A](%1$d)[/A]</string>
+    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
+    <string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
+    <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
+
+    <string name="section_account" context="button to the settings of the user\'s account">My Account</string>
+    <string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera uploads</string>
+    <!--
+    <string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
+    -->
+    <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
+    <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
+
+    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
+	<string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming shares with</string>
+    <!--
+    <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
+    -->
+
+    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">No files in your Cloud Drive</string>
+    <!--
+    <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
+    -->
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
+
+    <string name="choose_account_fragment" context="Title of the fragment Choose Account">CHOOSE ACCOUNT</string>
+
+    <!--
+    <string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
+    -->
+    <string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Available offline</string>
+    <!--
+    <string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
+    -->
+    <!--
+    <string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
+    -->
+    <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size</string>
+    <string name="file_properties_info_modified" context="when was the file modified">Modified</string>
+    <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
+    <string name="file_properties_info_created" context="when the file was created">Created</string>
+    <!--
+    <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
+    -->
+    <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
+
+    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions</string>
+    <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Share Permissions</string>
+    <string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
+    <string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">Shared with</string>
+    <string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
+    <string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
+    <string name="contact_invite" context="positive button on dialog to invite a contact">Invite</string>
+    <string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>
 	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
 	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
 	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
 	<!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below</string>	
 	<!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">Add a new contact to share</string>
-
+	
 	<string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
 
 	<string name="option_link_without_key" context="Alert Dialog to get link">Link without key</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
-
+	
 	<!--
     <string name="download_failed" context="Error message">Download failed</string>
     -->
@@ -2207,412 +2088,200 @@
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 
 	<string name="contact_info_button_more" context="More button in contact info page">More</string>
-	<plurals name="plural_select_file"
-	         context="Section title to select a file to perform an action">
-		<item context="one file" quantity="one">Choose File</item>
-		<item context="more files" quantity="other">Choose Files</item>
-	</plurals>
-	<string name="title_share_folder_explorer"
-	        context="Title of shared folder explorer to choose a folder to perform an action">Choose
-		folder
-	</string>
-	<string name="login_warning_abort_transfers"
-	        context="Popup message shown if an user try to login while there is still living transfer">
-		All transfers will be cancelled, do you want to login?
-	</string>
-	<string name="logout_warning_abort_transfers"
-	        context="Popup message shown if an user try to login while there is still living transfer">
-		All transfers will be cancelled, do you want to logout?
-	</string>
-	<string name="subtitle_read_only_permissions"
-	        context="Label to explain the read only participant permission in the options panel of the group info screen">
-		Read only
-	</string>
-	<string name="used_space"
-	        context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]of
-		%2$s used[/B]
-	</string>
-	<string name="staging_api_url_title"
-	        context="title of the alert dialog when the user is changing the API URL to staging">
-		Change to a test server?
-	</string>
-	<string name="staging_api_url_text"
-	        context="text of the alert dialog when the user is changing the API URL to staging">Are
-		you sure you want to change to a test server? Your account may suffer irrecoverable problems
-	</string>
-	<string name="title_confirmation_open_camera_on_chat"
-	        context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">
-		Open camera?
-	</string>
-	<string name="confirmation_open_camera_on_chat"
-	        context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">
-		If you open the camera, your video transmission will be paused in the current call.
-	</string>
-	<string name="notification_chat_undefined_title"
-	        context="Title of the notification when there is unknown activity on the Chat">Chat
-		activity
-	</string>
-	<string name="notification_chat_undefined_content"
-	        context="Content of the notification when there is unknown activity on the Chat">You may
-		have new messages
-	</string>
-	<string name="settings_rb_scheduler_enable_title"
-	        context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">
-		Rubbish-Bin Cleaning Scheduler:
-	</string>
-	<string name="settings_rb_scheduler_enable_subtitle"
-	        context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">
-		The Rubbish Bin is cleaned for you automatically.
-	</string>
-	<string name="settings_rb_scheduler_enable_period_PRO"
-	        context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">
-		The minimum period is 7 days.
-	</string>
-	<string name="settings_rb_scheduler_enable_period_FREE"
-	        context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">
-		The minimum period is 7 days and your maximum period is 30 days.
-	</string>
-	<string name="settings_rb_scheduler_select_days_title"
-	        context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">
-		Remove files older than
-	</string>
-	<string name="settings_rb_scheduler_select_days_subtitle"
-	        context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">
-		%d days
-	</string>
-	<string name="settings_rb_scheduler_alert_disabling"
-	        context="Text of the alert when a FREE user tries to disable the RB scheduler">To
-		disable the Rubbish-Bin Cleaning Scheduler or set a longer retention period, you need to
-		subscribe to a PRO plan.
-	</string>
-	<string name="hint_days"
-	        context="Hint of the field to write the days of the rubbish bin scheduler">days
-	</string>
-	<string name="confirmation_close_sessions_text"
-	        context="Text of the dialog to confirm after closing all other sessions">This will log
-		you out on all other active sessions except the current one.
-	</string>
-	<string name="confirmation_close_sessions_title"
-	        context="Title of the dialog to confirm after closing all other sessions">Do you want to
-		close all other sessions?
-	</string>
-	<string name="invite_not_sent_already_sent"
-	        context="Message shown when a contact request has not been sent because the invitation has been sent before">
-		The invitation to contact %s has been sent before and can be consulted in the Sent Requests
-		tab.
-	</string>
-	<string name="save_qr_cloud_drive"
-	        context="Label shown to indicate the QR is saving in Cloud Drive">Saving %s in Cloud
-		Drive&#8230;
-	</string>
-	<string name="general_folders" context="General label for folders">Folders</string>
-	<string name="general_files" context="General label for files">Files</string>
-	<string name="general_save_to_device"
-	        context="Item menu option upon right click on one or multiple files">Save to device
-	</string>
-	<string name="title_upload_explorer" context="Title of cloud explorer to upload a file">Upload
-		to MEGA
-	</string>
-	<string name="choose_destionation" context="Label choose destination">Choose destination
-	</string>
-	<string name="general_show_more" context="Label that indicates show more items">Show More
-	</string>
-	<string name="general_show_less" context="Label that indicates show less items">Show Less
-	</string>
-	<string name="notification_new_contact_request"
-	        context="Subtitle of the historic notification for a new contact request">[A]%s
-		[/A][B]sent you a contact request.[/B]
-	</string>
-	<string name="notification_new_contact"
-	        context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]is now a
-		contact.[/B]
-	</string>
-	<string name="notification_new_shared_folder"
-	        context="Subtitle of the historic notification for a new shared folder">[B]New shared
-		folder from [/B][A]%s.[/A]
-	</string>
-	<string name="notification_reminder_contact_request"
-	        context="Subtitle of the historic notification for a reminder new contact request">
-		[A]Reminder: [/A][B]%s [/B][C]sent you a contact request.[/C]
-	</string>
-	<string name="title_contact_request_notification_cancelled"
-	        context="Title of the historic notification for a contact request cancelled">Contact
-		request cancelled
-	</string>
-	<string name="subtitle_contact_request_notification_cancelled"
-	        context="Subtitle of the historic notification for contact request cancelled">[A]%s
-		[/A][B]cancelled the contact request.[/B]
-	</string>
-	<string name="title_contact_notification_deleted"
-	        context="Title of the historic notification when an user deletes you as contact">Contact
-		deleted
-	</string>
-	<string name="subtitle_contact_notification_deleted"
-	        context="Subtitle of the historic notification when an user deletes you as contact">
-		[A]%s [/A][B]deleted you as a contact.[/B]
-	</string>
-	<string name="title_contact_notification_blocked"
-	        context="Title of the historic notification when an user blocks you as contact">Contact
-		blocked
-	</string>
-	<string name="subtitle_contact_notification_blocked"
-	        context="Subtitle of the historic notification when an user blocks you as contact">[A]%s
-		[/A][B]blocked you as a contact.[/B]
-	</string>
-	<string name="section_notification_with_unread"
-	        context="Item of the navigation title for the notification section when there is any unread">
-		Notifications [A](%1$d)[/A]
-	</string>
-	<string name="title_account_notification_deleted"
-	        context="Title of the historic notification for an account deleted">Account deleted
-	</string>
-	<string name="subtitle_account_notification_deleted"
-	        context="Subtitle of the historic notification for an account deleted">[A]%s
-		[/A][B]account has been deleted/deactivated.[/B]
-	</string>
-	<string name="subtitle_file_takedown_notification"
-	        context="Subtitle of file takedown historic notification">[A]Your publicly shared file
-		[/A][B]%s[/B][C] has been taken down.[/C]
-	</string>
-	<string name="subtitle_folder_takedown_notification"
-	        context="Subtitle of folder takedown historic notification">[A]Your publicly shared
-		folder [/A][B]%s[/B][C] has been taken down.[/C]
-	</string>
-	<string name="subtitle_file_takedown_reinstated_notification"
-	        context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly
-		shared file [/A][B]%s[/B][C] has been reinstated.[/C]
-	</string>
-	<string name="subtitle_folder_takedown_reinstated_notification"
-	        context="Subtitle of a folder takedown reinstated historic notification">[A]Your
-		publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]
-	</string>
-	<string name="title_outgoing_contact_request"
-	        context="Title of the historic notification for outgoing contact requests">Sent request
-	</string>
-	<string name="title_incoming_contact_request"
-	        context="Title of the historic notification for incoming contact requests">Received
-		request
-	</string>
-	<string name="subtitle_outgoing_contact_request_denied"
-	        context="Subtitle of the historic notification for contact request denied">[A]%s
-		[/A][B]denied your contact request.[/B]
-	</string>
-	<string name="subtitle_outgoing_contact_request_accepted"
-	        context="Subtitle of the historic notification for contact request accepted">[A]%s
-		[/A][B]accepted your contact request.[/B]
-	</string>
-	<string name="notification_deleted_shared_folder"
-	        context="Subtitle of the historic notification for deleted shared folders (one or many)">
-		[B]Access to folders shared by [/B][A]%s[/A][B] were removed.[/B]
-	</string>
-	<string name="notification_left_shared_folder"
-	        context="Subtitle of the historic notification when a contact leaves a shared folder">
-		[A]%s[/A][B] has left a shared folder.[/B]
-	</string>
-	<string name="notification_left_shared_folder_with_name"
-	        context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">
-		[A]%1$s[/A][B] has left the shared folder [/B][A]%2$s.[/A]
-	</string>
-	<string name="subtitle_incoming_contact_request_ignored"
-	        context="Subtitle of the historic notification for incoming contact request ignored">
-		[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]
-	</string>
-	<string name="subtitle_incoming_contact_request_accepted"
-	        context="Subtitle of the historic notification for incoming contact request accepted">
-		[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]
-	</string>
-	<string name="subtitle_incoming_contact_request_denied"
-	        context="Subtitle of the historic notification for incoming contact request declined">
-		[B]Contact request from [/B][A]%s [/A][B]was declined[/B]
-	</string>
-	<string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current
-		account is [A]%s[/A]
-	</string>
-	<string name="footnote_achievements"
-	        context="Footnote to clarify the storage space is subject to the achievement program">*
-		Subject to your participation in our achievement program
-	</string>
-	<string name="select_payment_method"
-	        context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">
-		Select payment method
-	</string>
-	<string name="billing_period_title" context="title of billing period">Billing period</string>
-	<string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed
-		monthly[/A] %s /month
-	</string>
-	<string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed
-		yearly[/A] %s /year
-	</string>
-	<string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
-	<string name="button_continue" context="dialog option continue in alert dialog">Continue
-	</string>
-	<string name="payment_method_google_wallet" context="one of the payment methods">[A]Google
-		Pay[/A] (subscription)
-	</string>
-	<string name="payment_method_credit_card" context="one of the payment methods">[A]Credit
-		Card[/A] (subscription)
-	</string>
-	<string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A]
-		(one-off)
-	</string>
-	<string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A]
-		(one-off)
-	</string>
-	<string name="new_label_notification_item"
-	        context="Capital letters. Text of the label of a new historic notifications">NEW
-	</string>
-	<string name="context_new_file_name_hint"
-	        context="Input field description in the create file dialog.">file name
-	</string>
-	<string name="error_autoaway"
-	        context="Label shown when it types a wrong value setting the auto-away">Invalid value
-		for auto-away, it should be greater than 0.
-	</string>
-	<string name="option_enable_last_green_chat"
-	        context="Option in Settings section to enable the last active connection in chat">Show
-		Last seen&#8230;
-	</string>
-	<string name="subtitle_option_enable_last_green_chat"
-	        context="Subtitle of the option in Settings section to enable the last active connection in chat">
-		Allow your contacts to see the last time you were active on MEGA.
-	</string>
-	<plurals name="num_files_with_parameter"
-	         context="on the section notifications indicates the number of files added to a shared folder">
-		<item context="Singular of file. 1 file" quantity="one">%d file</item>
-		<item context="Plural of file. 2 files" quantity="other">%d files</item>
-	</plurals>
-	<plurals name="num_folders_with_parameter"
-	         context="on the section notifications indicates the number of folder added to a shared folder">
-		<item context="Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
-		<item context="Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
-	</plurals>
-	<string name="subtitle_notification_added_folders_and_files"
-	        context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">
-		[A]%1$s[/A][B] added %2$s and %3$s[/B]
-	</string>
-	<plurals name="subtitle_notification_added_files"
-	         context="Subtitle of the historic notification for new additions inside an existing shared folder">
-		<item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d
-			file.[/B]
-		</item>
-		<item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]added %2$d
-			files.[/B]
-		</item>
-	</plurals>
-	<plurals name="subtitle_notification_deleted_items"
-	         context="Subtitle of the historic notification for deletions inside an existing shared folder">
-		<item context="Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]deleted %2$d
-			item.[/B]
-		</item>
-		<item context="Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]deleted %2$d
-			items.[/B]
-		</item>
-	</plurals>
-	<plurals name="subtitle_notification_added_folders"
-	         context="Subtitle of the historic notification for new additions inside an existing shared folder">
-		<item context="Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]added %2$d
-			folder.[/B]
-		</item>
-		<item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d
-			folders.[/B]
-		</item>
-	</plurals>
-	<plurals name="subtitle_of_group_chat"
-	         context="Subtitle chat screen for groups with permissions and not archived">
-		<item context="Singular of participant. 1 participant" quantity="one">%d participant</item>
-		<item context="Plural of participant. 2 participants" quantity="other">%d participants
-		</item>
-	</plurals>
-	<string name="type_month"
-	        context="Label to show the price of each plan in the upgrade account section">
-		[A]From[/A] %s / [A]month[/A] *
-	</string>
-	<string name="upgrade_comment"
-	        context="the meaning of the asterisk in monthly* and annually* payment">* recurring
-		subscription can be cancelled anytime before the renewal date
-	</string>
-	<string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">
-		SSL certificate error
-	</string>
-	<string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">
-		MEGA is unable to connect securely through SSL. You might be on public WiFi with additional
-		requirements.
-	</string>
-	<string name="context_empty_notifications"
-	        context="Text of the empty screen for the notifications section">[B]No
-		[/B][A]Notifications[/A][B].[/B]
-	</string>
-	<string name="title_chat_shared_files_info"
-	        context="Title of the option on chat info screen to list all the files sent to the chat">
-		Shared files
-	</string>
-	<string name="error_message_already_sent"
-	        context="Error message when trying to remove an uploading attachment that has already finished">
-		Attachment already sent
-	</string>
-	<string name="call_ended_message" context="Message shown when a call ends.">[A]Call
-		ended[/A][C]. Duration: [/C]
-	</string>
-	<plurals name="plural_call_ended_messages_hours"
-	         context="Message that shows the hours of a call when it ends">
-		<item context="one hour" quantity="one">[B]%1$s hour[/B]</item>
-		<item context="more hours" quantity="other">[B]%1$s hours[/B]</item>
-	</plurals>
-	<plurals name="plural_call_ended_messages_minutes"
-	         context="Message that shows the minutes of a call when it ends">
-		<item context="one minute" quantity="one">[B]%1$s minute[/B]</item>
-		<item context="more minutes" quantity="other">[B]%1$s minutes[/B]</item>
-	</plurals>
-	<plurals name="plural_call_ended_messages_seconds"
-	         context="Message that shows the seconds of a call when it ends">
-		<item context="one second" quantity="one">[B]%1$d second[/B]</item>
-		<item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
-	</plurals>
-	<string name="last_seen_today"
-	        context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">
-		Last seen today %1$s
-	</string>
+
+    <plurals name="plural_select_file" context="Section title to select a file to perform an action">
+        <item context="one file" quantity="one">Choose File</item>
+        <item context="more files" quantity="other">Choose Files</item>
+    </plurals>
+
+    <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
+
+    <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to login?</string>
+    <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to logout?</string>
+
+    <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
+
+    <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]of %2$s used[/B]</string>
+
+    <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Change to a test server?</string>
+    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Are you sure you want to change to a test server? Your account may suffer irrecoverable problems</string>
+
+    <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Open camera?</string>
+    <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">If you open the camera, your video transmission will be paused in the current call.</string>
+
+    <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Chat activity</string>
+    <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">You may have new messages</string>
+
+    <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Rubbish-Bin Cleaning Scheduler:</string>
+    <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">The Rubbish Bin is cleaned for you automatically.</string>
+
+    <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days.</string>
+    <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days and your maximum period is 30 days.</string>
+
+    <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remove files older than</string>
+    <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
+
+    <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish-Bin Cleaning Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
+
+    <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
+
+    <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
+    <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
+
+    <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
+
+    <string name="save_qr_cloud_drive" context="Label shown to indicate the QR is saving in Cloud Drive">Saving %s in Cloud Drive&#8230;</string>
+
+    <string name="general_folders" context="General label for folders">Folders</string>
+    <string name="general_files" context="General label for files">Files</string>
+    <string name="general_save_to_device" context="Item menu option upon right click on one or multiple files">Save to device</string>
+
+    <string name="title_upload_explorer" context="Title of cloud explorer to upload a file">Upload to MEGA</string>
+    <string name="choose_destionation" context="Label choose destination">Choose destination</string>
+    <string name="general_show_more" context="Label that indicates show more items">Show More</string>
+    <string name="general_show_less" context="Label that indicates show less items">Show Less</string>
+
+    <string name="notification_new_contact_request" context="Subtitle of the historic notification for a new contact request">[A]%s [/A][B]sent you a contact request.[/B]</string>
+    <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
+    <string name="notification_new_shared_folder" context="Subtitle of the historic notification for a new shared folder">[B]New shared folder from [/B][A]%s.[/A]</string>
+
+    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]Reminder: [/A][B]%s [/B][C]sent you a contact request.[/C]</string>
+
+    <string name="title_contact_request_notification_cancelled" context="Title of the historic notification for a contact request cancelled">Contact request cancelled</string>
+    <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]cancelled the contact request.[/B]</string>
+
+    <string name="title_contact_notification_deleted" context="Title of the historic notification when an user deletes you as contact">Contact deleted</string>
+    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+
+    <string name="title_contact_notification_blocked" context="Title of the historic notification when an user blocks you as contact">Contact blocked</string>
+    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]blocked you as a contact.[/B]</string>
+
+    <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+
+    <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account deleted</string>
+    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
+
+    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
+
+    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+
+    <string name="title_outgoing_contact_request" context="Title of the historic notification for outgoing contact requests">Sent request</string>
+    <string name="title_incoming_contact_request" context="Title of the historic notification for incoming contact requests">Received request</string>
+
+    <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]denied your contact request.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
+
+    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]Access to folders shared by [/B][A]%s[/A][B] were removed.[/B]</string>
+    <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] has left a shared folder.[/B]</string>
+    <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] has left the shared folder [/B][A]%2$s.[/A]</string>
+
+    <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]</string>
+    <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
+    <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
+
+    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current account is [A]%s[/A]</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
+
+    <string name="billing_period_title" context="title of billing period">Billing period</string>
+    <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
+    <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
+    <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
+
+    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+
+    <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
+
+    <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file name</string>
+
+    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Invalid value for auto-away, it should be greater than 0.</string>
+
+    <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
+    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
+
+    <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
+        <item context="Singular of file. 1 file" quantity="one">%d file</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files</item>
+    </plurals>
+
+    <plurals name="num_folders_with_parameter" context="on the section notifications indicates the number of folder added to a shared folder">
+        <item context="Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
+        <item context="Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
+    </plurals>
+
+    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
+
+    <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d file.[/B]</item>
+        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]added %2$d files.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_notification_deleted_items" context="Subtitle of the historic notification for deletions inside an existing shared folder">
+        <item context="Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]deleted %2$d item.[/B]</item>
+        <item context="Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]deleted %2$d items.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_notification_added_folders" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]added %2$d folder.[/B]</item>
+        <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions and not archived">
+        <item context="Singular of participant. 1 participant" quantity="one">%d participant</item>
+        <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
+    </plurals>
+
+    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled anytime before the renewal date</string>
+
+    <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL certificate error</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public WiFi with additional requirements.</string>
+
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
+
+    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared files</string>
+
+    <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
+
+    <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
+    <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
+        <item context="one hour" quantity="one">[B]%1$s hour[/B]</item>
+        <item context="more hours" quantity="other">[B]%1$s hours[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_minutes" context="Message that shows the minutes of a call when it ends">
+        <item context="one minute" quantity="one">[B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[B]%1$s minutes[/B]</item>
+    </plurals>
+    <plurals name="plural_call_ended_messages_seconds" context="Message that shows the seconds of a call when it ends">
+        <item context="one second" quantity="one">[B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
+    </plurals>
+
+    <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">Last seen today %1$s</string>
+    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">Last seen a long time ago</string>
+    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">Last seen %1$s %2$s</string>
 	<string name="label_today" context="label today">Today</string>
 	<string name="label_yesterday" context="label yesterday">Yesterday</string>
-	<string name="last_seen_long_time_ago"
-	        context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">
-		Last seen a long time ago
-	</string>
-	<string name="last_seen_general"
-	        context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">
-		Last seen %1$s %2$s
-	</string>
-	<string name="context_empty_shared_files"
-	        context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared
-		Files[/A][B].[/B]
-	</string>
-	<string name="error_open_file_with"
-	        context="Error message shown when a file cannot be opened by other app using the open with option menu">
-		Error. The file cannot be opened.
-	</string>
-	<string name="second_row_info_item_shared_file_chat"
-	        context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">
-		%1$s . %2$s
-	</string>
-	<plurals name="messages_forwarded_success_plural"
-	         context="Confirmation message after forwarding one or several messages"
-	         formatted="false">
-		<item context="version item" quantity="one">Message forwarded</item>
-		<item context="version items" quantity="other">Messages forwarded</item>
-	</plurals>
-	<string name="title_pdf_password"
-	        context="Title of the dialog shown when a pdf required password">Type password
-	</string>
-	<string name="text_pdf_password"
-	        context="Text of the dialog shown when a pdf required password">%s is protected. Enter
-		the document opening password.
-	</string>
-	<string name="error_pdf_password"
-	        context="Error of the dialog shown wen a pdf required password and the user types a wrong password">
-		Wrong password. Try again.
-	</string>
-	<string name="error_max_pdf_password"
-	        context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">
-		The password is not valid.
-	</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
+
+    <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
+
+    <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
+
+    <plurals name="messages_forwarded_success_plural" formatted="false" context="Confirmation message after forwarding one or several messages">
+        <item context="version item" quantity="one">Message forwarded</item>
+        <item context="version items" quantity="other">Messages forwarded</item>
+    </plurals>
+
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Type password</string>
+    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is protected. Enter the document opening password.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Wrong password. Try again.</string>
+    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
+
 </resources>
