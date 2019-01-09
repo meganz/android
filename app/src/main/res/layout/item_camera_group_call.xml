@@ -1,0 +1,126 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/tools"
+    android:id="@+id/general"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <RelativeLayout
+        android:id="@+id/rl_surface_and_micro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:visibility="gone">
+
+        <!--Surface view-->
+        <RelativeLayout
+            android:id="@+id/parent_surface_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent">
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/micro_surface_view"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignTop="@+id/parent_surface_view"
+            android:layout_marginTop="10dp"
+            android:layout_alignRight="@+id/parent_surface_view"
+            android:layout_margin="10dp"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:src="@drawable/ic_mic_off_contact"/>
+        <RelativeLayout
+            android:id="@+id/rl_quality"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:visibility="gone">
+                <RelativeLayout
+                    android:id="@+id/quality_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/rl_icon_quality"
+                    android:padding="6dp">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/icon_quality"/>
+                </RelativeLayout>
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_avatar_micro"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:background="@android:color/transparent"
+        android:visibility="gone">
+
+        <!--Big Avatar-->
+        <RelativeLayout
+            android:id="@+id/avatar_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:background="@android:color/transparent">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/avatar_image"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                rounded:border_color="#4DFFFFFF"
+                rounded:border_width="3dp"
+                rounded:corner_radius="60dp" />
+
+            <TextView
+                android:id="@+id/avatar_initial_letter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
+        <!--Micro Avatar-->
+        <ImageView
+            android:id="@+id/micro_avatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_toRightOf="@+id/avatar_rl"
+            android:layout_alignTop="@+id/avatar_rl"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:src="@drawable/ic_mic_off_contact"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/green_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/border_green_layer"
+        android:visibility="gone"/>
+
+</RelativeLayout>
