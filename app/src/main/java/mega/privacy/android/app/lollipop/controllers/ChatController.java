@@ -195,6 +195,14 @@ public class ChatController {
                 megaChatApi.archiveChat(chat.getChatId(), true, (GroupChatInfoActivityLollipop) context);
             }
         }
+        else if(context instanceof ChatActivityLollipop){
+            if(chat.isArchived()){
+                megaChatApi.archiveChat(chat.getChatId(), false,(ChatActivityLollipop) context);
+            }
+            else{
+                megaChatApi.archiveChat(chat.getChatId(), true, (ChatActivityLollipop) context);
+            }
+        }
     }
 
     public void archiveChats(ArrayList<MegaChatListItem> chats){
