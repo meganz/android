@@ -695,7 +695,12 @@ public class ChatController {
                     }else{
                        return "";
                     }
-                } else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
+                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";
                     switch(message.getTermCode()){
                         case MegaChatMessage.END_CALL_REASON_ENDED:{
@@ -879,6 +884,10 @@ public class ChatController {
                     }else{
                         return "";
                     }
+                }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
+                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    builder.append(textToShow);
+                    return builder.toString();
                 }
                 else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";

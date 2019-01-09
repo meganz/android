@@ -16,13 +16,14 @@ import java.nio.ByteBuffer;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 
-public class LocalCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
+public class RemoteCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface, View.OnClickListener {
 
     int width = 0;
     int height = 0;
@@ -30,15 +31,19 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     MegaChatApiAndroid megaChatApi;
     Context context;
     long chatId;
+    long userHandle;
 
-    public SurfaceView localFullScreenSurfaceView;
-    MegaSurfaceRenderer localRenderer;
+    public SurfaceView remoteFullScreenSurfaceView;
+    MegaSurfaceRenderer remoteRenderer;
 
-    public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
-        log("newInstance");
-        LocalCameraCallFullScreenFragment f = new LocalCameraCallFullScreenFragment();
+    public static RemoteCameraCallFullScreenFragment newInstance(long chatId, long userHandle) {
+        log("newInstance() chatId: "+chatId);
+
+        RemoteCameraCallFullScreenFragment f = new RemoteCameraCallFullScreenFragment();
+
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
+        args.putLong("userHandle",userHandle);
         f.setArguments(args);
         return f;
     }
@@ -52,6 +57,9 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
+        this.userHandle = args.getLong("userHandle", -1);
+        log("onCreate() chatId: "+chatId);
+
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -63,22 +71,24 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
             return null;
         }
 
-        View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
+        View v = inflater.inflate(R.layout.fragment_remote_camera_call_full_screen, container, false);
 
-        localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-        localFullScreenSurfaceView.setZOrderMediaOverlay(true);
-        SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
-        localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
+        remoteFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_remote_video);
+        remoteFullScreenSurfaceView.setOnClickListener(this);
+        remoteFullScreenSurfaceView.setZOrderMediaOverlay(true);
+        SurfaceHolder remoteSurfaceHolder = remoteFullScreenSurfaceView.getHolder();
+        remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+        remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);
 
-        log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
-        megaChatApi.addChatLocalVideoListener(chatId, this);
+        log("onCreateView() addChatRemoteVideoListener chatId: "+chatId);
+        megaChatApi.addChatRemoteVideoListener(chatId, userHandle, this);
 
         return v;
     }
 
     @Override
-    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
+    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer){
+
         if((width == 0) || (height == 0)){
             return;
         }
@@ -87,10 +97,10 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
             this.width = width;
             this.height = height;
 
-            SurfaceHolder holder = localFullScreenSurfaceView.getHolder();
+            SurfaceHolder holder = remoteFullScreenSurfaceView.getHolder();
             if (holder != null) {
-                int viewWidth = localFullScreenSurfaceView.getWidth();
-                int viewHeight = localFullScreenSurfaceView.getHeight();
+                int viewWidth = remoteFullScreenSurfaceView.getWidth();
+                int viewHeight = remoteFullScreenSurfaceView.getHeight();
                 if ((viewWidth != 0) && (viewHeight != 0)) {
                     int holderWidth = viewWidth < width ? viewWidth : width;
                     int holderHeight = holderWidth * viewHeight / viewWidth;
@@ -98,7 +108,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    this.bitmap = remoteRenderer.CreateBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 }
                 else{
@@ -110,57 +120,63 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
         if (bitmap != null) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false);
+            remoteRenderer.DrawBitmap(false);
         }
     }
 
-
     @Override
     public void onAttach(Context context) {
+        log("onAttach");
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
     public void onDestroy(){
-        log("onDestroy()");
-        if(localFullScreenSurfaceView.getParent()!=null){
-            if(localFullScreenSurfaceView.getParent().getParent()!=null){
+        log("onDestroy");
+        if(remoteFullScreenSurfaceView.getParent()!=null){
+            if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
                 log("onDestroy() removeView chatId: "+chatId);
-                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+                ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
             }
         }
-        localFullScreenSurfaceView.setVisibility(View.GONE);
-        log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
-        megaChatApi.removeChatVideoListener(chatId, -1, this);
+        log("onDestroy() removeChatVideoListener (REMOTE) chatId: "+chatId);
+        remoteFullScreenSurfaceView.setVisibility(View.GONE);
+        megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         super.onDestroy();
     }
+
     @Override
     public void onResume() {
         log("onResume");
         this.width=0;
         this.height=0;
-        localFullScreenSurfaceView.setVisibility(View.VISIBLE);
+        remoteFullScreenSurfaceView.setVisibility(View.VISIBLE);
 
         super.onResume();
     }
+
     public void removeSurfaceView(){
         log("removeSurfaceView()");
-        if(localFullScreenSurfaceView.getParent()!=null){
-            if(localFullScreenSurfaceView.getParent().getParent()!=null){
+        if(remoteFullScreenSurfaceView.getParent()!=null){
+            if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
                 log("removeSurfaceView() removeView chatId: "+chatId);
-                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
+                ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
             }
         }
-        localFullScreenSurfaceView.setVisibility(View.GONE);
-        log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
-        megaChatApi.removeChatVideoListener(chatId, -1, this);
+        remoteFullScreenSurfaceView.setVisibility(View.GONE);
+        log("removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
+        megaChatApi.removeChatVideoListener(chatId, userHandle, this);
     }
 
     private static void log(String log) {
-        Util.log("LocalCameraCallFullScreenFragment", log);
+        Util.log("RemoteCameraCallFullScreenFragment", log);
+    }
+
+    @Override
+    public void onClick(View v) {
+        ((ChatCallActivity)context).remoteCameraClick();
     }
 }
