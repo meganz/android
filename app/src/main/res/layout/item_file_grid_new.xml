@@ -29,11 +29,12 @@
 				android:scaleType="fitCenter"/>
 			<TextView
 				android:id="@+id/file_grid_filename"
-				android:layout_width="110dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:layout_marginRight="16dp"
+				android:layout_marginRight="8dp"
 				android:layout_toRightOf="@+id/file_grid_icon"
+				android:layout_toLeftOf="@+id/file_grid_three_dots"
 				android:ellipsize="middle"
 				android:singleLine="true"
 				android:textColor="#DE000000"
@@ -57,14 +58,16 @@
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout_for_file"
 			android:layout_width="match_parent"
-			android:layout_height="172dp"
-			android:layout_margin="1dp">
+			android:layout_height="172dp">
 			<ImageView
 				android:id="@+id/file_grid_thumbnail"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_centerInParent="true"
-				android:scaleType="fitXY"/>
+				android:scaleType="fitXY"
+				android:paddingTop="1dp"
+				android:paddingRight="1dp"
+				android:paddingLeft="1dp"/>
 			<ImageView
 				android:id="@+id/file_grid_selected"
 				android:layout_width="23dp"
@@ -72,9 +75,7 @@
 				android:layout_alignParentLeft="true"
 				android:layout_alignParentTop="true"
 				android:layout_marginLeft="7dp"
-				android:layout_marginTop="7dp"
-				android:src="@drawable/ic_select_folder"
-				android:visibility="gone"/>
+				android:layout_marginTop="7dp"/>
 			<ImageView
 				android:id="@+id/file_grid_icon_for_file"
 				android:layout_width="88dp"
@@ -88,7 +89,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
-				android:layout_marginBottom="3dp"
 				android:background="@drawable/gradient_cam_uploads">
 				<TextView
 					android:id="@+id/file_grid_title_video_duration"
@@ -120,10 +120,11 @@
 			android:layout_below="@+id/file_grid_thumbnail_layout_for_file">
 			<TextView
 				android:id="@+id/file_grid_filename_for_file"
-				android:layout_width="110dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentLeft="true"
 				android:layout_centerVertical="true"
+				android:layout_toLeftOf="@+id/file_grid_three_dots_for_file"
 				android:layout_marginLeft="8dp"
 				android:ellipsize="middle"
 				android:singleLine="true"
