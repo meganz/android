@@ -276,7 +276,9 @@ public class AppRTCAudioManager {
     selectedAudioDevice = AudioDevice.NONE;
     audioDevices.clear();
 
-    proximitySensor.start();
+    if(proximitySensor != null) {
+      proximitySensor.start();
+    }
 
     // Initialize and start Bluetooth if a BT device is available or initiate
     // detection of new (enabled) BT devices.
