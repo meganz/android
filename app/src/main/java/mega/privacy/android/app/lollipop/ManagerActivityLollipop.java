@@ -630,6 +630,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public int comesFromNotificationsLevel = 0;
 	public long comesFromNotificationHandle = -1;
 	public long comesFromNotificationHandleSaved = -1;
+	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -1703,6 +1704,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
 		outState.putInt("accountFragmentPreUpgradeAccount", accountFragmentPreUpgradeAccount);
+		outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
 	}
 
 	@Override
@@ -1768,6 +1770,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
+			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
 		}
 		else{
 			log("Bundle is NULL");
@@ -16744,6 +16747,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Incoming Shares
 			drawerItem = DrawerItem.SHARED_ITEMS;
 			indexShares = 0;
+			comesFromNotificationDeepBrowserTreeIncoming = deepBrowserTreeIncoming;
+			comesFromNotificationHandleSaved = parentHandleIncoming;
 			if (parent != null){
 				comesFromNotificationsLevel = deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
 			}
