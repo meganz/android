@@ -284,6 +284,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MenuItem clearHistoryMenuItem;
     MenuItem contactInfoMenuItem;
     MenuItem leaveMenuItem;
+    MenuItem archiveMenuItem;
 
     boolean focusChanged=false;
 
@@ -1394,7 +1395,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void requestLastGreen(int state){
         log("requestLastGreen: "+state);
-        if(chatRoom!=null && !chatRoom.isGroup()){
+        if(chatRoom!=null && !chatRoom.isGroup() && !chatRoom.isArchived()){
             if(state == INITIAL_PRESENCE_STATUS){
                 state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
             }
@@ -1597,6 +1598,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         clearHistoryMenuItem = menu.findItem(R.id.cab_menu_clear_history_chat);
         contactInfoMenuItem = menu.findItem(R.id.cab_menu_contact_info_chat);
         leaveMenuItem = menu.findItem(R.id.cab_menu_leave_chat);
+        archiveMenuItem = menu.findItem(R.id.cab_menu_archive_chat);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -1614,6 +1616,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setVisible(false);
+                archiveMenuItem.setVisible(false);
 
             }else {
 
@@ -1624,6 +1627,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     clearHistoryMenuItem.setVisible(false);
                     inviteMenuItem.setVisible(false);
                     contactInfoMenuItem.setVisible(false);
+                    archiveMenuItem.setVisible(false);
                 }else {
                     int callsInProgress = megaChatApi.getNumCalls();
                     if(callsInProgress<=0){
@@ -1632,6 +1636,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }else{
                         callMenuItem.setVisible(false);
                         videoMenuItem.setVisible(false);
+                    }
+
+                    archiveMenuItem.setVisible(true);
+                    if(chatRoom.isArchived()){
+                        archiveMenuItem.setTitle(getString(R.string.general_unarchive));
+                    }
+                    else{
+                        archiveMenuItem.setTitle(getString(R.string.general_archive));
                     }
 
                     int permission = chatRoom.getOwnPrivilege();
@@ -1720,6 +1732,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             videoMenuItem.setVisible(false);
             clearHistoryMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
+            archiveMenuItem.setVisible(false);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -1778,6 +1791,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.cab_menu_leave_chat:{
                 log("Leave selected!");
                 showConfirmationLeaveChat(chatRoom);
+                break;
+            }
+            case R.id.cab_menu_archive_chat:{
+                log("Archive/unarchive selected!");
+                ChatController chatC = new ChatController(chatActivity);
+                chatC.archiveChat(chatRoom);
                 break;
             }
         }
@@ -6150,6 +6169,50 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
             log("TYPE_LAST_GREEN requested");
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+            long chatHandle = request.getChatHandle();
+            chatRoom = megaChatApi.getChatRoom(chatHandle);
+            String chatTitle = chatRoom.getTitle();
+
+            if(chatTitle==null){
+                chatTitle = "";
+            }
+            else if(!chatTitle.isEmpty() && chatTitle.length()>60){
+                chatTitle = chatTitle.substring(0,59)+"...";
+            }
+
+            if(!chatTitle.isEmpty() && chatRoom.isGroup() && !chatRoom.hasCustomTitle()){
+                chatTitle = "\""+chatTitle+"\"";
+            }
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                if(request.getFlag()){
+                    log("Chat archived");
+                    showSnackbar(getString(R.string.success_archive_chat, chatTitle));
+                }
+                else{
+                    log("Chat unarchived");
+                    showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
+                }
+            }
+            else{
+                if(request.getFlag()){
+                    log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
+                    showSnackbar(getString(R.string.error_archive_chat, chatTitle));
+                }
+                else{
+                    log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
+                    showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
+                }
+            }
+
+            supportInvalidateOptionsMenu();
+            setChatSubtitle();
+
+            if(!chatRoom.isArchived()){
+                requestLastGreen(INITIAL_PRESENCE_STATUS);
+            }
         }
     }
 

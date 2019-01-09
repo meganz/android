@@ -2152,7 +2152,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
-
 				}
 			}
 		}
