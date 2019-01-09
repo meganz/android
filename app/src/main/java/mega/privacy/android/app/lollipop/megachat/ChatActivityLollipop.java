@@ -3746,6 +3746,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         else{
                             if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                                log("itemCLick: TYPE_NODE_ATTACHMENT");
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if(nodeList.size()==1){
                                     MegaNode node = nodeList.get(0);
@@ -3780,6 +3781,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
                                             internalIntent=true;
                                         }
+                                        log("itemClick:putExtra: screenPosition("+screenPosition+"), msgId("+m.getMessage().getMsgId()+"), chatId("+idChat+"), filename("+node.getName()+")");
 
                                         mediaIntent.putExtra("screenPosition", screenPosition);
                                         mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
@@ -3797,7 +3799,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
                                                     log("askMe==false");
                                                     if (prefs.getStorageDownloadLocation() != null){
-                                                        log(" StorageDownloadLocation: "+prefs.getStorageDownloadLocation());
+                                                        log("StorageDownloadLocation: "+prefs.getStorageDownloadLocation());
                                                         if (prefs.getStorageDownloadLocation().compareTo("") != 0){
                                                             downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
                                                             log("downloadLocationDefaultPath: "+downloadLocationDefaultPath);
@@ -3839,11 +3841,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 }
                                             }
                                             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        }
-                                        else {
+                                        }else {
                                             log("itemClick:localPathNULL");
                                             if (Util.isOnline(this)){
                                                 if (megaApi.httpServerIsRunning() == 0) {
+                                                    log("megaApi.httpServerIsRunning() == 0");
                                                     megaApi.httpServerStart();
                                                 }
                                                 else{
@@ -3857,8 +3859,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 if(mi.totalMem>Constants.BUFFER_COMP){
                                                     log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
                                                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                                                }
-                                                else{
+                                                }else{
                                                     log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
                                                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                                                 }
@@ -3867,35 +3868,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 if(url!=null){
                                                     Uri parsedUri = Uri.parse(url);
                                                     if(parsedUri!=null){
+                                                        log("itemClick:parsedUri!=null ---> "+parsedUri);
                                                         mediaIntent.setDataAndType(parsedUri, mimeType);
-                                                    }
-                                                    else{
+                                                    }else{
                                                         log("itemClick:ERROR:httpServerGetLocalLink");
                                                         showSnackbar(getString(R.string.email_verification_text_error));
                                                     }
-                                                }
-                                                else{
+                                                }else{
                                                     log("itemClick:ERROR:httpServerGetLocalLink");
                                                     showSnackbar(getString(R.string.email_verification_text_error));
                                                 }
-                                            }
-                                            else {
+                                            }else{
                                                 showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
                                             }
                                         }
                                         mediaIntent.putExtra("HANDLE", node.getHandle());
                                         if (opusFile){
+                                            log("opusFile ");
                                             mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
                                         }
                                         if(internalIntent){
                                             startActivity(mediaIntent);
-                                        }
-                                        else{
+                                        }else{
                                             log("itemClick:externalIntent");
                                             if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
                                                 startActivity(mediaIntent);
-                                            }
-                                            else{
+                                            }else{
                                                 log("itemClick:noAvailableIntent");
                                                 showNodeAttachmentBottomSheet(m, position);
                                             }
@@ -4089,20 +4087,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         openMegaLink(url, false);
                                     }
                                 }
+                            }else if(m.getMessage().getType()==MegaChatMessage.TYPE_VOICE_CLIP){
+                                log("***** TYPE_VOICE_CLIP");
+                                MegaNodeList nodeList = m.getMessage().getMegaNodeList();
+                                if(nodeList.size()==1){//
+                                    MegaNode node = nodeList.get(0);
+                                   if (MimeTypeList.typeForName(node.getName()).isAudio()){ }
+                                }else{
+                                }
                             }
-//                            else if(m.getMessage().getType()==MegaChatMessage.TYPE_VOICE_CLIP){//
-//                                MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-//                                if(nodeList.size()==1){//
-//                                    MegaNode node = nodeList.get(0);
-//
-//                                   if (MimeTypeList.typeForName(node.getName()).isAudio()){
-//                                       adapter.playRecord((position+1),null, node.getName());
-//                                   }
-//                                }else{
-//
-//                                }
-//
-//                            }
                         }
                     }
                 }
@@ -6009,34 +6002,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if (userHandleToCompare == myUserHandle) {
             log("MY message!!");
-        }
-        else{
+        }else{
+            log("contact message");
             if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
                 userHandleToCompare = msg.getMessage().getHandleOfAction();
             } else {
                 userHandleToCompare = msg.getMessage().getUserHandle();
             }
-
             log("userHandleTocompare: "+userHandleToCompare);
             AndroidMegaChatMessage previousMessage = null;
-            if(messages.size()-1>index){
+            if(messages.size()-1 > index){
                 previousMessage = messages.get(index + 1);
-
                 if(previousMessage==null){
                     msg.setShowAvatar(true);
-                    log("2 - Previous message is null");
+                    log("Previous message is null");
                     return;
                 }
-
                 if(previousMessage.isUploading()){
                     msg.setShowAvatar(true);
                     log("Previous is uploading");
                     return;
                 }
 
-                if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
+                if((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
                     previousUserHandleToCompare = previousMessage.getMessage().getHandleOfAction();
-                } else {
+                }else{
                     previousUserHandleToCompare = previousMessage.getMessage().getUserHandle();
                 }
 
@@ -6051,11 +6041,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Set: "+true);
                     } else {
                         if (previousUserHandleToCompare == userHandleToCompare) {
-
                             msg.setShowAvatar(false);
                             log("Set: "+false);
-                        }
-                        else{
+                        }else{
                             msg.setShowAvatar(true);
                             log("Set: "+true);
                         }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -12,12 +13,15 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.ExifInterface;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
@@ -1064,6 +1068,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageFileSize = (TextView) v.findViewById(R.id.content_contact_message_file_size);
 
             holder.contentContactMessageVoiceClipLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_voice_clip_layout);
+            RelativeLayout.LayoutParams paramsVoiceClip = (RelativeLayout.LayoutParams) holder.contentContactMessageVoiceClipLayout.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsVoiceClip.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsVoiceClip.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
+            }
+            holder.contentContactMessageVoiceClipLayout.setLayoutParams(paramsVoiceClip);
+
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
             holder.contentContactMessageVoiceClipPlay = (ImageView) v.findViewById(R.id.content_contact_message_voice_clip_play_pause);
             holder.contentContactMessageVoiceClipPlay.setTag(holder);
@@ -5063,7 +5075,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Contact message!!: " + userHandle);
 
             if (((ChatActivityLollipop) context).isGroup()) {
-
                 holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
 
                 if (holder.fullNameTitle == null) {
@@ -5071,7 +5082,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (holder.fullNameTitle.trim().length() <= 0) {
-
                     log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
                     ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
                     if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
@@ -5085,7 +5095,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("4-Name already asked and no name received: " + message.getUserHandle());
                     }
                 }
-
                 holder.nameContactText.setVisibility(View.VISIBLE);
                 holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
@@ -5134,7 +5143,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementMessageLayout.setVisibility(View.GONE);
 
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.GONE);
-
             if (messages.get(position - 1).isShowAvatar()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
                 setContactAvatar(holder, userHandle, ((ViewHolderMessageChat) holder).fullNameTitle);
@@ -5474,6 +5482,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
+                        log("CHAT_ADAPTER_SHOW_ALL");
                         holder.dateLayout.setVisibility(View.VISIBLE);
                         holder.dateText.setText(TimeUtils.formatDate(message.getTimestamp(), TimeUtils.DATE_SHORT_FORMAT));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
@@ -5549,29 +5558,82 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipPlay.setOnClickListener(this);
             }
 
-
-
             holder.contentOwnMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
             holder.contentOwnMessageVoiceClipDuration.setVisibility(View.VISIBLE);
 
-
             //upload voice clip:
-            log("UPDATE VOICE CLIP");
-            MegaNodeList nodeList = message.getMegaNodeList();
-            if(nodeList.size()==1){
-                MegaNode node = nodeList.get(0);
+            log("MY message -> Update Voice Clip");
+            MegaNodeList nodeListOwn = message.getMegaNodeList();
+            if(nodeListOwn.size()==1){
+                MegaNode node = nodeListOwn.get(0);
                 if (MimeTypeList.typeForName(node.getName()).isAudio()){
-                    log("itemClick: isAudio. node.getName : "+node.getName());
+                    log("isAudio. node.getName : "+node.getName());
                     try {
-                        String pathVoiceClip = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR +"/"+ node.getName();
-                        holder.mediaPlayerVoiceNotes.setDataSource(pathVoiceClip);
-                        holder.mediaPlayerVoiceNotes.prepare();
+                        String voiceNotesLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
+                        log("voiceNotesLocationDefaultPath: "+voiceNotesLocationDefaultPath);
+                        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
+                        File f = new File(voiceNotesLocationDefaultPath, node.getName());
+                        boolean isOnMegaVoiceNotes = false;
+                        if(f.exists() && (f.length() == node.getSize())){
+                            isOnMegaVoiceNotes = true;
+                        }
+                        log("isOnMegaVoiceNotes: "+isOnMegaVoiceNotes);
+
+                        if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                            log("localPath  -> "+localPath);
+                            holder.mediaPlayerVoiceNotes.setDataSource(localPath);
+                            holder.mediaPlayerVoiceNotes.prepare();
+
+                        }else{
+                            log("localPath == null");
+                            if (Util.isOnline(context)){
+                                if (megaApi.httpServerIsRunning() == 0) {
+                                    log("megaApi.httpServerIsRunning() == 0");
+                                    megaApi.httpServerStart();
+                                }else{
+                                    log("ERROR:httpServerAlreadyRunning");
+                                }
+
+                                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                                ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                                activityManager.getMemoryInfo(mi);
+
+                                if(mi.totalMem>Constants.BUFFER_COMP){
+                                    log("total mem: "+mi.totalMem+" allocate 32 MB");
+                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                                }else{
+                                    log("total mem: "+mi.totalMem+" allocate 16 MB");
+                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                                }
+
+                                String url = megaApi.httpServerGetLocalLink(node);
+                                if(url!=null){
+                                    Uri parsedUri = Uri.parse(url);
+                                    if(parsedUri!=null){
+                                        log("parsedUri!=null ---> "+parsedUri);
+                                        String VoiceClipPath = parsedUri.toString();
+                                        log("VoiceClipPath---> "+VoiceClipPath);
+                                        holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
+                                        holder.mediaPlayerVoiceNotes.prepare();
+
+                                        holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                                        holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                        holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+                                    }else{
+                                        log("ERROR:httpServerGetLocalLink");
+                                    }
+                                }else{
+                                    log("ERROR:httpServerGetLocalLink");
+                                }
+                            }else{
+                                log("ERROR:httpServerGetLocalLink");
+
+                            }
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                    holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+
                 }
             }
 
@@ -5601,7 +5663,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             });
 
-
             if(!multipleSelect){
                 if (positionClicked != -1) {
                     if (positionClicked == position) {
@@ -5615,7 +5676,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }else{
                 log("Multiselect ON");
-
                 if (this.isItemChecked(position)) {
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
                 } else {
@@ -5625,34 +5685,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
         } else {
-
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
 
             if (((ChatActivityLollipop) context).isGroup()) {
-
                 holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
 
                 if (holder.fullNameTitle == null) {
                     holder.fullNameTitle = "";
                 }
-
                 if (holder.fullNameTitle.trim().length() <= 0) {
-
                     log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
                     ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
                     if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
+                        log("Call for nonContactName: " + message.getUserHandle());
                         ((ViewHolderMessageChat) holder).nameRequestedAction = true;
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
                         megaChatApi.getUserFirstname(userHandle, listener);
                         megaChatApi.getUserLastname(userHandle, listener);
                         megaChatApi.getUserEmail(userHandle, listener);
                     } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
+                        log("Name already asked and no name received: " + message.getUserHandle());
                     }
                 }
-
                 holder.nameContactText.setVisibility(View.VISIBLE);
                 holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
@@ -5699,7 +5754,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
             holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
             holder.contactManagementMessageLayout.setVisibility(View.GONE);
-
 
             if (messages.get(position - 1).isShowAvatar()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
@@ -5752,23 +5806,79 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
             holder.contentContactMessageVoiceClipDuration.setVisibility(View.VISIBLE);
 
+
             //upload voice clip:
-            log("UPDATE VOICE CLIP");
-            MegaNodeList nodeList = message.getMegaNodeList();
-            if(nodeList.size()==1){
-                MegaNode node = nodeList.get(0);
+            log("Contact message -> UPDATE VOICE CLIP");
+            MegaNodeList nodeListContact = message.getMegaNodeList();
+            if(nodeListContact.size()==1){
+                MegaNode node = nodeListContact.get(0);
                 if (MimeTypeList.typeForName(node.getName()).isAudio()){
-                    log("itemClick: isAudio. node.getName : "+node.getName());
+                    log("isAudio. node.getName : "+node.getName());
                     try {
-                        String pathVoiceClip = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR +"/"+ node.getName();
-                        holder.mediaPlayerVoiceNotes.setDataSource(pathVoiceClip);
-                        holder.mediaPlayerVoiceNotes.prepare();
+                        String voiceNotesLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
+                        log("voiceNotesLocationDefaultPath: "+voiceNotesLocationDefaultPath);
+                        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
+                        File f = new File(voiceNotesLocationDefaultPath, node.getName());
+                        boolean isOnMegaVoiceNotes = false;
+                        if(f.exists() && (f.length() == node.getSize())){
+                            isOnMegaVoiceNotes = true;
+                        }
+                        log("isOnMegaVoiceNotes: "+isOnMegaVoiceNotes);
+
+                        if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                            log("localPath  -> "+localPath);
+                            holder.mediaPlayerVoiceNotes.setDataSource(localPath);
+                            holder.mediaPlayerVoiceNotes.prepare();
+
+                        }else{
+                            log("localPath == null");
+                            if (Util.isOnline(context)){
+                                if (megaApi.httpServerIsRunning() == 0) {
+                                    log("megaApi.httpServerIsRunning() == 0");
+                                    megaApi.httpServerStart();
+                                }else{
+                                    log("ERROR:httpServerAlreadyRunning");
+                                }
+
+                                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                                ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                                activityManager.getMemoryInfo(mi);
+
+                                if(mi.totalMem>Constants.BUFFER_COMP){
+                                    log("total mem: "+mi.totalMem+" allocate 32 MB");
+                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                                }else{
+                                    log("total mem: "+mi.totalMem+" allocate 16 MB");
+                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                                }
+
+                                String url = megaApi.httpServerGetLocalLink(node);
+                                if(url!=null){
+                                    Uri parsedUri = Uri.parse(url);
+                                    if(parsedUri!=null){
+                                        log("parsedUri!=null ---> "+parsedUri);
+                                        String VoiceClipPath = parsedUri.toString();
+                                        log("VoiceClipPath---> "+VoiceClipPath);
+                                        holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
+                                        holder.mediaPlayerVoiceNotes.prepare();
+
+                                        holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                                        holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                        holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+                                    }else{
+                                        log("ERROR:httpServerGetLocalLink");
+                                    }
+                                }else{
+                                    log("ERROR:httpServerGetLocalLink");
+                                }
+                            }else{
+                                log("ERROR:httpServerGetLocalLink");
+                            }
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                    holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+
                 }
             }
 
@@ -5811,7 +5921,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             } else {
                 log("Multiselect ON");
-
                 if (this.isItemChecked(position)) {
                     holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
                 } else {
@@ -8446,6 +8555,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         switch (v.getId()) {
             case R.id.content_own_message_voice_clip_play_pause:{
                 log("onClick() content_own_message_voice_clip_play_pause");
+//                int [] dimens = new int[4];
+//                ((ChatActivityLollipop) context).itemClick(currentPosition, dimens);
                 playOwnRecord(currentPosition, holder);
                 break;
             }
@@ -8670,7 +8781,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("destroyVoiceElemnts() - getItemCount: "+getItemCount());
         if(getItemCount()!= 0){
            for(int i=0;i<messages.size();i++){
-               if(messages.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP){
+               if((messages.get(i).getMessage()!=null) && (messages.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
                    ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(i);
                    if(holder!=null) {
                        if(holder.mediaPlayerVoiceNotes!=null){

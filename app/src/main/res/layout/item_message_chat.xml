@@ -1506,7 +1506,7 @@
                             android:id="@+id/content_contact_message_voice_clip_seekBar"
                             android:layout_width="145dp"
                             android:layout_height="wrap_content"
-                            android:theme="@style/MySeekBar"
+                            android:theme="@style/ContactSeekBar"
                             android:thumbTint="@color/accentColor"
                             android:max="200"
                             android:progress="0"
