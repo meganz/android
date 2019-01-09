@@ -4088,7 +4088,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     }
                                 }
                             }else if(m.getMessage().getType()==MegaChatMessage.TYPE_VOICE_CLIP){
-                                log("***** TYPE_VOICE_CLIP");
+                                log("TYPE_VOICE_CLIP");
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if(nodeList.size()==1){//
                                     MegaNode node = nodeList.get(0);

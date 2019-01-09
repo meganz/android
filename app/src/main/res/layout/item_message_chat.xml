@@ -750,12 +750,31 @@
 
                         <ImageView
                             android:id="@+id/content_own_message_voice_clip_play_pause"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginLeft="16dp"
                             android:background="@null"
                             android:visibility="gone"/>
+
+                        <!-- Progress bar-->
+                        <RelativeLayout
+                            android:id="@+id/uploadingProgressBarVoiceClip"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:visibility="gone"
+                            android:background="@android:color/transparent">
+                            <ProgressBar
+                                android:id="@+id/uploadingProgressBarVoiceClip_im"
+                                android:indeterminate="true"
+                                android:indeterminateTintMode="src_atop"
+                                android:indeterminateTint="@color/small_letter_upgrade_account"
+                                android:layout_centerInParent="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </RelativeLayout>
 
                         <SeekBar
                             android:id="@+id/content_own_message_voice_clip_seekBar"
