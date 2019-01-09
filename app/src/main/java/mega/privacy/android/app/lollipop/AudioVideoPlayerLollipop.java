@@ -130,6 +130,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
@@ -139,6 +141,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -152,7 +155,8 @@ import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener{
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
 
     boolean fromChatSavedInstance = false;
     int[] screenPosition;
@@ -583,6 +587,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         finish();
                         return;
                     }
+
+                    megaChatApi.addChatCallListener(this);
                 }
 
                 if (isFolderLink) {
@@ -764,6 +770,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (fromChat) {
                 fromChatSavedInstance = true;
             }
+        }
+    }
+
+    @Override
+    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+        log("onChatCallUpdate ");
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
         }
     }
 
@@ -1142,6 +1156,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     log("playerListener: onPlayerStateChanged: " + playbackState);
+
+                    if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
+                        MegaHandleList handleList = megaChatApi.getChatCalls();
+                        if(handleList!=null && handleList.size()>0) {
+                            //Not allow to play content when a call is in progress
+                            player.setPlayWhenReady(false);
+                            showSnackbar(getString(R.string.not_allow_play_alert));
+                        }
+                    }
+
                     playbackStateSaved = playbackState;
                     if (playbackState == Player.STATE_BUFFERING) {
                         audioContainer.setVisibility(View.GONE);
@@ -3458,6 +3482,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             megaApi.httpServerStop();
         }
 
+        if (megaChatApi != null) {
+            megaChatApi.removeChatCallListener(this);
+        }
+
         if (megaApiFolder != null) {
             megaApiFolder.httpServerStop();
         }
@@ -3751,6 +3779,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 megaApi.removeGlobalListener(this);
                 megaApi.httpServerStop();
             }
+
+            if (megaChatApi != null) {
+                megaChatApi.removeChatCallListener(this);
+            }
+
             if (player != null){
                 player.release();
             }

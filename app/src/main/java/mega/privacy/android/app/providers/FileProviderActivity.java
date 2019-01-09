@@ -382,6 +382,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 							}
 							else{
 								log("onCreate: Chat correctly initialized");
+								megaChatApi.enableGroupChatCalls(true);
 							}
 						}
 					}
@@ -1571,6 +1572,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
 					log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
 					megaApi.login(lastEmail, lastPassword, this);
+					megaChatApi.enableGroupChatCalls(true);
 				} else {
 					log("ERROR INIT CHAT: " + ret);
 					megaChatApi.logout(this);
