@@ -1139,6 +1139,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
+        ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+
         ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
@@ -1402,9 +1404,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 bindRevokeNodeMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
-            case MegaChatMessage.TYPE_CALL_ENDED: {
-                log("MegaChatMessage.TYPE_CALL_ENDED");
-                bindCallEndedMessage((ViewHolderMessageChat) holder, androidMessage, position);
+            case MegaChatMessage.TYPE_CALL_ENDED:
+            case MegaChatMessage.TYPE_CALL_STARTED: {
+                log("MegaChatMessage.TYPE_CALL_ENDED or TYPE_CALL_STARTED");
+                bindCallMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
             case MegaChatMessage.TYPE_INVALID: {
@@ -1495,6 +1498,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case MegaChatMessage.TYPE_CHAT_TITLE:
             case MegaChatMessage.TYPE_TRUNCATE:
             case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CALL_STARTED:
             case MegaChatMessage.TYPE_CALL_ENDED:{
                 return true;
             }
@@ -1506,8 +1510,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void bindCallEndedMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        log("bindCallEndedMessage");
+    public void bindCallMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        log("bindCallMessage");
 
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
         MegaChatMessage message = androidMessage.getMessage();
@@ -1554,103 +1558,109 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = "";
 
-            switch(message.getTermCode()){
-                case MegaChatMessage.END_CALL_REASON_ENDED:{
+            if(message.getType()==MegaChatMessage.TYPE_CALL_STARTED){
+                ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
+                textToShow = context.getResources().getString(R.string.call_started_messages);
+            }
+            else{
+                switch(message.getTermCode()){
+                    case MegaChatMessage.END_CALL_REASON_ENDED:{
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
+                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
 
 
-                    int hours = message.getDuration() / 3600;
-                    int minutes = (message.getDuration() % 3600) / 60;
-                    int seconds = message.getDuration() % 60;
+                        int hours = message.getDuration() / 3600;
+                        int minutes = (message.getDuration() % 3600) / 60;
+                        int seconds = message.getDuration() % 60;
 
-                    textToShow = context.getString(R.string.call_ended_message);
+                        textToShow = context.getString(R.string.call_ended_message);
 
-                    if(hours != 0){
-                        String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
-                        textToShow = textToShow + textHours;
-                        if((minutes != 0)||(seconds != 0)){
-                            textToShow = textToShow+", ";
+                        if(hours != 0){
+                            String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                            textToShow = textToShow + textHours;
+                            if((minutes != 0)||(seconds != 0)){
+                                textToShow = textToShow+", ";
+                            }
                         }
-                    }
 
-                    if(minutes != 0){
-                        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
-                        textToShow = textToShow + textMinutes;
+                        if(minutes != 0){
+                            String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                            textToShow = textToShow + textMinutes;
+                            if(seconds != 0){
+                                textToShow = textToShow+", ";
+                            }
+                        }
+
                         if(seconds != 0){
-                            textToShow = textToShow+", ";
+                            String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                            textToShow = textToShow + textSeconds;
                         }
+
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                            textToShow = textToShow.replace("[/B]", "</font>");
+                            textToShow = textToShow.replace("[C]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[/C]", "</font>");
+                        } catch (Exception e) {
+                        }
+
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_REJECTED:{
 
-                    if(seconds != 0){
-                        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
-                        textToShow = textToShow + textSeconds;
+                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
+
+                        textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+
+                        } catch (Exception e) {
+                        }
+
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
 
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
-                        textToShow = textToShow.replace("[C]", "<font color=\'#868686\'>");
-                        textToShow = textToShow.replace("[/C]", "</font>");
-                    } catch (Exception e) {
+                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
+
+                        textToShow = String.format(context.getString(R.string.call_not_answered_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
+
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_FAILED:{
 
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_REJECTED:{
+                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
+                        textToShow = String.format(context.getString(R.string.call_failed_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
 
-                    textToShow = String.format(context.getString(R.string.call_rejected_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-
-                    } catch (Exception e) {
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_CANCELLED:{
 
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
+                        textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
 
-                    textToShow = String.format(context.getString(R.string.call_not_answered_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
+                        break;
                     }
-
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_FAILED:{
-
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
-
-                    textToShow = String.format(context.getString(R.string.call_failed_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
-                    }
-
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_CANCELLED:{
-
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
-
-                    textToShow = String.format(context.getString(R.string.call_cancelled_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
-                    }
-
-                    break;
                 }
             }
 
@@ -1804,101 +1814,104 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = "";
 
-            switch(message.getTermCode()){
-                case MegaChatMessage.END_CALL_REASON_ENDED:{
+            if(message.getType()==MegaChatMessage.TYPE_CALL_STARTED){
+                ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
+                textToShow = context.getResources().getString(R.string.call_started_messages);
+            }
+            else{
+                switch(message.getTermCode()){
+                    case MegaChatMessage.END_CALL_REASON_ENDED:{
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
+                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
 
-                    int hours = message.getDuration() / 3600;
-                    int minutes = (message.getDuration() % 3600) / 60;
-                    int seconds = message.getDuration() % 60;
+                        int hours = message.getDuration() / 3600;
+                        int minutes = (message.getDuration() % 3600) / 60;
+                        int seconds = message.getDuration() % 60;
 
-                    textToShow = context.getString(R.string.call_ended_message);
+                        textToShow = context.getString(R.string.call_ended_message);
 
-                    if(hours != 0){
-                        String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
-                        textToShow = textToShow + textHours;
-                        if((minutes != 0)||(seconds != 0)){
-                            textToShow = textToShow+", ";
+                        if(hours != 0){
+                            String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                            textToShow = textToShow + textHours;
+                            if((minutes != 0)||(seconds != 0)){
+                                textToShow = textToShow+", ";
+                            }
                         }
-                    }
 
-                    if(minutes != 0){
-                        String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
-                        textToShow = textToShow + textMinutes;
+                        if(minutes != 0){
+                            String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                            textToShow = textToShow + textMinutes;
+                            if(seconds != 0){
+                                textToShow = textToShow+", ";
+                            }
+                        }
+
                         if(seconds != 0){
-                            textToShow = textToShow+", ";
+                            String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                            textToShow = textToShow + textSeconds;
                         }
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                            textToShow = textToShow.replace("[/B]", "</font>");
+                            textToShow = textToShow.replace("[C]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[/C]", "</font>");
+                        } catch (Exception e) {
+                        }
+
+
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_REJECTED:{
+                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
+                        textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
 
-                    if(seconds != 0){
-                        String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
-                        textToShow = textToShow + textSeconds;
+                        break;
                     }
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
-                        textToShow = textToShow.replace("[C]", "<font color=\'#868686\'>");
-                        textToShow = textToShow.replace("[/C]", "</font>");
-                    } catch (Exception e) {
+                    case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
+
+                        textToShow = String.format(context.getString(R.string.call_missed_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
+
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_FAILED:{
 
+                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_REJECTED:{
+                        textToShow = String.format(context.getString(R.string.call_failed_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
-
-                    textToShow = String.format(context.getString(R.string.call_rejected_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
+                        break;
                     }
+                    case MegaChatMessage.END_CALL_REASON_CANCELLED:{
 
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
+                        textToShow = String.format(context.getString(R.string.call_missed_messages));
+                        try {
+                            textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
+                            textToShow = textToShow.replace("[/A]", "</font>");
+                        } catch (Exception e) {
+                        }
 
-                    textToShow = String.format(context.getString(R.string.call_missed_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
+                        break;
                     }
-
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_FAILED:{
-
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
-
-                    textToShow = String.format(context.getString(R.string.call_failed_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
-                    }
-
-                    break;
-                }
-                case MegaChatMessage.END_CALL_REASON_CANCELLED:{
-
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
-
-                    textToShow = String.format(context.getString(R.string.call_missed_messages));
-                    try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
-                        textToShow = textToShow.replace("[/A]", "</font>");
-                    } catch (Exception e) {
-                    }
-
-                    break;
                 }
             }
 
@@ -7246,7 +7259,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.messages = messages;
         notifyItemRemoved(position);
 
-        if (position == messages.size() - 1) {
+        if (position == messages.size()) {
             log("No need to update more");
         } else {
             log("Update until end");
@@ -8192,7 +8205,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.forward_contact_preview_landscape:{
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 messageArray.add(messages.get(currentPosition - 1));
-                ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
+                ((ChatActivityLollipop) context).forwardMessages(messageArray);
                 break;
             }
             case R.id.content_own_message_text:

@@ -7,6 +7,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -93,6 +94,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             break;
                         }
                         case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
+
                             if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
                                 MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                 if(nodeList != null) {
@@ -341,6 +343,43 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
 
                     ((ChatActivityLollipop) context).removeProgressDialog();
                 }
+            }
+            else if(context instanceof NodeAttachmentHistoryActivity){
+                if(success>0){
+                    //A message has been forwarded
+                    String text = null;
+                    int totalErrors = error+errorNotAvailable;
+                    if(totalErrors == 0){
+                        text = context.getResources().getQuantityString(R.plurals.messages_forwarded_success_plural, totalMessages);
+                    }
+                    else if(totalErrors==errorNotAvailable){
+                        text = context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors);
+                    }
+                    else{
+                        text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
+                    }
+
+                    ((NodeAttachmentHistoryActivity) context).showSnackbar(text);
+
+//                    if(chatHandles.length==1){
+//                        ((NodeAttachmentHistoryActivity) context).openChatAfterForward(chatHandles[0], text);
+//                    }
+//                    else {
+//                        ((NodeAttachmentHistoryActivity) context).openChatAfterForward(-1, text);
+//                    }
+                }
+                else{
+                    //No messages forwarded
+                    int totalErrors = error+errorNotAvailable;
+                    if(totalErrors==errorNotAvailable){
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
+                    }
+                    else{
+                        String text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(text);
+                    }
+                }
+                ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
             }
         }
     }
