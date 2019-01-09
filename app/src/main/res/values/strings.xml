@@ -13,7 +13,7 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
-    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> of </string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">of</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Cancel</string>
@@ -236,7 +236,7 @@
     <string name="cancel_transfer_confirmation">Delete this transfer?</string>
     <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud drive</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
@@ -2067,10 +2067,10 @@
 
     <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a customized plan.</string>
+    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Cloud Drive is full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
-    <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Cloud Drive is full. If you need more storage please contact MEGA support to get a customized plan.</string>
+    <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Cloud Drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
     <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get Bonus</string>
@@ -2159,7 +2159,7 @@
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
 
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account deleted</string>
-    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
+    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]The account [/B][A]%s[/A][B] has been deleted.[/B]</string>
 
     <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
     <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
@@ -2245,7 +2245,7 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
-    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared files</string>
+    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
@@ -2279,9 +2279,9 @@
         <item context="version items" quantity="other">Messages forwarded</item>
     </plurals>
 
-    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Type password</string>
-    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is protected. Enter the document opening password.</string>
-    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Wrong password. Try again.</string>
-    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
+    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
+    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password you have entered is not valid.</string>
 
 </resources>
