@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.camera2.CameraManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -1908,6 +1907,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+
+			}else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
+				String textToShow = context.getResources().getString(R.string.call_started_messages);
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
 			else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
 				String messageContent = chat.getLastMessage();
@@ -2141,7 +2152,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
-
 				}
 			}
 		}
@@ -2151,16 +2161,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 	
-	public void setChats (ArrayList<MegaChatListItem> chats){
-		log("SETCONTACTS!!!!");
-		this.chats = chats;
-		if(chats!=null)
-		{
-			log("num requests: "+chats.size());
-		}
+	public void setChats (ArrayList<MegaChatListItem> updatedChats){
+		log("setChats: "+ updatedChats.size());
+		this.chats = updatedChats;
 
 		positionClicked = -1;
-//		listFragment.invalidate();
+
+		if(listFragment!=null){
+            listFragment.invalidate();
+        }
+
 		notifyDataSetChanged();
 	}
 	
