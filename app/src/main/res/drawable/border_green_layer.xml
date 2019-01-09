@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <solid android:color="@color/user_layer_group_call"/>
+
+    <stroke android:width="0dp"/>
+
+    <corners android:radius="0dp" />
+
+</shape>

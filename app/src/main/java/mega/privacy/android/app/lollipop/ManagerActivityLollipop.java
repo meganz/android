@@ -2221,6 +2221,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(ret==0||ret==MegaChatApi.INIT_ERROR){
 						ret = megaChatApi.init(gSession);
 						log("After init: "+ret);
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+						}else if (ret == MegaChatApi.INIT_ERROR) {
+							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+						}else{
+							log("onCreate: Chat correctly initialized");
+							megaChatApi.enableGroupChatCalls(true);
+						}
 					}
 					else{
 						log("Offline mode: Do not init, chat already initialized");

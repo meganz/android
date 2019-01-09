@@ -160,6 +160,7 @@
     <color name="background_button_white">#FFFAFAFA</color>
     <color name="border_button_white">#FFE1E1E1</color>
     <color name="add_contact_icons">#FF707070</color>
+    <color name="user_layer_group_call">#8000BFA5</color>
 
     <color name="emoji_icons">#61000000</color>
     <color name="emoji_background">#FFECEFF1</color>
