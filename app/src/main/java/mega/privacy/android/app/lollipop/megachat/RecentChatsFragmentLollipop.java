@@ -277,7 +277,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                         else{
-                            log("chats no: "+chats.size());
+                            log("setChats:chats size: "+chats.size());
 
                             //Order by last interaction
                             Collections.sort(chats, new Comparator<MegaChatListItem> (){
@@ -1248,6 +1248,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                     else{
                         log("New unarchived element:refresh chat list");
+
                         setChats();
                     }
                     //Update last position
