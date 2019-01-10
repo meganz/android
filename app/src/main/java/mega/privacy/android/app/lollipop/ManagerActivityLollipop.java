@@ -12611,7 +12611,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			spaceTV.setText(result);
 			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
 			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
-			log("*** "+progress+ " *** "+usedSpace);
+			log("progress "+progress+ " usedSpace "+usedSpace);
 			usedSpacePB.setProgress(progress);
 			if (progress >=0 && usedSpace >=0) {
 				usedSpaceLayout.setVisibility(View.VISIBLE);
