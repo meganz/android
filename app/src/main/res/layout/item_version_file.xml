@@ -21,7 +21,9 @@
 			android:maxLines="1"
 			android:singleLine="true"
 			android:ellipsize="end"
-			android:textSize="14sp"/>
+			android:textSize="14sp"
+			android:fontFamily="sans-serif-light"
+			android:textStyle="bold"/>
 
 		<TextView
 			android:id="@+id/version_file_header_size"
@@ -32,6 +34,8 @@
 			android:layout_alignParentRight="true"
 			android:layout_centerVertical="true"
 			android:textSize="14sp"
+			android:fontFamily="sans-serif-light"
+			android:textStyle="bold"
 			android:ellipsize="end"
 			android:maxLines="1"/>
 	</RelativeLayout>

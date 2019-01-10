@@ -1759,8 +1759,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     private void sharedContactClicked() {
         FrameLayout sharedContactLayout = (FrameLayout)findViewById(R.id.shared_contact_list_container);
         if (isShareContactExpanded) {
+            if (sl != null) {
+                usersSharedWithTextButton.setText(sl.size() + " " + getResources().getQuantityString(R.plurals.general_num_users, sl.size()));
+            }
             sharedContactLayout.setVisibility(View.GONE);
         } else {
+            usersSharedWithTextButton.setText(R.string.general_close);
             sharedContactLayout.setVisibility(View.VISIBLE);
         }
 
