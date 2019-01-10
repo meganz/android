@@ -776,6 +776,16 @@
                                 android:layout_height="wrap_content"/>
                         </RelativeLayout>
 
+                        <!-- error icon-->
+                        <ImageView
+                            android:id="@+id/content_own_message_voice_clip_error"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
+                            android:visibility="gone"/>
+
                         <SeekBar
                             android:id="@+id/content_own_message_voice_clip_seekBar"
                             android:layout_width="145dp"
@@ -783,6 +793,7 @@
                             android:theme="@style/MySeekBar"
                             android:thumbTint="@color/white"
                             android:max="200"
+                            android:focusable="false"
                             android:progress="0"
                             android:background="@null"
                             android:layout_gravity="center_vertical"

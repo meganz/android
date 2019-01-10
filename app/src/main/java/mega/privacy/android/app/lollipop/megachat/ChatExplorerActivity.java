@@ -131,7 +131,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             if(intent.getAction()!=null){
                 if(intent.getAction()== Constants.ACTION_FORWARD_MESSAGES){
                     messagesIds = intent.getLongArrayExtra("ID_MESSAGES");
-                    log("No of messages to forward: "+messagesIds.length);
+                    log("********No of messages to forward: "+messagesIds.length);
                     chatIdFrom = intent.getLongExtra("ID_CHAT_FROM", -1);
                 }
             }

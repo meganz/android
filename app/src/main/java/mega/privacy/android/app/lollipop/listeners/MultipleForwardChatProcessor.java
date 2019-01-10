@@ -34,6 +34,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     MegaChatApiAndroid megaChatApi;
 
     public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat) {
+
         super();
         this.context = context;
 
