@@ -46,7 +46,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSharedFolderLollipopAdapter.ViewHolderShareList> implements OnClickListener {
+public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSharedFolderLollipopAdapter.ViewHolderShareList> implements OnClickListener, View.OnLongClickListener {
 	
 	Context context;
 	int positionClicked;
@@ -71,7 +71,21 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	ProgressDialog statusDialog;
 	
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
-	
+
+	@Override
+	public boolean onLongClick(View v) {
+
+        ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
+        int currentPosition = holder.currentPosition;
+
+        if (context instanceof FileContactListActivityLollipop) {
+            ((FileContactListActivityLollipop) context).activateActionMode();
+            ((FileContactListActivityLollipop) context).itemClick(currentPosition);
+        }
+
+		return true;
+	}
+
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
 		Context context;
@@ -221,6 +235,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		ViewHolderShareList holder = new ViewHolderShareList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.shared_folder_item_layout);
 		holder.itemLayout.setOnClickListener(this);
+		holder.itemLayout.setOnLongClickListener(this);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.shared_folder_contact_thumbnail);
 		holder.initialLetter = (TextView) v.findViewById(R.id.shared_folder_contact_initial_letter);
 		

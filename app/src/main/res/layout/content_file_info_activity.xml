@@ -24,8 +24,7 @@
             android:id="@+id/file_properties_owner_layout"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:gravity="left"
-            android:background="@color/content_text_background">
+            android:gravity="left">
 
             <RelativeLayout
                 android:id="@+id/contact_list_relative_layout_avatar"
@@ -40,7 +39,7 @@
                     android:layout_height="fill_parent"
                     android:scaleType="fitCenter"
                     android:layout_centerInParent="true"
-                    rounded:border_color="@color/border_file_properties"
+                    rounded:border_color="@color/white"
                     rounded:border_width="0dp"
                     rounded:corner_radius="20dp" />
 
@@ -82,8 +81,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
-                        android:textColor="@color/accentColor"
+                        android:textColor="@color/emoji_icons"
                         android:maxLines="1" />
+
+                    <ImageView
+                        android:id="@+id/file_properties_owner_state_icon"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginLeft="6dp"
+                        android:background="@null"
+                        android:src="@drawable/circle_status_contact_offline"
+                        android:visibility="gone"/>
 
                     </LinearLayout>
 
@@ -100,6 +110,13 @@
                     android:singleLine="true"/>
 
             </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="16dp"
+                android:background="@color/separator_grey"
+                android:layout_alignParentBottom="true"/>
         </RelativeLayout>
 
         <!-- AVAILABLE OFFLINE LAYOUT -->

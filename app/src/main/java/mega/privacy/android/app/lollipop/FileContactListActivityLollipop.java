@@ -12,7 +12,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,12 +21,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -66,7 +62,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
+public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -84,7 +80,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	RelativeLayout contactLayout;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-	GestureDetectorCompat detector;
 	ImageView emptyImage;
 	TextView emptyText;
 	FloatingActionButton fab;
@@ -125,18 +120,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	Handler handler;
 	DisplayMetrics outMetrics;
 
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-	    public void onLongPress(MotionEvent e) {
-			log("onLongPress -- RecyclerViewOnGestureListener");
-			// handle long press
-			if (!adapter.isMultipleSelect()){
-				adapter.setMultipleSelect(true);
-
-				actionMode = startSupportActionMode(new ActionBarCallBack());
-			}
-			super.onLongPress(e);
-	    }
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+		}
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -434,8 +424,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				log("Size of pending out shares: "+tempListContacts);
 				listContacts.addAll(megaApi.getPendingOutShares(node));
 			}
-
-			detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 			
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
 			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
@@ -443,7 +431,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
-			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 			
 			
 			emptyImage = (ImageView) findViewById(R.id.file_contact_list_empty_image);
@@ -1215,62 +1202,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,
 			ArrayList<MegaContactRequest> requests) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onDown(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
-		detector.onTouchEvent(e);
-		return false;
-	}
-
-	@Override
-	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
 	}
