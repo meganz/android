@@ -31,12 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
@@ -49,7 +47,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
     public static int GRID_LARGE = 2;
-    MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     Context context;
     ActionBar aB;
@@ -77,9 +74,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
@@ -110,16 +104,8 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         log("fragment ADDED");
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
-        }
-
-        if (megaApi.getRootNode() == null){
-            return null;
         }
 
         prefs = dbH.getPreferences();

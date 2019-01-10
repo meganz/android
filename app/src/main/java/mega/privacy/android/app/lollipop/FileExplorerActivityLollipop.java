@@ -501,8 +501,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							megaChatApi.logout(this);
 						}
 						else{
-
 							log("onCreate: Chat correctly initialized");
+							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}

@@ -3,9 +3,9 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.5.1 (220)</string>
+    <string name="app_version" context="Not translate">3.6 (221)</string>
     <string name="sdk_version" context="Not translate">0fbbaa4</string>
-    <string name="karere_version" context="Not translate">9c9b9cc</string>
+    <string name="karere_version" context="Not translate">f5b7c78</string>
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
@@ -68,6 +68,7 @@
     <!--
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     -->
+    <string name="general_show_info" context="Label of a button/notification to show info about something">Show info</string>
 
     <string name="error_general_nodes" context="Error getting the root node">Error. Please, try again.</string>
 
@@ -286,7 +287,7 @@
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size</string>
     <string name="file_properties_info_modified" context="when was the file modified">Modified</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Added</string>
+    <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
     <string name="file_properties_info_created" context="when the file was created">Created</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
@@ -1258,7 +1259,7 @@
     <string name="message_option_retry" context="option shown when a message could not be sent">Retry</string>
 
     <string name="title_message_not_sent_options" context="title of the menu for a non sent message">Message not sent</string>
-    <string name="title_message_uploading_options" context="title of the menu for an uploading message with attachment">Attachment uploading</string>
+    <string name="title_message_uploading_options" context="title of the menu for an uploading message with attachment">Uploading attachment</string>
 
     <string name="no_conversation_history" context="message shown when a chat has no messages">No conversation history</string>
 
@@ -1602,7 +1603,7 @@
     <string name="context_new_file_name" context="Input field description in the create file dialog.">File Name</string>
 
     <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Link name</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">link.url</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog.">Link URL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">SUBJECT</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">CONTENT</string>
@@ -1920,7 +1921,7 @@
     <string name="button_setup_2fa" context="Button that permits user begin with the process of enable Two-Factor Authentication">Begin Setup</string>
     <string name="explain_qr_seed_2fa_1" context="Text that explain how to do with Two-Factor Authentication QR">Scan or copy the seed to your Authenticator App.</string>
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">Be sure to backup this seed to a safe place in case you lose your device.</string>
-    <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Please enter the code generated by your Authenticator App.</string>
+    <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Please enter the 6-digit code generated by your Authenticator App.</string>
     <string name="general_verify" context="Text button">Verify</string>
     <string name="general_next" context="Text button">Next</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code. Not translate">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
@@ -2022,6 +2023,9 @@
     <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
     <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
 
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to the call</string>
+    <string name="join_call_layout" context="Title of the layout to join a group call from the chat screen">Tap to join to the call</string>
+
     <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Invite contacts</string>
     <string name="share_with" cotext="Label shown when the user wants to share something with other contacts">Share with</string>
     <string name="contacts_list_empty_text_loading_share" context="Message shown while the contact list from the device and from MEGA is being read and then shown to the user">Loading contacts&#8230;</string>
@@ -2064,7 +2068,12 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Invalid code</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a customized plan.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Cloud Drive is full. Upgrade now and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Cloud Drive is full. If you need more storage please contact MEGA support to get a customized plan.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
     <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get Bonus</string>
@@ -2132,8 +2141,8 @@
 
     <string name="title_upload_explorer" context="Title of cloud explorer to upload a file">Upload to MEGA</string>
     <string name="choose_destionation" context="Label choose destination">Choose destination</string>
-    <string name="general_show_more" context="Label that indicates show more items">Show more</string>
-    <string name="general_show_less" context="Label that indicates show less items">Show less</string>
+    <string name="general_show_more" context="Label that indicates show more items">Show More</string>
+    <string name="general_show_less" context="Label that indicates show less items">Show Less</string>
 
     <string name="notification_new_contact_request" context="Subtitle of the historic notification for a new contact request">[A]%s [/A][B]sent you a contact request.[/B]</string>
     <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
@@ -2155,11 +2164,11 @@
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account deleted</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
 
-    <string name="subtitle_file_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
-    <string name="subtitle_folder_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
 
-    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
-    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
 
     <string name="title_outgoing_contact_request" context="Title of the historic notification for outgoing contact requests">Sent request</string>
     <string name="title_incoming_contact_request" context="Title of the historic notification for incoming contact requests">Received request</string>
@@ -2167,7 +2176,7 @@
     <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]denied your contact request.[/B]</string>
     <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
 
-    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]Access to folders shared by [/B][A]%s[/A][B] was removed.[/B]</string>
+    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]Access to folders shared by [/B][A]%s[/A][B] were removed.[/B]</string>
     <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] has left a shared folder.[/B]</string>
     <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] has left the shared folder [/B][A]%2$s.[/A]</string>
 
@@ -2175,9 +2184,9 @@
     <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
 
-    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">[A]%s[/A] is your current account</string>
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievement program.</string>
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Payment</string>
+    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">Your current account is [A]%s[/A]</string>
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
 
     <string name="billing_period_title" context="title of billing period">Billing period</string>
     <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
@@ -2185,31 +2194,31 @@
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
 
-    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (subscription)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
 
-    <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file.txt</string>
+    <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">file name</string>
 
-    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Error. The value typed should be mayour than 0</string>
+    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Invalid value for auto-away, it should be greater than 0.</string>
 
-    <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
-    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
+    <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
+    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d file</item>
         <item context="Plural of file. 2 files" quantity="other">%d files</item>
     </plurals>
 
-    <plurals name="num_folders_with_parameter"  context="on the section notifications indicates the number of folder added to a shared folder">
+    <plurals name="num_folders_with_parameter" context="on the section notifications indicates the number of folder added to a shared folder">
         <item context="Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
         <item context="Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
     </plurals>
 
-    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
+    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
 
     <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
         <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d file.[/B]</item>
@@ -2231,20 +2240,23 @@
         <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
-    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s [A]month[/A] *</string>
+    <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
+    <string name="call_started_messages" context="Message shown when a call starts.">Call started</string>
 
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL certificate error</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public WiFi with additional requirements.</string>
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
+    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared files</string>
+
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
     <string name="call_ended_message" context="Message shown when a call ends.">[A]Call ended[/A][C]. Duration: [/C]</string>
     <plurals name="plural_call_ended_messages_hours" context="Message that shows the hours of a call when it ends">
-        <item context="one minute" quantity="one">[B]%1$s hour[/B]</item>
-        <item context="more minutes" quantity="other">[B]%1$s hours[/B]</item>
+        <item context="one hour" quantity="one">[B]%1$s hour[/B]</item>
+        <item context="more hours" quantity="other">[B]%1$s hours[/B]</item>
     </plurals>
     <plurals name="plural_call_ended_messages_minutes" context="Message that shows the minutes of a call when it ends">
         <item context="one minute" quantity="one">[B]%1$s minute[/B]</item>
@@ -2255,10 +2267,36 @@
         <item context="more seconds" quantity="other">[B]%1$d seconds[/B]</item>
     </plurals>
 
-    <string name="last_seen_today" context="Title of the dialog to inform about a SSL error">Last seen today at %1$s</string>
-    <string name="last_seen_long_time_ago" context="Title of the dialog to inform about a SSL error">Last seen a long time ago</string>
-    <string name="last_seen_general" context="Title of the dialog to inform about a SSL error">Last seen %1$s at %2$s</string>
+    <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Last seen [/A]today %1$s</string>
+    <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">[A]Last seen [/A]a long time ago</string>
+    <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">[A]Last seen [/A]%1$s %2$s</string>
+
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
+
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">joined the call</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">left the call</string>
+
+    <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Error. No more participants are allowed in this group call.</string>
+    <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Error. No more video are allowed in this group call.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
+    <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Incoming call&#8230;</string>
+    <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Calling&#8230;</string>
+
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Message contains invalid meta</string>
+
+    <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
+
+    <plurals name="messages_forwarded_success_plural" formatted="false" context="Confirmation message after forwarding one or several messages">
+        <item context="version item" quantity="one">Message forwarded</item>
+        <item context="version items" quantity="other">Messages forwarded</item>
+    </plurals>
+
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Type password</string>
+    <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is protected. Enter the document opening password.</string>
+    <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Wrong password. Try again.</string>
+    <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
+    
+    <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 
 </resources>

@@ -15,11 +15,6 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-        <!--<FrameLayout-->
-            <!--android:id="@+id/chat_emoji_keyboard"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:layout_alignParentBottom="true" />-->
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -85,7 +80,7 @@
                             android:layout_alignParentTop="true"
                             android:visibility="gone"/>
                     </RelativeLayout>
-                    <TextView
+                    <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -93,8 +88,7 @@
                         android:textSize="12sp"
                         android:visibility="gone"
                         android:singleLine="true"
-                        android:maxLines="1"
-                        android:ellipsize="end"
+                        android:ellipsize="none"
                         android:layout_marginRight="0dp"/>
                 </LinearLayout>
 
@@ -391,16 +385,14 @@
                 android:layout_below="@+id/toolbar_chat"
                 android:background="@color/accentColor">
                 <TextView
+                    android:id="@+id/call_in_progress_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:text="Tap to return to call"/>
+                    android:layout_centerHorizontal="true"/>
             </RelativeLayout>
-
-
             <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"

@@ -377,6 +377,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									}
 									else{
 										log("shouldRun: Chat correctly initialized");
+										megaChatApi.enableGroupChatCalls(true);
 									}
 								}
 							}
@@ -700,6 +701,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 						dbH.setCamSyncEnabled(false);
+						dbH.setSecondaryUploadEnabled(false);
 						return START_NOT_STICKY;
 					}
 					else{
@@ -714,6 +716,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 						dbH.setCamSyncEnabled(false);
+						dbH.setSecondaryUploadEnabled(false);
 						return START_NOT_STICKY;
 					}
 					else{
@@ -2218,7 +2221,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 			}
 			else{
-				log("Error: "+request.getType()+" : "+request.getRequestString());
+				log("Error ("+e.getErrorCode()+"): "+request.getType()+" : "+request.getRequestString());
 				if(request.getNodeHandle()!=-1){
 					MegaNode nodeError = megaApi.getNodeByHandle(request.getNodeHandle());
 					if(nodeError!=null){
@@ -2226,7 +2229,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 
-				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				if (e.getErrorCode() == MegaError.API_EOVERQUOTA)
+					isOverquota = true;
+
+				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
@@ -2320,12 +2326,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			CameraSyncService.this.cancel();
 		}
 		else{
-
-			if(isOverquota){
-				return;
-			}
-
 			if (e.getErrorCode() == MegaError.API_OK) {
+
+				if(isOverquota){
+					log("After overquota error");
+					isOverquota = false;
+				}
+
 				log("Image Sync OK: " + transfer.getFileName());
 				totalSizeUploaded += transfer.getTransferredBytes();
 				log("IMAGESYNCFILE: " + transfer.getPath());
@@ -2458,17 +2465,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					uploadNext();
 				}
 			}
-			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-				log("OVERQUOTA ERROR: "+e.getErrorCode());
-
-				isOverquota = true;
-
-				CameraSyncService.this.cancel();
-
-			}
 			else{
 				log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
-				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					isOverquota = true;
+				}
+
+				CameraSyncService.this.cancel();
 			}
 		}
 	}
@@ -2489,7 +2494,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 
 		if(isOverquota){
-			return;
+			log("After overquota error");
+			isOverquota = false;
 		}
 
 		final long bytes = transfer.getTransferredBytes();
@@ -2500,6 +2506,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName());
+
+		if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+			if (e.getValue() != 0)
+				log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+			else
+				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+
+			isOverquota = true;
+
+			updateProgressNotification(totalSizeToUpload);
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -2530,10 +2547,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 		}
 
+		String status = isOverquota ? getString(R.string.overquota_alert_title) :
+				getString(R.string.settings_camera_notif_title);
+
 		Intent intent = null;
 
 		intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
-		intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
+		intent.setAction(isOverquota ? Constants.ACTION_OVERQUOTA_STORAGE :
+				Constants.ACTION_CANCEL_CAM_SYNC);
 
 		String info = Util.getProgressSize(CameraSyncService.this, progress, totalSizeToUpload);
 
@@ -2555,7 +2576,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					.setOngoing(true)
 					.setContentTitle(message)
 					.setSubText(info)
-					.setContentText(getString(R.string.settings_camera_notif_title))
+					.setContentText(status)
 					.setOnlyAlertOnce(true);
 
 			notification = mBuilderCompat.build();
@@ -2568,7 +2589,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					.setOngoing(true)
 					.setContentTitle(message)
 					.setSubText(info)
-					.setContentText(getString(R.string.settings_camera_notif_title))
+					.setContentText(status)
 					.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
 		}
@@ -2581,7 +2602,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					.setOngoing(true)
 					.setContentTitle(message)
 					.setContentInfo(info)
-					.setContentText(getString(R.string.settings_camera_notif_title))
+					.setContentText(status)
 					.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
 //					notification = mBuilder.build();
