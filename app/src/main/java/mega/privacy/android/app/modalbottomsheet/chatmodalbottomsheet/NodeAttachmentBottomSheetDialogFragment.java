@@ -100,7 +100,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             messageId = savedInstanceState.getLong("messageId", -1);
             log("Handle of the message: "+messageId);
             handle = savedInstanceState.getLong("handle", -1);
-            messageMega = megaChatApi.getMessage(chatId, messageId);
+
+            if(context instanceof NodeAttachmentHistoryActivity){
+                messageMega = megaChatApi.getMessageFromNodeHistory(chatId, messageId);
+            }
+            else{
+                messageMega = megaChatApi.getMessage(chatId, messageId);
+            }
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
             }
@@ -118,7 +124,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
 
             log("Id Chat and Message id: "+chatId+ "___"+messageId);
-            messageMega = megaChatApi.getMessage(chatId, messageId);
+            if(context instanceof NodeAttachmentHistoryActivity){
+                messageMega = megaChatApi.getMessageFromNodeHistory(chatId, messageId);
+            }
+            else{
+                messageMega = megaChatApi.getMessage(chatId, messageId);
+            }
+
             if(messageMega!=null){
                 message = new AndroidMegaChatMessage(messageMega);
             }
@@ -160,7 +172,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorRemove = (LinearLayout) contentView.findViewById(R.id.separator_remove);
 
-        if(message.getMessage()==null){
+        if(message==null || message.getMessage()==null){
             return;
         }
 

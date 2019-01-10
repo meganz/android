@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -26,7 +25,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -831,6 +829,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			array[i] = ids.get(i);
 		}
 		intent.putExtra("messageIds", array);
+		intent.putExtra("fromNodeHistory", true);
 		startActivity(intent);
 	}
 
@@ -1329,7 +1328,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		if(importMessagesHandles.length==1){
 			for (int k = 0; k < importMessagesHandles.length; k++){
-				MegaChatMessage message = megaChatApi.getMessage(chatId, importMessagesHandles[k]);
+				MegaChatMessage message = megaChatApi.getMessageFromNodeHistory(chatId, importMessagesHandles[k]);
 				if(message!=null){
 
 					MegaNodeList nodeList = message.getMegaNodeList();
@@ -1364,7 +1363,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			MultipleRequestListener listener = new MultipleRequestListener(Constants.MULTIPLE_CHAT_IMPORT, this);
 
 			for (int k = 0; k < importMessagesHandles.length; k++){
-				MegaChatMessage message = megaChatApi.getMessage(chatId, importMessagesHandles[k]);
+				MegaChatMessage message = megaChatApi.getMessageFromNodeHistory(chatId, importMessagesHandles[k]);
 				if(message!=null){
 
 					MegaNodeList nodeList = message.getMegaNodeList();

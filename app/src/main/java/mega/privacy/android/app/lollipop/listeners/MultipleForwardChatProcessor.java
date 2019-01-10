@@ -65,7 +65,13 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         if(chatHandles.length==1){
             log("Forward to one chat");
             for(int i=0;i<idMessages.length;i++){
-                MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
+                MegaChatMessage messageToForward = null;
+                if(context instanceof NodeAttachmentHistoryActivity){
+                    messageToForward = megaChatApi.getMessageFromNodeHistory(idChat, idMessages[i]);
+                }
+                else{
+                    messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
+                }
                 if(messageToForward!=null){
                     int type = messageToForward.getType();
                     log("Type of message to forward: "+type);
@@ -164,7 +170,13 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
             log("Forward to many chats");
             for(int k=0;k<chatHandles.length;k++){
                 for(int i=0;i<idMessages.length;i++){
-                    MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
+                    MegaChatMessage messageToForward = null;
+                    if(context instanceof NodeAttachmentHistoryActivity){
+                        messageToForward = megaChatApi.getMessageFromNodeHistory(idChat, idMessages[i]);
+                    }
+                    else{
+                        messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
+                    }
                     log("Forward: "+ idMessages[i] + " chat id: "+chatHandles[k]);
                     if(messageToForward!=null){
                         int type = messageToForward.getType();
