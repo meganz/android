@@ -2747,8 +2747,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //ft.commitAllowingStateLoss();
     }
 
-
-
     public void attachFromCloud(){
         log("attachFromCloud");
         if(megaApi!=null && megaApi.getRootNode()!=null){
@@ -5312,9 +5310,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         for(int i=0;i<pendMsgs.size();i++){
             AndroidMegaChatMessage pMsg = pendMsgs.get(i);
             if(pMsg!=null && pMsg.getPendingMessage()!=null){
-                if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_UPLOADING){
+                if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_PREPARING){
                     if(pMsg.getPendingMessage().getTransferTag()!=-1){
-                        log("Transfer tag: "+pMsg.getPendingMessage().getTransferTag());
+                        log("STATE_PREPARING:Transfer tag: "+pMsg.getPendingMessage().getTransferTag());
+                        if(megaApi!=null) {
+                            MegaTransfer t = megaApi.getTransferByTag(pMsg.getPendingMessage().getTransferTag());
+                            if(t!=null){
+                                if(t.getState()==MegaTransfer.STATE_COMPLETED){
+                                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_SENT);
+                                }
+                                else if(t.getState()==MegaTransfer.STATE_CANCELLED){
+                                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_SENT);
+                                }
+                                else if(t.getState()==MegaTransfer.STATE_FAILED){
+                                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                    pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                    appendMessagePosition(pMsg);
+                                }
+                                else{
+                                    log("STATE_PREPARING:Found transfer in progress for the message");
+                                    appendMessagePosition(pMsg);
+                                }
+                            }
+                            else{
+                                log("STATE_PREPARING:Mark message as error uploading - no transfer in progress");
+                                dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
+                                appendMessagePosition(pMsg);
+                            }
+                        }
+                    }
+                }
+                else if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_UPLOADING){
+                    if(pMsg.getPendingMessage().getTransferTag()!=-1){
+                        log("STATE_UPLOADING:Transfer tag: "+pMsg.getPendingMessage().getTransferTag());
                         if(megaApi!=null && megaApi.isOnline()){
                             MegaTransfer t = megaApi.getTransferByTag(pMsg.getPendingMessage().getTransferTag());
                             if(t!=null){
@@ -5330,12 +5359,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     appendMessagePosition(pMsg);
                                 }
                                 else{
-                                    log("Found transfer in progress for the message");
+                                    log("STATE_UPLOADING:Found transfer in progress for the message");
                                     appendMessagePosition(pMsg);
                                 }
                             }
                             else{
-                                log("Mark message as error uploading - no transfer in progress");
+                                log("STATE_UPLOADING:Mark message as error uploading - no transfer in progress");
                                 dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_ERROR_UPLOADING);
                                 pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_ERROR_UPLOADING);
                                 appendMessagePosition(pMsg);
@@ -5471,7 +5500,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(msg.isUploading()){
                 lastIndex++;
-                log("The message is uploading add to index: "+lastIndex);
+                log("The message is uploading add to index: "+lastIndex+ "with state: "+msg.getPendingMessage().getState());
             }else{
                 log("status of message: "+msg.getMessage().getStatus());
                 if(lastIndex>=0) {
