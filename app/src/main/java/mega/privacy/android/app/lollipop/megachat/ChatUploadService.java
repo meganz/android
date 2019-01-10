@@ -948,7 +948,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					pendMsg.setNodeHandle(transfer.getNodeHandle());
 					pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
 					log("attachVoiceClips() - attachVoiceMessage");
-
 					megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
 				}

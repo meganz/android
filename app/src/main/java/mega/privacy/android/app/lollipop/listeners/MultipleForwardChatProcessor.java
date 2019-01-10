@@ -61,7 +61,6 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     }
 
     public void forward(){
-
         if(chatHandles.length==1){
             log("Forward to one chat");
             for(int i=0;i<idMessages.length;i++){
@@ -94,6 +93,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             break;
                         }
                         case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
+                            log("Forward to one chat TYPE_NODE_ATTACHMENT");
                             if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
                                 MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                 if(nodeList != null) {
@@ -136,7 +136,49 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             }
 
                             break;
-                        }case MegaChatMessage.TYPE_CONTAINS_META:{
+                        }
+
+                        case MegaChatMessage.TYPE_VOICE_CLIP:{
+                            log("Forward to one chat TYPE_VOICE_CLIP");
+                            if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
+                                MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                                if(nodeList != null) {
+                                    for (int j = 0; j < nodeList.size(); j++) {
+                                        MegaNode temp = nodeList.get(j);
+                                        String name = temp.getName();
+                                        MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
+                                        if(chatFolder==null){
+                                            log("Error no chat folder - return");
+                                            return;
+                                        }
+                                        MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
+                                        if(nodeToAttach!=null){
+                                            if(chatHandles[0]==idChat){
+                                                megaChatApi.attachVoiceMessage(chatHandles[0], nodeToAttach.getHandle(), this);
+                                            }else{
+                                                megaChatApi.attachVoiceMessage(chatHandles[0], nodeToAttach.getHandle(), this);
+                                            }
+                                        }else{
+                                            log("ERROR - Node to attach is NULL - one node not attached");
+                                        }
+                                    }
+                                }
+                            }else{
+                                MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                                if(nodeList != null) {
+                                    for (int j = 0; j < nodeList.size(); j++) {
+                                        MegaNode temp = nodeList.get(j);
+                                        if(chatHandles[0]==idChat){
+                                            megaChatApi.attachVoiceMessage(chatHandles[0], temp.getHandle(), this);
+                                        }else{
+                                            megaChatApi.attachVoiceMessage(chatHandles[0], temp.getHandle(), this);
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case MegaChatMessage.TYPE_CONTAINS_META:{
                             MegaChatContainsMeta meta = messageToForward.getContainsMeta();
                             String text = "";
                             if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
@@ -192,7 +234,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                 break;
                             }
                             case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-
+                                log("Forward to many chats - TYPE_NODE_ATTACHMENT");
                                 if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
                                     MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                     if(nodeList != null) {
@@ -236,7 +278,48 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                 }
 
                                 break;
-                            }case MegaChatMessage.TYPE_CONTAINS_META:{
+                            }case MegaChatMessage.TYPE_VOICE_CLIP:{
+                                log("Forward to many chats - TYPE_VOICE_CLIP");
+                                if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
+                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                                    if(nodeList != null) {
+                                        for (int j = 0; j < nodeList.size(); j++) {
+                                            MegaNode temp = nodeList.get(j);
+                                            String name = temp.getName();
+                                            MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
+                                            if(chatFolder==null){
+                                                log("Error no chat folder - return");
+                                                return;
+                                            }
+                                            MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
+                                            if(nodeToAttach!=null){
+                                                if(chatHandles[k]==idChat){
+                                                    megaChatApi.attachVoiceMessage(chatHandles[k], nodeToAttach.getHandle(), this);
+                                                }else{
+                                                    megaChatApi.attachVoiceMessage(chatHandles[k], nodeToAttach.getHandle(), this);
+                                                }
+                                            }else{
+                                                log("ERROR - Node to attach is NULL - one node not attached");
+                                            }
+                                        }
+                                    }
+                                }else{
+                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                                    if(nodeList != null) {
+                                        for (int j = 0; j < nodeList.size(); j++) {
+                                            MegaNode temp = nodeList.get(j);
+
+                                            if(chatHandles[k]==idChat){
+                                                megaChatApi.attachVoiceMessage(chatHandles[k], temp.getHandle(), this);
+                                            }else{
+                                                megaChatApi.attachVoiceMessage(chatHandles[k], temp.getHandle(), this);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                            case MegaChatMessage.TYPE_CONTAINS_META:{
                                 MegaChatContainsMeta meta = messageToForward.getContainsMeta();
                                 String text = "";
                                 if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){

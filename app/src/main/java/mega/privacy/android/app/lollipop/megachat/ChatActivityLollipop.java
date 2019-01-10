@@ -1976,13 +1976,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder = null;
                 isRecording = false;
                 voiceClipLayout.showLock(false);
-
             }
         }
-    }
-    public void sendVoiceClip(){
-        log("sendVoiceClip()");
-        uploadVoiceNote(outputFileVoiceNotes);
     }
 
     public void stopRecord(){
@@ -2003,7 +1998,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder = null;
                 isRecording = false;
                 voiceClipLayout.showLock(false);
-                sendVoiceClip();
+                uploadVoiceNote(outputFileVoiceNotes);
             }
         }
 
@@ -2394,7 +2389,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             statusDialog = temp;
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK) {
-            log("***** onActivityResult: ");
+            log("onActivityResult: ");
             if(!Util.isOnline(this)) {
                 try{
                     statusDialog.dismiss();
@@ -3232,7 +3227,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     break;
                 }
                 case R.id.chat_cab_menu_forward:{
-                    log("******Forward message");
+                    log("Forward message");
                     prepareMessagesToForward(messagesSelected);
                     break;
                 }
@@ -6814,7 +6809,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void prepareMessageToForward(long idMessage) {
-        log("******* prepareMessageToForward");
+        log("prepareMessageToForward");
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
         AndroidMegaChatMessage aM = new AndroidMegaChatMessage(m);
@@ -6824,16 +6819,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void prepareMessagesToForward(ArrayList<AndroidMegaChatMessage> messagesSelected){
-        log ("****** prepareMessagesToForward  -> messagesSelected.size "+messagesSelected.size());
+        log ("prepareMessagesToForward()  -> messagesSelected.size "+messagesSelected.size());
 
         ArrayList<AndroidMegaChatMessage> messagesToImport = new ArrayList<>();
         long[] idMessages = new long[messagesSelected.size()];
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMessage().getMsgId();
 
-            if(messagesSelected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+            if((messagesSelected.get(i).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getMessage().getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                 if(messagesSelected.get(i).getMessage().getUserHandle()!=myUserHandle){
-                    log("***** message TYPE_NODE_ATTACHMENT && contactHandle");
+                    log("message TYPE_NODE_ATTACHMENT && contactHandle");
                     //Node has to be imported
                     messagesToImport.add(messagesSelected.get(i));
                 }
@@ -6847,16 +6842,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if(messagesToImport.isEmpty()){
-            log("*******Proceed to forward");
+            log("Proceed to forward");
             forwardMessages(messagesSelected);
         }
         else{
-            log("******Proceed to import nodes to own Cloud");
+            log("Proceed to import nodes to own Cloud");
             ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), this);
 
             MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
-                log("****** Error no chat folder - return");
+                log("Error no chat folder - return");
                 return;
             }
 
@@ -6864,24 +6859,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 AndroidMegaChatMessage message = messagesToImport.get(j);
 
                 if(message!=null){
-                    log("****** message!=null");
-
+                    log("message!=null");
                     MegaNodeList nodeList = message.getMessage().getMegaNodeList();
-
                     for(int i=0;i<nodeList.size();i++){
                         MegaNode document = nodeList.get(i);
                         if (document != null) {
-                            log("****** DOCUMENT position("+i+"): " + document.getName() + "_" + document.getHandle());
-
+                            log("DOCUMENT position("+i+"): " + document.getName() + "_" + document.getHandle());
                             megaApi.copyNode(document, target, listener);
-                        }
-                        else{
-                            log("***** DOCUMENT position("+i+"): null");
+                        }else{
+                            log("DOCUMENT position("+i+"): null");
                         }
                     }
-                }
-                else{
-                    log("****** MESSAGE is null");
+                }else{
+                    log("*MESSAGE is null");
                     Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
                 }
             }
@@ -6889,14 +6879,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
-        log ("*******forwardMessages");
+        log ("forwardMessages()");
 
         long[] idMessages = new long[messagesSelected.size()];
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMessage().getMsgId();
         }
-        log ("*******putExtra: idMessages("+idMessages+"), idChat("+idChat+")");
-
         Intent i = new Intent(this, ChatExplorerActivity.class);
         i.putExtra("ID_MESSAGES", idMessages);
         i.putExtra("ID_CHAT_FROM", idChat);
