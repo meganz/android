@@ -454,8 +454,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
-        log("setNodes");
         this.nodes = insertPlaceHolderNode(nodes);
+        log("setNodes size: "+this.nodes.size());
 //		contentTextFragment.setText(getInfoFolder(node));
         notifyDataSetChanged();
     }
@@ -1219,7 +1219,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getItemCount() {
         if (nodes != null) {
-            return nodes.size() - placeholderCount;
+            return nodes.size();
         } else {
             return 0;
         }
