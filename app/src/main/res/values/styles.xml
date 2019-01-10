@@ -115,8 +115,8 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/accentColor</item>
         <item name="android:actionModeBackground">@color/accentColor</item>
-        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_black</item>
-        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_black</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="actionModeStyle">@style/Widget.ActionMode</item>
         <item name="android:actionModeStyle">@style/Widget.ActionMode</item>
         <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>

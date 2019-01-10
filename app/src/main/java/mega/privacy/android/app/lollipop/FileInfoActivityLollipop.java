@@ -26,7 +26,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
@@ -42,7 +41,6 @@ import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -98,6 +96,11 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -112,14 +115,14 @@ import nz.mega.sdk.MegaUserAlert;
 
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
+public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
 
-	public static int MAX_WIDTH_FILENAME_PORT=200;
+	public static int MAX_WIDTH_FILENAME_PORT=170;
 	public static int MAX_WIDTH_FILENAME_PORT_2=200;
-	
+
 	public static String NODE_HANDLE = "NODE_HANDLE";
 
 	static int TYPE_EXPORT_GET = 0;
@@ -147,6 +150,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     Drawable drawableDots;
     Drawable drawableDownload;
     Drawable drawableLeave;
+    Drawable drawableCopy;
+    Drawable drawableChat;
 
 	RelativeLayout imageToolbarLayout;
 	ImageView imageToolbarView;
@@ -224,6 +229,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	TextView ownerInfo;
 	ImageView ownerRoundeImage;
 	TextView ownerLetter;
+	ImageView ownerState;
 
 	MenuItem downloadMenuItem;
 	MenuItem shareMenuItem;
@@ -236,6 +242,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	MenuItem rubbishMenuItem;
 	MenuItem deleteMenuItem;
 	MenuItem leaveMenuItem;
+	MenuItem sendToChatMenuItem;
 
 	MegaNode node;
 
@@ -293,37 +300,90 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     private ArrayList<MegaShare> fullListContacts;
     private Button moreButton;
     private MegaFileInfoSharedContactLollipopAdapter adapter;
-    private GestureDetectorCompat detector;
     private ActionMode actionMode;
-    
-    class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
-        
-        public void onLongPress(MotionEvent e) {
-            log("onLongPress -- RecyclerViewOnGestureListener");
-            // handle long press
-            if (!adapter.isMultipleSelect()){
-                adapter.setMultipleSelect(true);
-                
-                actionMode = startSupportActionMode(new ActionBarCallBack());
-            }
-            super.onLongPress(e);
+
+    int countChat = 0;
+    int errorSent = 0;
+    int successSent = 0;
+
+    public void activateActionMode(){
+        log("activateActionMode");
+        if (!adapter.isMultipleSelect()){
+            adapter.setMultipleSelect(true);
+            actionMode = startSupportActionMode(new ActionBarCallBack());
         }
     }
-    
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("File sent correctly");
+                successSent++;
+            }
+            else{
+                log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+                errorSent++;
+            }
+
+            if(countChat==errorSent+successSent){
+                if(successSent==countChat){
+                    if(countChat==1){
+                        long handle = request.getChatHandle();
+                        MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
+                        if(chatItem!=null){
+                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                            intent.putExtra("CHAT_ID", handle);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                    else{
+                        showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+                    }
+                }
+                else if(errorSent==countChat){
+                    showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+                }
+                else{
+                    showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
+    }
+
     private class ActionBarCallBack implements ActionMode.Callback {
-        
+
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             log("onActionItemClicked");
             final List<MegaShare> shares = adapter.getSelectedShares();
-            
+
             switch(item.getItemId()){
                 case R.id.action_file_contact_list_permissions:{
-                    
+
                     //Change permissions
                     AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
                     dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-                    
+
                     final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                     dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
@@ -342,7 +402,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                             switch(item) {
                                 case 0:{
                                     if(shares!=null){
-                                        
+
                                         if(shares.size()!=0){
                                             log("Size array----- "+shares.size());
                                             for(int j=0;j<shares.size();j++){
@@ -377,7 +437,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                             }
                                         }
                                     }
-                                    
+
                                     break;
                                 }
                                 case 2:{
@@ -401,20 +461,20 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                             }
                         }
                     });
-                    
+
                     permissionsDialog = dialogBuilder.create();
                     permissionsDialog.show();
                     break;
                 }
                 case R.id.action_file_contact_list_delete:{
-                    
+
                     removeShare = true;
                     changeShare = false;
-                    
+
                     if(shares!=null){
-                        
+
                         if(shares.size()!=0){
-                            
+
                             if (shares.size() > 1) {
                                 log("Remove multiple contacts");
                                 showConfirmationRemoveMultipleContactFromShare(shares);
@@ -440,33 +500,36 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             }
             return false;
         }
-        
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             log("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
+            getWindow().setStatusBarColor(ContextCompat.getColor(fileInfoActivity, R.color.accentColorDark));
             return true;
         }
-        
+
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
             log("onDestroyActionMode");
             adapter.clearSelections();
             adapter.setMultipleSelect(false);
+            getWindow().setStatusBarColor(ContextCompat.getColor(fileInfoActivity, R.color.status_bar_search));
+            supportInvalidateOptionsMenu();
         }
-        
+
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             log("onPrepareActionMode");
             List<MegaShare> selected = adapter.getSelectedShares();
             boolean deleteShare = false;
             boolean permissions = false;
-            
+
             if (selected.size() != 0) {
                 permissions = true;
                 deleteShare = true;
-                
+
                 MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if(selected.size()==adapter.getItemCount()){
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -483,26 +546,26 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
                 menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
             }
-            
+
             menu.findItem(R.id.action_file_contact_list_permissions).setVisible(permissions);
             if(permissions == true){
                 menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }else{
                 menu.findItem(R.id.action_file_contact_list_permissions).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                
+
             }
-            
+
             menu.findItem(R.id.action_file_contact_list_delete).setVisible(deleteShare);
             if(deleteShare == true){
                 menu.findItem(R.id.action_file_contact_list_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }else{
                 menu.findItem(R.id.action_file_contact_list_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                
+
             }
-            
+
             return false;
         }
-        
+
     }
 
 	@Override
@@ -609,7 +672,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         String ownerString = "("+getString(R.string.file_properties_owner)+")";
         ownerLabelowner.setText(ownerString);
         ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
-
+        ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             log("Landscape configuration");
@@ -853,9 +916,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             listView.addItemDecoration(new SimpleDividerItemDecoration(this,outMetrics));
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
             listView.setLayoutManager(mLayoutManager);
-            listView.addOnItemTouchListener(this);
-
-            detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
 
             //get shared contact list and max number can be displayed in the list is five
             setContactList();
@@ -878,6 +938,46 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         }
 	}
 
+	void setOwnerState (long userHandle) {
+        if(Util.isChatEnabled()){
+            ownerState.setVisibility(View.VISIBLE);
+            if (megaChatApi != null){
+                int userStatus = megaChatApi.getUserOnlineStatus(userHandle);
+                if(userStatus == MegaChatApi.STATUS_ONLINE){
+                    log("This user is connected");
+                    ownerState.setVisibility(View.VISIBLE);
+                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_online));
+                }
+                else if(userStatus == MegaChatApi.STATUS_AWAY){
+                    log("This user is away");
+                    ownerState.setVisibility(View.VISIBLE);
+                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_away));
+                }
+                else if(userStatus == MegaChatApi.STATUS_BUSY){
+                    log("This user is busy");
+                    ownerState.setVisibility(View.VISIBLE);
+                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_busy));
+                }
+                else if(userStatus == MegaChatApi.STATUS_OFFLINE){
+                    log("This user is offline");
+                    ownerState.setVisibility(View.VISIBLE);
+                    ownerState.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.circle_status_contact_offline));
+                }
+                else if(userStatus == MegaChatApi.STATUS_INVALID){
+                    log("INVALID status: "+userStatus);
+                    ownerState.setVisibility(View.GONE);
+                }
+                else{
+                    log("This user status is: "+userStatus);
+                    ownerState.setVisibility(View.GONE);
+                }
+            }
+        }
+        else{
+            ownerState.setVisibility(View.GONE);
+        }
+    }
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -896,6 +996,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         drawableDownload = drawableDownload.mutate();
         drawableLeave = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_leave_share_w);
         drawableLeave = drawableLeave.mutate();
+        drawableCopy = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_copy_white);
+        drawableCopy.mutate();
+        drawableChat = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
+        drawableChat.mutate();
 
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
@@ -912,6 +1016,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		rubbishMenuItem = menu.findItem(R.id.cab_menu_file_info_rubbish);
 		deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete);
 		leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
+		sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat);
 
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
@@ -926,6 +1031,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             rubbishMenuItem.setVisible(false);
             deleteMenuItem.setVisible(false);
             leaveMenuItem.setVisible(false);
+            sendToChatMenuItem.setVisible(false);
+
+            setColorFilterBlack();
         }
         else {
             MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
@@ -940,13 +1048,23 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     getLinkMenuItem.setVisible(false);
                     editLinkMenuItem.setVisible(false);
                     removeLinkMenuItem.setVisible(false);
-                    renameMenuItem.setVisible(false);
+                    renameMenuItem.setVisible(true);
                     moveMenuItem.setVisible(true);
-                    copyMenuItem.setVisible(false);
+                    copyMenuItem.setVisible(true);
+                    sendToChatMenuItem.setVisible(false);
                     rubbishMenuItem.setVisible(false);
                     deleteMenuItem.setVisible(true);
                     leaveMenuItem.setVisible(false);
                 } else {
+
+                    if (node.isFolder() || !Util.isChatEnabled()) {
+                        sendToChatMenuItem.setVisible(false);
+                        menu.findItem(R.id.cab_menu_file_info_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                    }
+                    else {
+                        sendToChatMenuItem.setVisible(true);
+                        menu.findItem(R.id.cab_menu_file_info_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    }
 
                     if (node.isExported()) {
                         getLinkMenuItem.setVisible(false);
@@ -1049,7 +1167,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         } else {
                             shareMenuItem.setVisible(false);
                             menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
                         }
 
                         rubbishMenuItem.setVisible(true);
@@ -1089,7 +1206,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
 			/*Folder*/
                 else {
-                   setColorFilterBlack();
+                    getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
+                    setColorFilterBlack();
                 }
             }
         }
@@ -1124,6 +1242,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
             leaveMenuItem.setIcon(drawableLeave);
         }
+        if (copyMenuItem != null) {
+            drawableCopy.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            copyMenuItem.setIcon(drawableCopy);
+        }
+        if (sendToChatMenuItem != null) {
+            drawableChat.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            sendToChatMenuItem.setIcon(drawableChat);
+        }
     }
 
     void setColorFilterWhite () {
@@ -1152,6 +1278,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         if (leaveMenuItem != null) {
             drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
             leaveMenuItem.setIcon(drawableLeave);
+        }
+        if (copyMenuItem != null) {
+            drawableCopy.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            copyMenuItem.setIcon(drawableCopy);
+        }
+        if (sendToChatMenuItem != null) {
+            drawableChat.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            sendToChatMenuItem.setIcon(drawableChat);
         }
     }
 
@@ -1328,9 +1462,32 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				moveToTrash();
 				break;
 			}
+            case R.id.cab_menu_file_info_send_to_chat: {
+                log("Send chat option");
+                sendToChat();
+                break;
+            }
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
+	void sendToChat () {
+        if(node==null){
+            log("The selected node is NULL");
+            return;
+        }
+
+        if (nC == null) {
+            nC =  new NodeController(this);
+        }
+
+        if(adapterType == Constants.INCOMING_SHARES_ADAPTER || adapterType == Constants.SEARCH_ADAPTER){
+            nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
+        }
+        else {
+            nC.selectChatsToSendNode(node);
+        }
+    }
 
 	private void refreshProperties(){
 		log("refreshProperties");
@@ -1465,11 +1622,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 								if(!contactDB.getName().equals("")){
 									ownerLabel.setText(contactDB.getName()+" "+contactDB.getLastName());
 									ownerInfo.setText(user.getEmail());
+									setOwnerState(user.getHandle());
 									createDefaultAvatar(ownerRoundeImage, user, contactDB.getName());
 								}
 								else{
 									ownerLabel.setText(user.getEmail());
 									ownerInfo.setText(user.getEmail());
+                                    setOwnerState(user.getHandle());
 									createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
 								}
 							}
@@ -1477,12 +1636,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 								log("The contactDB is null: ");
 								ownerLabel.setText(user.getEmail());
 								ownerInfo.setText(user.getEmail());
+                                setOwnerState(user.getHandle());
 								createDefaultAvatar(ownerRoundeImage, user, user.getEmail());
 							}
 						}
 						else{
 							ownerLabel.setText(mS.getUser());
 							ownerInfo.setText(mS.getUser());
+                            setOwnerState(user.getHandle());
 							createDefaultAvatar(ownerRoundeImage, user, mS.getUser());
 						}
 
@@ -2481,11 +2642,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("copy nodes request finished");
 		}else if (request.getType() == MegaRequest.TYPE_SHARE){
             log(" MegaRequest.TYPE_SHARE");
-            
+
             if (e.getErrorCode() == MegaError.API_OK){
                 if(removeShare){
                     log("OK onRequestFinish remove");
-                    
+
                     removeShare=false;
                     adapter.setShareList(listContacts);
                     listView.invalidate();
@@ -2515,7 +2676,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             }
             log("Finish onRequestFinish");
         }
-        
+
 		if (request.getType() == MegaRequest.TYPE_SHARE){
 			try {
 				statusDialog.dismiss();
@@ -2578,6 +2739,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        log("-------------------onActivityResult " + requestCode + "____" + resultCode);
 
 		if (intent == null) {
 			return;
@@ -2744,6 +2906,29 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 log("ERROR, the file is not folder");
             }
 		}
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+            log("Send to "+chatHandles.length+" chats");
+
+            long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
+            log("Send "+nodeHandles.length+" nodes");
+
+            countChat = chatHandles.length;
+            if (megaChatApi != null) {
+                if(countChat==1){
+                    megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
+                }
+                else if(countChat>1){
+
+                    for(int i=0; i<chatHandles.length; i++){
+                        megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
+                    }
+                }
+            }
+            else{
+                log("megaChatApi is Null - cannot attach nodes");
+            }
+        }
 	}
 
 	@Override
@@ -3008,7 +3193,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			versionsLayout.setVisibility(View.GONE);
 			separatorVersions.setVisibility(View.GONE);
 		}
-        
+
         refresh();
 	}
 
@@ -3034,6 +3219,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         drawableDots.setColorFilter(null);
         drawableDownload.setColorFilter(null);
         drawableLeave.setColorFilter(null);
+        drawableCopy.setColorFilter(null);
+        drawableChat.setColorFilter(null);
     }
 
 	public static void log(String message) {
@@ -3248,7 +3435,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
         mySnackbar.show();
     }
-    
+
     public void itemClick(int position) {
         log("itemClick");
 
@@ -3263,10 +3450,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 i.putExtra("name",megaUser);
                 startActivity(i);
             }
-        
+
         }
     }
-    
+
     public void showOptionsPanel(MegaShare sShare){
         log("showNodeOptionsPanel");
         if(node!=null){
@@ -3275,27 +3462,27 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
         }
     }
-    
-    
+
+
     public void hideMultipleSelect() {
 	    if(adapter != null){
             adapter.setMultipleSelect(false);
         }
-        
+
         if (actionMode != null) {
             actionMode.finish();
         }
     }
-    
+
     public MegaUser getSelectedContact() {
         String email = selectedShare.getUser();
         return megaApi.getContact(email);
     }
-    
+
     public MegaShare getSelectedShare() {
         return selectedShare;
     }
-    
+
     public void changePermissions(){
         log("changePermissions");
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
@@ -3316,7 +3503,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
                 statusDialog = temp;
                 permissionsDialog.dismiss();
-            
+
                 switch(item) {
                     case 0:{
                         MegaUser u = megaApi.getContact(selectedShare.getUser());
@@ -3326,7 +3513,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         else{
                             megaApi.share(node, selectedShare.getUser(), MegaShare.ACCESS_READ, fileInfoActivityLollipop);
                         }
-                    
+
                         break;
                     }
                     case 1:{
@@ -3355,15 +3542,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         permissionsDialog = dialogBuilder.create();
         permissionsDialog.show();
     }
-    
+
     public void removeFileContactShare(){
         log("removeFileContactShare");
         showConfirmationRemoveContactFromShare(selectedShare.getUser());
     }
-    
+
     public void showConfirmationRemoveContactFromShare (final String email){
         log("showConfirmationRemoveContactFromShare");
-        
+
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -3378,19 +3565,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
             }
         };
-        
+
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         String message= getResources().getString(R.string.remove_contact_shared_folder,email);
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
-    
+
     public void removeShare (String email)
     {
         ProgressDialog temp = new ProgressDialog(this);
             temp.setMessage(getString(R.string.context_removing_contact_folder));
             temp.show();
-       
+
         statusDialog = temp;
         if (email != null){
             removeShare = true;
@@ -3400,22 +3587,22 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             megaApi.disableExport(node, this);
         }
     }
-    
+
     public void refresh(){
         setContactList();
         setMoreButtonText();
-        
+
         adapter.setShareList(listContacts);
         adapter.notifyDataSetChanged();
     }
-    
+
     private void setContactList() {
-        
+
         fullListContacts = new ArrayList<>();
         listContacts = new ArrayList<>();
         if (node != null) {
             fullListContacts = megaApi.getOutShares(node);
-            
+
             if (fullListContacts.size() > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
                 listContacts = new ArrayList<>(fullListContacts.subList(0,MAX_NUMBER_OF_CONTACTS_IN_LIST));
             } else {
@@ -3423,7 +3610,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             }
         }
     }
-    
+
     private void setMoreButtonText() {
         int fullSize = fullListContacts.size();
         if (fullSize > MAX_NUMBER_OF_CONTACTS_IN_LIST) {
@@ -3433,10 +3620,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             moreButton.setVisibility(View.GONE);
         }
     }
-    
+
     public void showConfirmationRemoveMultipleContactFromShare (final List<MegaShare> contacts){
         log("showConfirmationRemoveMultipleContactFromShare");
-        
+
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -3451,13 +3638,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
             }
         };
-        
+
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
-    
+
     public void removeMultipleShares(List<MegaShare> shares){
         log("removeMultipleShares");
         ProgressDialog temp = null;
@@ -3532,50 +3719,5 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             log("oninvalidate error");
         }
     }
-    
-    @Override
-    public boolean onInterceptTouchEvent(RecyclerView rv,MotionEvent e) {
-        detector.onTouchEvent(e);
-        return false;
-    }
-    
-    @Override
-    public void onTouchEvent(RecyclerView rv,MotionEvent e) {
-        
-    }
-    
-    @Override
-    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        
-    }
-    
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-    
-    @Override
-    public void onShowPress(MotionEvent e) {
-        
-    }
-    
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-    
-    @Override
-    public boolean onScroll(MotionEvent e1,MotionEvent e2,float distanceX,float distanceY) {
-        return false;
-    }
-    
-    @Override
-    public void onLongPress(MotionEvent e) {
-        
-    }
-    
-    @Override
-    public boolean onFling(MotionEvent e1,MotionEvent e2,float velocityX,float velocityY) {
-        return false;
-    }
+
 }

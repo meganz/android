@@ -14,6 +14,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLollipopAdapter {
+
     public MegaFileInfoSharedContactLollipopAdapter(Context _context,MegaNode node,ArrayList<MegaShare> _shareList,RecyclerView _lv) {
         super(_context,node,_shareList,_lv);
     }
@@ -125,5 +126,16 @@ public class MegaFileInfoSharedContactLollipopAdapter extends MegaSharedFolderLo
             log("NULL view pos: "+positionToflip);
             notifyItemChanged(pos);
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
+        int currentPosition = holder.currentPosition;
+
+        ((FileInfoActivityLollipop) context).activateActionMode();
+        ((FileInfoActivityLollipop) context).itemClick(currentPosition);
+
+        return true;
     }
 }
