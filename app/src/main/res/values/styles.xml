@@ -202,6 +202,10 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="ToolbarTitle.CollapsingToolbar" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">16.5sp</item>
+    </style>
+
     <style name="ToolbarTitle.Secondary" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>

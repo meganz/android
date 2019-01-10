@@ -161,6 +161,8 @@
                 android:layout_centerVertical="true"
                 android:textAllCaps="true"
                 android:textSize="14sp"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:stateListAnimator="@null"
                 android:elevation="0dp"
                 android:textColor="@color/accentColor"
@@ -254,7 +256,7 @@
         <RelativeLayout
             android:id="@+id/file_properties_size_layout"
             android:layout_width="match_parent"
-            android:layout_height="54dp"
+            android:layout_height="56dp"
             android:gravity="left"
             android:layout_marginLeft="72dp" >
 
@@ -520,7 +522,7 @@
         <RelativeLayout
             android:id="@+id/file_properties_created_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:gravity="left"
             android:layout_marginLeft="72dp">
 
