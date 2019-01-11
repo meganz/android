@@ -269,6 +269,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
 			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
+			checkScroll();
 			return true;
 		}
 		
@@ -278,7 +279,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 0);
+			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 3);
+			checkScroll();
 		}
 
 		@Override
@@ -367,6 +369,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		megaApi.addGlobalListener(this);
 
 		handler = new Handler();
+
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 		
 		listContacts = new ArrayList<MegaShare>();
 		
@@ -379,13 +383,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		if (extras != null){
 			nodeHandle = extras.getLong("name");
 			node=megaApi.getNodeByHandle(nodeHandle);
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-			}
 			
 			setContentView(R.layout.activity_file_contact_list);
 			
@@ -393,10 +390,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			tB = (Toolbar) findViewById(R.id.toolbar_file_contact_list);
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
-//			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			aB.setDisplayHomeAsUpEnabled(true);
 			aB.setDisplayShowHomeEnabled(true);
-			aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
+			aB.setTitle(node.getName().toUpperCase());
+			aB.setSubtitle(R.string.file_properties_shared_folder_select_contact);
 
 			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_file_contact_list);
 			container = (RelativeLayout) findViewById(R.id.file_contact_list);
@@ -404,7 +401,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			nameView = (TextView) findViewById(R.id.node_name);
 			createdView = (TextView) findViewById(R.id.node_last_update);
 			contactLayout = (RelativeLayout) findViewById(R.id.file_contact_list_layout);
-			contactLayout.setOnClickListener(this);
+			contactLayout.setVisibility(View.GONE);
+			findViewById(R.id.separator_file_contact_list).setVisibility(View.GONE);
+//			contactLayout.setOnClickListener(this);
 
 			fab = (FloatingActionButton) findViewById(R.id.floating_button_file_contact_list);
 			fab.setOnClickListener(this);
@@ -431,7 +430,14 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator()); 			
+			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 			
 			emptyImage = (ImageView) findViewById(R.id.file_contact_list_empty_image);
 			emptyText = (TextView) findViewById(R.id.file_contact_list_empty_text);
@@ -478,6 +484,26 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.setAdapter(adapter);
 		}
 	}
+
+	public void checkScroll() {
+		if (listView != null) {
+			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
+				changeActionBarElevation(true);
+			}
+			else if ((adapter != null && !adapter.isMultipleSelect())) {
+				changeActionBarElevation(false);
+			}
+		}
+	}
+
+	public void changeActionBarElevation(boolean whitElevation){
+		if (whitElevation) {
+			aB.setElevation(Util.px2dp(4, outMetrics));
+		}
+		else {
+			aB.setElevation(0);
+		}
+	}
 	
 	
 	public void showOptionsPanel(MegaShare sShare){
@@ -506,13 +532,17 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_folder_contact_list_without_share_action, menu);
+	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
 	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		
 		selectMenuItem.setVisible(true);
 		unSelectMenuItem.setVisible(false);
+
+		addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
+		addSharingContact.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_share_white, R.color.black));
+		addSharingContact.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -526,14 +556,29 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		    	return true;
 		    }
 		    case R.id.action_select:{
-		    	
 		    	selectAll();
 		    	return true;
 		    }
+			case R.id.action_folder_contacts_list_share_folder: {
+				shareOption();
+				return true;
+			}
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+
+	void shareOption() {
+		removeShare = false;
+		changeShare = false;
+
+		Intent intent = new Intent();
+		intent.setClass(this, AddContactActivityLollipop.class);
+		intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
+		intent.putExtra("MULTISELECT", 0);
+		intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 	}
 
 	// Clear all selected items
@@ -749,24 +794,16 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void onClick(View v) {
 
 		switch (v.getId()){		
-			case R.id.file_contact_list_layout:{
-				Intent i = new Intent(this, ManagerActivityLollipop.class);
-				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
-				i.putExtra("parentHandle", node.getHandle());
-				startActivity(i);
-				finish();
-				break;
-			}
+//			case R.id.file_contact_list_layout:{
+//				Intent i = new Intent(this, ManagerActivityLollipop.class);
+//				i.setAction(Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER);
+//				i.putExtra("parentHandle", node.getHandle());
+//				startActivity(i);
+//				finish();
+//				break;
+//			}
 			case R.id.floating_button_file_contact_list:{
-				removeShare = false;
-				changeShare = false;
-
-				Intent intent = new Intent();
-				intent.setClass(this, AddContactActivityLollipop.class);
-				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
-				intent.putExtra("MULTISELECT", 0);
-				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
+				shareOption();
 				break;
 			}
 		}

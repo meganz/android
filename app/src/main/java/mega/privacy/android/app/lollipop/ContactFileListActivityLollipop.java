@@ -153,7 +153,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		createFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
 
@@ -479,9 +478,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-		}
+
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();

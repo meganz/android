@@ -202,6 +202,11 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="ToolbarSubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/mail_my_account</item>
+    </style>
+
     <style name="ToolbarTitle.CollapsingToolbar" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">16.5sp</item>
     </style>

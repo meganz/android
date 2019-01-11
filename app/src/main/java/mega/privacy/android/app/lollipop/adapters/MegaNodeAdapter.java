@@ -490,6 +490,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
 
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(275,outMetrics));
+            } else {
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(210,outMetrics));
+            }
+
             holderList.textViewFileSize = (TextView)v.findViewById(R.id.file_list_filesize);
 
             holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);

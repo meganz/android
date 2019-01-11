@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/cab_menu_file_info_download"
-        android:orderInCategory="100"
+        android:orderInCategory="95"
         android:title="@string/general_save_to_device"
         android:icon="@drawable/ic_download_white"
         MEGA:showAsAction="never" />
@@ -27,7 +27,7 @@
 
     <item
         android:id="@+id/cab_menu_file_info_send_to_chat"
-        android:orderInCategory="100"
+        android:orderInCategory="115"
         android:tint="@color/white"
         android:title="@string/context_send_file_to_chat"
         android:icon="@drawable/ic_send_to_contact"
@@ -73,7 +73,7 @@
 
     <item
         android:id="@+id/cab_menu_file_info_leave"
-        android:orderInCategory="109"
+        android:orderInCategory="100"
         android:title="@string/general_leave"
         android:icon="@drawable/ic_leave_share_w"
         MEGA:showAsAction="never" />
