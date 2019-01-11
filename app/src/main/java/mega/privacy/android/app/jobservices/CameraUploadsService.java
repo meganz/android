@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1282,6 +1283,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         
         if (isOverQuota) {
             showStorageOverQuotaNotification();
+            JobUtil.cancelAllJobs(this);
         }
         
         if (mVideoCompressor != null) {
@@ -1474,6 +1476,15 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     @Override
     public void onTransferTemporaryError(MegaApiJava api,MegaTransfer transfer,MegaError e) {
         log("onTransferTemporaryError: " + transfer.getFileName());
+        if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+            if (e.getValue() != 0)
+                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+            else
+                log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+
+            isOverQuota = true;
+            cancel();
+        }
     }
     
     @Override
