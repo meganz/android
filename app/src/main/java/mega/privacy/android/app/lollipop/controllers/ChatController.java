@@ -1420,9 +1420,26 @@ public class ChatController {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
+                if (context instanceof ChatActivityLollipop) {
+                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof ChatFullScreenImageViewer){
+                    ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
             }
         }
 
@@ -1492,6 +1509,105 @@ public class ChatController {
             Intent service = new Intent(context, DownloadService.class);
             String serializeString = document.serialize();
             log("serializeString: "+serializeString);
+            service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
+            service.putExtra(DownloadService.EXTRA_PATH, path);
+            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                service.putExtra("fromMV", true);
+            }
+            context.startService(service);
+        }
+
+    }
+
+    public void saveForOffline(MegaNode node){
+        log("saveForOffline - node");
+
+        File destination = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                if (context instanceof ChatActivityLollipop) {
+                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof ChatFullScreenImageViewer){
+                    ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+            }
+        }
+
+        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+        if (node != null) {
+
+            if (Environment.getExternalStorageDirectory() != null){
+                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(node, context));
+            }
+            else{
+                destination = context.getFilesDir();
+            }
+
+            destination.mkdirs();
+
+            log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
+            if (destination.exists() && destination.isDirectory()){
+
+                File offlineFile = new File(destination, node.getName());
+                if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+                    log("File already exists!");
+                    if (context instanceof ChatFullScreenImageViewer){
+                        ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.file_already_exists));
+                    }
+                    else if (context instanceof AudioVideoPlayerLollipop){
+                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                    }
+                    else if (context instanceof PdfViewerActivityLollipop){
+                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                    }
+                }
+                else{
+                    dlFiles.put(node, destination.getAbsolutePath());
+                }
+            }
+            else{
+                log("Destination ERROR");
+            }
+        }
+
+
+        double availableFreeSpace = Double.MAX_VALUE;
+        try{
+            StatFs stat = new StatFs(destination.getAbsolutePath());
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        }
+        catch(Exception ex){}
+
+        for (MegaNode document : dlFiles.keySet()) {
+
+            String path = dlFiles.get(document);
+
+            if(availableFreeSpace <document.getSize()){
+                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, ((NodeAttachmentActivityLollipop) context));
+                continue;
+            }
+
+            Intent service = new Intent(context, DownloadService.class);
+            String serializeString = document.serialize();
+            log("serializeString: "+serializeString);
+            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
