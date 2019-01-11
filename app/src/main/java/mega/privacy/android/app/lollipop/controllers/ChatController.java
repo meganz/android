@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -2009,7 +2010,7 @@ public class ChatController {
             log("Proceed to import nodes to own Cloud");
             ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
 
-            MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
+            MegaNode target = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
                 log("Error no chat folder - return");
                 return;

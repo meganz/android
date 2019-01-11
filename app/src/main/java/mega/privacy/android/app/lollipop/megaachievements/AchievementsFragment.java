@@ -232,7 +232,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		registrationIcon = (ImageView) v.findViewById(R.id.registration_icon);
 		referralBonusIcon = (ImageView) v.findViewById(R.id.referral_bonuses_icon);
 
-		String transferQuotaString = getString(R.string.transfer_quota);
+		String transferQuotaString = getString(R.string.label_transfer_quota_achievements);
 		transferQuotaString = transferQuotaString.toLowerCase(Locale.getDefault());
 
 		String storageQuotaString = getString(R.string.unlocked_storage_title);

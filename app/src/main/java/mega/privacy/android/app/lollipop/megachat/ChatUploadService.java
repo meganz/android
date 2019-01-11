@@ -58,6 +58,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
+
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
@@ -219,11 +221,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 				log("The chat id is: "+chatId);
 
-				parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+				parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
 				if(parentNode != null){
 
 					totalUploads++;
-					log("The destination "+Constants.CHAT_FOLDER+ " already exists");
+					log("The destination "+CHAT_FOLDER+ " already exists");
 
 					if(!wl.isHeld()){
 						wl.acquire();

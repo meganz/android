@@ -17,6 +17,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
+
 /**
  * Created by mega on 19/09/18.
  */
@@ -46,7 +48,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         }
         oneNode = true;
         counter = 0;
-        parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+        parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
     }
 
     public void copyNode(MegaNode node) {

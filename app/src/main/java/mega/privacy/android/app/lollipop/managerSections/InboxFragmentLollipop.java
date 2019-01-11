@@ -1107,7 +1107,7 @@ public class InboxFragmentLollipop extends Fragment{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
 
-				String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_inbox));
+				String textToShow = getString(R.string.context_empty_inbox);
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
