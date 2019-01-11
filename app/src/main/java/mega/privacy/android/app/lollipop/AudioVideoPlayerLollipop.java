@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -2687,7 +2688,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         fragmentContainer.setVisibility(View.GONE);
         draggableView.setDraggable(true);
 
-        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commitNowAllowingStateLoss();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -3168,24 +3169,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void downloadFile() {
 
         if (adapterType == Constants.FILE_LINK_ADAPTER){
-            MegaNode node = megaApi.getNodeByHandle(currentDocument.getHandle());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            Constants.REQUEST_WRITE_STORAGE);
-
-                    handleListM.add(node.getHandle());
-                }
-            }
-
             if (nC == null) {
                 nC = new NodeController(this);
             }
             nC.downloadFileLink(currentDocument, uri.toString());
         }
         else if (fromChat){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                    handleListM.add(nodeChat.getHandle());
+                    return;
+                }
+            }
+
             if (chatC == null){
                 chatC = new ChatController(this);
             }
@@ -3203,6 +3203,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             Constants.REQUEST_WRITE_STORAGE);
 
                     handleListM.add(node.getHandle());
+                    return;
                 }
             }
 
@@ -3213,6 +3214,39 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 nC = new NodeController(this, isFolderLink);
             }
             nC.prepareForDownload(handleList, false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case Constants.REQUEST_WRITE_STORAGE:{
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (hasStoragePermission) {
+                    if (adapterType == Constants.FILE_LINK_ADAPTER) {
+                        if(nC==null){
+                        nC = new NodeController(this, isFolderLink);
+                    }
+                        nC.downloadFileLink(currentDocument, uri.toString());
+                    }
+                    else if (fromChat) {
+                        if (chatC == null){
+                            chatC = new ChatController(this);
+                        }
+                        if (nodeChat != null){
+                            chatC.prepareForChatDownload(nodeChat);
+                        }
+                    }
+                    else{
+                        if(nC==null){
+                            nC = new NodeController(this, isFolderLink);
+                        }
+                        nC.prepareForDownload(handleListM, false);
+                    }
+                }
+                break;
+            }
         }
     }
 

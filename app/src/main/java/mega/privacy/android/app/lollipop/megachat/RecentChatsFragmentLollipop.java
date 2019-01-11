@@ -244,6 +244,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void setChats(){
         log("setChats");
 
+        if(listView==null){
+            log("setChats:listView is null - do not update");
+            return;
+        }
+
         if(isAdded()){
             if(Util.isChatEnabled()){
 
@@ -981,6 +986,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         if(!isAdded()){
             log("return!");
+            return;
+        }
+
+        if(listView==null){
+            log("listItemUpdate:listView is null - do not update");
             return;
         }
 
