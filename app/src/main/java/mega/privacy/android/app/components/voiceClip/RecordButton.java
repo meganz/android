@@ -122,6 +122,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         }
     }
 
+
     public static void log(String message) {
         Util.log("RecordButton",message);
     }

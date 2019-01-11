@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -49,7 +50,8 @@ public class RecordView extends RelativeLayout {
     private MediaPlayer player;
     private AnimationHelper animationHelper;
     private View layoutLock;
-
+    private boolean flagRB = false;
+    Handler handlerStartRecord = new Handler();
 
     public RecordView(Context context) {
         super(context);
@@ -181,32 +183,35 @@ public class RecordView extends RelativeLayout {
         }
     }
 
+    final Runnable runStartRecord = new Runnable(){
+        @Override
+        public void run() {
+            if(flagRB){
+                counterTime.setBase(SystemClock.elapsedRealtime());
+                counterTime.start();
+                if (recordListener != null) {
+                    recordListener.onStart();
+                }
+            }
+        }
+    };
+
     protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
         log("onActionDown()");
-
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
-
         slideToCancelLayout.startShimmerAnimation();
         initialX = recordBtn.getX();
         playSound(RECORD_START);
-
         basketInitialY = basketImg.getY() + 90;
-
         showViews();
-
-        animationHelper.animateSmallMicAlpha();
-        counterTime.setBase(SystemClock.elapsedRealtime());
         startTime = System.currentTimeMillis();
-        counterTime.start();
         isSwiped = false;
-
-        if (recordListener != null) {
-            recordListener.onStart();
-        }
+        animationHelper.animateSmallMicAlpha();
+        handlerStartRecord.postDelayed(runStartRecord, 500); //500 milliseconds delay to record
+        flagRB = true;
     }
-
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
         log("onActionMove()");
@@ -270,6 +275,7 @@ public class RecordView extends RelativeLayout {
             }
             animationHelper.setStartRecorded(false);
             playSound(RECORD_ERROR);
+            flagRB = false;
 
         } else {
             log("onActionUp() - more than a second");
@@ -357,6 +363,11 @@ public class RecordView extends RelativeLayout {
         this.cancelBounds = bounds;
     }
 
+    public void destroyHandlers(){
+        if (handlerStartRecord != null){
+            handlerStartRecord.removeCallbacksAndMessages(null);
+        }
+    }
     public static void log(String message) {
         Util.log("RecordView",message);
     }

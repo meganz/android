@@ -400,11 +400,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:orientation="vertical"
-                android:layout_alignBottom="@id/writing_container_layout_chat_layout"
-                android:layout_gravity="bottom|right"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="48dp"
                 android:visibility="visible">
 
                 <mega.privacy.android.app.components.voiceClip.RecordView

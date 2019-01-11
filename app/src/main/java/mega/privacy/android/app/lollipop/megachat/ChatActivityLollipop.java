@@ -44,6 +44,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -198,7 +199,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ProgressDialog dialog;
     ProgressDialog statusDialog;
 
-//    public MegaChatMessage lastMessageSeen = null;
     public long lastIdMsgSeen = -1;
     public long generalUnreadCount = -1;
     boolean lastSeenReceived = false;
@@ -218,8 +218,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     LinearLayout emptyLayout;
 
     boolean pendingMessagesLoaded = false;
-
-//    boolean isFirstTimeStorage = true;
 
     boolean startVideo = false;
     public boolean activityVisible = false;
@@ -258,12 +256,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean editingMessage = false;
     MegaChatMessage messageToEdit = null;
 
-    GestureDetectorCompat detector;
-
     CoordinatorLayout fragmentContainer;
     RelativeLayout writingContainerLayout;
     RelativeLayout writingLayout;
     RecordView voiceClipLayout;
+    FrameLayout fragmentVoiceClip;
 
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
@@ -546,6 +543,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         messageJumpLayout.setVisibility(View.GONE);
 
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
+        fragmentVoiceClip = (FrameLayout) findViewById(R.id.record_voice_clip_layout);
+        paramsRecordButton(true);
+
         voiceClipLayout = (RecordView) findViewById(R.id.rl_voice_clip);
         voiceClipLayout.setVisibility(View.GONE);
 
@@ -617,6 +617,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+
+        chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
+
+        sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
+        sendIcon.setOnClickListener(this);
+        sendIcon.setEnabled(true);
+        sendIcon.setVisibility(View.GONE);
+
+        record = (RecordButton) findViewById(R.id.record_fab);
+        record.setBackground(null);
+        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
+        record.setVisibility(View.VISIBLE);
+        record.setRecordView(voiceClipLayout);
+        record.setListenForRecord(true);
 
         textChat.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) { }
@@ -715,6 +729,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(emojiKeyboard!=null){
                     emojiKeyboard.showLetterKeyboard();
+                    paramsRecordButton(true);
                 }
                 return false;
             }
@@ -729,6 +744,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(emojiKeyboard!=null) {
                     emojiKeyboard.showLetterKeyboard();
+                    paramsRecordButton(true);
                 }
                 return false;
             }
@@ -748,27 +764,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     if(emojiKeyboard!=null){
                         emojiKeyboard.showLetterKeyboard();
+                        paramsRecordButton(true);
                     }
                 }
                 return false;
             }
         });
-
-
-        chatRelativeLayout  = (RelativeLayout) findViewById(R.id.relative_chat_layout);
-
-        sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
-        sendIcon.setOnClickListener(this);
-        sendIcon.setEnabled(true);
-        sendIcon.setVisibility(View.GONE);
-
-        record = (RecordButton) findViewById(R.id.record_fab);
-        record.setBackground(null);
-//        record.setElevation(0);
-        record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
-        record.setVisibility(View.VISIBLE);
-        record.setRecordView(voiceClipLayout);
-        record.setListenForRecord(true);
 
         //ListenForRecord must be false ,otherwise onClick will not be called
         record.setOnRecordClickListener(new OnRecordClickListener() {
@@ -780,7 +781,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 8
         voiceClipLayout.setCancelBounds(1);
-
         //prevent recording under one Second
         voiceClipLayout.setLessThanSecondAllowed(false);
         voiceClipLayout.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
@@ -790,7 +790,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onStart() {
                 log("voiceClipLayout.setOnRecordListener() -> onStart()");
                 startRecordVoiceClip();
-//                handlerPadLock.postDelayed(runPadLock, 3000); //3 seconds delay to show de padlock
             }
             @Override
             public void onCancel() {
@@ -802,7 +801,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         myAudioRecorder = null;
                         isRecording = false;
                         voiceClipLayout.showLock(false);
-
                     }
                 }
             }
@@ -814,7 +812,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             @Override
             public void onLessThanSecond() {
-                log(" voiceClipLayout.setOnRecordListener() -> onLessThanSecond()");
+                log("voiceClipLayout.setOnRecordListener() -> onLessThanSecond()");
                 showBubble();
                 cancelRecord();
             }
@@ -834,7 +832,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
-
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);;
         listView.setNestedScrollingEnabled(false);
@@ -848,7 +845,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 // Get the first visible item
-//                            int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
+//               int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
                 if((messages!=null)&&(messages.size()>0)){
                     int lastPosition = messages.size()-1;
@@ -1777,11 +1774,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return super.onOptionsItemSelected(item);
     }
 
+
     public void startRecordVoiceClip(){
         log("startRecordVoiceClip() ");
         if(checkPermissionsVoiceClip()){
-            log("startRecordVoiceClip() ");
-
+            log("startRecordVoiceClip() with Permissions");
             String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
             File newFolder = new File(path);
             newFolder.mkdirs();
@@ -1799,16 +1796,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
                 myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             }
-            final Handler handlerPadLock = new Handler();
-            final Runnable runPadLock = new Runnable(){
-                @Override
-                public void run() {
-                    if(isRecording){
-                        log("show lock ");
-                        voiceClipLayout.showLock(true);
-                    }
-                }
-            };
+
+//            final Handler handlerPadLock = new Handler();
+//            final Runnable runPadLock = new Runnable(){
+//                @Override
+//                public void run() {
+//                    if(isRecording){
+//                        log("show lock ");
+//                        voiceClipLayout.showLock(true);
+//                    }
+//                }
+//            };
 
             record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
             record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
@@ -1823,7 +1821,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
                         isRecording = true;
-                        handlerPadLock.postDelayed(runPadLock, 3000); //3 seconds delay to show de padlock
+//                        handlerPadLock.postDelayed(runPadLock, 4000); //3 seconds delay to show de padlock
                     }
                 }
             }catch(IllegalStateException ise){}catch (IOException ioe){}
@@ -1869,7 +1867,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 uploadVoiceNote(outputFileVoiceNotes);
             }
         }
-
      }
 
     public void startCall(){
@@ -2564,6 +2561,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(emojiKeyboard!=null){
             if((emojiKeyboard.getLetterKeyboardShown())||(emojiKeyboard.getEmojiKeyboardShown())){
                 emojiKeyboard.hideBothKeyboard(this);
+                paramsRecordButton(true);
             }else{
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
@@ -2684,15 +2682,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             @Override
                             public void run() {
                                 emojiKeyboard.showEmojiKeyboard();
+                                paramsRecordButton(false);
                             }
                         },250);
 
                     }else if(emojiKeyboard.getEmojiKeyboardShown()){
                         emojiKeyboard.showLetterKeyboard();
-
+                        paramsRecordButton(true);
                     }else{
                         emojiKeyboard.showEmojiKeyboard();
-
+                        paramsRecordButton(false);
                     }
                 }
 
@@ -2707,6 +2706,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(emojiKeyboard!=null){
                     emojiKeyboard.hideBothKeyboard(this);
+                    paramsRecordButton(true);
                 }
                 boolean inProgressCall = false;
 
@@ -2736,6 +2736,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(emojiKeyboard!=null){
                     emojiKeyboard.hideBothKeyboard(this);
+                    paramsRecordButton(true);
                 }
                 attachContact();
                 break;
@@ -2748,6 +2749,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(emojiKeyboard!=null){
                     emojiKeyboard.hideBothKeyboard(this);
+                    paramsRecordButton(true);
                 }
                 attachPhotoVideo();
                 break;
@@ -2760,6 +2762,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 if(emojiKeyboard!=null){
                     emojiKeyboard.hideBothKeyboard(this);
+                    paramsRecordButton(true);
                 }
 
                 attachFromCloud();
@@ -2775,6 +2778,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if((emojiKeyboard!=null)&&(emojiKeyboard.getLetterKeyboardShown())){
                         emojiKeyboard.hideBothKeyboard(this);
+                        paramsRecordButton(true);
                         handlerEmojiKeyboard.postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -2794,6 +2798,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }else{
                         if(emojiKeyboard!=null){
                             emojiKeyboard.hideBothKeyboard(this);
+                            paramsRecordButton(true);
                         }
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2838,24 +2843,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void attachFromFileStorage(){
-//        if (isFirstTimeStorage) {
-            fileStorageF = ChatFileStorageFragment.newInstance();
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF")
-                    .commitNowAllowingStateLoss();
-//            isFirstTimeStorage = false;
-//        }
+        fileStorageF = ChatFileStorageFragment.newInstance();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
         fileStorageLayout.setVisibility(View.VISIBLE);
         pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
-
-//        fileStorageF = ChatFileStorageFragment.newInstance();
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//        ft.replace(R.id.fragment_container_file_storage, fileStorageF, "fileStorageF");
-//        ft.commitNow();
-
-        //ft.commitAllowingStateLoss();
+        paramsRecordButton(false);
     }
 
     public void attachFromCloud(){
@@ -2946,12 +2938,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messages.get(0).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
             }
             else{
-                //Not first element
-                //Find where to add in the queue
+                //Not first element - Find where to add in the queue
                 log(" NOT First element!");
 
                 AndroidMegaChatMessage msg = messages.get(index);
-
                 if(!androidMsgSent.isUploading()){
                     while(msg.isUploading()){
                         index--;
@@ -2961,7 +2951,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         msg = messages.get(index);
                     }
                 }
-
 
                 while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
                     index--;
@@ -2984,8 +2973,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
                 adapter.setMessages(messages);
-            }
-            else{
+            }else{
                 log("adapter is NOT null");
                 adapter.addMessage(messages, index);
                 if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
@@ -3049,14 +3037,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
-//    public void hideUploadPanel(){
-//        fab.setVisibility(View.VISIBLE);
-//        uploadPanel.setVisibility(View.GONE);
-//        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
-//        params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
-//        messagesContainerLayout.setLayoutParams(params);
-//    }
-
     public void activateActionMode(){
         log("activateActionMode");
         if (!adapter.isMultipleSelect()){
@@ -3066,7 +3046,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
 
-    /////Multiselect/////
+    //Multiselect
     private class  ActionBarCallBack implements ActionMode.Callback {
 
         @Override
@@ -3091,8 +3071,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     messageToEdit = messagesSelected.get(0).getMessage();
                     textChat.setText(messageToEdit.getContent());
                     textChat.setSelection(textChat.getText().length());
-                    //Show keyboard
-
                     break;
                 }
                 case R.id.chat_cab_menu_forward:{
@@ -3103,14 +3081,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 case R.id.chat_cab_menu_copy:{
                     clearSelections();
                     hideMultipleSelect();
-
                     String text = "";
 
                     if(messagesSelected.size()==1){
                         AndroidMegaChatMessage message = messagesSelected.get(0);
                         text = chatC.createSingleManagementString(message, chatRoom);
-                    }
-                    else{
+                    }else{
                         text = copyMessages(messagesSelected);
                     }
 
@@ -3464,14 +3440,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             return false;
         }
-
     }
 
     public boolean showSelectMenuItem(){
         if (adapter != null){
             return adapter.isMultipleSelect();
         }
-
         return false;
     }
 
@@ -3486,7 +3460,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         ChatController cC = new ChatController(chatActivity);
                         cC.deleteAndroidMessages(messages, chat);
                         break;
-
                     case DialogInterface.BUTTON_NEGATIVE:
                         //No button clicked
                         break;
@@ -3523,7 +3496,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         ChatController cC = new ChatController(chatActivity);
                         cC.deleteMessageById(messageId, chatId);
                         break;
-
                     case DialogInterface.BUTTON_NEGATIVE:
                         //No button clicked
                         break;
@@ -3540,7 +3512,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         builder.setMessage(R.string.confirmation_delete_one_message);
-
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
@@ -6377,12 +6348,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onDestroy(){
         if(emojiKeyboard!=null){
             emojiKeyboard.hideBothKeyboard(this);
+            paramsRecordButton(true);
         }
         if (handlerEmojiKeyboard != null){
             handlerEmojiKeyboard.removeCallbacksAndMessages(null);
         }
         if (handlerKeyboard != null){
             handlerKeyboard.removeCallbacksAndMessages(null);
+        }
+
+        if(voiceClipLayout!=null){
+            voiceClipLayout.destroyHandlers();
         }
 
         if (megaChatApi != null) {
@@ -6394,6 +6370,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
+        }
+        if (handlerReceive != null) {
+            handlerReceive.removeCallbacksAndMessages(null);
+        }
+        if (handlerSend != null) {
+            handlerSend.removeCallbacksAndMessages(null);
         }
 //        if(adapter!=null){
 //            adapter.destroyVoiceElemnts();
@@ -6946,6 +6928,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         if(emojiKeyboard!=null){
             emojiKeyboard.hideBothKeyboard(this);
+            paramsRecordButton(true);
         }
         //Update last seen position if different and there is unread messages
        //If the chat is being opened do not update, onLoad will do that
@@ -7652,8 +7635,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         if(emojiKeyboard!=null) {
             emojiKeyboard.hideBothKeyboard(this);
+            paramsRecordButton(true);
         }
-
     }
 
     public void showConfirmationConnect(){
@@ -7748,11 +7731,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+        paramsRecordButton(true);
     }
-        private String getHumanTimeText(long milliseconds) {
-            return String.format("%02d:%02d",
-                    TimeUnit.MILLISECONDS.toMinutes(milliseconds),
-                    TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
+    private String getHumanTimeText(long milliseconds) {
+        return String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(milliseconds),
+                TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
+    }
+
+    private int getActionBarHeight() {
+        log("getActionBarHeight()");
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (context != null && context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
         }
+        return actionBarHeight;
+    }
+
+    private void paramsRecordButton(boolean isHide){
+        int marginBottomVoicleButton = 0;
+        if(isHide){
+            marginBottomVoicleButton = Util.scaleWidthPx(48, outMetrics);
+        }else{
+            marginBottomVoicleButton = (outMetrics.heightPixels / 2 - getActionBarHeight())+(Util.scaleWidthPx(48, outMetrics));
+        }
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fragmentVoiceClip.getLayoutParams();
+        lp.setMargins(0,0,0, marginBottomVoicleButton);
+        lp.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.writing_container_layout_chat_layout);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        fragmentVoiceClip.setLayoutParams(lp);
+    }
+
 }
