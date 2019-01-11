@@ -1,5 +1,9 @@
 package mega.privacy.android.app.components.voiceClip;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.TypedArray;
@@ -13,11 +17,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.content.res.AppCompatResources;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -58,9 +65,13 @@ public class RecordView extends RelativeLayout {
     private boolean flagRB = false;
     Handler handlerStartRecord = new Handler();
     Handler handlerShowPadLock = new Handler();
-
+    float previewX = 0;
     private Animation animJump, animJumpFast;
+    int cont = 0;
 
+    float density;
+    DisplayMetrics outMetrics;
+    Display display;
 
     public RecordView(Context context) {
         super(context);
@@ -88,6 +99,11 @@ public class RecordView extends RelativeLayout {
         ViewGroup viewGroup = (ViewGroup) view.getParent();
         viewGroup.setClipChildren(false);
 
+        display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        density  = getResources().getDisplayMetrics().density;
+
         arrow = view.findViewById(R.id.arrow);
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
         smallBlinkingMic = view.findViewById(R.id.glowing_mic);
@@ -97,6 +113,8 @@ public class RecordView extends RelativeLayout {
         layoutLock = view.findViewById(R.id.layout_lock);
         imageLock = view.findViewById(R.id.image_lock);
         imageArrow = view.findViewById(R.id.image_arrow);
+        imageLock.setVisibility(GONE);
+        imageArrow.setVisibility(GONE);
         animJump = AnimationUtils.loadAnimation(getContext(), R.anim.jump);
         animJumpFast = AnimationUtils.loadAnimation(getContext(), R.anim.jump_fast);
         layoutLock.setVisibility(View.GONE);
@@ -160,15 +178,70 @@ public class RecordView extends RelativeLayout {
     public void showLock(boolean flag){
         log("showLock() -> "+flag);
         if(flag){
-            layoutLock.setVisibility(View.VISIBLE);
-            if((imageArrow!=null)&& (imageLock!=null)){
-                imageArrow.clearAnimation();
-                imageLock.clearAnimation();
-                imageArrow.startAnimation(animJumpFast);
-                imageLock.startAnimation(animJump);
+            cont = 0;
+            if(layoutLock.getVisibility() == View.GONE){
+                layoutLock.setVisibility(View.VISIBLE);
+                int prevHeight  = layoutLock.getHeight();
+                ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, Util.px2dp(150, outMetrics));
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        layoutLock.getLayoutParams().height = (int) animation.getAnimatedValue();
+                        layoutLock.requestLayout();
+                    }
+                });
+                valueAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        imageArrow.setVisibility(VISIBLE);
+                        imageLock.setVisibility(VISIBLE);
+                        if((imageArrow!=null)&& (imageLock!=null)){
+                            imageArrow.clearAnimation();
+                            imageLock.clearAnimation();
+                            imageArrow.startAnimation(animJumpFast);
+                            imageLock.startAnimation(animJump);
+                        }
+                    }
+                });
+                valueAnimator.setInterpolator(new DecelerateInterpolator());
+                valueAnimator.setDuration(500);
+                valueAnimator.start();
             }
+
         }else{
-            layoutLock.setVisibility(View.GONE);
+            flagRB = false;
+            cont ++;
+            if(cont == 1) {
+                if (layoutLock.getVisibility() == View.VISIBLE) {
+                    int prevHeight = layoutLock.getHeight();
+                    ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, 10);
+                    valueAnimator.setInterpolator(new DecelerateInterpolator());
+                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            layoutLock.getLayoutParams().height = (int) animation.getAnimatedValue();
+                            layoutLock.requestLayout();
+                        }
+                    });
+                    valueAnimator.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if ((imageArrow != null) && (imageLock != null)) {
+                                imageArrow.clearAnimation();
+                                imageLock.clearAnimation();
+                                imageArrow.startAnimation(animJumpFast);
+                                imageLock.startAnimation(animJump);
+                            }
+                            imageArrow.setVisibility(GONE);
+                            imageLock.setVisibility(GONE);
+                            layoutLock.setVisibility(View.GONE);
+                        }
+                    });
+                    valueAnimator.setInterpolator(new DecelerateInterpolator());
+                    valueAnimator.setDuration(100);
+                    valueAnimator.start();
+                }
+            }
         }
     }
 
@@ -230,7 +303,7 @@ public class RecordView extends RelativeLayout {
         @Override
         public void run() {
             if(flagRB){
-                log("runPadLock() ");
+                log("runPadLock() -> showLock");
                 showLock(true);
             }
         }
@@ -254,21 +327,77 @@ public class RecordView extends RelativeLayout {
         flagRB = true;
     }
 
+//    protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
+//        log("onActionMove()");
+//
+//        long time = System.currentTimeMillis() - startTime;
+//        if (!isSwiped) {
+//            log("onActionMove() - !isSwiped - slideToCancelLayout.getX(): "+slideToCancelLayout.getX()+", counterTime.getRight("+counterTime.getRight()+") + cancelBounds("+cancelBounds+"): "+(counterTime.getRight() + cancelBounds));
+//
+//            //Swipe To Cancel
+//            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+//                //if the time was less than one second then do not start basket animation
+//                if (isLessThanOneSecond(time)) {
+//                    log("onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
+//                    hideViews(true);
+//                    animationHelper.clearAlphaAnimation(false);
+//                    animationHelper.onAnimationEnd();
+//
+//                } else {
+//                    log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
+//                    hideViews(false);
+////                    animationHelper.animateBasket(basketInitialY);
+//                    animationHelper.animateBasket(basketInitialX);
+//
+//                }
+//
+//                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+//
+//                counterTime.stop();
+//                slideToCancelLayout.stopShimmerAnimation();
+//                isSwiped = true;
+//
+//                animationHelper.setStartRecorded(false);
+//
+//                if (recordListener != null) {
+//                    recordListener.onCancel();
+//                }
+//
+//            }else{
+//                log("onActionMove() - Swipe out of bounds");
+//                //if statement is to Prevent Swiping out of bounds
+//                if (motionEvent.getRawX() < initialX) {
+//                    log("onActionMove() - a");
+//
+//                    recordBtn.animate().x(motionEvent.getRawX()).setDuration(0).start();
+//
+//                    if (difX == 0) {
+//                        difX = (initialX - slideToCancelLayout.getX());
+//                    }
+//
+//                    slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
+//                }
+//            }
+//        }
+//    }
+
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
         log("onActionMove()");
 
         long time = System.currentTimeMillis() - startTime;
         if (!isSwiped) {
-            log("onActionMove() - !isSwiped - slideToCancelLayout.getX(): "+slideToCancelLayout.getX()+", counterTime.getRight("+counterTime.getRight()+") + cancelBounds("+cancelBounds+"): "+(counterTime.getRight() + cancelBounds));
-
+            log(" onActionMove() - !isSwiped - slideToCancelLayout.getX(): "+slideToCancelLayout.getX()+", counterTime.getRight("+counterTime.getRight()+") + cancelBounds("+cancelBounds+"): "+(counterTime.getRight() + cancelBounds));
             //Swipe To Cancel
             if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+
+                log("SWIPE TO CANCEL");
                 //if the time was less than one second then do not start basket animation
                 if (isLessThanOneSecond(time)) {
                     log("onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
                     hideViews(true);
                     animationHelper.clearAlphaAnimation(false);
                     animationHelper.onAnimationEnd();
+
 
                 } else {
                     log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
@@ -279,6 +408,7 @@ public class RecordView extends RelativeLayout {
                 }
 
                 animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+                showLock(false);
 
                 counterTime.stop();
                 slideToCancelLayout.stopShimmerAnimation();
@@ -291,6 +421,14 @@ public class RecordView extends RelativeLayout {
                 }
 
             }else{
+                if(previewX == 0){
+                    previewX = recordBtn.getX();
+                }else{
+                    if(recordBtn.getX() <= (previewX - 25)){
+                        showLock(false);
+                    }
+                }
+
                 log("onActionMove() - Swipe out of bounds");
                 //if statement is to Prevent Swiping out of bounds
                 if (motionEvent.getRawX() < initialX) {
@@ -337,7 +475,7 @@ public class RecordView extends RelativeLayout {
             animationHelper.clearAlphaAnimation(true);
         }
         animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-        flagRB = false;
+        showLock(false);
         counterTime.stop();
         slideToCancelLayout.stopShimmerAnimation();
         hideLock();
@@ -405,6 +543,23 @@ public class RecordView extends RelativeLayout {
     private void setCancelBounds(float cancelBounds, boolean convertDpToPixel) {
         float bounds = convertDpToPixel ? Util.toPixel(cancelBounds, context) : cancelBounds;
         this.cancelBounds = bounds;
+    }
+
+    public static void collapse(final View v, int duration, int targetHeight) {
+        log("collapse()");
+        int prevHeight  = v.getHeight();
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, targetHeight);
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                v.getLayoutParams().height = (int) animation.getAnimatedValue();
+                v.requestLayout();
+            }
+        });
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.setDuration(duration);
+        valueAnimator.start();
     }
 
     public void destroyHandlers(){

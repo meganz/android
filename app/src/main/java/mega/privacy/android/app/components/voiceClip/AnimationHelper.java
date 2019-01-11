@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -219,6 +220,40 @@ public class AnimationHelper {
         smallBlinkingMic.startAnimation(alphaAnimation);
     }
 
+    public void moveRecordButtonAndSlideToLock(final RecordButton recordBtn, float initialY, float difY) {
+        log("moveRecordButtonAndSlideToLock()");
+        final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getY(), initialY);
+        positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                log("moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
+                float y = (Float) animation.getAnimatedValue();
+                recordBtn.setY(y);
+            }
+        });
+
+
+        positionAnimator.addListener(new AnimatorListenerAdapter()
+        {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                log("moveRecordButtonAndSlideToCancelBack() ---- DONE");
+
+            }
+        });
+
+        positionAnimator.setDuration(0);
+        positionAnimator.start();
+
+//        // if the move event was not called ,then the difY will still 0 and there is no need to move it back
+//        if (difY != 0) {
+//            float y = initialY - difY;
+//            slideToCancelLayout.animate().y(y).setDuration(0).start();
+//        }
+
+    }
+
     public void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float difX) {
         log("moveRecordButtonAndSlideToCancelBack()");
         final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
@@ -227,7 +262,6 @@ public class AnimationHelper {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 log("moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
-
                 float x = (Float) animation.getAnimatedValue();
                 recordBtn.setX(x);
             }
