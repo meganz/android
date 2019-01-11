@@ -16,6 +16,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -52,9 +54,13 @@ public class RecordView extends RelativeLayout {
     private MediaPlayer player;
     private AnimationHelper animationHelper;
     private View layoutLock;
+    private ImageView imageLock, imageArrow;
     private boolean flagRB = false;
     Handler handlerStartRecord = new Handler();
     Handler handlerShowPadLock = new Handler();
+
+    private Animation animJump, animJumpFast;
+
 
     public RecordView(Context context) {
         super(context);
@@ -89,6 +95,10 @@ public class RecordView extends RelativeLayout {
         basketImg = view.findViewById(R.id.basket_img);
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
         layoutLock = view.findViewById(R.id.layout_lock);
+        imageLock = view.findViewById(R.id.image_lock);
+        imageArrow = view.findViewById(R.id.image_arrow);
+        animJump = AnimationUtils.loadAnimation(getContext(), R.anim.jump);
+        animJumpFast = AnimationUtils.loadAnimation(getContext(), R.anim.jump_fast);
         layoutLock.setVisibility(View.GONE);
 
         hideViews(true);
@@ -151,8 +161,23 @@ public class RecordView extends RelativeLayout {
         log("showLock() -> "+flag);
         if(flag){
             layoutLock.setVisibility(View.VISIBLE);
+            if((imageArrow!=null)&& (imageLock!=null)){
+                imageArrow.clearAnimation();
+                imageLock.clearAnimation();
+                imageArrow.startAnimation(animJumpFast);
+                imageLock.startAnimation(animJump);
+            }
         }else{
             layoutLock.setVisibility(View.GONE);
+        }
+    }
+
+    public void hideLock(){
+        if(imageLock!=null){
+            imageLock.clearAnimation();
+        }
+        if(imageArrow!=null){
+            imageArrow.clearAnimation();
         }
     }
 
@@ -315,6 +340,7 @@ public class RecordView extends RelativeLayout {
         flagRB = false;
         counterTime.stop();
         slideToCancelLayout.stopShimmerAnimation();
+        hideLock();
     }
 
 
@@ -388,6 +414,13 @@ public class RecordView extends RelativeLayout {
         if (handlerShowPadLock != null){
             handlerShowPadLock.removeCallbacksAndMessages(null);
         }
+        if(imageLock!=null){
+            imageLock.clearAnimation();
+        }
+        if(imageArrow!=null){
+            imageArrow.clearAnimation();
+        }
+
     }
     public static void log(String message) {
         Util.log("RecordView",message);

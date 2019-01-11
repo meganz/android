@@ -9020,37 +9020,37 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return finalTimerString;
     }
 
-//    public void destroyVoiceElemnts(){
-//        log("destroyVoiceElemnts() - getItemCount: "+getItemCount());
-//        if(getItemCount()!= 0){
-//           for(int i=0;i<messages.size();i++){
-//               if((messages.get(i).getMessage()!=null) && (messages.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
-//                   ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(i+1);
-//                   if(holder!=null) {
-//                       if(holder.mediaPlayerVoiceNotes!=null){
-//                           if(holder.mediaPlayerVoiceNotes.isPlaying()) {
-//                               holder.mediaPlayerVoiceNotes.pause();
-//                               holder.mediaPlayerVoiceNotes.stop();
-//                           }
-//                           holder.mediaPlayerVoiceNotes.reset();
-//                           holder.mediaPlayerVoiceNotes = null;
-//                       }
-//
-//                       if(holder.handlerVoiceNotes!=null){
-//                           if(runnableContactVoiceClip!=null){
-//                               holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
-//                           }
-//                           if(runnableOwnVoiceClip!=null){
-//                               holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
-//                           }
-//                           holder.handlerVoiceNotes.removeCallbacksAndMessages(null);
-//                       }
-//                   }
-//               }
-//
-//           }
-//        }
-//    }
+    public void destroyVoiceElemnts(){
+        log("destroyVoiceElemnts() - getItemCount: "+getItemCount());
+        if(getItemCount()!= 0){
+           for(int i=0;i<messages.size();i++){
+               if((messages.get(i)!=null) && (messages.get(i).getMessage()!=null) && (messages.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
+                   ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(i+1);
+                   if(holder!=null) {
+                       if(holder.mediaPlayerVoiceNotes!=null){
+                           if(holder.mediaPlayerVoiceNotes.isPlaying()) {
+                               holder.mediaPlayerVoiceNotes.pause();
+                               holder.mediaPlayerVoiceNotes.stop();
+                           }
+                           holder.mediaPlayerVoiceNotes.reset();
+                           holder.mediaPlayerVoiceNotes = null;
+                       }
+
+                       if(holder.handlerVoiceNotes!=null){
+                           if(runnableContactVoiceClip!=null){
+                               holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
+                           }
+                           if(runnableOwnVoiceClip!=null){
+                               holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
+                           }
+                           holder.handlerVoiceNotes.removeCallbacksAndMessages(null);
+                       }
+                   }
+               }
+
+           }
+        }
+    }
 
 
     @Override

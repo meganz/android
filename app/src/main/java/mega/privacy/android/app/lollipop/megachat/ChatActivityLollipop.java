@@ -806,6 +806,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 startRecordVoiceClip();
             }
             @Override
+            public void onLock() {
+                log("voiceClipLayout.setOnRecordListener() -> onLock()");
+            }
+            @Override
             public void onCancel() {
                 log("voiceClipLayout.setOnRecordListener() -> onCancel()");
                 if(isRecording){
@@ -6447,9 +6451,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (handlerSend != null) {
             handlerSend.removeCallbacksAndMessages(null);
         }
-//        if(adapter!=null){
-//            adapter.destroyVoiceElemnts();
-//        }
+        if(adapter!=null){
+            adapter.destroyVoiceElemnts();
+        }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
 
