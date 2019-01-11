@@ -73,6 +73,8 @@
                         android:textColor="@color/name_my_account"
                         android:ellipsize="end"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-light"
+                        android:textStyle="bold"
                         android:maxLines="1"
                         android:singleLine="true"/>
 
@@ -185,7 +187,7 @@
                 android:textColor="@color/accentColor"
                 android:background="@color/white"
                 android:gravity="left|center_vertical"
-                android:theme="@style/ButtonStyle"/>
+                style="@style/ButtonStyle"/>
         </RelativeLayout>
 
         <View
@@ -219,9 +221,15 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="12dp"
                 android:background="@android:color/transparent"
-                android:textColor="@color/accentColor" />
+                android:textColor="@color/accentColor"
+                android:textSize="14sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:layout_marginRight="8dp"
+                style="@style/ButtonStyle"/>
         </RelativeLayout>
 
 	    <!--shared contact list view-->
@@ -245,14 +253,21 @@
 				    android:choiceMode="multipleChoice"/>
 
 			    <Button android:id="@+id/more_button"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:layout_alignParentBottom="true"
-			            android:layout_alignParentRight="true"
-			            android:layout_below="@+id/file_info_contact_list_view"
-			            android:background="@android:color/transparent"
-			            android:text="4 More"
-			            android:textColor="@color/accentColor"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/file_info_contact_list_view"
+                    android:background="@android:color/transparent"
+                    android:text="4 More"
+                    android:textColor="@color/accentColor"
+                    android:textSize="14sp"
+                    style="@style/ButtonStyle"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:layout_marginRight="8dp"/>
 
 		    </RelativeLayout>
 
@@ -632,7 +647,7 @@
                 android:paddingBottom="10dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:theme="@style/ButtonStyle"/>
+                style="@style/ButtonStyle"/>
         </RelativeLayout>
 
     </LinearLayout>

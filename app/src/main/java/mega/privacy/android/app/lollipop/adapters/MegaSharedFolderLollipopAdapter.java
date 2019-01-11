@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -20,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -38,6 +40,8 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -55,6 +59,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 //	RecyclerView listViewActivity;
 	
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
 	DatabaseHandler dbH = null;
 	
 //	boolean removeShare = false;
@@ -168,6 +173,10 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		if (megaChatApi == null) {
+			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
+		}
 	}
 	
 	public void setContext(Context context){
@@ -196,6 +205,8 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
     	boolean firstName = false;
     	String nameText;
     	String firstNameText;
+
+    	ImageView stateIcon;
     	
     	public ViewHolderShareList(View itemView) {
 			super(itemView);
@@ -240,8 +251,16 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.initialLetter = (TextView) v.findViewById(R.id.shared_folder_contact_initial_letter);
 		
 		holder.textViewContactName = (TextView) v.findViewById(R.id.shared_folder_contact_name);
+		if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(280,outMetrics));
+		} else {
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(225,outMetrics));
+		}
+
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
 		holder.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.shared_folder_three_dots_layout);
+
+		holder.stateIcon = (ImageView) v.findViewById(R.id.shared_folder_state_icon);
 
 		v.setTag(holder); 
 		
@@ -275,6 +294,44 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				else{
 					log("The contactDB is null: ");
 					holder.textViewContactName.setText(holder.contactMail);
+				}
+
+				if(Util.isChatEnabled()){
+					holder.stateIcon.setVisibility(View.VISIBLE);
+					if (megaChatApi != null){
+						int userStatus = megaChatApi.getUserOnlineStatus(contact.getHandle());
+						if(userStatus == MegaChatApi.STATUS_ONLINE){
+							log("This user is connected");
+							holder.stateIcon.setVisibility(View.VISIBLE);
+							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
+						}
+						else if(userStatus == MegaChatApi.STATUS_AWAY){
+							log("This user is away");
+							holder.stateIcon.setVisibility(View.VISIBLE);
+							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
+						}
+						else if(userStatus == MegaChatApi.STATUS_BUSY){
+							log("This user is busy");
+							holder.stateIcon.setVisibility(View.VISIBLE);
+							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
+						}
+						else if(userStatus == MegaChatApi.STATUS_OFFLINE){
+							log("This user is offline");
+							holder.stateIcon.setVisibility(View.VISIBLE);
+							holder.stateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
+						}
+						else if(userStatus == MegaChatApi.STATUS_INVALID){
+							log("INVALID status: "+userStatus);
+							holder.stateIcon.setVisibility(View.GONE);
+						}
+						else{
+							log("This user status is: "+userStatus);
+							holder.stateIcon.setVisibility(View.GONE);
+						}
+					}
+				}
+				else{
+					holder.stateIcon.setVisibility(View.GONE);
 				}
 			}
 			else{

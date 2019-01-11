@@ -306,6 +306,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     int errorSent = 0;
     int successSent = 0;
 
+
+
     public void activateActionMode(){
         log("activateActionMode");
         if (!adapter.isMultipleSelect()){
@@ -1084,6 +1086,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     if (from == Constants.FROM_INCOMING_SHARES) {
 
                         downloadMenuItem.setVisible(true);
+                        menu.findItem(R.id.cab_menu_file_info_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
                         shareMenuItem.setVisible(false);
                         menu.findItem(R.id.cab_menu_file_info_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -1128,7 +1131,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                 renameMenuItem.setVisible(false);
                                 moveMenuItem.setVisible(false);
                                 copyMenuItem.setVisible(true);
-                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
                                 rubbishMenuItem.setVisible(false);
 
@@ -1145,7 +1147,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                 renameMenuItem.setVisible(false);
                                 moveMenuItem.setVisible(false);
                                 copyMenuItem.setVisible(true);
-                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
                                 rubbishMenuItem.setVisible(false);
 
@@ -1481,12 +1482,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             nC =  new NodeController(this);
         }
 
-        if(adapterType == Constants.INCOMING_SHARES_ADAPTER || adapterType == Constants.SEARCH_ADAPTER){
-            nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
-        }
-        else {
-            nC.selectChatsToSendNode(node);
-        }
+        nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
     }
 
 	private void refreshProperties(){

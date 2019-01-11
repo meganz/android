@@ -32,7 +32,6 @@
                 app:expandedTitleMarginTop="86dp"
                 app:expandedTitleMarginStart="72dp"
                 app:expandedTitleMarginBottom="14dp"
-                app:title="This is a long title text displayed in multiple lines."
                 app:maxLines="2"
                 app:lineSpacingMultiplier="1.2">
 
