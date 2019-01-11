@@ -34,8 +34,8 @@ public class AnimationHelper {
     private boolean isBasketAnimating, isStartRecorded = false;
     private float micX, micY = 0;
     private AnimatorSet micAnimation;
-//    private TranslateAnimation translateAnimation1;
-//    private TranslateAnimation translateAnimation2;
+    private TranslateAnimation translateAnimation1;
+    private TranslateAnimation translateAnimation2;
     private AlphaAnimation alphaAnimation1;
     private AlphaAnimation alphaAnimation2;
     private Handler handler1, handler2;
@@ -48,7 +48,9 @@ public class AnimationHelper {
     }
 
     @SuppressLint("RestrictedApi")
-    public void animateBasket(float basketInitialY) {
+    public void animateBasket(float basketInitialX) {
+//        public void animateBasket(float basketInitialY) {
+
         log("animateBasket()");
         isBasketAnimating = true;
 
@@ -71,6 +73,12 @@ public class AnimationHelper {
         alphaAnimation2.setDuration(350);
         alphaAnimation2.setFillAfter(true);
 
+        translateAnimation1 = new TranslateAnimation(basketInitialX, basketInitialX + 90, 0, 0);
+        translateAnimation1.setDuration(250);
+
+        translateAnimation2 = new TranslateAnimation(basketInitialX+90, basketInitialX, 0, 0);
+        translateAnimation2.setDuration(350);
+
 //        translateAnimation1 = new TranslateAnimation(0, 0, basketInitialY, basketInitialY - 90);
 //        translateAnimation1.setDuration(250);
 
@@ -85,14 +93,14 @@ public class AnimationHelper {
             @Override
             public void run() {
                 basketImg.setVisibility(VISIBLE);
-                basketImg.startAnimation(alphaAnimation1);
-//                basketImg.startAnimation(translateAnimation1);
+//                basketImg.startAnimation(alphaAnimation1);
+                basketImg.startAnimation(translateAnimation1);
 
             }
         }, 350);
 
-//        translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
-        alphaAnimation1.setAnimationListener(new Animation.AnimationListener() {
+        translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
+//        alphaAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
@@ -104,7 +112,8 @@ public class AnimationHelper {
                 handler2.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        basketImg.startAnimation(alphaAnimation2);
+//                        basketImg.startAnimation(alphaAnimation2);
+                        basketImg.startAnimation(translateAnimation2);
                         smallBlinkingMic.setVisibility(INVISIBLE);
                         basketImg.setVisibility(INVISIBLE);
                     }
@@ -114,8 +123,9 @@ public class AnimationHelper {
             public void onAnimationRepeat(Animation animation) {
             }
         });
+//        alphaAnimation2.setAnimationListener(new Animation.AnimationListener() {
 
-        alphaAnimation2.setAnimationListener(new Animation.AnimationListener() {
+        translateAnimation2.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
@@ -144,16 +154,22 @@ public class AnimationHelper {
     public void resetBasketAnimation() {
         log("resetBasketAnimation()");
         if (isBasketAnimating) {
-//            translateAnimation1.reset();
-            //            translateAnimation1.cancel();
-            if(alphaAnimation1!=null){
-                alphaAnimation1.reset();
-                alphaAnimation1.cancel();
+            if(translateAnimation1!=null){
+                translateAnimation1.reset();
+                translateAnimation1.cancel();
             }
-            if(alphaAnimation2!=null){
-                alphaAnimation2.reset();
-                alphaAnimation2.cancel();
+            if(translateAnimation2!=null){
+                translateAnimation2.reset();
+                translateAnimation2.cancel();
             }
+//            if(alphaAnimation1!=null){
+//                alphaAnimation1.reset();
+//                alphaAnimation1.cancel();
+//            }
+//            if(alphaAnimation2!=null){
+//                alphaAnimation2.reset();
+//                alphaAnimation2.cancel();
+//            }
             if(micAnimation!=null) {
                 micAnimation.cancel();
             }

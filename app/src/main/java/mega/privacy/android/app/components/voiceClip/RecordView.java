@@ -38,6 +38,8 @@ public class RecordView extends RelativeLayout {
     private ShimmerLayout slideToCancelLayout;
     private ImageView arrow;
     private float initialX, basketInitialY, difX = 0;
+    private float basketInitialX = 0;
+
     private float cancelBounds = DEFAULT_CANCEL_BOUNDS;
     private long startTime, elapsedTime = 0;
     private Context context;
@@ -210,7 +212,7 @@ public class RecordView extends RelativeLayout {
     };
 
     protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
-        log("****** onActionDown()");
+        log("onActionDown()");
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
@@ -218,6 +220,7 @@ public class RecordView extends RelativeLayout {
         initialX = recordBtn.getX();
         playSound(RECORD_START);
         basketInitialY = basketImg.getY() + 90;
+        basketInitialX = basketImg.getX() - 90;
         showViews();
         startTime = System.currentTimeMillis();
         isSwiped = false;
@@ -227,7 +230,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
-        log("****** onActionMove()");
+        log("onActionMove()");
 
         long time = System.currentTimeMillis() - startTime;
         if (!isSwiped) {
@@ -245,7 +248,9 @@ public class RecordView extends RelativeLayout {
                 } else {
                     log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
                     hideViews(false);
-                    animationHelper.animateBasket(basketInitialY);
+//                    animationHelper.animateBasket(basketInitialY);
+                    animationHelper.animateBasket(basketInitialX);
+
                 }
 
                 animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
@@ -282,7 +287,7 @@ public class RecordView extends RelativeLayout {
         log("onActionUp()");
         elapsedTime = System.currentTimeMillis() - startTime;
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
-            log("****** onActionUp() - less than a second");
+            log("onActionUp() - less than a second");
             if (recordListener != null){
                 recordListener.onLessThanSecond();
             }
@@ -290,7 +295,7 @@ public class RecordView extends RelativeLayout {
             playSound(RECORD_ERROR);
 
         } else {
-            log("******onActionUp() - more than a second");
+            log("onActionUp() - more than a second");
             if (recordListener != null && !isSwiped) {
                 recordListener.onFinish(elapsedTime);
             }
