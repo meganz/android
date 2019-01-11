@@ -85,6 +85,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
+    implementation 'io.supercharge:shimmerlayout:2.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

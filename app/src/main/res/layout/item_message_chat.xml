@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
     android:id="@+id/message_chat_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -732,6 +733,107 @@
 
                 <!--End RelativeLayout file-->
 
+                <!--send a voice clip-->
+                <RelativeLayout
+                    android:id="@+id/content_own_message_voice_clip_layout"
+                    android:layout_width="230dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/dark_rounded_chat_own_message"
+                    android:layout_marginRight="16dp"
+                    android:layout_alignParentRight="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/content_own_message_voice_clip_play_pause"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
+                            android:visibility="gone"/>
+
+                        <!-- Progress bar-->
+                        <RelativeLayout
+                            android:id="@+id/uploadingProgressBarVoiceClip"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:visibility="gone"
+                            android:background="@android:color/transparent">
+                            <ProgressBar
+                                android:id="@+id/uploadingProgressBarVoiceClip_im"
+                                android:indeterminate="true"
+                                android:indeterminateTintMode="src_atop"
+                                android:indeterminateTint="@color/small_letter_upgrade_account"
+                                android:layout_centerInParent="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </RelativeLayout>
+
+                        <!-- error icon-->
+                        <ImageView
+                            android:id="@+id/content_own_message_voice_clip_error"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
+                            android:visibility="gone"/>
+
+                        <SeekBar
+                            android:id="@+id/content_own_message_voice_clip_seekBar"
+                            android:layout_width="145dp"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/MySeekBar"
+                            android:thumbTint="@color/white"
+                            android:max="200"
+                            android:focusable="false"
+                            android:progress="0"
+                            android:background="@null"
+                            android:layout_gravity="center_vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/content_own_message_voice_clip_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textAlignment="center"
+                            android:background="@null"
+                            android:textColor="@android:color/white"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/own_triangle_icon_voice_clip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/content_own_message_voice_clip_layout"
+                    android:gravity="right"
+                    android:paddingRight="4dp"
+                    android:background="@android:color/transparent">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_gravity="center"
+                        android:background="@null"
+                        android:src="@drawable/ic_input_warning"/>
+                </RelativeLayout>
+
+                <!--End RelativeLayout voice clip-->
+
                 <!-- send a contact-->
                 <RelativeLayout
                     android:id="@+id/content_own_message_contact_layout"
@@ -1406,6 +1508,55 @@
                     </RelativeLayout>
                 </RelativeLayout>
                 <!--End RelativeLayout file-->
+
+                <!--Received a voice clip-->
+                <RelativeLayout
+                    android:id="@+id/content_contact_message_voice_clip_layout"
+                    android:layout_width="230dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/rounded_text_view_chat_contact_message"
+                    android:gravity="left"
+                    android:layout_alignParentLeft="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:id="@+id/content_contact_message_voice_clip_play_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:background="@null"
+                            android:visibility="gone"/>
+                        <SeekBar
+                            android:id="@+id/content_contact_message_voice_clip_seekBar"
+                            android:layout_width="145dp"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/ContactSeekBar"
+                            android:thumbTint="@color/accentColor"
+                            android:max="200"
+                            android:progress="0"
+                            android:background="@null"
+                            android:layout_gravity="center_vertical"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                        <TextView
+                            android:id="@+id/content_contact_message_voice_clip_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textAlignment="center"
+                            android:background="@null"
+                            android:textColor="@android:color/black"
+                            android:layout_gravity="center_vertical"
+                            android:textSize="13sp"/>
+                    </LinearLayout>
+                </RelativeLayout>
 
                 <!-- Received a contact-->
                 <RelativeLayout

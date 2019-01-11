@@ -128,9 +128,14 @@ public class Constants {
 	public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
 	public static final int WRITE_LOG = 10;
-	public static final int LOCATION_PERMISSION_REQUEST_CODE = 11;
 
-	public static final int PRO_LITE = 4;
+	public static final int RECORD_VOICE_CLIP = 11;
+    public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
+    public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
+    public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
+	public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+
+    public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
 	public static final int PRO_II = 2;

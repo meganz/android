@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -26,7 +25,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -789,10 +787,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						log("show node attachment panel");
 						showNodeAttachmentBottomSheet(m, position);
 					}
-
-
 				}
-
 			}
 		}else{
 			log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");

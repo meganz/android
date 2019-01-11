@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -21,6 +22,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -29,12 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 public class ChatFileStorageFragment extends BottomSheetDialogFragment{
@@ -47,7 +47,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     MegaChatFileStorageAdapter adapter;
     ChatFileStorageFragment fileStorageFragment = this;
     public static int GRID_LARGE = 2;
-    MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     Context context;
     ActionBar aB;
@@ -61,6 +60,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     RelativeLayout rlfragment;
     ArrayList<Integer> posSelected = new ArrayList<>();
     String downloadLocationDefaultPath = Util.downloadDIR;
+    FloatingActionButton sendIcon;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -74,9 +74,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
     @Override
     public void onCreate (Bundle savedInstanceState){
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
 
         dbH = DatabaseHandler.getDbHandler(getActivity());
 
@@ -107,16 +104,8 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
 
         log("fragment ADDED");
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
         if (aB == null){
             aB = ((AppCompatActivity)context).getSupportActionBar();
-        }
-
-        if (megaApi.getRootNode() == null){
-            return null;
         }
 
         prefs = dbH.getPreferences();
@@ -149,6 +138,14 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         recyclerView.setClipToPadding(false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        sendIcon = (FloatingActionButton) v.findViewById(R.id.send_file_icon_chat);
+        sendIcon.setVisibility(View.GONE);
+        sendIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendImages();
+            }
+        });
 
         if (recyclerView != null) {
 
@@ -183,9 +180,15 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             new FetchPhotosTask(fileStorageFragment).execute();
 
             if (adapter.getItemCount() == 0){
+                sendIcon.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.VISIBLE);
             }else{
+                if(adapter.isMultipleSelect()){
+                    sendIcon.setVisibility(View.VISIBLE);
+                }else{
+                    sendIcon.setVisibility(View.GONE);
+                }
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.GONE);
             }
@@ -209,7 +212,17 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
+    public void updateIconSend(boolean flag){
+        log("updateIconSend() - "+flag);
+        if(flag){
+            sendIcon.setVisibility(View.VISIBLE);
+        }else{
+            sendIcon.setVisibility(View.GONE);
+        }
+    }
+
     public void itemClick(int position) {
+        log("itemClick()");
         if (adapter.isMultipleSelect()){
             adapter.toggleSelection(position);
         }
@@ -230,9 +243,15 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                 adapter.setNodes(mPhotoUris);
 
                 if (adapter.getItemCount() == 0){
+                    sendIcon.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.GONE);
                     emptyTextView.setVisibility(View.VISIBLE);
                 }else{
+                    if(adapter.isMultipleSelect()){
+                        sendIcon.setVisibility(View.VISIBLE);
+                    }else{
+                        sendIcon.setVisibility(View.GONE);
+                    }
                     recyclerView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.GONE);
                 }
@@ -279,9 +298,6 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         return false;
     }
 
-    public void activatedMultiselect(boolean flag){
-        ((ChatActivityLollipop) getActivity()).multiselectActivated(flag);
-    }
 
     public void removePosition(Integer pos){
         posSelected.remove(pos);
@@ -362,9 +378,15 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                     context.adapter.notifyDataSetChanged();
                 }
                 if (context.adapter.getItemCount() == 0){
+                    context.sendIcon.setVisibility(View.GONE);
                     context.recyclerView.setVisibility(View.GONE);
                     context.emptyTextView.setVisibility(View.VISIBLE);
                 }else{
+                    if(context.adapter.isMultipleSelect()){
+                        context.sendIcon.setVisibility(View.VISIBLE);
+                    }else{
+                        context.sendIcon.setVisibility(View.GONE);
+                    }
                     context.recyclerView.setVisibility(View.VISIBLE);
                     context.emptyTextView.setVisibility(View.GONE);
                 }

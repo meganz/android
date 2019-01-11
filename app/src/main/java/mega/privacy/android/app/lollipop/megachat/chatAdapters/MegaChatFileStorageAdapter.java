@@ -65,6 +65,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         public ImageView photo;
         public RelativeLayout thumbLayout;
         public ImageView photoSelected;
+
 //        public RelativeLayout photoUnselected;
     }
 
@@ -283,7 +284,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
     @Override
     public void onClick(View v) {
-
+        log("onClick()");
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
         log("onClick -> Current position: "+currentPosition);
@@ -294,7 +295,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if (!isMultipleSelect()){
             setMultipleSelect(true);
             ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
-
         }else{
             ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
 
@@ -328,11 +328,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     public void setMultipleSelect(boolean multipleSelect) {
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
+            ((ChatFileStorageFragment) fragment).updateIconSend(this.multipleSelect);
+
         }
         if(this.multipleSelect){
             selectedItems = new SparseBooleanArray();
         }
-        ((ChatFileStorageFragment) fragment).activatedMultiselect(this.multipleSelect);
     }
 
 }

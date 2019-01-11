@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_container_chat"
-    android:background="@android:color/transparent"
+    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -94,78 +94,78 @@
 
             </android.support.v7.widget.Toolbar>
 
-
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/writing_container_layout_chat_layout"
                 android:layout_alignParentBottom="true"
+                android:background="@android:color/transparent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
+                    android:background="@android:color/transparent"
                     android:orientation="vertical">
-                    <LinearLayout
-                        android:id="@+id/separator_file"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/keyboard_chat_separator"
-                        android:orientation="horizontal" />
 
                     <RelativeLayout
-                        android:id="@+id/writing_linear_layout_chat"
+                        android:id="@+id/write_layout"
                         android:layout_width="match_parent"
-                        android:focusableInTouchMode="true"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:gravity="bottom"
+                        android:background="@android:color/transparent">
 
-                        <ImageButton
-                            android:id="@+id/send_message_icon_chat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="16dp"
-                            android:layout_centerVertical="true"
-                            android:background="@null"
-                            android:layout_alignBottom="@id/edit_text_chat"
-                            android:tint="@color/accentColor"
-                            android:src="@drawable/ic_send_black"/>
-
-                        <mega.privacy.android.app.components.twemoji.EmojiEditText
-                            android:id="@id/edit_text_chat"
+                        <LinearLayout
+                            android:id="@+id/separator_edit_text"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:layout_marginTop="6dp"
-                            android:layout_marginBottom="12dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:layout_centerVertical="true"
-                            android:textSize="14sp"
-                            android:layout_toLeftOf="@+id/send_message_icon_chat"
-                            android:inputType="textMultiLine|textCapSentences"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:textColor="@color/black" />
+                            android:layout_height="1dp"
+                            android:visibility="visible"
+                            android:background="@color/keyboard_chat_separator"
+                            android:orientation="horizontal"
+                            android:layout_alignTop="@id/writing_linear_layout_chat"/>
 
                         <RelativeLayout
-                            android:id="@+id/writing_disabled_linear_layout_chat"
+                            android:id="@+id/writing_linear_layout_chat"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone"
-                            android:background="@color/transparent_white">
+                            android:layout_height="48dp"
+                            android:visibility="visible"
+                            android:gravity="center_vertical"
+                            android:background="@android:color/transparent">
+                            <ImageButton
+                                android:id="@+id/send_message_icon_chat"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:visibility="visible"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginRight="8dp"
+                                android:background="@null"
+                                android:tint="@color/accentColor"
+                                android:src="@drawable/ic_send_black"/>
+                            <mega.privacy.android.app.components.twemoji.EmojiEditText
+                                android:id="@+id/edit_text_chat"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:background="@android:color/transparent"
+                                android:layout_toLeftOf="@id/send_message_icon_chat"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_centerVertical="true"
+                                android:textSize="14sp"
+                                android:inputType="textMultiLine|textCapSentences"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:textColor="@color/black"/>
                         </RelativeLayout>
                     </RelativeLayout>
 
                     <LinearLayout
-                        android:id="@+id/linear_layout_twemoji"
+                        android:id="@+id/linear_layout_options"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:orientation="horizontal"
-                        android:layout_alignBottom="@+id/edit_text_chat">
-
+                        android:orientation="horizontal">
                         <RelativeLayout
                             android:id="@+id/rl_keyboard_twemoji_chat"
                             android:layout_width="wrap_content"
@@ -180,7 +180,6 @@
                                 android:src="@drawable/ic_emoticon_white"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
-
                         <RelativeLayout
                             android:id="@+id/rl_media_icon_chat"
                             android:layout_width="wrap_content"
@@ -196,7 +195,6 @@
                                 android:layout_centerInParent="true"/>
 
                         </RelativeLayout>
-
                         <RelativeLayout
                             android:id="@+id/rl_send_contact_icon_chat"
                             android:layout_width="wrap_content"
@@ -211,7 +209,6 @@
                                 android:src="@drawable/ic_send_contact"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
-
                         <RelativeLayout
                             android:id="@+id/rl_pick_file_system_icon_chat"
                             android:layout_width="wrap_content"
@@ -226,7 +223,6 @@
                                 android:src="@drawable/ic_pick_file_system"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
-
                         <RelativeLayout
                             android:id="@+id/rl_pick_cloud_drive_icon_chat"
                             android:layout_width="wrap_content"
@@ -241,13 +237,11 @@
                                 android:src="@drawable/ic_pick_cloud_drive"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
-
                         <RelativeLayout
                             android:id="@+id/rl_pick_file_storage_icon_chat"
                             android:layout_width="wrap_content"
                             android:layout_weight="1"
                             android:layout_height="match_parent">
-
                             <ImageButton
                                 android:id="@+id/pick_file_storage_icon_chat"
                                 android:layout_width="wrap_content"
@@ -273,14 +267,12 @@
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
                     </LinearLayout>
-
                     <mega.privacy.android.app.components.twemoji.EmojiKeyboard
                         android:id="@+id/emojiView"
                         android:animateLayoutChanges="true"
                         android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-
                     <RelativeLayout
                         android:id="@+id/relative_layout_file_storage"
                         android:layout_width="match_parent"
@@ -292,7 +284,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@android:color/transparent"/>
-
                     </RelativeLayout>
                 </LinearLayout>
             </RelativeLayout>
@@ -308,19 +299,18 @@
                 android:layout_above="@id/writing_container_layout_chat_layout"
                 android:orientation="vertical">
 
+                <!--Empty messages -->
                 <LinearLayout
                     android:id="@+id/empty_messages_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/background_chat"
                     android:orientation="vertical">
-
                     <ImageView
                         android:id="@+id/empty_image_view_chat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"/>
-
                     <TextView
                         android:id="@+id/empty_text_chat_recent"
                         android:layout_width="wrap_content"
@@ -330,7 +320,6 @@
                         android:layout_gravity="center_horizontal"
                         android:textColor="@color/adapters_background"
                         android:textSize="18sp" />
-
                 </LinearLayout>
 
                 <!-- Layout with chat content -->
@@ -347,6 +336,7 @@
                         android:paddingBottom="24dp"/>
                 </RelativeLayout>
 
+                <!--User typing-->
                 <RelativeLayout
                     android:id="@+id/user_typing_layout"
                     android:layout_width="match_parent"
@@ -366,6 +356,7 @@
                         android:textSize="10sp"/>
                 </RelativeLayout>
 
+                <!--Jump and new messages-->
                 <RelativeLayout
                     android:id="@+id/message_jump_layout"
                     android:layout_width="163dp"
@@ -400,16 +391,15 @@
                             android:ellipsize="end"/>
                     </LinearLayout>
                 </RelativeLayout>
-
             </RelativeLayout>
 
+            <!--Call in progress-->
             <RelativeLayout
                 android:id="@+id/call_in_progress_layout"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_below="@+id/toolbar_maps"
                 android:background="@color/accentColor">
-
                 <TextView
                     android:id="@+id/call_in_progress_text"
                     android:layout_width="wrap_content"
@@ -418,11 +408,71 @@
                     android:textSize="14sp"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"/>
-
             </RelativeLayout>
+            <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/record_voice_clip_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:orientation="vertical"
+                android:layout_alignBottom="@id/writing_container_layout_chat_layout"
+                android:layout_gravity="bottom|right"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="48dp"
+                android:visibility="visible">
+
+                <mega.privacy.android.app.components.voiceClip.RecordView
+                    android:id="@+id/rl_voice_clip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:visibility="visible"
+                    android:layout_marginRight="8dp"
+                    android:layout_gravity="bottom|right"
+                    app:slide_to_cancel_arrow="@drawable/ic_slide_record_white"
+                    app:slide_to_cancel_arrow_color="@color/transparent_black"
+                    app:slide_to_cancel_bounds="8dp"
+                    app:slide_to_cancel_margin_right="10dp"
+                    app:slide_to_cancel_text="SLIDE TO CANCEL"
+                    app:counter_time_color="@color/delete_account"/>
+
+                <mega.privacy.android.app.components.voiceClip.RecordButton
+                    android:id="@+id/record_fab"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="centerInside"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginRight="8dp"
+                    android:visibility="visible"
+                    app:mic_icon="@drawable/ic_b_mic_on"/>
+
+                <LinearLayout
+                    android:id="@+id/bubble_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginRight="17dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="40dp"
+                    android:visibility="visible">
+                    <TextView
+                        android:id="@+id/bubble_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap and hold to record, release to send."
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:textColor="@color/white"
+                        android:textStyle="normal"
+                        android:fontFamily="Roboto"/>
+                </LinearLayout>
+            </FrameLayout>
         </RelativeLayout>
-
     </RelativeLayout>
-
 
 </android.support.design.widget.CoordinatorLayout>

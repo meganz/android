@@ -126,7 +126,9 @@ public class Util {
 	public static String chatTempDIR = "MEGA/MEGA Temp/Chat";
 	public static String oldMKFile = "/MEGA/MEGAMasterKey.txt";
 	public static String rKFile = "/MEGA/MEGARecoveryKey.txt";
-	
+	public static String voiceNotesDIR ="MEGA/MEGA Voice Notes";
+
+
 	public static String base64EncodedPublicKey_1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0bZjbgdGRd6/hw5/J2FGTkdG";
 	public static String base64EncodedPublicKey_2 = "tDTMdR78hXKmrxCyZUEvQlE/DJUR9a/2ZWOSOoaFfi9XTBSzxrJCIa+gjj5wkyIwIrzEi";
 	public static String base64EncodedPublicKey_3 = "55k9FIh3vDXXTHJn4oM9JwFwbcZf1zmVLyes5ld7+G15SZ7QmCchqfY4N/a/qVcGFsfwqm";
@@ -1154,6 +1156,35 @@ public class Util {
 		
 		return speedString;
 	}
+
+	public static String getVoiceClipName(long timestamp, String fileName) {
+		log("getVoiceNoteName() - timestamp: "+timestamp+", fileName: "+fileName);
+		String nameResult = "";
+		String extension = "";
+		String dateTime = "";
+
+		//Get extension:
+		String[] s = fileName.split("\\.");
+		if (s != null){
+			if (s.length > 0){
+				extension = s[s.length-1];
+			}
+		}
+		//Get date time:
+		try{
+			Calendar calendar = Calendar.getInstance();
+			TimeZone tz = TimeZone.getDefault();
+			calendar.setTimeInMillis(timestamp * 1000L);
+			calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+			Date currenTimeZone = (Date) calendar.getTime();
+			dateTime = sdf.format(currenTimeZone);
+
+		}catch (Exception e) {
+		}
+		nameResult = dateTime+"."+extension;
+		return nameResult;
+	}
 	
 	public static String getPhotoSyncName (long timeStamp, String fileName){
 		String photoSyncName = null;
@@ -1781,6 +1812,30 @@ public class Util {
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
 		
 	}
+
+//	public static boolean isVoiceClip(String path) {
+//		log("isVoiceClip: "+path);
+//		try{
+//			String extension = "";
+//			String[] s = path.split("\\.");
+//			if (s != null){
+//				if (s.length > 0){
+//					extension = s[s.length-1];
+//					log("isVoiceClip: extension"+extension);
+//
+//				}
+//			}
+//
+//			if(extension.equals("opus")){
+//				return true;
+//			}else{
+//				return false;
+//			}
+//		}catch(Exception e){
+//			log("Exception: "+e.getMessage());
+//			return false;
+//		}
+//	}
 	
 	public static boolean isVideoFile(String path) {
 		log("isVideoFile: "+path);
@@ -2205,6 +2260,20 @@ public class Util {
 			}
 		}
 		return true;
+	}
+
+	public static float toPixel(float dp, Context context){
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+		return px;
+	}
+
+	public static float toDp(float px, Context context){
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+		return dp;
 	}
 
 	private static void log(String message) {

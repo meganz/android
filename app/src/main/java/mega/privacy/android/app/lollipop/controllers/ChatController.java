@@ -195,6 +195,14 @@ public class ChatController {
                 megaChatApi.archiveChat(chat.getChatId(), true, (GroupChatInfoActivityLollipop) context);
             }
         }
+        else if(context instanceof ChatActivityLollipop){
+            if(chat.isArchived()){
+                megaChatApi.archiveChat(chat.getChatId(), false,(ChatActivityLollipop) context);
+            }
+            else{
+                megaChatApi.archiveChat(chat.getChatId(), true, (ChatActivityLollipop) context);
+            }
+        }
     }
 
     public void archiveChats(ArrayList<MegaChatListItem> chats){
@@ -2002,7 +2010,7 @@ public class ChatController {
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMsgId();
 
-            if(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+            if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                 if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
                     //Node has to be imported
                     messagesToImport.add(messagesSelected.get(i));

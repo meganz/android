@@ -88,7 +88,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        log("****onDestroy");
+        log("onDestroy");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
@@ -139,7 +139,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                log("BROADCAST TO SEND SIGNAL PRESENCE");
                 if(delaySignalPresence && megaChatApi.getPresenceConfig().isPending()==false){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();

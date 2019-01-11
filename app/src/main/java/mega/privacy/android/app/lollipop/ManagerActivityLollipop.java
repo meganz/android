@@ -343,6 +343,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     int orientationSaved;
 
+    float elevation = 0;
+
 	public enum FragmentTag {
 		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY;
@@ -1690,6 +1692,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
+		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 	}
@@ -1749,6 +1752,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
+			elevation = savedInstanceState.getFloat("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", -1);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 		}
@@ -9575,8 +9579,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					long rootHandle = megaApi.getRootNode().getHandle();
+					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
+						parentHandleBrowser = rootHandle;
+						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+						if (fbFLol != null) {
+							fbFLol.scrollToFirstPosition();
+						}
+					}
+				}
+				else {
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
@@ -12598,7 +12615,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			spaceTV.setText(result);
 			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
 			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
-			log("*** "+progress+ " *** "+usedSpace);
+			log("progress "+progress+ " usedSpace "+usedSpace);
 			usedSpacePB.setProgress(progress);
 			if (progress >=0 && usedSpace >=0) {
 				usedSpaceLayout.setVisibility(View.VISIBLE);
@@ -18133,10 +18150,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
     }
 
-	public void changeActionBarElevation(boolean whitElevation){
+	public void changeActionBarElevation(boolean withElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
+			if (withElevation) {
 				abL.setElevation(Util.px2dp(4, outMetrics));
+				if (elevation > 0) {
+					elevation = 0;
+					abL.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							abL.setElevation(Util.px2dp(4, outMetrics));
+						}
+					}, 100);
+				}
 			}
 			else {
 				abL.setElevation(0);

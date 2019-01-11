@@ -743,7 +743,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						log("Upload OK: " + transfer.getFileName());
 
 						if(Util.isVideoFile(transfer.getPath())){
-							log("Is video!!!");
+							log("onTransferFinish() - isVideo!");
 
 							File previewDir = PreviewUtils.getPreviewFolder(this);
 							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
@@ -753,9 +753,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
 							attachNodes(transfer);
-						}
-						else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
-							log("Is image!!!");
+						}else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
+							log("onTransferFinish() - isImage!");
 
 							File previewDir = PreviewUtils.getPreviewFolder(this);
 							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
@@ -766,9 +765,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
 
 							attachNodes(transfer);
-						}
-						else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
-							log("Is pdf!!!");
+						}else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
+							log("onTransferFinish() - isPDF!");
 
 							try{
 								ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
@@ -832,9 +830,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 									//todo with exception
 								}
 							}
-						}
-						else{
-							log("NOT video, image or pdf!");
+						}else if(MimeTypeList.typeForName(transfer.getPath()).isAudio()){
+							log("onTransferFinish() - isVoiceClip!");
+
+							attachVoiceClips(transfer);
+						}else{
+							log("NOT video, image, pdf or voice clip!");
 							attachNodes(transfer);
 						}
 					}
@@ -925,6 +926,33 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							}
 						}
 					}
+
+				}
+			}
+		}
+	}
+
+	public void attachVoiceClips(MegaTransfer transfer){
+		log("attachVoiceClips()");
+		//Find the pending message
+		String appData = transfer.getAppData();
+		String[] parts = appData.split(">");
+		int last = parts.length-1;
+		String idFound = parts[last];
+
+		int id = Integer.parseInt(idFound);
+		//Update status and nodeHandle on db
+		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
+
+		for(int i=0; i<pendingMessages.size();i++) {
+			PendingMessageSingle pendMsg = pendingMessages.get(i);
+			if (pendMsg.getId() == id) {
+				if (megaChatApi != null) {
+					requestSent++;
+					pendMsg.setNodeHandle(transfer.getNodeHandle());
+					pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
+					log("attachVoiceClips() - attachVoiceMessage");
+					megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
 				}
 			}
