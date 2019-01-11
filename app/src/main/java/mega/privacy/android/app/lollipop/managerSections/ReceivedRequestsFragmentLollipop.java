@@ -344,7 +344,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 					emptyImageView.setImageResource(R.drawable.received_requests_empty);
 				}
 
-				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.tab_received_requests));
+				String textToShow = getString(R.string.received_requests_empty);
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -418,7 +418,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 			}else{
 				emptyImageView.setImageResource(R.drawable.received_requests_empty);
 			}
-			String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.tab_received_requests));
+			String textToShow = getString(R.string.received_requests_empty);
 			try{
 				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 				textToShow = textToShow.replace("[/A]", "</font>");

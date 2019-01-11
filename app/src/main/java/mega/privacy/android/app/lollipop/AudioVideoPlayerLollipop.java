@@ -150,6 +150,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener{
 
@@ -4075,7 +4076,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(CHAT_FOLDER)
                         && adapterType == Constants.INCOMING_SHARES_ADAPTER) {
                     log("Incoming node copied to Send to chat");
                     MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());

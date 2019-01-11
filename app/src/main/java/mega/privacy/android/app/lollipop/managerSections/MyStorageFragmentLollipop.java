@@ -155,7 +155,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		previousVersionsText = (TextView) v.findViewById(R.id.my_storage_account_previous_versions_text);
 		previousVersionsLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_previous_versions_layout);
 		TextView previousVersionLbl = (TextView) v.findViewById(R.id.my_storage_account_previous_versions_title);
-        previousVersionLbl.setText(getResources().getQuantityString(R.plurals.header_previous_section_item, 1));
+        previousVersionLbl.setText(getResources().getQuantityString(R.plurals.header_previous_section_item, 2));
 
 //		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
 //		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();

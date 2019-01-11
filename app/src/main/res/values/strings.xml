@@ -249,8 +249,8 @@
     <string name="section_contacts" context="Title of the contact list">Contacts</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contacts [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
+    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]No [/B][A]sent requests[/A][B].[/B]</string>
+    <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]No [/B][A]received requests[/A][B].[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
 
     <string name="section_account" context="button to the settings of the user\'s account">My Account</string>
@@ -278,7 +278,7 @@
     <!--
     <string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
     -->
-    <string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Available offline</string>
+    <string name="file_properties_available_offline" context="The file are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Available offline</string>
     <!--
     <string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
     -->
@@ -287,7 +287,7 @@
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size</string>
     <string name="file_properties_info_modified" context="when was the file modified">Modified</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
+    <string name="file_properties_info_added" context="when was the file added in MEGA">Added</string>
     <string name="file_properties_info_created" context="when the file was created">Created</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
@@ -1273,8 +1273,11 @@
 	<string name="label_close" context="button label Close">Close</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
+	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Storage</string>
+	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Transfer quota</string>
+	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Transfer quota</string>
 
-    <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
+	<string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Storage space</string>
     <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer quota</string>
 
@@ -1557,7 +1560,7 @@
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Registration bonus</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Install MEGA desktop app</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">Account Base Quota</string>
-    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No media on Camera Uploads</string>
+    <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">No files in Camera Uploads</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d d left</string>
     <string name="expired_achievement" context="state to indicate the achievement has expired">Expired</string>
 
@@ -1707,15 +1710,20 @@
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No media on [/B][A]Camera Uploads[/A][B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Empty [/B][A]Rubbish Bin[/A][B].[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">[B]No files on your [/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]%1$s[/A][B].[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files on your [/B][A]Inbox[/A][B].[/B]</string>
+	<string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive ">[B]No files on your [/B][A]Cloud Drive[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]Contacts[/A][B].[/B]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">Outgoing Shared folders</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]No [/B][A]Incoming Shared folders[/A][B].[/B]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]No [/B][A]Outgoing Shared folders[/A][B].[/B]</string>
+	<string name="label_camera_upload_folder_name" context="Destination folder name of Camera Upload">Camera Uploads</string>
+	<string name="label_secondary_camera_upload_folder_name" context="Destination folder name of Secondary Camera Upload">Media Uploads</string>
+	<string name="label_photo_sync_folder_name" context="Destination folder name of PhotoSync">PhotoSync</string>
+	<string name="label_my_chat_file_folder_name" context="Destination folder name of chat files">My chat files</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Sent requests</string>
     <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">Received requests</string>
@@ -1746,6 +1754,11 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to a breach of MEGA’s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
+	<string name="label_file_size_byte" context="size in byte">B</string>
+	<string name="label_file_size_kilo_byte" context="size in kilobyte">KB</string>
+	<string name="label_file_size_mega_byte" context="size in megabyte">MB</string>
+	<string name="label_file_size_giga_byte" context="size in gigabyte">GB</string>
+	<string name="label_file_size_tera_byte" context="size in terabyte">TB</string>
 
     <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
         <item context="version item" quantity="one">%1$d version</item>

@@ -258,6 +258,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
+    public static String CHAT_FOLDER = "My chat files";
 
 	//GET PRO ACCOUNT PANEL
 	LinearLayout getProLayout=null;
@@ -1710,7 +1711,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onCreate after call super");
 
 		boolean selectDrawerItemPending = true;
-
+        CHAT_FOLDER = getString(R.string.label_my_chat_file_folder_name);
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -4938,10 +4939,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		setToolbarTitle();
 
 		if(Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
 			if (parentNode == null) {
-				log("Create folder: " + Constants.CHAT_FOLDER);
-				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+				log("Create folder: " + CHAT_FOLDER);
+				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 			}
 		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -5352,10 +5353,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove all notifications");
 		}
 
-		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		MegaNode parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
 		if(parentNode == null){
-			log("Create folder: "+Constants.CHAT_FOLDER);
-			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+			log("Create folder: "+CHAT_FOLDER);
+			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 		}
 
 		setToolbarTitle();
@@ -6133,10 +6134,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				if(Util.isChatEnabled()) {
-					MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+					MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
 					if (parentNode == null) {
-						log("Create folder: " + Constants.CHAT_FOLDER);
-						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+						log("Create folder: " + CHAT_FOLDER);
+						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 					}
 				}
 				searchExpand = true;

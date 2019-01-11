@@ -120,6 +120,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
@@ -2708,7 +2709,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(CHAT_FOLDER)
                         && type == Constants.INCOMING_SHARES_ADAPTER) {
                     log("Incoming node copied to Send to chat");
                     MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
