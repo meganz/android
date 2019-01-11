@@ -886,6 +886,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.handlerVoiceNotes = null;
             holder.contentOwnMessageVoiceClipSeekBar = (SeekBar) v.findViewById(R.id.content_own_message_voice_clip_seekBar);
             holder.contentOwnMessageVoiceClipDuration = (TextView) v.findViewById(R.id.content_own_message_voice_clip_duration);
+            holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(0));
+
             holder.ownTriangleIconVoiceClip = (RelativeLayout) v.findViewById(R.id.own_triangle_icon_voice_clip);
 
             holder.contentOwnMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_contact_layout);

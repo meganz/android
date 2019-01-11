@@ -34,7 +34,10 @@ public class AnimationHelper {
     private boolean isBasketAnimating, isStartRecorded = false;
     private float micX, micY = 0;
     private AnimatorSet micAnimation;
-    private TranslateAnimation translateAnimation1, translateAnimation2;
+//    private TranslateAnimation translateAnimation1;
+//    private TranslateAnimation translateAnimation2;
+    private AlphaAnimation alphaAnimation1;
+    private AlphaAnimation alphaAnimation2;
     private Handler handler1, handler2;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
@@ -60,11 +63,19 @@ public class AnimationHelper {
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
-        translateAnimation1 = new TranslateAnimation(0, 0, basketInitialY, basketInitialY - 90);
-        translateAnimation1.setDuration(250);
+        alphaAnimation1 = new AlphaAnimation(0.2f, 1.0f);
+        alphaAnimation1.setDuration(350);
+        alphaAnimation1.setFillAfter(true);
 
-        translateAnimation2 = new TranslateAnimation(0, 0, basketInitialY - 130, basketInitialY);
-        translateAnimation2.setDuration(350);
+        alphaAnimation2 = new AlphaAnimation(1.0f, 0.0f);
+        alphaAnimation2.setDuration(350);
+        alphaAnimation2.setFillAfter(true);
+
+//        translateAnimation1 = new TranslateAnimation(0, 0, basketInitialY, basketInitialY - 90);
+//        translateAnimation1.setDuration(250);
+
+//        translateAnimation2 = new TranslateAnimation(0, 0, basketInitialY - 130, basketInitialY);
+//        translateAnimation2.setDuration(350);
 
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);
@@ -74,12 +85,14 @@ public class AnimationHelper {
             @Override
             public void run() {
                 basketImg.setVisibility(VISIBLE);
-                basketImg.startAnimation(translateAnimation1);
+                basketImg.startAnimation(alphaAnimation1);
+//                basketImg.startAnimation(translateAnimation1);
 
             }
         }, 350);
 
-        translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
+//        translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
+        alphaAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
@@ -91,8 +104,7 @@ public class AnimationHelper {
                 handler2.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        basketImg.startAnimation(translateAnimation2);
-
+                        basketImg.startAnimation(alphaAnimation2);
                         smallBlinkingMic.setVisibility(INVISIBLE);
                         basketImg.setVisibility(INVISIBLE);
                     }
@@ -103,7 +115,7 @@ public class AnimationHelper {
             }
         });
 
-        translateAnimation2.setAnimationListener(new Animation.AnimationListener() {
+        alphaAnimation2.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
@@ -132,15 +144,25 @@ public class AnimationHelper {
     public void resetBasketAnimation() {
         log("resetBasketAnimation()");
         if (isBasketAnimating) {
-            translateAnimation1.reset();
-            translateAnimation1.cancel();
-            translateAnimation2.reset();
-            translateAnimation2.cancel();
-
-            micAnimation.cancel();
-
-            smallBlinkingMic.clearAnimation();
-            basketImg.clearAnimation();
+//            translateAnimation1.reset();
+            //            translateAnimation1.cancel();
+            if(alphaAnimation1!=null){
+                alphaAnimation1.reset();
+                alphaAnimation1.cancel();
+            }
+            if(alphaAnimation2!=null){
+                alphaAnimation2.reset();
+                alphaAnimation2.cancel();
+            }
+            if(micAnimation!=null) {
+                micAnimation.cancel();
+            }
+            if(smallBlinkingMic!=null) {
+                smallBlinkingMic.clearAnimation();
+            }
+            if(basketImg!=null) {
+                basketImg.clearAnimation();
+            }
 
             if (handler1 != null)
                 handler1.removeCallbacksAndMessages(null);
@@ -159,9 +181,14 @@ public class AnimationHelper {
 
     public void clearAlphaAnimation(boolean hideView) {
         log("clearAlphaAnimation()");
-        alphaAnimation.cancel();
-        alphaAnimation.reset();
-        smallBlinkingMic.clearAnimation();
+        if(alphaAnimation != null){
+            alphaAnimation.cancel();
+            alphaAnimation.reset();
+        }
+        if(smallBlinkingMic!=null) {
+            smallBlinkingMic.clearAnimation();
+        }
+
         if (hideView) {
             smallBlinkingMic.setVisibility(View.GONE);
         }
