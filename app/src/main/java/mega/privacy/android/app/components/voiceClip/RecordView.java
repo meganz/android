@@ -52,6 +52,7 @@ public class RecordView extends RelativeLayout {
     private View layoutLock;
     private boolean flagRB = false;
     Handler handlerStartRecord = new Handler();
+    Handler handlerShowPadLock = new Handler();
 
     public RecordView(Context context) {
         super(context);
@@ -187,8 +188,10 @@ public class RecordView extends RelativeLayout {
         @Override
         public void run() {
             if(flagRB){
+                log("runStartRecord()");
                 counterTime.setBase(SystemClock.elapsedRealtime());
                 counterTime.start();
+                handlerShowPadLock.postDelayed(runPadLock, 3000);
                 if (recordListener != null) {
                     recordListener.onStart();
                 }
@@ -196,8 +199,18 @@ public class RecordView extends RelativeLayout {
         }
     };
 
+    final Runnable runPadLock = new Runnable(){
+        @Override
+        public void run() {
+            if(flagRB){
+                log("runPadLock() ");
+                showLock(true);
+            }
+        }
+    };
+
     protected void onActionDown(RecordButton recordBtn, MotionEvent motionEvent) {
-        log("onActionDown()");
+        log("****** onActionDown()");
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
@@ -214,7 +227,7 @@ public class RecordView extends RelativeLayout {
     }
 
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
-        log("onActionMove()");
+        log("****** onActionMove()");
 
         long time = System.currentTimeMillis() - startTime;
         if (!isSwiped) {
@@ -269,16 +282,15 @@ public class RecordView extends RelativeLayout {
         log("onActionUp()");
         elapsedTime = System.currentTimeMillis() - startTime;
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
-            log("onActionUp() - less than a second");
+            log("****** onActionUp() - less than a second");
             if (recordListener != null){
                 recordListener.onLessThanSecond();
             }
             animationHelper.setStartRecorded(false);
             playSound(RECORD_ERROR);
-            flagRB = false;
 
         } else {
-            log("onActionUp() - more than a second");
+            log("******onActionUp() - more than a second");
             if (recordListener != null && !isSwiped) {
                 recordListener.onFinish(elapsedTime);
             }
@@ -295,6 +307,7 @@ public class RecordView extends RelativeLayout {
             animationHelper.clearAlphaAnimation(true);
         }
         animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+        flagRB = false;
         counterTime.stop();
         slideToCancelLayout.stopShimmerAnimation();
     }
@@ -366,6 +379,9 @@ public class RecordView extends RelativeLayout {
     public void destroyHandlers(){
         if (handlerStartRecord != null){
             handlerStartRecord.removeCallbacksAndMessages(null);
+        }
+        if (handlerShowPadLock != null){
+            handlerShowPadLock.removeCallbacksAndMessages(null);
         }
     }
     public static void log(String message) {

@@ -262,6 +262,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     CoordinatorLayout fragmentContainer;
     RelativeLayout writingContainerLayout;
+    RelativeLayout writeLayout;
     RelativeLayout writingLayout;
     RecordView voiceClipLayout;
     FrameLayout fragmentVoiceClip;
@@ -549,12 +550,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         messageJumpLayout = (RelativeLayout) findViewById(R.id.message_jump_layout);
         messageJumpText = (TextView) findViewById(R.id.message_jump_text);
         messageJumpLayout.setVisibility(View.GONE);
-
+        writeLayout = (RelativeLayout) findViewById(R.id.write_layout);
         writingLayout = (RelativeLayout) findViewById(R.id.writing_linear_layout_chat);
         fragmentVoiceClip = (FrameLayout) findViewById(R.id.record_voice_clip_layout);
         paramsRecordButton(true);
 
         voiceClipLayout = (RecordView) findViewById(R.id.rl_voice_clip);
+        paramsRecordButton(true);
         voiceClipLayout.setVisibility(View.GONE);
 
         linearLayoutOptions = (LinearLayout)findViewById(R.id.linear_layout_options);
@@ -1808,18 +1810,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
                 myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             }
-
-//            final Handler handlerPadLock = new Handler();
-//            final Runnable runPadLock = new Runnable(){
-//                @Override
-//                public void run() {
-//                    if(isRecording){
-//                        log("show lock ");
-//                        voiceClipLayout.showLock(true);
-//                    }
-//                }
-//            };
-
             record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
             record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
             record.setVisibility(View.VISIBLE);
@@ -1833,7 +1823,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
                         isRecording = true;
-//                        handlerPadLock.postDelayed(runPadLock, 4000); //3 seconds delay to show de padlock
                     }
                 }
             }catch(IllegalStateException ise){}catch (IOException ioe){}
@@ -7834,13 +7823,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void paramsRecordButton(boolean isHide){
         int marginBottomVoicleButton = 0;
         if(isHide){
-            marginBottomVoicleButton = Util.scaleWidthPx(48, outMetrics);
+            marginBottomVoicleButton = Util.px2dp(48, outMetrics);
+
         }else{
-            marginBottomVoicleButton = (outMetrics.heightPixels / 2 - getActionBarHeight())+(Util.scaleWidthPx(48, outMetrics));
+            marginBottomVoicleButton = (outMetrics.heightPixels / 2 - getActionBarHeight())+(Util.px2dp(48, outMetrics));
         }
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fragmentVoiceClip.getLayoutParams();
         lp.setMargins(0,0,0, marginBottomVoicleButton);
-        lp.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.writing_container_layout_chat_layout);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         fragmentVoiceClip.setLayoutParams(lp);
     }
