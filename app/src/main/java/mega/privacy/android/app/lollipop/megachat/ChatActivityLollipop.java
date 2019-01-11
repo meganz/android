@@ -38,6 +38,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -2220,14 +2221,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             //
             if (byteArray != null) {
                 Bitmap snapshot = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                String encodedSnapshot = Base64.encodeToString(byteArray, Base64.DEFAULT);
                 log("info bitmap: "+snapshot.getByteCount()+" "+snapshot.getWidth()+" "+snapshot.getHeight());
 
-                Double latitude = intent.getDoubleExtra("latitude", 0);
-                Double longitude = intent.getDoubleExtra("longitude", 0);
+                double latitude = intent.getDoubleExtra("latitude", 0);
+                double longitude = intent.getDoubleExtra("longitude", 0);
                 String locationName = intent.getStringExtra("name");
                 String locationAddress = intent.getStringExtra("address");
 
                 log("Send location [latitude]: " + latitude + " [longitude]: " + longitude + " [name]: " + locationName + " [address]: " + locationAddress);
+
+                float longLongitude = (float)longitude;
+
+                float longLatitude = (float)latitude;
+
+                log("Send location [longLatitude]: " + longLatitude + " [longLongitude]: " + longLongitude);
+                MegaChatMessage locationMessage = megaChatApi.sendGeolocation(idChat, longLongitude, longLatitude, encodedSnapshot);
+                if(locationMessage!=null){
+                    AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(locationMessage);
+                    sendMessageToUI(androidMsgSent);
+                }
             }
             else {
                 log("Send location bitmap null");
@@ -6210,8 +6223,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     showSnackbar(getString(R.string.call_error));
                 }
-
-
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
