@@ -39,6 +39,7 @@ public class Constants {
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 	public static int REQUEST_CODE_FILE_INFO = 1027;
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
+	public static int REQUEST_CODE_SEND_LOCATION = 1028;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
@@ -130,9 +131,9 @@ public class Constants {
 
 	public static final int RECORD_VOICE_CLIP = 11;
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
-
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
+	public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
 
     public static final int PRO_LITE = 4;
 	public static final int FREE = 0;

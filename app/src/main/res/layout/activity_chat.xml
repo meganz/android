@@ -33,7 +33,7 @@
                 <!--tools:context=".lollipop.megachat.ChatActivityLollipop" />-->
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_chat"
+                android:id="@+id/toolbar_maps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
@@ -250,6 +250,22 @@
                                 android:src="@drawable/ic_b_select_image"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rl_pick_location_icon_chat"
+                            android:layout_width="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent">
+
+                            <ImageButton
+                                android:id="@+id/pick_location_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:alpha="0.56"
+                                android:src="@drawable/ic_send_location"
+                                android:layout_centerInParent="true"/>
+                        </RelativeLayout>
                     </LinearLayout>
                     <mega.privacy.android.app.components.twemoji.EmojiKeyboard
                         android:id="@+id/emojiView"
@@ -278,8 +294,8 @@
                 android:id="@+id/message_container_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/toolbar_chat"
-                android:background="@android:color/transparent"
+                android:layout_below="@id/toolbar_maps"
+                android:background="@color/background_chat"
                 android:layout_above="@id/writing_container_layout_chat_layout"
                 android:orientation="vertical">
 
@@ -382,7 +398,7 @@
                 android:id="@+id/call_in_progress_layout"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
-                android:layout_below="@+id/toolbar_chat"
+                android:layout_below="@+id/toolbar_maps"
                 android:background="@color/accentColor">
                 <TextView
                     android:id="@+id/call_in_progress_text"
