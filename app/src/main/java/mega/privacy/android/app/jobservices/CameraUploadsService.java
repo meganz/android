@@ -1889,6 +1889,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         
         Intent intent = new Intent(this,ManagerActivityLollipop.class);
         intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext,"overquotanotification");
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
@@ -1896,34 +1898,32 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
             
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(mContext,notificationChannelId);
-            
-            mBuilderCompatO
+            builder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentText(contentText)
                     .setOngoing(false);
             
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilderCompatO.build());
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.build());
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
+            builder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentText(contentText)
                     .setOngoing(false);
             
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.build());
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.build());
         } else {
-            mBuilder
+            builder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentInfo(contentText)
                     .setColor(ContextCompat.getColor(this,R.color.mega))
                     .setOngoing(false);
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.getNotification());
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.getNotification());
         }
     }
     
