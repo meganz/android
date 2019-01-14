@@ -16,11 +16,11 @@ APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 LOG_FILE=/dev/null
 
 CRYPTOPP=cryptopp
-CRYPTOPP_VERSION=563
+CRYPTOPP_VERSION=800
 CRYPTOPP_SOURCE_FILE=cryptopp${CRYPTOPP_VERSION}.zip
 CRYPTOPP_SOURCE_FOLDER=${CRYPTOPP}/${CRYPTOPP}
 CRYPTOPP_DOWNLOAD_URL=http://www.cryptopp.com/${CRYPTOPP_SOURCE_FILE}
-CRYPTOPP_SHA1="f2fcd1fbf884bed70a69b565970ecd8b33a68cc4"
+CRYPTOPP_SHA1="dd0dc0586c0a3e0696cd323efc6fa2e2945ad920"
 
 SQLITE=sqlite
 SQLITE_VERSION=3120200
@@ -289,6 +289,7 @@ echo "* Setting up Crypto++"
 if [ ! -f ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready ]; then
     mkdir -p ${CRYPTOPP}/${CRYPTOPP}
     downloadCheckAndUnpack ${CRYPTOPP_DOWNLOAD_URL} ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE} ${CRYPTOPP_SHA1} ${CRYPTOPP}/${CRYPTOPP}
+    cp ${NDK_ROOT}/sources/android/cpufeatures/cpu-features.h ${CRYPTOPP}/${CRYPTOPP}/
     touch ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}.ready
 fi
 echo "* Crypto++ is ready"
