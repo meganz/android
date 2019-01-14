@@ -77,6 +77,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.RTFFormatter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -612,6 +613,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView retryAlert;
         ImageView triangleIcon;
 
+        //Location message
+        RelativeLayout transparentCoatingLocation;
+        RelativeLayout uploadingProgressBarLocation;
+        RelativeLayout forwardOwnMessageLocation;
+        RelativeLayout mainOwnMessageItemLocation;
+        ImageView previewOwnLocation;
+        RelativeLayout triangleErrorLocation;
+        RelativeLayout pinnedLocationLayout;
+        TextView pinnedLocationInfoText;
+
+        //Contact's message
+
         RelativeLayout contactMessageLayout;
         RelativeLayout titleContactMessage;
 
@@ -1125,6 +1138,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             holder.contactManagementMessageIcon = (ImageView) v.findViewById(R.id.contact_management_message_icon);
 
+            //Location message
+            holder.transparentCoatingLocation = (RelativeLayout) v.findViewById(R.id.transparent_coating_location);
+            holder.uploadingProgressBarLocation = (RelativeLayout) v.findViewById(R.id.uploadingProgressBarLocation);
+            holder.forwardOwnMessageLocation =  (RelativeLayout) v.findViewById(R.id.forward_own_location);
+            holder.mainOwnMessageItemLocation =  (RelativeLayout) v.findViewById(R.id.own_main_item_location);
+            holder.previewOwnLocation =  (ImageView) v.findViewById(R.id.own_rounded_imageview_location);
+            //holder.previewOwnLocation.setCornerRadius(radius);
+//            holder.previewOwnLocation.setBorderWidth(1);
+//            holder.previewOwnLocation.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            //holder.previewOwnLocation.setOval(false);
+
+            holder.triangleErrorLocation =  (RelativeLayout) v.findViewById(R.id.error_uploading_location);
+
+            holder.pinnedLocationLayout = (RelativeLayout) v.findViewById(R.id.pinnedLocationLayoutLocation);
+            holder.pinnedLocationInfoText = (TextView) v.findViewById(R.id.infoPinnedLocation);
+
             if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
                 MAX_WIDTH_FILENAME_LAND = 290;
                 MAX_WIDTH_FILENAME_PORT = 140;
@@ -1210,7 +1239,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
-
         ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
         ((ViewHolderMessageChat) holder).iconOwnTypeDocLandPreview.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).iconOwnTypeDocPortraitPreview.setVisibility(View.GONE);
@@ -1264,11 +1292,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-
             ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageContactThumb.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
+
+            //Hide layouts location messages
+            ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).forwardOwnMessageLocation.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).mainOwnMessageItemLocation.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).previewOwnLocation.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.GONE);
+
+            ((ViewHolderMessageChat) holder).pinnedLocationLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).pinnedLocationInfoText.setVisibility(View.GONE);
 
             String path = message.getPendingMessage().getFilePath();
             String name = message.getPendingMessage().getName();
@@ -1403,6 +1441,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).forwardContactRichLinks.setVisibility(View.GONE);
+
+        //Hide layouts location messages
+        ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).forwardOwnMessageLocation.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).mainOwnMessageItemLocation.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).previewOwnLocation.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.GONE);
+
+        ((ViewHolderMessageChat) holder).pinnedLocationLayout.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).pinnedLocationInfoText.setVisibility(View.GONE);
 
         AndroidMegaChatMessage androidMessage = messages.get(position - 1);
         MegaChatMessage message = messages.get(position - 1).getMessage();
@@ -3440,7 +3489,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
-                //COlor always status SENT
+                //Color always status SENT
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_meta_message_invalid));
 
@@ -3496,24 +3545,50 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
 
+                ((ViewHolderMessageChat) holder).mainOwnMessageItemLocation.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).previewOwnLocation.setVisibility(View.VISIBLE);
+
+                ((ViewHolderMessageChat) holder).pinnedLocationLayout.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).pinnedLocationInfoText.setVisibility(View.VISIBLE);
+
+                String location =Util.convertToDegrees(latitude, longitude);
+
+                ((ViewHolderMessageChat) holder).pinnedLocationInfoText.setText(location);
+
+                double pix = (int) bitmapImage.getHeight()*0.03;
+                log("Bitmap number of pixels: "+bitmapImage.getWidth()+" "+bitmapImage.getHeight()+" "+pix);
+
+                if (bitmapImage != null) {
+
+                    Bitmap roundedBitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmapImage, (int)pix);
+                    holder.previewOwnLocation.setImageBitmap(roundedBitmap);
+                } else {
+
+                }
+
                 int status = message.getStatus();
 
                 if((status==MegaChatMessage.STATUS_SERVER_REJECTED)||(status==MegaChatMessage.STATUS_SENDING_MANUAL)){
                     log("Show triangle retry!");
-                    ((ViewHolderMessageChat)holder).urlOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
                     ((ViewHolderMessageChat)holder).triangleIcon.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.VISIBLE);
 
-                }else if((status==MegaChatMessage.STATUS_SENDING)){
-                    ((ViewHolderMessageChat)holder).urlOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
-                    ((ViewHolderMessageChat)holder).triangleIcon.setVisibility(View.GONE);
+                }else if((status==MegaChatMessage.STATUS_SENDING)){((ViewHolderMessageChat)holder).triangleIcon.setVisibility(View.GONE);
                     ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.GONE);
 
                 }else{
                     log("Status: "+message.getStatus());
-                    ((ViewHolderMessageChat)holder).urlOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
                     ((ViewHolderMessageChat)holder).triangleIcon.setVisibility(View.GONE);
                     ((ViewHolderMessageChat)holder).retryAlert.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);
+                    ((ViewHolderMessageChat) holder).triangleErrorLocation.setVisibility(View.GONE);
                 }
 
                 holder.contactMessageLayout.setVisibility(View.GONE);
@@ -3523,14 +3598,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
                 holder.contentOwnMessageText.setVisibility(View.GONE);
-                holder.urlOwnMessageLayout.setVisibility(View.VISIBLE);
+                holder.urlOwnMessageLayout.setVisibility(View.GONE);
 
                 //Forwards element (own messages):
-                holder.forwardOwnRichLinks.setVisibility(View.VISIBLE);
+                holder.forwardOwnMessageLocation.setVisibility(View.VISIBLE);
                 if(isMultipleSelect()){
-                    holder.forwardOwnRichLinks.setOnClickListener(null);
+                    holder.forwardOwnMessageLocation.setOnClickListener(null);
                 }else{
-                    holder.forwardOwnRichLinks.setOnClickListener(this);
+                    holder.forwardOwnMessageLocation.setOnClickListener(this);
                 }
                 holder.forwardOwnPortrait.setVisibility(View.GONE);
                 holder.forwardOwnLandscape.setVisibility(View.GONE);
@@ -3548,44 +3623,28 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
                 holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
-                holder.urlOwnMessageTitle.setVisibility(View.VISIBLE);
-                holder.urlOwnMessageTitle.setText(longitude+"");
-                holder.urlOwnMessageTitle.setMaxLines(1);
-                holder.urlOwnMessageDescription.setText(latitude+"");
-                holder.urlOwnMessageDescription.setMaxLines(2);
-                holder.urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
-                holder.urlOwnMessageLink.setText("blank");
-
-                if (bitmapImage != null) {
-                    holder.urlOwnMessageImage.setImageBitmap(bitmapImage);
-                    holder.urlOwnMessageImage.setVisibility(View.VISIBLE);
-                } else {
-                    holder.urlOwnMessageImage.setVisibility(View.GONE);
-                }
-
-
                 if (!multipleSelect) {
                     if (positionClicked != -1) {
                         if (positionClicked == position) {
                             holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
                             listFragment.smoothScrollToPosition(positionClicked);
-                            holder.forwardOwnRichLinks.setEnabled(false);
+                            holder.forwardOwnMessageLocation.setEnabled(false);
                         } else {
                             holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                            holder.forwardOwnRichLinks.setEnabled(true);
+                            holder.forwardOwnMessageLocation.setEnabled(true);
                         }
                     } else {
                         holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                        holder.forwardOwnRichLinks.setEnabled(true);
+                        holder.forwardOwnMessageLocation.setEnabled(true);
                     }
                 } else {
                     if (this.isItemChecked(position)) {
                         holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-                        holder.forwardOwnRichLinks.setEnabled(false);
+                        holder.forwardOwnMessageLocation.setEnabled(false);
                     } else {
                         log("NOT selected");
                         holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
-                        holder.forwardOwnRichLinks.setEnabled(true);
+                        holder.forwardOwnMessageLocation.setEnabled(true);
                     }
                 }
             } else {

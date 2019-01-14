@@ -26,6 +26,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -2274,6 +2275,38 @@ public class Util {
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
 		return dp;
+	}
+
+	public static  String convertToDegrees(float latitude, float longitude) {
+		StringBuilder builder = new StringBuilder();
+
+		String latitudeDegrees = Location.convert(Math.abs(latitude), Location.FORMAT_MINUTES);
+		String[] latitudeSplit = latitudeDegrees.split(":");
+		builder.append(latitudeSplit[0]);
+		builder.append("°");
+		builder.append(latitudeSplit[1]);
+		builder.append("'");
+
+		if (latitude < 0) {
+			builder.append(" S ");
+		} else {
+			builder.append(" N ");
+		}
+
+		String longitudeDegrees = Location.convert(Math.abs(longitude), Location.FORMAT_MINUTES);
+		String[] longitudeSplit = longitudeDegrees.split(":");
+		builder.append(longitudeSplit[0]);
+		builder.append("°");
+		builder.append(longitudeSplit[1]);
+		builder.append("'");
+
+		if (longitude < 0) {
+			builder.append(" W");
+		} else {
+			builder.append(" E");
+		}
+
+		return builder.toString();
 	}
 
 	private static void log(String message) {

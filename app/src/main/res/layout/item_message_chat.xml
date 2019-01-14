@@ -954,6 +954,138 @@
             </RelativeLayout>
             <!--End RelativeLayout own content message-->
 
+            <!-- own elements location -->
+            <RelativeLayout
+                android:id="@+id/own_main_item_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent">
+
+                <RelativeLayout
+                    android:id="@+id/own_main_item_location_rl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@drawable/background_location_message">
+
+                    <!--Preview of location-->
+                    <ImageView
+                        android:id="@+id/own_rounded_imageview_location"
+                        android:layout_width="256dp"
+                        android:layout_height="128dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginRight="1dp"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:background="@android:color/transparent" />
+
+                    <RelativeLayout
+                        android:id="@+id/pinnedLocationLayoutLocation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="72dp"
+                        android:background="@android:color/transparent"
+                        android:layout_below="@id/own_rounded_imageview_location"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginBottom="1dp">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+                            <TextView
+                                android:id="@+id/titlePinnedLocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pinned Location"
+                                android:textSize="16dp"
+                                android:layout_marginBottom="8dp"
+                                android:textColor="@color/name_my_account"/>
+
+                            <TextView
+                                android:id="@+id/infoPinnedLocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/titlePinnedLocation"
+                                android:textSize="14dp"
+                                android:textColor="@color/name_my_account"/>
+
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+                    <!--Transparent coat location message-->
+                    <RelativeLayout
+                        android:id="@+id/transparent_coating_location"
+                        android:layout_width="256dp"
+                        android:layout_height="128dp"
+                        android:background="@drawable/shape_images_chat_transparent"/>
+
+                    <!-- Progress bar location message-->
+                    <RelativeLayout
+                        android:id="@+id/uploadingProgressBarLocation"
+                        android:layout_width="212dp"
+                        android:layout_height="152dp"
+                        android:background="@android:color/transparent">
+
+                        <ProgressBar
+                            android:id="@+id/uploadingProgressBarLocation_im"
+                            android:indeterminate="true"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:paddingRight="5dp"
+                            android:paddingBottom="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <!-- triangle icon location message-->
+                <RelativeLayout
+                    android:id="@+id/error_uploading_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingRight="4dp"
+                    android:layout_toLeftOf="@+id/own_main_item_location_rl"
+                    android:background="@android:color/transparent">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_gravity="center"
+                        android:background="@null"
+                        android:src="@drawable/ic_input_warning"/>
+                </RelativeLayout>
+
+                <!--forward icon location message-->
+                <RelativeLayout
+                    android:id="@+id/forward_own_location"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/forward_circle"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:layout_toLeftOf="@+id/own_main_item_location_rl">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        android:background="@null"
+                        android:layout_margin="5dp"
+                        android:src="@drawable/ic_w_forward"/>
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <!--End RelativeLayout own location message-->
+
             <TextView
                 android:id="@+id/not_sent_own_message_text"
                 android:layout_width="wrap_content"

@@ -15,7 +15,6 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
