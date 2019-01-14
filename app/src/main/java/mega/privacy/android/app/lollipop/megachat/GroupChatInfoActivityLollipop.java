@@ -50,6 +50,7 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -222,25 +223,30 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             setContentView(R.layout.activity_group_chat_properties);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-            }
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 
             fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_group_chat);
             toolbar = (Toolbar) findViewById(R.id.toolbar_group_chat_properties);
             setSupportActionBar(toolbar);
             aB = getSupportActionBar();
 
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
 
-            aB.setTitle(getString(R.string.group_chat_info_label));
+            aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
             scrollView = (android.support.v4.widget.NestedScrollView) findViewById(R.id.scroll_view_group_chat_properties);
+            new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+                @Override
+                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    if (scrollView.canScrollVertically(-1)){
+                        changeActionBarElevation(true);
+                    }
+                    else {
+                        changeActionBarElevation(false);
+                    }
+                }
+            });
 
             //Info Layout
             avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
@@ -372,6 +378,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             participants = new ArrayList<>();
 
             setParticipants();
+        }
+    }
+
+    public void changeActionBarElevation(boolean whitElevation){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (whitElevation) {
+                aB.setElevation(Util.px2dp(4, outMetrics));
+            }
+            else {
+                aB.setElevation(0);
+            }
         }
     }
 
