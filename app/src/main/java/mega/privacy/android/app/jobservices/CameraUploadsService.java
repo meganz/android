@@ -158,6 +158,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     private String tempRoot;
     Context mContext;
     private VideoCompressor mVideoCompressor;
+    private Handler checkStartHanlder = new Handler();
     
     @Override
     public void onDestroy() {
@@ -208,7 +209,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             finish();
         }
         log("STARTS NOW");
-        new Handler().postDelayed(new Runnable() {
+        checkStartHanlder.postDelayed(new Runnable() {
             
             @Override
             public void run() {
@@ -248,6 +249,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     private void startCameraUploads() {
         log("startCameraUploads");
         preparingFinished = true;
+        checkStartHanlder.removeCallbacksAndMessages(null);
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
         getFilesFromMediaStore();
     }
@@ -472,7 +474,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     private void startParallelUpload(List<SyncRecord> finalList,boolean isCompressedVideo) {
         for (SyncRecord file : finalList) {
-            
             if (!running) {
                 break;
             }
@@ -1759,6 +1760,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     public void onCompressFinished(String currentIndexString) {
         log("onCompressFinished");
+
         if (!canceled) {
             log("preparing to upload compressed video");
             ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoSyncRecordsByState(STATUS_PENDING));
@@ -2103,9 +2105,9 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         
     }
     
-//    private final static boolean OUTPUT = false;
+//    private final static boolean OUTPUT = true;
 //
-//    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
+//    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "compress.txt";
 //
 //    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd HH:mm:ss");
 //

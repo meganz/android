@@ -17,10 +17,8 @@ import mega.privacy.android.app.jobservices.DaemonService;
 
 @TargetApi(21)
 public class JobUtil {
-    //todo short time for testing purpose
-    public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
 
-    public static final long SCHEDULER_INTERVAL_ANDROID_5_6 = 60 * DateUtils.MINUTE_IN_MILLIS;
+    public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
 
     public static final int START_JOB_FAILED = -1;
 
@@ -77,13 +75,7 @@ public class JobUtil {
         JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler != null) {
             JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(PHOTOS_UPLOAD_JOB_ID,new ComponentName(context,CameraUploadStarterService.class));
-
-            //todo testing purpose need to be removed
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL);
-            } else {
-                jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL_ANDROID_5_6);
-            }
+            jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL);
             jobInfoBuilder.setPersisted(true);
 
             int result = jobScheduler.schedule(jobInfoBuilder.build());
