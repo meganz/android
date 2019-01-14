@@ -485,15 +485,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         startClock();
     }
 
-
     public void updateSubTitleClock(){
         log("updateSubTitleClock()");
         int sessionStatus = -1;
 
-        if(callChat.getStatus()<=MegaChatCall.CALL_STATUS_RING_IN){
-            subtitleToobar.setText(getString(R.string.call_starting));
-
-        }else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
+        if(callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+            aB.setSubtitle(getString(R.string.outgoing_call_starting));
+        }
+        else if(callChat.getStatus()<=MegaChatCall.CALL_STATUS_RING_IN){
+            subtitleToobar.setText(getString(R.string.incoming_call_starting));
+        }
+        else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
             if(chat.isGroup()){
                 startClock();
                 int totalParticipants = callChat.getNumParticipants() + 1;
@@ -517,7 +519,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }else{
             subtitleToobar.setText(null);
-
         }
     }
 

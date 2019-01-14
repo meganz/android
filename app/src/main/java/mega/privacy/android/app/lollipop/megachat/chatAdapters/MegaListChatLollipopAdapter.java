@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.camera2.CameraManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -2153,7 +2152,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
-
 				}
 			}
 		}
@@ -2163,16 +2161,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 	
-	public void setChats (ArrayList<MegaChatListItem> chats){
-		log("SETCONTACTS!!!!");
-		this.chats = chats;
-		if(chats!=null)
-		{
-			log("num requests: "+chats.size());
-		}
+	public void setChats (ArrayList<MegaChatListItem> updatedChats){
+		log("setChats: "+ updatedChats.size());
+		this.chats = updatedChats;
 
 		positionClicked = -1;
-//		listFragment.invalidate();
+
+		if(listFragment!=null){
+            listFragment.invalidate();
+        }
+
 		notifyDataSetChanged();
 	}
 	
