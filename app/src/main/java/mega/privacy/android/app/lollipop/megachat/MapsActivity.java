@@ -89,6 +89,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     private final int DEFAULT_RADIUS = 50000;
     private final float DEFAULT_ZOOM = 18f;
+    private final int MAX_SIZE = 45000;
 
     private DisplayMetrics outMetrics;
     private Toolbar tB;
@@ -307,6 +308,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
         isGPSEnabled = isGPSEnabled();
 
+        if (isFullScreenEnabled) {
+            progressBar.setVisibility(View.GONE);
+        }
+
         if (isGPSEnabled) {
             if (myLocationFab.getVisibility() != View.VISIBLE) {
                 myLocationFab.setVisibility(View.VISIBLE);
@@ -335,8 +340,8 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
-        if (isGPSEnabled && (search == null || search.isEmpty())) {
-            setMyLocation(true, false);
+        if (isGPSEnabled && !isSearchEnabled()) {
+            setMyLocation(true);
         }
         setFullScreen();
     }
@@ -390,7 +395,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         });
     }
 
-    private void setMyLocation(final boolean animateCamera, final boolean searchMode) {
+    private void setMyLocation(final boolean animateCamera) {
         log("setMyLocation");
         if (mMap == null) {
             return;
@@ -419,14 +424,16 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                             else {
                                 arrayListAddresses.add(0, new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_label), addresses.get(0).getAddressLine(0)));
                             }
-                            findNearbyPlaces();
+                            if (!isSearchEnabled()) {
+                                findNearbyPlaces();
+                            }
                         }
                     }
                     myLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     if (animateCamera) {
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, DEFAULT_ZOOM));
                     }
-                    else if (searchMode) {
+                    else if (isSearchEnabled()) {
                         findSearchPlaces();
                     }
                 }
@@ -462,10 +469,30 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
     }
 
-    void setActivityResult (final int position, MapAddress location) {
+    void resizeMap() {
+        if (listLayout == null) {
+            listLayout = (RelativeLayout) findViewById(R.id.list_layout);
+        }
+        listLayout.setVisibility(View.INVISIBLE);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            int heigth = (128 * outMetrics.widthPixels) / 256;
+            setMapParams(outMetrics.widthPixels, heigth);
+        }
+        else {
+            Rect rect = new Rect();
+            getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+            int heigth  = outMetrics.heightPixels - rect.top - tB.getHeight();
+            int width = (256 * heigth) / 128;
+            setMapParams(width, heigth);
+        }
+    }
+
+    void setActivityResult (final int position, final MapAddress location) {
         if (mMap == null) {
             return;
         }
+
+        resizeMap();
         if (fullScreenMarker != null) {
             fullScreenMarker.remove();
         }
@@ -476,39 +503,61 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         final Double latitude = location.getLatLng().latitude;
         final Double longitude = location.getLatLng().longitude;
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(location.getLatLng()));
+        LatLngBounds latLngBounds = getLatLngBounds(250, location.getLatLng());
+
+        mMap.setMyLocationEnabled(false);
+        mMap.clear();
+        if (fullscreenIconMarker == null) {
+            fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
+        }
+
         mMap.addMarker(new MarkerOptions().position(location.getLatLng()));
-        mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0));
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
-            public void onSnapshotReady(Bitmap bitmap) {
-                Intent intent = new Intent();
-//                (Like Whatsapp, on desgins only latitude and longitude)
-//                Fullscreen mode --> send only direction
-//                Click on place --> send name and direction
-//                Click on send current location --> send nothing
-//                Click on search location --> send name and direction if available
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                intent.putExtra("snapshot", byteArray);
-                intent.putExtra("latitude", latitude);
-                intent.putExtra("longitude", longitude);
-                if (position == 0) {
-                    if (isFullScreenEnabled) {
-                        intent.putExtra("name", address);
-                        intent.putExtra("address", address);
+            public void onMapLoaded() {
+                log("map loaded finish");
+                mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+                    @Override
+                    public void onSnapshotReady(Bitmap bitmap) {
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        int quality = 100;
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+                        byte[] byteArray = stream.toByteArray();
+                        log("The bitmaps has "+byteArray.length+" initial size");
+                        while (byteArray.length > MAX_SIZE) {
+                            stream = new ByteArrayOutputStream();
+                            quality -= 10;
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+                            byteArray = stream.toByteArray();
+                        }
+                        log("The bitmaps has "+byteArray.length+" final size with quality: "+quality);
+
+                        Intent intent = new Intent();
+//                        (Like Whatsapp, on desgins only latitude and longitude)
+//                        Fullscreen mode --> send only direction
+//                        Click on place --> send name and direction
+//                        Click on send current location --> send nothing
+//                        Click on search location --> send name and direction if available
+                        intent.putExtra("snapshot", byteArray);
+                        intent.putExtra("latitude", latitude);
+                        intent.putExtra("longitude", longitude);
+                        if (position == 0) {
+                            if (isFullScreenEnabled) {
+                                intent.putExtra("name", address);
+                                intent.putExtra("address", address);
+                            } else {
+                                intent.putExtra("name", "");
+                                intent.putExtra("address", "");
+                            }
+                        } else {
+                            intent.putExtra("name", name);
+                            intent.putExtra("address", address);
+                        }
+                        setResult(RESULT_OK, intent);
+                        finish();
                     }
-                    else {
-                        intent.putExtra("name", "");
-                        intent.putExtra("address", "");
-                    }
-                }
-                else {
-                    intent.putExtra("name", name);
-                    intent.putExtra("address", address);
-                }
-                setResult(RESULT_OK, intent);
-                finish();
+                });
             }
         });
     }
@@ -556,7 +605,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                     isFullScreenEnabled = false;
                     setFullScreen();
                 }
-                setMyLocation(true, false);
+                setMyLocation(true);
                 break;
             }
         }
@@ -606,10 +655,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
         });
 
-        if (search != null && !search.isEmpty()) {
-            searchView.setQuery(search, true);
-        }
-
         refreshMenuItem = (MenuItem) menu.findItem(R.id.action_refresh);
 
         if (isGPSEnabled()) {
@@ -622,6 +667,15 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    boolean isSearchEnabled () {
+        if (search != null && !search.isEmpty()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     void onMapSearch(String search) {
@@ -641,15 +695,19 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                 arrayListAddresses.clear();
             }
             clearPlaces();
-            setMyLocation(false, true);
+            setMyLocation(false);
         }
     }
 
+    LatLngBounds getLatLngBounds (int radius, LatLng latLng) {
+        double distanceFromCenterToCorner = radius * Math.sqrt(2);
+        LatLng southwestCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 225.0);
+        LatLng northeastCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 45.0);
+        return new LatLngBounds(southwestCorner, northeastCorner);
+    }
+
     void findSearchPlaces () {
-        double distanceFromCenterToCorner = DEFAULT_RADIUS * Math.sqrt(2);
-        LatLng southwestCorner = SphericalUtil.computeOffset(myLocation, distanceFromCenterToCorner, 225.0);
-        LatLng northeastCorner = SphericalUtil.computeOffset(myLocation, distanceFromCenterToCorner, 45.0);
-        final LatLngBounds latLngBounds = new LatLngBounds(southwestCorner, northeastCorner);
+        final LatLngBounds latLngBounds = getLatLngBounds(DEFAULT_RADIUS, myLocation);
         final LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(myLocation);
         clearPlaces();
@@ -679,6 +737,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                                     numMarkers = 0;
                                     mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 110));
                                     setAdapterAddresses();
+                                    progressBar.setVisibility(View.GONE);
                                 }
                             }
                         });
@@ -853,7 +912,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         else {
             fullscreenMarkerIcon.setVisibility(View.INVISIBLE);
             fullscreenMarkerIconShadow.setVisibility(View.GONE);
-            setMyLocation(false, false);
+            setMyLocation(false);
 
             try {
                 fullScreenMarker.remove();
@@ -867,7 +926,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.my_location_fab: {
-                setMyLocation(true, false);
+                setMyLocation(true);
                 break;
             }
             case R.id.set_fullscreen_fab: {
