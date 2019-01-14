@@ -1522,9 +1522,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 			}
         }
-        
+
         return 0;
     }
+
+	public void scrollToFirstPosition () {
+		if (((ManagerActivityLollipop)context).isList) {
+			mLayoutManager.scrollToPositionWithOffset(0,0);
+		}
+		else {
+			gridLayoutManager.scrollToPositionWithOffset(0,0);
+		}
+	}
     
     public RecyclerView getRecyclerView() {
         return recyclerView;
