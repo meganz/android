@@ -1308,8 +1308,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     }
     
     public static void log(String message) {
-//        Util.log("CameraUploadsService",message);
-        log("CameraUploadsService",message);
+        Util.log("CameraUploadsService",message);
     }
     
     @Override
@@ -2104,35 +2103,35 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         
     }
     
-    private final static boolean OUTPUT = false;
-    
-    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
-    
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd HH:mm:ss");
-    
-    public static void log(Object context,Object any) {
-        String msg = (any == null) ? "NULL" : any.toString();
-        String dateStr = DATE_FORMAT.format(new Date());
-        if (context != null) {
-            if (context instanceof String) {
-                msg = "[" + dateStr + "] " + context + "--->" + msg;
-            } else {
-                msg = "[" + dateStr + "] " + context.getClass().getSimpleName() + "--->" + msg;
-            }
-        }
-        if (OUTPUT) {
-            File log = new File(LOG_FILE);
-            try {
-                if (!log.exists()) {
-                    log.createNewFile();
-                }
-                FileWriter writer = new FileWriter(LOG_FILE,true);
-                writer.write(msg + "\n");
-                writer.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        Log.e("@#@",msg);
-    }
+//    private final static boolean OUTPUT = false;
+//
+//    private static final String LOG_FILE = Environment.getExternalStorageDirectory() + File.separator + "camera_upload.txt";
+//
+//    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM-dd HH:mm:ss");
+//
+//    public static void log(Object context,Object any) {
+//        String msg = (any == null) ? "NULL" : any.toString();
+//        String dateStr = DATE_FORMAT.format(new Date());
+//        if (context != null) {
+//            if (context instanceof String) {
+//                msg = "[" + dateStr + "] " + context + "--->" + msg;
+//            } else {
+//                msg = "[" + dateStr + "] " + context.getClass().getSimpleName() + "--->" + msg;
+//            }
+//        }
+//        if (OUTPUT) {
+//            File log = new File(LOG_FILE);
+//            try {
+//                if (!log.exists()) {
+//                    log.createNewFile();
+//                }
+//                FileWriter writer = new FileWriter(LOG_FILE,true);
+//                writer.write(msg + "\n");
+//                writer.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        Log.e("@#@",msg);
+//    }
 }

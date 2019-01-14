@@ -9,8 +9,8 @@ import android.support.annotation.RequiresApi;
 import org.webrtc.EncodedImage;
 
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.Util;
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraUploadStarterService extends JobService {
 
     @Override
@@ -41,8 +41,8 @@ public class CameraUploadStarterService extends JobService {
         }
     }
 
-    private void log(String s) {
-        CameraUploadsService.log(this,s);
+    private void log(String message) {
+        Util.log("CameraUploadStarterService", message);
     }
 
     @Override

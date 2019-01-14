@@ -1115,7 +1115,6 @@ public class VideoCompressor {
     }
     
     private static void log(String message){
-//        Util.log("VideoCompressor",message);
-        CameraUploadsService.log("VideoCompressor",message);
+        Util.log("VideoCompressor",message);
     }
 }

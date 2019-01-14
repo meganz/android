@@ -104,7 +104,6 @@ public class JobUtil {
     }
 
     private static void log(String message) {
-        //Util.log("JobUtil", message);
-        CameraUploadsService.log("JobUtil",message);
+        Util.log("JobUtil", message);
     }
 }

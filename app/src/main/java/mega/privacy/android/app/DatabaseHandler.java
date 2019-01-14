@@ -648,14 +648,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		    db.execSQL(CREATE_SYNC_RECORDS_TABLE);
 
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_UPLOAD_VIDEO_QUALITY + " TEXT;");
-//            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + " = " + MegaPreferences.MEDIUM + ";");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CONVERSION_ON_CHARGING + " BOOLEAN;");
-//            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_ON_CHARGING + " = '" + encrypt("true") + "';");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CHARGING_ON_SIZE + " TEXT;");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT;");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT;");
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT;");
-//            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + " = " + MegaPreferences.CONVERSION_ON_CHARGING_WHEN_SIZE + ";");
 		}
 	}
 

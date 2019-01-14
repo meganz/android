@@ -6,6 +6,7 @@ import android.app.job.JobService;
 import android.os.Build;
 
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.Util;
 
 @TargetApi(21)
 public class DaemonService extends JobService {
@@ -28,7 +29,6 @@ public class DaemonService extends JobService {
     }
 
     public static void log(String message) {
-//        Util.log("DaemonService",message);
-        CameraUploadsService.log("DaemonService",message);
+        Util.log("DaemonService",message);
     }
 }
