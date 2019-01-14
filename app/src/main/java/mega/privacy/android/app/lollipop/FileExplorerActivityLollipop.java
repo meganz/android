@@ -564,8 +564,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
-				getSupportFragmentManager().executePendingTransactions();
+				ft.commitNowAllowingStateLoss();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -594,8 +593,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
-				getSupportFragmentManager().executePendingTransactions();
+				ft.commitNowAllowingStateLoss();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -625,8 +623,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
-				getSupportFragmentManager().executePendingTransactions();
+				ft.commitNowAllowingStateLoss();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -786,8 +783,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 					ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-					ft.commit();
-					getSupportFragmentManager().executePendingTransactions();
+					ft.commitNowAllowingStateLoss();
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 

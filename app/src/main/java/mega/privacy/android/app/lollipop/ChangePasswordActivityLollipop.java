@@ -304,6 +304,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	@Override
+	public void onBackPressed() {
+		log("onBackPressed");
+		super.callToSuperBack = true;
+		super.onBackPressed();
+	}
+
+	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
