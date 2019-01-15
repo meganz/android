@@ -4,12 +4,15 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -60,6 +63,8 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    DisplayMetrics outMetrics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -95,28 +100,26 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             }
         }
 
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
         setContentView(R.layout.activity_chat_explorer);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_chat_explorer);
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
         fab.setOnClickListener(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
         //Set toolbar
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if(aB!=null){
-            aB.setTitle(getString(R.string.choose_chat));
+            aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         }
         else{
             log("aB is null");
@@ -165,12 +168,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         inflater.inflate(R.menu.file_explorer_action, menu);
 
         createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-        createFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
         newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
-        newChatMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 
         createFolderMenuItem.setVisible(false);
-        newChatMenuItem.setVisible(true);
+        newChatMenuItem.setVisible(false);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -330,6 +331,9 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                         chooseChats(chatExplorerFragment.getSelectedChats());
                     }
                 }
+                break;
+            }
+            case R.id.new_group_button: {
                 break;
             }
         }
