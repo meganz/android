@@ -887,6 +887,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageVoiceClipSeekBar = (SeekBar) v.findViewById(R.id.content_own_message_voice_clip_seekBar);
             holder.contentOwnMessageVoiceClipDuration = (TextView) v.findViewById(R.id.content_own_message_voice_clip_duration);
             holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(0));
+            holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
 
             holder.ownTriangleIconVoiceClip = (RelativeLayout) v.findViewById(R.id.own_triangle_icon_voice_clip);
 
@@ -1282,6 +1283,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).uploadingProgressBarVoiceClip.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipDuration.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(0));
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setProgress(0);
+
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileName.setVisibility(View.GONE);
@@ -8804,18 +8810,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         switch (v.getId()) {
-            case R.id.content_own_message_voice_clip_play_pause:{
-                if(!(((ChatActivityLollipop)context).isRecording())){
-                    playOwnRecord(currentPosition, holder);
-                }
-                break;
-            }
+//            case R.id.content_own_message_voice_clip_play_pause:{
+//                if(!(((ChatActivityLollipop)context).isRecording())){
+//                    playOwnRecord(currentPosition, holder);
+//                }
+//                break;
+//            }
+//            case R.id.content_contact_message_voice_clip_play_pause:{
+//                if(!(((ChatActivityLollipop)context).isRecording())){
+//                    playContactRecord(currentPosition, holder);
+//                }
+//                break;
+//            }
+            case R.id.content_own_message_voice_clip_play_pause:
             case R.id.content_contact_message_voice_clip_play_pause:{
                 if(!(((ChatActivityLollipop)context).isRecording())){
-                    playContactRecord(currentPosition, holder);
+                    log("onClick() play or pause");
+                    playRecord(currentPosition, holder);
                 }
                 break;
             }
+
             case R.id.forward_own_rich_links:
             case R.id.forward_own_contact:
             case R.id.forward_own_file:
@@ -8879,70 +8894,89 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        this.notifyItemChanged(currentPosition);
     }
 
-    public void playContactRecord(final int position, ViewHolderMessageChat holder){
-        log("playContactRecord: position "+position+", holder: "+holder);
-        if(holder == null){
-            holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(position);
-        }
-        if(holder!=null) {
-            if(holder.mediaPlayerVoiceNotes!=null){
-                if(holder.mediaPlayerVoiceNotes.isPlaying()) {
-                    holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
-                    log("isPlaying ----> pause, lastProgress: "+holder.lastProgress);
-                    holder.mediaPlayerVoiceNotes.pause();
-                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                    setPlayingSomething(false);
 
-                    if(runnableContactVoiceClip!=null){
-                        holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
+    public void playRecord(final int position, ViewHolderMessageChat holder){
+        log("playRecord: position "+position);
+        AndroidMegaChatMessage currentMessage = getMessageAt(position);
+        if(currentMessage!=null){
+            if((currentMessage.getMessage()!=null)&&(currentMessage.getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
+                if(messages.get(position-1).getMessage().getUserHandle() == myUserHandle){
+                    log("playRecord: MY message");
+
+                    if(holder == null){
+                        holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(position);
                     }
-                }else {
-                    if(isPlayingSomething()){
-                        stopReproductions();
+                    if(holder!=null) {
+                        if(holder.mediaPlayerVoiceNotes!=null){
+                            if(holder.mediaPlayerVoiceNotes.isPlaying()) {
+                                log("playRecord: MY message: isPlaying");
+                                holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
+                                log("playRecord: MY message--------> paused");
+                                holder.mediaPlayerVoiceNotes.pause();
+                                setPlayingSomething(false);
+                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                                if(runnableOwnVoiceClip!=null){
+                                    holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
+                                }
+                            }else {
+                                log("playRecord: MY message: is NOT Playing");
+
+                                if(isPlayingSomething()){
+                                    log("playRecord: MY message: is Playing OTHER");
+                                    stopReproductions();
+                                }
+                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+                                log("playRecord: MY message-------> start playing");
+                                holder.mediaPlayerVoiceNotes.start();
+                                setPlayingSomething(true);
+                                updateOwnSeekBar(holder);
+                            }
+                        }
                     }
-                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                    holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                    holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
-                    holder.mediaPlayerVoiceNotes.start();
-                    setPlayingSomething(true);
-                    updateContactSeekBar(holder);
+                }else{
+                    log("playRecord: CONTACT message");
+
+                    if(holder == null){
+                        holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(position);
+                    }
+                    if(holder!=null) {
+                        if(holder.mediaPlayerVoiceNotes!=null){
+
+                            if(holder.mediaPlayerVoiceNotes.isPlaying()) {
+                                log("playRecord: CONTACT message: isPlaying");
+                                holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
+                                log("playRecord: CONTACT message--------> paused");
+                                holder.mediaPlayerVoiceNotes.pause();
+                                setPlayingSomething(false);
+                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                                if(runnableContactVoiceClip!=null){
+                                    holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
+                                }
+                            }else {
+                                log("playRecord: CONTACT message: is NOT Playing");
+
+                                if(isPlayingSomething()){
+                                    log("playRecord: CONTACT message: is Playing OTHER");
+                                    stopReproductions();
+                                }
+                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+                                log("playRecord: CONTACT message-------> start playing");
+                                holder.mediaPlayerVoiceNotes.start();
+                                setPlayingSomething(true);
+                                updateContactSeekBar(holder);
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
 
-    public void playOwnRecord(final int position, ViewHolderMessageChat holder){
-        log("playOwnRecord: position "+position+", holder: "+holder);
-        if(holder == null){
-            holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(position);
-        }
-        if(holder!=null) {
-            if(holder.mediaPlayerVoiceNotes!=null){
-                if(holder.mediaPlayerVoiceNotes.isPlaying()) {
-                    holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
-                    holder.mediaPlayerVoiceNotes.pause();
-                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                    setPlayingSomething(false);
-
-                    if(runnableOwnVoiceClip!=null){
-                        holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
-                    }
-                }else {
-                    if(isPlayingSomething()){
-                        stopReproductions();
-                    }
-                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                    holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                    holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
-                    holder.mediaPlayerVoiceNotes.start();
-                    setPlayingSomething(true);
-                    updateOwnSeekBar(holder);
-
-                }
-            }
-        }
     }
 
     private void updateContactSeekBar(final ViewHolderMessageChat holder) {
@@ -8969,6 +9003,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.mediaPlayerVoiceNotes.pause();
                     }
                     holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    setPlayingSomething(false);
                     if(runnableContactVoiceClip!=null){
                         holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
                     }
@@ -8976,11 +9011,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
                     holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
                     holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.mediaPlayerVoiceNotes.getDuration()));
-                    setPlayingSomething(false);
                 }
             });
         }
-
     }
 
     private void updateOwnSeekBar(final ViewHolderMessageChat holder) {
@@ -9006,6 +9039,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.mediaPlayerVoiceNotes.pause();
                     }
                     holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    setPlayingSomething(false);
                     if(runnableOwnVoiceClip!=null){
                         holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
                     }
@@ -9013,7 +9047,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
                     holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
                     holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.mediaPlayerVoiceNotes.getDuration()));
-                    setPlayingSomething(false);
+
                 }
             });
         }
@@ -9083,23 +9117,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             for(int i=0;i<messages.size();i++){
                 if((messages.get(i)!=null) && (messages.get(i).getMessage()!=null) && (messages.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
                     if(messages.get(i).getMessage().getUserHandle() == myUserHandle){
-                        log("stopReproductions() my message");
                         ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(i+1);
                         if(holder!=null) {
                             if(holder.mediaPlayerVoiceNotes!=null){
                                 holder.lastProgress = 0;
                                 if(holder.mediaPlayerVoiceNotes.isPlaying()){
+                                    setPlayingSomething(false);
                                     holder.mediaPlayerVoiceNotes.pause();
+                                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                                    if(runnableOwnVoiceClip!=null){
+                                        holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
+                                    }
+                                    holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                                    holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+                                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                    holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.mediaPlayerVoiceNotes.getDuration()));
                                 }
-                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                                if(runnableOwnVoiceClip!=null){
-                                    holder.handlerVoiceNotes.removeCallbacks(runnableOwnVoiceClip);
-                                }
-                                holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                                holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
-                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.mediaPlayerVoiceNotes.getDuration()));
-                                setPlayingSomething(false);
                             }
                         }
                     }else{
@@ -9109,19 +9142,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             if(holder.mediaPlayerVoiceNotes!=null){
                                 holder.lastProgress = 0;
                                 if(holder.mediaPlayerVoiceNotes.isPlaying()){
+                                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                                    if(runnableContactVoiceClip!=null){
+                                        holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
+                                    }
+                                    holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                                    holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
+                                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                    holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.mediaPlayerVoiceNotes.getDuration()));
+                                    setPlayingSomething(false);
                                     holder.mediaPlayerVoiceNotes.pause();
                                 }
-                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                                if(runnableContactVoiceClip!=null){
-                                    holder.handlerVoiceNotes.removeCallbacks(runnableContactVoiceClip);
-                                }
-                                holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                                holder.contentContactMessageVoiceClipSeekBar.setMax(holder.mediaPlayerVoiceNotes.getDuration());
-                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.mediaPlayerVoiceNotes.getDuration()));
-                                setPlayingSomething(false);
                             }
-
                         }
                     }
                 }
