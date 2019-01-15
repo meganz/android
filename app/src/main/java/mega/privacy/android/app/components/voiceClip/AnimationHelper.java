@@ -50,8 +50,6 @@ public class AnimationHelper {
 
     @SuppressLint("RestrictedApi")
     public void animateBasket(float basketInitialX) {
-//        public void animateBasket(float basketInitialY) {
-
         log("animateBasket()");
         isBasketAnimating = true;
 
@@ -80,12 +78,6 @@ public class AnimationHelper {
         translateAnimation2 = new TranslateAnimation(basketInitialX+90, basketInitialX, 0, 0);
         translateAnimation2.setDuration(350);
 
-//        translateAnimation1 = new TranslateAnimation(0, 0, basketInitialY, basketInitialY - 90);
-//        translateAnimation1.setDuration(250);
-
-//        translateAnimation2 = new TranslateAnimation(0, 0, basketInitialY - 130, basketInitialY);
-//        translateAnimation2.setDuration(350);
-
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);
 
@@ -94,14 +86,11 @@ public class AnimationHelper {
             @Override
             public void run() {
                 basketImg.setVisibility(VISIBLE);
-//                basketImg.startAnimation(alphaAnimation1);
                 basketImg.startAnimation(translateAnimation1);
-
             }
         }, 350);
 
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
-//        alphaAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
             }
@@ -113,10 +102,9 @@ public class AnimationHelper {
                 handler2.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-//                        basketImg.startAnimation(alphaAnimation2);
                         basketImg.startAnimation(translateAnimation2);
                         smallBlinkingMic.setVisibility(INVISIBLE);
-                        basketImg.setVisibility(INVISIBLE);
+//                        basketImg.setVisibility(INVISIBLE);
                     }
                 }, 450);
             }
@@ -163,14 +151,6 @@ public class AnimationHelper {
                 translateAnimation2.reset();
                 translateAnimation2.cancel();
             }
-//            if(alphaAnimation1!=null){
-//                alphaAnimation1.reset();
-//                alphaAnimation1.cancel();
-//            }
-//            if(alphaAnimation2!=null){
-//                alphaAnimation2.reset();
-//                alphaAnimation2.cancel();
-//            }
             if(micAnimation!=null) {
                 micAnimation.cancel();
             }
@@ -190,7 +170,6 @@ public class AnimationHelper {
             smallBlinkingMic.setX(micX);
             smallBlinkingMic.setY(micY);
             smallBlinkingMic.setVisibility(View.GONE);
-
             isBasketAnimating = false;
         }
     }
@@ -205,7 +184,6 @@ public class AnimationHelper {
         if(smallBlinkingMic!=null) {
             smallBlinkingMic.clearAnimation();
         }
-
         if (hideView) {
             smallBlinkingMic.setVisibility(View.GONE);
         }
@@ -220,39 +198,6 @@ public class AnimationHelper {
         smallBlinkingMic.startAnimation(alphaAnimation);
     }
 
-    public void moveRecordButtonAndSlideToLock(final RecordButton recordBtn, float initialY, float difY) {
-        log("moveRecordButtonAndSlideToLock()");
-        final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getY(), initialY);
-        positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                log("moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
-                float y = (Float) animation.getAnimatedValue();
-                recordBtn.setY(y);
-            }
-        });
-
-
-        positionAnimator.addListener(new AnimatorListenerAdapter()
-        {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                log("moveRecordButtonAndSlideToCancelBack() ---- DONE");
-
-            }
-        });
-
-        positionAnimator.setDuration(0);
-        positionAnimator.start();
-
-//        // if the move event was not called ,then the difY will still 0 and there is no need to move it back
-//        if (difY != 0) {
-//            float y = initialY - difY;
-//            slideToCancelLayout.animate().y(y).setDuration(0).start();
-//        }
-
-    }
 
     public void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float difX) {
         log("moveRecordButtonAndSlideToCancelBack()");
@@ -266,10 +211,7 @@ public class AnimationHelper {
                 recordBtn.setX(x);
             }
         });
-
-
-        positionAnimator.addListener(new AnimatorListenerAdapter()
-        {
+        positionAnimator.addListener(new AnimatorListenerAdapter(){
             @Override
             public void onAnimationEnd(Animator animation) {
                 log("moveRecordButtonAndSlideToCancelBack() ---- DONE");
@@ -280,32 +222,11 @@ public class AnimationHelper {
         positionAnimator.setDuration(0);
         positionAnimator.start();
 
-//        final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
-//        positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-//        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator animation) {
-//                float x = (Float) animation.getAnimatedValue();
-//                recordBtn.setX(x);
-//
-//
-//            }
-//        });
-
-//        ((ChatActivityLollipop)context).stopRecord();
-//        recordBtn.stopScale();
-
-//        positionAnimator.setDuration(0);
-//        positionAnimator.start();
-
-
-
         // if the move event was not called ,then the difX will still 0 and there is no need to move it back
         if (difX != 0) {
             float x = initialX - difX;
             slideToCancelLayout.animate().x(x).setDuration(0).start();
         }
-
     }
 
     public void resetSmallMic() {
@@ -316,7 +237,6 @@ public class AnimationHelper {
 
     public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
         this.onBasketAnimationEndListener = onBasketAnimationEndListener;
-
     }
 
     protected void onAnimationEnd() {
@@ -330,10 +250,7 @@ public class AnimationHelper {
         log("setStartRecorded()  -> "+startRecorded);
         isStartRecorded = startRecorded;
     }
-
     public static void log(String message) {
         Util.log("AnimationHelper",message);
     }
-
-
 }

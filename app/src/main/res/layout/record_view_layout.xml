@@ -4,21 +4,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/parent_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
+    android:layout_height="150dp"
+    android:layout_gravity="bottom"
+    android:background="@null"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:layout_gravity="bottom"
+    android:paddingBottom="16dp"
     android:visibility="visible">
 
+    <!--android:layout_alignBottom="@id/layout_lock"-->
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/layout_lock"
-        android:layout_marginBottom="10dp"
+        android:layout_height="24dp"
         android:layout_alignParentRight="true"
-        android:background="@android:color/transparent"
+        android:layout_marginRight="55dp"
+        android:layout_alignParentBottom="true"
+        android:background="@null"
         app:shimmer_animation_duration="1500"
         app:shimmer_color="#ffffff"
         app:shimmer_reverse_animation="true">
@@ -27,31 +29,54 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center">
+
             <ImageView
                 android:id="@+id/arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_slide_record_white"
-                android:tint="@color/transparent_black"/>
+                android:tint="@color/transparent_black" />
+
             <TextView
                 android:id="@+id/slide_to_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="50dp"
+                android:text="@string/slide_to_cancel"
+                android:textColor="@color/name_my_account"
                 android:textSize="13sp"
-                android:textStyle="normal"
-                android:text="SLIDE TO CANCEL"
-                android:textColor="@color/name_my_account" />
+                android:textStyle="normal" />
         </LinearLayout>
     </io.supercharge.shimmerlayout.ShimmerLayout>
 
+    <!--android:layout_alignBottom="@id/layout_lock"-->
+    <RelativeLayout
+        android:id="@+id/rl_cancel_record"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="70dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_centerInParent="true"
+            android:fontFamily="roboto"
+            android:text="@string/cancel_voice_clip"
+            android:textColor="@color/delete_account"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
     <android.support.v7.widget.CardView
         android:id="@+id/layout_lock"
+        style="@style/CardViewTheme"
         android:layout_width="48dp"
         android:layout_height="150dp"
-        style="@style/CardViewTheme"
-        android:background="@color/white"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
         android:translationZ="1dp"
         android:visibility="gone"
         app:cardCornerRadius="15dp">
@@ -64,138 +89,52 @@
                 android:id="@+id/image_lock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_lock"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_lock" />
             <ImageView
                 android:id="@+id/image_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_collapse"
-                android:layout_marginBottom="56dp"/>
+                android:layout_marginBottom="56dp"
+                android:src="@drawable/ic_collapse" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-
+    <!--android:layout_alignBottom="@id/layout_lock"-->
     <ImageView
         android:id="@+id/glowing_mic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/layout_lock"
-        android:background="@null"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginLeft="8dp"
+        android:background="@null"
         android:src="@drawable/ic_mic_on"
-        android:tint="@color/delete_account"/>
+        android:tint="@color/delete_account" />
 
+    <!--android:layout_alignBottom="@id/layout_lock"-->
     <ImageView
         android:id="@+id/basket_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/layout_lock"
-        android:background="@null"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginLeft="8dp"
+        android:background="@null"
         android:src="@drawable/ic_basket"
         android:tint="@color/delete_account"
         android:visibility="gone" />
 
+    <!--android:layout_alignBottom="@id/layout_lock"-->
     <Chronometer
         android:id="@+id/counter_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/layout_lock"
+        android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/glowing_mic"
-        android:layout_marginBottom="10dp"
         android:text="00:00"
         android:textColor="@color/delete_account"
         android:textSize="16sp"
         android:textStyle="bold" />
 
 </RelativeLayout>
-
-
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--android:id="@+id/parent_layout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:clipChildren="false"-->
-    <!--android:clipToPadding="false"-->
-    <!--android:paddingBottom="15dp"-->
-    <!--android:paddingTop="15dp"-->
-    <!--android:visibility="visible">-->
-
-
-    <!--<ImageView-->
-        <!--android:id="@+id/glowing_mic"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:layout_marginLeft="8dp"-->
-        <!--android:src="@drawable/ic_mic_on"-->
-        <!--android:tint="@color/delete_account" />-->
-
-    <!--<ImageView-->
-        <!--android:id="@+id/basket_img"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:layout_marginLeft="8dp"-->
-        <!--android:src="@drawable/ic_basket"-->
-        <!--android:tint="@color/delete_account"-->
-        <!--android:visibility="invisible" />-->
-    <!---->
-
-    <!--<Chronometer-->
-        <!--android:id="@+id/counter_tv"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_marginRight="21dp"-->
-        <!--android:layout_toRightOf="@+id/glowing_mic"-->
-        <!--android:layout_marginLeft="5dp"-->
-        <!--android:gravity="center"-->
-        <!--android:text="00:00"-->
-        <!--android:textColor="@color/delete_account"-->
-        <!--android:textSize="16sp"-->
-        <!--android:textStyle="normal"-->
-        <!--android:fontFamily="Roboto"/>-->
-
-    <!--<io.supercharge.shimmerlayout.ShimmerLayout-->
-        <!--android:id="@+id/shimmer_layout"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_toRightOf="@+id/counter_tv"-->
-        <!--app:shimmer_animation_duration="1500"-->
-        <!--app:shimmer_color="#ffffff"-->
-        <!--app:shimmer_reverse_animation="true">-->
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:gravity="center">-->
-            <!--<ImageView-->
-                <!--android:id="@+id/arrow"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:src="@drawable/ic_slide_record_white"-->
-                <!--android:tint="@color/transparent_black"/>-->
-            <!--<TextView-->
-                <!--android:id="@+id/slide_to_cancel"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:textColor="@color/name_my_account"-->
-                <!--android:textSize="13sp"-->
-                <!--android:textStyle="normal"-->
-                <!--android:fontFamily="Roboto"-->
-                <!--android:text="SLIDE TO CANCEL"/>-->
-        <!--</LinearLayout>-->
-    <!--</io.supercharge.shimmerlayout.ShimmerLayout>-->
-
-<!--</RelativeLayout>-->

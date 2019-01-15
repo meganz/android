@@ -143,15 +143,15 @@
                                 android:background="@null"
                                 android:tint="@color/accentColor"
                                 android:src="@drawable/ic_send_black"/>
+
                             <mega.privacy.android.app.components.twemoji.EmojiEditText
                                 android:id="@+id/edit_text_chat"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:gravity="center_vertical"
                                 android:background="@android:color/transparent"
-                                android:layout_toLeftOf="@id/send_message_icon_chat"
+                                android:layout_marginRight="58dp"
                                 android:layout_marginLeft="10dp"
-                                android:layout_marginRight="10dp"
                                 android:layout_centerVertical="true"
                                 android:textSize="14sp"
                                 android:inputType="textMultiLine|textCapSentences"
@@ -424,16 +424,11 @@
                     android:id="@+id/rl_voice_clip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:maxHeight ="150dp"
                     android:background="@android:color/transparent"
                     android:visibility="visible"
                     android:layout_marginRight="8dp"
-                    android:layout_gravity="bottom|right"
-                    app:slide_to_cancel_arrow="@drawable/ic_slide_record_white"
-                    app:slide_to_cancel_arrow_color="@color/transparent_black"
-                    app:slide_to_cancel_bounds="8dp"
-                    app:slide_to_cancel_margin_right="10dp"
-                    app:slide_to_cancel_text="SLIDE TO CANCEL"
-                    app:counter_time_color="@color/delete_account"/>
+                    android:layout_gravity="bottom|right"/>
 
                 <mega.privacy.android.app.components.voiceClip.RecordButton
                     android:id="@+id/record_fab"

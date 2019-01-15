@@ -785,6 +785,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
+
         //ListenForRecord must be false ,otherwise onClick will not be called
         record.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
@@ -797,6 +798,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setCancelBounds(1);
         //prevent recording under one Second
         voiceClipLayout.setLessThanSecondAllowed(false);
+//        voiceClipLayout.setSlideMarginRight(Util.px2dp(55, outMetrics));
         voiceClipLayout.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
 
         voiceClipLayout.setOnRecordListener(new OnRecordListener() {
@@ -808,6 +810,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onLock() {
                 log("voiceClipLayout.setOnRecordListener() -> onLock()");
+                record.setBackground(null);
+                record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_send_black));
+//                record.setVisibility(View.VISIBLE);
+//                record.setRecordView(voiceClipLayout);
+//                record.setListenForRecord(true);
             }
             @Override
             public void onCancel() {
@@ -1208,6 +1215,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(permission==MegaChatRoom.PRIV_RO) {
                     log("Permission RO");
                     writingContainerLayout.setVisibility(View.GONE);
+                    fragmentVoiceClip.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
                     sendContactButton.setVisibility(View.GONE);
@@ -1230,6 +1238,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else if(permission==MegaChatRoom.PRIV_RM) {
                     log("Permission RM");
                     writingContainerLayout.setVisibility(View.GONE);
+                    fragmentVoiceClip.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
                     sendContactButton.setVisibility(View.GONE);
@@ -1259,6 +1268,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     log("permission: "+permission);
                     writingContainerLayout.setVisibility(View.VISIBLE);
+                    fragmentVoiceClip.setVisibility(View.VISIBLE);
 
                     mediaButton.setVisibility(View.VISIBLE);
                     sendContactButton.setVisibility(View.VISIBLE);
@@ -1309,6 +1319,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
 
                     writingContainerLayout.setVisibility(View.GONE);
+                    fragmentVoiceClip.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
                     sendContactButton.setVisibility(View.GONE);
@@ -1333,6 +1344,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     log("Permission RM");
                     writingContainerLayout.setVisibility(View.GONE);
+                    fragmentVoiceClip.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
                     sendContactButton.setVisibility(View.GONE);
@@ -1365,6 +1377,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     long userHandle = chatRoom.getPeerHandle(0);
                     setStatus(userHandle);
                     writingContainerLayout.setVisibility(View.VISIBLE);
+                    fragmentVoiceClip.setVisibility(View.VISIBLE);
 
                     mediaButton.setVisibility(View.VISIBLE);
                     sendContactButton.setVisibility(View.VISIBLE);
@@ -1868,7 +1881,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.release();
                 myAudioRecorder = null;
                 isRecording = false;
-                voiceClipLayout.showLock(false);
+//                voiceClipLayout.showLock(false);
                 uploadVoiceNote(outputFileVoiceNotes);
             }
         }
@@ -7784,14 +7797,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
     public void showBubble(){
         log("showBubble()");
-        if(isRecording){
-            if(myAudioRecorder!=null){
-                log("myAudioRecorder -> CANCEL - isRecording = FALSE");
-                myAudioRecorder.reset();
-                myAudioRecorder = null;
-                isRecording = false;
-            }
-        }
         bubbleLayout.setAlpha(1);
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleLayout.animate().alpha(0).setDuration(4000);

@@ -40,13 +40,20 @@ import mega.privacy.android.app.utils.Util;
 
 public class RecordView extends RelativeLayout {
 
+    public enum UserBehaviour {
+        CANCELING,
+        LOCKING,
+        NONE
+    }
+
     public static final int DEFAULT_CANCEL_BOUNDS = 1; //8dp
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
     private TextView slideToCancel;
     private ShimmerLayout slideToCancelLayout;
+    private RelativeLayout cancelRecordLayout;
     private ImageView arrow;
-    private float initialX, basketInitialY, difX = 0;
+    private float initialX,initialY, basketInitialY, difX = 0;
     private float basketInitialX = 0;
 
     private float cancelBounds = DEFAULT_CANCEL_BOUNDS;
@@ -66,6 +73,7 @@ public class RecordView extends RelativeLayout {
     Handler handlerStartRecord = new Handler();
     Handler handlerShowPadLock = new Handler();
     float previewX = 0;
+    float previewY = 0;
     private Animation animJump, animJumpFast;
     int cont = 0;
 
@@ -73,12 +81,20 @@ public class RecordView extends RelativeLayout {
     DisplayMetrics outMetrics;
     Display display;
 
+    private float lastX, lastY;
+    private float firstX, firstY;
+
+    private float directionOffset, cancelOffset, lockOffset;
+    private float dp = 0;
+    private boolean isLocked = false;
+    private UserBehaviour userBehaviour = UserBehaviour.NONE;
+
+
     public RecordView(Context context) {
         super(context);
         this.context = context;
         init(context, null, -1, -1);
     }
-
 
     public RecordView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -110,6 +126,7 @@ public class RecordView extends RelativeLayout {
         counterTime = view.findViewById(R.id.counter_tv);
         basketImg = view.findViewById(R.id.basket_img);
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
+        cancelRecordLayout = view.findViewById(R.id.rl_cancel_record);
         layoutLock = view.findViewById(R.id.layout_lock);
         imageLock = view.findViewById(R.id.image_lock);
         imageArrow = view.findViewById(R.id.image_arrow);
@@ -117,44 +134,45 @@ public class RecordView extends RelativeLayout {
         imageArrow.setVisibility(GONE);
         animJump = AnimationUtils.loadAnimation(getContext(), R.anim.jump);
         animJumpFast = AnimationUtils.loadAnimation(getContext(), R.anim.jump_fast);
-        layoutLock.setVisibility(View.GONE);
+        layoutLock.setVisibility(GONE);
+        cancelRecordLayout.setVisibility(GONE);
 
         hideViews(true);
 
-        if (attrs != null && defStyleAttr == -1 && defStyleRes == -1) {
-            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordView, defStyleAttr, defStyleRes);
-
-            int slideArrowResource = typedArray.getResourceId(R.styleable.RecordView_slide_to_cancel_arrow, -1);
-            String slideToCancelText = typedArray.getString(R.styleable.RecordView_slide_to_cancel_text);
-            int slideMarginRight = (int) typedArray.getDimension(R.styleable.RecordView_slide_to_cancel_margin_right, 30);
-            int counterTimeColor = typedArray.getColor(R.styleable.RecordView_counter_time_color, -1);
-            int arrowColor = typedArray.getColor(R.styleable.RecordView_slide_to_cancel_arrow_color, -1);
-            int cancelBounds = typedArray.getDimensionPixelSize(R.styleable.RecordView_slide_to_cancel_bounds, -1);
-
-            if (cancelBounds != -1) {
-                setCancelBounds(cancelBounds, false);//don't convert it to pixels since it's already in pixels
-            }
-
-            if (slideArrowResource != -1) {
-                Drawable slideArrow = AppCompatResources.getDrawable(getContext(), slideArrowResource);
-                arrow.setImageDrawable(slideArrow);
-            }
-
-            if (slideToCancelText != null){
-                slideToCancel.setText(slideToCancelText);
-            }
-
-            if (counterTimeColor != -1) {
-                setCounterTimeColor(counterTimeColor);
-            }
-
-            if (arrowColor != -1) {
-                setSlideToCancelArrowColor(arrowColor);
-            }
-
-            setMarginRight(slideMarginRight, true);
-            typedArray.recycle();
-        }
+//        if (attrs != null && defStyleAttr == -1 && defStyleRes == -1) {
+//            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordView, defStyleAttr, defStyleRes);
+//
+//            int slideArrowResource = typedArray.getResourceId(R.styleable.RecordView_slide_to_cancel_arrow, -1);
+//            String slideToCancelText = typedArray.getString(R.styleable.RecordView_slide_to_cancel_text);
+//            int slideMarginRight = (int) typedArray.getDimension(R.styleable.RecordView_slide_to_cancel_margin_right, 30);
+//            int counterTimeColor = typedArray.getColor(R.styleable.RecordView_counter_time_color, -1);
+//            int arrowColor = typedArray.getColor(R.styleable.RecordView_slide_to_cancel_arrow_color, -1);
+//            int cancelBounds = typedArray.getDimensionPixelSize(R.styleable.RecordView_slide_to_cancel_bounds, -1);
+//
+//            if (cancelBounds != -1) {
+//                setCancelBounds(cancelBounds, false);//don't convert it to pixels since it's already in pixels
+//            }
+//
+//            if (slideArrowResource != -1) {
+//                Drawable slideArrow = AppCompatResources.getDrawable(getContext(), slideArrowResource);
+//                arrow.setImageDrawable(slideArrow);
+//            }
+//
+//            if (slideToCancelText != null){
+//                slideToCancel.setText(slideToCancelText);
+//            }
+//
+//            if (counterTimeColor != -1) {
+//                setCounterTimeColor(counterTimeColor);
+//            }
+//
+//            if (arrowColor != -1) {
+//                setSlideToCancelArrowColor(arrowColor);
+//            }
+//
+//            setMarginRight(slideMarginRight, true);
+//            typedArray.recycle();
+//        }
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
     }
 
@@ -162,6 +180,7 @@ public class RecordView extends RelativeLayout {
     private void hideViews(boolean hideSmallMic) {
         log("hideViews()");
         slideToCancelLayout.setVisibility(GONE);
+        cancelRecordLayout.setVisibility(GONE);
         counterTime.setVisibility(GONE);
         if (hideSmallMic){
             smallBlinkingMic.setVisibility(GONE);
@@ -171,6 +190,7 @@ public class RecordView extends RelativeLayout {
     private void showViews() {
         log("showViews()");
         slideToCancelLayout.setVisibility(VISIBLE);
+        cancelRecordLayout.setVisibility(GONE);
         smallBlinkingMic.setVisibility(VISIBLE);
         counterTime.setVisibility(VISIBLE);
     }
@@ -213,6 +233,7 @@ public class RecordView extends RelativeLayout {
             cont ++;
             if(cont == 1) {
                 if (layoutLock.getVisibility() == View.VISIBLE) {
+                    layoutLock.setVisibility(View.GONE);
                     int prevHeight = layoutLock.getHeight();
                     ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, 10);
                     valueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -245,14 +266,6 @@ public class RecordView extends RelativeLayout {
         }
     }
 
-    public void hideLock(){
-        if(imageLock!=null){
-            imageLock.clearAnimation();
-        }
-        if(imageArrow!=null){
-            imageArrow.clearAnimation();
-        }
-    }
 
     private boolean isLessThanOneSecond(long time) {
         return time <= 1500;
@@ -288,7 +301,6 @@ public class RecordView extends RelativeLayout {
         @Override
         public void run() {
             if(flagRB){
-                log("runStartRecord()");
                 counterTime.setBase(SystemClock.elapsedRealtime());
                 counterTime.start();
                 handlerShowPadLock.postDelayed(runPadLock, 3000);
@@ -316,9 +328,24 @@ public class RecordView extends RelativeLayout {
         animationHelper.resetSmallMic();
         slideToCancelLayout.startShimmerAnimation();
         initialX = recordBtn.getX();
+        initialY = recordBtn.getY();
+
+        if (firstX == 0) {
+            firstX = motionEvent.getRawX();
+        }
+
+        if (firstY == 0) {
+            firstY = motionEvent.getRawY();
+        }
+
+        lockOffset = (float) (recordBtn.getX() / 2.5);
+        isLocked = false;
+
         playSound(RECORD_START);
+
         basketInitialY = basketImg.getY() + 90;
         basketInitialX = basketImg.getX() - 90;
+
         showViews();
         startTime = System.currentTimeMillis();
         isSwiped = false;
@@ -381,115 +408,381 @@ public class RecordView extends RelativeLayout {
 //        }
 //    }
 
+
     protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
         log("onActionMove()");
 
         long time = System.currentTimeMillis() - startTime;
         if (!isSwiped) {
-            log(" onActionMove() - !isSwiped - slideToCancelLayout.getX(): "+slideToCancelLayout.getX()+", counterTime.getRight("+counterTime.getRight()+") + cancelBounds("+cancelBounds+"): "+(counterTime.getRight() + cancelBounds));
-            //Swipe To Cancel
-            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+            UserBehaviour direction = UserBehaviour.NONE;
+            float motionX = Math.abs(firstX - motionEvent.getRawX());
+            float motionY = Math.abs(firstY - motionEvent.getRawY());
 
-                log("SWIPE TO CANCEL");
-                //if the time was less than one second then do not start basket animation
-                if (isLessThanOneSecond(time)) {
-                    log("onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
-                    hideViews(true);
-                    animationHelper.clearAlphaAnimation(false);
-                    animationHelper.onAnimationEnd();
-
-
-                } else {
-                    log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
-                    hideViews(false);
-//                    animationHelper.animateBasket(basketInitialY);
-                    animationHelper.animateBasket(basketInitialX);
-
+            if (motionX > directionOffset && motionX > directionOffset && lastX < firstX && lastY < firstY) {
+                if (motionX > motionY && lastX < firstX) {
+                    direction = UserBehaviour.CANCELING;
+                } else if (motionY > motionX && lastY < firstY) {
+                    direction = UserBehaviour.LOCKING;
                 }
 
-                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-                showLock(false);
+            } else if (motionX > motionY && motionX > directionOffset && lastX < firstX) {
+                direction = UserBehaviour.CANCELING;
 
-                counterTime.stop();
-                slideToCancelLayout.stopShimmerAnimation();
-                isSwiped = true;
+            } else if (motionY > motionX && motionY > directionOffset && lastY < firstY) {
+                direction = UserBehaviour.LOCKING;
+            }
 
-                animationHelper.setStartRecorded(false);
+            if (direction == UserBehaviour.CANCELING) {
+                if (userBehaviour == UserBehaviour.NONE || motionEvent.getRawY() + recordBtn.getWidth() / 2 > firstY) {
+//                    userBehaviour = UserBehaviour.CANCELING;
 
-                if (recordListener != null) {
-                    recordListener.onCancel();
-                }
+                    if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+                        //if the time was less than one second then do not start basket animation
+                        if (isLessThanOneSecond(time)) {
+                            log("onActionMove() CANCELING-> Swipe To Cancel less than one second --> no basket animation");
+                            hideViews(true);
+                            animationHelper.clearAlphaAnimation(false);
+                            animationHelper.onAnimationEnd();
+                        } else {
+                            log("onActionMove() onActionMove() CANCELING->  Swipe To Cancel more than one second --> start basket animation");
+                            hideViews(false);
+                            animationHelper.animateBasket(basketInitialX);
+                        }
 
-            }else{
-                if(previewX == 0){
-                    previewX = recordBtn.getX();
-                }else{
-                    if(recordBtn.getX() <= (previewX - 25)){
+                        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
                         showLock(false);
+                        counterTime.stop();
+                        slideToCancelLayout.stopShimmerAnimation();
+                        isSwiped = true;
+                        animationHelper.setStartRecorded(false);
+                        userBehaviour = UserBehaviour.CANCELING;
+                        if (recordListener != null) {
+                            recordListener.onCancel();
+                        }
+
+                    }else{
+                        if(previewX == 0){
+                            previewX = recordBtn.getX();
+                        }else{
+                            if(recordBtn.getX() <= (previewX - 25)){
+                                showLock(false);
+                            }
+                        }
+                        if (motionEvent.getRawX() < initialX) {
+                            log("onActionMove() - to left");
+                            recordBtn.animate().x(motionEvent.getRawX()).setDuration(0).start();
+                            recordBtn.setTranslationY(0);
+                            if (difX == 0) {
+                                difX = (initialX - slideToCancelLayout.getX());
+                            }
+                            slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
+                        }
+                        userBehaviour = UserBehaviour.NONE;
                     }
                 }
 
-                log("onActionMove() - Swipe out of bounds");
-                //if statement is to Prevent Swiping out of bounds
-                if (motionEvent.getRawX() < initialX) {
-                    log("onActionMove() - a");
-
-                    recordBtn.animate().x(motionEvent.getRawX()).setDuration(0).start();
-
-                    if (difX == 0) {
-                        difX = (initialX - slideToCancelLayout.getX());
+            } else if (direction == UserBehaviour.LOCKING) {
+                if (userBehaviour == UserBehaviour.NONE || motionEvent.getRawX() + recordBtn.getWidth() / 2 > firstX) {
+                    if(layoutLock.getVisibility() == VISIBLE){
+                        if ((-(firstY - motionEvent.getRawY())) < -lockOffset) {
+                            if(!isLocked){
+                                log("onActionMove() LOCKING ");
+                                if (recordListener != null) {
+                                    recordListener.onLock();
+                                }
+                                recordBtn.setTranslationY(0);
+                                recordBtn.setTranslationX(0);
+                                userBehaviour = UserBehaviour.LOCKING;
+                                showLock(false);
+                                slideToCancelLayout.stopShimmerAnimation();
+                                slideToCancelLayout.setVisibility(GONE);
+                                cancelRecordLayout.setVisibility(VISIBLE);
+                                cancelRecordLayout.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        log("onActionUp() - LOCKING && CANCEL");
+                                        hideViews(false);
+                                        animationHelper.animateBasket(basketInitialX);
+                                        counterTime.stop();
+                                        animationHelper.setStartRecorded(false);
+                                        if (recordListener != null) {
+                                            recordListener.onCancel();
+                                        }
+                                    }
+                                });
+                                if (recordListener != null) {
+                                    recordListener.onLock();
+                                }
+                                isLocked = true;
+                            }
+                            return;
+                        }
+                        log("LOCKING:recordBtn.setTranslationY: "+(-(firstY - motionEvent.getRawY())));
+                        log("LOCKING:setTranslationY: "+(-(firstY - motionEvent.getRawY())));
+                        recordBtn.setTranslationY(-(firstY - motionEvent.getRawY()));
+                        recordBtn.setTranslationX(0);
                     }
-
-                    slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
                 }
             }
+
+            lastX = motionEvent.getRawX();
+            lastY = motionEvent.getRawY();
         }
     }
+
+
+
+//    protected void onActionMove(RecordButton recordBtn, MotionEvent motionEvent) {
+//        log("onActionMove()");
+//
+//        long time = System.currentTimeMillis() - startTime;
+//        if (!isSwiped) {
+//            UserBehaviour direction = UserBehaviour.NONE;
+//
+//            float motionX = Math.abs(firstX - motionEvent.getRawX());
+//            float motionY = Math.abs(firstY - motionEvent.getRawY());
+//            if (motionX > directionOffset && motionX > directionOffset && lastX < firstX && lastY < firstY) {
+//
+//                if (motionX > motionY && lastX < firstX) {
+//                    direction = UserBehaviour.CANCELING;
+//                } else if (motionY > motionX && lastY < firstY) {
+//                    direction = UserBehaviour.LOCKING;
+//                }
+//
+//            } else if (motionX > motionY && motionX > directionOffset && lastX < firstX) {
+//                direction = UserBehaviour.CANCELING;
+//
+//            } else if (motionY > motionX && motionY > directionOffset && lastY < firstY) {
+//                direction = UserBehaviour.LOCKING;
+//            }
+//
+//            if (direction == UserBehaviour.CANCELING) {
+//                if (userBehaviour == UserBehaviour.NONE || motionEvent.getRawY() + recordBtn.getWidth() / 2 > firstY) {
+//                    userBehaviour = UserBehaviour.CANCELING;
+//                }
+//
+//                if (userBehaviour == UserBehaviour.CANCELING) {
+//
+////                    translateX(-(firstX - motionEvent.getRawX()));
+//
+//                    if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+//                        //if the time was less than one second then do not start basket animation
+//                        if (isLessThanOneSecond(time)) {
+//                            log("onActionMove() - Swipe To Cancel less than one second --> no basket animation");
+//                            hideViews(true);
+//                            animationHelper.clearAlphaAnimation(false);
+//                            animationHelper.onAnimationEnd();
+//                        } else {
+//                            log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
+//                            hideViews(false);
+//                            animationHelper.animateBasket(basketInitialX);
+//                        }
+//
+//                        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+//                        showLock(false);
+//                        counterTime.stop();
+//                        slideToCancelLayout.stopShimmerAnimation();
+//                        isSwiped = true;
+//                        animationHelper.setStartRecorded(false);
+//                        if (recordListener != null) {
+//                            recordListener.onCancel();
+//                        }
+//                    }else{
+//                        if(previewX == 0){
+//                            previewX = recordBtn.getX();
+//                        }else{
+//                            if(recordBtn.getX() <= (previewX - 25)){
+//                                showLock(false);
+//                            }
+//                        }
+//                        if (motionEvent.getRawX() < initialX) {
+//                            log("onActionMove() - to left");
+//                            recordBtn.animate().x(motionEvent.getRawX()).setDuration(0).start();
+//                            recordBtn.setTranslationY(0);
+//                            if (difX == 0) {
+//                                difX = (initialX - slideToCancelLayout.getX());
+//                            }
+//                            slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
+//                        }
+//                    }
+//
+//                }
+//            } else if (direction == UserBehaviour.LOCKING) {
+//                if (userBehaviour == UserBehaviour.NONE || motionEvent.getRawX() + recordBtn.getWidth() / 2 > firstX) {
+//                    userBehaviour = UserBehaviour.LOCKING;
+//                }
+//
+//                if (userBehaviour == UserBehaviour.LOCKING) {
+//                    if(layoutLock.getVisibility() == VISIBLE){
+//                        if ((-(firstY - motionEvent.getRawY())) < -lockOffset) {
+//                            if(!isLocked){
+//                                recordBtn.setTranslationY(0);
+//                                recordBtn.setTranslationX(0);
+//                                if (recordListener != null) {
+//                                    recordListener.onLock();
+//                                }
+//                                isLocked = true;
+//                            }
+//                            return;
+//                        }
+//                        log("LOCKING:recordBtn.setTranslationY: "+(-(firstY - motionEvent.getRawY())));
+//                        log("LOCKING:setTranslationY: "+(-(firstY - motionEvent.getRawY())));
+//                        recordBtn.setTranslationY(-(firstY - motionEvent.getRawY()));
+//                        recordBtn.setTranslationX(0);
+//                    }
+//                }
+//            }
+//
+//            lastX = motionEvent.getRawX();
+//            lastY = motionEvent.getRawY();
+//
+//
+//
+////            log(" onActionMove() - !isSwiped - slideToCancelLayout.getX(): "+slideToCancelLayout.getX()+", counterTime.getRight("+counterTime.getRight()+") + cancelBounds("+cancelBounds+"): "+(counterTime.getRight() + cancelBounds));
+////            //Swipe To Cancel
+////            if (slideToCancelLayout.getX() != 0 && slideToCancelLayout.getX() <= counterTime.getRight() + cancelBounds) {
+////
+////                log("SWIPE TO CANCEL");
+////                //if the time was less than one second then do not start basket animation
+////                if (isLessThanOneSecond(time)) {
+////                    log("onActionMove() - Swipe To Cancel less than one second --> no basket animation\");");
+////                    hideViews(true);
+////                    animationHelper.clearAlphaAnimation(false);
+////                    animationHelper.onAnimationEnd();
+////
+////
+////                } else {
+////                    log("onActionMove() - Swipe To Cancel more than one second --> start basket animation");
+////                    hideViews(false);
+//////                    animationHelper.animateBasket(basketInitialY);
+////                    animationHelper.animateBasket(basketInitialX);
+////
+////                }
+////
+////                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+////                showLock(false);
+////
+////                counterTime.stop();
+////                slideToCancelLayout.stopShimmerAnimation();
+////                isSwiped = true;
+////
+////                animationHelper.setStartRecorded(false);
+////
+////                if (recordListener != null) {
+////                    recordListener.onCancel();
+////                }
+////
+////            }else{
+////                if(previewX == 0){
+////                    previewX = recordBtn.getX();
+////                }else{
+////                    if(recordBtn.getX() <= (previewX - 25)){
+////                        showLock(false);
+////                    }
+////                }
+////
+////                if ((motionEvent.getRawY() > initialY)&&(layoutLock.getVisibility() == VISIBLE)) {
+////
+//////                    recordBtn.animate().y(motionEvent.getRawY()).setDuration(0).start();
+////
+//////                    if (difX == 0) {
+//////                        difX = (initialX - slideToCancelLayout.getX());
+//////                    }
+////
+//////                    slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
+////                }
+////
+////                log("onActionMove() - Swipe out of bounds");
+////                //if statement is to Prevent Swiping out of bounds
+////                if (motionEvent.getRawX() < initialX) {
+////                    log("onActionMove() - to left");
+////
+////                    recordBtn.animate().x(motionEvent.getRawX()).setDuration(0).start();
+////
+////                    if (difX == 0) {
+////                        difX = (initialX - slideToCancelLayout.getX());
+////                    }
+////
+////                    slideToCancelLayout.animate().x(motionEvent.getRawX() - difX).setDuration(0).start();
+////                }
+////            }
+//        }
+//    }
+//
 
     protected void onActionUp(RecordButton recordBtn) {
         log("onActionUp()");
         elapsedTime = System.currentTimeMillis() - startTime;
+        if (handlerShowPadLock != null){
+            handlerShowPadLock.removeCallbacksAndMessages(null);
+        }
+        flagRB = false;
         if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
             log("onActionUp() - less than a second");
             if (recordListener != null){
                 recordListener.onLessThanSecond();
             }
+            userBehaviour = UserBehaviour.NONE;
             animationHelper.setStartRecorded(false);
             playSound(RECORD_ERROR);
 
-        } else {
+        }else{
             log("onActionUp() - more than a second");
-            if (recordListener != null && !isSwiped) {
-                recordListener.onFinish(elapsedTime);
+            if(userBehaviour == UserBehaviour.LOCKING){
+                log("onActionUp() - LOCKING()");
+                showLock(false);
+                firstX = 0;
+                firstY = 0;
+                lastX = 0;
+                lastY = 0;
+                userBehaviour = UserBehaviour.NONE;
+                recordBtn.setTranslationY(0);
+                recordBtn.setTranslationX(0);
+                isLocked = false;
+
+            }else if(userBehaviour == UserBehaviour.CANCELING){
+                log("onActionUp() - CANCELING()");
+                animationHelper.setStartRecorded(false);
+                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+                showLock(false);
+                counterTime.stop();
+                slideToCancelLayout.stopShimmerAnimation();
+
+                firstX = 0;
+                firstY = 0;
+                lastX = 0;
+                lastY = 0;
+                userBehaviour = UserBehaviour.NONE;
+                isLocked = false;
+            }else{
+                log("onActionUp() - NONE");
+                if (recordListener != null && !isSwiped) {
+                    recordListener.onFinish(elapsedTime);
+                }
+                animationHelper.setStartRecorded(false);
+                if (!isSwiped) {
+                    playSound(RECORD_FINISHED);
+                }
+                //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
+                hideViews(!isSwiped);
+                if (!isSwiped) {
+                    animationHelper.clearAlphaAnimation(true);
+                }
+                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+                showLock(false);
+                counterTime.stop();
+                slideToCancelLayout.stopShimmerAnimation();
+
+                firstX = 0;
+                firstY = 0;
+                lastX = 0;
+                lastY = 0;
+                userBehaviour = UserBehaviour.NONE;
+                recordBtn.setTranslationY(0);
+                recordBtn.setTranslationX(0);
+                isLocked = false;
             }
-            animationHelper.setStartRecorded(false);
-
-            if (!isSwiped) {
-                playSound(RECORD_FINISHED);
-            }
         }
-        //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
-        hideViews(!isSwiped);
-
-        if (!isSwiped) {
-            animationHelper.clearAlphaAnimation(true);
-        }
-        animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-        showLock(false);
-        counterTime.stop();
-        slideToCancelLayout.stopShimmerAnimation();
-        hideLock();
-    }
-
-
-    private void setMarginRight(int marginRight, boolean convertToDp) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) slideToCancelLayout.getLayoutParams();
-        if (convertToDp) {
-            layoutParams.rightMargin = (int) Util.toPixel(marginRight, context);
-        }else {
-            layoutParams.rightMargin = marginRight;
-        }
-        slideToCancelLayout.setLayoutParams(layoutParams);
     }
 
     public void setOnRecordListener(OnRecordListener recrodListener) {
@@ -518,9 +811,7 @@ public class RecordView extends RelativeLayout {
     public void setSmallMicIcon(int icon) {
         smallBlinkingMic.setImageResource(icon);
     }
-    public void setSlideMarginRight(int marginRight) {
-        setMarginRight(marginRight, true);
-    }
+
     public void setCustomSounds(int startSound, int finishedSound, int errorSound) {
         //0 means do not play sound
         RECORD_START = startSound;
