@@ -157,8 +157,6 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
-
-
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
 
@@ -2236,11 +2234,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 float longLatitude = (float)latitude;
 
                 log("Send location [longLatitude]: " + longLatitude + " [longLongitude]: " + longLongitude);
-                MegaChatMessage locationMessage = megaChatApi.sendGeolocation(idChat, longLongitude, longLatitude, encodedSnapshot);
-                if(locationMessage!=null){
-                    AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(locationMessage);
-                    sendMessageToUI(androidMsgSent);
-                }
+                sendLocationMessage(longLongitude, longLatitude, encodedSnapshot);
             }
             else {
                 log("Send location bitmap null");
@@ -2917,6 +2911,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         MegaChatMessage msgSent = megaChatApi.sendMessage(idChat, text);
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
         sendMessageToUI(androidMsgSent);
+    }
+
+    public void sendLocationMessage(float longLongitude, float longLatitude, String encodedSnapshot){
+        log("sendLocationMessage");
+
+        MegaChatMessage locationMessage = megaChatApi.sendGeolocation(idChat, longLongitude, longLatitude, encodedSnapshot);
+        if(locationMessage!=null){
+            AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(locationMessage);
+            sendMessageToUI(androidMsgSent);
+        }
     }
 
     public void hideNewMessagesLayout(){

@@ -183,14 +183,26 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             String text = "";
                             if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
                                 text = meta.getRichPreview().getText();
-                            }else{
+                                if(chatHandles[0]==idChat){
+                                    ((ChatActivityLollipop) context).sendMessage(text);
+                                }
+                                else{
+                                    megaChatApi.sendMessage(chatHandles[0], text);
+                                }
+                            }else if (meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+
+                                String image = meta.getGeolocation().getImage();
+                                float latitude = meta.getGeolocation().getLatitude();
+                                float longitude = meta.getGeolocation().getLongitude();
+
+                                if(chatHandles[0]==idChat){
+                                    ((ChatActivityLollipop) context).sendLocationMessage(longitude, latitude, image);
+                                }
+                                else{
+                                    megaChatApi.sendGeolocation(chatHandles[0], longitude, latitude, image);
+                                }
                             }
-                            if(chatHandles[0]==idChat){
-                                ((ChatActivityLollipop) context).sendMessage(text);
-                            }
-                            else{
-                                megaChatApi.sendMessage(chatHandles[0], text);
-                            }
+
                             checkTotalMessages();
                             break;
                         }

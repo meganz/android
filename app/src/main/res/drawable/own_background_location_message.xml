@@ -15,5 +15,3 @@
         android:bottomRightRadius="12dp">
     </corners>
 </shape>
-
-<!--        android:color="@color/mail_my_account"-->
