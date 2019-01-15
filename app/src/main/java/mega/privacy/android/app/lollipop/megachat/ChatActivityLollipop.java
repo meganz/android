@@ -647,6 +647,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setColorFilter(null);
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        sendIcon.setVisibility(View.GONE);
         record.setRecordView(voiceClipLayout);
 
         textChat.addTextChangedListener(new TextWatcher() {
@@ -804,6 +805,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("voiceClipLayout.setOnRecordListener() -> onStart()");
+                stopAnyReproduction();
                 startRecordVoiceClip();
             }
             @Override
@@ -1833,6 +1835,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             record.setColorFilter(null);
             record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
             record.setVisibility(View.VISIBLE);
+            sendIcon.setVisibility(View.GONE);
             textChat.setVisibility(View.GONE);
             voiceClipLayout.setVisibility(View.VISIBLE);
 
@@ -1858,6 +1861,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setColorFilter(null);
         record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        sendIcon.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.GONE);
         textChat.setVisibility(View.VISIBLE);
 
@@ -1884,6 +1888,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setColorFilter(null);
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        sendIcon.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.GONE);
         textChat.setVisibility(View.VISIBLE);
 
@@ -7868,4 +7873,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentVoiceClip.setLayoutParams(lp);
     }
 
+    public boolean isRecording() {
+        return isRecording;
+    }
+
+    public void stopAnyReproduction(){
+        if(adapter.isPlayingSomething()){
+            adapter.stopReproductions();
+        }
+    }
 }
