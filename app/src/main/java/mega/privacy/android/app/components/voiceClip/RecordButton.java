@@ -42,15 +42,25 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
-            int imageResource = typedArray.getResourceId(R.styleable.RecordButton_mic_icon, -1);
-
-            if (imageResource != -1) {
-                setTheImageResource(imageResource);
-            }
             typedArray.recycle();
         }
-        this.setOnTouchListener(this);
-        this.setOnClickListener(this);
+    }
+
+    public void activateOnClickListener(boolean flag){
+        log("activateOnClickListener -> "+flag);
+        if(flag){
+            this.setOnClickListener(this);
+        }else{
+            this.setOnClickListener(null);
+        }
+    }
+    public void activateOnTouchListener(boolean flag){
+        log("activateOnTouchListener -> "+flag);
+        if(flag){
+            this.setOnTouchListener(this);
+        }else{
+            this.setOnTouchListener(null);
+        }
     }
 
     @Override
@@ -70,15 +80,10 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             setClip((View) v.getParent());
         }
     }
-
-    private void setTheImageResource(int imageResource) {
-        Drawable image = AppCompatResources.getDrawable(getContext(), imageResource);
-        setImageDrawable(image);
-    }
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (isListenForRecord()) {
+            log("onTouch");
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
                     log("onTouch() - ACTION_DOWN");
@@ -121,7 +126,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             onRecordClickListener.onClick(v);
         }
     }
-
 
     public static void log(String message) {
         Util.log("RecordButton",message);
