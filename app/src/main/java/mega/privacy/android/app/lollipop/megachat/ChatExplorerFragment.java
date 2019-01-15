@@ -30,17 +30,21 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContactAdapter;
+import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaUser;
 
-public class ChatExplorerFragment extends Fragment{
+public class ChatExplorerFragment extends Fragment {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -58,6 +62,8 @@ public class ChatExplorerFragment extends Fragment{
     LinearLayoutManager mLayoutManager;
 
     ArrayList<MegaChatListItem> chats;
+    ArrayList<MegaChatListItem> archievedChats;
+    ArrayList<MegaContactAdapter> contacts;
 
     int lastFirstVisiblePosition;
 
@@ -73,6 +79,10 @@ public class ChatExplorerFragment extends Fragment{
     float density;
     DisplayMetrics outMetrics;
     Display display;
+
+    LinearLayout addLayout;
+    Button newGroupButton;
+    RecyclerView addedList;
 
 
     @Override
@@ -115,6 +125,17 @@ public class ChatExplorerFragment extends Fragment{
         density = getResources().getDisplayMetrics().density;
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
+
+        addLayout = (LinearLayout) v.findViewById(R.id.linear_layout_add);
+        addedList = (RecyclerView) v.findViewById(R.id.contact_adds_recycler_view);
+        newGroupButton = (Button) v.findViewById(R.id.new_group_button);
+        if (context instanceof ChatExplorerActivity) {
+            addLayout.setVisibility(View.VISIBLE);
+            newGroupButton.setOnClickListener((ChatExplorerActivity) context);
+        }
+        else {
+            addLayout.setVisibility(View.GONE);
+        }
 
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
 
@@ -192,12 +213,28 @@ public class ChatExplorerFragment extends Fragment{
                 chats.clear();
             }
             else{
-                chats = new ArrayList<MegaChatListItem>();
+                chats = new ArrayList<>();
+            }
+
+            if (archievedChats != null) {
+                archievedChats.clear();
+            }
+            else {
+                archievedChats =  new ArrayList<>();
+            }
+
+            if (contacts != null) {
+                contacts.clear();
+            }
+            else {
+                contacts = new ArrayList<>();
             }
 
             int initState = megaChatApi.getInitState();
             log("Init state is: "+initState);
             chats = megaChatApi.getActiveChatListItems();
+            archievedChats = megaChatApi.getArchivedChatListItems();
+            getVisibleMEGAContacts();
 
             log("chats no: "+chats.size());
 
@@ -233,6 +270,28 @@ public class ChatExplorerFragment extends Fragment{
                 log("adapterList.getItemCount() NOT = 0");
                 listView.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    void getVisibleMEGAContacts () {
+        ArrayList<MegaUser> contactsMEGA = megaApi.getContacts();
+        for (int i=0;i<contactsMEGA.size();i++){
+            log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
+            if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+
+                MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
+                String fullName = "";
+                if(contactDB!=null){
+                    ContactController cC = new ContactController(context);
+                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                }
+                else{
+                    fullName = contactsMEGA.get(i).getEmail();
+                }
+
+                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                contacts.add(megaContactAdapter);
             }
         }
     }

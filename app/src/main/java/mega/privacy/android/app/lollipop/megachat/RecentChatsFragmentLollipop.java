@@ -127,11 +127,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void checkScroll() {
         if (listView != null) {
-            if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+            if (context instanceof ManagerActivityLollipop) {
+                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                }
             }
-            else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+            else if (context instanceof ArchivedChatsActivity) {
+                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                    ((ArchivedChatsActivity) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ArchivedChatsActivity) context).changeActionBarElevation(false);
+                }
             }
         }
     }
@@ -160,9 +170,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (context instanceof ManagerActivityLollipop) {
-                    checkScroll();
-                }
+                checkScroll();
             }
         });
 //        listView.setClipToPadding(false);

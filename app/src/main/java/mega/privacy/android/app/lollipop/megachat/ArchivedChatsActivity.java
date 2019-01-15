@@ -4,12 +4,15 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -38,6 +41,7 @@ import nz.mega.sdk.MegaChatRoom;
 
 public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
+    AppBarLayout abL;
     Toolbar tB;
     ActionBar aB;
     FrameLayout fragmentContainer;
@@ -53,6 +57,8 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     MegaChatApiAndroid megaChatApi;
 
     public long selectedChatItemId;
+
+    DisplayMetrics outMetrics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,28 +97,27 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
         megaChatApi.addChatListener(this);
 
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
         setContentView(R.layout.activity_chat_explorer);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_chat_explorer);
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
         fab.setVisibility(View.GONE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
         //Set toolbar
+        abL = (AppBarLayout) findViewById(R.id.app_bar_layout_chat_explorer);
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if(aB!=null){
-            aB.setTitle(getString(R.string.archived_chats_title_section));
+            aB.setTitle(getString(R.string.archived_chats_title_section).toUpperCase());
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         }
         else{
             log("aB is null");
@@ -129,6 +134,23 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_chat_explorer, archivedChatsFragment, "archivedChatsFragment");
         ft.commitNow();
+    }
+
+    public void changeActionBarElevation(boolean whitElevation){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (whitElevation) {
+                abL.setElevation(Util.px2dp(4, outMetrics));
+            }
+            else {
+                abL.setElevation(0);
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        super.callToSuperBack = true;
     }
 
     @Override
@@ -203,7 +225,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             int numberUnread = megaChatApi.getUnreadChats();
 
             if(numberUnread==0){
-                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
             }
             else{
 
@@ -220,7 +242,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             }
         }
         else{
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
         }
     }
 
