@@ -648,7 +648,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
         record.setRecordView(voiceClipLayout);
-        record.setListenForRecord(true);
 
         textChat.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) { }
@@ -737,7 +736,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
-
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -789,7 +787,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
-
         //ListenForRecord must be false ,otherwise onClick will not be called
         record.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
@@ -799,11 +796,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
-        //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 8
         voiceClipLayout.setCancelBounds(1);
-        //prevent recording under one Second
         voiceClipLayout.setLessThanSecondAllowed(false);
-//        voiceClipLayout.setSlideMarginRight(Util.px2dp(55, outMetrics));
         voiceClipLayout.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
 
         voiceClipLayout.setOnRecordListener(new OnRecordListener() {

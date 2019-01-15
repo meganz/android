@@ -16,11 +16,8 @@ import mega.privacy.android.app.utils.Util;
 
 
 public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
-//    private ScaleAnim scaleAnim;
     private RecordView recordView;
-    private boolean listenForRecord = true;
     private OnRecordClickListener onRecordClickListener;
-
 
     public void setRecordView(RecordView recordView) {
         this.recordView = recordView;
@@ -82,7 +79,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (isListenForRecord()) {
             log("onTouch");
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
@@ -101,19 +97,9 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
                     break;
                 }
             }
-        }
-        return isListenForRecord();
+        return true;
     }
 
-
-    public void setListenForRecord(boolean listenForRecord) {
-        log("setListenForRecord() -> "+listenForRecord);
-        this.listenForRecord = listenForRecord;
-    }
-    public boolean isListenForRecord() {
-        log("isListenForRecord() -> "+listenForRecord);
-        return listenForRecord;
-    }
     public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
         log("setOnRecordClickListener()");
         this.onRecordClickListener = onRecordClickListener;
