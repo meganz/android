@@ -1894,7 +1894,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext,"overquotanotification");
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel("overquotanotification",notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
