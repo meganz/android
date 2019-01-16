@@ -35,6 +35,8 @@ public class EmojiKeyboard extends LinearLayout {
     private OnEmojiClickListener onEmojiClickListener;
     private OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
 
+    boolean isListenerActivated  = true;
+
     private boolean isLetterKeyboardShown = false;
     private boolean isEmojiKeyboardShown = false;
 
@@ -42,7 +44,9 @@ public class EmojiKeyboard extends LinearLayout {
     final OnEmojiLongClickListener longClickListener = new OnEmojiLongClickListener() {
         @Override
         public void onEmojiLongClick(@NonNull final EmojiImageView view, @NonNull final Emoji emoji) {
-            variantPopup.show(view, emoji);
+            if(isListenerActivated){
+                variantPopup.show(view, emoji);
+            }
         }
     };
 
@@ -50,16 +54,19 @@ public class EmojiKeyboard extends LinearLayout {
     final OnEmojiClickListener clickListener = new OnEmojiClickListener() {
         @Override
         public void onEmojiClick(@NonNull final EmojiImageView imageView, @NonNull final Emoji emoji) {
-            editInterface.input(emoji);
-            recentEmoji.addEmoji(emoji);
-            imageView.updateEmoji(emoji);
+            if(isListenerActivated) {
+                editInterface.input(emoji);
+                recentEmoji.addEmoji(emoji);
+                imageView.updateEmoji(emoji);
 
-            if (onEmojiClickListener != null) {
-                onEmojiClickListener.onEmojiClick(imageView, emoji);
+                if (onEmojiClickListener != null) {
+                    onEmojiClickListener.onEmojiClick(imageView, emoji);
+                }
+                variantPopup.dismiss();
             }
-            variantPopup.dismiss();
         }
     };
+
 
     public EmojiKeyboard(Context context) {
         super(context);
@@ -219,6 +226,10 @@ public class EmojiKeyboard extends LinearLayout {
                 view.clearFocus();
             }
         }
+    }
+
+    public void setListenerActivated(boolean listenerActivated) {
+        isListenerActivated = listenerActivated;
     }
 
     public boolean getLetterKeyboardShown() {

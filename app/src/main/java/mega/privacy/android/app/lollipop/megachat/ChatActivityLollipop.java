@@ -344,7 +344,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     String outputFileVoiceNotes;
     private RecordButton record;
     private MediaRecorder myAudioRecorder;
-    boolean isRecording = false;
+
+    //    boolean isRecording = false;
+    boolean recordingNow = false;
     LinearLayout bubbleLayout;
     TextView bubbleText;
 
@@ -589,6 +591,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         handlerKeyboard = new Handler();
         handlerEmojiKeyboard = new Handler();
 
+        textChat.setEnabled(true);
+        emojiKeyboard.setListenerActivated(true);
+
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressText = (TextView) findViewById(R.id.call_in_progress_text);
@@ -821,14 +826,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onCancel() {
                 log("voiceClipLayout.setOnRecordListener() -> onCancel()");
                 record.setEnabled(false);
-                if(isRecording){
+                if(isRecordingNow()){
                     if(myAudioRecorder!=null){
                         log("myAudioRecorder -> CANCEL - isRecording = FALSE");
                         myAudioRecorder.stop();
                         myAudioRecorder.reset();
                         myAudioRecorder = null;
                         outputFileVoiceNotes = null;
-                        isRecording = false;
+                        setRecordingNow(false);
+//                        isRecording = false;
                         voiceClipLayout.showLock(false);
                     }
                 }
@@ -1840,12 +1846,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             voiceClipLayout.setVisibility(View.VISIBLE);
 
             try {
-                if(!isRecording){
+                if(!isRecordingNow()){
                     if(myAudioRecorder!=null){
                         log("myAudioRecorder -> START - isRecording = TRUE");
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
-                        isRecording = true;
+                        setRecordingNow(true);
+//                        isRecording = true;
                     }
                 }
             }catch(IllegalStateException ise){}catch (IOException ioe){}
@@ -1865,14 +1872,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setVisibility(View.GONE);
         textChat.setVisibility(View.VISIBLE);
 
-        if(isRecording){
+        if(isRecordingNow()){
             if(myAudioRecorder!=null){
                 log("myAudioRecorder -> CANCEL - isRecording = FALSE");
 //                myAudioRecorder.stop();
                 myAudioRecorder.reset();
                 myAudioRecorder = null;
                 outputFileVoiceNotes = null;
-                isRecording = false;
+                setRecordingNow(false);
+//                isRecording = false;
                 voiceClipLayout.showLock(false);
             }
         }
@@ -1892,13 +1900,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setVisibility(View.GONE);
         textChat.setVisibility(View.VISIBLE);
 
-        if(isRecording){
+        if(isRecordingNow()){
             if(myAudioRecorder!=null) {
                 log("myAudioRecorder -> STOP - isRecording = FALSE");
                 myAudioRecorder.stop();
                 myAudioRecorder.release();
                 myAudioRecorder = null;
-                isRecording = false;
+                setRecordingNow(false);
+
+//                isRecording = false;
                 uploadVoiceNote(outputFileVoiceNotes);
                 outputFileVoiceNotes = null;
             }
@@ -2735,30 +2745,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.keyboard_twemoji_chat:
             case R.id.rl_keyboard_twemoji_chat:{
-                log("onClick:keyboard_icon_chat:  ");
-                if(fileStorageLayout.isShown()){
-                    hideFileStorageSection();
-                }
-                if(emojiKeyboard!=null){
-                    if(emojiKeyboard.getLetterKeyboardShown()){
-                        emojiKeyboard.hideLetterKeyboard();
-                        handlerKeyboard.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                emojiKeyboard.showEmojiKeyboard();
-                                paramsRecordButton(false);
-                            }
-                        },250);
+                log("*******onClick:keyboard_icon_chat:  ");
+                if(!isRecordingNow()){
+                    if(fileStorageLayout.isShown()){
+                        hideFileStorageSection();
+                    }
+                    if(emojiKeyboard!=null){
+                        if(emojiKeyboard.getLetterKeyboardShown()){
+                            emojiKeyboard.hideLetterKeyboard();
+                            handlerKeyboard.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    emojiKeyboard.showEmojiKeyboard();
+                                    paramsRecordButton(false);
+                                }
+                            },250);
 
-                    }else if(emojiKeyboard.getEmojiKeyboardShown()){
-                        emojiKeyboard.showLetterKeyboard();
-                        paramsRecordButton(true);
-                    }else{
-                        emojiKeyboard.showEmojiKeyboard();
-                        paramsRecordButton(false);
+                        }else if(emojiKeyboard.getEmojiKeyboardShown()){
+                            emojiKeyboard.showLetterKeyboard();
+                            paramsRecordButton(true);
+                        }else{
+                            emojiKeyboard.showEmojiKeyboard();
+                            paramsRecordButton(false);
+                        }
                     }
                 }
-
                 break;
             }
 
@@ -6489,6 +6500,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder = null;
             outputFileVoiceNotes = null;
         }
+        setRecordingNow(false);
 
         if(adapter!=null){
             adapter.destroyVoiceElemnts();
@@ -7873,13 +7885,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentVoiceClip.setLayoutParams(lp);
     }
 
-    public boolean isRecording() {
-        return isRecording;
-    }
-
     public void stopAnyReproduction(){
         if(adapter.isPlayingSomething()){
             adapter.stopReproductions();
+        }
+    }
+
+    public boolean isRecordingNow() {
+        return recordingNow;
+    }
+
+    public void setRecordingNow(boolean recordingNow) {
+        this.recordingNow = recordingNow;
+        log("setRecordingNow: "+recordingNow);
+
+        if(recordingNow){
+            if(textChat!=null){
+                textChat.setEnabled(false);
+            }
+            if(emojiKeyboard!=null){
+                emojiKeyboard.setListenerActivated(false);
+            }
+        }else{
+            if(textChat!=null){
+                textChat.setEnabled(true);
+            }
+            if(emojiKeyboard!=null){
+                emojiKeyboard.setListenerActivated(true);
+            }
         }
     }
 }

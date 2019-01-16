@@ -8810,21 +8810,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         switch (v.getId()) {
-//            case R.id.content_own_message_voice_clip_play_pause:{
-//                if(!(((ChatActivityLollipop)context).isRecording())){
-//                    playOwnRecord(currentPosition, holder);
-//                }
-//                break;
-//            }
-//            case R.id.content_contact_message_voice_clip_play_pause:{
-//                if(!(((ChatActivityLollipop)context).isRecording())){
-//                    playContactRecord(currentPosition, holder);
-//                }
-//                break;
-//            }
             case R.id.content_own_message_voice_clip_play_pause:
             case R.id.content_contact_message_voice_clip_play_pause:{
-                if(!(((ChatActivityLollipop)context).isRecording())){
+                if(!(((ChatActivityLollipop)context).isRecordingNow())){
                     log("onClick() play or pause");
                     playRecord(currentPosition, holder);
                 }
