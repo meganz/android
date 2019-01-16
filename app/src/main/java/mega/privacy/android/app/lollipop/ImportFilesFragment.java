@@ -160,7 +160,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
                 });
             }
             adapter.setImportNameFiles(nameFiles);
-            if (incomingButton.getVisibility() == View.VISIBLE) {
+            if (showMoreLayout.getVisibility() == View.VISIBLE) {
                 itemsVisibles = false;
                 adapter.setItemsVisibility(itemsVisibles);
             }
@@ -176,7 +176,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
 
     public void itemClick(View view, int position) {
         log("itemClick");
-        ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+
         if (view.getId() == R.id.edit_icon_layout) {
             if (adapter != null) {
                 ShareInfo info = (ShareInfo) adapter.getItem(position);

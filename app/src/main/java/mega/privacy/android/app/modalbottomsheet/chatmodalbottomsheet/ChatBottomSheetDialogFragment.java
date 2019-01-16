@@ -171,8 +171,16 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             iconStateChatPanel.setVisibility(View.GONE);
             addAvatarChatPanel(null, chat);
 
-            separatorInfo.setVisibility(View.GONE);
-            optionInfoChat.setVisibility(View.GONE);
+            infoChatText.setText(getString(R.string.group_chat_info_label));
+
+            if(megaApi!=null && megaApi.getRootNode()!=null){
+                optionInfoChat.setVisibility(View.VISIBLE);
+                separatorInfo.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionInfoChat.setVisibility(View.GONE);
+                separatorInfo.setVisibility(View.GONE);
+            }
 
             optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.VISIBLE);
@@ -297,15 +305,21 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     optionMuteChatText.setText(getString(R.string.general_unmute));
                 }
                 else{
-                    log("Chat with notifications enabled!!");
-                    optionMuteChatText.setText(getString(R.string.general_mute));
-                    optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
+                    optionInfoChat.setVisibility(View.GONE);
+                    separatorInfo.setVisibility(View.GONE);
+                    optionClearHistory.setVisibility(View.GONE);
                 }
             }
             else{
-                log("Chat prefs is NULL");
-                optionMuteChatText.setText(getString(R.string.general_mute));
-                optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
+                MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
+                if(chatRoom!=null){
+                    titleMailContactChatPanel.setText(chatRoom.getPeerEmail(0));
+                    addAvatarChatPanel(chatRoom.getPeerEmail(0), chat);
+                }
+
+                optionInfoChat.setVisibility(View.GONE);
+                separatorInfo.setVisibility(View.GONE);
+                optionClearHistory.setVisibility(View.GONE);
             }
 
             if(chat.isArchived()){

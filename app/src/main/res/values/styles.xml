@@ -58,6 +58,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
+        <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
@@ -90,6 +91,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
+        <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
     <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">
@@ -218,13 +220,21 @@
         <item name="android:windowMinWidthMinor">90%</item>
     </style>
 
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="colorControlActivated">@color/accentColor</item>
-        <item name="colorControlNormal">#000000</item>
+    <style name="ColorControlStyle" parent="Theme.Megaactionbar">
+        <item name="android:colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlNormal">@color/text_secondary</item>
     </style>
 
     <style name="ButtonStyle" parent="Widget.AppCompat.Button">
         <item name="android:minHeight">24dp</item>
         <item name="android:minWidth">44dp</item>
+    </style>
+
+    <style name="PreferenceStyle" parent="@style/PreferenceThemeOverlay.v14.Material">
+        <item name="preferenceCategoryStyle">@style/PreferenceCategoryStyle</item>
+    </style>
+
+    <style name="PreferenceCategoryStyle" parent="@style/Preference.Category.Material">
+        <item name="android:layout">@layout/my_category_preference</item>
     </style>
 </resources>

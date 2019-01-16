@@ -153,7 +153,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			log("onActionItemClicked");
 			List<MegaNode> documents = adapter.getSelectedNodes();
-			((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
 
 			switch (item.getItemId()) {
 				case R.id.action_mode_close_button: {

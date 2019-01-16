@@ -129,11 +129,12 @@ public class ChatExplorerFragment extends Fragment{
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (listView.canScrollVertically(-1)){
-                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-                }
-                else {
-                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+                if (context instanceof FileExplorerActivityLollipop) {
+                    if (listView.canScrollVertically(-1)) {
+                        ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+                    } else {
+                        ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+                    }
                 }
             }
         });

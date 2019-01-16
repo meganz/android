@@ -63,7 +63,7 @@ import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsC
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -143,6 +143,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     LinearLayout privateLayout;
     View privateSeparator;
+
+    RelativeLayout sharedFilesLayout;
+    View dividerSharedFilesLayout;
 
     RelativeLayout clearChatLayout;
     View dividerClearLayout;
@@ -314,6 +317,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             //Private chat
             privateLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_private_layout);
             privateSeparator = (View) findViewById(R.id.divider_private_layout);
+
+            //Chat Shared Files Layout
+
+            sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_chat_files_shared_layout);
+            sharedFilesLayout.setOnClickListener(this);
+
+            dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
 
             //Clear chat Layout
             clearChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_clear_layout);
@@ -966,10 +976,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onClick(View view) {
         log("onClick");
 
-        if(megaChatApi.isSignalActivityRequired()){
-            megaChatApi.signalPresenceActivity();
-        }
-
         switch (view.getId()) {
 
             case R.id.chat_group_contact_properties_edit_icon: {
@@ -1027,9 +1033,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
                 break;
             }
-            case R.id.chat_group_contact_properties_private_layout:{
+            case R.id.chat_group_contact_properties_private_layout: {
                 log("Make chat private");
                 showConfirmationPrivateChatDialog();
+                break;
+            }
+            case R.id.chat_group_contact_properties_chat_files_shared_layout:{
+                Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+                if(chat!=null){
+                    nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+                }
+                startActivity(nodeHistoryIntent);
                 break;
             }
         }
@@ -1306,12 +1320,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         cC.inviteContact(email);
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        log("onBackPressed");
-//
-//        super.onBackPressed();
-//    }
+    @Override
+    public void onBackPressed() {
+        super.callToSuperBack = true;
+        super.onBackPressed();
+    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -1871,7 +1884,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);

@@ -65,6 +65,8 @@ public final class ChatAdvancedNotificationBuilder {
     private String notificationChannelNameChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_NAME;
     private String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
     private String notificationChannelNameChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
+    private String notificationChannelIdChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
+    private String notificationChannelNameChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
     private String notificationChannelIdInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelNameInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
     private String notificationChannelIdIncomingCall = Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
@@ -95,7 +97,7 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
 
         ArrayList<MegaChatMessage> unreadMessages = new ArrayList<>();
-        for(int i=0;i<=unreadHandleList.size();i++){
+        for(int i=0;i<unreadHandleList.size();i++){
             MegaChatMessage message = megaChatApi.getMessage(chatId, unreadHandleList.get(i));
             log("Chat: "+chat.getTitle()+" messagID: "+unreadHandleList.get(i));
             if(message!=null){
@@ -208,103 +210,91 @@ public final class ChatAdvancedNotificationBuilder {
 
 //        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
-        int unreadCount = 0;
-
         for(int i=0; i<chats.size(); i++){
-            if(unreadCount<8){
-                if(MegaApplication.getOpenChatId() != chats.get(i).getChatId()){
-                    MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
+            if(MegaApplication.getOpenChatId() != chats.get(i).getChatId()){
+                MegaHandleList handleListUnread = request.getMegaHandleListByChat(chats.get(i).getChatId());
 
-                    for(int j=0;j<=handleListUnread.size();j++){
-                        if(unreadCount<8){
-                            log("Get message id: "+handleListUnread.get(j)+" from chatId: "+chats.get(i).getChatId());
-                            MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
-                            if(message!=null){
+                for(int j=0;j<handleListUnread.size();j++){
+                    log("Get message id: "+handleListUnread.get(j)+" from chatId: "+chats.get(i).getChatId());
+                    MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
+                    if(message!=null){
 
-                                String messageContent = "";
+                        String messageContent = "";
 
-                                if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+                        if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
 
-                                    MegaNodeList nodeList = message.getMegaNodeList();
-                                    if(nodeList != null) {
-                                        if (nodeList.size() == 1) {
-                                            MegaNode node = nodeList.get(0);
-                                            log("Node Name: " + node.getName());
-                                            messageContent = node.getName();
-                                        }
-                                    }
+                            MegaNodeList nodeList = message.getMegaNodeList();
+                            if(nodeList != null) {
+                                if (nodeList.size() == 1) {
+                                    MegaNode node = nodeList.get(0);
+                                    log("Node Name: " + node.getName());
+                                    messageContent = node.getName();
                                 }
-                                else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            }
+                        }
+                        else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
 
-                                    long userCount  = message.getUsersCount();
+                            long userCount  = message.getUsersCount();
 
-                                    if(userCount==1) {
-                                        String name = "";
-                                        name = message.getUserName(0);
-                                        if (name.trim().isEmpty()) {
-                                            name = message.getUserName(0);
-                                        }
-                                        String email = message.getUserName(0);
-                                        log("Contact Name: " + name);
-                                        messageContent = email;
-                                    }
-                                    else{
-                                        StringBuilder name = new StringBuilder("");
-                                        name.append(message.getUserName(0));
-                                        for (int k = 1; k < userCount; k++) {
-                                            name.append(", " + message.getUserName(k));
-                                        }
-                                        messageContent = name.toString();
-                                    }
+                            if(userCount==1) {
+                                String name = "";
+                                name = message.getUserName(0);
+                                if (name.trim().isEmpty()) {
+                                    name = message.getUserName(0);
                                 }
-                                else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                                    log("Type TRUNCATE message");
-                                    messageContent = context.getString(R.string.history_cleared_message);
-                                }
-                                else{
-                                    messageContent = message.getContent();
-                                }
-
-                                CharSequence cs = " ";
-                                String title = chats.get(i).getTitle();
-                                if(chats.get(i).isGroup()){
-                                    long lastMsgSender = message.getUserHandle();
-
-                                    MegaChatRoom chatRoom = megaChatApi.getChatRoom(chats.get(i).getChatId());
-                                    String nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-                                    if(nameAction==null){
-                                        nameAction = "";
-                                    }
-
-                                    if(nameAction.trim().length()<=0){
-                                        ChatController cC = new ChatController(context);
-                                        nameAction = cC.getFirstName(lastMsgSender, chatRoom);
-                                    }
-
-                                    cs = nameAction + " @ " + title + ": " + messageContent;
-                                }
-                                else{
-                                    cs = title +": " + messageContent;
-                                }
-
-                                inboxStyle.addLine(cs);
+                                String email = message.getUserName(0);
+                                log("Contact Name: " + name);
+                                messageContent = email;
                             }
                             else{
-                                log("Message cannot be recovered because unreadCount: "+unreadCount);
-                                break;
+                                StringBuilder name = new StringBuilder("");
+                                name.append(message.getUserName(0));
+                                for (int k = 1; k < userCount; k++) {
+                                    name.append(", " + message.getUserName(k));
+                                }
+                                messageContent = name.toString();
                             }
                         }
-                        else{
-                            break;
+                        else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                            log("Type TRUNCATE message");
+                            messageContent = context.getString(R.string.history_cleared_message);
                         }
+                        else{
+                            messageContent = message.getContent();
+                        }
+
+                        CharSequence cs = " ";
+                        String title = chats.get(i).getTitle();
+                        if(chats.get(i).isGroup()){
+                            long lastMsgSender = message.getUserHandle();
+
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chats.get(i).getChatId());
+                            String nameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+                            if(nameAction==null){
+                                nameAction = "";
+                            }
+
+                            if(nameAction.trim().length()<=0){
+                                ChatController cC = new ChatController(context);
+                                nameAction = cC.getFirstName(lastMsgSender, chatRoom);
+                            }
+
+                            cs = nameAction + " @ " + title + ": " + messageContent;
+                        }
+                        else{
+                            cs = title +": " + messageContent;
+                        }
+
+                        inboxStyle.addLine(cs);
                     }
-                }
-                else{
-                    log("Do not show notification - opened chat");
+                    else{
+                        log("Message NULL cannot be recovered");
+                        break;
+                    }
                 }
             }
             else{
-                break;
+                log("Do not show notification - opened chat");
             }
         }
 
@@ -373,6 +363,8 @@ public final class ChatAdvancedNotificationBuilder {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(true);
+            channel.enableVibration(false);
+            channel.setVibrationPattern(new long[]{ 0 });
             if (notificationManager != null){
                 notificationManager.createNotificationChannel(channel);
             }
@@ -693,7 +685,8 @@ public final class ChatAdvancedNotificationBuilder {
             if (!beep) {
                 NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
                 channel.setShowBadge(true);
-                channel.setVibrationPattern(null);
+                channel.enableVibration(false);
+                channel.setVibrationPattern(new long[]{ 0 });
                 if (notificationManager != null) {
                     notificationManager.createNotificationChannel(channel);
                 }
@@ -711,13 +704,47 @@ public final class ChatAdvancedNotificationBuilder {
 
                 return notificationBuilderO.build();
             } else {
-                NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSummary, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
-                channel.setShowBadge(true);
+                boolean vibrationEnabled = true;
+                ChatSettings chatSettings = dbH.getChatSettings();
+                if (chatSettings != null){
+                    if (chatSettings.getVibrationEnabled()!=null && !chatSettings.getVibrationEnabled().isEmpty()){
+                        if (chatSettings.getVibrationEnabled().compareTo("false") == 0){
+                            vibrationEnabled = false;
+                        }
+                    }
+                }
+
+                NotificationChannel channel = null;
+                if (vibrationEnabled){
+                    channel = new NotificationChannel(notificationChannelIdChatSummary, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
+                    channel.setShowBadge(true);
+                }
+                else{
+                    channel = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate, notificationChannelNameChatSummaryNoVibrate, NotificationManager.IMPORTANCE_HIGH);
+                    channel.setShowBadge(true);
+                    channel.enableVibration(false);
+                    channel.setVibrationPattern(new long[] {0L});
+                }
+
                 if (notificationManager != null) {
+                    if (notificationManager.getNotificationChannel(notificationChannelIdChatSummary) != null){
+                        notificationManager.deleteNotificationChannel(notificationChannelIdChatSummary);
+                    }
+                    if (notificationManager.getNotificationChannel(notificationChannelIdChatSummaryNoVibrate) != null){
+                        notificationManager.deleteNotificationChannel(notificationChannelIdChatSummaryNoVibrate);
+                    }
+
                     notificationManager.createNotificationChannel(channel);
                 }
 
-                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
+                NotificationCompat.Builder notificationBuilderO = null;
+                if (vibrationEnabled){
+                    notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
+                }
+                else{
+                    notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryNoVibrate);
+                }
+
                 notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
 
                 notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify)
@@ -793,6 +820,7 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void removeAllChatNotifications(){
+        log("removeAllChatNotifications");
         notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_CHAT);
         notificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT);
     }
@@ -802,6 +830,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
+            channel.enableVibration(false);
+            channel.setVibrationPattern(new long[]{ 0 });
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -902,7 +932,6 @@ public final class ChatAdvancedNotificationBuilder {
                 NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
                 notificationBuilderO
                         .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentTitle(chatToAnswer.getPeerFullname(0))
                         .setContentText(context.getString(R.string.notification_subtitle_incoming))
                         .setAutoCancel(false)
                         .setVibrate(pattern)
@@ -911,6 +940,13 @@ public final class ChatAdvancedNotificationBuilder {
                         .setColor(ContextCompat.getColor(context, R.color.mega))
                         .setPriority(NotificationManager.IMPORTANCE_HIGH)
                         .setFullScreenIntent(pendingIntentAnswer, true);
+
+                if(chatToAnswer.isGroup()){
+                    notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
+                }
+                else{
+                    notificationBuilderO.setContentTitle(chatToAnswer.getPeerFullname(0));
+                }
 
                 Bitmap largeIcon = setUserAvatar(chatToAnswer);
                 if (largeIcon != null) {
@@ -924,12 +960,18 @@ public final class ChatAdvancedNotificationBuilder {
                 //No sound just vibration
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentTitle(chatToAnswer.getPeerFullname(0))
                         .setContentText(context.getString(R.string.notification_subtitle_incoming))
                         .setAutoCancel(false)
                         .setVibrate(pattern)
                         .addAction(actionIgnore)
                         .addAction(actionAnswer);
+
+                if(chatToAnswer.isGroup()){
+                    notificationBuilder.setContentTitle(chatToAnswer.getTitle());
+                }
+                else{
+                    notificationBuilder.setContentTitle(chatToAnswer.getPeerFullname(0));
+                }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
@@ -979,7 +1021,7 @@ public final class ChatAdvancedNotificationBuilder {
                     MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
                     if(call!=null){
                         log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
-                        if((call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS) && (call.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING)){
+                        if((call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS) && (call.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION)){
                             callInProgress = call;
                             log("FOUND Call in progress: "+callInProgress.getChatid());
                             break;
@@ -992,7 +1034,7 @@ public final class ChatAdvancedNotificationBuilder {
                     log("openCallId: "+openCallChatId);
                     if(openCallChatId!=-1){
                         MegaChatCall possibleCall = megaChatApi.getChatCall(openCallChatId);
-                        if(possibleCall.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING){
+                        if(possibleCall.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION){
                             callInProgress = possibleCall;
                             log("FOUND Call activity shown: "+callInProgress.getChatid());
                         }
@@ -1155,7 +1197,11 @@ public final class ChatAdvancedNotificationBuilder {
     public void generateChatNotification(MegaChatRequest request){
         log("generateChatNotification");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            log("generateChatNotification:POST Android O");
+            newGenerateChatNotification(request);
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             String manufacturer = "xiaomi";
             if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
@@ -1204,11 +1250,13 @@ public final class ChatAdvancedNotificationBuilder {
                 if (!(chats.isEmpty())) {
                     lastChatId = chats.get(0).getChatId();
                 } else {
-                    log("ERROR:chatsEMPTY:return");
+                    log("ERROR:chatsEMPTY:removeAllChatNotifications");
+                    removeAllChatNotifications();
                     return;
                 }
             } else {
-                log("ERROR:chatsNULL:return");
+                log("ERROR:chatsNULL:removeAllChatNotifications");
+                removeAllChatNotifications();
                 return;
             }
 
@@ -1338,6 +1386,7 @@ public final class ChatAdvancedNotificationBuilder {
         log("should beep: "+beep);
 
         MegaHandleList chatHandleList = request.getMegaHandleList();
+        log("size chatHandleList: "+chatHandleList.size());
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
         for(int i=0; i<chatHandleList.size(); i++){
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
@@ -1356,13 +1405,14 @@ public final class ChatAdvancedNotificationBuilder {
             }
         });
 
-        log("generateChatNotification for: "+chats.size()+" chats");
+        log("generateChatNotificationPreN for: "+chats.size()+" chats");
         long lastChatId = -1;
         if(chats!=null && (!(chats.isEmpty()))){
             lastChatId = chats.get(0).getChatId();
+            showChatNotificationPreN(request, beep, lastChatId);
+        }else{
+            removeAllChatNotifications();
         }
-
-        showChatNotificationPreN(request, beep, lastChatId);
     }
 
     public void showChatNotificationPreN(MegaChatRequest request, boolean beep, long lastChatId){

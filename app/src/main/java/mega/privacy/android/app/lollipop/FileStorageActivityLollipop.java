@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -63,7 +64,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -177,7 +177,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -294,7 +294,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		newFolderMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_b_new_folder, R.color.white));
+		newFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 		
 		if (mode == Mode.PICK_FOLDER) {
 			boolean writable = path.canWrite();
@@ -345,6 +345,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+		}
+
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
@@ -522,7 +529,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		path.mkdirs();
 		changeFolder(path);
 		log("Path to show: "+path);
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
 	@Override
@@ -712,7 +718,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onClick(View v) {		
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
@@ -845,7 +850,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	public void itemClick(int position) {
 		log("itemClick: position: "+position);
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		FileDocument document = adapter.getDocumentAt(position);
 		if(document == null)
@@ -931,11 +935,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.callToSuperBack = false;
+		super.onBackPressed();
 
 		// Finish activity if at the root
 		if (path.equals(root)) {
-			log("Root: "+root);
+			super.callToSuperBack = true;
 			super.onBackPressed();
 		// Go one level higher otherwise
 		} else {

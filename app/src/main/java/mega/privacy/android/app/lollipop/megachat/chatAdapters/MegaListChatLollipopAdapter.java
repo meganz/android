@@ -40,9 +40,9 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -54,7 +54,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -63,6 +63,8 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
+
+import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -132,8 +134,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		RoundedImageView imageView;
 		TextView contactInitialLetter;
-		TextView textViewContactName;
-		EmojiconTextView textViewContent;
+		EmojiTextView textViewContactName;
+		EmojiTextView textViewContent;
 		TextView textViewDate;
 		String textFastScroller = "";
 		ImageButton imageButtonThreeDots;
@@ -486,7 +488,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 			((ViewHolderNormalChatList)holder).contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
-			((ViewHolderNormalChatList)holder).textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
+			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+			}else{
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+			}
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
@@ -496,7 +503,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
 			}
 
-			((ViewHolderNormalChatList)holder).textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
+			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+			}else{
+				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
+			}
+
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
 				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
@@ -732,12 +745,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void setMultipleSelect(boolean multipleSelect) {
 		log("setMultipleSelect");
+		if (!this.multipleSelect && multipleSelect) {
+			selectedItems = new SparseBooleanArray();
+		}
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
-		}
-		if(this.multipleSelect)
-		{
-			selectedItems = new SparseBooleanArray();
 		}
 	}
 
@@ -825,6 +837,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 			});
 			view.imageView.startAnimation(flipAnimation);
+		}
+		else {
+			if (selectedItems.size() <= 0){
+				if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
+					((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+				}
+			}
 		}
 	}
 
@@ -1094,7 +1113,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(title!=null){
 				log("ChatRoom title: "+title);
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
@@ -1138,8 +1157,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				log("ChatRoom title: "+chat.getTitle());
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
-				String dateFS = TimeChatUtils.formatDate(chat.getLastTimestamp(), TimeChatUtils.DATE_SHORT_SHORT_FORMAT);
+				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+				String dateFS = TimeUtils.formatDate(chat.getLastTimestamp(), TimeUtils.DATE_SHORT_SHORT_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
 				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;
@@ -1288,7 +1307,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							myFullName = megaChatApi.getMyEmail();
 						}
 
-						textToShow = String.format(context.getString(R.string.message_add_participant), myFullName, fullNameAction);
+						textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(myFullName), toCDATA(fullNameAction));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1310,7 +1329,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), myFullName);
+							textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(myFullName));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1327,7 +1346,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_remove_participant), myFullName, fullNameAction);
+							textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(myFullName), toCDATA(fullNameAction));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1388,7 +1407,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_add_participant), fullNameTitle, myFullName);
+							textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(myFullName));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1432,7 +1451,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								}
 							}
 
-							textToShow = String.format(context.getString(R.string.message_add_participant), fullNameTitle, fullNameAction);
+							textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1455,7 +1474,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameTitle, myFullName);
+							textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(fullNameTitle), toCDATA(myFullName));
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1471,7 +1490,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(chat.getLastMessageSender()==chat.getLastMessageHandle()){
 								log("The participant left the chat");
 
-								textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), fullNameTitle);
+								textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(fullNameTitle));
 								try{
 									textToShow = textToShow.replace("[A]", "");
 									textToShow = textToShow.replace("[/A]", "");
@@ -1512,7 +1531,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 									}
 								}
 
-								textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameTitle, fullNameAction);
+								textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
 								try{
 									textToShow = textToShow.replace("[A]", "");
 									textToShow = textToShow.replace("[/A]", "");
@@ -1573,7 +1592,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(myFullName.trim().length()<=0){
 							myFullName = megaChatApi.getMyEmail();
 						}
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), myFullName, privilegeString, myFullName);
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(myFullName), toCDATA(privilegeString), toCDATA(myFullName));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1628,7 +1647,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							myFullName = megaChatApi.getMyEmail();
 						}
 
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), myFullName, privilegeString, fullNameAction);
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(myFullName), toCDATA(privilegeString), toCDATA(fullNameAction));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1682,7 +1701,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						if(myFullName.trim().length()<=0){
 							myFullName = megaChatApi.getMyEmail();
 						}
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), fullNameTitle, privilegeString, myFullName);
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(myFullName));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1729,7 +1748,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 						}
 
-						textToShow = String.format(context.getString(R.string.message_permissions_changed), fullNameTitle, privilegeString, fullNameAction);
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1760,9 +1779,51 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else if(messageType==MegaChatMessage.TYPE_TRUNCATE){
 				log("Message type TRUNCATE");
 
-				String fullNameAction = getFullNameAction(chat);
+				String textToShow = null;
+				if(chat.getLastMessageSender() == megaChatApi.getMyUserHandle()){
+					String myFullName = megaChatApi.getMyFullname();
+					if(myFullName==null){
+						myFullName = "";
+					}
+					if(myFullName.trim().length()<=0){
+						myFullName = megaChatApi.getMyEmail();
+					}
+					textToShow = String.format(context.getString(R.string.history_cleared_by),toCDATA(myFullName));
+				}
+				else{
+					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
-				String textToShow = String.format(context.getString(R.string.history_cleared_by), fullNameAction);
+					String fullNameAction = chatRoom.getPeerFullnameByHandle(chat.getLastMessageSender());
+					if(fullNameAction==null){
+						fullNameAction = "";
+					}
+
+					if(fullNameAction.trim().length()<=0){
+						fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+					}
+
+					if(fullNameAction.trim().length()<=0){
+
+//					megaChatApi.getUserFirstname();
+						if(fullNameAction.isEmpty()){
+							if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+								log("3-Call for nonContactName: "+ chat.getLastMessageSender());
+								fullNameAction = "Unknown name";
+								((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+								((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+								ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender());
+								megaChatApi.getUserFirstname(chat.getLastMessageSender(), listener);
+								megaChatApi.getUserLastname(chat.getLastMessageSender(), listener);
+								megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+							}
+							else{
+								log("4-Name already asked and no name received: "+ chat.getLastMessageSender());
+							}
+						}
+					}
+
+					textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(fullNameAction));
+				}
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1782,7 +1843,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-
 			}
 			else if(messageType==MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE) {
 				log("Message type TYPE_PUBLIC_HANDLE_CREATE");
@@ -1852,7 +1912,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				Spanned result = null;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
+				}
+				else {
 					result = Html.fromHtml(textToShow);
 				}
 
@@ -1887,6 +1948,18 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+
+			}else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
+				String textToShow = context.getResources().getString(R.string.call_started_messages);
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
 			else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
 				String messageContent = chat.getLastMessage();
@@ -1909,32 +1982,41 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					switch(termCode){
 						case MegaChatMessage.END_CALL_REASON_ENDED:{
 
+							int hours = duration / 3600;
 							int minutes = (duration % 3600) / 60;
 							int seconds = duration % 60;
 
-							if(minutes == 0){
-								textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
-							}
-							else{
-								if(seconds == 0){
-									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
-								}
-								else if (seconds == 1){
-									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
-								}
-								else{
-									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
-								}
-							}
+							textToShow = context.getString(R.string.call_ended_message);
 
-							try {
+                            if(hours != 0){
+                                String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
+                                textToShow = textToShow + textHours;
+                                if((minutes != 0)||(seconds != 0)){
+                                    textToShow = textToShow+", ";
+                                }
+                            }
+
+                            if(minutes != 0){
+                                String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
+                                textToShow = textToShow + textMinutes;
+                                if(seconds != 0){
+                                    textToShow = textToShow+", ";
+                                }
+                            }
+
+                            if(seconds != 0){
+                                String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
+                                textToShow = textToShow + textSeconds;
+                            }
+
+							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
 								textToShow = textToShow.replace("[B]", "");
 								textToShow = textToShow.replace("[/B]", "");
 								textToShow = textToShow.replace("[C]", "");
 								textToShow = textToShow.replace("[/C]", "");
-							} catch (Exception e) {
+							}catch (Exception e){
 							}
 
 							break;
@@ -2111,7 +2193,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
-
 				}
 			}
 		}
@@ -2167,16 +2248,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		return fullNameAction;
 	}
 	
-	public void setChats (ArrayList<MegaChatListItem> chats){
-		log("SETCONTACTS!!!!");
-		this.chats = chats;
-		if(chats!=null)
-		{
-			log("num requests: "+chats.size());
-		}
+	public void setChats (ArrayList<MegaChatListItem> updatedChats){
+		log("setChats: "+ updatedChats.size());
+		this.chats = updatedChats;
 
 		positionClicked = -1;
-//		listFragment.invalidate();
+
+		if(listFragment!=null){
+            listFragment.invalidate();
+        }
+
 		notifyDataSetChanged();
 	}
 	

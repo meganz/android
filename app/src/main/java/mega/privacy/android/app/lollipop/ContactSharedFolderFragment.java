@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -24,10 +23,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
@@ -39,7 +37,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     
     RecyclerView listView;
     Button moreButton;
-    MegaBrowserLollipopAdapter adapter;
+    MegaNodeAdapter adapter;
     Stack<Long> parentHandleStack = new Stack<Long>();
     final int MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5;
     private ActionMode actionMode;
@@ -80,7 +78,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             listView.setItemAnimator(new DefaultItemAnimator());
             
             if (adapter == null) {
-                adapter = new MegaBrowserLollipopAdapter(context,this,contactNodes,-1,listView,aB,Constants.CONTACT_SHARED_FOLDER_ADAPTER,MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+                adapter = new MegaNodeAdapter(context,this,contactNodes,-1,listView,aB,Constants.CONTACT_SHARED_FOLDER_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
                 
             } else {
                 adapter.setNodes(contactNodes);
@@ -178,7 +176,6 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     }
     
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
-        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
         
         if (adapter.isMultipleSelect()) {
             log("multiselect ON");

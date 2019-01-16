@@ -232,6 +232,50 @@ public class Util {
 		}
 	}
 
+	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
+		if(activity == null){
+			return;
+		}
+
+		try{
+			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+			dialogBuilder.setPositiveButton(
+					activity.getString(android.R.string.ok),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							if (finish) {
+								if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+									activity.finishAndRemoveTask();
+								}else{
+									activity.finish();
+								}
+							}
+						}
+					});
+			dialogBuilder.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					if (finish) {
+						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							activity.finishAndRemoveTask();
+						}else{
+							activity.finish();
+						}
+					}
+				}
+			});
+
+
+			AlertDialog dialog = dialogBuilder.create();
+			dialog.show();
+			brandAlertDialog(dialog);
+		}catch(Exception ex){
+			Util.showToast(activity, message);
+		}
+	}
+
 	/*
 	 * Build error dialog
 	 * @param message Message to display
@@ -322,6 +366,21 @@ public class Util {
 
 		return count;
 	}
+
+    public static String toCDATA(String src) {
+        if (src != null) {
+            //solution from web client
+            src = src.replaceAll("&","&amp;")
+                    .replaceAll("\"","&quot;")
+                    .replaceAll("'","&#39;")
+                    .replaceAll("<","&lt;")
+                    .replaceAll(">","&gt;");
+            //another solution
+//            src = src.replaceAll("]]>", "] ]>");
+//            src = "<![CDATA[" + src + "]]>";
+        }
+        return src;
+    }
 	
 	public static long getFreeExternalMemorySize() {
 		log("getFreeExternalMemorySize");
@@ -1854,13 +1913,6 @@ public class Util {
 		return cal;
 	}
 
-	public static Calendar calculateDateFromTimestamp2 (long timestamp){
-		log("calculateTimestamp: "+timestamp);
-		Calendar cal = Calendar.getInstance();
-		log("calendar: "+cal.get(Calendar.YEAR)+ " "+cal.get(Calendar.MONTH));
-		return cal;
-	}
-
 	public static boolean isChatEnabled (){
 		log("isChatEnabled");
 		if (dbH == null){
@@ -2136,6 +2188,24 @@ public class Util {
         }
         return Util.downloadDIR;
     }
+
+    public static boolean askMe (Context context) {
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		MegaPreferences prefs = dbH.getPreferences();
+
+		if (prefs != null){
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
 
 	private static void log(String message) {
 		log("Util", message);
