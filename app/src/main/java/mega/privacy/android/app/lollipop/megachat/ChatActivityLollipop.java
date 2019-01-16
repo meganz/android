@@ -2707,7 +2707,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.keyboard_twemoji_chat:
             case R.id.rl_keyboard_twemoji_chat:{
-                log("*******onClick:keyboard_icon_chat:  ");
+                log("onClick:keyboard_icon_chat:  ");
                 if(!isRecordingNow()){
                     if(fileStorageLayout.isShown()){
                         hideFileStorageSection();
@@ -2738,30 +2738,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.media_icon_chat:
             case R.id.rl_media_icon_chat:{
                 log("onClick:media_icon_chat");
-                if(fileStorageLayout.isShown()){
-                    hideFileStorageSection();
-                }
-                if(emojiKeyboard!=null){
-                    emojiKeyboard.hideBothKeyboard(this);
-                    paramsRecordButton(true);
-                }
-                boolean inProgressCall = false;
+                if(!isRecordingNow()){
+                    if(fileStorageLayout.isShown()){
+                        hideFileStorageSection();
+                    }
+                    if(emojiKeyboard!=null){
+                        emojiKeyboard.hideBothKeyboard(this);
+                        paramsRecordButton(true);
+                    }
+                    boolean inProgressCall = false;
 
-                MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
-                if(callInProgress != null){
-                    if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                        inProgressCall = true;
+                    MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                    if(callInProgress != null){
+                        if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                            inProgressCall = true;
+                        }else{
+                            inProgressCall = false;
+                        }
                     }else{
                         inProgressCall = false;
                     }
-                }else{
-                    inProgressCall = false;
-                }
 
-                if(!inProgressCall){
-                    openCameraApp();
-                }else{
-                    showConfirmationOpenCamera(chatRoom);
+                    if(!inProgressCall){
+                        openCameraApp();
+                    }else{
+                        showConfirmationOpenCamera(chatRoom);
+                    }
                 }
                 break;
             }
@@ -2838,14 +2840,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_attach_chat:
             case R.id.rl_attach_icon_chat: {
                 log("Show attach bottom sheet");
-                if(fileStorageLayout.isShown()){
-                    hideFileStorageSection();
+                if(!isRecordingNow()) {
+                    if (fileStorageLayout.isShown()) {
+                        hideFileStorageSection();
+                    }
+                    if (emojiKeyboard != null) {
+                        emojiKeyboard.hideBothKeyboard(this);
+                        paramsRecordButton(true);
+                    }
+                    showSendAttachmentBottomSheet();
                 }
-                if(emojiKeyboard!=null){
-                    emojiKeyboard.hideBothKeyboard(this);
-                    paramsRecordButton(true);
-                }
-                showSendAttachmentBottomSheet();
                 break;
             }
 		}
