@@ -15,7 +15,6 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -163,13 +162,13 @@
 
                     <LinearLayout
                         android:id="@+id/linear_layout_options"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="48dp"
                         android:orientation="horizontal"
                         android:background="@color/white">
                         <RelativeLayout
                             android:id="@+id/rl_keyboard_twemoji_chat"
-                            android:layout_width="wrap_content"
+                            android:layout_width="56dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1">
                             <ImageButton
@@ -183,7 +182,7 @@
                         </RelativeLayout>
                         <RelativeLayout
                             android:id="@+id/rl_media_icon_chat"
-                            android:layout_width="wrap_content"
+                            android:layout_width="56dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1">
                             <ImageButton
@@ -197,50 +196,8 @@
 
                         </RelativeLayout>
                         <RelativeLayout
-                            android:id="@+id/rl_send_contact_icon_chat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-                            <ImageButton
-                                android:id="@+id/send_contact_icon_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@null"
-                                android:tint="@color/transparent_black"
-                                android:src="@drawable/ic_send_contact"
-                                android:layout_centerInParent="true"/>
-                        </RelativeLayout>
-                        <RelativeLayout
-                            android:id="@+id/rl_pick_file_system_icon_chat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-                            <ImageButton
-                                android:id="@+id/pick_file_system_icon_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@null"
-                                android:tint="@color/transparent_black"
-                                android:src="@drawable/ic_pick_file_system"
-                                android:layout_centerInParent="true"/>
-                        </RelativeLayout>
-                        <RelativeLayout
-                            android:id="@+id/rl_pick_cloud_drive_icon_chat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1">
-                            <ImageButton
-                                android:id="@+id/pick_cloud_drive_icon_chat"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@null"
-                                android:tint="@color/transparent_black"
-                                android:src="@drawable/ic_pick_cloud_drive"
-                                android:layout_centerInParent="true"/>
-                        </RelativeLayout>
-                        <RelativeLayout
                             android:id="@+id/rl_pick_file_storage_icon_chat"
-                            android:layout_width="wrap_content"
+                            android:layout_width="56dp"
                             android:layout_weight="1"
                             android:layout_height="match_parent">
                             <ImageButton
@@ -253,18 +210,18 @@
                         </RelativeLayout>
 
                         <RelativeLayout
-                            android:id="@+id/rl_pick_location_icon_chat"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/rl_attach_icon_chat"
+                            android:layout_width="56dp"
                             android:layout_weight="1"
                             android:layout_height="match_parent">
 
                             <ImageButton
-                                android:id="@+id/pick_location_icon_chat"
+                                android:id="@+id/pick_attach_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:background="@null"
                                 android:alpha="0.56"
-                                android:src="@drawable/ic_send_location"
+                                android:src="@drawable/attach_file"
                                 android:layout_centerInParent="true"/>
                         </RelativeLayout>
                     </LinearLayout>
