@@ -55,6 +55,7 @@ public class RecordView extends RelativeLayout {
     private ImageView arrow;
     private float initialX,initialY, basketInitialY, difX = 0;
     private float basketInitialX = 0;
+    private float heightButtom = 0;
 
     private float cancelBounds = DEFAULT_CANCEL_BOUNDS;
     private long startTime, elapsedTime = 0;
@@ -184,7 +185,7 @@ public class RecordView extends RelativeLayout {
             if(layoutLock.getVisibility() == View.GONE){
                 layoutLock.setVisibility(View.VISIBLE);
                 int prevHeight  = layoutLock.getHeight();
-                ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, Util.px2dp(150, outMetrics));
+                ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, Util.px2dp(125, outMetrics));
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
@@ -203,6 +204,8 @@ public class RecordView extends RelativeLayout {
                             imageArrow.startAnimation(animJumpFast);
                             imageLock.startAnimation(animJump);
                         }
+                        lockOffset = layoutLock.getHeight() - heightButtom;
+                        log("lockOffset: "+lockOffset);
                     }
                 });
                 valueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -309,6 +312,7 @@ public class RecordView extends RelativeLayout {
         slideToCancelLayout.startShimmerAnimation();
         initialX = recordBtn.getX();
         initialY = recordBtn.getY();
+        heightButtom = recordBtn.getHeight();
 
         if (firstX == 0) {
             firstX = motionEvent.getRawX();
@@ -318,7 +322,7 @@ public class RecordView extends RelativeLayout {
             firstY = motionEvent.getRawY();
         }
 
-        lockOffset = (float) (recordBtn.getX() / 2.5);
+//        lockOffset = (float) (recordBtn.getX() / 5);
         isLocked = false;
 
         playSound(RECORD_START);
@@ -380,6 +384,7 @@ public class RecordView extends RelativeLayout {
                         animationHelper.setStartRecorded(false);
                         userBehaviour = UserBehaviour.CANCELING;
                         if (recordListener != null) {
+                            log("onActionMove() -> onCancel()");
                             recordListener.onCancel();
                         }
 
@@ -451,36 +456,45 @@ public class RecordView extends RelativeLayout {
             }
             userBehaviour = UserBehaviour.NONE;
             animationHelper.setStartRecorded(false);
+            firstX = 0;
+            firstY = 0;
+            lastX = 0;
+            lastY = 0;
+            recordBtn.setTranslationY(0);
+            recordBtn.setTranslationX(0);
             playSound(RECORD_ERROR);
 
         }else{
             log("onActionUp() - more than a second");
             if(userBehaviour == UserBehaviour.LOCKING){
                 log("onActionUp() - LOCKING()");
-                showLock(false);
-                firstX = 0;
-                firstY = 0;
-                lastX = 0;
-                lastY = 0;
-                userBehaviour = UserBehaviour.NONE;
-                recordBtn.setTranslationY(0);
-                recordBtn.setTranslationX(0);
-                isLocked = false;
+//                showLock(false);
+//                firstX = 0;
+//                firstY = 0;
+//                lastX = 0;
+//                lastY = 0;
+//                userBehaviour = UserBehaviour.NONE;
+//                recordBtn.setTranslationY(0);
+//                recordBtn.setTranslationX(0);
+//                isLocked = false;
 
             }else if(userBehaviour == UserBehaviour.CANCELING){
                 log("onActionUp() - CANCELING()");
+
                 animationHelper.setStartRecorded(false);
                 animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
                 showLock(false);
                 counterTime.stop();
                 slideToCancelLayout.stopShimmerAnimation();
-
+                recordBtn.setTranslationY(0);
+                recordBtn.setTranslationX(0);
                 firstX = 0;
                 firstY = 0;
                 lastX = 0;
                 lastY = 0;
                 userBehaviour = UserBehaviour.NONE;
                 isLocked = false;
+
             }else{
                 log("onActionUp() - NONE");
                 if (recordListener != null && !isSwiped) {

@@ -1868,7 +1868,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(isRecording){
             if(myAudioRecorder!=null){
                 log("myAudioRecorder -> CANCEL - isRecording = FALSE");
-                myAudioRecorder.stop();
+//                myAudioRecorder.stop();
                 myAudioRecorder.reset();
                 myAudioRecorder = null;
                 outputFileVoiceNotes = null;
