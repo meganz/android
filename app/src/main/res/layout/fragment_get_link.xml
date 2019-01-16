@@ -109,7 +109,8 @@
                     android:checked="false"
                     android:layout_toRightOf="@id/link_without_key_image"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16dp"/>
+                    android:textSize="16dp"
+                    android:theme="@style/ColorControlStyle"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -140,7 +141,8 @@
                     android:layout_toRightOf="@id/link_decryption_key_image"
                     android:layout_marginRight="16dp"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16dp"/>
+                    android:textSize="16dp"
+                    android:theme="@style/ColorControlStyle"/>
 
             </RelativeLayout>
 
@@ -172,7 +174,8 @@
                     android:layout_marginRight="16dp"
                     android:checked="true"
                     android:textColor="@color/name_my_account"
-                    android:textSize="16dp"/>
+                    android:textSize="16dp"
+                    android:theme="@style/ColorControlStyle"/>
 
             </RelativeLayout>
 

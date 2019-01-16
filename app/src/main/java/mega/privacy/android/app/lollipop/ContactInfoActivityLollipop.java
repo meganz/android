@@ -1,11 +1,13 @@
 package mega.privacy.android.app.lollipop;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -14,12 +16,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -62,6 +66,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -71,10 +76,12 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeChatUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -149,6 +156,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ChatItemPreferences chatPrefs = null;
 	boolean generalChatNotifications = true;
 
+	boolean startVideo = false;
+
 	RelativeLayout sharedFoldersLayout;
 	ImageView sharedFoldersIcon;
 	TextView sharedFoldersText;
@@ -158,11 +167,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout shareContactLayout;
 	View dividerShareContactLayout;
 
+	RelativeLayout sharedFilesLayout;
+	View dividerSharedFilesLayout;
+
 	//Toolbar elements
 	ImageView contactStateIcon;
 	TextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
-	TextView secondLineTextToolbar;
+	MarqueeTextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
 
 	RelativeLayout clearChatLayout;
@@ -279,7 +291,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
-			secondLineTextToolbar = (TextView) findViewById(R.id.second_line_toolbar);
+			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
@@ -381,6 +393,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
+			//Chat Shared Files Layout
+
+			sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_files_shared_layout);
+			sharedFilesLayout.setOnClickListener(this);
+
+			dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
+
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
@@ -473,6 +492,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						if(chatHandle==-1){
 							notificationsLayout.setVisibility(View.GONE);
 							dividerNotificationsLayout.setVisibility(View.GONE);
+
+							sharedFilesLayout.setVisibility(View.GONE);
+							dividerSharedFilesLayout.setVisibility(View.GONE);
 						}
 						else{
 							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -481,6 +503,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					else{
 						notificationsLayout.setVisibility(View.GONE);
 						dividerNotificationsLayout.setVisibility(View.GONE);
+
+						sharedFilesLayout.setVisibility(View.GONE);
+						dividerSharedFilesLayout.setVisibility(View.GONE);
 					}
 
 					if (megaChatApi == null){
@@ -581,8 +606,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 			if(Util.isChatEnabled()){
 
 				chatSettings = dbH.getChatSettings();
@@ -616,6 +639,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				notificationsLayout.setVisibility(View.GONE);
 				dividerNotificationsLayout.setVisibility(View.GONE);
+
+				sharedFilesLayout.setVisibility(View.GONE);
+				dividerSharedFilesLayout.setVisibility(View.GONE);
 			}
 
 		} else {
@@ -742,8 +768,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
@@ -815,13 +839,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if(chatRoomTo!=null){
-			if(startVideo){
-				log("Start video call");
-				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+
+			if(megaChatApi.getChatCall(chatRoomTo.getChatId())!=null){
+				Intent i = new Intent(this, ChatCallActivity.class);
+				i.putExtra("chatHandle", chatRoomTo.getChatId());
+				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(i);
 			}
 			else{
-				log("Start audio call");
-				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+				if(startVideo){
+					log("Start video call");
+					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+				}
+				else{
+					log("Start audio call");
+					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+				}
 			}
 		}
 		else{
@@ -843,6 +876,54 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			megaChatApi.createChat(false, peers, listener);
 		}
 	}
+
+	public boolean checkPermissionsCall(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			if (!hasCameraPermission) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+				return false;
+			}
+
+			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+			if (!hasRecordAudioPermission) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+				return false;
+			}
+
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		switch (requestCode) {
+			case Constants.REQUEST_CAMERA: {
+				log("REQUEST_CAMERA");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
+				}
+				break;
+			}
+			case Constants.RECORD_AUDIO: {
+				log("RECORD_AUDIO");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
+				}
+				break;
+			}
+
+		}
+	}
+
 
 	public void openChat(long chatId, String text){
 		log("openChat: "+chatId);
@@ -1112,7 +1193,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		switch (v.getId()) {
 			case R.id.chat_contact_properties_clear_layout: {
@@ -1148,12 +1228,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
-				startCall(false);
+				startVideo = false;
+				if(checkPermissionsCall()){
+					startCall(false);
+				}
+
+//				startCall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
-				startCall(true);
+				startVideo = true;
+				if(checkPermissionsCall()){
+					startCall(true);
+				}
+//				startCall(true);
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -1206,6 +1295,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 				break;
 			}
+			case R.id.chat_contact_properties_chat_files_shared_layout:{
+				Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+				if(chat!=null){
+					nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+				}
+				startActivity(nodeHistoryIntent);
+				break;
+			}
 		}
 	}
 
@@ -1227,7 +1324,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 
 			if (parent.isFolder()){
-				android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(this);
+				android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -1721,15 +1818,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		log("onResume-ContactChatInfoActivityLollipop");
 		super.onResume();
 
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
 		if(Util.isChatEnabled()){
 			setContactPresenceStatus();
 		} else{
 			contactStateIcon.setVisibility(View.GONE);
 		}
 
-		requestLastGreen(-1);
+		if(Util.isChatEnabled()){
+			requestLastGreen(-1);
+		}
 	}
 
 	@Override
@@ -1786,6 +1883,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	public void onBackPressed() {
+		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
@@ -2461,11 +2559,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int state = megaChatApi.getUserOnlineStatus(user.getHandle());
 
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+				String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
+				secondLineTextToolbar.isMarqueeIsNecessary(this);
+//				secondLineTextToolbar.setText("formattedDate formattedDate formattedDate formattedDate formattedDate");
 				secondLineLengthToolbar.setText(formattedDate);
 
 				log("Date last green: "+formattedDate);

@@ -3,14 +3,7 @@ package mega.privacy.android.app.lollipop.megaachievements;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -28,29 +21,17 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaStringList;
-import nz.mega.sdk.MegaUser;
 
 public class AchievementsFragment extends Fragment implements OnClickListener{
 	
@@ -328,8 +309,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 		daysLeftInstallDesktopText = (TextView) v.findViewById(R.id.days_left_text_install_desktop);
 		daysLeftInstallDesktopText.setText(("..."));
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		daysLeftInstallDesktopText.setVisibility(View.INVISIBLE);
 		daysLeftInstallAppText.setVisibility(View.INVISIBLE);
 
@@ -365,7 +344,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
 			case R.id.referral_bonuses_layout:{

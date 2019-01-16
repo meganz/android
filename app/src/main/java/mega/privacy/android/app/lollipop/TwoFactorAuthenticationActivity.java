@@ -193,7 +193,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scanOrCopyIsShown = savedInstanceState.getBoolean("scanOrCopyIsShown", false);
             isEnabled2FA = savedInstanceState.getBoolean("isEnabled2FA", false);
             isErrorShown = savedInstanceState.getBoolean("isErrorShown", false);
-            firstTime = savedInstanceState.getBoolean("firstTime", true);
+            firstTime = savedInstanceState.getBoolean("firstTimeAfterInstallation", true);
             rkSaved = savedInstanceState.getBoolean("rkSaved", false);
             seed = savedInstanceState.getString("seed");
             arraySeed = savedInstanceState.getStringArrayList("arraySeed");
@@ -679,6 +679,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
     @Override
     public void onBackPressed() {
+        super.callToSuperBack = false;
+        super.onBackPressed();
+
         if (confirm2FAIsShown) {
             confirm2FAIsShown = false;
             showScanOrCopyLayout();
@@ -694,6 +697,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 update2FASetting();
             }
             else {
+                super.callToSuperBack = true;
                 super.onBackPressed();
             }
         }
@@ -899,7 +903,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         outState.putBoolean("scanOrCopyIsShown", scanOrCopyIsShown);
         outState.putBoolean("isEnabled2FA", isEnabled2FA);
         outState.putBoolean("isErrorShown", isErrorShown);
-        outState.putBoolean("firstTime", firstTime);
+        outState.putBoolean("firstTimeAfterInstallation", firstTime);
         outState.putBoolean("rkSaved", rkSaved);
         outState.putBoolean("isNoAppsDialogShown", isNoAppsDialogShown);
         outState.putBoolean("isHelpDialogShown", isHelpDialogShown);

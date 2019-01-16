@@ -150,7 +150,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					
 					//Change permissions
 	
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileContactListActivityLollipop);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileContactListActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
 	
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					
@@ -488,8 +488,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.setMultipleSelect(false);
 			
 			listView.setAdapter(adapter);
-
-			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
 	}
 	
@@ -533,7 +531,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -672,7 +669,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	public void itemClick(int position) {
 		log("itemClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -692,13 +689,16 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+		super.callToSuperBack = false;
+		super.onBackPressed();
+
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 		}
 		else{
 			if (parentHandleStack.isEmpty()){
+				super.callToSuperBack = true;
 				super.onBackPressed();
 			}
 			else{
@@ -759,7 +759,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	@Override
 	public void onClick(View v) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
 		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
@@ -794,7 +794,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	public void changePermissions(){
 		log("changePermissions");
 		notifyDataSetChanged();
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 		dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 		final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 		dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
@@ -920,7 +920,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if(node!=null)
 			{
 				if (node.isFolder()){
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {

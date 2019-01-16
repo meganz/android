@@ -64,6 +64,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private ImageView nodeThumb;
     private TextView nodeName;
     private TextView nodeInfo;
+    private ImageView nodeVersionsIcon;
     private RelativeLayout nodeIconLayout;
     private ImageView nodeIcon;
     private LinearLayout optionDownload;
@@ -171,6 +172,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_name_text);
         nodeInfo = (TextView) contentView.findViewById(R.id.node_info_text);
+        nodeVersionsIcon = (ImageView) contentView.findViewById(R.id.node_info_versions_icon);
         nodeIconLayout = (RelativeLayout) contentView.findViewById(R.id.node_relative_layout_icon);
         nodeIcon = (ImageView) contentView.findViewById(R.id.node_icon);
         optionDownload = (LinearLayout) contentView.findViewById(R.id.option_download_layout);
@@ -253,6 +255,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                 if (node.isFolder()) {
                     nodeInfo.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
+                    nodeVersionsIcon.setVisibility(View.GONE);
+
                     if (node.isInShare()) {
                         nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                     } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
@@ -271,6 +275,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 } else {
                     long nodeSize = node.getSize();
                     nodeInfo.setText(Util.getSizeString(nodeSize));
+
+                    if(megaApi.hasVersions(node)){
+                        nodeVersionsIcon.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        nodeVersionsIcon.setVisibility(View.GONE);
+                    }
 
                     if (node.hasThumbnail()) {
                         log("Node has thumbnail");
@@ -340,14 +351,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     }
 
                     if (node.isShared()) {
-                        if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
-                            log("Visible clear shares - firstNavigationLevel true!");
-                            optionClearShares.setVisibility(View.VISIBLE);
-
-                        } else {
-                            counterShares--;
-                            optionClearShares.setVisibility(View.GONE);
-                        }
+                        optionClearShares.setVisibility(View.VISIBLE);
                     } else {
                         counterShares--;
                         optionClearShares.setVisibility(View.GONE);

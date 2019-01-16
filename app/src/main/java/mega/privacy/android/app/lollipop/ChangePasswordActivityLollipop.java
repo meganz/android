@@ -299,7 +299,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 		}
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+	}
+
+	@Override
+	public void onBackPressed() {
+		log("onBackPressed");
+		super.callToSuperBack = true;
+		super.onBackPressed();
 	}
 
 	@Override
@@ -796,7 +802,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	    switch (item.getItemId()) {
 	    // Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
@@ -807,12 +812,22 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    return super.onOptionsItemSelected(item);
 	}
 
+	void hidePasswordIfVisible () {
+		if (passwdVisibility) {
+			passwdVisibility = false;
+			toggleButtonNewPasswd.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
+			showHidePassword(R.id.toggle_button_new_passwd);
+			toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
+			showHidePassword(R.id.toggle_button_new_passwd2);
+		}
+	}
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		switch(v.getId()){
 			case R.id.action_change_password: {
+				hidePasswordIfVisible();
 				if (changePassword) {
 					log("ok proceed to change");
 					onChangePasswordClick();
@@ -1035,8 +1050,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (!validateForm(false)) {
 			return;

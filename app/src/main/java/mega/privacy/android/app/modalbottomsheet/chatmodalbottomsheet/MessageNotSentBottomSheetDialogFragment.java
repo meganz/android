@@ -115,6 +115,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_delete_layout);
         optionDeleteLayout.setOnClickListener(this);
 
+        titleSlidingPanel.setText(getString(R.string.title_message_not_sent_options));
+
         LinearLayout separator = (LinearLayout) contentView.findViewById(R.id.separator);
 
         if(selectedMessage!=null&&selectedChat!=null){
@@ -126,36 +128,36 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                         if((selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_STANDARD)||(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR)){
                             optionRetryLayout.setVisibility(View.VISIBLE);
                             optionRetryLayout.setOnClickListener(this);
+                            separator.setVisibility(View.VISIBLE);
+
                         }
                         else{
                             optionRetryLayout.setVisibility(View.GONE);
+                            separator.setVisibility(View.GONE);
                         }
                     }
                     else{
                         optionRetryLayout.setVisibility(View.GONE);
+                        separator.setVisibility(View.GONE);
                     }
                 }
                 else{
                     log("Null recovering the original msg");
                     optionRetryLayout.setVisibility(View.GONE);
+                    separator.setVisibility(View.GONE);
                 }
             }
             else{
                 if((selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_STANDARD)||(selectedChat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR)){
                     optionRetryLayout.setVisibility(View.VISIBLE);
                     optionRetryLayout.setOnClickListener(this);
+                    separator.setVisibility(View.VISIBLE);
                 }
                 else{
                     optionRetryLayout.setVisibility(View.GONE);
+                    separator.setVisibility(View.GONE);
                 }
             }
-        }
-
-        if (optionRetryLayout.getVisibility() == View.GONE || optionDeleteLayout.getVisibility() == View.GONE) {
-            separator.setVisibility(View.GONE);
-        }
-        else {
-            separator.setVisibility(View.VISIBLE);
         }
 
         dialog.setContentView(contentView);

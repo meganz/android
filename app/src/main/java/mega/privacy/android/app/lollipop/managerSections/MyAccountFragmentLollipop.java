@@ -321,8 +321,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		refreshAccountInfo();
 
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return v;
 	}
     
@@ -555,7 +553,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()) {
 
 			case R.id.logout_button:{
@@ -686,8 +683,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public int onBackPressed(){
 		log("onBackPressed");
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 		return 0;
 	}
 
