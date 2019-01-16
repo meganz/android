@@ -323,8 +323,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     String outputFileVoiceNotes;
     private RecordButton record;
     private MediaRecorder myAudioRecorder;
-
-    //    boolean isRecording = false;
     boolean recordingNow = false;
     LinearLayout bubbleLayout;
     TextView bubbleText;
@@ -801,7 +799,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         myAudioRecorder = null;
                         outputFileVoiceNotes = null;
                         setRecordingNow(false);
-//                        isRecording = false;
                         voiceClipLayout.showLock(false);
                     }
                 }
@@ -1803,7 +1800,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
                         setRecordingNow(true);
-//                        isRecording = true;
                     }
                 }
             }catch(IllegalStateException ise){}catch (IOException ioe){}
@@ -1826,12 +1822,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(isRecordingNow()){
             if(myAudioRecorder!=null){
                 log("myAudioRecorder -> CANCEL - isRecording = FALSE");
-//                myAudioRecorder.stop();
+//***********************************                myAudioRecorder.stop();
                 myAudioRecorder.reset();
                 myAudioRecorder = null;
                 outputFileVoiceNotes = null;
                 setRecordingNow(false);
-//                isRecording = false;
                 voiceClipLayout.showLock(false);
             }
         }
@@ -1858,8 +1853,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.release();
                 myAudioRecorder = null;
                 setRecordingNow(false);
-
-//                isRecording = false;
                 uploadVoiceNote(outputFileVoiceNotes);
                 outputFileVoiceNotes = null;
             }

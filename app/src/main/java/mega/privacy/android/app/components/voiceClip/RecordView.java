@@ -204,8 +204,6 @@ public class RecordView extends RelativeLayout {
                             imageArrow.startAnimation(animJumpFast);
                             imageLock.startAnimation(animJump);
                         }
-                        lockOffset = layoutLock.getHeight() - heightButtom;
-                        log("lockOffset: "+lockOffset);
                     }
                 });
                 valueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -322,9 +320,9 @@ public class RecordView extends RelativeLayout {
             firstY = motionEvent.getRawY();
         }
 
-//        lockOffset = (float) (recordBtn.getX() / 5);
+        //lockOffset = (float) (recordBtn.getX() / 2.5);
+        lockOffset = Util.px2dp(125, outMetrics);
         isLocked = false;
-
         playSound(RECORD_START);
 
         basketInitialY = basketImg.getY() + 90;
