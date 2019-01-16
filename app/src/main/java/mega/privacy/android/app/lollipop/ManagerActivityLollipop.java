@@ -2453,6 +2453,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(Util.isChatEnabled()){
 				megaApi.shouldShowRichLinkWarning(this);
 				megaApi.isRichPreviewsEnabled(this);
+				megaApi.isGeolocationEnabled(this);
 			}
 
 			transferData = megaApi.getTransferData(this);
@@ -15755,6 +15756,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     }
 				}
             }
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
+
+				if(e.getErrorCode() == MegaError.API_OK){
+					log("Attribute USER_ATTR_GEOLOCATION enabled");
+					MegaApplication.setEnabledGeoLocation(true);
+				}
+				else{
+					log("Attribute USER_ATTR_GEOLOCATION disabled");
+					MegaApplication.setEnabledGeoLocation(false);
+				}
+			}
             else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				log("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
 				if (e.getErrorCode() == MegaError.API_OK) {

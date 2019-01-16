@@ -132,6 +132,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static int counterNotNowRichLinkWarning = -1;
 	private static boolean enabledRichLinks = false;
 
+	private static boolean enabledGeoLocation = false;
+
 	private static int disableFileVersions = -1;
 
 	private static boolean recentChatVisible = false;
@@ -1790,6 +1792,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	public static void setShowRichLinkWarning(boolean showRichLinkWarning) {
 		MegaApplication.showRichLinkWarning = showRichLinkWarning;
+	}
+
+	public static boolean isEnabledGeoLocation() {
+		return enabledGeoLocation;
+	}
+
+	public static void setEnabledGeoLocation(boolean enabledGeoLocation) {
+		MegaApplication.enabledGeoLocation = enabledGeoLocation;
 	}
 
 	public static int getCounterNotNowRichLinkWarning() {

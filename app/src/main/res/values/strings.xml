@@ -2309,4 +2309,6 @@
     
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 
+    <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned location</string>
+
 </resources>

@@ -2817,7 +2817,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void sendLocation(){
-        getLocationPermission();
+        log("sendLocation");
+        if(MegaApplication.isEnabledGeoLocation()){
+            getLocationPermission();
+        }
+        else{
+            showSendLocationDialog();
+        }
     }
 
     public void sendContact(){
@@ -2849,7 +2855,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 .setPositiveButton(getString(R.string.button_continue),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        getLocationPermission();
+                        //getLocationPermission();
+                        megaApi.enableGeolocation(chatActivity);
                     }
                 })
                 .setNegativeButton(R.string.general_cancel,
@@ -6616,6 +6623,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else{
                 log("Chat upload cancelled");
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
+            if(request.getParamType()==MegaApiJava.USER_ATTR_GEOLOCATION){
+                if(e.getErrorCode() == MegaError.API_OK){
+                    log("Attribute USER_ATTR_GEOLOCATION enabled");
+                    MegaApplication.setEnabledGeoLocation(true);
+                    getLocationPermission();
+                }
+                else{
+                    log("Attribute USER_ATTR_GEOLOCATION disabled");
+                    MegaApplication.setEnabledGeoLocation(false);
+                }
             }
         }
     }

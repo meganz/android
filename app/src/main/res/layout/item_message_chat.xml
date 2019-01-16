@@ -997,7 +997,7 @@
                                     android:id="@+id/own_title_pinned_location"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Pinned Location"
+                                    android:text="@string/title_geolocation_message"
                                     android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
                                     android:textColor="@color/name_my_account"/>
