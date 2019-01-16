@@ -99,7 +99,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6_221";
+	static final public String USER_AGENT = "MEGAAndroid/3.5.1_222";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -540,9 +540,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		final EmojiCompat.Config config;
 		if (USE_BUNDLED_EMOJI) {
+			log("use Bundle emoji");
 			// Use the bundled font for EmojiCompat
 			config = new BundledEmojiCompatConfig(getApplicationContext());
 		} else {
+			log("use downloadable font for EmojiCompat");
 			// Use a downloadable font for EmojiCompat
 			final FontRequest fontRequest = new FontRequest(
 					"com.google.android.gms.fonts",
@@ -554,11 +556,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					.registerInitCallback(new EmojiCompat.InitCallback() {
 						@Override
 						public  void onInitialized() {
-							Log.i(TAG, "EmojiCompat initialized");
+							log("EmojiCompat initialized");
 						}
 						@Override
 						public  void onFailed(@Nullable Throwable throwable) {
-							Log.e(TAG, "EmojiCompat initialization failed", throwable);
+							log("EmojiCompat initialization failed");
 						}
 					});
 		}

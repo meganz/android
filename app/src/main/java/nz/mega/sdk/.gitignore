@@ -75,6 +75,7 @@
 /MegaTransferData.java
 /MegaChatContainsMeta.java
 /MegaChatRichPreview.java
+/MegaChatGeolocation.java
 
 /MegaBackupListener.java
 /MegaBackup.java

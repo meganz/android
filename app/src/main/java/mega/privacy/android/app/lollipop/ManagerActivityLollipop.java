@@ -3129,10 +3129,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void deleteCurrentFragment () {
 		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-			try {
-				getSupportFragmentManager().executePendingTransactions();
-			} catch (Exception e){};
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
 		}
 	}
 
@@ -4225,10 +4222,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void replaceFragment (Fragment f, String fTag) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, f, fTag);
-		ft.commit();
-		try {
-			getSupportFragmentManager().executePendingTransactions();
-		} catch (Exception e){};
+		ft.commitNowAllowingStateLoss();
 	}
 
 	void refreshFragment (String fTag) {
@@ -9084,10 +9078,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
 				ScanCodeFragment fragment = new ScanCodeFragment();
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
-				try {
-					getSupportFragmentManager().executePendingTransactions();
-				} catch (Exception e){};
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
 				Intent intent = new Intent(this, QRCodeActivity.class);
 				intent.putExtra("contacts", true);
 				startActivity(intent);
