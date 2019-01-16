@@ -98,7 +98,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     Thread task;
     
     static public boolean running = false;
-    private boolean preparingFinished = false;
     private Handler handler;
     
     WifiManager.WifiLock lock;
@@ -158,8 +157,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     private String tempRoot;
     Context mContext;
     private VideoCompressor mVideoCompressor;
-    private Handler checkStartHanlder = new Handler();
-    
+
     @Override
     public void onDestroy() {
         log("onDestroy()");
@@ -209,18 +207,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             finish();
         }
         log("STARTS NOW");
-        checkStartHanlder.postDelayed(new Runnable() {
-            
-            @Override
-            public void run() {
-                if (!preparingFinished && isServiceRunning) {
-                    log("timeout, finish self.");
-                    finish();
-                } else {
-                    log("preparingFinished is " + preparingFinished + " isServiceRunning is " + isServiceRunning);
-                }
-            }
-        },3 * DateUtils.MINUTE_IN_MILLIS);
         return START_NOT_STICKY;
     }
     
@@ -248,8 +234,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     private void startCameraUploads() {
         log("startCameraUploads");
-        preparingFinished = true;
-        checkStartHanlder.removeCallbacksAndMessages(null);
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_checking_title),mPendingIntent,false);
         getFilesFromMediaStore();
     }
@@ -1292,7 +1276,6 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
         
         canceled = true;
-        preparingFinished = false;
         running = false;
         stopForeground(true);
         cancelNotification();
