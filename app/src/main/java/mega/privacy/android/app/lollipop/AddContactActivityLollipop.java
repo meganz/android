@@ -3062,10 +3062,25 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     private void startConversation (ArrayList<String> contacts, boolean megaContacts, String chatTitle) {
+        log("startConversation");
         Intent intent = new Intent();
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contacts);
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
+
+        if(getChatLinkBox.isChecked()){
+            if(chatTitle!=null && !chatTitle.isEmpty()){
+                String trimChatTitle = chatTitle.trim();
+                if(trimChatTitle.isEmpty()){
+                    Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+                    return;
+                }
+            }
+            else if(chatTitle==null || chatTitle.isEmpty()){
+                Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+                return;
+            }
+        }
 
         if(chatTitle!=null){
             intent.putExtra(EXTRA_CHAT_TITLE, chatTitle);

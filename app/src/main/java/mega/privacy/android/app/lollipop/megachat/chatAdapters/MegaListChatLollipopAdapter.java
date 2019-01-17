@@ -1307,7 +1307,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							myFullName = megaChatApi.getMyEmail();
 						}
 
-						textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(myFullName), toCDATA(fullNameAction));
+						if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
+							textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(myFullName));
+						}
+						else{
+							textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(myFullName), toCDATA(fullNameAction));
+						}
+
 						try{
 							textToShow = textToShow.replace("[A]", "");
 							textToShow = textToShow.replace("[/A]", "");
@@ -1407,7 +1413,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if(myFullName.trim().length()<=0){
 								myFullName = megaChatApi.getMyEmail();
 							}
-							textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(myFullName));
+
+							if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
+								textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(fullNameTitle));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(myFullName));
+							}
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1451,7 +1463,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								}
 							}
 
-							textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
+							if(chat.getLastMessageSender() == chat.getLastMessageHandle()){
+								textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(fullNameTitle));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(fullNameTitle), toCDATA(fullNameAction));
+							}
+
 							try{
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1848,7 +1866,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("Message type TYPE_PUBLIC_HANDLE_CREATE");
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.message_created_chat_link), fullNameAction);
+				String textToShow = String.format(context.getString(R.string.message_created_chat_link), toCDATA(fullNameAction));
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1873,7 +1891,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("Message type TYPE_PUBLIC_HANDLE_DELETE");
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.message_deleted_chat_link), fullNameAction);
+				String textToShow = String.format(context.getString(R.string.message_deleted_chat_link), toCDATA(fullNameAction));
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1899,7 +1917,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.message_set_chat_private), fullNameAction);
+				String textToShow = String.format(context.getString(R.string.message_set_chat_private), toCDATA(fullNameAction));
 
 				try{
 					textToShow = textToShow.replace("[A]", "");
@@ -1926,7 +1944,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				String messageContent = chat.getLastMessage();
 				String fullNameAction = getFullNameAction(chat);
 
-				String textToShow = String.format(context.getString(R.string.change_title_messages), fullNameAction, messageContent);
+				String textToShow = String.format(context.getString(R.string.change_title_messages), toCDATA(fullNameAction), messageContent);
 
 				try {
 					textToShow = textToShow.replace("[A]", "");

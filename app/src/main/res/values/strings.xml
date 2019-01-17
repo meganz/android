@@ -2133,8 +2133,8 @@
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable encrypted key rotation</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link">[A]%1$s[/A][B] created a chat link[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link">[A]%1$s[/A][B] deleted a chat link[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link">[A]%1$s[/A][B] created a chat link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link">[A]%1$s[/A][B] deleted a chat link.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete link</string>
 
@@ -2342,4 +2342,6 @@
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
     
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
+
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 </resources>
