@@ -968,10 +968,10 @@
                         android:background="@drawable/own_background_location_message">
 
                         <!--Preview of location-->
-                        <ImageView
+                        <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/own_rounded_imageview_location"
                             android:layout_width="256dp"
-                            android:layout_height="128dp"
+                            android:layout_height="140dp"
                             android:layout_marginTop="1dp"
                             android:layout_marginLeft="1dp"
                             android:layout_marginRight="1dp"
@@ -980,11 +980,22 @@
                             android:background="@android:color/transparent" />
 
                         <RelativeLayout
+                            android:id="@+id/own_separator_imageview_location"
+                            android:layout_width="256dp"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="-12dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:background="@color/white"
+                            android:layout_below="@id/own_rounded_imageview_location"/>
+
+                        <RelativeLayout
                             android:id="@+id/own_pinned_location_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="72dp"
                             android:background="@android:color/transparent"
                             android:layout_below="@id/own_rounded_imageview_location"
+                            android:layout_marginTop="-12dp"
                             android:layout_marginRight="12dp"
                             android:layout_marginLeft="12dp"
                             android:layout_marginBottom="1dp">
@@ -1805,10 +1816,10 @@
                         android:background="@drawable/contact_background_location_message">
 
                         <!--Preview of location-->
-                        <ImageView
+                        <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/contact_rounded_imageview_location"
                             android:layout_width="256dp"
-                            android:layout_height="128dp"
+                            android:layout_height="140dp"
                             android:layout_marginTop="1dp"
                             android:layout_marginLeft="1dp"
                             android:layout_marginRight="1dp"
@@ -1817,11 +1828,22 @@
                             android:background="@android:color/transparent" />
 
                         <RelativeLayout
+                            android:id="@+id/contact_separator_imageview_location"
+                            android:layout_width="256dp"
+                            android:layout_height="12dp"
+                            android:layout_marginTop="-12dp"
+                            android:layout_marginLeft="1dp"
+                            android:layout_marginRight="1dp"
+                            android:background="@color/white"
+                            android:layout_below="@id/contact_rounded_imageview_location"/>
+
+                        <RelativeLayout
                             android:id="@+id/contact_pinned_location_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="72dp"
                             android:background="@android:color/transparent"
                             android:layout_below="@id/contact_rounded_imageview_location"
+                            android:layout_marginTop="-12dp"
                             android:layout_marginRight="12dp"
                             android:layout_marginLeft="12dp"
                             android:layout_marginBottom="1dp">

@@ -17,8 +17,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -59,9 +59,12 @@ import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -73,6 +76,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +93,8 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         View.OnClickListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
 
     private final int DEFAULT_RADIUS = 50000;
-    private final float DEFAULT_ZOOM = 18f;
+    public static final float DEFAULT_ZOOM = 18f;
+    public final int SNAPSHOT_SIZE = 750;
     private final int MAX_SIZE = 45000;
 
     private DisplayMetrics outMetrics;
@@ -97,6 +103,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     private ProgressBar progressBar;
     private GoogleMap mMap;
+    private MapView mapView;
     private RelativeLayout mapLayout;
     private View shadowLayout;
     private RelativeLayout listLayout;
@@ -138,12 +145,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
         if (savedInstanceState != null) {
             isFullScreenEnabled = savedInstanceState.getBoolean("isFullScreenEnabled", false);
@@ -469,57 +471,82 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
     }
 
-    void resizeMap() {
-        if (listLayout == null) {
-            listLayout = (RelativeLayout) findViewById(R.id.list_layout);
+    void saveSnapshotAsImage (Bitmap bitmap, int quality) {
+        File defaultDownloadLocation = null;
+
+        if (Environment.getExternalStorageDirectory() != null) {
+            defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
         }
-        listLayout.setVisibility(View.INVISIBLE);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            int heigth = (128 * outMetrics.widthPixels) / 256;
-            setMapParams(outMetrics.widthPixels, heigth);
+        else{
+            defaultDownloadLocation = getFilesDir();
         }
-        else {
-            Rect rect = new Rect();
-            getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
-            int heigth  = outMetrics.heightPixels - rect.top - tB.getHeight();
-            int width = (256 * heigth) / 128;
-            setMapParams(width, heigth);
+        defaultDownloadLocation.mkdirs();
+        File outFile = new File(defaultDownloadLocation.getAbsolutePath(), "mapSnapshot.jpg");
+        if (outFile != null) {
+            log("DATA connection new file != null");
+            FileOutputStream fOut;
+            try {
+                fOut = new FileOutputStream(outFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fOut);
+                fOut.flush();
+                fOut.close();
+                bitmap.recycle();
+                log("DATA connection file compressed");
+            } catch (Exception e) {}
         }
     }
 
     void setActivityResult (final int position, final MapAddress location) {
-        if (mMap == null) {
-            return;
-        }
 
-        resizeMap();
-        if (fullScreenMarker != null) {
-            fullScreenMarker.remove();
-        }
-        clearPlaces();
+        progressBar.setVisibility(View.VISIBLE);
 
         final String name = location.getName();
         final String address = location.getAddress();
         final Double latitude = location.getLatLng().latitude;
         final Double longitude = location.getLatLng().longitude;
 
-        LatLngBounds latLngBounds = getLatLngBounds(250, location.getLatLng());
+        GoogleMapOptions options = new GoogleMapOptions()
+                .compassEnabled(false)
+                .mapToolbarEnabled(false)
+                .camera(CameraPosition.fromLatLngZoom(location.getLatLng(), DEFAULT_ZOOM))
+                .liteMode(true);
 
-        mMap.setMyLocationEnabled(false);
-        mMap.clear();
-        if (fullscreenIconMarker == null) {
-            fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
+        mapView = new MapView(this, options);
+        mapView.onCreate(null);
+
+        final int mapWidth;
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mapWidth = outMetrics.widthPixels;
+        }
+        else {
+            mapWidth = outMetrics.heightPixels;
         }
 
-        mMap.addMarker(new MarkerOptions().position(location.getLatLng()));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0));
-        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+//        final int mapHeight = (MAP_MESSAGE_HEIGHT * mapWidth) / MAP_MESSAGE_WIDTH;
+
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapLoaded() {
-                log("map loaded finish");
-                mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+            public void onMapReady(GoogleMap googleMap) {
+                googleMap.addMarker(new MarkerOptions().position(location.getLatLng()));
+
+                mapView.measure(View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY));
+                mapView.layout(0, 0, mapWidth, mapWidth);
+
+                LatLngBounds latLngBounds = getLatLngBounds(500, location.getLatLng());
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0));
+                googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
-                    public void onSnapshotReady(Bitmap bitmap) {
+                    public void onMapLoaded() {
+                        mapView.setDrawingCacheEnabled(true);
+                        mapView.measure(View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY),
+                                View.MeasureSpec.makeMeasureSpec(mapWidth, View.MeasureSpec.EXACTLY));
+                        mapView.layout(0, 0, mapWidth, mapWidth);
+                        mapView.buildDrawingCache(true);
+                        Bitmap bitmap = Bitmap.createScaledBitmap(mapView.getDrawingCache(), SNAPSHOT_SIZE, SNAPSHOT_SIZE, false);
+                        mapView.setDrawingCacheEnabled(false);
+
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         int quality = 100;
                         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
@@ -531,6 +558,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                             byteArray = stream.toByteArray();
                         }
+                        saveSnapshotAsImage(bitmap, quality);
                         log("The bitmaps has "+byteArray.length+" final size with quality: "+quality);
 
                         Intent intent = new Intent();
@@ -699,7 +727,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
     }
 
-    LatLngBounds getLatLngBounds (int radius, LatLng latLng) {
+    public static LatLngBounds getLatLngBounds (int radius, LatLng latLng) {
         double distanceFromCenterToCorner = radius * Math.sqrt(2);
         LatLng southwestCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 225.0);
         LatLng northeastCorner = SphericalUtil.computeOffset(latLng, distanceFromCenterToCorner, 45.0);
