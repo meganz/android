@@ -147,7 +147,7 @@
                             android:id="@+id/url_own_message_text_rl"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/background_text_rich_link" >
+                            android:background="@drawable/dark_background_text_rich_link" >
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_own_message_text"
                                 android:layout_width="wrap_content"
@@ -343,6 +343,24 @@
 
                         </LinearLayout>
 
+                    </RelativeLayout>
+
+                    <!--triangle icon rich link-->
+                    <RelativeLayout
+                        android:id="@+id/error_uploading_rich_link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="4dp"
+                        android:layout_toLeftOf="@+id/url_own_message_layout"
+                        android:background="@android:color/transparent">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_gravity="center"
+                            android:background="@null"
+                            android:src="@drawable/ic_input_warning"/>
                     </RelativeLayout>
 
                     <!--forward rich links-->
@@ -757,6 +775,7 @@
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="16dp"
+                                android:src="@drawable/ic_play_grey"
                                 android:background="@null"
                                 android:visibility="gone"/>
 
@@ -779,15 +798,15 @@
                                     android:layout_height="wrap_content"/>
                             </RelativeLayout>
 
-                            <!-- error icon-->
-                            <ImageView
-                                android:id="@+id/content_own_message_voice_clip_error"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
-                                android:background="@null"
-                                android:visibility="gone"/>
+                            <!--&lt;!&ndash; error icon&ndash;&gt;-->
+                            <!--<ImageView-->
+                                <!--android:id="@+id/content_own_message_voice_clip_error"-->
+                                <!--android:layout_width="24dp"-->
+                                <!--android:layout_height="24dp"-->
+                                <!--android:layout_gravity="center_vertical"-->
+                                <!--android:layout_marginLeft="16dp"-->
+                                <!--android:background="@null"-->
+                                <!--android:visibility="gone"/>-->
 
                             <SeekBar
                                 android:id="@+id/content_own_message_voice_clip_seekBar"

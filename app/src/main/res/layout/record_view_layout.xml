@@ -9,7 +9,7 @@
     android:background="@null"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="16dp"
+    android:paddingBottom="10dp"
     android:visibility="visible">
 
     <!--android:layout_alignBottom="@id/layout_lock"-->

@@ -169,6 +169,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean newVisibility = false;
     boolean getMoreHistory=false;
+    private int RECORD_FINISHED = R.raw.record_finished;
 
     int minutesLastGreen = -1;
 
@@ -763,6 +764,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onClick(View v) {
                 log("record.setOnRecordClickListener()");
+                voiceClipLayout.playSound(RECORD_FINISHED);
                 stopRecord();
             }
         });
@@ -774,7 +776,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
-                log("voiceClipLayout.setOnRecordListener() -> onStart()");
+                log("voiceClipLayout.setOnRecordListener() -> onStart() -> stopAnyReproduction && startRecordVoiceClip");
                 stopAnyReproduction();
                 startRecordVoiceClip();
             }
@@ -2763,48 +2765,50 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_file_storage_icon_chat:
             case R.id.rl_pick_file_storage_icon_chat:{
                 log("file storage icon ");
-                if(fileStorageLayout.isShown()){
-                    hideFileStorageSection();
-                }else{
 
-                    if((emojiKeyboard!=null)&&(emojiKeyboard.getLetterKeyboardShown())){
-                        emojiKeyboard.hideBothKeyboard(this);
-                        paramsRecordButton(true);
-                        handlerEmojiKeyboard.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                                    if (!hasStoragePermission) {
-                                        ActivityCompat.requestPermissions(chatActivity,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
-                                    }else{
+                if(!isRecordingNow()){
+                    if(fileStorageLayout.isShown()){
+                        hideFileStorageSection();
+                    }else{
+
+                        if((emojiKeyboard!=null)&&(emojiKeyboard.getLetterKeyboardShown())){
+                            emojiKeyboard.hideBothKeyboard(this);
+                            paramsRecordButton(true);
+                            handlerEmojiKeyboard.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                                        if (!hasStoragePermission) {
+                                            ActivityCompat.requestPermissions(chatActivity,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+                                        }else{
+                                            chatActivity.attachFromFileStorage();
+                                        }
+                                    }
+                                    else{
                                         chatActivity.attachFromFileStorage();
                                     }
                                 }
-                                else{
-                                    chatActivity.attachFromFileStorage();
+                            },250);
+                        }else{
+                            if(emojiKeyboard!=null){
+                                emojiKeyboard.hideBothKeyboard(this);
+                                paramsRecordButton(true);
+                            }
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                                if (!hasStoragePermission) {
+                                    ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+
+                                }else{
+                                    this.attachFromFileStorage();
                                 }
                             }
-                        },250);
-                    }else{
-                        if(emojiKeyboard!=null){
-                            emojiKeyboard.hideBothKeyboard(this);
-                            paramsRecordButton(true);
-                        }
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
-
-                            }else{
+                            else{
                                 this.attachFromFileStorage();
                             }
                         }
-                        else{
-                            this.attachFromFileStorage();
-                        }
-                    }
 
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -2818,7 +2822,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    else{
 //                        this.attachFromFileStorage();
 //                    }
+                    }
                 }
+
                 break;
             }
             case R.id.toolbar_maps:{
@@ -7841,6 +7847,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void stopAnyReproduction(){
+        log("stopAnyReproduction()");
         if(adapter.isPlayingSomething()){
             adapter.stopReproductions();
         }
