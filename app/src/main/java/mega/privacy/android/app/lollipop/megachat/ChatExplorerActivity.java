@@ -31,6 +31,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -38,13 +39,15 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-public class ChatExplorerActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface{
+public class ChatExplorerActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
     Toolbar tB;
     ActionBar aB;
@@ -327,9 +330,9 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         switch(v.getId()) {
             case R.id.fab_chat_explorer: {
                 if(chatExplorerFragment!=null){
-                    if(chatExplorerFragment.getSelectedChats()!=null){
-                        chooseChats(chatExplorerFragment.getSelectedChats());
-                    }
+//                    if(chatExplorerFragment.getSelectedChats()!=null){
+//                        chooseChats(chatExplorerFragment.getSelectedChats());
+//                    }
                 }
                 break;
             }
@@ -385,5 +388,41 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     public void onBackPressed() {
         super.callToSuperBack = true;
         super.onBackPressed();
+    }
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+    }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+        int state = megaChatApi.getUserOnlineStatus(userhandle);
+        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
+            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
+            if (userhandle != megaChatApi.getMyUserHandle()) {
+
+            }
+        }
     }
 }

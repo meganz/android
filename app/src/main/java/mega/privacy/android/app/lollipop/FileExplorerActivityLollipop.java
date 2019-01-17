@@ -1254,12 +1254,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
-						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
-							showFabButton(true);
-						}
-						else{
-							showFabButton(false);
-						}
+//						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
+//							showFabButton(true);
+//						}
+//						else{
+//							showFabButton(false);
+//						}
 					}
 					else if(f instanceof CloudDriveExplorerFragmentLollipop){
 
@@ -1329,12 +1329,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
-						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
-							showFabButton(true);
-						}
-						else{
-							showFabButton(false);
-						}
+//						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
+//							showFabButton(true);
+//						}
+//						else{
+//							showFabButton(false);
+//						}
 					}
 					else if(f instanceof IncomingSharesExplorerFragmentLollipop){
 
@@ -1503,7 +1503,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					case CHAT_FRAGMENT:{
 						if(chatExplorer!=null && chatExplorer.isAdded()){
 							showFabButton(false);
-							chatExplorer.clearSelections();
+//							chatExplorer.clearSelections();
 							chooseFragment(IMPORT_FRAGMENT);
 						}
 						break;
@@ -2746,9 +2746,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 				if(chatExplorer!=null && chatExplorer.isAdded()){
-					if(chatExplorer.getSelectedChats()!=null){
-						sendToChats(chatExplorer.getSelectedChats());
-					}
+//					if(chatExplorer.getSelectedChats()!=null){
+//						sendToChats(chatExplorer.getSelectedChats());
+//					}
 				}
 				break;
 			}
