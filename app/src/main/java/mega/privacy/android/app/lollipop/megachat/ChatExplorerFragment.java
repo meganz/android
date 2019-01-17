@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -36,9 +37,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
@@ -56,7 +59,8 @@ public class ChatExplorerFragment extends Fragment {
     Context context;
     ActionBar aB;
     RecyclerView listView;
-    MegaListChatLollipopAdapter adapterList;
+//    MegaListChatLollipopAdapter adapterList;
+    MegaListChatExplorerAdapter adapterList;
     RelativeLayout mainRelativeLayout;
 
     LinearLayoutManager mLayoutManager;
@@ -64,6 +68,7 @@ public class ChatExplorerFragment extends Fragment {
     ArrayList<MegaChatListItem> chats;
     ArrayList<MegaChatListItem> archievedChats;
     ArrayList<MegaContactAdapter> contacts;
+    ArrayList<ChatExplorerListItem> items;
 
     int lastFirstVisiblePosition;
 
@@ -80,7 +85,7 @@ public class ChatExplorerFragment extends Fragment {
     DisplayMetrics outMetrics;
     Display display;
 
-    LinearLayout addLayout;
+    AppBarLayout addLayout;
     Button newGroupButton;
     RecyclerView addedList;
 
@@ -126,12 +131,13 @@ public class ChatExplorerFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
 
-        addLayout = (LinearLayout) v.findViewById(R.id.linear_layout_add);
+        addLayout = (AppBarLayout) v.findViewById(R.id.linear_layout_add);
         addedList = (RecyclerView) v.findViewById(R.id.contact_adds_recycler_view);
         newGroupButton = (Button) v.findViewById(R.id.new_group_button);
         if (context instanceof ChatExplorerActivity) {
             addLayout.setVisibility(View.VISIBLE);
             newGroupButton.setOnClickListener((ChatExplorerActivity) context);
+            setFirstLayoutVisibility(View.VISIBLE);
         }
         else {
             addLayout.setVisibility(View.GONE);
@@ -155,6 +161,13 @@ public class ChatExplorerFragment extends Fragment {
                         ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
                     } else {
                         ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+                    }
+                }
+                else if (context instanceof ChatExplorerActivity && addLayout != null && addLayout.getVisibility() == View.VISIBLE) {
+                    if (listView.canScrollVertically(-1)) {
+                        addLayout.setElevation(Util.px2dp(4, outMetrics));
+                    } else {
+                        addLayout.setElevation(0);
                     }
                 }
             }
@@ -205,10 +218,59 @@ public class ChatExplorerFragment extends Fragment {
         return v;
     }
 
+    void setFirstLayoutVisibility (int visibility) {
+        newGroupButton.setVisibility(visibility);
+        if (visibility == View.VISIBLE) {
+            addedList.setVisibility(View.GONE);
+        }
+        else if (visibility == View.GONE) {
+            addedList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public MegaContactAdapter getContact(MegaChatListItem chat) {
+        long handle = chat.getPeerHandle();
+        String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
+        MegaUser user = megaApi.getContact(userHandleEncoded);
+
+//        Maybe the contact is not my contact already
+        if (user == null) {
+            log("Chat "+chat.getTitle()+" with PeerHandle: "+handle+" is NULL");
+            return null;
+        }
+
+        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(handle+""));
+        String fullName = "";
+        if(contactDB!=null){
+            ContactController cC = new ContactController(context);
+            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), user.getEmail());
+        }
+        else{
+            fullName = user.getEmail();
+        }
+
+        if (handle != -1) {
+            int userStatus = megaChatApi.getUserOnlineStatus(handle);
+            if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+                log("Request last green for user");
+                megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
+            }
+        }
+
+        return new MegaContactAdapter(contactDB, user, fullName);
+    }
+
     public void setChats(){
         log("setChats");
 
         if(isAdded()){
+            if (items != null) {
+                items.clear();
+            }
+            else {
+                items = new ArrayList<>();
+            }
+
             if(chats!=null){
                 chats.clear();
             }
@@ -236,39 +298,80 @@ public class ChatExplorerFragment extends Fragment {
             archievedChats = megaChatApi.getArchivedChatListItems();
             getVisibleMEGAContacts();
 
-            log("chats no: "+chats.size());
+            for (MegaChatListItem chat : chats) {
+                if (chat.isGroup()) {
+                    items.add(new ChatExplorerListItem(chat));
+                }
+                else {
+                    items.add(new ChatExplorerListItem(chat, getContact(chat)));
+                }
+            }
 
-            //Order by last interaction
-            Collections.sort(chats, new Comparator<MegaChatListItem> (){
+            for (MegaChatListItem archieved : archievedChats) {
+                if (archieved.isGroup()) {
+                    items.add(new ChatExplorerListItem(archieved));
+                }
+                else {
+                    items.add(new ChatExplorerListItem(archieved, getContact(archieved)));
+                }
+            }
 
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
+            for (MegaContactAdapter contact : contacts) {
+                if (contact.getMegaUser() != null) {
+                    MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getMegaUser().getHandle());
+                    if (chat == null) {
+                        if (contact.getMegaUser() != null) {
+                            long handle = contact.getMegaUser().getHandle();
+                            if (handle != -1) {
+                                int userStatus = megaChatApi.getUserOnlineStatus(handle);
+                                if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+                                    log("Request last green for user");
+                                    megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
+                                }
+                            }
+                        }
+                        items.add(new ChatExplorerListItem(contact));
+                    }
+                }
+            }
 
-                    long result = timestamp2 - timestamp1;
-                    return (int)result;
+            log("items no: "+items.size());
+
+            //Order by name
+            Collections.sort(items, new Comparator<ChatExplorerListItem> (){
+
+                public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
+                    String n1 = c1.getName();
+                    String n2 = c2.getName();
+
+                    int res = String.CASE_INSENSITIVE_ORDER.compare(n1, n2);
+                    if (res == 0) {
+                        res = n1.compareTo(n2);
+                    }
+                    return res;
                 }
             });
 
             if (adapterList == null){
                 log("adapterList is NULL");
-                adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                adapterList = new MegaListChatExplorerAdapter(context, this, items);
             }
             else{
-                adapterList.setChats(chats);
+                adapterList.setItems(items);
             }
 
             listView.setAdapter(adapterList);
-            adapterList.setPositionClicked(-1);
 
             if (adapterList.getItemCount() == 0){
                 log("adapterList.getItemCount() == 0");
                 listView.setVisibility(View.GONE);
+                addLayout.setVisibility(View.GONE);
                 emptyLayout.setVisibility(View.VISIBLE);
             }
             else{
                 log("adapterList.getItemCount() NOT = 0");
                 listView.setVisibility(View.VISIBLE);
+                addLayout.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
         }
@@ -296,28 +399,28 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    public ArrayList<MegaChatListItem> getSelectedChats() {
-        log("getSelectedChats");
-
-        if(adapterList!=null){
-            return adapterList.getSelectedChats();
-        }
-        return null;
-    }
+//    public ArrayList<MegaChatListItem> getSelectedChats() {
+//        log("getSelectedChats");
+//
+//        if(adapterList!=null){
+//            return adapterList.getSelectedChats();
+//        }
+//        return null;
+//    }
 
     /*
      * Clear all selected items
      */
-    public void clearSelections() {
-        log("clearSelections");
-        adapterList.clearSelections();
-    }
-
-    public void selectAll() {
-        if (adapterList != null) {
-            adapterList.selectAll();
-        }
-    }
+//    public void clearSelections() {
+//        log("clearSelections");
+//        adapterList.clearSelections();
+//    }
+//
+//    public void selectAll() {
+//        if (adapterList != null) {
+//            adapterList.selectAll();
+//        }
+//    }
 
     public void itemClick(int position) {
         log("itemClick");
@@ -325,27 +428,27 @@ public class ChatExplorerFragment extends Fragment {
             megaChatApi.signalPresenceActivity();
         }
 
-        adapterList.toggleSelection(position);
-        List<MegaChatListItem> chats = adapterList.getSelectedChats();
+//        adapterList.toggleSelection(position);
+//        List<MegaChatListItem> chats = adapterList.getSelectedChats();
 
-        if(context instanceof  ChatExplorerActivity){
-            if (chats.size() > 0){
-                log("Show FAB button to send");
-                ((ChatExplorerActivity)context).showFabButton(true);
-            }
-            else{
-                ((ChatExplorerActivity)context).showFabButton(false);
-            }
-        }
-        else{
-            if (chats.size() > 0){
-                log("Show FAB button to send");
-                ((FileExplorerActivityLollipop)context).showFabButton(true);
-            }
-            else{
-                ((FileExplorerActivityLollipop)context).showFabButton(false);
-            }
-        }
+//        if(context instanceof  ChatExplorerActivity){
+//            if (chats.size() > 0){
+//                log("Show FAB button to send");
+//                ((ChatExplorerActivity)context).showFabButton(true);
+//            }
+//            else{
+//                ((ChatExplorerActivity)context).showFabButton(false);
+//            }
+//        }
+//        else{
+//            if (chats.size() > 0){
+//                log("Show FAB button to send");
+//                ((FileExplorerActivityLollipop)context).showFabButton(true);
+//            }
+//            else{
+//                ((FileExplorerActivityLollipop)context).showFabButton(false);
+//            }
+//        }
     }
     /////END Multiselect/////
 

@@ -79,7 +79,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
       mOutMetrics = new DisplayMetrics ();
       display.getMetrics(mOutMetrics);
-      textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      textViewMaxWidth = Util.scaleWidthPx(255, mOutMetrics);
       setText(getText());
 
     }else if(mContext instanceof ArchivedChatsActivity){
