@@ -2127,7 +2127,7 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish-Bin Cleaning Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Create chat link</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable encrypted key rotation</string>
@@ -2344,4 +2344,10 @@
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the link you are about to delete.</string>
+    <string name="context_create_chat_link_warning_text" context="Text of the dialog to generate a public chat link">Pending text</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to share a link to the chat and new participants will not see past messages.</string>
+
 </resources>

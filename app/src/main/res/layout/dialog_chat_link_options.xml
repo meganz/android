@@ -26,8 +26,8 @@
                 android:id="@+id/image_chat_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="34dp"
-                android:src="@drawable/transfer_quota_empty"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/ic_get_chat_link"
                 android:layout_gravity="center_horizontal"/>
 
             <TextView
@@ -36,11 +36,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="28dp"
                 android:layout_marginLeft="28dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
                 android:textSize="16sp"
                 android:gravity="center_horizontal"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna."
                 android:textColor="@color/mail_my_account"
                 android:layout_gravity="center_horizontal"/>
 
@@ -49,6 +48,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
+                android:paddingRight="16dp"
+                android:paddingLeft="16dp"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/background_accent_button"
                 android:textColor="@color/white"

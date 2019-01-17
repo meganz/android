@@ -1089,7 +1089,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
 		builder.setTitle(getResources().getString(R.string.action_delete_link));
-        String message= getResources().getString(R.string.context_remove_link_warning_text);
+        String message= getResources().getString(R.string.context_remove_chat_link_warning_text);
         builder.setMessage(message).setPositiveButton(R.string.delete_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
@@ -1835,6 +1835,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         title.setText(getString(R.string.make_chat_private_option));
 
         TextView text = (TextView) dialogView.findViewById(R.id.text_chat_link);
+        text.setText(getString(R.string.context_make_private_chat_warning_text));
 
         chatLinkDialog = dialogBuilder.create();
 
@@ -1859,12 +1860,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         dialogBuilder.setView(dialogView);
 
         Button actionButton = (Button) dialogView.findViewById(R.id.chat_link_button_action);
-        actionButton.setText(getString(R.string.general_create));
+        actionButton.setText(getString(R.string.get_chat_link_option));
 
         TextView title = (TextView) dialogView.findViewById(R.id.chat_link_title);
         title.setText(getString(R.string.get_chat_link_option));
 
-        TextView text = (TextView) dialogView.findViewById(R.id.text_chat_link);
+        TextView firstText = (TextView) dialogView.findViewById(R.id.text_chat_link);
+        firstText.setText(getString(R.string.context_create_chat_link_warning_text));
 
         chatLinkDialog = dialogBuilder.create();
 
