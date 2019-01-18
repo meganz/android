@@ -47,7 +47,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
@@ -1007,29 +1006,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         generalUnreadCount = savedInstanceState.getLong("generalUnreadCount",-1);
                     }
 
+                    String text = null;
                     if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
                         log("ACTION_CHAT_SHOW_MESSAGES");
                         isOpeningChat = true;
 
-                        String text = newIntent.getStringExtra("showSnackbar");
-                        if (text != null) {
-                            showSnackbar(text);
-                        }
-                        else{
+                        text = newIntent.getStringExtra("showSnackbar");
+                        if (text == null) {
+
                             int errorCode = newIntent.getIntExtra("PUBLIC_LINK", 1);
                             if(errorCode!=1){
                                 if(errorCode==MegaChatError.ERROR_OK){
-                                    showSnackbar(getString(R.string.chat_link_copied_clipboard));
+                                    text = getString(R.string.chat_link_copied_clipboard);
                                 }
                                 else{
                                     log("initAfterIntent:publicLinkError:errorCode");
-                                    showSnackbar(getString(R.string.general_error) + ": " + errorCode);
+                                    text = getString(R.string.general_error) + ": " + errorCode;
                                 }
                             }
                         }
                     }
 
-                    showChat();
+                    showChat(text);
                 }
             }
         }
@@ -1038,7 +1036,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showChat(){
+    public void showChat(String textSnackbar){
 
         if(idChat!=-1) {
 
@@ -1176,6 +1174,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 emptyLayout.setVisibility(View.VISIBLE);
 
                 chatRelativeLayout.setVisibility(View.GONE);
+
+                if(textSnackbar!=null){
+                    showSnackbar(textSnackbar);
+                }
 
                 loadHistory();
                 log("On create: stateHistory: " + stateHistory);
@@ -6405,7 +6407,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
-                showChat();
+                showChat(null);
             }
             else {
                 log("EEEERRRRROR WHEN LOADING CHAT LINK" + e.getErrorString());
@@ -6413,7 +6415,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     //ERROR_EXIST - If the user already participates in the chat.
                     idChat = request.getChatHandle();
                     MegaApplication.setOpenChatId(idChat);
-                    showChat();
+                    showChat(null);
                     MegaChatRoom chatActive = megaChatApi.getChatRoom(idChat);
                     if (chatActive.isActive()) {
                         showAlertChatLink(false);
@@ -6453,7 +6455,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if (request.getUserHandle() != -1) {
                     //Rejoin option
-                    showChat();
+                    showChat(null);
                 } else {
                     //Join
                     setChatSubtitle();
@@ -6653,22 +6655,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     return;
                 }
-                else if((intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES))){
+                else if((intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES))||(intent.getAction().equals(Constants.ACTION_OPEN_CHAT_LINK))){
                     log("Intent to open new chat: "+intent.getAction());
-                    finish();
-                    long chatIdIntent = intent.getLongExtra("CHAT_ID", -1);
-                    if(chatIdIntent!=-1){
-                        Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-                        intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-                        intentOpenChat.putExtra("CHAT_ID", chatIdIntent);
-                        this.startActivity(intentOpenChat);
-                    }
-                    else{
-                        log("Error the chat Id is not valid: "+chatIdIntent);
-                    }
-
-                }
-                else if(intent.getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
                     if(messages!=null){
                         messages.clear();
                     }
@@ -6704,7 +6692,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         try{
             statusDialog.dismiss();
         } catch(Exception ex){};
-
     }
 
     public void revoke(){

@@ -14162,29 +14162,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
-					log("create group chat with participants: "+peers.size());
-
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
-                    if (isEKR) {
-                        megaChatApi.createChat(true, peers, chatTitle, this);
-                    }
-                    else {
-                    	final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
+					boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
+					boolean chatLink = false;
+					if (!isEKR) {
+						chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
+					}
 
-                    	if(chatLink){
-                    		if(chatTitle!=null && !chatTitle.isEmpty()){
-								CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-								megaChatApi.createPublicChat(peers, chatTitle, listener);
-							}
-							else{
-                    			Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
-							}
-						}
-						else{
-							megaChatApi.createPublicChat(peers, chatTitle, this);
-						}
-                    }
+					createGroupChat(peers, chatTitle, chatLink, isEKR);
 				}
 			}
 		}
@@ -14252,6 +14237,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
+		}
+	}
+
+	public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR){
+
+		log("create group chat with participants: "+peers.size());
+
+		if (isEKR) {
+			megaChatApi.createChat(true, peers, chatTitle, this);
+		}
+		else {
+			if(chatLink){
+				if(chatTitle!=null && !chatTitle.isEmpty()){
+					CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
+					megaChatApi.createPublicChat(peers, chatTitle, listener);
+				}
+				else{
+					Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+				}
+			}
+			else{
+				megaChatApi.createPublicChat(peers, chatTitle, this);
+			}
 		}
 	}
 
