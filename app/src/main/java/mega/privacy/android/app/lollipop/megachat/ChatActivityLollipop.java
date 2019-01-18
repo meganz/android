@@ -6437,7 +6437,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(voiceClipLayout!=null){
             voiceClipLayout.destroyHandlers();
         }
-
+        if(megaApi != null) {
+            megaApi.removeRequestListener(this);
+        }
         if (megaChatApi != null) {
             megaChatApi.closeChatRoom(idChat, this);
             MegaApplication.setClosedChat(true);

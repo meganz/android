@@ -350,15 +350,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                         if(listView==null){
                             log("setChats: INIT_OFFLINE_SESSION: listView is null");
+                        }else if(listView!=null){
+                            listView.setVisibility(View.VISIBLE);
                         }
-
-                        listView.setVisibility(View.VISIBLE);
-                        emptyLayout.setVisibility(View.GONE);
+                        if(emptyLayout!=null){
+                            emptyLayout.setVisibility(View.GONE);
+                        }
 
                         if (adapterList == null){
                             log("adapterList is NULL");
                             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
-                            listView.setAdapter(adapterList);
+                            if(listView!=null) {
+                                listView.setAdapter(adapterList);
+                            }
                         }
                         else{
                             adapterList.setChats(chats);
