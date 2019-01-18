@@ -6121,6 +6121,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         holder.lastProgress = 0;
         int voiceClipDuration = 0;
 
+        //Find own voice clip to know the duration
+        MegaNodeList nodeListOwn = message.getMegaNodeList();
+        if(nodeListOwn.size()==1) {
+            MegaNode node = nodeListOwn.get(0);
+            if (MimeTypeList.typeForName(node.getName()).isAudio()) {
+                voiceClipDuration = node.getDuration();
+                log("isAudio: " + node.getName()+ " duration: "+voiceClipDuration);
+            }
+        }
+
         if (message.getUserHandle() == myUserHandle) {
             log("MY message!!");
 
@@ -6270,9 +6280,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
             });
-
-
-            //Find own voice clip to know the duration
 
 //            MegaNodeList nodeListOwn = message.getMegaNodeList();
 //            if(nodeListOwn.size()==1){
