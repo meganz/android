@@ -238,6 +238,50 @@ public class Util {
 		}
 	}
 
+	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
+		if(activity == null){
+			return;
+		}
+
+		try{
+			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+			dialogBuilder.setPositiveButton(
+					activity.getString(android.R.string.ok),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							if (finish) {
+								if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+									activity.finishAndRemoveTask();
+								}else{
+									activity.finish();
+								}
+							}
+						}
+					});
+			dialogBuilder.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					if (finish) {
+						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							activity.finishAndRemoveTask();
+						}else{
+							activity.finish();
+						}
+					}
+				}
+			});
+
+
+			AlertDialog dialog = dialogBuilder.create();
+			dialog.show();
+			brandAlertDialog(dialog);
+		}catch(Exception ex){
+			Util.showToast(activity, message);
+		}
+	}
+
 	/*
 	 * Build error dialog
 	 * @param message Message to display

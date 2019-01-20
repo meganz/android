@@ -1493,16 +1493,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 visibilityFastScroller();
                 
                 setOverviewLayout();
-                
+
                 int lastVisiblePosition = 0;
                 if (!lastPositionStack.empty()) {
                     lastVisiblePosition = lastPositionStack.pop();
                     log("Pop of the stack " + lastVisiblePosition + " position");
                 }
                 log("Scroll to " + lastVisiblePosition + " position");
-                
+
                 if (lastVisiblePosition >= 0) {
-                    
+
                     if (((ManagerActivityLollipop)context).isList) {
                         mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition,0);
                     } else {
@@ -1520,6 +1520,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         
         return 0;
     }
+
+	public void scrollToFirstPosition () {
+		if (((ManagerActivityLollipop)context).isList) {
+			mLayoutManager.scrollToPositionWithOffset(0,0);
+		}
+		else {
+			gridLayoutManager.scrollToPositionWithOffset(0,0);
+		}
+	}
     
     public RecyclerView getRecyclerView() {
         return recyclerView;

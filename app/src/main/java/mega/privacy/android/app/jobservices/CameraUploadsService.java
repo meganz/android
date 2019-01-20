@@ -965,6 +965,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                                                     megaChatApi.logout(CameraUploadsService.this);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
+                                                    megaChatApi.enableGroupChatCalls(true);
                                                 }
                                             }
                                         }

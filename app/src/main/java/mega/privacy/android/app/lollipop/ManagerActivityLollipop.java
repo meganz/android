@@ -346,6 +346,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     int orientationSaved;
 
+    float elevation = 0;
+
 	public enum FragmentTag {
 		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY;
@@ -1733,6 +1735,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
+		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 	}
@@ -1792,6 +1795,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
+			elevation = savedInstanceState.getFloat("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", -1);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 		}
@@ -2271,6 +2275,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(ret==0||ret==MegaChatApi.INIT_ERROR){
 						ret = megaChatApi.init(gSession);
 						log("After init: "+ret);
+						if (ret == MegaChatApi.INIT_NO_CACHE) {
+							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+						}else if (ret == MegaChatApi.INIT_ERROR) {
+							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
+						}else{
+							log("onCreate: Chat correctly initialized");
+							megaChatApi.enableGroupChatCalls(true);
+						}
 					}
 					else{
 						log("Offline mode: Do not init, chat already initialized");
@@ -3171,10 +3183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void deleteCurrentFragment () {
 		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-			try {
-				getSupportFragmentManager().executePendingTransactions();
-			} catch (Exception e){};
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
 		}
 	}
 
@@ -4282,10 +4291,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void replaceFragment (Fragment f, String fTag) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, f, fTag);
-		ft.commit();
-		try {
-			getSupportFragmentManager().executePendingTransactions();
-		} catch (Exception e){};
+		ft.commitNowAllowingStateLoss();
 	}
 
 	void refreshFragment (String fTag) {
@@ -9141,10 +9147,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
 				ScanCodeFragment fragment = new ScanCodeFragment();
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
-				try {
-					getSupportFragmentManager().executePendingTransactions();
-				} catch (Exception e){};
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
 				Intent intent = new Intent(this, QRCodeActivity.class);
 				intent.putExtra("contacts", true);
 				startActivity(intent);
@@ -9637,8 +9640,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					long rootHandle = megaApi.getRootNode().getHandle();
+					if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
+						parentHandleBrowser = rootHandle;
+						refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+						if (fbFLol != null) {
+							fbFLol.scrollToFirstPosition();
+						}
+					}
+				}
+				else {
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+				}
 				break;
 			}
 			case R.id.bottom_navigation_item_offline: {
@@ -18195,10 +18211,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
     }
 
-	public void changeActionBarElevation(boolean whitElevation){
+	public void changeActionBarElevation(boolean withElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
+			if (withElevation) {
 				abL.setElevation(Util.px2dp(4, outMetrics));
+				if (elevation > 0) {
+					elevation = 0;
+					abL.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							abL.setElevation(Util.px2dp(4, outMetrics));
+						}
+					}, 100);
+				}
 			}
 			else {
 				abL.setElevation(0);
