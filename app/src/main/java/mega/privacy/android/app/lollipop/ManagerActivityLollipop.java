@@ -13426,89 +13426,76 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			log("Send to "+chatHandles.length+" chats");
 
+			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
 
 			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
-			int countChat = chatHandles.length;
-			log("Selected: "+countChat+" chats to send");
+			if (chatHandles != null && chatHandles.length > 0) {
+				if (contactHandles != null && contactHandles.length > 0) {
+					ArrayList<MegaChatRoom> chats = new ArrayList<>();
+					ArrayList<MegaUser> users = new ArrayList<>();
 
-			if(nodeHandles!=null){
-				log("Send "+nodeHandles.length+" nodes");
-				MultipleAttachChatListener listener = null;
-				int counter = chatHandles.length*nodeHandles.length;
-				if(countChat==1){
-					if(nodeHandles.length==1){
-						listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+					for (int i=0; i<contactHandles.length; i++) {
+						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+						if (user != null) {
+							users.add(user);
+						}
+					}
+
+					for (int i=0; i<chatHandles.length; i++) {
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+						if (chatRoom != null) {
+							chats.add(chatRoom);
+						}
+					}
+
+					CreateChatToPerformActionListener listener = null;
+					boolean createChats = false;
+
+					if(nodeHandles!=null){
+						listener = new CreateChatToPerformActionListener(chats, users, nodeHandles, this, CreateChatToPerformActionListener.SEND_FILES);
+						createChats = true;
+					}
+					else if(userHandles!=null){
+						listener = new CreateChatToPerformActionListener(chats, users, userHandles, this, CreateChatToPerformActionListener.SEND_CONTACTS);
+						createChats = true;
 					}
 					else{
-						listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
+						log("Error on sending to chat");
 					}
-				}
-				else{
 
-					if(nodeHandles.length==1){
-						listener = new MultipleAttachChatListener(this, -1, false, counter);
-					}
-					else{
-						listener = new MultipleAttachChatListener(this, -1, true, counter);
-					}
-				}
-				if(countChat==1){
-
-					if(nodeHandles.length==1){
-						//One chat, one file
-						megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
-					}
-					else{
-						//One chat, many files
-						for(int i=0;i<nodeHandles.length;i++){
-							megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+					if (createChats) {
+						for (MegaUser user : users) {
+							MegaChatPeerList peers = MegaChatPeerList.createInstance();
+							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+							megaChatApi.createChat(false, peers, listener);
 						}
 					}
 				}
-				else if(countChat>1){
+				else {
+					int countChat = chatHandles.length;
+					log("Selected: "+countChat+" chats to send");
 
-					if(nodeHandles.length==1){
-						//Many chats, one file
-						for(int i=0;i<chatHandles.length;i++){
-							megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
-						}
+					if(nodeHandles!=null){
+						log("Send "+nodeHandles.length+" nodes");
 
+						sendFilesToChats(null, chatHandles, nodeHandles);
+					}
+					else if(userHandles!=null){
+						log("Send "+userHandles.length+" contacts");
+
+						sendContactsToChats(null, chatHandles, userHandles);
 					}
 					else{
-						//Many chat, many files
-						for(int i=0;i<chatHandles.length;i++){
-							for(int j=0;j<nodeHandles.length;j++){
-								megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
-							}
-						}
+						log("Error on sending to chat");
 					}
 				}
 			}
-			else if(userHandles!=null){
-				log("Send "+userHandles.length+" contacts");
-
-				for(int i=0;i<chatHandles.length;i++){
-					for(int j=0;j<userHandles.length;j++){
-						MegaHandleList handleList = MegaHandleList.createInstance();
-						handleList.addMegaHandle(userHandles[j]);
-						megaChatApi.attachContacts(chatHandles[i], handleList);
-					}
-				}
-
-				if(countChat==1){
-					openChat(chatHandles[0], null);
-				}
-				else{
-					String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
-					showSnackbar(message);
-				}
-			}
-			else{
+			else {
 				log("Error on sending to chat");
 			}
-
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -14176,6 +14163,96 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
+		}
+	}
+
+	public void sendFilesToChats (ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] nodeHandles) {
+		MultipleAttachChatListener listener = null;
+
+		if (chatHandles == null && chats != null) {
+			chatHandles = new long[chats.size()];
+			for (int i=0; i<chats.size(); i++) {
+				chatHandles[i] = chats.get(i).getChatId();
+			}
+		}
+
+		int countChat = chatHandles.length;
+        int counter = chatHandles.length*nodeHandles.length;
+
+		if(countChat==1){
+			if(nodeHandles.length==1){
+				listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+			}
+			else{
+				listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
+			}
+		}
+		else{
+
+			if(nodeHandles.length==1){
+				listener = new MultipleAttachChatListener(this, -1, false, counter);
+			}
+			else{
+				listener = new MultipleAttachChatListener(this, -1, true, counter);
+			}
+		}
+		if(countChat==1){
+
+			if(nodeHandles.length==1){
+				//One chat, one file
+				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
+			}
+			else{
+				//One chat, many files
+				for(int i=0;i<nodeHandles.length;i++){
+					megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+				}
+			}
+		}
+		else if(countChat>1){
+
+			if(nodeHandles.length==1){
+				//Many chats, one file
+				for(int i=0;i<chatHandles.length;i++){
+					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
+				}
+
+			}
+			else{
+				//Many chat, many files
+				for(int i=0;i<chatHandles.length;i++){
+					for(int j=0;j<nodeHandles.length;j++){
+						megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+					}
+				}
+			}
+		}
+	}
+
+	public void sendContactsToChats (ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] userHandles) {
+		if (chatHandles == null && chats != null) {
+			chatHandles = new long[chats.size()];
+			for (int i=0; i<chats.size(); i++) {
+				chatHandles[i] = chats.get(i).getChatId();
+			}
+		}
+
+		int countChat = chatHandles.length;
+
+		for(int i=0;i<chatHandles.length;i++){
+			for(int j=0;j<userHandles.length;j++){
+				MegaHandleList handleList = MegaHandleList.createInstance();
+				handleList.addMegaHandle(userHandles[j]);
+				megaChatApi.attachContacts(chatHandles[i], handleList);
+			}
+		}
+
+		if(countChat==1){
+			openChat(chatHandles[0], null);
+		}
+		else{
+			String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
+			showSnackbar(message);
 		}
 	}
 

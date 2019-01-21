@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 
 import java.io.File;
 
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -42,7 +44,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
             boolean avatarExists = false;
 
             if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                if(((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder)!=null && ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail()!=null && request.getEmail()!=null){
+                if(holder !=null && ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail()!=null && request.getEmail()!=null){
                     if (((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail().compareTo(request.getEmail()) == 0){
                         File avatar = null;
                         if (context.getExternalCacheDir() != null){
@@ -63,6 +65,68 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                                 }
                                 else{
                                     ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).setImageView(bitmap);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    log("Adapter cannot be updated - null");
+                }
+            }
+            else if (holder instanceof MegaListChatExplorerAdapter.ViewHolderChatExplorerList) {
+                if(holder !=null && ((MegaListChatExplorerAdapter.ViewHolderChatExplorerList)holder).getEmail()!=null && request.getEmail()!=null){
+                    if (((MegaListChatExplorerAdapter.ViewHolderChatExplorerList)holder).getEmail().compareTo(request.getEmail()) == 0){
+                        File avatar = null;
+                        if (context.getExternalCacheDir() != null){
+                            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaListChatExplorerAdapter.ViewHolderChatExplorerList)holder).getEmail() + ".jpg");
+                        }
+                        else{
+                            avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaListChatExplorerAdapter.ViewHolderChatExplorerList)holder).getEmail() + ".jpg");
+                        }
+                        Bitmap bitmap = null;
+                        if (avatar.exists()){
+                            if (avatar.length() > 0){
+                                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                                bOpts.inPurgeable = true;
+                                bOpts.inInputShareable = true;
+                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                                if (bitmap == null) {
+                                    avatar.delete();
+                                }
+                                else{
+                                    ((MegaListChatExplorerAdapter.ViewHolderChatExplorerList)holder).setAvatarImage(bitmap);
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    log("Adapter cannot be updated - null");
+                }
+            }
+            else if (holder instanceof MegaChipChatExplorerAdapter.ViewHolderChips) {
+                if(holder !=null && ((MegaChipChatExplorerAdapter.ViewHolderChips)holder).getEmail()!=null && request.getEmail()!=null){
+                    if (((MegaChipChatExplorerAdapter.ViewHolderChips)holder).getEmail().compareTo(request.getEmail()) == 0){
+                        File avatar = null;
+                        if (context.getExternalCacheDir() != null){
+                            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaChipChatExplorerAdapter.ViewHolderChips)holder).getEmail() + ".jpg");
+                        }
+                        else{
+                            avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaChipChatExplorerAdapter.ViewHolderChips)holder).getEmail() + ".jpg");
+                        }
+                        Bitmap bitmap = null;
+                        if (avatar.exists()){
+                            if (avatar.length() > 0){
+                                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                                bOpts.inPurgeable = true;
+                                bOpts.inInputShareable = true;
+                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                                if (bitmap == null) {
+                                    avatar.delete();
+                                }
+                                else{
+                                    ((MegaChipChatExplorerAdapter.ViewHolderChips)holder).setAvatar(bitmap);
                                 }
                             }
                         }
