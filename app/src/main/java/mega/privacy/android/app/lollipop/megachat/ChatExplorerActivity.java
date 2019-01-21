@@ -18,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -282,16 +281,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         snackbar.show();
     }
 
-    public void chooseChats(ArrayList<MegaChatListItem> chatListItems){
+    public void chooseChats(ArrayList<ChatExplorerListItem> listItems) {
         log("chooseChats");
 
-        long[] longArray = new long[chatListItems.size()];
-        for (int i=0; i<chatListItems.size(); i++){
-            longArray[i] = chatListItems.get(i).getChatId();
-        }
-
         Intent intent = new Intent();
-        intent.putExtra("SELECTED_CHATS", longArray);
 
         if(nodeHandles!=null){
             intent.putExtra("NODE_HANDLES", nodeHandles);
@@ -303,6 +296,35 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
         if(messagesIds!=null){
             intent.putExtra("ID_MESSAGES", messagesIds);
+        }
+        ArrayList<MegaChatListItem> chats = new ArrayList<>();
+        ArrayList<MegaUser> users = new ArrayList<>();
+
+        for (ChatExplorerListItem item : listItems) {
+            if (item.getChat() != null) {
+                chats.add(item.getChat());
+             }
+            else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
+                users.add(item.getContact().getMegaUser());
+            }
+        }
+
+        if (chats != null && !chats.isEmpty()) {
+            long[] chatHandles = new long[chats.size()];
+            for (int i=0; i<chats.size(); i++) {
+                chatHandles[i] = chats.get(i).getChatId();
+            }
+
+            intent.putExtra("SELECTED_CHATS", chatHandles);
+        }
+
+        if (users != null && !chats.isEmpty()) {
+            long[] userHandles = new long[users.size()];
+            for (int i=0; i<users.size(); i++) {
+                userHandles[i] = users.get(i).getHandle();
+            }
+
+            intent.putExtra("SELECTED_USERS", userHandles);
         }
 
         setResult(RESULT_OK, intent);
@@ -330,13 +352,14 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         switch(v.getId()) {
             case R.id.fab_chat_explorer: {
                 if(chatExplorerFragment!=null){
-//                    if(chatExplorerFragment.getSelectedChats()!=null){
-//                        chooseChats(chatExplorerFragment.getSelectedChats());
-//                    }
+                    if(chatExplorerFragment.getAddedChats()!=null){
+                        chooseChats(chatExplorerFragment.getAddedChats());
+                    }
                 }
                 break;
             }
             case R.id.new_group_button: {
+                //Wait until chat-links be merged to develop-studio branch
                 break;
             }
         }
@@ -359,6 +382,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
             log("Create chat request finish.");
            onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+
         }
     }
 
@@ -421,7 +445,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
             String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
             if (userhandle != megaChatApi.getMyUserHandle()) {
-
+                chatExplorerFragment = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorerFragment");
+                if (chatExplorerFragment != null) {
+                    chatExplorerFragment.updateLastGreenContact(userhandle, formattedDate);
+                }
             }
         }
     }

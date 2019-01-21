@@ -60,6 +60,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
@@ -77,6 +78,7 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNodeHistoryListenerInterface;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -86,6 +88,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface {
 
@@ -1288,15 +1291,52 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 			showProgressForwarding();
 
-			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-			log("Send to "+chatHandles.length+" chats");
-
 			long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
 			log("Send "+idMessages.length+" messages");
 
-			MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
+			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			log("Send to "+chatHandles.length+" chats");
 
-			forwardChatProcessor.forward();
+			long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+
+			if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
+				if (contactHandles != null && contactHandles.length > 0) {
+					ArrayList<MegaUser> users = new ArrayList<>();
+					ArrayList<MegaChatRoom> chats =  new ArrayList<>();
+
+					for (int i=0; i<contactHandles.length; i++) {
+						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+						if (user != null) {
+							users.add(user);
+						}
+					}
+
+					for (int i=0; i<chatHandles.length; i++) {
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+						if (chatRoom != null) {
+							chats.add(chatRoom);
+						}
+					}
+
+					CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, chatId);
+
+					for (MegaUser user : users) {
+						MegaChatPeerList peers = MegaChatPeerList.createInstance();
+						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+						megaChatApi.createChat(false, peers, listener);
+					}
+				}
+				else {
+					int countChat = chatHandles.length;
+					log("Selected: " + countChat + " chats to send");
+
+					MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
+					forwardChatProcessor.forward();
+				}
+			}
+			else {
+				log("Error on sending to chat");
+			}
 		}
 	}
 

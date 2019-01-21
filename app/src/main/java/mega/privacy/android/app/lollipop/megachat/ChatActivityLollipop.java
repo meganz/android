@@ -93,6 +93,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -2117,15 +2118,52 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             showProgressForwarding();
 
-            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            log("Send to "+chatHandles.length+" chats");
-
             long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
             log("Send "+idMessages.length+" messages");
 
-            MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
+            long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+            log("Send to "+chatHandles.length+" chats");
 
-            forwardChatProcessor.forward();
+            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+
+            if (chatHandles != null && chatHandles.length > 0 && idMessages != null) {
+                if (contactHandles != null && contactHandles.length > 0) {
+                    ArrayList<MegaUser> users = new ArrayList<>();
+                    ArrayList<MegaChatRoom> chats =  new ArrayList<>();
+
+                    for (int i=0; i<contactHandles.length; i++) {
+                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+                        if (user != null) {
+                            users.add(user);
+                        }
+                    }
+
+                    for (int i=0; i<chatHandles.length; i++) {
+                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                        if (chatRoom != null) {
+                            chats.add(chatRoom);
+                        }
+                    }
+
+                    CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, idMessages, this, CreateChatToPerformActionListener.SEND_MESSAGES, idChat);
+
+                    for (MegaUser user : users) {
+                        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                        peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                        megaChatApi.createChat(false, peers, listener);
+                    }
+                }
+                else {
+                    int countChat = chatHandles.length;
+                    log("Selected: " + countChat + " chats to send");
+
+                    MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
+                    forwardChatProcessor.forward();
+                }
+            }
+            else {
+                log("Error on sending to chat");
+            }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             if (resultCode == Activity.RESULT_OK) {

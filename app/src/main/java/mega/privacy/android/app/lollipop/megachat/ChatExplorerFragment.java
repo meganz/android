@@ -27,7 +27,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -37,8 +37,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -59,7 +59,6 @@ public class ChatExplorerFragment extends Fragment {
     Context context;
     ActionBar aB;
     RecyclerView listView;
-//    MegaListChatLollipopAdapter adapterList;
     MegaListChatExplorerAdapter adapterList;
     RelativeLayout mainRelativeLayout;
 
@@ -69,6 +68,7 @@ public class ChatExplorerFragment extends Fragment {
     ArrayList<MegaChatListItem> archievedChats;
     ArrayList<MegaContactAdapter> contacts;
     ArrayList<ChatExplorerListItem> items;
+    ArrayList<ChatExplorerListItem> addedItems;
 
     int lastFirstVisiblePosition;
 
@@ -88,6 +88,8 @@ public class ChatExplorerFragment extends Fragment {
     AppBarLayout addLayout;
     Button newGroupButton;
     RecyclerView addedList;
+    MegaChipChatExplorerAdapter adapterAdded;
+    LinearLayoutManager addedLayoutManager;
 
 
     @Override
@@ -105,6 +107,12 @@ public class ChatExplorerFragment extends Fragment {
             chatEnabled=true;
             if (megaChatApi == null){
                 megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                if (context instanceof ChatExplorerActivity) {
+                    megaChatApi.addChatListener((ChatExplorerActivity) context);
+                }
+                else if (context instanceof FileExplorerActivityLollipop) {
+//                    megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
+                }
             }
         }
         else{
@@ -136,6 +144,12 @@ public class ChatExplorerFragment extends Fragment {
         newGroupButton = (Button) v.findViewById(R.id.new_group_button);
         if (context instanceof ChatExplorerActivity) {
             addLayout.setVisibility(View.VISIBLE);
+            addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+            addedList.setLayoutManager(addedLayoutManager);
+            addedList.setHasFixedSize(true);
+            addedList.setItemAnimator(new DefaultItemAnimator());
+            addedList.setClipToPadding(false);
+
             newGroupButton.setOnClickListener((ChatExplorerActivity) context);
             setFirstLayoutVisibility(View.VISIBLE);
         }
@@ -253,11 +267,25 @@ public class ChatExplorerFragment extends Fragment {
             int userStatus = megaChatApi.getUserOnlineStatus(handle);
             if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                 log("Request last green for user");
-                megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
+                megaChatApi.requestLastGreen(handle, null);
             }
         }
 
         return new MegaContactAdapter(contactDB, user, fullName);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (megaChatApi != null) {
+            if (context instanceof ChatExplorerActivity) {
+                megaChatApi.removeChatListener((ChatExplorerActivity) context);
+            }
+//            else if (context instanceof FileExplorerActivityLollipop) {
+//                megaChatApi.removeChatListener((FileExplorerActivityLollipop) context);
+//            }
+        }
     }
 
     public void setChats(){
@@ -269,6 +297,13 @@ public class ChatExplorerFragment extends Fragment {
             }
             else {
                 items = new ArrayList<>();
+            }
+
+            if (addedItems != null) {
+                addedItems.clear();
+            }
+            else {
+                addedItems = new ArrayList<>();
             }
 
             if(chats!=null){
@@ -337,12 +372,12 @@ public class ChatExplorerFragment extends Fragment {
 
             log("items no: "+items.size());
 
-            //Order by name
+            //Order by title
             Collections.sort(items, new Comparator<ChatExplorerListItem> (){
 
                 public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
-                    String n1 = c1.getName();
-                    String n2 = c2.getName();
+                    String n1 = c1.getTitle();
+                    String n2 = c2.getTitle();
 
                     int res = String.CASE_INSENSITIVE_ORDER.compare(n1, n2);
                     if (res == 0) {
@@ -351,6 +386,23 @@ public class ChatExplorerFragment extends Fragment {
                     return res;
                 }
             });
+
+
+            if (adapterAdded == null) {
+                adapterAdded = new MegaChipChatExplorerAdapter(context, this, addedItems);
+            }
+            else {
+                adapterAdded.setItems(addedItems);
+            }
+
+            addedList.setAdapter(adapterAdded);
+
+            if (adapterAdded.getItemCount() == 0) {
+                setFirstLayoutVisibility(View.VISIBLE);
+            }
+            else {
+                setFirstLayoutVisibility(View.GONE);
+            }
 
             if (adapterList == null){
                 log("adapterList is NULL");
@@ -399,6 +451,15 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
+    public ArrayList<ChatExplorerListItem> getAddedChats () {
+
+        if (addedItems != null) {
+            return addedItems;
+        }
+
+        return null;
+    }
+
 //    public ArrayList<MegaChatListItem> getSelectedChats() {
 //        log("getSelectedChats");
 //
@@ -428,29 +489,23 @@ public class ChatExplorerFragment extends Fragment {
             megaChatApi.signalPresenceActivity();
         }
 
-//        adapterList.toggleSelection(position);
-//        List<MegaChatListItem> chats = adapterList.getSelectedChats();
+        if (adapterList != null && adapterList.getItemCount() > 0) {
+            ChatExplorerListItem item = adapterList.getItem(position);
 
-//        if(context instanceof  ChatExplorerActivity){
-//            if (chats.size() > 0){
-//                log("Show FAB button to send");
-//                ((ChatExplorerActivity)context).showFabButton(true);
-//            }
-//            else{
-//                ((ChatExplorerActivity)context).showFabButton(false);
-//            }
-//        }
-//        else{
-//            if (chats.size() > 0){
-//                log("Show FAB button to send");
-//                ((FileExplorerActivityLollipop)context).showFabButton(true);
-//            }
-//            else{
-//                ((FileExplorerActivityLollipop)context).showFabButton(false);
-//            }
-//        }
+            addedItems.add(item);
+            adapterAdded.setItems(addedItems);
+            setFirstLayoutVisibility(View.GONE);
+            items.remove(item);
+            adapterList.setItems(items);
+
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).showFabButton(true);
+            }
+            else{
+                ((FileExplorerActivityLollipop)context).showFabButton(true);
+            }
+        }
     }
-    /////END Multiselect/////
 
     @Override
     public void onAttach(Activity activity) {
@@ -610,6 +665,106 @@ public class ChatExplorerFragment extends Fragment {
             return ((ChatExplorerActivity)context).chatIdFrom;
         }
         return -1;
+    }
+
+    public long getMegaContactHandle (MegaContactAdapter contact) {
+        long handle = -1;
+        if (contact != null) {
+            if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
+                handle = contact.getMegaUser().getHandle();
+            }
+            else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
+                handle = Long.parseLong(contact.getMegaContactDB().getHandle());
+            }
+        }
+        return handle;
+    }
+
+    public void updateLastGreenContact (long userhandle, String formattedDate) {
+        ListIterator<ChatExplorerListItem> itrReplace = items.listIterator();
+        while (itrReplace.hasNext()) {
+            ChatExplorerListItem itemToUpdate = itrReplace.next();
+            if (itemToUpdate != null) {
+                if (itemToUpdate.getContact() != null) {
+                    if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
+                        itemToUpdate.getContact().setLastGreen(formattedDate);
+                        break;
+                    }
+                }
+                else {
+                    continue;
+                }
+            } else {
+                break;
+            }
+        }
+
+        int indexToReplace = -1;
+        if(adapterList!=null && adapterList.getItems() != null){
+            ListIterator<ChatExplorerListItem> itrReplace2 = adapterList.getItems().listIterator();
+            while (itrReplace2.hasNext()) {
+                ChatExplorerListItem itemToUpdate = itrReplace2.next();
+                if (itemToUpdate != null) {
+                    if (itemToUpdate.getContact() != null) {
+                        if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
+                            itemToUpdate.getContact().setLastGreen(formattedDate);
+                            indexToReplace = itrReplace2.nextIndex() - 1;
+                            break;
+                        }
+                    }
+                    else {
+                        continue;
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (indexToReplace != -1) {
+                adapterList.updateItemContactStatus(indexToReplace);
+            }
+        }
+    }
+
+    public void deleteItem(int position) {
+        ChatExplorerListItem item = adapterAdded.getItem(position);
+        if (item != null) {
+            addedItems.remove(item);
+            adapterAdded.setItems(addedItems);
+            items.add(item);
+            Collections.sort(items, new Comparator<ChatExplorerListItem> (){
+
+                public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
+                    String n1 = c1.getTitle();
+                    String n2 = c2.getTitle();
+
+                    int res = String.CASE_INSENSITIVE_ORDER.compare(n1, n2);
+                    if (res == 0) {
+                        res = n1.compareTo(n2);
+                    }
+                    return res;
+                }
+            });
+            adapterList.setItems(items);
+
+            if (addedItems.size() > 0) {
+                setFirstLayoutVisibility(View.GONE);
+                if(context instanceof  ChatExplorerActivity){
+                    ((ChatExplorerActivity)context).showFabButton(true);
+                }
+                else{
+                    ((FileExplorerActivityLollipop)context).showFabButton(true);
+                }
+            }
+            else {
+                setFirstLayoutVisibility(View.VISIBLE);
+                if(context instanceof  ChatExplorerActivity){
+                    ((ChatExplorerActivity)context).showFabButton(false);
+                }
+                else{
+                    ((FileExplorerActivityLollipop)context).showFabButton(false);
+                }
+            }
+        }
     }
 
     private static void log(String log) {

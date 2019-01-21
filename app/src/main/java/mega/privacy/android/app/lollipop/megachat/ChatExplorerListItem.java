@@ -7,23 +7,23 @@ public class ChatExplorerListItem {
 
     MegaContactAdapter contact;
     MegaChatListItem chat;
-    String name;
+    String title;
 
     public ChatExplorerListItem (MegaContactAdapter contact) {
         this.contact = contact;
         this.chat = null;
-        this.name = contact.getFullName();
+        this.title = contact.getFullName();
     }
     public ChatExplorerListItem (MegaChatListItem chat) {
         this.contact = null;
         this.chat = chat;
-        this.name = chat.getTitle();
+        this.title = chat.getTitle();
     }
 
     public ChatExplorerListItem (MegaChatListItem chat, MegaContactAdapter contact) {
         this.contact = contact;
         this.chat = chat;
-        this.name = chat.getTitle();
+        this.title = chat.getTitle();
     }
 
     public MegaChatListItem getChat() {
@@ -34,7 +34,7 @@ public class ChatExplorerListItem {
         return contact;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 }
