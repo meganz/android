@@ -460,29 +460,6 @@ public class ChatExplorerFragment extends Fragment {
         return null;
     }
 
-//    public ArrayList<MegaChatListItem> getSelectedChats() {
-//        log("getSelectedChats");
-//
-//        if(adapterList!=null){
-//            return adapterList.getSelectedChats();
-//        }
-//        return null;
-//    }
-
-    /*
-     * Clear all selected items
-     */
-//    public void clearSelections() {
-//        log("clearSelections");
-//        adapterList.clearSelections();
-//    }
-//
-//    public void selectAll() {
-//        if (adapterList != null) {
-//            adapterList.selectAll();
-//        }
-//    }
-
     public void itemClick(int position) {
         log("itemClick");
         if(megaChatApi.isSignalActivityRequired()){
@@ -492,17 +469,19 @@ public class ChatExplorerFragment extends Fragment {
         if (adapterList != null && adapterList.getItemCount() > 0) {
             ChatExplorerListItem item = adapterList.getItem(position);
 
-            addedItems.add(item);
-            adapterAdded.setItems(addedItems);
-            setFirstLayoutVisibility(View.GONE);
-            items.remove(item);
-            adapterList.setItems(items);
+            if (item != null) {
+                addedItems.add(item);
+                adapterAdded.setItems(addedItems);
+                setFirstLayoutVisibility(View.GONE);
+                items.remove(item);
+                adapterList.setItems(items);
 
-            if(context instanceof  ChatExplorerActivity){
-                ((ChatExplorerActivity)context).showFabButton(true);
-            }
-            else{
-                ((FileExplorerActivityLollipop)context).showFabButton(true);
+                if(context instanceof  ChatExplorerActivity){
+                    ((ChatExplorerActivity)context).showFabButton(true);
+                }
+                else{
+                    ((FileExplorerActivityLollipop)context).showFabButton(true);
+                }
             }
         }
     }
@@ -681,34 +660,17 @@ public class ChatExplorerFragment extends Fragment {
     }
 
     public void updateLastGreenContact (long userhandle, String formattedDate) {
-        ListIterator<ChatExplorerListItem> itrReplace = items.listIterator();
-        while (itrReplace.hasNext()) {
-            ChatExplorerListItem itemToUpdate = itrReplace.next();
-            if (itemToUpdate != null) {
-                if (itemToUpdate.getContact() != null) {
-                    if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
-                        itemToUpdate.getContact().setLastGreen(formattedDate);
-                        break;
-                    }
-                }
-                else {
-                    continue;
-                }
-            } else {
-                break;
-            }
-        }
 
-        int indexToReplace = -1;
         if(adapterList!=null && adapterList.getItems() != null){
-            ListIterator<ChatExplorerListItem> itrReplace2 = adapterList.getItems().listIterator();
-            while (itrReplace2.hasNext()) {
-                ChatExplorerListItem itemToUpdate = itrReplace2.next();
+            ListIterator<ChatExplorerListItem> itrReplace = adapterList.getItems().listIterator();
+            while (itrReplace.hasNext()) {
+                ChatExplorerListItem itemToUpdate = itrReplace.next();
                 if (itemToUpdate != null) {
                     if (itemToUpdate.getContact() != null) {
                         if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
                             itemToUpdate.getContact().setLastGreen(formattedDate);
-                            indexToReplace = itrReplace2.nextIndex() - 1;
+                            adapterList.updateItemContactStatus(itrReplace.nextIndex());
+                            items = adapterList.getItems();
                             break;
                         }
                     }
@@ -719,8 +681,26 @@ public class ChatExplorerFragment extends Fragment {
                     break;
                 }
             }
-            if (indexToReplace != -1) {
-                adapterList.updateItemContactStatus(indexToReplace);
+        }
+
+        if(adapterAdded!=null && adapterAdded.getItems() != null){
+            ListIterator<ChatExplorerListItem> itrReplace = adapterAdded.getItems().listIterator();
+            while (itrReplace.hasNext()) {
+                ChatExplorerListItem itemToUpdate = itrReplace.next();
+                if (itemToUpdate != null) {
+                    if (itemToUpdate.getContact() != null) {
+                        if (getMegaContactHandle(itemToUpdate.getContact()) == userhandle) {
+                            itemToUpdate.getContact().setLastGreen(formattedDate);
+                            items = adapterAdded.getItems();
+                            break;
+                        }
+                    }
+                    else {
+                        continue;
+                    }
+                } else {
+                    break;
+                }
             }
         }
     }

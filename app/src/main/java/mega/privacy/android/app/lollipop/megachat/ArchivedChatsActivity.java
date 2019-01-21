@@ -123,7 +123,8 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             log("aB is null");
         }
 
-        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+//        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+        badgeDrawable = new BadgeDrawerArrowDrawable(this);
 
         updateNavigationToolbarIcon();
 
