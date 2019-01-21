@@ -777,8 +777,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("voiceClipLayout.setOnRecordListener() -> onStart() -> stopAnyReproduction && startRecordVoiceClip");
-                stopAnyReproduction();
-                startRecordVoiceClip();
+                if(adapter.isSomethingPlaying()){
+                    log("setOnRecordListener()  --- isSomethingPlaying");
+                    boolean result = adapter.stopReproductions();
+                    if(result){
+                        log("setOnRecordListener()  --- reproductions stopped successfully");
+                        startRecordVoiceClip();
+                    }
+                }else{
+                    log("setOnRecordListener()  --- nothing is playing");
+                    startRecordVoiceClip();
+                }
+
             }
             @Override
             public void onLock() {
@@ -7848,12 +7858,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentVoiceClip.setLayoutParams(lp);
     }
 
-    public void stopAnyReproduction(){
-        log("stopAnyReproduction()");
-        if(adapter.isPlayingSomething()){
-            adapter.stopReproductions();
-        }
-    }
+//    public void stopAnyReproduction(){
+//        log("stopAnyReproduction()");
+//        if(adapter.isSomethingPlaying()){
+//            adapter.stopReproductions();
+//        }
+//    }
 
     public boolean isRecordingNow() {
         return recordingNow;
