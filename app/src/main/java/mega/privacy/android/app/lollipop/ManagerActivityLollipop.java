@@ -13455,11 +13455,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					boolean createChats = false;
 
 					if(nodeHandles!=null){
-						listener = new CreateChatToPerformActionListener(chats, users, nodeHandles, this, CreateChatToPerformActionListener.SEND_FILES);
+						listener = new CreateChatToPerformActionListener(chats, users, nodeHandles, this, CreateChatToPerformActionListener.SEND_FILES, -1);
 						createChats = true;
 					}
 					else if(userHandles!=null){
-						listener = new CreateChatToPerformActionListener(chats, users, userHandles, this, CreateChatToPerformActionListener.SEND_CONTACTS);
+						listener = new CreateChatToPerformActionListener(chats, users, userHandles, this, CreateChatToPerformActionListener.SEND_CONTACTS, -1);
 						createChats = true;
 					}
 					else{

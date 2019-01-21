@@ -60,26 +60,6 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
         }
     }
 
-    public CreateChatToPerformActionListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long[] handles, Context context, int action) {
-        super();
-        this.context = context;
-        this.counter = usersNoChat.size();
-        if (chats != null && !chats.isEmpty()) {
-            this.totalCounter = usersNoChat.size() + chats.size();
-        }
-        else {
-            this.totalCounter = this.counter;
-        }
-        this.chats = chats;
-        this.usersNoChat = usersNoChat;
-        this.handles = handles;
-        this.action = action;
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-        }
-    }
-
     public CreateChatToPerformActionListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long[] handles, Context context, int action, long idChat) {
         super();
         this.context = context;

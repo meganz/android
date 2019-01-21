@@ -25,7 +25,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -233,7 +232,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         }
         
         if (item.getChat() != null) {
-            if(item.getChat().getOwnPrivilege()==MegaChatRoom.PRIV_RM||item.getChat().getOwnPrivilege()==MegaChatRoom.PRIV_RO){
+            if(item.getChat().getOwnPrivilege()==MegaChatRoom.PRIV_RM || item.getChat().getOwnPrivilege()==MegaChatRoom.PRIV_RO){
                 holder.avatarImage.setAlpha(.4f);
                 holder.itemLayout.setOnClickListener(null);
                 holder.itemLayout.setOnLongClickListener(null);
@@ -472,7 +471,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
             }
             else if (context instanceof FileExplorerActivityLollipop) {
-                ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
+//                ((FileExplorerActivityLollipop) fragment).itemClick(holder.getAdapterPosition());
             }
         }
     }
@@ -491,7 +490,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     public void setItems (ArrayList<ChatExplorerListItem> items) {
-        this.items = items;
+        this.items =  items;
         notifyDataSetChanged();
     }
 

@@ -30,7 +30,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         super(context);
 
         backgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop) {
+        if (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
             backgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
         }
         else {
@@ -39,7 +39,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop) {
+        if (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
             bigBackgroundPaint.setColor(Color.WHITE);
         }
         else {
@@ -48,7 +48,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop) {
+        if (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
             textPaint.setColor(Color.WHITE);
         }
         else {

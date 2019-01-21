@@ -97,7 +97,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
         holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.scaleWidthPx(60, outMetrics));
+        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
 
@@ -190,13 +190,16 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
     public void setItems (ArrayList<ChatExplorerListItem> items){
         log("setContacts");
         this.items = items;
-
         notifyDataSetChanged();
     }
 
     public ChatExplorerListItem getItem(int position) {
         log("getItem");
         return items.get(position);
+    }
+
+    public ArrayList<ChatExplorerListItem> getItems () {
+        return items;
     }
 
     public void setUserAvatar(ViewHolderChips holder, ChatExplorerListItem item){
