@@ -5341,6 +5341,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
                 }
+                else if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER){
+                    log("STATE_PREPARING_FROM_EXPLORER: Convert to STATE_PREPARING");
+                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_PREPARING);
+                    pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_PREPARING);
+                    appendMessagePosition(pMsg);
+                }
                 else if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_UPLOADING){
                     if(pMsg.getPendingMessage().getTransferTag()!=-1){
                         log("STATE_UPLOADING:Transfer tag: "+pMsg.getPendingMessage().getTransferTag());
