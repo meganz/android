@@ -38,6 +38,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -1360,6 +1361,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("isOnMegaVoiceNotes: "+isOnMegaVoiceNotes);
 
                 if(MimeTypeList.typeForName(path).isAudio() && isOnMegaVoiceNotes){
+                    log("onBindViewHolderUploading - audio");
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
@@ -1372,6 +1374,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setProgress(0);
+
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setEnabled(false);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setVisibility(View.GONE);
@@ -6228,9 +6233,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.INVISIBLE);
                 holder.uploadingProgressBarVoiceClip.setVisibility(View.GONE);
+                holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
+                holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
 
             }else if (status == MegaChatMessage.STATUS_SENDING) {
-                log(" bindVoiceClipAttachmentMessage:STATUS_SENDING");
+                log("bindVoiceClipAttachmentMessage:STATUS_SENDING");
 
                 holder.contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
                 holder.uploadingProgressBarVoiceClip.setVisibility(View.VISIBLE);
@@ -6238,7 +6245,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                 holder.errorUploadingVoiceClip.setVisibility(View.GONE);
                 holder.retryAlert.setVisibility(View.GONE);
-
+                holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
+                holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
             }else {
                 log("bindVoiceClipAttachmentMessage:OTHER");
 
@@ -6248,35 +6256,67 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.uploadingProgressBarVoiceClip.setVisibility(View.GONE);
                 holder.errorUploadingVoiceClip.setVisibility(View.GONE);
                 holder.retryAlert.setVisibility(View.GONE);
-            }
 
-            // moving the track as per the seekBar's position
-            holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if(fromUser){
-                        log("bindVoiceClipAttachmentMessage:myMessage:onProgressChanged -> progress: "+progress);
-                        holder.lastProgress = progress;
+                holder.contentOwnMessageVoiceClipSeekBar.setEnabled(true);
+                // moving the track as per the seekBar's position
+                holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if(fromUser){
+                            log("bindVoiceClipAttachmentMessage:myMessage:onProgressChanged -> progress: "+progress);
+                            holder.lastProgress = progress;
+                            holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
+                            if(holder.mediaPlayerVoiceNotes!=null){
+                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        log("bindVoiceClipAttachmentMessage:myMessage:onStartTrackingTouch");
+                    }
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        log("bindVoiceClipAttachmentMessage:myMessage:onStopTrackingTouch");
+                        holder.lastProgress = seekBar.getProgress();
                         holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
                         if(holder.mediaPlayerVoiceNotes!=null){
                             holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
                         }
                     }
-                }
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                    log("bindVoiceClipAttachmentMessage:myMessage:onStartTrackingTouch");
-                }
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                    log("bindVoiceClipAttachmentMessage:myMessage:onStopTrackingTouch");
-                    holder.lastProgress = seekBar.getProgress();
-                    holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
-                    if(holder.mediaPlayerVoiceNotes!=null){
-                        holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                    }
-                }
-            });
+                });
+
+
+
+            }
+
+//            // moving the track as per the seekBar's position
+//            holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//                @Override
+//                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                    if(fromUser){
+//                        log("bindVoiceClipAttachmentMessage:myMessage:onProgressChanged -> progress: "+progress);
+//                        holder.lastProgress = progress;
+//                        holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
+//                        if(holder.mediaPlayerVoiceNotes!=null){
+//                            holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+//                        }
+//                    }
+//                }
+//                @Override
+//                public void onStartTrackingTouch(SeekBar seekBar) {
+//                    log("bindVoiceClipAttachmentMessage:myMessage:onStartTrackingTouch");
+//                }
+//                @Override
+//                public void onStopTrackingTouch(SeekBar seekBar) {
+//                    log("bindVoiceClipAttachmentMessage:myMessage:onStopTrackingTouch");
+//                    holder.lastProgress = seekBar.getProgress();
+//                    holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
+//                    if(holder.mediaPlayerVoiceNotes!=null){
+//                        holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+//                    }
+//                }
+//            });
 
             if(!multipleSelect){
                 if (positionClicked != -1) {
@@ -6412,6 +6452,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
             holder.contentContactMessageVoiceClipPlay.setOnClickListener(null);
             holder.contentContactMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
+            holder.contentContactMessageVoiceClipSeekBar.setEnabled(true);
             holder.contentContactMessageVoiceClipDuration.setVisibility(View.VISIBLE);
 
             //Find contact voice clip to know the duration
@@ -6424,9 +6465,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }else{
                 holder.contentContactMessageVoiceClipPlay.setOnClickListener(this);
             }
-
-            holder.contentContactMessageVoiceClipDuration.setVisibility(View.VISIBLE);
-            holder.contentContactMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
 
             holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
             holder.contentContactMessageVoiceClipSeekBar.setMax(holder.totalDurationOfVoiceClip);
@@ -9573,46 +9611,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-//    private void updateContactSeekBar(final ViewHolderMessageChat holder) {
-//        runnableContactVoiceClip = new Runnable() {
-//            @Override
-//            public void run() {
-//                updateContactSeekBar(holder);
-//            }
-//        };
-//        if(holder.mediaPlayerVoiceNotes != null){
-//            holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
-//            holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-//            holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
-//
-//            handlerVoiceNotes.postDelayed(runnableContactVoiceClip,50);
-//
-//            // once the audio is complete, timer is stopped here
-//            holder.mediaPlayerVoiceNotes.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                @Override
-//                public void onCompletion(MediaPlayer mp) {
-//                    if(holder.mediaPlayerVoiceNotes.isPlaying()){
-//                        holder.mediaPlayerVoiceNotes.pause();
-//                        holder.mediaPlayerVoiceNotes.stop();
-//                    }
-//
-//                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-//                    holder.lastProgress = 0;
-//                    holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-////                    holder.contentContactMessageVoiceClipSeekBar.setMax(holder.totalDurationOfVoiceClip);
-//                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-//                    holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
-//                    log("updateContactSeekBar:setOnCompletionListener");
-//                    removeCallBacks();
-//
-//
-//
-//                    setPlayingSomething(false);
-//
-//                }
-//            });
-//        }
-//    }
 
     private String milliSecondsToTimer(long milliseconds) {
         String finalTimerString = "";

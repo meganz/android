@@ -185,6 +185,8 @@ public class RecordView extends RelativeLayout {
             cont = 0;
             if(layoutLock.getVisibility() == View.GONE){
                 layoutLock.setVisibility(View.VISIBLE);
+                imageArrow.setVisibility(VISIBLE);
+                imageLock.setVisibility(VISIBLE);
                 int prevHeight  = layoutLock.getHeight();
                 ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, Util.px2dp(125, outMetrics));
                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -197,8 +199,7 @@ public class RecordView extends RelativeLayout {
                 valueAnimator.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        imageArrow.setVisibility(VISIBLE);
-                        imageLock.setVisibility(VISIBLE);
+
                         if((imageArrow!=null)&& (imageLock!=null)){
                             imageArrow.clearAnimation();
                             imageLock.clearAnimation();
