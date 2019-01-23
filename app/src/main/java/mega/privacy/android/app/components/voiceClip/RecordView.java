@@ -87,7 +87,8 @@ public class RecordView extends RelativeLayout {
     private float lastX, lastY;
     private float firstX, firstY;
 
-    private float directionOffset, cancelOffset, lockOffset;
+    private float directionOffset;
+//    private float lockOffset;
     private boolean isLocked = false;
     private UserBehaviour userBehaviour = UserBehaviour.NONE;
 
@@ -318,6 +319,8 @@ public class RecordView extends RelativeLayout {
 
         firstX = motionEvent.getRawX();
         firstY = motionEvent.getRawY();
+        lastX = motionEvent.getRawX();
+        lastY = motionEvent.getRawY();
 
 //        lockOffset = (float) (recordBtn.getX() / 2.5);
         isLocked = false;
@@ -343,7 +346,7 @@ public class RecordView extends RelativeLayout {
             float motionX = Math.abs(firstX - motionEvent.getRawX());
             float motionY = Math.abs(firstY - motionEvent.getRawY());
 
-            if (motionX > directionOffset && motionX > directionOffset && lastX < firstX && lastY < firstY) {
+            if (motionX > directionOffset && lastX < firstX) {
                 if (motionX > motionY && lastX < firstX) {
                     direction = UserBehaviour.CANCELING;
                 } else if (motionY > motionX && lastY < firstY) {
@@ -410,7 +413,7 @@ public class RecordView extends RelativeLayout {
                     if((layoutLock.getVisibility() == VISIBLE) && (isLockpadShown)){
                         if((firstY - motionEvent.getRawY()) >= (layoutLock.getHeight()- recordBtn.getHeight())){
                             if((!isLocked) && (recordListener != null)) {
-                                log(" onActionMove() ----> LOCKING");
+                                log("onActionMove() ----> LOCKING");
                                 recordListener.onLock();
                                 recordBtn.setTranslationY(0);
                                 recordBtn.setTranslationX(0);
