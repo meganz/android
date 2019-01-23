@@ -6145,14 +6145,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
 					}
 				}
-				searchExpand = true;
-				textsearchQuery = false;
 				searchQuery = "";
-				firstNavigationLevel = true;
-				parentHandleSearch = -1;
-				levelsSearch = -1;
-				drawerItem = DrawerItem.SEARCH;
-				selectDrawerItemLollipop(drawerItem);
+				searchExpand = true;
+				if (drawerItem != DrawerItem.CHAT) {
+					textsearchQuery = false;
+					firstNavigationLevel = true;
+					parentHandleSearch = -1;
+					levelsSearch = -1;
+					drawerItem = DrawerItem.SEARCH;
+					selectDrawerItemLollipop(drawerItem);
+				}
 				return true;
 			}
 
@@ -6160,9 +6162,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				log("onMenuItemActionCollapse()");
 				searchExpand = false;
-				backToDrawerItem(bottomNavigationCurrentItem);
-				textSubmitted = true;
-				changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+				if (drawerItem != DrawerItem.CHAT) {
+					backToDrawerItem(bottomNavigationCurrentItem);
+					textSubmitted = true;
+					changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+				}
+				else {
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if (rChatFL != null) {
+						rChatFL.closeSearch();
+						supportInvalidateOptionsMenu();
+					}
+				}
 				return true;
 			}
 		});
@@ -6171,28 +6182,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				log("onQueryTextSubmit: "+query);
-				searchQuery = "" + query;
-				setToolbarTitle();
-				supportInvalidateOptionsMenu();
-				log("Search query: " + query);
-				textSubmitted = true;
-				searchExpand = false;
+				if (drawerItem != DrawerItem.CHAT) {
+					searchQuery = "" + query;
+					setToolbarTitle();
+					supportInvalidateOptionsMenu();
+					log("Search query: " + query);
+					textSubmitted = true;
+					searchExpand = false;
+				}
+				else {
+					hideKeyboard();
+				}
 				return true;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-
-				if(textSubmitted){
-					sFLol.setAllowedMultiselect(true);
-					textSubmitted = false;
-				}else if (textsearchQuery) {
-//					selectDrawerItemLollipop(DrawerItem.SEARCH);
-					refreshFragment(FragmentTag.SEARCH.getTag());
-				}else{
+				if (drawerItem != DrawerItem.CHAT) {
+					if (textSubmitted) {
+						sFLol.setAllowedMultiselect(true);
+						textSubmitted = false;
+					} else if (textsearchQuery) {
+						refreshFragment(FragmentTag.SEARCH.getTag());
+					} else {
+						searchQuery = newText;
+						refreshFragment(FragmentTag.SEARCH.getTag());
+					}
+				}
+				else {
 					searchQuery = newText;
-//					selectDrawerItemLollipop(DrawerItem.SEARCH);
-					refreshFragment(FragmentTag.SEARCH.getTag());
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+					if (rChatFL != null) {
+						rChatFL.filterChats(newText);
+					}
 				}
 				return true;
 			}
@@ -7209,26 +7231,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
 
-					if(Util.isOnline(this)){
-						newChatMenuItem.setVisible(true);
-						rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-						if(rChatFL != null && rChatFL.getItemCount()>0){
-							selectMenuItem.setVisible(true);
-						}
-						else{
-							selectMenuItem.setVisible(false);
-						}
-						setStatusMenuItem.setVisible(true);
-					}
-					else{
+					if (searchExpand) {
+						openSearchView();
 						newChatMenuItem.setVisible(false);
 						selectMenuItem.setVisible(false);
 						setStatusMenuItem.setVisible(false);
 					}
+					else {
+						if (Util.isOnline(this)) {
+							newChatMenuItem.setVisible(true);
+							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+							if (rChatFL != null && rChatFL.getItemCount() > 0) {
+								selectMenuItem.setVisible(true);
+							} else {
+								selectMenuItem.setVisible(false);
+							}
+							setStatusMenuItem.setVisible(true);
+						} else {
+							newChatMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
+							setStatusMenuItem.setVisible(false);
+						}
+					}
+					searchMenuItem.setVisible(true);
 
 					//Hide
 					searchByDate.setVisible(false);
-					searchMenuItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
@@ -18562,6 +18590,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 	}
+
+	public void closeSearchView () {
+	    if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
+	        searchMenuItem.collapseActionView();
+        }
+    }
 
 	public void setTextSubmitted () {
 	    if (searchView != null) {
