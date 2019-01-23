@@ -70,6 +70,7 @@ import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1171,7 +1172,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         }else{
             size = String.valueOf(Integer.parseInt(sizeInDB));
         }
-        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label).replace("XXMB",size) + getResources().getString(R.string.hint_MB);
+        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label).replace("$size",size + getResources().getString(R.string.hint_MB));
         cameraUploadCharging.setSummary(chargingHelper);
 		
 	}
@@ -3012,19 +3013,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             
             @Override
             public void run() {
-                log("Now I start the service");
-                if (isDeviceSupportParallelUpload() && !CameraUploadsService.isServiceRunning) {
-                    Intent newIntent = new Intent(context,CameraUploadsService.class);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        log("enableCameraUpload: starting on Oreo or above: ");
-                        context.startForegroundService(newIntent);
-                    } else {
-                        log("enableCameraUpload: starting below Oreo  ");
-                        context.startService(newIntent);
-                    }
-                } else {
-                    log("enableCameraUpload(): isDeviceSupportParallelUpload() is " + isDeviceSupportParallelUpload() + " and isServiceRunning " + CameraUploadsService.isServiceRunning);
-                }
+                log("enableCameraUpload, Now I start the service");
+                JobUtil.startCameraUploadService(context);
             }
         }, 1 * 1000);
         
@@ -3201,6 +3191,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             if(isQueueSizeValid(size)){
                 newFolderDialog.dismiss();
                 cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
+                String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label).replace("$size",size + getResources().getString(R.string.hint_MB));
+                cameraUploadCharging.setSummary(chargingHelper);
                 dbH.setChargingOnSize(size);
                 prefs.setChargingOnSize(size + "");
                 restartCameraUpload();

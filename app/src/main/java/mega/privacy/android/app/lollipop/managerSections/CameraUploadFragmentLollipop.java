@@ -68,7 +68,6 @@ import mega.privacy.android.app.components.DividerItemDecorationV2;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -78,6 +77,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterL
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -94,7 +94,6 @@ import static mega.privacy.android.app.lollipop.managerSections.SettingsFragment
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
 import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
-import static mega.privacy.android.app.utils.Util.isDeviceSupportParallelUpload;
 
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, MegaRequestListenerInterface{
@@ -1474,19 +1473,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             
             @Override
             public void run() {
-                log("Now I start the service");
-                if (isDeviceSupportParallelUpload() && !CameraUploadsService.isServiceRunning) {
-                    Intent newIntent = new Intent(context,CameraUploadsService.class);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        log("cameraOnOffFirstTime: starting on Oreo or above: ");
-                        context.startForegroundService(newIntent);
-                    } else {
-                        log("cameraOnOffFirstTime: starting below Oreo  ");
-                        context.startService(newIntent);
-                    }
-                } else {
-                    log("cameraOnOffFirstTime: isDeviceSupportParallelUpload() is " + isDeviceSupportParallelUpload() + " and isServiceRunning " + CameraUploadsService.isServiceRunning);
-                }
+                log("cameraOnOffFirstTime Now I start the service");
+                JobUtil.startCameraUploadService(context);
             }
         },1 * 1000);
 		
@@ -1561,14 +1549,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
                                             @Override
                                             public void run() {
-                                                log("Now I start the service");
-                                                if (Util.isDeviceSupportParallelUpload()) {
-                                                    startJob(context);
-                                                } else {
-                                                    context.startService(new Intent(context,CameraSyncService.class));
-                                                }
+                                                log("cameraOnOff, Now I start the service");
+                                                JobUtil.startCameraUploadService(context);
                                             }
-                                        },10 * 1000);
+                                        },1 * 1000);
                                         
                                         ((ManagerActivityLollipop)context).refreshCameraUpload();
 										
@@ -1611,14 +1595,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
                         @Override
                         public void run() {
-                            log("Now I start the service");
-                            if (Util.isDeviceSupportParallelUpload()) {
-                                startJob(context);
-                            } else {
-                                context.startService(new Intent(context,CameraSyncService.class));
-                            }
+                            log("popup onclick - Now I start the service");
+                            JobUtil.startCameraUploadService(context);
                         }
-                    },10 * 1000);
+                    },1 * 1000);
 				
 					((ManagerActivityLollipop)context).refreshCameraUpload();
 					switch (which){
