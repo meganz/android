@@ -537,6 +537,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     }
     
     private void saveDataToDB(ArrayList<SyncRecord> list) {
+        log("saveDataToDB list length is " + list.size());
         for (SyncRecord file : list) {
             SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(),file.isSecondary(),file.isCopyOnly());
             if (exist != null) {

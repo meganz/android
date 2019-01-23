@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -83,6 +84,7 @@ import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
 import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
+import static mega.privacy.android.app.utils.Util.isDeviceSupportParallelUpload;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
 //import android.support.v4.preference.PreferenceFragment;
@@ -204,7 +206,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	SwitchPreferenceCompat twoFASwitch;
 
 	PreferenceScreen preferenceScreen;
-
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory chatEnabledCategory;
 	PreferenceCategory chatNotificationsCategory;
@@ -973,6 +974,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		if (cameraUpload){
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
+            cameraUploadOn.setSummary(R.string.settings_camera_upload_status_helper_label);
 			cameraUploadHow.setSummary(wifi);
 			localCameraUploadFolder.setSummary(camSyncLocalPath);
 			localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
@@ -1077,6 +1079,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else{
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+            cameraUploadOn.setSummary("");
 			cameraUploadHow.setSummary("");
 			localCameraUploadFolder.setSummary("");
 			localCameraUploadFolderSDCard.setSummary("");
@@ -1159,6 +1162,18 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
+        
+        String sizeInDB = prefs.getChargingOnSize();
+        String size;
+        if(sizeInDB == null){
+            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+            size = String.valueOf(DEFAULT_CONVENTION_QUEUE_SIZE);
+        }else{
+            size = String.valueOf(Integer.parseInt(sizeInDB));
+        }
+        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label).replace("XXMB",size) + getResources().getString(R.string.hint_MB);
+        cameraUploadCharging.setSummary(chargingHelper);
+		
 	}
 
 	public void setVersionsInfo(){
@@ -2205,6 +2220,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+            cameraUploadOn.setSummary("");
 			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
 			cameraUploadCategory.removePreference(cameraUploadHow);
 			cameraUploadCategory.removePreference(cameraUploadWhat);
@@ -2997,15 +3013,23 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             @Override
             public void run() {
                 log("Now I start the service");
-                if (Util.isDeviceSupportParallelUpload()) {
-                    startJob(context);
-                }else{
-                    context.startService(new Intent(context, CameraSyncService.class));
+                if (isDeviceSupportParallelUpload() && !CameraUploadsService.isServiceRunning) {
+                    Intent newIntent = new Intent(context,CameraUploadsService.class);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        log("enableCameraUpload: starting on Oreo or above: ");
+                        context.startForegroundService(newIntent);
+                    } else {
+                        log("enableCameraUpload: starting below Oreo  ");
+                        context.startService(newIntent);
+                    }
+                } else {
+                    log("enableCameraUpload(): isDeviceSupportParallelUpload() is " + isDeviceSupportParallelUpload() + " and isServiceRunning " + CameraUploadsService.isServiceRunning);
                 }
             }
-        }, 30 * 1000);
+        }, 1 * 1000);
         
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
+        cameraUploadOn.setSummary(R.string.settings_camera_upload_status_helper_label);
         cameraUploadHow.setSummary(wifi);
         localCameraUploadFolder.setSummary(camSyncLocalPath);
         localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
@@ -3077,6 +3101,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         }
     
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+        cameraUploadOn.setSummary("");
         secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
         cameraUploadCategory.removePreference(cameraUploadHow);
         cameraUploadCategory.removePreference(cameraUploadWhat);
