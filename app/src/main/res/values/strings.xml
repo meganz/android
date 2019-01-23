@@ -2310,5 +2310,7 @@
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">SLIDE TO CANCEL</string>
     <string name="cancel_voice_clip" context="text of button to cancel a voice clip ">CANCEL</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
+
 
 </resources>

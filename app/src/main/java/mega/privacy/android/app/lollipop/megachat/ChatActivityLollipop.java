@@ -778,14 +778,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onStart() {
                 log("voiceClipLayout.setOnRecordListener() -> onStart() -> stopAnyReproduction && startRecordVoiceClip");
                 if(adapter.isSomethingPlaying()){
-                    log("setOnRecordListener()  --- isSomethingPlaying");
                     boolean result = adapter.stopReproductions();
                     if(result){
-                        log("setOnRecordListener()  --- reproductions stopped successfully");
                         startRecordVoiceClip();
                     }
                 }else{
-                    log("setOnRecordListener()  --- nothing is playing");
                     startRecordVoiceClip();
                 }
 
