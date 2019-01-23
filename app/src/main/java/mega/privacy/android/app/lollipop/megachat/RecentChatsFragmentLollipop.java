@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -76,6 +77,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     FastScroller fastScroller;
 
     ArrayList<MegaChatListItem> chats;
+
+    FilterChatsTask filterChatsTask;
 
     int lastFirstVisiblePosition;
 
@@ -962,6 +965,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
             intent.putExtra("CHAT_ID", chats.get(position).getChatId());
             this.startActivity(intent);
+            if (context instanceof ManagerActivityLollipop) {
+                if (((ManagerActivityLollipop) context).searchQuery != null  && !((ManagerActivityLollipop) context).searchQuery.isEmpty()) {
+                    closeSearch();
+                    ((ManagerActivityLollipop) context).closeSearchView();
+                }
+            }
         }
     }
     /////END Multiselect/////
@@ -1759,6 +1768,52 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                fastScroller.setVisibility(View.VISIBLE);
            }
         }
+    }
+
+    public void filterChats (String s) {
+        if (adapterList.isMultipleSelect()) {
+            hideMultipleSelect();
+        }
+
+        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
+            filterChatsTask.cancel(true);
+        }
+        filterChatsTask = new FilterChatsTask();
+        filterChatsTask.execute(s);
+    }
+
+    class FilterChatsTask extends AsyncTask<String, Void, Void> {
+
+        ArrayList<MegaChatListItem> filteredChats;
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            if (chats != null && !chats.isEmpty()) {
+                if (filteredChats == null) {
+                    filteredChats = new ArrayList<>();
+                } else {
+                    filteredChats.clear();
+                }
+                for (MegaChatListItem chat : chats) {
+                    if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
+                        filteredChats.add(chat);
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            adapterList.setChats(filteredChats);
+        }
+    }
+
+    public void closeSearch() {
+        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
+            filterChatsTask.cancel(true);
+        }
+        adapterList.setChats(chats);
     }
 
     private static void log(String log) {
