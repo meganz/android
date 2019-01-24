@@ -48,6 +48,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -92,6 +93,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView usedSpace;
 	TextView lastSession;
 	TextView connections;
+	TextView addPhoneNumber;
 
 	ImageView editImageView;
 
@@ -220,6 +222,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
 		infoEmail.setOnClickListener(this);
+		
+		addPhoneNumber = (TextView)v.findViewById(R.id.add_phone_number);
+		addPhoneNumber.setText(R.string.add_phone_number_label);
+		addPhoneNumber.setOnClickListener(this);
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
@@ -678,6 +684,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 				break;
 			}
+            case R.id.add_phone_number:{
+                Intent intent = new Intent(context,SMSVerificationActivity.class) ;
+                startActivity(intent);
+                break;
+            }
+            
 		}
 	}
 

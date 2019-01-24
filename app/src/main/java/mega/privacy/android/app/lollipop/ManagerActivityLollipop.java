@@ -127,6 +127,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
@@ -264,6 +265,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
+	TextView addPhoneNumberButton;
+	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
 	AlertDialog evaluateAppDialog;
@@ -418,7 +421,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
-	FrameLayout accountInfoFrame;
+    RelativeLayout accountInfoFrame;
 	TextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
@@ -2051,6 +2054,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
 		}
         upgradeAccount.setOnClickListener(this);
+        
+        addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton.setOnClickListener(this);
+        
+        addPhoneNumberLabel = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_label);
+        addPhoneNumberLabel.setText(R.string.navigation_drawer_add_phone_number_helper);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
@@ -2136,7 +2145,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
+		accountInfoFrame = (RelativeLayout) findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
         nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
@@ -12907,15 +12916,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onClick");
 
 		switch(v.getId()){
-//			case R.id.custom_search:{
-//				if (searchMenuItem != null) {
-//					MenuItemCompat.expandActionView(searchMenuItem);
-//				}
-//				else{
-//					log("searchMenuItem == null");
-//				}
-//				break;
-//			}
+			case R.id.navigation_drawer_add_phone_number_button:{
+                Intent intent = new Intent(this,SMSVerificationActivity.class) ;
+                startActivity(intent);
+				break;
+			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
 				break;

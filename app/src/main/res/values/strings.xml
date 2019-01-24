@@ -663,6 +663,9 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Default download location</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask for download location</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
+	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
+	<string name="navigation_drawer_add_phone_number_label" context="label of button in navigation drawer that ask user to add their phone number">Add phone number</string>
+	<string name="navigation_drawer_add_phone_number_helper" context="label of button in navigation drawer that ask user to add their phone number">Get free $size when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
 
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
         <item context="internal storage option">Internal storage</item>
