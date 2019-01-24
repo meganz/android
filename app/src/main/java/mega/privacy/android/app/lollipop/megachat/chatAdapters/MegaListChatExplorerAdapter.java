@@ -30,10 +30,8 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.utils.Constants;
@@ -467,12 +465,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ViewHolderChatExplorerList holder = (ViewHolderChatExplorerList) v.getTag();
 
         if (v.getId() == R.id.chat_explorer_list_item_layout) {
-            if (context instanceof ChatExplorerActivity) {
-                ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
-            }
-            else if (context instanceof FileExplorerActivityLollipop) {
-//                ((FileExplorerActivityLollipop) fragment).itemClick(holder.getAdapterPosition());
-            }
+            ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
         }
     }
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -30,6 +31,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
     public static int SEND_FILES = 4;
     public static int SEND_CONTACTS = 5;
     public static int SEND_MESSAGES = 6;
+    public static int SEND_FILE_EXPLORER_CONTENT = 7;
 
     Context context;
     int counter = 0;
@@ -279,6 +281,40 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         }
                         MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(context, chatHandles, handles, idChat);
                         forwardChatProcessor.forward();
+                    }
+                }
+            }
+            else if (action == SEND_FILE_EXPLORER_CONTENT) {
+                counter--;
+                log("Counter after decrease: "+counter);
+                if (e.getErrorCode() != MegaError.API_OK){
+                    error++;
+                    log("ERROR creating chat");
+                }
+                else{
+                    if(chats==null){
+                        chats = new ArrayList<MegaChatRoom>();
+                    }
+                    MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
+                    if(chat!=null){
+                        chats.add(chat);
+                    }
+                }
+
+                if(counter==0){
+                    log("Counter is 0 - all requests processed");
+                    if((usersNoChat.size() == error) && (chats==null || chats.isEmpty())){
+                        //All send messages fail; Show error
+                        message = context.getResources().getString(R.string.content_not_send, totalCounter);
+                        if (context instanceof FileExplorerActivityLollipop) {
+                            ((FileExplorerActivityLollipop) context).showSnackbar(message);
+                        }
+                    }
+                    else {
+//                        Send content
+                        if (context instanceof FileExplorerActivityLollipop) {
+                            ((FileExplorerActivityLollipop) context).sendToChats(chats);
+                        }
                     }
                 }
             }

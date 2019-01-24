@@ -65,8 +65,10 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
@@ -74,6 +76,7 @@ import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -82,7 +85,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -97,7 +102,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener {
+public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
@@ -188,7 +193,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	private int tabShown = CLOUD_TAB;
 
-	ArrayList<MegaChatListItem> chatListItems;
+	ArrayList<MegaChatRoom> chatListItems;
 
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
@@ -443,12 +448,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-			}
+			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 
 			log("hide action bar");
 			if (!MegaApplication.isLoggingIn()) {
@@ -514,13 +514,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
-			}
+			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
 			afterLoginAndFetch();
 		}
@@ -903,13 +897,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
-	public void changeActionBarElevation(boolean whitElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
-				abL.setElevation(Util.px2dp(4, outMetrics));
-			}
-			else {
-				abL.setElevation(0);
+	public void changeActionBarElevation(boolean whitElevation) {
+		chatExplorer = getChatExplorerFragment();
+		if (chatExplorer == null || chatExplorer.isHidden()) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if (whitElevation) {
+					abL.setElevation(Util.px2dp(4, outMetrics));
+				}
+				else {
+					abL.setElevation(0);
+				}
 			}
 		}
 	}
@@ -953,7 +950,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if(index==0){
 				if(isChatFirst){
 					createFolderMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(true);
+					newChatMenuItem.setVisible(false);
 				}
 				else{
 					//CLOUD TAB
@@ -1049,7 +1046,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 				else{
 					createFolderMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(true);
+					newChatMenuItem.setVisible(false);
 				}
 			}
 
@@ -1067,7 +1064,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						case INCOMING_FRAGMENT:{
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
-							if(iSharesExplorer != null && iSharesExplorer.isAdded()){
+							if(iSharesExplorer != null){
 								if (deepBrowserTree > 0) {
 									//Check the folder's permissions
 									long parentH = iSharesExplorer.getParentHandle();
@@ -1091,7 +1088,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							break;
 						}
 						case CHAT_FRAGMENT:{
-							newChatMenuItem.setVisible(true);
+							newChatMenuItem.setVisible(false);
 							break;
 						}
 					}
@@ -1188,7 +1185,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						case CLOUD_FRAGMENT: {
 							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 
-							if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+							if(cDriveExplorer!=null){
 								if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
 									setRootTitle();
 								}
@@ -1201,7 +1198,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						case INCOMING_FRAGMENT:{
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 
-							if(iSharesExplorer!=null && iSharesExplorer.isAdded()){
+							if(iSharesExplorer!=null){
 								if(deepBrowserTree==0){
 									setRootTitle();
 								}
@@ -1484,7 +1481,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (importFileF) {
 				switch (importFragmentSelected) {
 					case CLOUD_FRAGMENT: {
-						if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+						if(cDriveExplorer!=null){
 							if (cDriveExplorer.onBackPressed() == 0){
 								chooseFragment(IMPORT_FRAGMENT);
 							}
@@ -1501,7 +1498,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						break;
 					}
 					case CHAT_FRAGMENT:{
-						if(chatExplorer!=null && chatExplorer.isAdded()){
+						chatExplorer = getChatExplorerFragment();
+						if(chatExplorer!=null){
 							showFabButton(false);
 //							chatExplorer.clearSelections();
 							chooseFragment(IMPORT_FRAGMENT);
@@ -1514,7 +1512,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 			}
-			else if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+			else if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
 					finishActivity();
 				}
@@ -1548,7 +1546,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				if(chatListItems!=null){
 					for(int i=0; i < chatListItems.size();i++){
-						MegaChatListItem item = chatListItems.get(i);
+						MegaChatRoom item = chatListItems.get(i);
 						long idChat = item.getChatId();
 						log("Id chat: "+idChat);
 						PendingMessageSingle pMsgSingle = new PendingMessageSingle();
@@ -1632,7 +1630,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 
 			if(chatListItems.size()==1){
-				MegaChatListItem chatItem = chatListItems.get(0);
+				MegaChatRoom chatItem = chatListItems.get(0);
 				long idChat = chatItem.getChatId();
 				if(chatItem!=null){
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -2276,13 +2274,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if (error.getErrorCode() == MegaError.API_OK){
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					Window window = this.getWindow();
-					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-					window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
-				}
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
@@ -2532,22 +2525,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 			//Update chat view
-			String chatTag1;
-			if (importFileF) {
-				chatTag1  ="chatExplorer";
-			}
-			else {
-				if (isChatFirst) {
-					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
-				}
-				else {
-					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
-				}
-			}
-			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
-			if(chatExplorer!=null && chatExplorer.isAdded()){
+			chatExplorer = getChatExplorerFragment();
+			if(chatExplorer!=null){
 				chatExplorer.setChats();
 			}
+			showSnackbar(getString(R.string.new_group_chat_created));
 		}
 		else{
 			log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
@@ -2725,38 +2707,97 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		});
 	}
 
+	void getChatAdded (ArrayList<ChatExplorerListItem> listItems) {
+		ArrayList<MegaChatRoom> chats = new ArrayList<>();
+		ArrayList<MegaUser> users = new ArrayList<>();
+
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.preparing_chats));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+
+		for (ChatExplorerListItem item : listItems) {
+			if (item.getChat() != null) {
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(item.getChat().getChatId());
+				if (chatRoom != null) {
+					chats.add(chatRoom);
+				}
+			}
+			else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
+				users.add(item.getContact().getMegaUser());
+			}
+		}
+
+		if (!users.isEmpty()) {
+			CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, -1, this, CreateChatToPerformActionListener.SEND_FILE_EXPLORER_CONTENT);
+
+			for (MegaUser user : users) {
+				MegaChatPeerList peers = MegaChatPeerList.createInstance();
+				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+				megaChatApi.createChat(false, peers, listener);
+			}
+		}
+		else {
+			sendToChats(chats);
+		}
+	}
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");
 
 		switch(v.getId()) {
 			case R.id.fab_file_explorer: {
-
-				String chatTag1;
-				if (importFileF) {
-					chatTag1  ="chatExplorer";
-				}
-				else {
-					if(isChatFirst){
-						chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					}
-					else{
-						chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				chatExplorer = getChatExplorerFragment();
+				if(chatExplorer!=null){
+					if(chatExplorer.getAddedChats()!=null){
+//						sendToChats(chatExplorer.getAddedChats());
+						getChatAdded(chatExplorer.getAddedChats());
 					}
 				}
-				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
-				if(chatExplorer!=null && chatExplorer.isAdded()){
-//					if(chatExplorer.getSelectedChats()!=null){
-//						sendToChats(chatExplorer.getSelectedChats());
-//					}
+				break;
+			}
+			case R.id.new_group_button: {
+				if(megaApi!=null && megaApi.getRootNode()!=null){
+					ArrayList<MegaUser> contacts = megaApi.getContacts();
+					if(contacts==null){
+						showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+					}
+					else {
+						if(contacts.isEmpty()){
+							showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+						}
+						else{
+							Intent intent = new Intent(this, AddContactActivityLollipop.class);
+							intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+							intent.putExtra("onlyCreateGroup", true);
+							startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
+						}
+					}
+				}
+				else{
+					log("Online but not megaApi");
+					Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
 				break;
 			}
 		}
 	}
 
-	public void sendToChats(ArrayList<MegaChatListItem> chatListItems){
-		log("sendToChats");
+	public void sendToChats(ArrayList<MegaChatRoom> chatListItems){
+
+		if (statusDialog != null) {
+			try {
+				statusDialog.dismiss();
+			}
+			catch(Exception ex){}
+		}
 
 		this.chatListItems = chatListItems;
 
@@ -2792,7 +2833,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 
 				if(chatListItems.size()==1){
-					MegaChatListItem chatItem = chatListItems.get(0);
+					MegaChatRoom chatItem = chatListItems.get(0);
 					long idChat = chatItem.getChatId();
 					if(chatItem!=null){
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -3246,6 +3287,61 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		return m.find();
+	}
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+	}
+
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+	}
+
+	@Override
+	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+		int state = megaChatApi.getUserOnlineStatus(userhandle);
+		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
+			String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
+			if (userhandle != megaChatApi.getMyUserHandle()) {
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.updateLastGreenContact(userhandle, formattedDate);
+				}
+			}
+		}
+	}
+
+	ChatExplorerFragment getChatExplorerFragment () {
+		String chatTag1;
+		if (importFileF) {
+			chatTag1  ="chatExplorer";
+		}
+		else {
+			if(isChatFirst){
+				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			}
+			else{
+				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			}
+		}
+		return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 	}
 
 	public long getParentHandleCloud() {

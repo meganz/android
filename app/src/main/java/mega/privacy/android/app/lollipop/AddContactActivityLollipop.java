@@ -222,6 +222,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private boolean createNewGroup = false;
     private String title = "";
 
+    private boolean onlyCreateGroup;
+
     @Override
     public List<ShareContactInfo> getAdapterData() {
         if (inputString != null && !inputString.equals("")) {
@@ -1308,6 +1310,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("isConfirmAddShown", isConfirmAddShown);
         outState.putString("confirmAddMail", confirmAddMail);
         outState.putBoolean("createNewGroup", createNewGroup);
+        outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
 
         saveContactsAdded(outState);
     }
@@ -1397,6 +1400,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if (comesFromChat) {
                 title = getIntent().getStringExtra("aBtitle");
             }
+            onlyCreateGroup = getIntent().getBooleanExtra("onlyCreateGroup", false);
             if (contactType == Constants.CONTACT_TYPE_MEGA || contactType == Constants.CONTACT_TYPE_BOTH){
                 multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
                 if(multipleSelectIntent==0){
@@ -1598,6 +1602,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
             confirmAddMail = savedInstanceState.getString("confirmAddMail");
             createNewGroup = savedInstanceState.getBoolean("createNewGroup", false);
+            onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
 
             if (contactType == Constants.CONTACT_TYPE_MEGA || contactType == Constants.CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
@@ -1684,6 +1689,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 queryIfHasReadContactsPermissions();
             }
         }
+
+        if (onlyCreateGroup) {
+            createNewGroup = true;
+            setTitleAB();
+            inviteContactButton.setVisibility(View.GONE);
+            newGroupChatButton.setVisibility(View.GONE);
+        }
     }
 
     void queryIfHasReadContactsPermissions() {
@@ -1731,7 +1743,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     aB.setTitle(getString(R.string.group_chat_start_conversation_label));
                 }
                 else if (createNewGroup && !onNewGroup) {
-                    aB.setTitle(getString(R.string.group_chat_start_conversation_label));
+                    if (onlyCreateGroup) {
+                        aB.setTitle(getString(R.string.title_new_group));
+                    }
+                    else {
+                        aB.setTitle(getString(R.string.group_chat_start_conversation_label));
+                    }
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(addedContactsMEGA.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsMEGA.size()));
                     }
@@ -2850,7 +2867,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (onNewGroup) {
             returnToAddContacts();
         }
-        else if (createNewGroup) {
+        else if (createNewGroup && !onlyCreateGroup) {
             createNewGroup = false;
             aB.setSubtitle(null);
             inviteContactButton.setVisibility(View.VISIBLE);

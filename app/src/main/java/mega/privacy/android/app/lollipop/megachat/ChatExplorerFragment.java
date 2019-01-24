@@ -111,7 +111,7 @@ public class ChatExplorerFragment extends Fragment {
                     megaChatApi.addChatListener((ChatExplorerActivity) context);
                 }
                 else if (context instanceof FileExplorerActivityLollipop) {
-//                    megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
+                    megaChatApi.addChatListener((FileExplorerActivityLollipop) context);
                 }
             }
         }
@@ -142,7 +142,7 @@ public class ChatExplorerFragment extends Fragment {
         addLayout = (AppBarLayout) v.findViewById(R.id.linear_layout_add);
         addedList = (RecyclerView) v.findViewById(R.id.contact_adds_recycler_view);
         newGroupButton = (Button) v.findViewById(R.id.new_group_button);
-        if (context instanceof ChatExplorerActivity) {
+        if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop) {
             addLayout.setVisibility(View.VISIBLE);
             addedLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
             addedList.setLayoutManager(addedLayoutManager);
@@ -150,7 +150,12 @@ public class ChatExplorerFragment extends Fragment {
             addedList.setItemAnimator(new DefaultItemAnimator());
             addedList.setClipToPadding(false);
 
-            newGroupButton.setOnClickListener((ChatExplorerActivity) context);
+            if (context instanceof ChatExplorerActivity) {
+                newGroupButton.setOnClickListener((ChatExplorerActivity) context);
+            }
+            else if (context instanceof FileExplorerActivityLollipop) {
+                newGroupButton.setOnClickListener((FileExplorerActivityLollipop) context);
+            }
             setFirstLayoutVisibility(View.VISIBLE);
         }
         else {
@@ -173,8 +178,14 @@ public class ChatExplorerFragment extends Fragment {
                 if (context instanceof FileExplorerActivityLollipop) {
                     if (listView.canScrollVertically(-1)) {
                         ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+                        if (addLayout.getVisibility() == View.VISIBLE) {
+                            addLayout.setElevation(Util.px2dp(4, outMetrics));
+                        }
                     } else {
                         ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+                        if (addLayout.getVisibility() == View.VISIBLE) {
+                            addLayout.setElevation(0);
+                        }
                     }
                 }
                 else if (context instanceof ChatExplorerActivity && addLayout != null && addLayout.getVisibility() == View.VISIBLE) {
@@ -282,9 +293,9 @@ public class ChatExplorerFragment extends Fragment {
             if (context instanceof ChatExplorerActivity) {
                 megaChatApi.removeChatListener((ChatExplorerActivity) context);
             }
-//            else if (context instanceof FileExplorerActivityLollipop) {
-//                megaChatApi.removeChatListener((FileExplorerActivityLollipop) context);
-//            }
+            else if (context instanceof FileExplorerActivityLollipop) {
+                megaChatApi.removeChatListener((FileExplorerActivityLollipop) context);
+            }
         }
     }
 

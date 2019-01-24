@@ -188,7 +188,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 break;
             }
             case R.id.cab_menu_new_chat:{
-
                 if(megaApi!=null && megaApi.getRootNode()!=null){
                     ArrayList<MegaUser> contacts = megaApi.getContacts();
                     if(contacts==null){
@@ -359,7 +358,27 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 break;
             }
             case R.id.new_group_button: {
-                //Wait until chat-links be merged to develop-studio branch
+                if(megaApi!=null && megaApi.getRootNode()!=null){
+                    ArrayList<MegaUser> contacts = megaApi.getContacts();
+                    if(contacts==null){
+                        showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                    }
+                    else {
+                        if(contacts.isEmpty()){
+                            showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                        }
+                        else{
+                            Intent intent = new Intent(this, AddContactActivityLollipop.class);
+                            intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+                            intent.putExtra("onlyCreateGroup", true);
+                            startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
+                        }
+                    }
+                }
+                else{
+                    log("Online but not megaApi");
+                    Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                }
                 break;
             }
         }
@@ -396,6 +415,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             if(chatExplorerFragment!=null && chatExplorerFragment.isAdded()){
                 chatExplorerFragment.setChats();
             }
+            showSnackbar(getString(R.string.new_group_chat_created));
         }
         else{
             log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
