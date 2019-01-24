@@ -1284,10 +1284,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                     else{
-                        long participantsLabel = chatRoom.getPeerCount()+1; //Add one to include me
-                        subtitleToobar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) participantsLabel, participantsLabel)));
-                        subtitleToobar.setVisibility(View.VISIBLE);
-                        iconStateToolbar.setVisibility(View.GONE);
+                        if(chatRoom.hasCustomTitle()){
+                            setCustomSubtitle();
+                        }
+                        else{
+                            long participantsLabel = chatRoom.getPeerCount()+1; //Add one to include me
+                            subtitleToobar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) participantsLabel, participantsLabel)));
+                            subtitleToobar.setVisibility(View.VISIBLE);
+                            iconStateToolbar.setVisibility(View.GONE);
+                        }
                     }
                 }
             }
@@ -1386,6 +1391,71 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
+    }
+
+    public void setCustomSubtitle(){
+        log("setCustomSubtitle");
+
+        long participantsCount = chatRoom.getPeerCount();
+        StringBuilder customSubtitle = new StringBuilder("");
+        for(int i=0;i<participantsCount;i++) {
+
+            if(i!=0){
+                customSubtitle.append(", ");
+            }
+
+            String participantName = chatRoom.getPeerFirstname(i);
+            if(participantName==null){
+                //Get the lastname
+                String participantLastName = chatRoom.getPeerLastname(i);
+                if(participantLastName==null){
+                    //Get the email
+                    String participantEmail = chatRoom.getPeerEmail(i);
+                    customSubtitle.append(participantEmail);
+                }
+                else{
+                    if(participantLastName.trim().isEmpty()){
+                        //Get the email
+                        String participantEmail = chatRoom.getPeerEmail(i);
+                        customSubtitle.append(participantEmail);
+                    }
+                    else{
+                        //Append last name to the title
+                        customSubtitle.append(participantLastName);
+                    }
+                }
+            }
+            else{
+                if(participantName.trim().isEmpty()){
+                    //Get the lastname
+                    String participantLastName = chatRoom.getPeerLastname(i);
+                    if(participantLastName==null){
+                        //Get the email
+                        String participantEmail = chatRoom.getPeerEmail(i);
+                        customSubtitle.append(participantEmail);
+                    }
+                    else{
+                        if(participantLastName.trim().isEmpty()){
+                            //Get the email
+                            String participantEmail = chatRoom.getPeerEmail(i);
+                            customSubtitle.append(participantEmail);
+                        }
+                        else{
+                            //Append last name to the title
+                            customSubtitle.append(participantLastName);
+                        }
+                    }
+                }
+                else{
+                    //Append first name to the title
+                    customSubtitle.append(participantName);
+                }
+            }
+        }
+
+        subtitleToobar.setText(adjustForLargeFont(customSubtitle.toString()));
+        subtitleToobar.setVisibility(View.VISIBLE);
+        iconStateToolbar.setVisibility(View.GONE);
     }
 
     public void setLastGreen(String date){
@@ -5378,6 +5448,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                     }
+                }
+                else if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER){
+                    log("STATE_PREPARING_FROM_EXPLORER: Convert to STATE_PREPARING");
+                    dbH.updatePendingMessageOnTransferFinish(pMsg.getPendingMessage().getId(), "-1", PendingMessageSingle.STATE_PREPARING);
+                    pMsg.getPendingMessage().setState(PendingMessageSingle.STATE_PREPARING);
+                    appendMessagePosition(pMsg);
                 }
                 else if(pMsg.getPendingMessage().getState()==PendingMessageSingle.STATE_UPLOADING){
                     if(pMsg.getPendingMessage().getTransferTag()!=-1){
