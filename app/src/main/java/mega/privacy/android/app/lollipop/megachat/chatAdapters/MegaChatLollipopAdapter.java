@@ -184,7 +184,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         @Override
         protected void onPostExecute(Integer param) {
             log("ChatPreviewAsyncTask-onPostExecute");
-
             if (param == 0) {
                 log("Preview recovered from folder");
                 int position = holder.getCurrentPosition();
@@ -215,8 +214,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }else{
                     log("messages removed");
                 }
-
-
             } else if (param == 2) {
                 File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
                 log("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());
@@ -905,6 +902,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.isPlaying = false;
             holder.totalDurationOfVoiceClip = 0;
             holder.mediaPlayerVoiceNotes = null;
+
             //my voice clip:
             holder.contentOwnMessageVoiceClipLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_voice_clip_layout);
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.GONE);
@@ -1238,6 +1236,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolderUploading(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderUploading(): position " + position);
 
+        ((ViewHolderMessageChat) holder).totalDurationOfVoiceClip = 0;
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
@@ -6128,6 +6127,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         MegaChatMessage message = androidMessage.getMessage();
         holder.mediaPlayerVoiceNotes = new MediaPlayer();
+        holder.totalDurationOfVoiceClip = 0;
 
         //get Voice clip duration
         MegaNodeList nodeListOwn = message.getMegaNodeList();
@@ -9110,7 +9110,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.content_own_message_voice_clip_play_pause:
             case R.id.content_contact_message_voice_clip_play_pause:{
                 if(!(((ChatActivityLollipop)context).isRecordingNow())){
-                    log("onClick() playRecord");
                     playRecord(currentPosition, holder);
                 }
                 break;
@@ -9200,18 +9199,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             if(holder.mediaPlayerVoiceNotes.isPlaying()) {
                                 //PLAY -> PAUSE
-                                log("playRecord:MY message:isPlaying -> pause && (isPlaying = false)");
+                                log("playRecord:MY message:isPlaying -> pause");
                                 holder.mediaPlayerVoiceNotes.pause();
                                 holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
                                 holder.mediaPlayerVoiceNotes.stop();
 
                                 holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
                                 holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-
-                                removeCallBacks();
                                 holder.isPlaying = false;
                                 holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-
+                                removeCallBacks();
                             }else {
                                 //PAUSE -> PLAY
                                 log("playRecord:MY message:is NOT Playing   -> upload my voice clip");
@@ -9234,30 +9231,28 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 log("playRecord:localPath != null");
                                                 if(holder.mediaPlayerVoiceNotes!=null){
                                                     if(isSomethingPlaying()){
-                                                        log("");
+                                                        log("playRecord:localPath:isSomethingPlaying");
                                                         boolean result = stopReproductions();
                                                         if(result){
                                                             holder.mediaPlayerVoiceNotes.reset();
                                                             holder.mediaPlayerVoiceNotes.setDataSource(localPath);
                                                             holder.mediaPlayerVoiceNotes.prepare();
                                                             holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-
                                                             holder.mediaPlayerVoiceNotes.start();
-                                                            updateOwnSeekBar(holder);
                                                             holder.isPlaying = true;
                                                             holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                                            updateOwnSeekBar(holder);
                                                         }
                                                     }else{
+                                                        log("playRecord:localPath:isNothingPlaying");
                                                         holder.mediaPlayerVoiceNotes.reset();
                                                         holder.mediaPlayerVoiceNotes.setDataSource(localPath);
                                                         holder.mediaPlayerVoiceNotes.prepare();
                                                         holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-
                                                         holder.mediaPlayerVoiceNotes.start();
-                                                        updateOwnSeekBar(holder);
                                                         holder.isPlaying = true;
                                                         holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-
+                                                        updateOwnSeekBar(holder);
                                                     }
                                                 }
                                             }else{
@@ -9283,17 +9278,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             if(holder.mediaPlayerVoiceNotes.isPlaying()) {
                                 //PLAY -> PAUSE
-                                log("playRecord:CONTACT message:isPlaying -> pause && (isPlaying = false)");
+                                log("playRecord:CONTACT message:isPlaying -> pause");
                                 holder.mediaPlayerVoiceNotes.pause();
                                 holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
                                 holder.mediaPlayerVoiceNotes.stop();
 
                                 holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
                                 holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-
-                                removeCallBacks();
                                 holder.isPlaying = false;
                                 holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                                removeCallBacks();
 
                             }else {
                                 //PAUSE -> PLAY
@@ -9314,39 +9308,33 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             }
 
                                             if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
-                                                log(" playRecord:localPath !=null ");
+                                                log("playRecord:localPath !=null ");
                                                 if(holder.mediaPlayerVoiceNotes!=null){
                                                     if(isSomethingPlaying()){
+                                                        log("playRecord:localPath:CONTACT message:isSomethingPlaying");
                                                         boolean result = stopReproductions();
                                                         if(result){
                                                             holder.mediaPlayerVoiceNotes.reset();
                                                             holder.mediaPlayerVoiceNotes.setDataSource(localPath);
                                                             holder.mediaPlayerVoiceNotes.prepare();
                                                             holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-
-                                                            log("playRecord:localPath:CONTACT message -> start && (isPlaying = true)");
                                                             holder.mediaPlayerVoiceNotes.start();
-                                                            updateContactSeekBar(holder);
                                                             holder.isPlaying = true;
                                                             holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-
+                                                            updateContactSeekBar(holder);
                                                         }
                                                     }else{
-
-                                                        log("playRecord:localPath:CONTACT message:isSomethingPlaying ---- FALSE");
+                                                        log("playRecord:localPath:CONTACT message:isNothingPlaying");
                                                         holder.mediaPlayerVoiceNotes.reset();
                                                         holder.mediaPlayerVoiceNotes.setDataSource(localPath);
                                                         holder.mediaPlayerVoiceNotes.prepare();
                                                         holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-
-                                                        log("playRecord:localPath:CONTACT message -> start && (isPlaying = true)");
                                                         holder.mediaPlayerVoiceNotes.start();
-                                                        updateContactSeekBar(holder);
                                                         holder.isPlaying = true;
                                                         holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                                        updateContactSeekBar(holder);
                                                     }
                                                 }
-
                                             }else{
                                                 log("playRecord:localPath == null");
                                                 if (Util.isOnline(context)){
@@ -9383,25 +9371,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                                         holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
                                                                         holder.mediaPlayerVoiceNotes.prepare();
                                                                         holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                                                        log("playRecord:uri:CONTACT message -> start && (isPlaying = true)");
                                                                         holder.mediaPlayerVoiceNotes.start();
-                                                                        updateContactSeekBar(holder);
                                                                         holder.isPlaying = true;
                                                                         holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-
+                                                                        updateContactSeekBar(holder);
                                                                     }
                                                                 }else{
-                                                                    log("playRecord:uri:CONTACT message:isSomethingPlaying ----- FALSE");
+                                                                    log("playRecord:uri:CONTACT message:isNothingPlaying ");
                                                                     holder.mediaPlayerVoiceNotes.reset();
                                                                     holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
                                                                     holder.mediaPlayerVoiceNotes.prepare();
                                                                     holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-
-                                                                    log("playRecord:uri:CONTACT message -> start && (isPlaying = true)");
                                                                     holder.mediaPlayerVoiceNotes.start();
-                                                                    updateContactSeekBar(holder);
                                                                     holder.isPlaying = true;
                                                                     holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                                                    updateContactSeekBar(holder);
                                                                 }
                                                             }
                                                         }else{
@@ -9454,10 +9438,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.lastProgress = 0;
                     holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
                     holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
-
-                    removeCallBacks();
                     holder.isPlaying = false;
                     holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    removeCallBacks();
                 }
             });
 
@@ -9473,7 +9456,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             @Override
             public void run() {
                 if(holder.mediaPlayerVoiceNotes != null) {
-                    log(" updateContactSeekBar:run");
                     holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
                     holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
                     holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
@@ -9485,23 +9467,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.mediaPlayerVoiceNotes.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    log("updateContactSeekBar:setOnCompletionListener -> stop && (isPlaying = false)");
-
+                    log("updateContactSeekBar:setOnCompletionListener");
                     if(holder.mediaPlayerVoiceNotes.isPlaying()) {
-                        log("updateContactSeekBar:setOnCompletionListener:isPlaying");
                         holder.mediaPlayerVoiceNotes.pause();
                         holder.mediaPlayerVoiceNotes.stop();
                     }
                     holder.lastProgress = 0;
                     holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
                     holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
-
-                    removeCallBacks();
                     holder.isPlaying = false;
                     holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    removeCallBacks();
                 }
             });
-
             holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
             holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
             holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
@@ -9582,9 +9560,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.mediaPlayerVoiceNotes.pause();
                                     holder.mediaPlayerVoiceNotes.stop();
                                     holder.mediaPlayerVoiceNotes.reset();
-                                    log("stopReproductions() -> removeCallBacks");
-
                                     removeCallBacks();
+
                                     holder.isPlaying = false;
                                     return true;
                                 }
