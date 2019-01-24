@@ -2300,17 +2300,22 @@
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d contacts</item>
-        <item context="Plural of file. 2 files" quantity="other">%d files was not sent to %d contacts</item>
+        <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files was not sent to %d chats</item>
     </plurals>
 
     <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d contacts</item>
-        <item context="Plural of file. 2 files" quantity="other">%d contacts was not sent to %d contacts</item>
+        <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d contacts was not sent to %d chats</item>
     </plurals>
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
-        <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d contacts</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d contacts</item>
+        <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
     </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created correctly</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparing files</string>
 </resources>
