@@ -2299,4 +2299,20 @@
     
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 
+    <string name="delete_versions" context="Action delete all file versions">Delete file versions</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete version history?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Version history deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Version history not deleted.</string>
+
+    <plurals name="versions_delected_correctly" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d version deleted correctly</item>
+        <item context="version items" quantity="other">%d versions deleted correctly</item>
+    </plurals>
+
+    <plurals name="versions_delected_erroneously" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d version deleted erroneously</item>
+        <item context="version items" quantity="other">%d versions deleted erroneously</item>
+    </plurals>
+
 </resources>
