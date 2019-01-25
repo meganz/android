@@ -65,6 +65,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -196,6 +197,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -559,6 +561,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
+	private AlertDialog alertDialogSMSVerification;
 
 	private MenuItem searchMenuItem;
 	private MenuItem gridSmallLargeMenuItem;
@@ -14674,6 +14677,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				true, preWarning);
 	}
 
+	public void showSMSVerificationDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout, null);
+        dialogBuilder.setView(dialogView);
+
+        TextView text = dialogView.findViewById(R.id.sv_dialog_msg);
+        final EditText num = dialogView.findViewById(R.id.et_num);
+        dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String phone = num.getText().toString();
+                megaApi.sendSMSVerificationCode(phone,managerActivity );
+            }
+        });
+        text.setText("dasdasdaasdasd");
+        alertDialogSMSVerification = dialogBuilder.create();
+        alertDialogSMSVerification.setCancelable(true);
+        alertDialogSMSVerification.setCanceledOnTouchOutside(true);
+        alertDialogSMSVerification.show();
+    }
+
+    private void tlog(Object any) {
+        TL.log(this,"@#@",any);
+    }
+
 	/**
 	 * Method to show a dialog to indicate the storage status.
 	 * @param storageState Storage status.
@@ -15384,6 +15414,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
+        tlog("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
+        if(request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
+            tlog("send code to verify");
+        }
+        if(request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
+            tlog("send phone number,get code");
+        }
 
 		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
