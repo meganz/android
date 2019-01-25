@@ -666,6 +666,16 @@
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="navigation_drawer_add_phone_number_label" context="label of button in navigation drawer that ask user to add their phone number">Add phone number</string>
 	<string name="navigation_drawer_add_phone_number_helper" context="label of button in navigation drawer that ask user to add their phone number">Get free $size when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
+	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
+	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_learn_more" context="label of a button that use to open a web page to let user to know more.">Learn More</string>
+	<string name="verify_account_counry_label" context="Country list button label">Country</string>
+	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
+	<string name="verify_account_next_button" context="button label to go to next page">Next</string>
+	<string name="verify_account_back_button" context="button label to go to back page">Back</string>
+	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
+	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
 
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
         <item context="internal storage option">Internal storage</item>
