@@ -254,8 +254,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if (chat.getTitle().length() > 0){
                 String chatTitle = chat.getTitle().trim();
-                String firstLetter = chatTitle.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+                String firstLetter = "";
+                if(!chatTitle.isEmpty()){
+                    firstLetter = chatTitle.charAt(0) + "";
+                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                }
+
                 initialLetter.setText(firstLetter);
             }
 
@@ -1022,6 +1027,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
                     }
+                    else if(title.trim().isEmpty()){
+                        log("title trim is empty");
+                        input.setError(getString(R.string.invalid_string));
+                        input.requestFocus();
+                    }
                     else {
                         log("action DONE ime - change title");
                         changeTitle(title);
@@ -1042,6 +1052,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         String title = input.getText().toString();
                         if(title.equals("")||title.isEmpty()){
                             log("input is empty");
+                            input.setError(getString(R.string.invalid_string));
+                            input.requestFocus();
+                        }
+                        else if(title.trim().isEmpty()){
+                            log("title trim is empty");
                             input.setError(getString(R.string.invalid_string));
                             input.requestFocus();
                         }
@@ -1077,6 +1092,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 String title = input.getText().toString();
                 if(title.equals("")||title.isEmpty()){
                     log("input is empty");
+                    input.setError(getString(R.string.invalid_string));
+                    input.requestFocus();
+                }
+                else if(title.trim().isEmpty()){
+                    log("title trim is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
                 }
@@ -1471,8 +1491,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 if (chat.getTitle().length() > 0){
                     String chatTitle = chat.getTitle().trim();
-                    String firstLetter = chatTitle.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    String firstLetter = "";
+                    if(!chatTitle.isEmpty()){
+                        firstLetter = chatTitle.charAt(0) + "";
+                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    }
                     initialLetter.setText(firstLetter);
                 }
 
