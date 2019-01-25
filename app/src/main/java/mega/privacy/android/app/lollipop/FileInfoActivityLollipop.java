@@ -306,7 +306,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     int errorSent = 0;
     int successSent = 0;
 
-
+    int versionsToRemove = 0;
+    int versionsRemoved = 0;
+    int errorVersionRemove = 0;
 
     public void activateActionMode(){
         log("activateActionMode");
@@ -1936,7 +1938,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			case R.id.file_properties_text_number_versions:{
                 Intent i = new Intent(this, VersionsFileActivity.class);
                 i.putExtra("handle", node.getHandle());
-                startActivity(i);
+                startActivityForResult(i, Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY);
 				break;
 			}
 			case R.id.file_properties_link_button:{
@@ -2593,15 +2595,38 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			if (versionsToRemove > 0) {
+                log("remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK){
+                    versionsRemoved++;
+                }
+                else{
+                    errorVersionRemove++;
+                }
 
-			log("remove request finished");
-			if (e.getErrorCode() == MegaError.API_OK){
-				finish();
-			}
-			else{
-			    showSnackbar(getString(R.string.context_no_removed));
-			}
-
+                if (versionsRemoved+errorVersionRemove == versionsToRemove) {
+                    if (versionsRemoved == versionsToRemove) {
+                        showSnackbar(getString(R.string.version_history_deleted));
+                    }
+                    else {
+                        showSnackbar(getString(R.string.version_history_deleted_erroneously)
+                                + getResources().getQuantityString(R.plurals.versions_delected_correctly, versionsRemoved)
+                                + getResources().getQuantityString(R.plurals.versions_delected_erroneously, errorVersionRemove));
+                    }
+                    versionsToRemove = 0;
+                    versionsRemoved = 0;
+                    errorVersionRemove = 0;
+                }
+            }
+            else {
+                log("remove request finished");
+                if (e.getErrorCode() == MegaError.API_OK){
+                    finish();
+                }
+                else{
+                    showSnackbar(getString(R.string.context_no_removed));
+                }
+            }
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			try {
@@ -2921,8 +2946,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     }
                 }
             }
-            else{
+            else {
                 log("megaChatApi is Null - cannot attach nodes");
+            }
+		}
+		else if (requestCode == Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == RESULT_OK) {
+            if(!Util.isOnline(this)){
+                Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+                return;
+            }
+            if (intent.getBooleanExtra("deleteVersionHistory", false)) {
+                ArrayList<MegaNode> versions = megaApi.getVersions(node);
+                versionsToRemove = versions.size() -1;
+                for (int i=1; i<versions.size(); i++) {
+                    megaApi.removeVersion(versions.get(i), this);
+                }
             }
         }
 	}
