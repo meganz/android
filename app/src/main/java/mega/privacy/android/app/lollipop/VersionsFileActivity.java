@@ -96,6 +96,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
+	MenuItem deleteVersionsMenuItem;
 
 	Handler handler;
 
@@ -390,6 +391,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
+		deleteVersionsMenuItem = menu.findItem(R.id.action_delete_version_history);
 
 		menu.findItem(R.id.action_folder_contacts_list_share_folder).setVisible(false);
 
@@ -416,10 +418,44 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		    	selectAll();
 		    	return true;
 		    }
+			case R.id.action_delete_version_history: {
+				showDeleteVersionHistoryDialog();
+				return true;
+			}
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+
+	void showDeleteVersionHistoryDialog () {
+		log("showDeleteVersionHistoryDialog");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						deleteVersionHistory();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.title_delete_version_history);
+		builder.setMessage(R.string.text_delete_version_history).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	void deleteVersionHistory () {
+		Intent intent = new Intent();
+		intent.putExtra("deleteVersionHistory", true);
+		setResult(RESULT_OK, intent);
+		finish();
 	}
 
 	// Clear all selected items
