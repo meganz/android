@@ -14680,17 +14680,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showSMSVerificationDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout, null);
+        final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
         dialogBuilder.setView(dialogView);
 
         TextView text = dialogView.findViewById(R.id.sv_dialog_msg);
         final EditText num = dialogView.findViewById(R.id.et_num);
+        dialogView.findViewById(R.id.sv_btn_horizontal_xxx).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String phone = num.getText().toString();
+                megaApi.sendSMSVerificationCode(phone,managerActivity);
+            }
+        });
         dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 String phone = num.getText().toString();
-                megaApi.sendSMSVerificationCode(phone,managerActivity );
+                megaApi.checkSMSVerificationCode("429789",managerActivity);
+            }
+        });
+        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class));
             }
         });
         text.setText("dasdasdaasdasd");
@@ -15416,10 +15431,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
         tlog("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
         if(request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
-            tlog("send code to verify");
+            if(e.getErrorCode() == MegaError.API_EACCESS) {
+                tlog("reached verification limitation.");
+            }
+            if(e.getErrorCode() == MegaError.API_EEXPIRED) {
+                tlog("the number has been verified.");
+            }
+            if(e.getErrorCode() == MegaError.API_EFAILED) {
+                tlog("wrong code");
+            }
+            if(e.getErrorCode() == MegaError.API_EEXIST) {
+                tlog("no pending");
+            }
+            if(e.getErrorCode() == MegaError.API_OK) {
+                tlog("successful");
+            }
+            if(e.getErrorCode() == MegaError.API_EARGS) {
+                tlog("wrong number");
+            }
         }
         if(request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
             tlog("send phone number,get code");
+            if(e.getErrorCode() == MegaError.API_ETEMPUNAVAIL) {
+                tlog("reached limitation.");
+            }
+            if(e.getErrorCode() == MegaError.API_OK) {
+                tlog("will receive sms");
+            }
+            if(e.getErrorCode() == MegaError.API_EARGS) {
+                tlog("wrong number");
+            }
         }
 
 		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){

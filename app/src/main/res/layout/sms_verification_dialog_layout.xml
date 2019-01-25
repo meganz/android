@@ -37,6 +37,18 @@
                 android:gravity="center_horizontal"
                 android:textColor="@color/mail_my_account"
                 android:textSize="16sp"/>
+            <EditText
+                android:id="@+id/et_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:stateListAnimator="@null"
+                android:inputType="phone"
+                android:layout_gravity="left"
+                android:layout_marginRight="16dp"
+                android:text="00642108194233"
+                android:textColor="@color/accentColor"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,16 +56,6 @@
                 android:layout_marginTop="35dp"
                 android:layout_marginBottom="24dp"
                 android:orientation="horizontal">
-                <EditText
-                    android:id="@+id/et_num"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"
-                    android:inputType="phone"
-                    android:layout_marginRight="16dp"
-                    android:textColor="@color/accentColor"/>
                 <Button
                     android:id="@+id/sv_btn_horizontal_not_now"
                     android:layout_width="wrap_content"
@@ -74,7 +76,19 @@
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:text="ADD"
+                    android:text="CHECK"
+                    android:textColor="@color/accentColor"/>
+                <Button
+                    android:id="@+id/sv_btn_horizontal_xxx"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="22dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@android:color/transparent"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:stateListAnimator="@null"
+                    android:text="SEND"
                     android:textColor="@color/accentColor"/>
             </LinearLayout>
         </LinearLayout>
