@@ -670,7 +670,7 @@
 	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
 	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
-	<string name="verify_account_helper_learn_more" context="label of a button that use to open a web page to let user to know more.">Learn More</string>
+	<string name="verify_account_helper_learn_more" context="label of a button that use to open a web page to let user to know more."> Learn More</string>
 	<string name="verify_account_counry_label" context="Country list button label">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
 	<string name="verify_account_next_button" context="button label to go to next page">Next</string>

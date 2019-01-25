@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -31,9 +33,10 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
-public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
+public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
 
     private static List<Country> countries;
 
@@ -42,6 +45,8 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
     private CountryListAdapter adapter;
 
     private Toolbar toolbar;
+    public static final String COUNTRY_NAME = "country_name";
+    public static final String COUNTRY_CODE = "country_code";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
 
         countryList = findViewById(R.id.country_list);
         adapter = new CountryListAdapter(countries);
+        adapter.setCallback(this);
         countryList.setAdapter(adapter);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         countryList.setLayoutManager(manager);
@@ -122,7 +128,16 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
         }
         return countries;
     }
-
+    
+    @Override
+    public void onCountrySelected(Country country) {
+        Intent result = new Intent();
+        result.putExtra(COUNTRY_NAME,country.getName());
+        result.putExtra(COUNTRY_CODE,country.getCode());
+        setResult(Activity.RESULT_OK, result);
+        finish();
+    }
+    
     public class Country {
 
         private String name;
@@ -153,5 +168,9 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
         public void setCode(String code) {
             this.code = code;
         }
+    }
+    
+    public static void countrySelected(){
+    
     }
 }
