@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,12 +20,18 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+
+import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.COUNTRY_CODE;
+import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.COUNTRY_NAME;
 
 public class SMSVerificationActivity extends PinActivityLollipop implements View.OnClickListener {
     
-    private TextView helperText, errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber;
+    private TextView helperText, selectedCountry,errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber;
+    private View divider1, divider2;
     private ImageView errorInvalidPhoneNumberIcon;
     private RelativeLayout countrySelector;
     private EditText phoneNumberInput;
@@ -32,6 +39,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private boolean isSelectedCountryValid;
     private boolean isPhoneNumberValid;
     private String selectedCountryCode;
+    private String selectedCountryName;
+    
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +48,14 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms_verification);
         
+        //divider
+        divider1 = findViewById(R.id.verify_account_divider1);
+        divider2 = findViewById(R.id.verify_account_divider2);
+        
         //titles
         titleCountryCode = findViewById(R.id.verify_account_country_label);
         titlePhoneNumber = findViewById(R.id.verify_account_phone_number_label);
+        selectedCountry = findViewById(R.id.verify_account_selected_country);
         
         //set helper text
         helperText = findViewById(R.id.verify_account_helper);
@@ -103,6 +117,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             public void onTextChanged(CharSequence s,int start,int before,int count) {
                 log("onTextChanged");
                 errorInvalidPhoneNumber.setVisibility(View.GONE);
+                errorInvalidPhoneNumberIcon.setVisibility(View.GONE);
+                divider2.setBackgroundColor(Color.parseColor("#8A000000"));
             }
             
             @Override
@@ -149,8 +165,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         switch (v.getId()) {
             case (R.id.verify_account_country_selector): {
                 log("verify_account_country_selector clicked");
-                //todo launch list
-                selectedCountryCode = "23423";
+                launchCountryPicker();
                 break;
             }
             case (R.id.verify_account_next_button): {
@@ -163,22 +178,36 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         }
     }
     
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode,Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        if (requestCode == Constants.REQUEST_CODE_COUNTRY_PICKER && resultCode == RESULT_OK) {
+            selectedCountryCode = data.getStringExtra(COUNTRY_CODE);
+            selectedCountryName = data.getStringExtra(COUNTRY_NAME);
+            
+            String label = selectedCountryName + " (" + selectedCountryCode + ")";
+            selectedCountry.setText(label);
+            errorInvalidCountryCode.setVisibility(View.GONE);
+            titleCountryCode.setVisibility(View.VISIBLE);
+            titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
+        }
+    }
+    
+    private void launchCountryPicker(){
+        startActivityForResult(new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class), Constants.REQUEST_CODE_COUNTRY_PICKER);
+    }
+    
     private void nextButtonClicked() {
         log("nextButtonClicked");
         Util.hideKeyboard(this);
         hideError();
         validateFields();
-        resetTitles();
         if (isPhoneNumberValid && isSelectedCountryValid) {
             hideError();
             RequestTxt();
         } else {
             showError();
         }
-    }
-    
-    private void resetTitles() {
-    
     }
     
     private void validateFields() {
@@ -208,6 +237,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             errorInvalidCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setTextColor(Color.parseColor("#FFFF333A"));
+            divider1.setBackgroundColor(Color.parseColor("#FFFF333A"));
         }
         
         if (!isPhoneNumberValid) {
@@ -216,6 +246,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             errorInvalidPhoneNumberIcon.setVisibility(View.VISIBLE);
             titlePhoneNumber.setVisibility(View.VISIBLE);
             titlePhoneNumber.setTextColor(Color.parseColor("#FFFF333A"));
+            divider2.setBackgroundColor(Color.parseColor("#FFFF333A"));
         }
         
     }
@@ -227,6 +258,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         errorInvalidPhoneNumberIcon.setVisibility(View.GONE);
         titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
         titlePhoneNumber.setTextColor(Color.parseColor("#FF00BFA5"));
+        divider1.setBackgroundColor(Color.parseColor("#8A000000"));
+        divider2.setBackgroundColor(Color.parseColor("#8A000000"));
     }
     
     private void RequestTxt() {

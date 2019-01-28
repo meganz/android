@@ -16,11 +16,20 @@ import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.utils.TL;
 
 public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.CountryHolder> {
+    
+    public interface CountrySelectedCallback{
+        void onCountrySelected(CountryCodePickerActivityLollipop.Country country);
+    }
 
     private List<CountryCodePickerActivityLollipop.Country> countries;
+    private CountrySelectedCallback callback;
 
     public CountryListAdapter(List<CountryCodePickerActivityLollipop.Country> countries) {
         this.countries = countries;
+    }
+    
+    public void setCallback(CountrySelectedCallback callback){
+        this.callback = callback;
     }
 
     @NonNull
@@ -34,6 +43,10 @@ public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.
             @Override
             public void onClick(View v) {
                 log(holder.nameAndCode.getTag());
+                CountryCodePickerActivityLollipop.Country country = countries.get(holder.getAdapterPosition());
+                if(callback != null){
+                    callback.onCountrySelected(country);
+                }
             }
         });
         v.setTag(holder);
