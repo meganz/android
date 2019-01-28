@@ -1,22 +1,18 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.SearchManager;
-import android.content.Context;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.DividerItemDecoration;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +21,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +32,13 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
 
     private static List<Country> countries;
 
+    private List<Country> selectedCountries = new ArrayList<>();
+
     private RecyclerView countryList;
 
     private CountryListAdapter adapter;
+
+    private ActionBar actionBar;
 
     private Toolbar toolbar;
 
@@ -59,36 +58,69 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        actionBar.setTitle("SELECT COUNTRY");
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(Util.mutateIcon(this,R.drawable.ic_arrow_back_white,R.color.black));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_country_picker, menu);
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        inflater.inflate(R.menu.activity_country_picker,menu);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
-
+        searchMenuItem.setIcon(Util.mutateIcon(this,R.drawable.ic_menu_search,R.color.black));
         SearchView searchView = (SearchView)searchMenuItem.getActionView();
+        if (searchView != null) {
+            searchView.setIconifiedByDefault(true);
+        }
+
+        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete.setTextColor(ContextCompat.getColor(this,R.color.black));
+        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this,R.color.status_bar_login));
+        searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+        v.setBackgroundColor(ContextCompat.getColor(this,android.R.color.transparent));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                log("onQueryTextSubmit: " + query);
+                InputMethodManager imm = (InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+                View view = getCurrentFocus();
+                if (view == null) {
+                    view = new View(CountryCodePickerActivityLollipop.this);
+                }
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+                }
+//                search(query);
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
-                return false;
+                search(newText);
+                return true;
             }
         });
         return super.onCreateOptionsMenu(menu);
     }
 
+    private void search(String query) {
+        selectedCountries.clear();
+        for (Country country : countries) {
+            if (country.name.toLowerCase().contains(query.toLowerCase())) {
+                selectedCountries.add(country);
+            }
+        }
+        adapter.refresh(selectedCountries);
+    }
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
         finish();
     }
 
