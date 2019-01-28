@@ -9520,18 +9520,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if(holder!=null){
                         if(holder.mediaPlayerVoiceNotes!=null){
                             if(holder.mediaPlayerVoiceNotes.isPlaying()) {
+                                log("destroyVoiceElemnts():stopMediaPlayer");
                                 holder.mediaPlayerVoiceNotes.pause();
                                 holder.mediaPlayerVoiceNotes.stop();
+                                holder.mediaPlayerVoiceNotes.reset();
                             }
-                            holder.mediaPlayerVoiceNotes.reset();
                             holder.mediaPlayerVoiceNotes = null;
+                            holder.isPlaying = false;
                         }
-                        holder.isPlaying = false;
                     }
                 }
             }
-            megaApi.httpServerStop();
             removeCallBacks();
+
+            if (megaApi.httpServerIsRunning() != 0) {
+                log("destroyVoiceElemnts:megaApi.httpServerAlreadyRunning");
+                megaApi.httpServerStop();
+            }
         }
     }
 

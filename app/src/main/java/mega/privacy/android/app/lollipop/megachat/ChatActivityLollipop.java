@@ -321,7 +321,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private AlertDialog locationDialog;
 
     //VOICE CLIPS:
-    String outputFileVoiceNotes;
+    String outputFileVoiceNotes = null;
     private RecordButton record;
     private MediaRecorder myAudioRecorder;
     boolean recordingNow = false;
@@ -621,6 +621,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setVisibility(View.GONE);
         record.setRecordView(voiceClipLayout);
 
+        myAudioRecorder = new MediaRecorder();
+
         textChat.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) { }
 
@@ -763,7 +765,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
-                log("record.setOnRecordClickListener()");
+                log("record.setOnRecordClickListener():onClick -> stopRecord()");
                 voiceClipLayout.playSound(RECORD_FINISHED);
                 stopRecord();
             }
@@ -776,59 +778,63 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
-                log("voiceClipLayout.setOnRecordListener() -> onStart() -> stopAnyReproduction && startRecordVoiceClip");
+                log("voiceClipLayout.setOnRecordListener():onStart()");
                 if(adapter.isSomethingPlaying()){
                     boolean result = adapter.stopReproductions();
                     if(result){
+                        log("voiceClipLayout.setOnRecordListener():onStart() -> startRecordVoiceClip");
                         startRecordVoiceClip();
                     }
                 }else{
+                    log("voiceClipLayout.setOnRecordListener():onStart() -> startRecordVoiceClip");
                     startRecordVoiceClip();
                 }
+            }
 
-            }
             @Override
-            public void onLock() {
-                log("voiceClipLayout.setOnRecordListener() -> onLock()");
-                record.setBackground(null);
-                record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_send_white));
-                record.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
-                record.activateOnClickListener(true);
-                record.activateOnTouchListener(false);
+            public void onLessThanSecond() {
+                log("voiceClipLayout.setOnRecordListener():onLessThanSecond() -> cancelRecord");
+                showBubble();
+                cancelRecord();
             }
+
             @Override
             public void onCancel() {
-                log("voiceClipLayout.setOnRecordListener() -> onCancel()");
+                log("voiceClipLayout.setOnRecordListener():onCancel()");
                 record.setEnabled(false);
                 if(isRecordingNow()){
                     if(myAudioRecorder!=null){
-                        log("myAudioRecorder -> CANCEL - isRecording = FALSE");
-                        myAudioRecorder.stop();
+                        log("voiceClipLayout.setOnRecordListener():onCancel() - myAudioRecorder.reset()");
                         myAudioRecorder.reset();
-                        myAudioRecorder = null;
                         outputFileVoiceNotes = null;
                         setRecordingNow(false);
                         voiceClipLayout.showLock(false);
                     }
                 }
             }
+
+            @Override
+            public void onLock() {
+                log("voiceClipLayout.setOnRecordListener():onLock()");
+                record.setBackground(null);
+                record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_send_white));
+                record.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
+                record.activateOnClickListener(true);
+                record.activateOnTouchListener(false);
+            }
+
             @Override
             public void onFinish(long recordTime) {
                 String time = getHumanTimeText(recordTime);
-                log("voiceClipLayout.setOnRecordListener() -> onFinish() at "+time);
+                log("voiceClipLayout.setOnRecordListener():onFinish ->  stopRecord()");
                 stopRecord();
             }
-            @Override
-            public void onLessThanSecond() {
-                log("voiceClipLayout.setOnRecordListener() -> onLessThanSecond()");
-                showBubble();
-                cancelRecord();
-            }
+
         });
         voiceClipLayout.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
             @Override
             public void onAnimationEnd() {
-                log("voiceClipLayout.setOnBasketAnimationEndListener()");
+                log("oiceClipLayout.setOnBasketAnimationEndListener():onAnimationEnd -> cancelRecord");
                 cancelRecord();
             }
         });
@@ -1785,15 +1791,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             File voiceFile = new File(outputFileVoiceNotes);
             String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
             outputFileVoiceNotes = path + "/note_voice"+name;
-            if(myAudioRecorder!=null){
-                myAudioRecorder.setOutputFile(outputFileVoiceNotes);
-            }else{
-                myAudioRecorder = new MediaRecorder();
+            if((myAudioRecorder!=null)&&(outputFileVoiceNotes != null)) {
+                log("startRecordVoiceClip: myAudioRecorder initialized and dataSourceConfigure ");
                 myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                 myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
                 myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             }
+
             record.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
             record.setColorFilter(null);
             record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_on));
@@ -1805,7 +1810,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             try {
                 if(!isRecordingNow()){
                     if(myAudioRecorder!=null){
-                        log("myAudioRecorder -> START - isRecording = TRUE");
+                        log("startRecordVoiceClip: myAudioRecorder.prepare() && myAudioRecorder.start()");
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
                         setRecordingNow(true);
@@ -1830,10 +1835,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(isRecordingNow()){
             if(myAudioRecorder!=null){
-                log("myAudioRecorder -> CANCEL - isRecording = FALSE");
-//myAudioRecorder.stop();
+                log("cancelRecord(): myAudioRecorder.reset()");
                 myAudioRecorder.reset();
-                myAudioRecorder = null;
                 outputFileVoiceNotes = null;
                 setRecordingNow(false);
                 voiceClipLayout.showLock(false);
@@ -1857,10 +1860,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(isRecordingNow()){
             if(myAudioRecorder!=null) {
-                log("myAudioRecorder -> STOP - isRecording = FALSE");
+                log("stopRecord(): myAudioRecorder.stop()");
                 myAudioRecorder.stop();
-                myAudioRecorder.release();
-                myAudioRecorder = null;
                 setRecordingNow(false);
                 uploadVoiceNote(outputFileVoiceNotes);
                 outputFileVoiceNotes = null;
@@ -6465,8 +6466,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if(myAudioRecorder!=null){
-            myAudioRecorder.stop();
+            log("onDestroy(): myAudioRecorder.reset() && myAudioRecorder.release()");
             myAudioRecorder.reset();
+            myAudioRecorder.release();
             myAudioRecorder = null;
             outputFileVoiceNotes = null;
         }
