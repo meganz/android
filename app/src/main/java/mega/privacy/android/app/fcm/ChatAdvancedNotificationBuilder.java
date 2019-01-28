@@ -221,8 +221,8 @@ public final class ChatAdvancedNotificationBuilder {
 
                         String messageContent = "";
 
-                        if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-
+                        if((message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(message.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
+                            log("buildNotificationPreN() TYPE_NODE_ATTACHMENT || TYPE_VOICE_CLIP");
                             MegaNodeList nodeList = message.getMegaNodeList();
                             if(nodeList != null) {
                                 if (nodeList.size() == 1) {
@@ -233,6 +233,7 @@ public final class ChatAdvancedNotificationBuilder {
                             }
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            log("buildNotificationPreN() TYPE_CONTACT_ATTACHMENT");
 
                             long userCount  = message.getUsersCount();
 
@@ -256,10 +257,12 @@ public final class ChatAdvancedNotificationBuilder {
                             }
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                            log("Type TRUNCATE message");
+                            log("buildNotificationPreN() TYPE_TRUNCATE");
+
                             messageContent = context.getString(R.string.history_cleared_message);
                         }
                         else{
+                            log("buildNotificationPreN() OTHER");
                             messageContent = message.getContent();
                         }
 
@@ -400,8 +403,8 @@ public final class ChatAdvancedNotificationBuilder {
             String messageContent = "";
 
             if(msg!=null){
-                if(msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-
+                if((msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (msg.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
+                    log("buildNotification() TYPE_NODE_ATTACHMENT || TYPE_VOICE_CLIP");
                     MegaNodeList nodeList = msg.getMegaNodeList();
                     if(nodeList != null) {
                         if (nodeList.size() == 1) {
@@ -412,6 +415,7 @@ public final class ChatAdvancedNotificationBuilder {
                     }
                 }
                 else if(msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                    log("buildNotification() TYPE_CONTACT_ATTACHMENT");
 
                     long userCount  = msg.getUsersCount();
 
@@ -435,10 +439,14 @@ public final class ChatAdvancedNotificationBuilder {
                     }
                 }
                 else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                    log("buildNotification() TYPE_TRUNCATE");
+
                     log("Type TRUNCATE message");
                     messageContent = context.getString(R.string.history_cleared_message);
                 }
                 else{
+                    log("buildNotification() OTHER");
+
                     messageContent = msg.getContent();
                 }
 
