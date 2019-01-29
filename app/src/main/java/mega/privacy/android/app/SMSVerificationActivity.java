@@ -23,6 +23,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -276,14 +277,15 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     private void RequestTxt() {
         //todo request txt and launch next activity
-        String phoneNumber = "+64210404525";//selectedCountryCode + phoneNumberInput.getText().toString();
+        String phoneNumber = selectedCountryCode + phoneNumberInput.getText().toString();
+//        String phoneNumber = "00642108194233";
         log(" RequestTxt phone number is " + phoneNumber);
         megaApi.sendSMSVerificationCode(phoneNumber,this,true);
     }
     
     public static void log(String message) {
         //Util.log("SMSVerificationActivity",message);
-        Log.d("click","yuan " + message);
+        TL.log("SmsVerificationActivity","@#@",message );
     }
     
     @Override
@@ -317,7 +319,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 showError();
             }
             if(e.getErrorCode() == MegaError.API_EACCESS) {
-                log("API_EACCESS");
+                log("has been verified");
                 showError();
             }
         }

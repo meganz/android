@@ -14707,8 +14707,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
         });
         alertDialogSMSVerification = dialogBuilder.create();
-        alertDialogSMSVerification.setCancelable(true);
-        alertDialogSMSVerification.setCanceledOnTouchOutside(true);
+        alertDialogSMSVerification.setCancelable(false);
+        alertDialogSMSVerification.setCanceledOnTouchOutside(false);
         alertDialogSMSVerification.show();
     }
 
