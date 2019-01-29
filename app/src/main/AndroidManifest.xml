@@ -430,6 +430,10 @@
 	              android:theme="@style/SMSVerificationStyle"
 	              android:screenOrientation="portrait"/>
 
+	    <activity android:name=".SMSVerificationReceiveTxtActivity"
+	              android:theme="@style/SMSVerificationReceiveTxtActivityTheme"
+	              android:screenOrientation="portrait"/>
+
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity"
             android:label="@string/contact_properties_activity"

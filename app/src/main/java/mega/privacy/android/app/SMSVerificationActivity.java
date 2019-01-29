@@ -30,6 +30,8 @@ import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipo
 
 public class SMSVerificationActivity extends PinActivityLollipop implements View.OnClickListener {
     
+    public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
+    public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
     private TextView helperText, selectedCountry,errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber;
     private View divider1, divider2;
     private ImageView errorInvalidPhoneNumberIcon;
@@ -75,6 +77,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
             public void onClick(View textView) {
+                //todo
                 Log.d("click","Yuan ");
                 
             }
@@ -265,6 +268,11 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private void RequestTxt() {
         //todo request txt and launch next activity
         log(" RequestTxt ");
+        String enteredPhoneNumber = phoneNumberInput.getText().toString();
+        Intent intent = new Intent(this, SMSVerificationReceiveTxtActivity.class);
+        intent.putExtra(SELECTED_COUNTRY_CODE,selectedCountryCode);
+        intent.putExtra(ENTERED_PHONE_NUMBER, enteredPhoneNumber);
+        startActivity(intent);
     }
     
     public static void log(String message) {

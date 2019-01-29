@@ -60,7 +60,6 @@
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
-
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
 
@@ -241,5 +240,9 @@
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="android:windowNoTitle">true</item>
 	</style>
-
+	<style name="SMSVerificationReceiveTxtActivityTheme" parent="Theme.Megaactionbar">
+		<item name="colorPrimaryDark">#3490B1</item>
+		<item name="colorPrimary">#FFF9F9F9</item>
+		<item name="android:background">#ffffff</item>
+	</style>
 </resources>
