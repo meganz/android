@@ -9235,7 +9235,55 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                                 }
                                             }else{
                                                 log("playRecord:localPath == null");
-                                                ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_message_voice_clip));
+                                                if (Util.isOnline(context)){
+                                                    if (megaApi.httpServerIsRunning() == 0) {
+                                                        log("megaApi.httpServerIsRunning() == 0");
+                                                        megaApi.httpServerStart();
+                                                    }else{
+                                                        log("ERROR:httpServerAlreadyRunning");
+                                                    }
+
+                                                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                                                    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                                                    activityManager.getMemoryInfo(mi);
+
+                                                    if(mi.totalMem>Constants.BUFFER_COMP){
+                                                        log("total mem: "+mi.totalMem+" allocate 32 MB");
+                                                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                                                    }else{
+                                                        log("total mem: "+mi.totalMem+" allocate 16 MB");
+                                                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                                                    }
+
+                                                    String url = megaApi.httpServerGetLocalLink(node);
+                                                    if(url!=null){
+                                                        Uri parsedUri = Uri.parse(url);
+                                                        if(parsedUri!=null){
+                                                            String VoiceClipPath = parsedUri.toString();
+                                                            if(holder.mediaPlayerVoiceNotes!=null){
+                                                                stopCurrentPlaying();
+                                                                log("playRecord:myMessage:uri -> play");
+                                                                holder.mediaPlayerVoiceNotes.reset();
+                                                                holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
+                                                                holder.mediaPlayerVoiceNotes.setLooping(false);
+                                                                holder.mediaPlayerVoiceNotes.prepare();
+                                                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                                                                holder.mediaPlayerVoiceNotes.start();
+                                                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                                                updateOwnSeekBar(holder);
+                                                            }
+                                                        }else{
+                                                            log("ERROR:httpServerGetLocalLink");
+                                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_message_voice_clip));
+                                                        }
+                                                    }else{
+                                                        log("ERROR:httpServerGetLocalLink");
+                                                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_message_voice_clip));
+                                                    }
+                                                }else{
+                                                    log("ERROR:isOnline");
+                                                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_message_voice_clip));
+                                                }
                                             }
                                         } catch (IOException e) {
                                             e.printStackTrace();
