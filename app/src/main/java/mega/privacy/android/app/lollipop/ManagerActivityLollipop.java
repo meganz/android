@@ -14690,7 +14690,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             @Override
             public void onClick(View v) {
                 String phone = num.getText().toString();
-                megaApi.sendSMSVerificationCode(phone,managerActivity);
+                megaApi.sendSMSVerificationCode(phone,managerActivity,true);
+//                megaApi.sendSMSVerificationCode(phone,managerActivity);
             }
         });
         dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
@@ -14698,7 +14699,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             @Override
             public void onClick(View v) {
                 String phone = num.getText().toString();
-                megaApi.checkSMSVerificationCode("429789",managerActivity);
+                megaApi.checkSMSVerificationCode(phone,managerActivity);
+                tlog(megaApi.smsVerifiedPhoneNumber());
             }
         });
         dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
@@ -15460,6 +15462,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
             if(e.getErrorCode() == MegaError.API_EARGS) {
                 tlog("wrong number");
+            }
+            if(e.getErrorCode() == MegaError.API_EACCESS) {
+                tlog("API_EACCESS");
             }
         }
 
