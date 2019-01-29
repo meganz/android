@@ -11,10 +11,13 @@ import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,6 +28,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -39,6 +43,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
 public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListChatExplorerAdapter.ViewHolderChatExplorerList> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
@@ -51,16 +56,20 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     DatabaseHandler dbH = null;
 
     ViewHolderChatExplorerList holder;
+    RecyclerView listView;
 
     Context context;
     ArrayList<ChatExplorerListItem> items;
     Object fragment;
 
-    public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items) {
+    private SparseBooleanArray selectedItems;
+
+    public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView) {
         log("new adapter");
         this.context = _context;
         this.items = _items;
         this.fragment = _fragment;
+        this.listView = _listView;
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -69,6 +78,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if (megaChatApi == null){
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
+
+        selectedItems = new SparseBooleanArray();
 
         cC = new ChatController(context);
     }
@@ -135,10 +146,11 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     public void onBindViewHolder(MegaListChatExplorerAdapter.ViewHolderChatExplorerList holder, int position) {
 
         ChatExplorerListItem item = getItem(position);
+        MegaChatListItem chat = item.getChat();
 
         holder.titleText.setText(item.getTitle());
 
-        if (item.getChat() != null && item.getChat().isGroup()) {
+        if (chat != null && chat.isGroup()) {
             if (item.getTitle().length() > 0){
                 String chatTitle = item.getTitle().trim();
                 String firstLetter = chatTitle.charAt(0) + "";
@@ -149,30 +161,40 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             holder.stateIcon.setVisibility(View.GONE);
             holder.lastSeenStateText.setVisibility(View.GONE);
             holder.participantsText.setVisibility(View.VISIBLE);
-            MegaChatRoom chatRoom = megaChatApi.getChatRoom(item.getChat().getChatId());
+            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
             long peerCount = chatRoom.getPeerCount() + 1;
             holder.participantsText.setText(context.getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) peerCount, peerCount));
         }
         else {
 
             holder.participantsText.setVisibility(View.GONE);
+            MegaContactAdapter contact = item.getContact();
 
             long handle = -1;
 
-            if (item.getChat() != null) {
-                holder.email = megaChatApi.getContactEmail(item.getChat().getPeerHandle());
+            if (chat != null) {
+                holder.email = megaChatApi.getContactEmail(chat.getPeerHandle());
                 log("email: "+holder.email);
             }
-            else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
-                holder.email = item.getContact().getMegaUser().getEmail();
+            else if (contact != null && contact.getMegaUser() != null) {
+                holder.email = contact.getMegaUser().getEmail();
             }
 
-            if (item.getContact() != null && item.getContact().getMegaUser() != null) {
-                handle = item.getContact().getMegaUser().getHandle();
+            if (contact != null && contact.getMegaUser() != null) {
+                handle = contact.getMegaUser().getHandle();
             }
 
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
-            setUserAvatar(holder, userHandleEncoded);
+
+            if(this.isItemChecked(position)){
+                holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+                holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
+                holder.initialLetter.setVisibility(View.GONE);
+            }
+            else{
+                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                setUserAvatar(holder, userHandleEncoded);
+            }
             
             if(Util.isChatEnabled()){
                 if (megaChatApi != null){
@@ -217,8 +239,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                     }
 
                     if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-                        if(item.getContact() != null && !item.getContact().getLastGreen().isEmpty()){
-                            holder.lastSeenStateText.setText(item.getContact().getLastGreen());
+                        if(contact != null && !contact.getLastGreen().isEmpty()){
+                            holder.lastSeenStateText.setText(contact.getLastGreen());
                             holder.lastSeenStateText.isMarqueeIsNecessary(context);
                         }
                     }
@@ -229,8 +251,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             }
         }
         
-        if (item.getChat() != null) {
-            if(item.getChat().getOwnPrivilege()==MegaChatRoom.PRIV_RM || item.getChat().getOwnPrivilege()==MegaChatRoom.PRIV_RO){
+        if (chat != null) {
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM || chat.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
                 holder.avatarImage.setAlpha(.4f);
                 holder.itemLayout.setOnClickListener(null);
                 holder.itemLayout.setOnLongClickListener(null);
@@ -465,7 +487,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ViewHolderChatExplorerList holder = (ViewHolderChatExplorerList) v.getTag();
 
         if (v.getId() == R.id.chat_explorer_list_item_layout) {
-            ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
+            if (!isItemChecked(holder.getAdapterPosition())) {
+                ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
+            }
         }
     }
 
@@ -491,6 +515,50 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         log("updateContactStatus: "+position);
 
         notifyItemChanged(position);
+    }
+
+    private boolean isItemChecked(int position) {
+        return selectedItems.get(position);
+    }
+
+    public void toggleSelection(int pos) {
+        log("toggleSelection");
+
+        if (selectedItems.get(pos, false)) {
+            log("delete pos: "+pos);
+            selectedItems.delete(pos);
+        }
+        else {
+            log("PUT pos: "+pos);
+            selectedItems.put(pos, true);
+        }
+        notifyItemChanged(pos);
+
+        MegaListChatExplorerAdapter.ViewHolderChatExplorerList view = (MegaListChatExplorerAdapter.ViewHolderChatExplorerList) listView.findViewHolderForLayoutPosition(pos);
+        if(view!=null){
+            log("Start animation: "+pos);
+            Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+            flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+//                    Hide multipleselect
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            view.avatarImage.startAnimation(flipAnimation);
+        }
+        else {
+//            Hide multipleselect
+        }
     }
 
     private static void log(String log) {

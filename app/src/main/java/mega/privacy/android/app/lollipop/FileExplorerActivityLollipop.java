@@ -1408,6 +1408,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		bundle.putInt("importFragmentSelected", importFragmentSelected);
 		bundle.putString("action", action);
 		bundle.putSerializable("nameFiles", nameFiles);
+
+		if (getChatExplorerFragment() != null) {
+			getSupportFragmentManager().putFragment(bundle, "chatExplorerFragment", getChatExplorerFragment());
+		}
 	}
 	
 	@Override
@@ -1522,6 +1526,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			super.callToSuperBack = true;
 			super.onBackPressed();
 		}
+
+		setToolbarSubtitle(null);
 	}
 
 	/*
@@ -2432,6 +2438,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setToolbarSubtitle(String s) {
+		aB.setSubtitle(s);
 	}
 	
 	@Override

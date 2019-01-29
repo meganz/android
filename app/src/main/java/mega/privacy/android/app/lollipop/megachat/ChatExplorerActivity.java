@@ -152,13 +152,26 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             }
         }
 
-        if(chatExplorerFragment ==null){
+        if (savedInstanceState != null) {
+            chatExplorerFragment = (ChatExplorerFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatExplorerFragment");
+        }
+        else if (chatExplorerFragment == null) {
             chatExplorerFragment = new ChatExplorerFragment().newInstance();
         }
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_chat_explorer, chatExplorerFragment, "chatExplorerFragment");
         ft.commitNow();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "chatExplorerFragment", getSupportFragmentManager().findFragmentByTag("chatExplorerFragment"));
+    }
+
+    public void setToolbarSubtitle(String s) {
+        aB.setSubtitle(s);
     }
 
     @Override
