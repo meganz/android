@@ -39,7 +39,8 @@ public class Constants {
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 	public static int REQUEST_CODE_FILE_INFO = 1027;
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
-    public final static int REQUEST_CODE_COUNTRY_PICKER = 1029;
+    public static int REQUEST_CODE_COUNTRY_PICKER = 1029;
+    public static int REQUEST_CODE_VERIFY_CODE = 1030;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";

@@ -35,11 +35,15 @@ import android.widget.TextView;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.SMSVerificationActivity.ENTERED_PHONE_NUMBER;
 import static mega.privacy.android.app.SMSVerificationActivity.SELECTED_COUNTRY_CODE;
 
-public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop implements View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
+public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
     
     private Toolbar toolbar;
     private ActionBar actionBar;
@@ -595,9 +599,9 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             String pin = sb.toString().trim();
             log("PIN: " + pin);
             if (pin != null) {
-               // megaApi.sendSMSVerificationCode("sdfsdfsdf",null,true);
+                megaApi.checkSMSVerificationCode(pin,this);
+                return;
             }
-            return;
         }
         showError();
     }
@@ -632,4 +636,49 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
     
     
+    @Override
+    public void onRequestStart(MegaApiJava api,MegaRequest request) {
+        
+    }
+    
+    @Override
+    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
+        
+    }
+    
+    @Override
+    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+        if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
+            if (e.getErrorCode() == MegaError.API_EACCESS) {
+                log("reached verification limitation.");
+                showError();
+            }
+            if (e.getErrorCode() == MegaError.API_EEXPIRED) {
+                log("the code has been verified.");
+                showError();
+            }
+            if (e.getErrorCode() == MegaError.API_EFAILED) {
+                log("wrong code");
+                showError();
+            }
+            if (e.getErrorCode() == MegaError.API_EEXIST) {
+                log("no pending");
+                showError();
+            }
+            if (e.getErrorCode() == MegaError.API_OK) {
+                log("successful");
+                setResult(RESULT_OK);
+                finish();
+            }
+            if (e.getErrorCode() == MegaError.API_EARGS) {
+                log("wrong number");
+                showError();
+            }
+        }
+    }
+    
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
+        
+    }
 }

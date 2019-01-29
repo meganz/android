@@ -12,8 +12,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 public class PinActivityLollipop extends BaseActivity {
 	
-	private MegaApiAndroid megaApi;
-	private MegaChatApiAndroid megaChatApi;
+	protected MegaApiAndroid megaApi;
+    protected MegaChatApiAndroid megaChatApi;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

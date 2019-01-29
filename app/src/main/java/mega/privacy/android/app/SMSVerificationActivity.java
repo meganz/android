@@ -24,11 +24,16 @@ import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.COUNTRY_CODE;
 import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.COUNTRY_NAME;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_VERIFY_CODE;
 
-public class SMSVerificationActivity extends PinActivityLollipop implements View.OnClickListener {
+public class SMSVerificationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
     
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
@@ -193,6 +198,10 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             errorInvalidCountryCode.setVisibility(View.GONE);
             titleCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
+            selectedCountry.setTextColor(Color.parseColor("#DE000000"));
+            divider1.setBackgroundColor(Color.parseColor("#8A000000"));
+        }else if(requestCode == Constants.REQUEST_CODE_VERIFY_CODE && resultCode == RESULT_OK){
+            finish();
         }
     }
     
@@ -267,16 +276,55 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     private void RequestTxt() {
         //todo request txt and launch next activity
-        log(" RequestTxt ");
-        String enteredPhoneNumber = phoneNumberInput.getText().toString();
-        Intent intent = new Intent(this, SMSVerificationReceiveTxtActivity.class);
-        intent.putExtra(SELECTED_COUNTRY_CODE,selectedCountryCode);
-        intent.putExtra(ENTERED_PHONE_NUMBER, enteredPhoneNumber);
-        startActivity(intent);
+        String phoneNumber = "+64210404525";//selectedCountryCode + phoneNumberInput.getText().toString();
+        log(" RequestTxt phone number is " + phoneNumber);
+        megaApi.sendSMSVerificationCode(phoneNumber,this,true);
     }
     
     public static void log(String message) {
         //Util.log("SMSVerificationActivity",message);
         Log.d("click","yuan " + message);
+    }
+    
+    @Override
+    public void onRequestStart(MegaApiJava api,MegaRequest request) {
+    
+    }
+    
+    @Override
+    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
+    
+    }
+    
+    @Override
+    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+        if(request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
+            log("send phone number,get code");
+            if(e.getErrorCode() == MegaError.API_ETEMPUNAVAIL) {
+                log("reached limitation.");
+                showError();
+            }
+            if(e.getErrorCode() == MegaError.API_OK) {
+                log("will receive sms");
+                String enteredPhoneNumber = phoneNumberInput.getText().toString();
+                Intent intent = new Intent(this, SMSVerificationReceiveTxtActivity.class);
+                intent.putExtra(SELECTED_COUNTRY_CODE,selectedCountryCode);
+                intent.putExtra(ENTERED_PHONE_NUMBER, enteredPhoneNumber);
+                startActivityForResult(intent,REQUEST_CODE_VERIFY_CODE);
+            }
+            if(e.getErrorCode() == MegaError.API_EARGS) {
+                log("wrong number");
+                showError();
+            }
+            if(e.getErrorCode() == MegaError.API_EACCESS) {
+                log("API_EACCESS");
+                showError();
+            }
+        }
+    }
+    
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
+    
     }
 }
