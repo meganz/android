@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
@@ -51,6 +52,8 @@ public class ChatExplorerFragment extends Fragment {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
+    ChatExplorerFragment chatExplorerFragment;
+
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
@@ -69,6 +72,7 @@ public class ChatExplorerFragment extends Fragment {
     ArrayList<MegaContactAdapter> contacts;
     ArrayList<ChatExplorerListItem> items;
     ArrayList<ChatExplorerListItem> addedItems;
+    ArrayList<String> addedItemsSaved;
 
     int lastFirstVisiblePosition;
 
@@ -90,7 +94,6 @@ public class ChatExplorerFragment extends Fragment {
     RecyclerView addedList;
     MegaChipChatExplorerAdapter adapterAdded;
     LinearLayoutManager addedLayoutManager;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,6 +122,8 @@ public class ChatExplorerFragment extends Fragment {
             log("Chat not enabled!");
             chatEnabled=false;
         }
+
+        chatExplorerFragment = this;
     }
 
 
@@ -238,6 +243,13 @@ public class ChatExplorerFragment extends Fragment {
             megaChatApi.signalPresenceActivity();
         }
 
+        if (savedInstanceState != null) {
+            addedItemsSaved = savedInstanceState.getStringArrayList("addedItemsSaved");
+        }
+        else {
+            addedItemsSaved = new ArrayList<>();
+        }
+
         this.setChats();
 
         return v;
@@ -299,145 +311,26 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
+    void sortByAlphabetical ( ) {
+        Collections.sort(items, new Comparator<ChatExplorerListItem> (){
+
+            public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
+                String n1 = c1.getTitle();
+                String n2 = c2.getTitle();
+
+                int res = String.CASE_INSENSITIVE_ORDER.compare(n1, n2);
+                if (res == 0) {
+                    res = n1.compareTo(n2);
+                }
+                return res;
+            }
+        });
+    }
+
     public void setChats(){
         log("setChats");
 
-        if(isAdded()){
-            if (items != null) {
-                items.clear();
-            }
-            else {
-                items = new ArrayList<>();
-            }
-
-            if (addedItems != null) {
-                addedItems.clear();
-            }
-            else {
-                addedItems = new ArrayList<>();
-            }
-
-            if(chats!=null){
-                chats.clear();
-            }
-            else{
-                chats = new ArrayList<>();
-            }
-
-            if (archievedChats != null) {
-                archievedChats.clear();
-            }
-            else {
-                archievedChats =  new ArrayList<>();
-            }
-
-            if (contacts != null) {
-                contacts.clear();
-            }
-            else {
-                contacts = new ArrayList<>();
-            }
-
-            int initState = megaChatApi.getInitState();
-            log("Init state is: "+initState);
-            chats = megaChatApi.getActiveChatListItems();
-            archievedChats = megaChatApi.getArchivedChatListItems();
-            getVisibleMEGAContacts();
-
-            for (MegaChatListItem chat : chats) {
-                if (chat.isGroup()) {
-                    items.add(new ChatExplorerListItem(chat));
-                }
-                else {
-                    items.add(new ChatExplorerListItem(chat, getContact(chat)));
-                }
-            }
-
-            for (MegaChatListItem archieved : archievedChats) {
-                if (archieved.isGroup()) {
-                    items.add(new ChatExplorerListItem(archieved));
-                }
-                else {
-                    items.add(new ChatExplorerListItem(archieved, getContact(archieved)));
-                }
-            }
-
-            for (MegaContactAdapter contact : contacts) {
-                if (contact.getMegaUser() != null) {
-                    MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getMegaUser().getHandle());
-                    if (chat == null) {
-                        if (contact.getMegaUser() != null) {
-                            long handle = contact.getMegaUser().getHandle();
-                            if (handle != -1) {
-                                int userStatus = megaChatApi.getUserOnlineStatus(handle);
-                                if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                                    log("Request last green for user");
-                                    megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
-                                }
-                            }
-                        }
-                        items.add(new ChatExplorerListItem(contact));
-                    }
-                }
-            }
-
-            log("items no: "+items.size());
-
-            //Order by title
-            Collections.sort(items, new Comparator<ChatExplorerListItem> (){
-
-                public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
-                    String n1 = c1.getTitle();
-                    String n2 = c2.getTitle();
-
-                    int res = String.CASE_INSENSITIVE_ORDER.compare(n1, n2);
-                    if (res == 0) {
-                        res = n1.compareTo(n2);
-                    }
-                    return res;
-                }
-            });
-
-
-            if (adapterAdded == null) {
-                adapterAdded = new MegaChipChatExplorerAdapter(context, this, addedItems);
-            }
-            else {
-                adapterAdded.setItems(addedItems);
-            }
-
-            addedList.setAdapter(adapterAdded);
-
-            if (adapterAdded.getItemCount() == 0) {
-                setFirstLayoutVisibility(View.VISIBLE);
-            }
-            else {
-                setFirstLayoutVisibility(View.GONE);
-            }
-
-            if (adapterList == null){
-                log("adapterList is NULL");
-                adapterList = new MegaListChatExplorerAdapter(context, this, items);
-            }
-            else{
-                adapterList.setItems(items);
-            }
-
-            listView.setAdapter(adapterList);
-
-            if (adapterList.getItemCount() == 0){
-                log("adapterList.getItemCount() == 0");
-                listView.setVisibility(View.GONE);
-                addLayout.setVisibility(View.GONE);
-                emptyLayout.setVisibility(View.VISIBLE);
-            }
-            else{
-                log("adapterList.getItemCount() NOT = 0");
-                listView.setVisibility(View.VISIBLE);
-                addLayout.setVisibility(View.VISIBLE);
-                emptyLayout.setVisibility(View.GONE);
-            }
-        }
+        new RecoverItemsTask().execute();
     }
 
     void getVisibleMEGAContacts () {
@@ -478,20 +371,21 @@ public class ChatExplorerFragment extends Fragment {
         }
 
         if (adapterList != null && adapterList.getItemCount() > 0) {
+            adapterList.toggleSelection(position);
             ChatExplorerListItem item = adapterList.getItem(position);
 
-            if (item != null) {
+            if (item != null && !addedItems.contains(item)) {
                 addedItems.add(item);
                 adapterAdded.setItems(addedItems);
                 setFirstLayoutVisibility(View.GONE);
-                items.remove(item);
-                adapterList.setItems(items);
 
                 if(context instanceof  ChatExplorerActivity){
                     ((ChatExplorerActivity)context).showFabButton(true);
+                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
                 else{
                     ((FileExplorerActivityLollipop)context).showFabButton(true);
+                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
             }
         }
@@ -611,6 +505,19 @@ public class ChatExplorerFragment extends Fragment {
         if(listView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
+
+        if (addedItems != null && !addedItems.isEmpty()) {
+            if (addedItemsSaved == null) {
+                addedItemsSaved = new ArrayList<>();
+            }
+            else {
+                addedItemsSaved.clear();
+            }
+            for (ChatExplorerListItem item : addedItems) {
+                addedItemsSaved.add(item.getId().toString());
+            }
+            outState.putStringArrayList("addedItemsSaved", addedItemsSaved);
+        }
     }
 
     @Override
@@ -721,39 +628,193 @@ public class ChatExplorerFragment extends Fragment {
         if (item != null) {
             addedItems.remove(item);
             adapterAdded.setItems(addedItems);
-            items.add(item);
-            Collections.sort(items, new Comparator<ChatExplorerListItem> (){
 
-                public int compare(ChatExplorerListItem c1, ChatExplorerListItem c2) {
-                    String n1 = c1.getTitle();
-                    String n2 = c2.getTitle();
-
-                    int res = String.CASE_INSENSITIVE_ORDER.compare(n1, n2);
-                    if (res == 0) {
-                        res = n1.compareTo(n2);
-                    }
-                    return res;
-                }
-            });
-            adapterList.setItems(items);
+            if (adapterList != null) {
+                adapterList.toggleSelection(position);
+            }
 
             if (addedItems.size() > 0) {
                 setFirstLayoutVisibility(View.GONE);
                 if(context instanceof  ChatExplorerActivity){
                     ((ChatExplorerActivity)context).showFabButton(true);
+                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
                 else{
                     ((FileExplorerActivityLollipop)context).showFabButton(true);
+                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
             }
             else {
                 setFirstLayoutVisibility(View.VISIBLE);
                 if(context instanceof  ChatExplorerActivity){
                     ((ChatExplorerActivity)context).showFabButton(false);
+                    ((ChatExplorerActivity)context).setToolbarSubtitle(null);
                 }
                 else{
                     ((FileExplorerActivityLollipop)context).showFabButton(false);
+                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
                 }
+            }
+        }
+    }
+
+    class RecoverItemsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(isAdded()){
+                if (items != null) {
+                    items.clear();
+                }
+                else {
+                    items = new ArrayList<>();
+                }
+
+                if (addedItems != null) {
+                    addedItems.clear();
+                }
+                else {
+                    addedItems = new ArrayList<>();
+                }
+
+                if(chats!=null){
+                    chats.clear();
+                }
+                else{
+                    chats = new ArrayList<>();
+                }
+
+                if (archievedChats != null) {
+                    archievedChats.clear();
+                }
+                else {
+                    archievedChats =  new ArrayList<>();
+                }
+
+                if (contacts != null) {
+                    contacts.clear();
+                }
+                else {
+                    contacts = new ArrayList<>();
+                }
+
+                chats = megaChatApi.getActiveChatListItems();
+                archievedChats = megaChatApi.getArchivedChatListItems();
+                getVisibleMEGAContacts();
+
+                for (MegaChatListItem chat : chats) {
+                    if (chat.isGroup()) {
+                        items.add(new ChatExplorerListItem(chat));
+                    }
+                    else {
+                        items.add(new ChatExplorerListItem(chat, getContact(chat)));
+                    }
+                }
+
+                for (MegaChatListItem archieved : archievedChats) {
+                    if (archieved.isGroup()) {
+                        items.add(new ChatExplorerListItem(archieved));
+                    }
+                    else {
+                        items.add(new ChatExplorerListItem(archieved, getContact(archieved)));
+                    }
+                }
+
+                for (MegaContactAdapter contact : contacts) {
+                    if (contact.getMegaUser() != null) {
+                        MegaChatRoom chat = megaChatApi.getChatRoomByUser(contact.getMegaUser().getHandle());
+                        if (chat == null) {
+                            if (contact.getMegaUser() != null) {
+                                long handle = contact.getMegaUser().getHandle();
+                                if (handle != -1) {
+                                    int userStatus = megaChatApi.getUserOnlineStatus(handle);
+                                    if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+                                        log("Request last green for user");
+                                        megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
+                                    }
+                                }
+                            }
+                            items.add(new ChatExplorerListItem(contact));
+                        }
+                    }
+                }
+
+                log("items no: "+items.size());
+
+                //Order by title
+                sortByAlphabetical();
+
+                if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
+                    for (String id : addedItemsSaved) {
+                        for (ChatExplorerListItem item : items) {
+                            if (item.getId().equals(id)) {
+                                addedItems.add(item);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (adapterAdded == null) {
+                    adapterAdded = new MegaChipChatExplorerAdapter(context, chatExplorerFragment, addedItems);
+                }
+                else {
+                    adapterAdded.setItems(addedItems);
+                }
+
+                if (adapterList == null){
+                    log("adapterList is NULL");
+                    adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
+                }
+                else{
+                    adapterList.setItems(items);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            addedList.setAdapter(adapterAdded);
+
+            listView.setAdapter(adapterList);
+
+            if (adapterAdded.getItemCount() == 0) {
+                setFirstLayoutVisibility(View.VISIBLE);
+
+                if(context instanceof  ChatExplorerActivity){
+                    ((ChatExplorerActivity)context).setToolbarSubtitle(null);
+                }
+                else{
+                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
+                }
+            }
+            else {
+                setFirstLayoutVisibility(View.GONE);
+
+                if(context instanceof  ChatExplorerActivity){
+                    ((ChatExplorerActivity)context).showFabButton(true);
+                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                }
+                else{
+                    ((FileExplorerActivityLollipop)context).showFabButton(true);
+                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                }
+            }
+
+            if (adapterList.getItemCount() == 0){
+                log("adapterList.getItemCount() == 0");
+                listView.setVisibility(View.GONE);
+                addLayout.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("adapterList.getItemCount() NOT = 0");
+                listView.setVisibility(View.VISIBLE);
+                addLayout.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
             }
         }
     }
