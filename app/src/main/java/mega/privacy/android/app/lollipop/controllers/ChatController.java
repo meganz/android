@@ -260,7 +260,7 @@ public class ChatController {
         MegaChatMessage messageToDelete;
         if(message!=null){
 
-            if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+            if((message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (message.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                 log("Delete node attachment message");
                 megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
             }

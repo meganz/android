@@ -779,7 +779,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("voiceClipLayout.setOnRecordListener():onStart()");
-                adapter.stopAnyPlaying();
+                adapter.stopCurrentPlaying();
                 startRecordVoiceClip();
             }
 
@@ -1713,23 +1713,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
-
 //                onBackPressed();
                 finish();
                 break;
             }
             case R.id.cab_menu_call_chat:{
-
-                startVideo = false;
-                if(checkPermissionsCall()){
-                    startCall();
+                if(!isRecordingNow()){
+                    startVideo = false;
+                    if(checkPermissionsCall()){
+                        startCall();
+                    }
                 }
                 break;
             }
             case R.id.cab_menu_video_chat:{
-                startVideo = true;
-                if(checkPermissionsCall()){
-                    startCall();
+                if(!isRecordingNow()){
+                    startVideo = true;
+                    if(checkPermissionsCall()){
+                        startCall();
+                    }
                 }
                 break;
             }
@@ -1862,6 +1864,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      }
 
     public void startCall(){
+        if(adapter!=null){
+            adapter.stopCurrentPlaying();
+        }
         if(startVideo){
             log("Start video call");
             megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
@@ -2086,6 +2091,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         log("forwardMessages");
+        if(adapter!=null){
+            adapter.stopCurrentPlaying();
+        }
         chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
     }
 
@@ -2482,6 +2490,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         log("Open camera and lost the camera in the call");
+                        if(adapter!=null){
+                            adapter.stopCurrentPlaying();
+                        }
                         //Remove the local video from the video call:
                         MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                         if(callInProgress != null) {
@@ -2525,6 +2536,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         log("Clear chat!");
+                        if(adapter!=null){
+                            adapter.stopCurrentPlaying();
+                        }
 //						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
                         log("Clear history selected!");
                         chatC.clearHistory(c);
@@ -2558,6 +2572,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE: {
+                        if(adapter!=null){
+                            adapter.stopCurrentPlaying();
+                        }
                         ChatController chatC = new ChatController(chatActivity);
                         chatC.leaveChat(c);
                         break;
@@ -3526,6 +3543,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
+                        if(adapter!=null){
+                            adapter.stopCurrentPlaying();
+                        }
                         ChatController cC = new ChatController(chatActivity);
                         cC.deleteAndroidMessages(messages, chat);
                         break;
@@ -3550,8 +3570,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             builder.setMessage(R.string.confirmation_delete_several_messages);
         }
-        builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setPositiveButton(R.string.context_remove, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationDeleteMessage(final long messageId, final long chatId){
@@ -6290,6 +6309,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
             try{
                 statusDialog.dismiss();
             } catch(Exception ex) {};
