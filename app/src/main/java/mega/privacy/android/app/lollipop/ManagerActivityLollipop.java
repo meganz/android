@@ -345,7 +345,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private int storageState = MegaApiJava.STORAGE_STATE_GREEN;
 	private boolean isStorageStatusDialogShown = false;
-
+	private String registeredPhoneNumber;
+	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
     float elevation = 0;
@@ -646,6 +647,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
+	
+	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            if (intent != null && intent.getAction() == Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER) {
+                refreshAddPhoneNumberButton();
+            }
+        }
+    };
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1791,6 +1801,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+            
+            localBroadcastManager.registerReceiver(refreshAddPhoneNumberButtonReceiver,
+                    new IntentFilter(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
 		}
 
 		nC = new NodeController(this);
@@ -2057,6 +2070,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
 		}
         upgradeAccount.setOnClickListener(this);
+        
+        registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+        navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
+        if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        }else{
+            navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
+        }
         
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
@@ -4226,6 +4247,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
 
     	super.onDestroy();
 	}
@@ -15426,43 +15448,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@SuppressLint("NewApi") @Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
-        tlog("onRequestFinish: " + request.getRequestString()+"_"+e.getErrorCode());
-        if(request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
-            if(e.getErrorCode() == MegaError.API_EACCESS) {
-                tlog("reached verification limitation.");
-            }
-            if(e.getErrorCode() == MegaError.API_EEXPIRED) {
-                tlog("the number has been verified.");
-            }
-            if(e.getErrorCode() == MegaError.API_EFAILED) {
-                tlog("wrong code");
-            }
-            if(e.getErrorCode() == MegaError.API_EEXIST) {
-                tlog("no pending");
-            }
-            if(e.getErrorCode() == MegaError.API_OK) {
-                tlog("successful");
-            }
-            if(e.getErrorCode() == MegaError.API_EARGS) {
-                tlog("wrong number");
-            }
-        }
-        if(request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
-            tlog("send phone number,get code");
-            if(e.getErrorCode() == MegaError.API_ETEMPUNAVAIL) {
-                tlog("reached limitation.");
-            }
-            if(e.getErrorCode() == MegaError.API_OK) {
-                tlog("will receive sms");
-            }
-            if(e.getErrorCode() == MegaError.API_EARGS) {
-                tlog("wrong number");
-            }
-            if(e.getErrorCode() == MegaError.API_EACCESS) {
-                tlog("API_EACCESS");
-            }
-        }
-
 		if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_LONG).show();
@@ -18649,6 +18634,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setTextSubmitted () {
 	    if (searchView != null) {
 	        searchView.setQuery(searchQuery, true);
+        }
+    }
+    
+    private void refreshAddPhoneNumberButton(){
+        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        if(maFLol != null){
+            maFLol.updateAddPhoneNumberLabel();
         }
     }
 }

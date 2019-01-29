@@ -222,10 +222,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		infoEmail.setText(megaApi.getMyEmail());
 		infoEmail.setOnClickListener(this);
-		
+        
+        String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
 		addPhoneNumber = (TextView)v.findViewById(R.id.add_phone_number);
-		addPhoneNumber.setText(R.string.add_phone_number_label);
-		addPhoneNumber.setOnClickListener(this);
+		if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+            addPhoneNumber.setText(registeredPhoneNumber);
+        }else{
+            addPhoneNumber.setText(R.string.add_phone_number_label);
+            addPhoneNumber.setOnClickListener(this);
+        }
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
 
@@ -1003,4 +1008,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onAbortCancel() {
 		log("onAbortCancel");
 	}
+	
+	public void updateAddPhoneNumberLabel(){
+        String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+        if(registeredPhoneNumber != null & registeredPhoneNumber.length() > 0){
+            addPhoneNumber.setText(registeredPhoneNumber);
+            addPhoneNumber.setOnClickListener(null);
+        }
+    }
 }

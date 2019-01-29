@@ -276,11 +276,14 @@
 
 	<LinearLayout android:id="@+id/navigation_drawer_add_phone_number_container"
 	              android:layout_width="match_parent"
-	              android:layout_height="120dp"
+	              android:layout_height="wrap_content"
+	              android:paddingBottom="16dp"
 	              android:layout_marginTop="20dp"
+	              android:paddingRight="16dp"
 	              android:background="#FFF9F9F9"
 	              android:layout_gravity="bottom"
 	              android:layout_alignParentBottom="true"
+	              android:visibility="gone"
 	              android:orientation="vertical">
 		<LinearLayout android:layout_width="match_parent"
 		              android:layout_height="wrap_content"
@@ -293,7 +296,7 @@
 			           android:src="@drawable/il_verify_phone_drawer"/>
 			<TextView android:id="@+id/navigation_drawer_add_phone_number_button"
 			          android:layout_width="wrap_content"
-			          android:layout_height="38dp"
+			          android:layout_height="wrap_content"
 			          android:layout_marginLeft="16dp"
 			          android:background="@drawable/background_button_border_accent"
 			          android:gravity="center"

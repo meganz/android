@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -103,6 +105,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
                 ds.setUnderlineText(false);
+                ds.setColor(getResources().getColor(R.color.accentColor));
             }
         };
         spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -572,18 +575,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         sixthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
     }
     
-    private void copySeed() {
-        log("copy seed");
-        ClipboardManager clipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-        if (seed != null) {
-            ClipData clip = ClipData.newPlainText("seed",seed);
-            if (clip != null) {
-                clipboard.setPrimaryClip(clip);
-                Snackbar.make(inputContainer,getString(R.string.messages_copied_clipboard),Snackbar.LENGTH_LONG).show();
-            }
-        }
-    }
-    
     private void validateVerificationCode() {
         log("validateVerificationCode");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
@@ -667,6 +658,8 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             }
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("successful");
+                Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 setResult(RESULT_OK);
                 finish();
             }
