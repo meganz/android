@@ -9348,7 +9348,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                             if(f.exists() && (f.length() == node.getSize())){
                                                 isOnMegaVoiceNotes = true;
                                             }
-
                                             if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
                                                 log("playRecord:localPath !=null ");
                                                 if(holder.mediaPlayerVoiceNotes!=null){
