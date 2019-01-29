@@ -779,16 +779,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("voiceClipLayout.setOnRecordListener():onStart()");
-                if(adapter.isSomethingPlaying()){
-                    boolean result = adapter.stopReproductions();
-                    if(result){
-                        log("voiceClipLayout.setOnRecordListener():onStart() -> startRecordVoiceClip");
-                        startRecordVoiceClip();
-                    }
-                }else{
-                    log("voiceClipLayout.setOnRecordListener():onStart() -> startRecordVoiceClip");
-                    startRecordVoiceClip();
-                }
+                adapter.stopAnyPlaying();
+                startRecordVoiceClip();
             }
 
             @Override
@@ -2648,7 +2640,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(checkPermissionsCall()){
                     MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                     log("call_in_progress_layout clicked: "+callInProgress.getStatus());
-
                     if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
                         megaChatApi.startChatCall(idChat, false, this);
                     }else if((callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
@@ -2665,10 +2656,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.send_message_icon_chat:{
                 log("onClick:send_message_icon_chat");
-
                 writingLayout.setClickable(false);
                 String text = textChat.getText().toString();
-
                 if(!text.isEmpty()) {
                     if (editingMessage) {
                         log("onClick:send_message_icon_chat:editingMessage");
@@ -3644,10 +3633,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         log("itemClick : position: "+positionInAdapter);
-        int position = positionInAdapter-1;
+        int positionInMessages = positionInAdapter-1;
 
-        if(position<messages.size()){
-            AndroidMegaChatMessage m = messages.get(position);
+        if(positionInMessages < messages.size()){
+            AndroidMegaChatMessage m = messages.get(positionInMessages);
 
             if (adapter.isMultipleSelect()) {
                 log("itemClick isMultipleSelect");
@@ -3682,7 +3671,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }else{
                 if(m!=null){
                     if(m.isUploading()){
-                        showUploadingAttachmentBottomSheet(m, position);
+                        showUploadingAttachmentBottomSheet(m, positionInMessages);
                     }else{
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
@@ -3691,7 +3680,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     log("selected message rowId: " + m.getMessage().getRowId());
                                     if ((m.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) || (m.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                                         log("show not sent message panel");
-                                        showMsgNotSentPanel(m, position);
+                                        showMsgNotSentPanel(m, positionInMessages);
                                     }
                                 }
                             }
@@ -3711,7 +3700,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                         else{
                                             log("Image without preview - show node attachment panel for one node");
-                                            showNodeAttachmentBottomSheet(m, position);
+                                            showNodeAttachmentBottomSheet(m, positionInMessages);
                                         }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible()||MimeTypeList.typeForName(node.getName()).isAudio()){
@@ -3847,12 +3836,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 startActivity(mediaIntent);
                                             }else{
                                                 log("itemClick:noAvailableIntent");
-                                                showNodeAttachmentBottomSheet(m, position);
+                                                showNodeAttachmentBottomSheet(m, positionInMessages);
                                             }
                                         }
                                         overridePendingTransition(0,0);
                                         if (adapter != null) {
-                                            adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position);
+                                            adapter.setNodeAttachmentVisibility(false, holder_imageDrag, positionInMessages);
                                         }
 
                                     }else if (MimeTypeList.typeForName(node.getName()).isPdf()){
@@ -3962,18 +3951,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                         else{
                                             log("itemClick:noAvailableIntent");
-                                            showNodeAttachmentBottomSheet(m, position);
+                                            showNodeAttachmentBottomSheet(m, positionInMessages);
                                         }
                                         overridePendingTransition(0,0);
                                     }
                                     else{
                                         log("NOT Image, pdf, audio or video - show node attachment panel for one node");
-                                        showNodeAttachmentBottomSheet(m, position);
+                                        showNodeAttachmentBottomSheet(m, positionInMessages);
                                     }
                                 }
                                 else{
                                     log("show node attachment panel");
-                                    showNodeAttachmentBottomSheet(m, position);
+                                    showNodeAttachmentBottomSheet(m, positionInMessages);
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
@@ -3984,11 +3973,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         if (m.getMessage().getUsersCount() == 1) {
                                             long userHandle = m.getMessage().getUserHandle(0);
                                             if(userHandle != megaChatApi.getMyUserHandle()){
-                                                showContactAttachmentBottomSheet(m, position);
+                                                showContactAttachmentBottomSheet(m, positionInMessages);
                                             }
-                                        }
-                                        else{
-                                            showContactAttachmentBottomSheet(m, position);
+                                        }else{
+                                            showContactAttachmentBottomSheet(m, positionInMessages);
                                         }
                                     }
                                 }
@@ -4058,7 +4046,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             }
         }else{
-            log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
+            log("DO NOTHING: Position ("+positionInMessages+") is more than size in messages (size: "+messages.size()+")");
         }
     }
 
