@@ -2319,4 +2319,10 @@
     
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
 
+    <string name="sms_add_phone_number_dialog_title" context="Dialog title for adding phone number">Add phone number</string>
+    <string name="sms_add_phone_number_dialog_msg_achievement_user" context="Text for scenario 1 &amp; 2 for achievement users">Get free [xx]GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_msg_non_achievement_user" context="Text for scenario 1 &amp; 2 for non achievement users">Add your phone number to MEGA. This makes it easier for your contacts to find you on MEGA.</string>
+    <string name="sms_add_phone_number_dialog_btn_add" context="Add phone number">ADD</string>
+    <string name="sms_add_phone_number_dialog_btn_not_now" context="Add phone number">NOT NOW</string>
+
 </resources>

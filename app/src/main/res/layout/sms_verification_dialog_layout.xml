@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="344dp" android:layout_height="395dp"
+    android:layout_width="344dp"
+    android:layout_height="395dp"
     android:orientation="vertical">
     <ScrollView
         android:layout_width="match_parent"
@@ -16,8 +17,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="25dp"
+                android:text="@string/sms_add_phone_number_dialog_title"
                 android:textColor="@color/name_my_account"
-                android:text="Add phone number"
                 android:textSize="18sp"/>
             <ImageView
                 android:id="@+id/image_storage_status"
@@ -28,33 +29,22 @@
                 android:src="@drawable/il_verify_phone_circle"/>
             <TextView
                 android:id="@+id/sv_dialog_msg"
+                style="@style/GetFreeXxGbWhen"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="wrap_content "
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginRight="25dp"
-                android:gravity="center_horizontal"
-                android:textColor="@color/mail_my_account"
-                android:textSize="16sp"/>
-            <EditText
-                android:id="@+id/et_num"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:stateListAnimator="@null"
-                android:inputType="phone"
-                android:layout_gravity="left"
-                android:layout_marginRight="16dp"
-                android:text="00642108194233"
-                android:textColor="@color/accentColor"/>
+                android:gravity="start"
+                android:lineSpacingMultiplier="1.31"
+                android:textAlignment="textStart"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="35dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="18dp"
                 android:orientation="horizontal">
                 <Button
                     android:id="@+id/sv_btn_horizontal_not_now"
@@ -64,31 +54,19 @@
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:text="NOT NOW"
+                    android:text="@string/sms_add_phone_number_dialog_btn_not_now"
                     android:textColor="@color/accentColor"/>
                 <Button
                     android:id="@+id/sv_btn_horizontal_add"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="22dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginRight="24dp"
                     android:background="@android:color/transparent"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:text="CHECK"
-                    android:textColor="@color/accentColor"/>
-                <Button
-                    android:id="@+id/sv_btn_horizontal_xxx"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="22dp"
-                    android:layout_marginRight="16dp"
-                    android:background="@android:color/transparent"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"
-                    android:text="SEND"
+                    android:text="@string/sms_add_phone_number_dialog_btn_add"
                     android:textColor="@color/accentColor"/>
             </LinearLayout>
         </LinearLayout>

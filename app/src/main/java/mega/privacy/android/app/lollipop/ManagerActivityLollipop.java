@@ -14683,34 +14683,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
         dialogBuilder.setView(dialogView);
 
-        TextView text = dialogView.findViewById(R.id.sv_dialog_msg);
-        final EditText num = dialogView.findViewById(R.id.et_num);
-        dialogView.findViewById(R.id.sv_btn_horizontal_xxx).setOnClickListener(new OnClickListener() {
+        TextView msg = dialogView.findViewById(R.id.sv_dialog_msg);
+        boolean isAchievementUser = true;
+        if (isAchievementUser) {
+            msg.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+        } else {
+            msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+        }
+
+        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                String phone = num.getText().toString();
-                megaApi.sendSMSVerificationCode(phone,managerActivity,true);
-//                megaApi.sendSMSVerificationCode(phone,managerActivity);
+                alertDialogSMSVerification.dismiss();
             }
         });
         dialogView.findViewById(R.id.sv_btn_horizontal_add).setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                String phone = num.getText().toString();
-                megaApi.checkSMSVerificationCode(phone,managerActivity);
-                tlog(megaApi.smsVerifiedPhoneNumber());
+                startActivity(new Intent(getApplicationContext(),SMSVerificationActivity.class));
+                alertDialogSMSVerification.dismiss();
             }
         });
-        dialogView.findViewById(R.id.sv_btn_horizontal_not_now).setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class));
-            }
-        });
-        text.setText("dasdasdaasdasd");
         alertDialogSMSVerification = dialogBuilder.create();
         alertDialogSMSVerification.setCancelable(true);
         alertDialogSMSVerification.setCanceledOnTouchOutside(true);

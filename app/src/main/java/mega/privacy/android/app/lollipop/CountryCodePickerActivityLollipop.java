@@ -1,9 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
-import android.app.Activity;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -30,7 +27,6 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
@@ -168,8 +164,16 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         Intent result = new Intent();
         result.putExtra(COUNTRY_NAME,country.getName());
         result.putExtra(COUNTRY_CODE,country.getCode());
-        setResult(Activity.RESULT_OK, result);
+        setResult(Activity.RESULT_OK,result);
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public class Country {
@@ -204,7 +208,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         }
     }
 
-    public static void countrySelected(){
+    public static void countrySelected() {
 
     }
 }

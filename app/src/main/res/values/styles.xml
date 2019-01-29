@@ -245,4 +245,9 @@
 		<item name="colorPrimary">#FFF9F9F9</item>
 		<item name="android:background">#ffffff</item>
 	</style>
+    <style name="GetFreeXxGbWhen" parent="@style/TextAppearance.AppCompat">
+        <item name="android:fontFamily">Roboto</item>
+        <item name="android:textColor">#FF666666</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>
