@@ -2453,6 +2453,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(Util.isChatEnabled()){
 				megaApi.shouldShowRichLinkWarning(this);
 				megaApi.isRichPreviewsEnabled(this);
+				megaApi.isGeolocationEnabled(this);
 			}
 
 			transferData = megaApi.getTransferData(this);
@@ -3128,10 +3129,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void deleteCurrentFragment () {
 		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 		if (currentFragment != null){
-			getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-			try {
-				getSupportFragmentManager().executePendingTransactions();
-			} catch (Exception e){};
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
 		}
 	}
 
@@ -4224,10 +4222,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void replaceFragment (Fragment f, String fTag) {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, f, fTag);
-		ft.commit();
-		try {
-			getSupportFragmentManager().executePendingTransactions();
-		} catch (Exception e){};
+		ft.commitNowAllowingStateLoss();
 	}
 
 	void refreshFragment (String fTag) {
@@ -9083,10 +9078,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
 				ScanCodeFragment fragment = new ScanCodeFragment();
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit();
-				try {
-					getSupportFragmentManager().executePendingTransactions();
-				} catch (Exception e){};
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
 				Intent intent = new Intent(this, QRCodeActivity.class);
 				intent.putExtra("contacts", true);
 				startActivity(intent);
@@ -15755,6 +15747,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     }
 				}
             }
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
+
+				if(e.getErrorCode() == MegaError.API_OK){
+					log("Attribute USER_ATTR_GEOLOCATION enabled");
+					MegaApplication.setEnabledGeoLocation(true);
+				}
+				else{
+					log("Attribute USER_ATTR_GEOLOCATION disabled");
+					MegaApplication.setEnabledGeoLocation(false);
+				}
+			}
             else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				log("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
 				if (e.getErrorCode() == MegaError.API_OK) {
