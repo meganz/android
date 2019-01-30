@@ -160,8 +160,26 @@
 				android:paddingTop="10dp"
 				android:paddingRight="16dp"
 				android:paddingBottom="10dp"
+				android:layout_marginLeft="10dp"
 				android:text="@string/verify_account_next_button"
 				android:textColor="@color/white"/>
+
+			<TextView
+				android:id="@+id/verify_account_not_now_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_marginTop="10dp"
+				android:layout_toLeftOf="@+id/verify_account_next_button"
+				android:minHeight="0dp"
+				android:paddingLeft="16dp"
+				android:paddingTop="10dp"
+				android:paddingRight="16dp"
+				android:paddingBottom="10dp"
+				android:text="@string/verify_account_not_now_button"
+				android:textAllCaps="true"
+				android:textColor="@color/accentColor"
+				android:textStyle="bold"/>
 		</RelativeLayout>
 	</LinearLayout>
 </ScrollView>

@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -107,6 +108,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 super.updateDrawState(ds);
                 ds.setUnderlineText(false);
                 ds.setColor(getResources().getColor(R.color.accentColor));
+                ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             }
         };
         spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

@@ -2,6 +2,8 @@ package mega.privacy.android.app;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
@@ -40,7 +43,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     public static final String SELECTED_COUNTRY_CODE = "COUNTRY_CODE";
     public static final String ENTERED_PHONE_NUMBER = "ENTERED_PHONE_NUMBER";
-    private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber;
+    private TextView helperText, selectedCountry, errorInvalidCountryCode, errorInvalidPhoneNumber, titleCountryCode, titlePhoneNumber, notNowButton;
     private View divider1, divider2;
     private ImageView errorInvalidPhoneNumberIcon;
     private RelativeLayout countrySelector;
@@ -72,36 +75,42 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         
         //set helper text
         helperText = findViewById(R.id.verify_account_helper);
-        String text;
-        if (isUserLocked) {
-            text = getResources().getString(R.string.verify_account_helper_locked);
+        if (true || isUserLocked) {
+            String text = getResources().getString(R.string.verify_account_helper_locked);
+            //learn more
+            int start = text.length();
+            text += getResources().getString(R.string.verify_account_helper_learn_more);
+            int end = text.length();
+            SpannableString spanString = new SpannableString(text);
+            ClickableSpan clickableSpan = new ClickableSpan() {
+                @Override
+                public void onClick(View textView) {
+                    //todo open external link
+                    log("Learn more clicked");
+                    String url = "https://mega.nz/terms";
+                    Intent openTermsIntent = new Intent(SMSVerificationActivity.this, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(url));
+                    startActivity(openTermsIntent);
+                }
+        
+                @Override
+                public void updateDrawState(TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setUnderlineText(false);
+                    ds.setColor(getResources().getColor(R.color.accentColor));
+                    ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                }
+            };
+            spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            helperText.setText(spanString);
+            helperText.setMovementMethod(LinkMovementMethod.getInstance());
+            helperText.setHighlightColor(Color.TRANSPARENT);
         } else {
-            text = getResources().getString(R.string.verify_account_helper_add_new);
+            helperText.setText(R.string.verify_account_helper_add_new);
         }
         
-        //learn more
-        int start = text.length();
-        text += getResources().getString(R.string.verify_account_helper_learn_more);
-        int end = text.length();
-        SpannableString spanString = new SpannableString(text);
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(View textView) {
-                //todo open external link
-                log("Learn more clicked");
-            }
-            
-            @Override
-            public void updateDrawState(TextPaint ds) {
-                super.updateDrawState(ds);
-                ds.setUnderlineText(false);
-                ds.setColor(getResources().getColor(R.color.accentColor));
-            }
-        };
-        spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        helperText.setText(spanString);
-        helperText.setMovementMethod(LinkMovementMethod.getInstance());
-        helperText.setHighlightColor(Color.TRANSPARENT);
+        
         
         //country selector
         countrySelector = findViewById(R.id.verify_account_country_selector);
@@ -148,9 +157,18 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             }
         });
         
-        //next button
+        //buttons
         nextButton = findViewById(R.id.verify_account_next_button);
         nextButton.setOnClickListener(this);
+        
+        notNowButton = findViewById(R.id.verify_account_not_now_button);
+        notNowButton.setOnClickListener(this);
+        
+        if(isUserLocked){
+            notNowButton.setVisibility(View.GONE);
+        }else{
+            notNowButton.setVisibility(View.VISIBLE);
+        }
         
         //error message and icon
         errorInvalidCountryCode = findViewById(R.id.verify_account_invalid_country_code);
@@ -180,6 +198,11 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             case (R.id.verify_account_next_button): {
                 log("verify_account_next_button clicked");
                 nextButtonClicked();
+                break;
+            }
+            case (R.id.verify_account_not_now_button):{
+                log("verify_account_not_now_button clicked");
+                finish();
                 break;
             }
             default:

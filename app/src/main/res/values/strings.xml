@@ -675,6 +675,7 @@
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
 	<string name="verify_account_next_button" context="button label - go to next page">Next</string>
 	<string name="verify_account_back_button" context="button label - go to previous page">Back</string>
+	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
 	<string name="verify_account_confirm_button" context="button label - submit verification code">Confirm</string>
 	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
