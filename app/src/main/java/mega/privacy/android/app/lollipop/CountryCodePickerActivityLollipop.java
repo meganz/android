@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 
 public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
@@ -59,7 +61,10 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contry_code_picker);
-        outMetrics = new DisplayMetrics();
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
         changeStatusBarColor();
         if (countries == null) {
             countries = loadCountries();
@@ -71,8 +76,12 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                changeActionBarElevation();
                 super.onScrolled(recyclerView, dx, dy);
+                if(recyclerView.canScrollVertically(-1)) {
+                    changeActionBarElevation(true);
+                } else {
+                    changeActionBarElevation(false);
+                }
             }
         });
         adapter = new CountryListAdapter(countries);
@@ -91,22 +100,31 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     }
 
     private void changeStatusBarColor() {
-        final Window window = this.getWindow();
+        Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(ContextCompat.getColor(this,R.color.status_bar_search));
     }
 
-    public void changeActionBarElevation() {
-        abL.setElevation(Util.px2dp(4,outMetrics));
-        abL.postDelayed(new Runnable() {
+    public void changeActionBarElevation(boolean withElevation) {
+        if(withElevation) {
+            final float elevation = Util.px2dp(4,outMetrics);
+            abL.postDelayed(new Runnable() {
 
-            @Override
-            public void run() {
-                log("changeActionBarElevation");
-                abL.setElevation(Util.px2dp(4,outMetrics));
-            }
-        },100);
+                @Override
+                public void run() {
+                    abL.setElevation(elevation);
+                }
+            },100);
+        } else {
+            abL.postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    abL.setElevation(0);
+                }
+            },100);
+        }
     }
 
     @Override
