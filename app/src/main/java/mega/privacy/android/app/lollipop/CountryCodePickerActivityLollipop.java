@@ -2,17 +2,22 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import org.json.JSONArray;
@@ -35,11 +40,15 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     private List<Country> selectedCountries = new ArrayList<>();
 
+    private AppBarLayout abL;
+
     private RecyclerView countryList;
 
     private CountryListAdapter adapter;
 
     private ActionBar actionBar;
+
+    private DisplayMetrics outMetrics;
 
     private Toolbar toolbar;
     public static final String COUNTRY_NAME = "country_name";
@@ -50,11 +59,22 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contry_code_picker);
+        outMetrics = new DisplayMetrics();
+        changeStatusBarColor();
         if (countries == null) {
             countries = loadCountries();
         }
 
+        abL = findViewById(R.id.app_bar_layout);
         countryList = findViewById(R.id.country_list);
+        countryList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                changeActionBarElevation();
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
         adapter = new CountryListAdapter(countries);
         adapter.setCallback(this);
         countryList.setAdapter(adapter);
@@ -64,10 +84,29 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("SELECT COUNTRY");
+        actionBar.setTitle(getString(R.string.action_search_country));
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(Util.mutateIcon(this,R.drawable.ic_arrow_back_white,R.color.black));
+    }
+
+    private void changeStatusBarColor() {
+        final Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this,R.color.status_bar_search));
+    }
+
+    public void changeActionBarElevation() {
+        abL.setElevation(Util.px2dp(4,outMetrics));
+        abL.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                log("changeActionBarElevation");
+                abL.setElevation(Util.px2dp(4,outMetrics));
+            }
+        },100);
     }
 
     @Override

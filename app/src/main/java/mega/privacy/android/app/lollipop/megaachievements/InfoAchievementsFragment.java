@@ -18,6 +18,7 @@ import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -73,6 +74,7 @@ public class InfoAchievementsFragment extends Fragment{
 		secondParagraph = (TextView) v.findViewById(R.id.info_achievements_how_works_second_p);
 
 		long count = ((AchievementsActivity)context).megaAchievements.getAwardsCount();
+        TL.log(this,"@#@" ,"getAwardsCount:" + count );
 		for(int i=0; i<count; i++) {
 			int type = ((AchievementsActivity) context).megaAchievements.getAwardClass(i);
 
@@ -137,7 +139,42 @@ public class InfoAchievementsFragment extends Fragment{
 				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_mobile_app, Util.getSizeString(storageAppInstall), Util.getSizeString(transferAppInstall)));
 				secondParagraph.setVisibility(View.GONE);
 			}
-		}
+		}else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
+            aB.setTitle(getString(R.string.title_add_phone));
+            long addPhoneStorageValue = ((AchievementsActivity)context).megaAchievements.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+            long addPhoneTransferValue = ((AchievementsActivity)context).megaAchievements.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+            icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_big));
+
+            if(awardId==-1){
+                log("No award for this achievement");
+                checkIcon.setVisibility(View.GONE);
+                title.setText(getString(R.string.figures_achievements_text, Util.getSizeString(addPhoneStorageValue), Util.getSizeString(addPhoneTransferValue)));
+                title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, Util.getSizeString(addPhoneStorageValue), Util.getSizeString(addPhoneTransferValue)));
+                secondParagraph.setVisibility(View.GONE);
+            }
+            else{
+                if(diffDays<=15){
+                    title.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.expired_border));
+                }
+                else{
+                    title.setBackground(ContextCompat.getDrawable(context, R.drawable.bonus_ts_border));
+                }
+
+                if(diffDays>0){
+                    title.setText(getString(R.string.expiration_date_for_achievements, diffDays));
+                }
+                else{
+                    title.setText(context.getResources().getString(R.string.expired_achievement));
+                }
+
+                long storageAddPhone = ((AchievementsActivity)context).megaAchievements.getRewardStorageByAwardId(awardId);
+                long transferAddPhone = ((AchievementsActivity)context).megaAchievements.getRewardTransferByAwardId(awardId);
+                firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_add_phone, Util.getSizeString(storageAddPhone), Util.getSizeString(transferAddPhone)));
+                secondParagraph.setVisibility(View.GONE);
+            }
+        }
 		else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL){
 
 			aB.setTitle(getString(R.string.title_install_desktop));

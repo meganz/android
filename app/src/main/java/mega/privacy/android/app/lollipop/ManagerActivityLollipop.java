@@ -14706,7 +14706,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         dialogBuilder.setView(dialogView);
 
         TextView msg = dialogView.findViewById(R.id.sv_dialog_msg);
-        boolean isAchievementUser = true;
+        boolean isAchievementUser = megaApi.isAchievementsEnabled();
         if (isAchievementUser) {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
         } else {

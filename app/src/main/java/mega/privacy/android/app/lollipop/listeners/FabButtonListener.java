@@ -28,7 +28,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
     public void onClick(View v) {
         log("onClick FabButtonListener");
         MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        megaApi.sendSMSVerificationCode("+64210404525",null,true);
+        megaApi.sendSMSVerificationCode("+642108194233",null,true);
 //        switch(v.getId()) {
 //            case R.id.floating_button: {
 //                log("Floating Button click!");
