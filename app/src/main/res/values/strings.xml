@@ -2318,4 +2318,5 @@
 
     <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created correctly</string>
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparing files</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as message.</string>
 </resources>

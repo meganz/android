@@ -122,6 +122,21 @@ public class ChatController {
         }
     }
 
+    public void selectChatsToAttachContacts (ArrayList<MegaUser> contacts) {
+        long[] longArray = new long[contacts.size()];
+
+        for (int i=0; i<contacts.size(); i++) {
+            longArray[i] = contacts.get(i).getHandle();
+        }
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("USER_HANDLES", longArray);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+    }
+
     public void leaveChat(long chatId){
         if(context instanceof ManagerActivityLollipop){
             megaChatApi.leaveChat(chatId, (ManagerActivityLollipop) context);

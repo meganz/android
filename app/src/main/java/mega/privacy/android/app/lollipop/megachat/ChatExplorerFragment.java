@@ -388,6 +388,9 @@ public class ChatExplorerFragment extends Fragment {
                     ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
             }
+            else if (addedItems.contains(item)) {
+                deleteItem(item);
+            }
         }
     }
 
@@ -514,7 +517,7 @@ public class ChatExplorerFragment extends Fragment {
                 addedItemsSaved.clear();
             }
             for (ChatExplorerListItem item : addedItems) {
-                addedItemsSaved.add(item.getId().toString());
+                addedItemsSaved.add(item.getId());
             }
             outState.putStringArrayList("addedItemsSaved", addedItemsSaved);
         }
@@ -623,15 +626,21 @@ public class ChatExplorerFragment extends Fragment {
         }
     }
 
-    public void deleteItem(int position) {
+    public void deleteItemPosition(int position) {
         ChatExplorerListItem item = adapterAdded.getItem(position);
+        if (adapterList != null) {
+            int positionItem = adapterList.getPosition(item);
+            if (positionItem != -1) {
+                adapterList.toggleSelection(positionItem);
+            }
+        }
+        deleteItem(item);
+    }
+
+    public void deleteItem(ChatExplorerListItem item) {
         if (item != null) {
             addedItems.remove(item);
             adapterAdded.setItems(addedItems);
-
-            if (adapterList != null) {
-                adapterList.toggleSelection(position);
-            }
 
             if (addedItems.size() > 0) {
                 setFirstLayoutVisibility(View.GONE);
@@ -744,11 +753,23 @@ public class ChatExplorerFragment extends Fragment {
                 //Order by title
                 sortByAlphabetical();
 
+                if (adapterList == null){
+                    log("adapterList is NULL");
+                    adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
+                }
+                else{
+                    adapterList.setItems(items);
+                }
+
                 if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
                     for (String id : addedItemsSaved) {
                         for (ChatExplorerListItem item : items) {
                             if (item.getId().equals(id)) {
                                 addedItems.add(item);
+                                int position = adapterList.getPosition(item);
+                                if (position != -1) {
+                                    adapterList.toggleSelection(position);
+                                }
                                 break;
                             }
                         }
@@ -760,14 +781,6 @@ public class ChatExplorerFragment extends Fragment {
                 }
                 else {
                     adapterAdded.setItems(addedItems);
-                }
-
-                if (adapterList == null){
-                    log("adapterList is NULL");
-                    adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
-                }
-                else{
-                    adapterList.setItems(items);
                 }
             }
 
@@ -816,6 +829,15 @@ public class ChatExplorerFragment extends Fragment {
                 addLayout.setVisibility(View.VISIBLE);
                 emptyLayout.setVisibility(View.GONE);
             }
+        }
+    }
+
+    public void search (String s) {
+        if (s != null && !s.isEmpty()) {
+
+        }
+        else {
+
         }
     }
 

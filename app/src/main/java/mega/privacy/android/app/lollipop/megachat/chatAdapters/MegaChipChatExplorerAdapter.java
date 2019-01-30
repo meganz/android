@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
@@ -171,7 +170,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             }
             switch (view.getId()) {
                 case R.id.delete_icon_chip: {
-                    ((ChatExplorerFragment) fragment).deleteItem(currentPosition);
+                    ((ChatExplorerFragment) fragment).deleteItemPosition(currentPosition);
                     break;
                 }
             }
