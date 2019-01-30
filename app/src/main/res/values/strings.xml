@@ -2314,5 +2314,7 @@
 
 
     <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned location</string>
+    <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
+
 
 </resources>

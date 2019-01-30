@@ -79,7 +79,7 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDial
 
         titleSlidingPanel.setText(getString(R.string.context_send));
 
-        LinearLayout separator = (LinearLayout) contentView.findViewById(R.id.send_attachment_chat_separator);
+//        LinearLayout separator = (LinearLayout) contentView.findViewById(R.id.send_attachment_chat_separator);
 
         dialog.setContentView(contentView);
 
