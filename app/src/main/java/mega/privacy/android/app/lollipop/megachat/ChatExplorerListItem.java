@@ -20,6 +20,7 @@ public class ChatExplorerListItem {
         this.contact = null;
         this.chat = chat;
         this.title = chat.getTitle();
+        this.id = String.valueOf(chat.getChatId());
     }
 
     public ChatExplorerListItem (MegaChatListItem chat, MegaContactAdapter contact) {

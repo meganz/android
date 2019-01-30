@@ -18,8 +18,10 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -162,6 +164,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	MenuItem createFolderMenuItem;
 	MenuItem newChatMenuItem;
+	MenuItem searchMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
 	private long fragmentHandle  = -1;
@@ -226,6 +229,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	String action = null;
     private android.support.v7.app.AlertDialog renameDialog;
 	HashMap<String, String> nameFiles = new HashMap<>();
+
+	SearchView searchView;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -918,12 +923,59 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.file_explorer_action, menu);
-	    
+
+	    searchMenuItem = menu.findItem(R.id.cab_menu_search);
+	    searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
+	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
+
+		searchView = (SearchView) searchMenuItem.getActionView();
+
+		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
+		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+
+		if (searchView != null){
+			searchView.setIconifiedByDefault(true);
+		}
+
+		searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+			@Override
+			public boolean onMenuItemActionExpand(MenuItem item) {
+				return true;
+			}
+
+			@Override
+			public boolean onMenuItemActionCollapse(MenuItem item) {
+				return true;
+			}
+		});
+
+		searchView.setMaxWidth(Integer.MAX_VALUE);
+		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				log("onQueryTextSubmit: "+query);
+
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.search(newText);
+				}
+				return true;
+			}
+		});
 
 //	    if(iSharesExplorer != null){
 //	    	if (iSharesExplorer.deepBrowserTree==0){
@@ -949,6 +1001,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if(index==0){
 				if(isChatFirst){
+					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
 				}
@@ -1045,6 +1098,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					newChatMenuItem.setVisible(false);
 				}
 				else{
+					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
 				}
@@ -1089,6 +1143,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						case CHAT_FRAGMENT:{
 							newChatMenuItem.setVisible(false);
+							searchMenuItem.setVisible(true);
 							break;
 						}
 					}

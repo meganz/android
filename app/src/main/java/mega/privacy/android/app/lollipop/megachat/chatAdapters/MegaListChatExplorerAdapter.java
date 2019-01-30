@@ -157,7 +157,15 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 firstLetter = firstLetter.toUpperCase(Locale.getDefault());
                 holder.initialLetter.setText(firstLetter);
             }
-            createGroupChatAvatar(holder);
+            if(this.isItemChecked(position)){
+                holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+                holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
+                holder.initialLetter.setVisibility(View.GONE);
+            }
+            else{
+                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                createGroupChatAvatar(holder);
+            }
             holder.stateIcon.setVisibility(View.GONE);
             holder.lastSeenStateText.setVisibility(View.GONE);
             holder.participantsText.setVisibility(View.VISIBLE);
@@ -471,6 +479,11 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         return 0;
     }
 
+    public int getPosition (ChatExplorerListItem item) {
+        log("getPosition");
+        return items.indexOf(item);
+    }
+
     @Override
     public void onClick(View v) {
         setClick(v);
@@ -487,9 +500,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ViewHolderChatExplorerList holder = (ViewHolderChatExplorerList) v.getTag();
 
         if (v.getId() == R.id.chat_explorer_list_item_layout) {
-            if (!isItemChecked(holder.getAdapterPosition())) {
-                ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
-            }
+            ((ChatExplorerFragment) fragment).itemClick(holder.getAdapterPosition());
         }
     }
 
