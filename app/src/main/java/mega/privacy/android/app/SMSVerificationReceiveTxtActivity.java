@@ -76,7 +76,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.parseColor("#3490B1"));
+            window.setStatusBarColor(getColor(R.color.dark_primary_color));
         }
         
         //labels
