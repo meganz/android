@@ -74,7 +74,6 @@ public class InfoAchievementsFragment extends Fragment{
 		secondParagraph = (TextView) v.findViewById(R.id.info_achievements_how_works_second_p);
 
 		long count = ((AchievementsActivity)context).megaAchievements.getAwardsCount();
-        TL.log(this,"@#@" ,"getAwardsCount:" + count );
 		for(int i=0; i<count; i++) {
 			int type = ((AchievementsActivity) context).megaAchievements.getAwardClass(i);
 

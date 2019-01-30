@@ -28,7 +28,6 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -353,6 +352,7 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 
 		daysLeftInstallDesktopText.setVisibility(View.INVISIBLE);
 		daysLeftInstallAppText.setVisibility(View.INVISIBLE);
+		daysLeftAddPhoneText.setVisibility(View.INVISIBLE);
 
 		figureUnlockedRewardStorage.setText("...");
 
@@ -748,9 +748,6 @@ public class AchievementsFragment extends Fragment implements OnClickListener{
 	}
 
 	public static void log(String log) {
-//		Util.log("AchievementsFragment", log);
-        TL.log("das","@#@" , log);
+		Util.log("AchievementsFragment", log);
 	}
-
-
 }

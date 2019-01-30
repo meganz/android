@@ -65,7 +65,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -197,7 +196,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -351,7 +349,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     float elevation = 0;
 
-	public enum FragmentTag {
+    public enum FragmentTag {
 		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY;
 
@@ -2964,6 +2962,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
+        //This account hasn't verified a phone number and newly registers.
+        if(registeredPhoneNumber == null && firstLogin) {
+            showSMSVerificationDialog();
+        }
 		log("END onCreate");
 	}
 
@@ -14700,6 +14702,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showSMSVerificationDialog() {
+	    log("showSMSVerificationDialog");
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
@@ -14707,6 +14710,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
         TextView msg = dialogView.findViewById(R.id.sv_dialog_msg);
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
+        log("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
         } else {
@@ -14732,10 +14736,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         alertDialogSMSVerification.setCancelable(false);
         alertDialogSMSVerification.setCanceledOnTouchOutside(false);
         alertDialogSMSVerification.show();
-    }
-
-    private void tlog(Object any) {
-        TL.log(this,"@#@",any);
     }
 
 	/**

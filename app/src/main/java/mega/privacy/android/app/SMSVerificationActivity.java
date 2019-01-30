@@ -26,7 +26,6 @@ import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -314,13 +313,12 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             log(" RequestTxt phone number is " + phoneNumber);
             shouldDisableNextButton = true;
             nextButton.setTextColor(Color.RED);
-            megaApi.sendSMSVerificationCode(phoneNumber,this,true);
+            megaApi.sendSMSVerificationCode(phoneNumber,this);
         }
     }
     
     public static void log(String message) {
-        //Util.log("SMSVerificationActivity",message);
-        TL.log("SmsVerificationActivity","@#@",message);
+        Util.log("SMSVerificationActivity",message);
     }
     
     @Override
