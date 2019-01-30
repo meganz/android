@@ -41,6 +41,7 @@ public class Constants {
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
     public static int REQUEST_CODE_COUNTRY_PICKER = 1029;
     public static int REQUEST_CODE_VERIFY_CODE = 1030;
+    public static int REQUEST_CODE_SMS_VERIFICATION = 1031;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";

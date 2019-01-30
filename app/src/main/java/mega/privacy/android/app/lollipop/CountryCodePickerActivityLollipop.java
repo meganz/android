@@ -43,6 +43,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     private Toolbar toolbar;
     public static final String COUNTRY_NAME = "country_name";
+    public static final String DIAL_CODE = "dial_code";
     public static final String COUNTRY_CODE = "country_code";
 
     @Override
@@ -124,7 +125,6 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         finish();
     }
 
@@ -142,7 +142,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
             JSONArray ja = new JSONArray(sb.toString());
             for (int i = 0;i < ja.length();i++) {
                 JSONObject jo = ja.getJSONObject(i);
-                countries.add(new Country(jo.getString("name"),jo.getString("dial_code")));
+                countries.add(new Country(jo.getString("name"),jo.getString("dial_code"),jo.getString("code")));
             }
 
         } catch (IOException e) {
@@ -163,7 +163,8 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     public void onCountrySelected(Country country) {
         Intent result = new Intent();
         result.putExtra(COUNTRY_NAME,country.getName());
-        result.putExtra(COUNTRY_CODE,country.getCode());
+        result.putExtra(DIAL_CODE,country.getCode());
+        result.putExtra(COUNTRY_CODE,country.getCountryCode());
         setResult(Activity.RESULT_OK,result);
         finish();
     }
@@ -179,16 +180,17 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     public class Country {
 
         private String name;
-
+        private String countryCode;
         private String code;
 
         public Country() {
 
         }
 
-        public Country(String name,String code) {
+        public Country(String name,String code,String countryCode) {
             this.name = name;
             this.code = code;
+            this.countryCode = countryCode;
         }
 
         public String getName() {
@@ -205,6 +207,14 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
         public void setCode(String code) {
             this.code = code;
+        }
+    
+        public String getCountryCode() {
+            return countryCode;
+        }
+    
+        public void setCountryCode(String countryCode) {
+            this.countryCode = countryCode;
         }
     }
 

@@ -669,7 +669,7 @@
 	<string name="navigation_drawer_add_phone_number_helper" context="label of button in navigation drawer that ask user to add their phone number">Get free $size when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
 	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
-	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Get free [xx]GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
 	<string name="verify_account_helper_learn_more" context="label of a button that use to open a web page to let user to know more.">&#160;Learn More</string>
 	<string name="verify_account_counry_label" context="Country list button label">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
@@ -683,6 +683,10 @@
 	<string name="verify_account_incorrect_code" context="error message when user entered an incorrect verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn\'t receive a code?</string>
 	<string name="verify_account_resend_button" context="label for resend verification code button">&#160;Resend</string>
+	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This phone number has been registered.</string>
+	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
+	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code is invalid">The code is invalid</string>
 
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
         <item context="internal storage option">Internal storage</item>

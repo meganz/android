@@ -50,6 +50,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
@@ -75,8 +76,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SMS_VERIFICATION;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener, AbortPendingTransferCallback {
 
@@ -193,6 +196,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean pinLongClick = false;
 
     private boolean twoFA = false;
+    public static final String NAME_USER_LOCKED = "NAME_USER_LOCKED";
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -1993,7 +1997,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (parentHandle != -1){
                     Intent intent = new Intent();
                     intent.putExtra("PARENT_HANDLE", parentHandle);
-                    ((LoginActivityLollipop) context).setResult(Activity.RESULT_OK, intent);
+                    ((LoginActivityLollipop) context).setResult(RESULT_OK, intent);
                     ((LoginActivityLollipop) context).finish();
                 }
                 else{
@@ -2144,7 +2148,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginFetchNodesProgressBar.setProgress(0);
         }
     }
-
+    
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
         try{
@@ -2162,7 +2166,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (request.getType() == MegaRequest.TYPE_LOGIN){
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
-
                 String errorMessage = "";
 
                 if (error.getErrorCode() == MegaError.API_ESID){
@@ -2193,6 +2196,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         verify2faProgressBar.setVisibility(View.GONE);
                     }
                     verifyShowError();
+                }else if(error.getErrorCode() == MegaError.API_EBLOCKED){
+                    Intent intent = new Intent(context,SMSVerificationActivity.class);
+                    intent.putExtra(NAME_USER_LOCKED,true);
+                    startActivityForResult(intent,REQUEST_CODE_SMS_VERIFICATION);
                 }
                 else{
                     if (error.getErrorCode() == MegaError.API_ENOENT) {
@@ -3104,5 +3111,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private static void log(String log) {
         Util.log("LoginFragmentLollipop", log);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode,int resultCode,Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        if (requestCode == Constants.REQUEST_CODE_SMS_VERIFICATION && resultCode == RESULT_OK) {
+            startFastLogin();
+        }
     }
 }
