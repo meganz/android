@@ -3281,12 +3281,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
                 if(chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
-
+                    log("Chat without permissions");
                     boolean showCopy = true;
                     for(int i=0; i<selected.size();i++) {
                         if (showCopy) {
-                            if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                            if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP ) {
                                 showCopy = false;
+                            }else if(selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META){
+                                MegaChatContainsMeta meta = selected.get(i).getMessage().getContainsMeta();
+                                if(meta!=null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+                                    log("YPE_CONTAINS_META && CONTAINS_META_GEOLOCATION");
+                                    showCopy = false;
+                                }
                             }
                         }
                     }
@@ -3401,10 +3407,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                         else{
-                            log("other selected");
+                            log("other type: "+selected.get(0).getMessage().getType());
 
                             MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
-                            menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+
+                            if(messageSelected.getType() == MegaChatMessage.TYPE_CONTAINS_META){
+                                MegaChatContainsMeta meta = messageSelected.getContainsMeta();
+                                if(meta!=null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+                                    log("TYPE_CONTAINS_META && CONTAINS_META_GEOLOCATION");
+                                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+
+                                }
+                            }else{
+                                menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                            }
+
 
                             if(messageSelected.getUserHandle()==myUserHandle){
 
@@ -3470,6 +3487,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             if (showCopy) {
                                 if (selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
                                     showCopy = false;
+                                }else if(selected.get(i).getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META){
+                                    MegaChatContainsMeta meta = selected.get(i).getMessage().getContainsMeta();
+                                    if(meta!=null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+                                        showCopy = false;
+                                    }
                                 }
                             }
 
