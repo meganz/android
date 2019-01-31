@@ -481,67 +481,93 @@ public class RecordView extends RelativeLayout {
             playSound(RECORD_ERROR);
 
         }else{
-            log("onActionUp() - more than a second");
-            if(userBehaviour == UserBehaviour.LOCKING){
-                log("onActionUp() - LOCKING()");
-                showLock(false);
-                firstX = 0;
-                firstY = 0;
-                lastX = 0;
-                lastY = 0;
-                userBehaviour = UserBehaviour.NONE;
-                recordBtn.setTranslationY(0);
-                recordBtn.setTranslationX(0);
-                isLocked = false;
+            log("onActionUp() - more than a second -> isSwiped = "+isSwiped);
+            if (recordListener != null && !isSwiped) {
+                recordListener.onFinish(elapsedTime);
+            }
+            animationHelper.setStartRecorded(false);
+            if (!isSwiped) {
+                playSound(RECORD_FINISHED);
+            }
+
+            //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
+            hideViews(!isSwiped);
+            if (!isSwiped) {
+                animationHelper.clearAlphaAnimation(true);
+            }
+            animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+
+            showLock(false);
+            counterTime.stop();
+            slideToCancelLayout.stopShimmerAnimation();
+
+            firstX = 0;
+            firstY = 0;
+            lastX = 0;
+            lastY = 0;
+
+            userBehaviour = UserBehaviour.NONE;
+
+            recordBtn.setTranslationY(0);
+            recordBtn.setTranslationX(0);
+            isLocked = false;
+
+//            if(userBehaviour == UserBehaviour.LOCKING){
+//                showLock(false);
+//                firstX = 0;
+//                firstY = 0;
+//                lastX = 0;
+//                lastY = 0;
+//                userBehaviour = UserBehaviour.NONE;
+//                recordBtn.setTranslationY(0);
+//                recordBtn.setTranslationX(0);
+//                isLocked = false;
+////                counterTime.stop();
+////                slideToCancelLayout.stopShimmerAnimation();
+//
+//
+//            }else if(userBehaviour == UserBehaviour.CANCELING){//
+//                animationHelper.setStartRecorded(false);
+//                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+//                showLock(false);
 //                counterTime.stop();
 //                slideToCancelLayout.stopShimmerAnimation();
-
-
-            }else if(userBehaviour == UserBehaviour.CANCELING){
-                log("onActionUp() - CANCELING()");
-
-                animationHelper.setStartRecorded(false);
-                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-                showLock(false);
-                counterTime.stop();
-                slideToCancelLayout.stopShimmerAnimation();
-                recordBtn.setTranslationY(0);
-                recordBtn.setTranslationX(0);
-                firstX = 0;
-                firstY = 0;
-                lastX = 0;
-                lastY = 0;
-                userBehaviour = UserBehaviour.NONE;
-                isLocked = false;
-
-            }else{
-                log("onActionUp() - NONE");
-                if (recordListener != null && !isSwiped) {
-                    recordListener.onFinish(elapsedTime);
-                }
-                animationHelper.setStartRecorded(false);
-                if (!isSwiped) {
-                    playSound(RECORD_FINISHED);
-                }
-                //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
-                hideViews(!isSwiped);
-                if (!isSwiped) {
-                    animationHelper.clearAlphaAnimation(true);
-                }
-                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-                showLock(false);
-                counterTime.stop();
-                slideToCancelLayout.stopShimmerAnimation();
-
-                firstX = 0;
-                firstY = 0;
-                lastX = 0;
-                lastY = 0;
-                userBehaviour = UserBehaviour.NONE;
-                recordBtn.setTranslationY(0);
-                recordBtn.setTranslationX(0);
-                isLocked = false;
-            }
+//                recordBtn.setTranslationY(0);
+//                recordBtn.setTranslationX(0);
+//                firstX = 0;
+//                firstY = 0;
+//                lastX = 0;
+//                lastY = 0;
+//                userBehaviour = UserBehaviour.NONE;
+//                isLocked = false;
+//
+//            }else{
+//                if (recordListener != null && !isSwiped) {
+//                    recordListener.onFinish(elapsedTime);
+//                }
+//                animationHelper.setStartRecorded(false);
+//                if (!isSwiped) {
+//                    playSound(RECORD_FINISHED);
+//                }
+//                //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
+//                hideViews(!isSwiped);
+//                if (!isSwiped) {
+//                    animationHelper.clearAlphaAnimation(true);
+//                }
+//                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
+//                showLock(false);
+//                counterTime.stop();
+//                slideToCancelLayout.stopShimmerAnimation();
+//
+//                firstX = 0;
+//                firstY = 0;
+//                lastX = 0;
+//                lastY = 0;
+//                userBehaviour = UserBehaviour.NONE;
+//                recordBtn.setTranslationY(0);
+//                recordBtn.setTranslationX(0);
+//                isLocked = false;
+//            }
         }
     }
 

@@ -765,7 +765,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
-                log("record.setOnRecordClickListener():onClick -> stopRecord()");
+                log("record.setOnRecordClickListener():onClick -> stopRecord");
                 voiceClipLayout.playSound(RECORD_FINISHED);
                 stopRecord();
             }
@@ -778,14 +778,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
-                log("voiceClipLayout.setOnRecordListener():onStart()");
+                log("voiceClipLayout.setOnRecordListener():onStart() -> startRecordVoiceClip");
                 adapter.stopCurrentPlaying();
                 startRecordVoiceClip();
             }
 
             @Override
             public void onLessThanSecond() {
-                log("voiceClipLayout.setOnRecordListener():onLessThanSecond() -> cancelRecord");
+                log("voiceClipLayout.setOnRecordListener():onLessThanSecond() -> showBubble && cancelRecord");
                 showBubble();
                 cancelRecord();
             }
@@ -818,7 +818,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onFinish(long recordTime) {
                 String time = getHumanTimeText(recordTime);
-                log("voiceClipLayout.setOnRecordListener():onFinish ->  stopRecord()");
+                log("voiceClipLayout.setOnRecordListener():onFinish -> stopRecord");
                 stopRecord();
             }
 
@@ -826,7 +826,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
             @Override
             public void onAnimationEnd() {
-                log("oiceClipLayout.setOnBasketAnimationEndListener():onAnimationEnd -> cancelRecord");
+                log("voiceClipLayout.setOnBasketAnimationEndListener():onAnimationEnd -> cancelRecord");
                 cancelRecord();
             }
         });
@@ -1787,6 +1787,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             outputFileVoiceNotes = path + "/note_voice"+name;
             if((myAudioRecorder!=null)&&(outputFileVoiceNotes != null)) {
                 log("startRecordVoiceClip: myAudioRecorder initialized and dataSourceConfigure ");
+                myAudioRecorder.reset();
                 myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                 myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
