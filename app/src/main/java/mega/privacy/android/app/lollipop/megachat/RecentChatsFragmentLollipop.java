@@ -979,6 +979,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     ((ManagerActivityLollipop) context).closeSearchView();
                 }
             }
+            else if (context instanceof ArchivedChatsActivity) {
+                if (((ArchivedChatsActivity) context).querySearch != null && !((ArchivedChatsActivity) context).querySearch.isEmpty()) {
+                    closeSearch();
+                    ((ArchivedChatsActivity) context).closeSearchView();
+                }
+            }
         }
     }
     /////END Multiselect/////
@@ -1745,6 +1751,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
 
+        if (context instanceof ManagerActivityLollipop) {
+            String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
+            if (searchQuery != null && ((ManagerActivityLollipop) context).searchExpand) {
+                filterChats(searchQuery);
+            }
+        }
+
         super.onResume();
     }
 
@@ -1814,6 +1827,36 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         @Override
         protected void onPostExecute(Void aVoid) {
             adapterList.setChats(filteredChats);
+
+            if (adapterList.getItemCount() == 0){
+                log("adapterList.getItemCount() == 0");
+                listView.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.VISIBLE);
+                inviteButton.setVisibility(View.GONE);
+                String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+
+                try{
+                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[/A]", "</font>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[/B]", "</font>");
+                }
+                catch (Exception e){}
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+
+                emptyTextViewInvite.setText(result);
+                emptyTextViewInvite.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("adapterList.getItemCount() NOT = 0");
+                listView.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -1822,6 +1865,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             filterChatsTask.cancel(true);
         }
         adapterList.setChats(chats);
+
+        if (adapterList.getItemCount() == 0){
+            log("adapterList.getItemCount() == 0");
+            listView.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        }
+        else{
+            log("adapterList.getItemCount() NOT = 0");
+            listView.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+        }
     }
 
     private static void log(String log) {

@@ -53,6 +53,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,6 +102,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
@@ -2205,6 +2208,23 @@ public class Util {
 			}
 		}
 		return true;
+	}
+
+	public static void hideKeyboard(Activity activity, int flag){
+
+		View v = activity.getCurrentFocus();
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
+	}
+
+	public static void hideKeyboardView(Context context, View v, int flag){
+
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
 	}
 
 	private static void log(String message) {

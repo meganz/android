@@ -1055,11 +1055,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                View view = getCurrentFocus();
-                if (view != null) {
-                    InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                }
+                Util.hideKeyboard(groupChatInfoActivity, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
 
