@@ -3542,7 +3542,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-        participantText.setText(cont+"/6");
+        int totalVideoParticipantsAllowed = megaChatApi.getMaxVideoCallParticipants();
+        participantText.setText(cont+"/"+totalVideoParticipantsAllowed);
         linearParticipants.setVisibility(View.VISIBLE);
     }
 
