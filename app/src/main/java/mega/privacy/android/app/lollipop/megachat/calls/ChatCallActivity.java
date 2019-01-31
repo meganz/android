@@ -490,7 +490,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         int sessionStatus = -1;
 
         if(callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
-            aB.setSubtitle(getString(R.string.outgoing_call_starting));
+            subtitleToobar.setText(getString(R.string.outgoing_call_starting));
         }
         else if(callChat.getStatus()<=MegaChatCall.CALL_STATUS_RING_IN){
             subtitleToobar.setText(getString(R.string.incoming_call_starting));
@@ -831,8 +831,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         linearParticipants = (LinearLayout) tB.findViewById(R.id.ll_participants);
         participantText = (TextView) tB.findViewById(R.id.participants_text);
         linearParticipants.setVisibility(View.GONE);
-
-
 
         myChrono = new Chronometer(context);
 
@@ -3445,7 +3443,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private Runnable updateTimerThread = new Runnable() {
         public void run() {
             long elapsedTime = SystemClock.uptimeMillis() - myChrono.getBase();
-//            aB.setSubtitle(getDateFromMillis(elapsedTime));
             subtitleToobar.setText(getDateFromMillis(elapsedTime));
             customHandler.postDelayed(this, 0);
         }
