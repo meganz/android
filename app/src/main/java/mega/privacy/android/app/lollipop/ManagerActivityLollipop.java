@@ -472,6 +472,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
+	boolean shouldShowSMSDialog = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -1643,6 +1644,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
 		outState.putBoolean("firstLogin", firstLogin);
+		outState.putBoolean("shouldShowSMSDialog", shouldShowSMSDialog);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -2031,6 +2033,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewLayout();
 				}
 				setContactStatus();
+                registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+                if (registeredPhoneNumber != null) {
+                    navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+                } else {
+                    navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
+                }
 			}
 
 			@Override
@@ -2068,20 +2076,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
 		}
         upgradeAccount.setOnClickListener(this);
-        
-        registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
-        if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
-            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
-        }else{
-            navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
-        }
         
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
         
         addPhoneNumberLabel = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_label);
-        addPhoneNumberLabel.setText(R.string.navigation_drawer_add_phone_number_helper);
+        boolean isAchievementUser = megaApi.isAchievementsEnabled();
+        log("is achievement user: " + isAchievementUser);
+        if (isAchievementUser) {
+            addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+        } else {
+            addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+        }
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
@@ -2849,6 +2857,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		}
 	        		else{
 						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
+                        shouldShowSMSDialog = getIntent().getBooleanExtra("shouldShowSMSDialog", shouldShowSMSDialog);
 						if (firstLogin){
 							log("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
@@ -2868,6 +2877,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     getIntent().removeExtra("newAccount");
                     getIntent().removeExtra("upgradeAccount");
 					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
+                    shouldShowSMSDialog = intentRec.getBooleanExtra("shouldShowSMSDialog", shouldShowSMSDialog);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -2963,9 +2973,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		setContactStatus();
         //This account hasn't verified a phone number and newly registers.
-        if(registeredPhoneNumber == null && firstLogin) {
-            showSMSVerificationDialog();
-        }
+//        if(registeredPhoneNumber == null && firstLogin) {
+//            showSMSVerificationDialog();
+//        }
 		log("END onCreate");
 	}
 
@@ -4297,6 +4307,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public boolean isFirstLogin() {
+        return firstLogin;
+    }
+
 	public void selectDrawerItemCloudDrive(){
 		log("selectDrawerItemCloudDrive");
 
@@ -4341,7 +4355,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			firstTimeAfterInstallation = false;
             dbH.setFirstTime(false);
 		}
-	}
+
+        //This account hasn't verified a phone number and newly registers.
+        if (megaApi.smsVerifiedPhoneNumber() == null && shouldShowSMSDialog) {
+            shouldShowSMSDialog = false;
+            showSMSVerificationDialog();
+        }
+    }
 
 	public void setToolbarTitle(){
 		log("setToolbarTitle");

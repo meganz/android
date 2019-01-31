@@ -36,7 +36,7 @@
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
                 android:gravity="start"
-                android:lineSpacingMultiplier="1.31"
+                android:lineSpacingMultiplier="1.27"
                 android:textAlignment="textStart"/>
             <LinearLayout
                 android:layout_width="wrap_content"

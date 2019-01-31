@@ -666,10 +666,10 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
 	<string name="add_phone_number_label" context="label of button on account page that ask user to add their phone number">Add phone number</string>
 	<string name="navigation_drawer_add_phone_number_label" context="label of button in navigation drawer that ask user to add their phone number">Add phone number</string>
-	<string name="navigation_drawer_add_phone_number_helper" context="label of button in navigation drawer that ask user to add their phone number">Get free $size when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
+	<string name="navigation_drawer_add_phone_number_helper" context="label of button in navigation drawer that ask user to add their phone number">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you one MEGA</string>
 	<string name="verify_account_title" context="Title of verify phone number page">Verify your account</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been suspended temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
-	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Get free [xx]GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
+	<string name="verify_account_helper_add_new" context="Text to explain to user why to verify phone number (add new phone number use case)">Get free 20GB when you add your phone number. This makes it easier for your contacts to find you on MEGA.</string>
 	<string name="verify_account_helper_learn_more" context="label of a button that use to open a web page to let user to know more.">&#160;Learn More</string>
 	<string name="verify_account_counry_label" context="Country list button label">Country</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>

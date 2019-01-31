@@ -2006,6 +2006,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
                         intent.putExtra("firstLogin", true);
+                        intent.putExtra("shouldShowSMSDialog", true);
                         if (action != null){
                             log("Action not NULL");
                             if (action.equals(Constants.ACTION_EXPORT_MASTER_KEY)){
@@ -2038,6 +2039,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         else{
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             intent.putExtra("firstLogin", true);
+                            intent.putExtra("shouldShowSMSDialog", true);
                             initialCam = true;
                         }
 
@@ -2349,9 +2351,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                     errorMessage = getString(R.string.account_not_validated_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+                } else if (error.getErrorCode() == MegaError.API_EBLOCKED) {
                     errorMessage = getString(R.string.error_account_suspended);
+                    Intent intent = new Intent(context,SMSVerificationActivity.class);
+                    intent.putExtra(NAME_USER_LOCKED,true);
+                    startActivityForResult(intent,REQUEST_CODE_SMS_VERIFICATION);
                 }
                 else{
                     errorMessage = error.getErrorString();
@@ -3117,7 +3121,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
         if (requestCode == Constants.REQUEST_CODE_SMS_VERIFICATION && resultCode == RESULT_OK) {
-            startFastLogin();
+            UserCredentials credentials = dbH.getCredentials();
+            if(credentials != null) {
+                log("unblock, and fast login");
+                startFastLogin();
+            } else {
+                log("unblock");
+                et_user.setText(lastEmail);
+                et_password.setText("");
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         
         //set helper text
         helperText = findViewById(R.id.verify_account_helper);
-        if (true || isUserLocked) {
+        if (isUserLocked) {
             String text = getResources().getString(R.string.verify_account_helper_locked);
             //learn more
             int start = text.length();
@@ -106,7 +106,13 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             helperText.setMovementMethod(LinkMovementMethod.getInstance());
             helperText.setHighlightColor(Color.TRANSPARENT);
         } else {
-            helperText.setText(R.string.verify_account_helper_add_new);
+            boolean isAchievementUser = megaApi.isAchievementsEnabled();
+            log("is achievement user: " + isAchievementUser);
+            if (isAchievementUser) {
+                helperText.setText(R.string.sms_add_phone_number_dialog_msg_achievement_user);
+            } else {
+                helperText.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
+            }
         }
         
         
@@ -136,7 +142,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                log("onTextChanged");
                 errorInvalidPhoneNumber.setVisibility(View.GONE);
                 errorInvalidPhoneNumberIcon.setVisibility(View.GONE);
                 divider2.setBackgroundColor(Color.parseColor("#8A000000"));
@@ -145,7 +150,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             @Override
             public void afterTextChanged(Editable s) {
                 String input = s.toString();
-                log("afterTextChanged " + input);
                 int inputLength = input == null ? 0 : input.length();
                 if (inputLength > 0) {
                     titlePhoneNumber.setTextColor(Color.parseColor("#FF00BFA5"));
@@ -313,7 +317,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             log(" RequestTxt phone number is " + phoneNumber);
             shouldDisableNextButton = true;
             nextButton.setTextColor(Color.RED);
-            megaApi.sendSMSVerificationCode(phoneNumber,this);
+            megaApi.sendSMSVerificationCode(phoneNumber,this,true);
         }
     }
     

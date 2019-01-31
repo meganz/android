@@ -2,18 +2,15 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collections;
 import java.util.List;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 
 public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.CountryHolder> {
