@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
@@ -260,6 +261,15 @@ public final class ChatAdvancedNotificationBuilder {
                             log("buildNotificationPreN() TYPE_TRUNCATE");
 
                             messageContent = context.getString(R.string.history_cleared_message);
+
+                        }else if(message.getType()==MegaChatMessage.TYPE_CONTAINS_META){
+                            log("buildNotification() TYPE_CONTAINS_META");
+                            MegaChatContainsMeta meta = message.getContainsMeta();
+                            if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                                messageContent = context.getString(R.string.title_geolocation_message);
+                            }else{
+                                messageContent = message.getContent();
+                            }
                         }
                         else{
                             log("buildNotificationPreN() OTHER");
@@ -441,8 +451,15 @@ public final class ChatAdvancedNotificationBuilder {
                 else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                     log("buildNotification() TYPE_TRUNCATE");
 
-                    log("Type TRUNCATE message");
                     messageContent = context.getString(R.string.history_cleared_message);
+                }else if(msg.getType()==MegaChatMessage.TYPE_CONTAINS_META){
+                    log("buildNotification() TYPE_CONTAINS_META");
+                    MegaChatContainsMeta meta = msg.getContainsMeta();
+                    if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                        messageContent = context.getString(R.string.title_geolocation_message);
+                    }else{
+                        messageContent = msg.getContent();
+                    }
                 }
                 else{
                     log("buildNotification() OTHER");
