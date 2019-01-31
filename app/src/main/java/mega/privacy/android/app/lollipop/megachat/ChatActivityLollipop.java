@@ -4036,7 +4036,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTAINS_META){
                                 log("TYPE_CONTAINS_META");
-                                log("open rich link");
 
 //                                if(!adapter.getforwardOwnRichLinksB()){
                                     MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
@@ -4045,6 +4044,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             String url = meta.getRichPreview().getUrl();
                                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                                             startActivity(browserIntent);
+                                        }else if (meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+
                                         }
                                     }else{
 

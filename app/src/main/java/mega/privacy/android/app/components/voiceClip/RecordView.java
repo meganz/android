@@ -301,7 +301,6 @@ public class RecordView extends RelativeLayout {
         @Override
         public void run() {
             if(flagRB){
-                log("runPadLock() -> showLock");
                 showLock(true);
             }
         }
@@ -625,12 +624,20 @@ public class RecordView extends RelativeLayout {
     }
 
     public void destroyHandlers(){
+        log("destroyHandlers");
         if (handlerStartRecord != null){
+            if(runStartRecord!=null){
+                handlerStartRecord.removeCallbacks(runStartRecord);
+            }
             handlerStartRecord.removeCallbacksAndMessages(null);
         }
         if (handlerShowPadLock != null){
+            if(runPadLock!=null){
+                handlerShowPadLock.removeCallbacks(runPadLock);
+            }
             handlerShowPadLock.removeCallbacksAndMessages(null);
         }
+
         if(imageLock!=null){
             imageLock.clearAnimation();
         }
