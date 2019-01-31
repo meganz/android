@@ -18,7 +18,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -232,6 +231,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	SearchView searchView;
 
+	FileExplorerActivityLollipop fileExplorerActivityLollipop;
+
+	String querySearch = "";
+	boolean isSearchExpanded = false;
+	boolean pendingToOpenSearchView = false;
+
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -349,6 +354,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			importFragmentSelected = savedInstanceState.getInt("importFragmentSelected", -1);
 			action = savedInstanceState.getString("action", null);
 			nameFiles = (HashMap<String, String>) savedInstanceState.getSerializable("nameFiles");
+			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatExplorerFragment");
+			querySearch = savedInstanceState.getString("querySearch", "");
+			isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
+
+			if (isSearchExpanded) {
+				pendingToOpenSearchView = true;
+			}
 		}
 		else{
 			log("Bundle is NULL");
@@ -359,6 +371,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			importFragmentSelected = -1;
 			action = null;
 		}
+
+		fileExplorerActivityLollipop = this;
 				
 		dbH = DatabaseHandler.getDbHandler(this);
 		credentials = dbH.getCredentials();
@@ -949,11 +963,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				isSearchExpanded = true;
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.enableSearch(true);
+				}
 				return true;
 			}
 
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
+				isSearchExpanded = false;
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.enableSearch(false);
+				}
 				return true;
 			}
 		});
@@ -963,12 +987,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				log("onQueryTextSubmit: "+query);
-
+				Util.hideKeyboard(fileExplorerActivityLollipop, 0);
 				return true;
 			}
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
+				querySearch = newText;
 				chatExplorer = getChatExplorerFragment();
 				if (chatExplorer != null) {
 					chatExplorer.search(newText);
@@ -989,7 +1014,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
-	
+
+	public void isPendingToOpenSearchView () {
+		if (pendingToOpenSearchView) {
+			String query = querySearch;
+			searchMenuItem.expandActionView();
+			searchView.setQuery(query, false);
+			pendingToOpenSearchView = false;
+		}
+	}
+
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenuLollipop");
@@ -1467,6 +1501,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		if (getChatExplorerFragment() != null) {
 			getSupportFragmentManager().putFragment(bundle, "chatExplorerFragment", getChatExplorerFragment());
 		}
+
+		bundle.putString("querySearch", querySearch);
+		bundle.putBoolean("isSearchExpanded", isSearchExpanded);
 	}
 	
 	@Override
@@ -3407,6 +3444,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
+	}
+
+	public void collapseSearchView () {
+		if (searchMenuItem != null) {
+			searchMenuItem.collapseActionView();
+		}
 	}
 
 	public long getParentHandleCloud() {

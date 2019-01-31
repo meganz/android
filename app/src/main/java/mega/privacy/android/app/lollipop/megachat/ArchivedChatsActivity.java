@@ -10,9 +10,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -48,9 +51,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     RecentChatsFragmentLollipop archivedChatsFragment;
     FloatingActionButton fab;
 
-    MenuItem createFolderMenuItem;
-    MenuItem newChatMenuItem;
-
     private BadgeDrawerArrowDrawable badgeDrawable;
 
     MegaApiAndroid megaApi;
@@ -59,6 +59,15 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     public long selectedChatItemId;
 
     DisplayMetrics outMetrics;
+
+    MenuItem searchMenuItem;
+    SearchView searchView;
+
+    ArchivedChatsActivity archivedChatsActivity;
+
+    String querySearch = "";
+    boolean isSearchExpanded = false;
+    boolean pendingToOpenSearchView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +106,8 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
         megaChatApi.addChatListener(this);
 
+        archivedChatsActivity = this;
+
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -130,6 +141,15 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
         if(archivedChatsFragment ==null){
             archivedChatsFragment = new RecentChatsFragmentLollipop().newInstance();
+        }
+
+        if (savedInstanceState != null) {
+            querySearch = savedInstanceState.getString("querySearch", "");
+            isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
+
+            if (isSearchExpanded) {
+                pendingToOpenSearchView = true;
+            }
         }
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -185,6 +205,14 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("querySearch", querySearch);
+        outState.putBoolean("isSearchExpanded", isSearchExpanded);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
 
@@ -195,6 +223,77 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_archived_chats, menu);
+
+        searchMenuItem = menu.findItem(R.id.action_search);
+        searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
+
+        searchView = (SearchView) searchMenuItem.getActionView();
+
+        SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
+        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
+        searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+
+        if (searchView != null){
+            searchView.setIconifiedByDefault(true);
+        }
+
+        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                isSearchExpanded = true;
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                isSearchExpanded = false;
+                archivedChatsFragment.closeSearch();
+                supportInvalidateOptionsMenu();
+                return true;
+            }
+        });
+
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                log("onQueryTextSubmit: "+query);
+                Util.hideKeyboard(archivedChatsActivity, 0);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                querySearch = newText;
+                archivedChatsFragment.filterChats(newText);
+                return true;
+            }
+        });
+
+        if (pendingToOpenSearchView) {
+            String query = querySearch;
+            searchMenuItem.expandActionView();
+            searchView.setQuery(query, false);
+            pendingToOpenSearchView = false;
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public void closeSearchView () {
+        if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
+            searchMenuItem.collapseActionView();
+        }
     }
 
     public void showSnackbar(String s){

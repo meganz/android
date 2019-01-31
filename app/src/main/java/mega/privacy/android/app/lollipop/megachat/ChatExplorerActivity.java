@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
@@ -71,6 +69,12 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     SearchView searchView;
 
+    ChatExplorerActivity chatExplorerActivity;
+
+    String querySearch = "";
+    boolean isSearchExpanded = false;
+    boolean pendingToOpenSearchView = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -105,6 +109,8 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 return;
             }
         }
+
+        chatExplorerActivity = this;
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -158,6 +164,12 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
         if (savedInstanceState != null) {
             chatExplorerFragment = (ChatExplorerFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatExplorerFragment");
+            querySearch = savedInstanceState.getString("querySearch", "");
+            isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
+
+            if (isSearchExpanded) {
+                pendingToOpenSearchView = true;
+            }
         }
         else if (chatExplorerFragment == null) {
             chatExplorerFragment = new ChatExplorerFragment().newInstance();
@@ -172,6 +184,9 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, "chatExplorerFragment", getSupportFragmentManager().findFragmentByTag("chatExplorerFragment"));
+
+        outState.putString("querySearch", querySearch);
+        outState.putBoolean("isSearchExpanded", isSearchExpanded);
     }
 
     public void setToolbarSubtitle(String s) {
@@ -209,11 +224,15 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                isSearchExpanded = true;
+                chatExplorerFragment.enableSearch(true);
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                isSearchExpanded = false;
+                chatExplorerFragment.enableSearch(false);
                 return true;
             }
         });
@@ -223,18 +242,28 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             @Override
             public boolean onQueryTextSubmit(String query) {
                 log("onQueryTextSubmit: "+query);
-
+                Util.hideKeyboard(chatExplorerActivity, 0);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                querySearch = newText;
                 chatExplorerFragment.search(newText);
                 return true;
             }
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void isPendingToOpenSearchView () {
+        if (pendingToOpenSearchView) {
+            String query = querySearch;
+            searchMenuItem.expandActionView();
+            searchView.setQuery(query, false);
+            pendingToOpenSearchView = false;
+        }
     }
 
     @Override
@@ -396,6 +425,12 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
         else{
             fab.setVisibility(View.GONE);
+        }
+    }
+
+    public void collapseSearchView () {
+        if (searchMenuItem != null) {
+            searchMenuItem.collapseActionView();
         }
     }
 

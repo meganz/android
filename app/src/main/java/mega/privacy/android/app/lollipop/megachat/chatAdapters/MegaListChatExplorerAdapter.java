@@ -62,7 +62,10 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     ArrayList<ChatExplorerListItem> items;
     Object fragment;
 
-    private SparseBooleanArray selectedItems;
+    SparseBooleanArray selectedItems;
+
+    boolean isSearchEnabled;
+    SparseBooleanArray searchSelectedItems;
 
     public MegaListChatExplorerAdapter(Context _context, Object _fragment, ArrayList<ChatExplorerListItem> _items, RecyclerView _listView) {
         log("new adapter");
@@ -157,7 +160,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 firstLetter = firstLetter.toUpperCase(Locale.getDefault());
                 holder.initialLetter.setText(firstLetter);
             }
-            if(this.isItemChecked(position)){
+            if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
                 holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
                 holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
                 holder.initialLetter.setVisibility(View.GONE);
@@ -194,7 +197,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
-            if(this.isItemChecked(position)){
+            if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
                 holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
                 holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
                 holder.initialLetter.setVisibility(View.GONE);
@@ -532,6 +535,10 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         return selectedItems.get(position);
     }
 
+    private boolean isSearchItemChecked(int position) {
+        return searchSelectedItems.get(position);
+    }
+
     public void toggleSelection(int pos) {
         log("toggleSelection");
 
@@ -570,6 +577,18 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         else {
 //            Hide multipleselect
         }
+    }
+
+    public void setSearchEnabled(boolean searchEnabled) {
+        this.isSearchEnabled = searchEnabled;
+    }
+
+    public boolean isSearchEnabled () {
+        return isSearchEnabled;
+    }
+
+    public void setSearchSelectedItems (SparseBooleanArray searchSelectedItems) {
+        this.searchSelectedItems = searchSelectedItems;
     }
 
     private static void log(String log) {

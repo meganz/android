@@ -229,6 +229,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	private ImageView toggleButton;
 	private boolean passwdVisibility;
+
+	FileProviderActivity fileProviderActivity;
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -245,6 +247,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		super.onCreate(savedInstanceState);
+
+		fileProviderActivity = this;
 
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -865,7 +869,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					hideKeyboard();
+					Util.hideKeyboard(fileProviderActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -970,7 +974,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	void permitVerify(){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard();
+			Util.hideKeyboard(this, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -987,14 +991,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				log("lastEmail: "+lastEmail+" lastPasswd: "+lastPassword);
 				megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
 			}
-		}
-	}
-
-	void hideKeyboard(){
-
-		View v = getCurrentFocus();
-		if (v != null){
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
 	}
 

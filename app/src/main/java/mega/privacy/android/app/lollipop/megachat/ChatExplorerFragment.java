@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -94,6 +95,8 @@ public class ChatExplorerFragment extends Fragment {
     RecyclerView addedList;
     MegaChipChatExplorerAdapter adapterAdded;
     LinearLayoutManager addedLayoutManager;
+
+    SearchTask searchTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -208,7 +211,7 @@ public class ChatExplorerFragment extends Fragment {
         emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
 
-        String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+        String textToShow = String.format(context.getString(R.string.chat_explorer_empty));
         try{
             textToShow = textToShow.replace("[A]", "<font color=\'#7a7a7a\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
@@ -371,8 +374,23 @@ public class ChatExplorerFragment extends Fragment {
         }
 
         if (adapterList != null && adapterList.getItemCount() > 0) {
-            adapterList.toggleSelection(position);
             ChatExplorerListItem item = adapterList.getItem(position);
+
+            if (adapterList.isSearchEnabled()) {
+                if (context instanceof ChatExplorerActivity) {
+                    ((ChatExplorerActivity) context).collapseSearchView();
+                }
+                else {
+                    ((FileExplorerActivityLollipop) context).collapseSearchView();
+                }
+                adapterList.setItems(items);
+                int togglePossition = adapterList.getPosition(item);
+                adapterList.toggleSelection(togglePossition);
+            }
+            else {
+                adapterList.toggleSelection(position);
+            }
+
 
             if (item != null && !addedItems.contains(item)) {
                 addedItems.add(item);
@@ -812,32 +830,120 @@ public class ChatExplorerFragment extends Fragment {
                     ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
                 else{
-                    ((FileExplorerActivityLollipop)context).showFabButton(true);
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
+                    ((FileExplorerActivityLollipop) context).showFabButton(true);
+                    ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
             }
 
-            if (adapterList.getItemCount() == 0){
-                log("adapterList.getItemCount() == 0");
-                listView.setVisibility(View.GONE);
-                addLayout.setVisibility(View.GONE);
-                emptyLayout.setVisibility(View.VISIBLE);
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).isPendingToOpenSearchView();
             }
-            else{
-                log("adapterList.getItemCount() NOT = 0");
-                listView.setVisibility(View.VISIBLE);
+            else if (context instanceof FileExplorerActivityLollipop) {
+                ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
+            }
+
+            setListVisibility();
+        }
+    }
+
+    void setListVisibility () {
+        if (adapterList.getItemCount() == 0){
+            log("adapterList.getItemCount() == 0");
+            listView.setVisibility(View.GONE);
+            addLayout.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        }
+        else{
+            log("adapterList.getItemCount() NOT = 0");
+            listView.setVisibility(View.VISIBLE);
+            if (!adapterList.isSearchEnabled()) {
                 addLayout.setVisibility(View.VISIBLE);
-                emptyLayout.setVisibility(View.GONE);
             }
+            emptyLayout.setVisibility(View.GONE);
+        }
+    }
+
+    class SearchTask extends AsyncTask<String, Void, Void> {
+
+        ArrayList<ChatExplorerListItem> searchItems = new ArrayList<>();
+        SparseBooleanArray searchSelectedItems = new SparseBooleanArray();
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            String s = strings[0];
+            boolean areAddedItems = false;
+
+            if (addedItems != null && !addedItems.isEmpty()) {
+                areAddedItems = true;
+            }
+
+            for (ChatExplorerListItem item : items) {
+                if (item.getTitle().toLowerCase().contains(s.toLowerCase())) {
+                    searchItems.add(item);
+                    if (areAddedItems && addedItems.contains(item)) {
+                        searchSelectedItems.put(searchItems.indexOf(item), true);
+                    }
+                }
+            }
+
+            adapterList.setSearchSelectedItems(searchSelectedItems);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            adapterList.setItems(searchItems);
+            setListVisibility();
         }
     }
 
     public void search (String s) {
-        if (s != null && !s.isEmpty()) {
-
+        if (searchTask != null && searchTask.getStatus() != AsyncTask.Status.FINISHED) {
+            searchTask.cancel(true);
         }
-        else {
+        searchTask = new SearchTask();
+        searchTask.execute(s);
+    }
 
+    public void enableSearch(boolean enable) {
+        if (enable) {
+            search("");
+            if (addLayout.getVisibility() == View.VISIBLE) {
+                addLayout.setVisibility(View.GONE);
+            }
+            if (adapterList != null && !adapterList.isSearchEnabled()) {
+                adapterList.setSearchEnabled(enable);
+            }
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).showFabButton(false);
+            }
+            else{
+                ((FileExplorerActivityLollipop)context).showFabButton(false);
+            }
+        }
+        else{
+            if (addLayout.getVisibility() == View.GONE) {
+                addLayout.setVisibility(View.VISIBLE);
+            }
+
+            if (adapterList != null && adapterList.isSearchEnabled()) {
+                adapterList.setSearchEnabled(enable);
+            }
+
+            if (adapterAdded != null && adapterAdded.getItemCount() == 0) {
+                setFirstLayoutVisibility(View.VISIBLE);
+            }
+            else {
+                setFirstLayoutVisibility(View.GONE);
+
+                if(context instanceof  ChatExplorerActivity){
+                    ((ChatExplorerActivity)context).showFabButton(true);
+                }
+                else{
+                    ((FileExplorerActivityLollipop)context).showFabButton(true);
+                }
+            }
         }
     }
 

@@ -448,7 +448,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	boolean firstTimeAfterInstallation = true;
 //	String pathNavigation = "/";
 	SearchView searchView;
-	boolean searchExpand = false;
+	public boolean searchExpand = false;
 	public String searchQuery = "";
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
@@ -6191,7 +6191,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					searchExpand = false;
 				}
 				else {
-					hideKeyboard();
+					Util.hideKeyboard(managerActivity, 0);
 				}
 				return true;
 			}
@@ -10188,11 +10188,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				View view = getCurrentFocus();
-				if (view != null) {
-					InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-				}
+				Util.hideKeyboard(managerActivity, InputMethodManager.HIDE_NOT_ALWAYS);
 			}
 		});
 
@@ -10626,7 +10622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					hideKeyboard();
+					Util.hideKeyboard(managerActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -10737,17 +10733,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		verify2FADialogIsShown = true;
 	}
 
-	void hideKeyboard(){
-
-		View v = getCurrentFocus();
-		if (v != null){
-			if (imm == null) {
-				imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-			}
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-		}
-	}
-
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
@@ -10775,7 +10760,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void permitVerify(int type){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard();
+			Util.hideKeyboard(managerActivity, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -15916,7 +15901,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The change link has been sent");
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -15924,7 +15909,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				log("The new mail already exists");
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -15938,7 +15923,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error when asking for change mail link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -16005,7 +15990,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("cancelation link received!");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -16019,7 +16004,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error when asking for the cancelation link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null && verify2FADialog.isShowing()){
 					verify2FADialog.dismiss();
 				}
@@ -16528,7 +16513,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sttFLol.update2FAPreference(false);
 					showSnackbar(getString(R.string.label_2fa_disabled));
 				}
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null) {
 					verify2FADialog.dismiss();
 				}
@@ -16538,7 +16523,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				verifyShowError();
 			}
 			else {
-				hideKeyboard();
+				Util.hideKeyboard(managerActivity, 0);
 				if (verify2FADialog != null) {
 					verify2FADialog.dismiss();
 				}
