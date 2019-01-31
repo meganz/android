@@ -3417,7 +3417,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 if(meta!=null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
                                     log("TYPE_CONTAINS_META && CONTAINS_META_GEOLOCATION");
                                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
-
+                                }else{
+                                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
                                 }
                             }else{
                                 menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);

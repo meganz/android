@@ -9604,7 +9604,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if(messageR.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META){
                             log("TYPE_CONTAINS_META ");
                             MegaChatContainsMeta meta = messageR.getMessage().getContainsMeta();
-                            if(meta!=null && (meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW||meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)){
+                            if(meta!=null && (meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW || meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION)){
 //                                setMultipleSelect(true);
                                 ((ChatActivityLollipop) context).activateActionMode();
                                 ((ChatActivityLollipop) context).itemClick(currentPosition, null);
