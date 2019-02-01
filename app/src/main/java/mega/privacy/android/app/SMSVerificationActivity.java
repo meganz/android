@@ -316,7 +316,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
             log(" RequestTxt phone number is " + phoneNumber);
             shouldDisableNextButton = true;
-            megaApi.sendSMSVerificationCode(phoneNumber,this,true);
+            megaApi.sendSMSVerificationCode(phoneNumber,this);
         }
     }
     
