@@ -66,17 +66,23 @@ public class BaseActivity extends AppCompatActivity {
 
         checkMegaApiObjects();
 
-        if(megaChatApi.getPresenceConfig()==null){
-            delaySignalPresence = true;
-        }
-        else{
-            if(megaChatApi.getPresenceConfig().isPending()==true){
+        if(megaChatApi != null){
+            if(megaChatApi.getPresenceConfig()==null){
                 delaySignalPresence = true;
             }
             else{
-                delaySignalPresence = false;
-                retryConnectionsAndSignalPresence();
+                if(megaChatApi.getPresenceConfig().isPending()==true){
+                    delaySignalPresence = true;
+                }
+                else{
+                    delaySignalPresence = false;
+                    retryConnectionsAndSignalPresence();
+                }
             }
+        }
+        else{
+            delaySignalPresence = false;
+            retryConnectionsAndSignalPresence();
         }
     }
 
