@@ -660,8 +660,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
     
     public static void log(String message) {
-        //Util.log("SMSVerificationReceiveTxtActivity",message);
-        Log.d("SMSVerification","yuan " + message);
+        Util.log("SMSVerificationReceiveTxtActivity",message);
     }
     
     

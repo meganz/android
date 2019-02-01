@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -1010,10 +1011,24 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 	
 	public void updateAddPhoneNumberLabel(){
-        String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-        if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
-            addPhoneNumber.setText(registeredPhoneNumber);
-            addPhoneNumber.setOnClickListener(null);
-        }
+        log("updateAddPhoneNumberLabel");
+        addPhoneNumber.setVisibility(View.GONE);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                
+                //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
+                String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+                log("updateAddPhoneNumberLabel " + registeredPhoneNumber);
+                
+                if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
+                    addPhoneNumber.setText(registeredPhoneNumber);
+                    addPhoneNumber.setOnClickListener(null);
+                    addPhoneNumber.setVisibility(View.VISIBLE);
+                }
+            }
+        }, 3000);
+        
     }
 }
