@@ -303,31 +303,35 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 											scaleBitmap.compress(getCompressFormat(file.getName()), 100, fOut);
 											fOut.flush();
 											fOut.close();
-											fileBitmap.recycle();
-											scaleBitmap.recycle();
 											log("DATA connection file compressed");
 											pendingMessages.add(pendingMsg);
-											megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
+											megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), true);
 											log("DATA connection file uploading");
 										} catch (Exception e){
 											pendingMessages.add(pendingMsg);
 											megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
 											log("DATA connection Exception compressing: "+ e.getMessage());
 										}
+										fileBitmap.recycle();
+										scaleBitmap.recycle();
 									}
 									else {
+										fileBitmap.recycle();
+										scaleBitmap.recycle();
 										pendingMessages.add(pendingMsg);
 										megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
 										log("DATA connection new file NULL");
 									}
 								}
 								else {
+									fileBitmap.recycle();
 									pendingMessages.add(pendingMsg);
 									megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
 									log("DATA connection scaled Bitmap NULL");
 								}
 							}
 							else {
+								fileBitmap.recycle();
 								pendingMessages.add(pendingMsg);
 								megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
 								log("DATA connection factor >= 1 totalPixels: "+totalPixels+" width: "+width+ " height: "+height+" DOWNSCALE_IMAGES_PX/totalPixels: "+DOWNSCALE_IMAGES_PX/totalPixels+" Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): "+Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels));
