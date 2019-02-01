@@ -2,6 +2,7 @@ package mega.privacy.android.app;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -32,6 +33,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -428,7 +432,22 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         //show keyboard
         imm.showSoftInput(firstPin,InputMethodManager.SHOW_IMPLICIT);
     }
-    
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(firstPin,0);
+            }
+        },100);
+
+    }
+
     @Override
     public void onBackPressed() {
         log("onBackPressed");
@@ -659,16 +678,21 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
+            log("send verification code,get " +  e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_EEXPIRED) {
                 log("the code has been verified.");
                 showError(getString(R.string.verify_account_error_code_verified));
-            }  else if (e.getErrorCode() == MegaError.API_OK) {
+            } else if (e.getErrorCode() == MegaError.API_EACCESS) {
+                showError(getString(R.string.verify_account_error_reach_limit));
+            } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+                showError(getString(R.string.verify_account_error_phone_number_register));
+            } else if (e.getErrorCode() == MegaError.API_OK) {
                 log("verification successful");
                 Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 setResult(RESULT_OK);
                 finish();
-            }else{
+            } else {
                 log("invalid code");
                 showError(getString(R.string.verify_account_error_invalid_code));
             }

@@ -686,8 +686,9 @@
 	<string name="verify_account_resend_button" context="label for resend verification code button">&#160;Resend</string>
 	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This phone number has been registered.</string>
 	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
+	<string name="verify_account_verify_limit" context="error message that will show to user when per code to be verified more than twice">Only two attempts to verify per code</string>
 	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
-	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code is invalid">The code is invalid</string>
+	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code is invalid">The code is wrong</string>
 
     <string-array name="settings_storage_download_location_array" context="if the user has an internal and an external SD card, it has to be set on the settings screen">
         <item context="internal storage option">Internal storage</item>

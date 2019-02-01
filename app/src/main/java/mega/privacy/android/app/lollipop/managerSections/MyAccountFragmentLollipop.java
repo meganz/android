@@ -1011,7 +1011,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	
 	public void updateAddPhoneNumberLabel(){
         String registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-        if(registeredPhoneNumber != null & registeredPhoneNumber.length() > 0){
+        if(registeredPhoneNumber != null && registeredPhoneNumber.length() > 0){
             addPhoneNumber.setText(registeredPhoneNumber);
             addPhoneNumber.setOnClickListener(null);
         }

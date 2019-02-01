@@ -316,7 +316,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
             log(" RequestTxt phone number is " + phoneNumber);
             shouldDisableNextButton = true;
-            nextButton.setTextColor(Color.RED);
             megaApi.sendSMSVerificationCode(phoneNumber,this,true);
         }
     }
@@ -340,7 +339,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         shouldDisableNextButton = false;
         nextButton.setTextColor(Color.WHITE);
         if (request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
-            log("send phone number,get code");
+            log("send phone number,get code" + e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("will receive sms");
                 String enteredPhoneNumber = phoneNumberInput.getText().toString();
@@ -359,7 +358,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
-            } else if (e.getErrorCode() == MegaError.API_EACCESS) {
+            } else if (e.getErrorCode() == MegaError.API_EEXIST) {
                 log("Phone number has been registered");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_error_phone_number_register);

@@ -51,9 +51,9 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     private DisplayMetrics outMetrics;
 
     private Toolbar toolbar;
-    public static final String COUNTRY_NAME = "country_name";
+    public static final String COUNTRY_NAME = "name";
     public static final String DIAL_CODE = "dial_code";
-    public static final String COUNTRY_CODE = "country_code";
+    public static final String COUNTRY_CODE = "code";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +155,6 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
                 if (imm != null) {
                     imm.hideSoftInputFromWindow(view.getWindowToken(),0);
                 }
-//                search(query);
                 return true;
             }
 
@@ -197,7 +196,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
             JSONArray ja = new JSONArray(sb.toString());
             for (int i = 0;i < ja.length();i++) {
                 JSONObject jo = ja.getJSONObject(i);
-                countries.add(new Country(jo.getString("name"),jo.getString("dial_code"),jo.getString("code")));
+                countries.add(new Country(jo.getString(COUNTRY_NAME),jo.getString(DIAL_CODE),jo.getString(COUNTRY_CODE)));
             }
 
         } catch (IOException e) {
