@@ -302,6 +302,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	@Override
+	public void onBackPressed() {
+		log("onBackPressed");
+		super.callToSuperBack = true;
+		super.onBackPressed();
+	}
+
+	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
@@ -805,11 +812,22 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    return super.onOptionsItemSelected(item);
 	}
 
+	void hidePasswordIfVisible () {
+		if (passwdVisibility) {
+			passwdVisibility = false;
+			toggleButtonNewPasswd.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
+			showHidePassword(R.id.toggle_button_new_passwd);
+			toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
+			showHidePassword(R.id.toggle_button_new_passwd2);
+		}
+	}
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
 			case R.id.action_change_password: {
+				hidePasswordIfVisible();
 				if (changePassword) {
 					log("ok proceed to change");
 					onChangePasswordClick();

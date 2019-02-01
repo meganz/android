@@ -244,6 +244,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     public void setChats(){
         log("setChats");
 
+        if(listView==null){
+            log("setChats:listView is null - do not update");
+            return;
+        }
+
         if(isAdded()){
             if(Util.isChatEnabled()){
 
@@ -277,7 +282,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                         else{
-                            log("chats no: "+chats.size());
+                            log("setChats:chats size: "+chats.size());
 
                             //Order by last interaction
                             Collections.sort(chats, new Comparator<MegaChatListItem> (){
@@ -348,21 +353,25 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         });
 
+                        if(listView==null){
+                            log("setChats: INIT_OFFLINE_SESSION: listView is null");
+                        }
+
+                        listView.setVisibility(View.VISIBLE);
+                        emptyLayout.setVisibility(View.GONE);
+
                         if (adapterList == null){
                             log("adapterList is NULL");
                             adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                            listView.setAdapter(adapterList);
                         }
                         else{
                             adapterList.setChats(chats);
                         }
 
-                        listView.setAdapter(adapterList);
                         fastScroller.setRecyclerView(listView);
                         visibilityFastScroller();
                         adapterList.setPositionClicked(-1);
-
-                        listView.setVisibility(View.VISIBLE);
-                        emptyLayout.setVisibility(View.GONE);
                     }
                 }
                 else{
@@ -980,6 +989,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             return;
         }
 
+        if(listView==null){
+            log("listItemUpdate:listView is null - do not update");
+            return;
+        }
+
         if(context instanceof ManagerActivityLollipop){
             if(!(((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.CHAT)){
                 log("not CHAT shown!");
@@ -1244,6 +1258,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                     else{
                         log("New unarchived element:refresh chat list");
+
                         setChats();
                     }
                     //Update last position

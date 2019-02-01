@@ -91,6 +91,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
+        <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
     <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">

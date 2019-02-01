@@ -99,7 +99,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.5_216";
+	static final public String USER_AGENT = "MEGAAndroid/3.5.1_222";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -538,9 +538,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		final EmojiCompat.Config config;
 		if (USE_BUNDLED_EMOJI) {
+			log("use Bundle emoji");
 			// Use the bundled font for EmojiCompat
 			config = new BundledEmojiCompatConfig(getApplicationContext());
 		} else {
+			log("use downloadable font for EmojiCompat");
 			// Use a downloadable font for EmojiCompat
 			final FontRequest fontRequest = new FontRequest(
 					"com.google.android.gms.fonts",
@@ -552,11 +554,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					.registerInitCallback(new EmojiCompat.InitCallback() {
 						@Override
 						public  void onInitialized() {
-							Log.i(TAG, "EmojiCompat initialized");
+							log("EmojiCompat initialized");
 						}
 						@Override
 						public  void onFailed(@Nullable Throwable throwable) {
-							Log.e(TAG, "EmojiCompat initialization failed", throwable);
+							log("EmojiCompat initialization failed");
 						}
 					});
 		}
@@ -652,6 +654,32 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		int videoWidth = 480;
 		int videoHeight = 320;
 		int videoFps = 15;
+
+		stopVideoCapture();
+		Context context = ContextUtils.getApplicationContext();
+		if (Camera2Enumerator.isSupported(context) && useCamera2) {
+			videoCapturer = createCameraCapturer(new Camera2Enumerator(context));
+		} else {
+			videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture));
+		}
+
+		if (videoCapturer == null) {
+			log("Unable to create video capturer");
+			return;
+		}
+
+		// Link the capturer with the surfaceTextureHelper and the native video source
+		VideoCapturer.CapturerObserver capturerObserver = new AndroidVideoTrackSourceObserver(nativeAndroidVideoTrackSource);
+		videoCapturer.initialize(surfaceTextureHelper, context, capturerObserver);
+
+		// Start the capture!
+		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
+	}
+
+	static public void startVideoCaptureWithParameters(int videoWidth, int videoHeight, int videoFps, long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+		// Settings
+		boolean useCamera2 = false;
+		boolean captureToTexture = true;
 
 		stopVideoCapture();
 		Context context = ContextUtils.getApplicationContext();
@@ -1313,7 +1341,21 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
+		log("onEvent: " + event.getText());
 
+		if (event.getType() == MegaEvent.EVENT_STORAGE) {
+			log("Storage status changed");
+			int state = event.getNumber();
+			if (state == MegaApiJava.STORAGE_STATE_CHANGE) {
+				api.getAccountDetails(null);
+			}
+			else {
+				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
+				intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+				intent.putExtra("state", state);
+				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+			}
+		}
 	}
 
 
@@ -1506,6 +1548,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+
 		log("onChatCallUpdate");
         stopService(new Intent(this,IncomingCallService.class));
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
@@ -1531,6 +1574,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 						if (callToLaunch != null) {
 							if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+								log("Launch call with status: "+callToLaunch.getStatus());
 								launchCallActivity(callToLaunch);
 							} else {
 								log("Launch not in correct status");
@@ -1712,6 +1756,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void launchCallActivity(MegaChatCall call){
 		log("launchCallActivity: "+call.getStatus());
 		MegaApplication.setShowPinScreen(false);
+		MegaApplication.setOpenCallChatId(call.getChatid());
 
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra("chatHandle", call.getChatid());
@@ -1722,9 +1767,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		log("Launch call: "+chatRoom.getTitle());
-//        TL.log(this,"launch Activity" );
-//        Intent i = new Intent(this, TestActivity.class);
-//        startActivity(i);
 
 	}
 
