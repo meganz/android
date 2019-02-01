@@ -147,7 +147,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         inputContainer = findViewById(R.id.verify_account_input_code_layout);
         firstPin = findViewById(R.id.verify_account_input_code_first);
         firstPin.setOnLongClickListener(this);
-        imm.showSoftInput(firstPin,InputMethodManager.SHOW_FORCED);
         firstPin.setOnFocusChangeListener(this);
         firstPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -184,7 +183,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         
         secondPin = findViewById(R.id.verify_account_input_code_second);
         secondPin.setOnLongClickListener(this);
-        imm.showSoftInput(secondPin,InputMethodManager.SHOW_FORCED);
         secondPin.setOnFocusChangeListener(this);
         secondPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -220,7 +218,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         
         thirdPin = findViewById(R.id.verify_account_input_code_third);
         thirdPin.setOnLongClickListener(this);
-        imm.showSoftInput(thirdPin,InputMethodManager.SHOW_FORCED);
         thirdPin.setOnFocusChangeListener(this);
         thirdPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -255,7 +252,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         
         fourthPin = findViewById(R.id.verify_account_input_code_fourth);
         fourthPin.setOnLongClickListener(this);
-        imm.showSoftInput(fourthPin,InputMethodManager.SHOW_FORCED);
         fourthPin.setOnFocusChangeListener(this);
         fourthPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -289,7 +285,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         
         fifthPin = findViewById(R.id.verify_account_input_code_fifth);
         fifthPin.setOnLongClickListener(this);
-        imm.showSoftInput(fifthPin,InputMethodManager.SHOW_FORCED);
         fifthPin.setOnFocusChangeListener(this);
         fifthPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -322,7 +317,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         
         sixthPin = findViewById(R.id.verify_account_input_code_sixth);
         sixthPin.setOnLongClickListener(this);
-        imm.showSoftInput(sixthPin,InputMethodManager.SHOW_FORCED);
         sixthPin.setOnFocusChangeListener(this);
         sixthPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -428,9 +422,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         textParams.setMargins(0,0,0,0);
         sixthPin.setLayoutParams(textParams);
         sixthPin.setEt(fifthPin);
-        
-        //show keyboard
-        imm.showSoftInput(firstPin,InputMethodManager.SHOW_IMPLICIT);
     }
 
     @Override
@@ -441,11 +432,10 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
             @Override
             public void run() {
-                InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.showSoftInput(firstPin,0);
-            }
-        },100);
 
+                imm.showSoftInput(firstPin,0);
+            }
+        },900);
     }
 
     @Override

@@ -353,7 +353,12 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 errorInvalidPhoneNumber.setVisibility(View.VISIBLE);
                 errorInvalidPhoneNumber.setTextColor(Color.parseColor("#FFFF333A"));
                 errorInvalidPhoneNumber.setText(R.string.verify_account_error_reach_limit);
-            } else if (e.getErrorCode() == MegaError.API_EARGS) {
+            } else if (e.getErrorCode() == MegaError.API_EACCESS) {
+                log("already verified");
+                isPhoneNumberValid = false;
+                String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
+                showPhoneNumberValidationError(errorMessage);
+            }else if (e.getErrorCode() == MegaError.API_EARGS) {
                 log("Invalid phone number");
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);

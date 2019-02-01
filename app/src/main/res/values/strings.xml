@@ -679,6 +679,7 @@
 	<string name="verify_account_confirm_button" context="button label - submit verification code">Confirm</string>
 	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
+	<string name="verify_account_already_verified" context="error message if user click next button without enter a verified phone number">Your phone number has been verified</string>
 	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
 	<string name="verify_account_enter_code_title" context="enter verification code page title">Verify your account</string>
 	<string name="verify_account_incorrect_code" context="error message when user entered an incorrect verification code">Wrong code. Please try again or resend.</string>
