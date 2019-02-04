@@ -2,12 +2,17 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.View;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 
@@ -23,7 +28,27 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
     public void onClick(View v) {
         log("onClick FabButtonListener");
         MegaApiAndroid megaApi = ((MegaApplication)((ManagerActivityLollipop)context).getApplication()).getMegaApi();
-        megaApi.sendSMSVerificationCode("00642108194233", null, true);
+        megaApi.sendSMSVerificationCode("+642108294492",new MegaRequestListenerInterface() {
+            @Override
+            public void onRequestStart(MegaApiJava api,MegaRequest request) {
+                Log.e("@#@","code: " + request.getRequestString() );
+            }
+
+            @Override
+            public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
+
+            }
+
+            @Override
+            public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+                Log.e("@#@","code: " + e.getErrorCode() );
+            }
+
+            @Override
+            public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
+
+            }
+        },true);
 //        switch(v.getId()) {
 //            case R.id.floating_button: {
 //                log("Floating Button click!");
