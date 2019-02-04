@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -233,18 +234,21 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     public class Country {
 
-        private String name;
-        private String countryCode;
-        private String code;
+        private String name = "";
+        private String countryCode = "";
+        private String code = "";
+        private Context context;
+        private final String prefix = "country_";
 
         public Country() {
 
         }
 
         public Country(String name,String code,String countryCode) {
-            this.name = name;
+            this.context = getApplicationContext();
             this.code = code;
             this.countryCode = countryCode;
+            this.name = getTranslatableCountryName(countryCode, name);
         }
 
         public String getName() {
@@ -252,7 +256,16 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         }
 
         public void setName(String name) {
-            this.name = name;
+            this.name = getTranslatableCountryName(this.countryCode,name);
+        }
+        
+        public String getTranslatableCountryName(String countryCode,String name){
+            int stringId = context.getResources().getIdentifier(prefix + countryCode.toLowerCase(), "string", context.getPackageName());
+            if(stringId > 0){
+                return context.getString(stringId);
+            }else{
+                return name;
+            }
         }
 
         public String getCode() {
