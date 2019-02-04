@@ -208,7 +208,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
 
         int numPeersOnCall = getItemCount();
-        log("onBindViewHolderGrid() - peer: "+peer.getHandle()+", numPeersOnCall: "+numPeersOnCall);
+        log("onBindViewHolderGrid() - (peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") of numPeersOnCall: "+numPeersOnCall);
 
 
         if(isGrid){
@@ -221,7 +221,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }else if((numPeersOnCall >= 4) && (numPeersOnCall < 7)){
                 lp.height = maxScreenWidth/2;
                 lp.width = maxScreenWidth/2;
-                if((peers.size()==5)&&(peer.getHandle().equals(megaChatApi.getMyUserHandle()))){
+                if((peers.size()==5)  && (peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
                     ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
                     layoutParamsPeer.width = maxScreenWidth;
                     layoutParamsPeer.height = maxScreenWidth/2;
@@ -242,7 +242,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }else if((numPeersOnCall >= 4) && (numPeersOnCall < 7)){
                 lp.height = maxScreenWidth/2;
                 lp.width = maxScreenWidth/2;
-                if((peers.size()==5)&&(peer.getHandle().equals(megaChatApi.getMyUserHandle()))){
+                if((peers.size()==5)  && (peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
                     ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
                     layoutParamsPeer.width = maxScreenWidth;
                     layoutParamsPeer.height = maxScreenWidth/2;
@@ -274,7 +274,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holder.avatarInitialLetter.setText("");
 
         if(peer.isVideoOn()) {
-            log("peer: "+peer.getHandle()+", VIDEO ON pos: "+position);
+            log("(peerid = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") VIDEO ON pos: "+position);
 
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
@@ -398,19 +398,20 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
             //Listener && SurfaceView
             if(peer.getListener() == null){
-                log("peer: "+peer.getHandle()+", VIDEO ON- listener == null ");
+                log("( peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") VIDEO ON- listener == null ");
                 holder.parentSurfaceView.removeAllViews();
                 TextureView myTexture = new TextureView(context);
                 myTexture.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
                 myTexture.setAlpha(1.0f);
                 myTexture.setRotation(0);
-                GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getHandle());
+                GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getPeerId(), peer.getClientId());
                 peer.setListener(listenerPeer);
 
-                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+//                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
                     megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
                 } else {
-                    megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), peer.getListener());
+                    megaChatApi.addChatRemoteVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
                 }
                 if(numPeersOnCall < 7){
                     peer.getListener().getLocalRenderer().addListener(null);
@@ -422,7 +423,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
             }else{
 
-                log("peer: "+peer.getHandle()+", VIDEO ON - listener != null");
+                log("(peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") VIDEO ON - listener != null");
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     if(peer.getListener().getSurfaceView().getParent()!=null){
                         if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
@@ -536,12 +537,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
         }else{
-            log("peer: "+peer.getHandle()+", VIDEO OFF");
+            log("(peerId = "+peer.getPeerId()+", clientId = "+peer.getPeerId()+") VIDEO OFF");
             //Avatar:
-            if(peer.getHandle() == megaChatApi.getMyUserHandle()){
+            if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
                 setProfileMyAvatar(holder);
             }else{
-                setProfileUserAvatar(peer.getHandle(), peer.getName(), holder);
+                setProfileUserAvatar(peer.getPeerId(), peer.getName(), holder);
             }
 
             holder.qualityLayout.setVisibility(GONE);
@@ -549,10 +550,10 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             //Remove SurfaceView && Listener:
             holder.surfaceMicroLayout.setVisibility(GONE);
             if(peer.getListener() != null){
-                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                    megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
+                if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+                    megaChatApi.removeChatVideoListener(chatId, -1, -1, peer.getListener());
                 }else{
-                    megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
+                    megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
                 }
                 if(holder.parentSurfaceView.getChildCount() == 0){
                     if(peer.getListener().getSurfaceView().getParent()!=null){
@@ -1025,7 +1026,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     }
 
     @Override
-    public void resetSize(Long userHandle) {
+    public void resetSize(long peerid, long clientid) {
         log("resetSize");
         if(getItemCount()!=0){
             for(InfoPeerGroupCall peer:peers){
@@ -1056,10 +1057,10 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
                 //Remove SurfaceView && Listener:
                 if(peer.getListener() != null){
-                    if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                        megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
+                    if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+                        megaChatApi.removeChatVideoListener(chatId, -1, -1, peer.getListener());
                     }else{
-                        megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
+                        megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
                     }
                     if(holder.parentSurfaceView.getChildCount() == 0){
                         if(peer.getListener().getSurfaceView().getParent()!=null){
@@ -1071,10 +1072,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
                         holder.parentSurfaceView.removeAllViews();
                         holder.parentSurfaceView.removeAllViewsInLayout();
-
                         if(peer.getListener().getSurfaceView().getParent()!=null){
                             if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
-
                                 ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
                             }
                         }
