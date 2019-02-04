@@ -84,13 +84,14 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     PorterDuffXfermode modesrcin;
     int surfaceWidth = 0;
     int surfaceHeight = 0;
-    Long handleUser;
+    long peerId;
+    long clientId;
     private TextureView myTexture = null;
 
     protected List<MegaSurfaceRendererGroupListener> listeners;
 
 
-    public MegaSurfaceRendererGroup(TextureView view, Long handle) {
+    public MegaSurfaceRendererGroup(TextureView view, long peerId, long clientId) {
         log("MegaSurfaceRendererGroup(): ");
 
         this.myTexture = view;
@@ -99,7 +100,8 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
-        this.handleUser = handle;
+        this.peerId = peerId;
+        this.clientId = clientId;
         listeners = new ArrayList<MegaSurfaceRendererGroupListener>();
     }
 
@@ -113,14 +115,11 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         dstRect.right = dstWidth;
         dstRect.bottom = dstHeight;
         dstRectf = new RectF(dstRect);
-
         adjustAspectRatio();
-
     }
 
     private void adjustAspectRatio() {
         log("adjustAspectRatio()");
-
         if (bitmap != null && dstRect.height() != 0) {
             dstRect.top = 0;
             dstRect.left = 0;
@@ -131,14 +130,11 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     public Bitmap CreateBitmap(int width, int height) {
         log("CreateBitmap(): width = "+width+", height = "+height);
-
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
             try {
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
-            }
-            catch (Exception e) {
-            }
+            }catch (Exception e) {}
         }
 
         if(height == width){
@@ -148,6 +144,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
             srcRect.left = 0;
             srcRect.right = width;
             log(" CreateBitmap(): width == height. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+
         }else if(height > width){
             bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
             srcRect.top = 0;
@@ -205,7 +202,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     private void notifyState(MegaSurfaceRendererGroupListener listener) {
         if(listener == null)
             return;
-        listener.resetSize(handleUser);
+        listener.resetSize(peerId, clientId);
     }
 
     @Override
@@ -241,7 +238,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
     }
 
     public interface MegaSurfaceRendererGroupListener {
-        void resetSize(Long handle);
+        void resetSize(long peerId, long clientId);
     }
 
     public ByteBuffer CreateByteBuffer(int width, int height) {
