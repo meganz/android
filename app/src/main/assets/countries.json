@@ -15,7 +15,7 @@
     "code": "DZ"
   },
   {
-    "name": "AmericanSamoa",
+    "name": "American Samoa",
     "dial_code": "+1684",
     "code": "AS"
   },
@@ -176,7 +176,7 @@
   },
   {
     "name": "Cayman Islands",
-    "dial_code": "+345",
+    "dial_code": "+1",
     "code": "KY"
   },
   {
@@ -241,7 +241,7 @@
   },
   {
     "name": "Cyprus",
-    "dial_code": "+537",
+    "dial_code": "+357",
     "code": "CY"
   },
   {
@@ -406,7 +406,7 @@
   },
   {
     "name": "Guyana",
-    "dial_code": "+595",
+    "dial_code": "+592",
     "code": "GY"
   },
   {
@@ -476,7 +476,7 @@
   },
   {
     "name": "Kazakhstan",
-    "dial_code": "+77",
+    "dial_code": "+7",
     "code": "KZ"
   },
   {
@@ -980,17 +980,7 @@
     "code": "ZW"
   },
   {
-    "name": "land Islands",
-    "dial_code": "",
-    "code": "AX"
-  },
-  {
-    "name": "Antarctica",
-    "dial_code": null,
-    "code": "AQ"
-  },
-  {
-    "name": "Bolivia, Plurinational State of",
+    "name": "Bolivia",
     "dial_code": "+591",
     "code": "BO"
   },
@@ -1035,7 +1025,7 @@
     "code": "HK"
   },
   {
-    "name": "Iran, Islamic Republic of",
+    "name": "Iran",
     "dial_code": "+98",
     "code": "IR"
   },
@@ -1075,17 +1065,17 @@
     "code": "MO"
   },
   {
-    "name": "Macedonia, The Former Yugoslav Republic of",
+    "name": "Macedonia",
     "dial_code": "+389",
     "code": "MK"
   },
   {
-    "name": "Micronesia, Federated States of",
+    "name": "Micronesia",
     "dial_code": "+691",
     "code": "FM"
   },
   {
-    "name": "Moldova, Republic of",
+    "name": "Moldova",
     "dial_code": "+373",
     "code": "MD"
   },
@@ -1095,7 +1085,7 @@
     "code": "MZ"
   },
   {
-    "name": "Palestinian Territory, Occupied",
+    "name": "Palestinian",
     "dial_code": "+970",
     "code": "PS"
   },
@@ -1120,7 +1110,7 @@
     "code": "BL"
   },
   {
-    "name": "Saint Helena, Ascension and Tristan Da Cunha",
+    "name": "Saint Helena",
     "dial_code": "+290",
     "code": "SH"
   },
@@ -1170,12 +1160,12 @@
     "code": "SY"
   },
   {
-    "name": "Taiwan, Province of China",
+    "name": "Taiwan",
     "dial_code": "+886",
     "code": "TW"
   },
   {
-    "name": "Tanzania, United Republic of",
+    "name": "Tanzania",
     "dial_code": "+255",
     "code": "TZ"
   },
@@ -1185,7 +1175,7 @@
     "code": "TL"
   },
   {
-    "name": "Venezuela, Bolivarian Republic of",
+    "name": "Venezuela",
     "dial_code": "+58",
     "code": "VE"
   },
