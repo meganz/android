@@ -407,7 +407,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getPeerId(), peer.getClientId());
                 peer.setListener(listenerPeer);
 
-//                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
                     megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
                 } else {
