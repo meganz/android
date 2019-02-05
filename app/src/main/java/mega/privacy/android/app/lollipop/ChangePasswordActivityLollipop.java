@@ -599,7 +599,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					hideKeyboard();
+					Util.hideKeyboard(changePasswordActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -737,7 +737,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	void permitVerify(){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard();
+			Util.hideKeyboard(changePasswordActivity, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -789,14 +789,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					sixthPin.setText("");
 				}
 			}
-		}
-	}
-
-	void hideKeyboard(){
-
-		View v = getCurrentFocus();
-		if (v != null){
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
 	}
 
