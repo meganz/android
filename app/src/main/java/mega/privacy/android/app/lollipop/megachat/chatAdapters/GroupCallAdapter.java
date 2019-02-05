@@ -540,9 +540,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             log("(peerId = "+peer.getPeerId()+", clientId = "+peer.getPeerId()+") VIDEO OFF");
             //Avatar:
             if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
-                setProfileMyAvatar(holder);
+                setProfileMyAvatarGroupCall(holder);
             }else{
-                setProfileUserAvatar(peer.getPeerId(), peer.getName(), holder);
+                setProfileParticipantAvatarGroupCall(peer.getPeerId(), peer.getName(), holder);
             }
 
             holder.qualityLayout.setVisibility(GONE);
@@ -661,41 +661,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         return null;
     }
 
-   //My avatar
-   public void setProfileMyAvatar(ViewHolderGroupCall holder) {
-        log("setProfileMyAvatar()");
-       Bitmap myBitmap = null;
-       File avatar = null;
-       if (context != null) {
-           if (context.getExternalCacheDir() != null) {
-               avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
-           } else {
-               avatar = new File(context.getCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
-           }
-       }
-       if (avatar.exists()) {
-           if (avatar.length() > 0) {
-               BitmapFactory.Options bOpts = new BitmapFactory.Options();
-               bOpts.inPurgeable = true;
-               bOpts.inInputShareable = true;
-               myBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-               myBitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, myBitmap, 3);
-               if (myBitmap != null) {
-                       holder.avatarImage.setImageBitmap(myBitmap);
-                       holder.avatarInitialLetter.setVisibility(GONE);
-               }else{
-                   createMyDefaultAvatar(holder);
-               }
-           }else {
-               createMyDefaultAvatar(holder);
-           }
-       }else {
-           createMyDefaultAvatar(holder);
-       }
-   }
-    //My Default avatar
-    public void createMyDefaultAvatar(ViewHolderGroupCall holder) {
-        log("createMyDefaultAvatar()");
+    //Group call: default my avatar
+    public void createMyDefaultAvatarGroupCall(ViewHolderGroupCall holder) {
+        log("createMyDefaultAvatarGroupCall()");
 
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
@@ -726,93 +694,49 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holder.avatarInitialLetter.setText(myFirstLetter);
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
     }
+    //Group call: my avatar
+   public void setProfileMyAvatarGroupCall(ViewHolderGroupCall holder) {
+        log("setProfileMyAvatarGroupCall()");
+       Bitmap myBitmap = null;
+       File avatar = null;
+       if (context != null) {
+           if (context.getExternalCacheDir() != null) {
+               avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
+           } else {
+               avatar = new File(context.getCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
+           }
+       }
+       if (avatar.exists()) {
+           if (avatar.length() > 0) {
+               BitmapFactory.Options bOpts = new BitmapFactory.Options();
+               bOpts.inPurgeable = true;
+               bOpts.inInputShareable = true;
+               myBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+               myBitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, myBitmap, 3);
+               if (myBitmap != null) {
+                       holder.avatarImage.setImageBitmap(myBitmap);
+                       holder.avatarInitialLetter.setVisibility(GONE);
+               }else{
+                   createMyDefaultAvatarGroupCall(holder);
+               }
+           }else {
+               createMyDefaultAvatarGroupCall(holder);
+           }
+       }else {
+           createMyDefaultAvatarGroupCall(holder);
+       }
+   }
 
-
-    public void setProfileUserAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
-        log("setProfileUserAvatar()");
-        String contactMail = megaChatApi.getContactEmail(userHandle);
-
-        createDefaultUserAvatar(userHandle, holder, fullName, contactMail);
-
-        ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
-        File avatar = null;
-
-        if(contactMail == null){
-            if (context.getExternalCacheDir() != null) {
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandle + ".jpg");
-            }else {
-                avatar = new File(context.getCacheDir().getAbsolutePath(), userHandle + ".jpg");
-            }
-        }else{
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
-        }
-        Bitmap bitmap = null;
-        if (avatar.exists()){
-            if (avatar.length() > 0){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap == null) {
-                    avatar.delete();
-
-                    if(megaApi==null){
-                        log("setUserAvatar: megaApi is Null in Offline mode");
-                        return;
-                    }
-
-                    if (context.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                    }
-                    else{
-                        megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                    }
-                }else{
-                    holder.avatarInitialLetter.setVisibility(GONE);
-                    holder.avatarImage.setVisibility(View.VISIBLE);
-                    holder.avatarImage.setImageBitmap(bitmap);
-                }
-            }else{
-
-                if(megaApi==null){
-                    log("setUserAvatar: megaApi is Null in Offline mode");
-                    return;
-                }
-
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }else{
-                    megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }
-            }
-        }else{
-            if(megaApi==null){
-                log("setUserAvatar: megaApi is Null in Offline mode");
-                return;
-            }
-            if (context.getExternalCacheDir() != null){
-                megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-            }
-            else{
-                megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-            }
-        }
-    }
-
-    //User Default avatar
-    public void createDefaultUserAvatar(long userHandle, ViewHolderGroupCall holder, String fullName, String contactMail){
-        log("createDefaultUserAvatar()");
+    //Group call: default participant avatar
+    public void createDefaultParticipantAvatarGroupCall(long peerid, ViewHolderGroupCall holder, String fullName, String mail){
+        log("createDefaultParticipantAvatarGroupCall()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
 
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
+        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(peerid));
         if (color != null) {
             p.setColor(Color.parseColor(color));
         } else {
@@ -849,9 +773,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             setInitialByMail=true;
         }
         if(setInitialByMail){
-            if (contactMail != null){
-                if (contactMail.length() > 0){
-                    String firstLetter = contactMail.charAt(0) + "";
+            if (mail != null){
+                if (mail.length() > 0){
+                    String firstLetter = mail.charAt(0) + "";
                     firstLetter = firstLetter.toUpperCase(Locale.getDefault());
                     holder.avatarInitialLetter.setText(firstLetter);
                     holder.avatarInitialLetter.setTextColor(Color.WHITE);
@@ -860,6 +784,117 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
         }
 //        ((ViewHolderNormalChatList)holder).contactInitialLetter.setTextSize(24);
+
+    }
+    //Group call: participant avatar
+    public void setProfileParticipantAvatarGroupCall(long peerid, String fullName, ViewHolderGroupCall holder){
+        log("setProfileParticipantAvatarGroupCall()");
+
+        if(peerid == megaChatApi.getMyUserHandle()){
+            //My peer
+            String contactMail = megaChatApi.getMyEmail();
+
+            File avatar = null;
+            if (context != null) {
+                if (context.getExternalCacheDir() != null) {
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+                } else {
+                    avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+                }
+            }
+
+            Bitmap bitmap = null;
+            if (avatar.exists()) {
+                if (avatar.length() > 0) {
+                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                    bOpts.inPurgeable = true;
+                    bOpts.inInputShareable = true;
+                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+//                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+                    if (bitmap != null) {
+                        holder.avatarInitialLetter.setVisibility(GONE);
+                        holder.avatarImage.setVisibility(View.VISIBLE);
+                        holder.avatarImage.setImageBitmap(bitmap);
+                    }else{
+                        createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
+                    }
+                }else {
+                    createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
+                }
+            }else {
+                createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
+            }
+
+        }else{
+            //Contact
+            String contactMail = megaChatApi.getContactEmail(peerid);
+
+            createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
+
+            ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
+            File avatar = null;
+
+            if(contactMail == null){
+                if (context.getExternalCacheDir() != null) {
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), peerid + ".jpg");
+                }else {
+                    avatar = new File(context.getCacheDir().getAbsolutePath(), peerid + ".jpg");
+                }
+            }else{
+                if (context.getExternalCacheDir() != null){
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+                }else{
+                    avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+                }
+            }
+            Bitmap bitmap = null;
+            if (avatar.exists()){
+                if (avatar.length() > 0){
+                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                    bOpts.inPurgeable = true;
+                    bOpts.inInputShareable = true;
+                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                    if (bitmap == null) {
+                        avatar.delete();
+                        if(megaApi==null){
+                            log("setUserAvatar: megaApi is Null in Offline mode");
+                            return;
+                        }
+                        if (context.getExternalCacheDir() != null){
+                            megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                        }else{
+                            megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                        }
+                    }else{
+                        holder.avatarInitialLetter.setVisibility(GONE);
+                        holder.avatarImage.setVisibility(View.VISIBLE);
+                        holder.avatarImage.setImageBitmap(bitmap);
+                    }
+                }else{
+
+                    if(megaApi==null){
+                        log("setUserAvatar: megaApi is Null in Offline mode");
+                        return;
+                    }
+
+                    if (context.getExternalCacheDir() != null){
+                        megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                    }else{
+                        megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                    }
+                }
+            }else{
+                if(megaApi==null){
+                    log("setUserAvatar: megaApi is Null in Offline mode");
+                    return;
+                }
+                if (context.getExternalCacheDir() != null){
+                    megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                }else{
+                    megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+                }
+            }
+        }
 
     }
 
