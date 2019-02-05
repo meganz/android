@@ -412,6 +412,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 } else {
                     megaChatApi.addChatRemoteVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
                 }
+
                 if(numPeersOnCall < 7){
                     peer.getListener().getLocalRenderer().addListener(null);
                 }else{
