@@ -173,11 +173,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
 
-            View view = getCurrentFocus();
-            if (view != null) {
-                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
+            Util.hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
 
             aB.setTitle(getString(R.string.achievements_title));
             if(achievementsFragment==null){
@@ -309,11 +305,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
     public void inviteFriends(ArrayList<String> mails){
         log("inviteFriends");
-        View view = getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+        Util.hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS);
 
         showFragment(Constants.ACHIEVEMENTS_FRAGMENT, -1);
 
