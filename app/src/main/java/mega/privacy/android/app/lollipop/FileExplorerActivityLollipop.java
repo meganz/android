@@ -58,7 +58,6 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -72,7 +71,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -221,6 +219,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	String action = null;
     private android.support.v7.app.AlertDialog renameDialog;
 	HashMap<String, String> nameFiles = new HashMap<>();
+
+	MegaNode myChatFilesNode;
+	ArrayList<MegaNode> attachNodes = new ArrayList<>();
+	ArrayList<ShareInfo> uploadInfos = new ArrayList<>();
+	int filesChecked = 0;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -1526,6 +1529,139 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
+	long createPendingMessageDBH (long idChat, long timestamp, String fingerprint, ShareInfo info) {
+		log("Id chat: "+idChat);
+		PendingMessageSingle pMsgSingle = new PendingMessageSingle();
+		pMsgSingle.setChatId(idChat);
+		pMsgSingle.setUploadTimestamp(timestamp);
+		pMsgSingle.setFilePath(info.getFileAbsolutePath());
+		pMsgSingle.setName(info.getTitle());
+		pMsgSingle.setFingerprint(fingerprint);
+		long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
+		pMsgSingle.setId(idMessage);
+
+		if(idMessage!=-1){
+			log("name of the file: "+info.getTitle());
+			log("size of the file: "+info.getSize());
+		}
+		else{
+			log("Error when adding pending msg to the database");
+		}
+		return idMessage;
+	}
+
+	void startChatUploadService () {
+		log("Launch chat upload with files "+filePreparedInfos.size());
+		filesChecked = 0;
+		long[] attachNodeHandles;
+		ArrayList<Long> pendMsgArray = new ArrayList<>();
+		Intent intent = new Intent(this, ChatUploadService.class);
+
+		if (chatListItems != null && !chatListItems.isEmpty()) {
+			long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
+			ArrayList<String> filesToUploadFingerPrint = new ArrayList<>();
+			if (attachNodes != null && !attachNodes.isEmpty()) {
+//			There are exists files
+				if (attachNodes.size() < filePreparedInfos.size()) {
+//					There are exist files and files for upload
+					attachNodeHandles = new long[attachNodes.size()];
+					for (int i=0; i<attachNodes.size(); i++) {
+						attachNodeHandles[i] = attachNodes.get(i).getHandle();
+					}
+
+					long[] attachIdChats = new long[chatListItems.size()];
+					for (int i=0; i<chatListItems.size(); i++) {
+						attachIdChats[i] = chatListItems.get(i).getChatId();
+					}
+					intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
+					intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles);
+
+					int pos = 0;
+					for (ShareInfo info : uploadInfos) {
+						long timestamp = System.currentTimeMillis()/1000;
+						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+						filesToUploadFingerPrint.add(fingerprint);
+						for(MegaChatListItem item : chatListItems){
+							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+							pos++;
+						}
+					}
+					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
+					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+					startService(intent);
+				}
+				else {
+//					All files exists, not necessary start ChatUploadService
+					for (MegaNode node : attachNodes) {
+						for (MegaChatListItem item : chatListItems) {
+							megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
+						}
+					}
+//					Mostrar snackbar
+				}
+			}
+			else {
+//			All files for upload
+				int pos = 0;
+				for (ShareInfo info : filePreparedInfos) {
+					long timestamp = System.currentTimeMillis()/1000;
+					String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+					filesToUploadFingerPrint.add(fingerprint);
+					for(MegaChatListItem item : chatListItems){
+						idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+						pos++;
+					}
+				}
+				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
+				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+				startService(intent);
+			}
+		}
+		else{
+			filePreparedInfos = null;
+			log("ERROR null files to upload");
+			finishActivity();
+		}
+
+		if (statusDialog != null) {
+			try {
+				statusDialog.dismiss();
+			}
+			catch(Exception ex){}
+		}
+
+		filePreparedInfos = null;
+		log("finish!!!");
+		finishActivity();
+	}
+
+	void checkIfFilesExistsInMEGA () {
+		for (ShareInfo info : filePreparedInfos) {
+			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+			MegaNode node = megaApi.getNodeByFingerprint(fingerprint);
+			if (node != null) {
+				if (node.getParentHandle() == myChatFilesNode.getHandle()) {
+//					File is in My Chat Files --> Add to attach
+					attachNodes.add(node);
+					filesChecked++;
+				}
+				else {
+//					File is in Cloud --> Copy in My Chat Files
+					megaApi.copyNode(node, myChatFilesNode, this);
+				}
+			}
+			else {
+				uploadInfos.add(info);
+				filesChecked++;
+			}
+		}
+		if (filesChecked == filePreparedInfos.size()) {
+			startChatUploadService();
+		}
+	}
+
 	/*
 	 * Handle processed upload intent
 	 */
@@ -1540,80 +1676,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
 		}
 		else {
-			log("Launch chat upload with files "+infos.size());
-			for (ShareInfo info : infos) {
-				Intent intent = new Intent(this, ChatUploadService.class);
-
-				long timestamp = System.currentTimeMillis()/1000;
-
-				if(chatListItems!=null){
-					for(int i=0; i < chatListItems.size();i++){
-						MegaChatListItem item = chatListItems.get(i);
-						long idChat = item.getChatId();
-						log("Id chat: "+idChat);
-						PendingMessageSingle pMsgSingle = new PendingMessageSingle();
-						pMsgSingle.setChatId(idChat);
-						pMsgSingle.setUploadTimestamp(timestamp);
-
-						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-						pMsgSingle.setFilePath(info.getFileAbsolutePath());
-						pMsgSingle.setName(info.getTitle());
-						pMsgSingle.setFingerprint(fingerprint);
-
-						long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
-						pMsgSingle.setId(idMessage);
-
-						if(idMessage!=-1){
-							intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
-
-							log("name of the file: "+info.getTitle());
-							log("size of the file: "+info.getSize());
-
-							intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-
-							startService(intent);
-						}
-						else{
-							log("Error when adding pending msg to the database");
-						}
-					}
-				}
-				else{
-					filePreparedInfos = null;
-					log("ERROR null files to upload");
-					finishActivity();
-				}
-
+			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			if(myChatFilesNode == null){
+				log("Create folder: "+Constants.CHAT_FOLDER);
+				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), this);
 			}
-
-			if (statusDialog != null) {
-				try {
-					statusDialog.dismiss();
-				}
-				catch(Exception ex){}
+			else {
+				checkIfFilesExistsInMEGA();
 			}
-
-			if(chatListItems.size()==1){
-				MegaChatListItem chatItem = chatListItems.get(0);
-				long idChat = chatItem.getChatId();
-				if(chatItem!=null){
-					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-					intent.putExtra("CHAT_ID", idChat);
-					startActivity(intent);
-				}
-			}
-			else{
-				Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
-				chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
-				startActivity(chatIntent);
-			}
-
-			filePreparedInfos = null;
-			log("finish!!!");
-			finishActivity();
 		}
 	}
 	
@@ -2095,51 +2165,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (error.getErrorCode() == MegaError.API_OK){
-
-				if(tabShown==CLOUD_TAB){
-					String gcFTag;
-					if(isChatFirst){
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-					}
-					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					}
-					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-					if (cDriveExplorer != null){
-						cDriveExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleCloud = request.getNodeHandle();
-						log("The handle of the created folder is: "+parentHandleCloud);
-					}						
+			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			if (myChatFilesNode != null && myChatFilesNode.getHandle() == request.getNodeHandle()) {
+				checkIfFilesExistsInMEGA();
+			}
+			else {
+				try {
+					statusDialog.dismiss();
 				}
-				else if (tabShown == NO_TABS){
-					if (importFileF && importFragmentSelected != -1) {
-						switch (importFragmentSelected) {
-							case CLOUD_FRAGMENT: {
-								if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
-									cDriveExplorer.navigateToFolder(request.getNodeHandle());
-								}
-								break;
-							}
-							case INCOMING_FRAGMENT: {
-								if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
-									iSharesExplorer.navigateToFolder(request.getNodeHandle());
-								}
-								break;
-							}
-						}
-					}
-					else if (cDriveExplorer != null){
-						cDriveExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleCloud = request.getNodeHandle();
-					}
-					else{
+				catch (Exception ex) {}
+
+				if (error.getErrorCode() == MegaError.API_OK){
+
+					if(tabShown==CLOUD_TAB){
 						String gcFTag;
 						if(isChatFirst){
 							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
@@ -2151,23 +2189,60 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (cDriveExplorer != null){
 							cDriveExplorer.navigateToFolder(request.getNodeHandle());
 							parentHandleCloud = request.getNodeHandle();
+							log("The handle of the created folder is: "+parentHandleCloud);
 						}
 					}
-					log("The handle of the created folder is: "+parentHandleCloud);
-				}
-				else{
-
-					String gcFTag;
-					if(isChatFirst){
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+					else if (tabShown == NO_TABS){
+						if (importFileF && importFragmentSelected != -1) {
+							switch (importFragmentSelected) {
+								case CLOUD_FRAGMENT: {
+									if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
+										cDriveExplorer.navigateToFolder(request.getNodeHandle());
+									}
+									break;
+								}
+								case INCOMING_FRAGMENT: {
+									if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
+										iSharesExplorer.navigateToFolder(request.getNodeHandle());
+									}
+									break;
+								}
+							}
+						}
+						else if (cDriveExplorer != null){
+							cDriveExplorer.navigateToFolder(request.getNodeHandle());
+							parentHandleCloud = request.getNodeHandle();
+						}
+						else{
+							String gcFTag;
+							if(isChatFirst){
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+							}
+							else{
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+							}
+							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+							if (cDriveExplorer != null){
+								cDriveExplorer.navigateToFolder(request.getNodeHandle());
+								parentHandleCloud = request.getNodeHandle();
+							}
+						}
+						log("The handle of the created folder is: "+parentHandleCloud);
 					}
 					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-					}
-					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-					if (iSharesExplorer != null){
-						iSharesExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleIncoming = request.getNodeHandle();
+
+						String gcFTag;
+						if(isChatFirst){
+							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+						}
+						else{
+							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+						}
+						iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+						if (iSharesExplorer != null){
+							iSharesExplorer.navigateToFolder(request.getNodeHandle());
+							parentHandleIncoming = request.getNodeHandle();
+						}
 					}
 				}
 			}
@@ -2294,6 +2369,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				}
 			}	
+		}
+		else if (request.getType() == MegaRequest.TYPE_COPY) {
+			filesChecked++;
+			if (error.getErrorCode() == MegaError.API_OK) {
+				MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+				if (node != null) {
+					attachNodes.add(node);
+					if (filesChecked == filePreparedInfos.size()) {
+						startChatUploadService();
+					}
+				}
+			}
+			else {
+				log("Error copying node into My Chat Files");
+			}
 		}
 	}
 
