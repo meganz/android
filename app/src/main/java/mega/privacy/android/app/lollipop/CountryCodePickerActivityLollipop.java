@@ -29,6 +29,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.R;
@@ -175,6 +177,13 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
                 selectedCountries.add(country);
             }
         }
+        Collections.sort(selectedCountries,new Comparator<Country>() {
+        
+            @Override
+            public int compare(Country o1,Country o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
         adapter.refresh(selectedCountries);
     }
 
@@ -211,6 +220,13 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
                 e.printStackTrace();
             }
         }
+        Collections.sort(countries,new Comparator<Country>() {
+            
+            @Override
+            public int compare(Country o1,Country o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
         return countries;
     }
 
