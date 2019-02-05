@@ -829,6 +829,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						try{
 							temp = new ProgressDialog(this);
 							temp.setMessage(getString(R.string.upload_prepare));
+							temp.setCancelable(false);
+							temp.setCanceledOnTouchOutside(false);
 							temp.show();
 						}
 						catch(Exception e){
@@ -1426,6 +1428,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						try{
 							temp = new ProgressDialog(this);
 							temp.setMessage(getString(R.string.upload_prepare));
+							temp.setCancelable(false);
+							temp.setCanceledOnTouchOutside(false);
 							temp.show();
 						}
 						catch(Exception e){
@@ -1823,6 +1827,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				try{
 					temp = new ProgressDialog(this);
 					temp.setMessage(getString(R.string.upload_prepare));
+					temp.setCancelable(false);
+					temp.setCanceledOnTouchOutside(false);
 					temp.show();
 				}
 				catch(Exception e){
@@ -2816,6 +2822,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					try{
 						temp = new ProgressDialog(this);
 						temp.setMessage(getString(R.string.upload_prepare));
+						temp.setCancelable(false);
+						temp.setCanceledOnTouchOutside(false);
 						temp.show();
 					}
 					catch(Exception e){
@@ -2836,6 +2844,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				try{
 					temp = new ProgressDialog(this);
 					temp.setMessage(getString(R.string.upload_prepare));
+					temp.setCancelable(false);
+					temp.setCanceledOnTouchOutside(false);
 					temp.show();
 				}
 				catch(Exception e){
