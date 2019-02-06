@@ -16,11 +16,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -53,6 +53,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -159,7 +161,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	boolean startVideo = false;
 
 	RelativeLayout sharedFoldersLayout;
-	ImageView sharedFoldersIcon;
 	TextView sharedFoldersText;
 	Button sharedFoldersButton;
 	View dividerSharedFoldersLayout;
@@ -204,6 +205,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	float scaleH;
 
 	DatabaseHandler dbH = null;
+
+	Drawable drawableShare;
+	Drawable drawableSend;
+	Drawable drawableArrow;
+	Drawable drawableDots;
 
 	MenuItem shareMenuItem;
 	MenuItem sendFileMenuItem;
@@ -300,10 +306,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape configuration");
 
-				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_LAND, context.getResources().getDisplayMetrics());
-				appBarLayout.setLayoutParams(params);
-
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
 				firstLineTextToolbar.setMaxWidth((int) width);
 				firstLineLengthToolbar.setMaxWidth((int) width);
@@ -315,10 +317,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("Portrait configuration");
-
-				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_PORT, context.getResources().getDisplayMetrics());
-				appBarLayout.setLayoutParams(params);
 
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
 				firstLineTextToolbar.setMaxWidth((int) width);
@@ -376,8 +374,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Shared folders layout
 			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
 			sharedFoldersLayout.setOnClickListener(this);
-
-			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
 
 			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
 
@@ -732,12 +728,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
 
+		drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+		drawableDots = drawableDots.mutate();
+		drawableArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+		drawableArrow = drawableArrow.mutate();
+
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+		drawableShare = drawableShare.mutate();
+		drawableSend = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
+		drawableSend = drawableSend.mutate();
+
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.contact_properties_action, menu);
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		sendFileMenuItem = menu.findItem(R.id.cab_menu_send_file);
+		sendFileMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		if(Util.isOnline(this)){
 
@@ -761,7 +768,67 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			sendFileMenuItem.setVisible(false);
 		}
 
+		appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+			@Override
+			public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+				if (offset == 0) {
+					// Expanded
+					firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+					secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+					setColorFilterWhite();
+				}
+				else {
+					if (offset<0 && Math.abs(offset)>=appBarLayout.getTotalScrollRange()/2) {
+						// Collapsed
+						firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+						secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+						setColorFilterBlack();
+					}
+					else {
+						firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+						secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+						setColorFilterWhite();
+					}
+				}
+			}
+		});
+
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	void setColorFilterWhite () {
+
+		drawableArrow.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
+
+		drawableDots.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+		toolbar.setOverflowIcon(drawableDots);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
+		if (sendFileMenuItem != null) {
+			drawableSend.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			sendFileMenuItem.setIcon(drawableSend);
+		}
+	}
+
+	void setColorFilterBlack () {
+		drawableArrow.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
+
+		drawableDots.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+		toolbar.setOverflowIcon(drawableDots);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
+		if (sendFileMenuItem != null) {
+			drawableSend.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+			sendFileMenuItem.setIcon(drawableSend);
+		}
 	}
 
 	@Override
@@ -1801,6 +1868,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
+		drawableArrow.setColorFilter(null);
+		drawableDots.setColorFilter(null);
+		drawableSend.setColorFilter(null);
+		drawableShare.setColorFilter(null);
 	}
 
 	public static void log(String message) {
@@ -1958,6 +2030,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public void showSnackbar(String s){
 		log("showSnackbar: "+s);
 		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -1967,9 +2044,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         RelativeLayout sharedFolderLayout = (RelativeLayout)findViewById(R.id.shared_folder_list_container);
 		if(isShareFolderExpanded){
 			sharedFolderLayout.setVisibility(View.GONE);
+			if (user != null) {
+				setFoldersButtonText(megaApi.getInShares(user));
+			}
 		}
 		else{
 			sharedFolderLayout.setVisibility(View.VISIBLE);
+			sharedFoldersButton.setText(R.string.general_close);
             if (sharedFoldersFragment == null){
                 sharedFoldersFragment = new ContactSharedFolderFragment();
                 sharedFoldersFragment.setUserEmail(user.getEmail());
@@ -2375,16 +2456,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     }
     
     private void setFoldersButtonText(ArrayList<MegaNode> nodes){
-        sharedFoldersButton.setText(getDescription(nodes));
-        if(nodes.size() == 0){
-            sharedFoldersButton.setClickable(false);
-            sharedFoldersLayout.setClickable(false);
-        }
+		if (nodes != null) {
+			sharedFoldersButton.setText(getDescription(nodes));
+			if (nodes.size() == 0) {
+				sharedFoldersButton.setClickable(false);
+				sharedFoldersLayout.setClickable(false);
+			}
+		}
     }
     
     public void showSnackbarNotSpace(){
         log("showSnackbarNotSpace");
         Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
         mySnackbar.show();
     }

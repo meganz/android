@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,6 +34,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -742,15 +744,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					finish();
 				}
 				else if(e.getErrorCode()==MegaError.API_ENOENT){
-					Snackbar.make(fragmentContainer, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1));
 				}
 				else
 				{
-					Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.import_success_error));
 				}
 
 			}else{
-				Snackbar.make(fragmentContainer, getString(R.string.import_success_message), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.import_success_message));
 			}
 		}
 	}
@@ -834,7 +836,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
 
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -852,12 +854,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					megaApi.copyNode(nodeToImport, target, this);
 				} else {
 					log("TARGET: null");
-					Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.import_success_error));
 				}
 			}
 			else{
 				log("DOCUMENT: null");
-				Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.import_success_error));
 			}
 
 		}
@@ -874,7 +876,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				statusDialog.dismiss();
 			} catch(Exception ex) {};
 
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -944,12 +946,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-								Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
+								showSnackbar(message);
 							}
 						}
 						catch (Exception e){
 							String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
+							showSnackbar(message);
 						}
 						return;
 					}
@@ -1008,6 +1010,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -1016,6 +1023,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");
 		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
 		mySnackbar.show();
 	}

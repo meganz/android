@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -1845,7 +1846,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
-				Snackbar.make(fragmentContainer,getString(R.string.upload_can_not_open),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.upload_can_not_open));
 				return;
 			}
 			else {
@@ -1860,7 +1861,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.upload_began));
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -2090,6 +2091,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
@@ -2104,8 +2110,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			file = Util.createTemporalTextFile(name, data);
 		}
 		if(file!=null){
-			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
-
+			showSnackbar(getString(R.string.upload_began));
 			Intent intent = new Intent(this, UploadService.class);
 			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
@@ -2118,7 +2123,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finishActivity();
 		}
 		else{
-			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.email_verification_text_error));
 		}
 	}
 
@@ -2238,7 +2243,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				megaApi.createFolder(title, parentNode, this);
 			}
 			else{
-				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_folder_already_exists));
 			}
 		}
 		else{
@@ -2268,7 +2273,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					megaApi.createFolder(title, parentNode, this);
 				}
 				else{
-					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_folder_already_exists));
 				}
 			}
 			else{
