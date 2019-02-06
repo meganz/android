@@ -334,7 +334,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/destructive_items"
+                    android:tint="@color/dark_primary_color"
                     android:src="@drawable/ic_rubbish_bin"
                     android:visibility="visible" />
 
@@ -346,7 +346,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textColor="@color/destructive_items"
+                    android:textColor="@color/dark_primary_color"
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>

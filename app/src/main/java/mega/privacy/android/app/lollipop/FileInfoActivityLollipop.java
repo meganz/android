@@ -344,26 +344,17 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             if(countChat==errorSent+successSent){
                 if(successSent==countChat){
                     if(countChat==1){
-                        long handle = request.getChatHandle();
-                        MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
-                        if(chatItem!=null){
-                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-                            intent.putExtra("CHAT_ID", handle);
-                            startActivity(intent);
-                            finish();
-                        }
+                        showSnackbarSentAsMessage(request.getChatHandle(), getString(R.string.sent_as_message));
                     }
                     else{
-                        showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+                        showSnackbarSentAsMessage(-1, getString(R.string.sent_as_message));
                     }
                 }
                 else if(errorSent==countChat){
                     showSnackbar(getString(R.string.error_attaching_node_from_cloud));
                 }
                 else{
-                    showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+                    showSnackbarSentAsMessage(-1, getString(R.string.error_sent_as_message));
                 }
             }
         }
@@ -3320,6 +3311,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
 	}
+
+    public void showSnackbarSentAsMessage (long idChat, String s) {
+        log("showSnackbarSentAsMessage");
+        Snackbar mySnackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
+        mySnackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
+        mySnackbar.show();
+    }
 
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){

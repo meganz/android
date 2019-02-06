@@ -2319,6 +2319,7 @@
     <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created correctly</string>
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparing files</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as message.</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">The file has not been sent to any of the selected chats</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">Delete file versions</string>

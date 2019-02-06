@@ -19,10 +19,18 @@ import mega.privacy.android.app.utils.Constants;
 public class SnackbarNavigateOption implements View.OnClickListener{
 
     Context context;
+    long idChat;
+    boolean isSentAsMessageSnackbar = false;
 
     public SnackbarNavigateOption(Context context) {
 
         this.context=context;
+    }
+
+    public SnackbarNavigateOption(Context context, long idChat) {
+        this.context = context;
+        this.idChat = idChat;
+        isSentAsMessageSnackbar = true;
     }
 
     @Override
@@ -30,28 +38,63 @@ public class SnackbarNavigateOption implements View.OnClickListener{
         //Intent to Settings
 
         if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop)context).moveToSettingsSectionStorage();
+            if (isSentAsMessageSnackbar) {
+                ((ManagerActivityLollipop) context).moveToChatSection(idChat);
+            }
+            else {
+                ((ManagerActivityLollipop) context).moveToSettingsSectionStorage();
+            }
         }
         else if(context instanceof FullScreenImageViewerLollipop){
-            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
-            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
-            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            ((FullScreenImageViewerLollipop)context).startActivity(settingIntent);
-            ((FullScreenImageViewerLollipop)context).finish();
+            if (isSentAsMessageSnackbar) {
+                Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("CHAT_ID", idChat);
+                ((FullScreenImageViewerLollipop)context).startActivity(intent);
+                ((FullScreenImageViewerLollipop)context).finish();
+            }
+            else{
+                Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+                settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
+                settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                ((FullScreenImageViewerLollipop)context).startActivity(settingIntent);
+                ((FullScreenImageViewerLollipop)context).finish();
+            }
         }
         else if(context instanceof PdfViewerActivityLollipop){
-            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
-            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
-            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            ((PdfViewerActivityLollipop)context).startActivity(settingIntent);
-            ((PdfViewerActivityLollipop)context).finish();
+            if (isSentAsMessageSnackbar) {
+                Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("CHAT_ID", idChat);
+                ((PdfViewerActivityLollipop)context).startActivity(intent);
+                ((PdfViewerActivityLollipop)context).finish();
+            }
+            else{
+                Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+                settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
+                settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                ((PdfViewerActivityLollipop)context).startActivity(settingIntent);
+                ((PdfViewerActivityLollipop)context).finish();
+            }
         }
         else if(context instanceof AudioVideoPlayerLollipop){
-            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
-            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
-            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            ((AudioVideoPlayerLollipop)context).startActivity(settingIntent);
-            ((AudioVideoPlayerLollipop)context).finish();
+            if (isSentAsMessageSnackbar) {
+                Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("CHAT_ID", idChat);
+                ((AudioVideoPlayerLollipop)context).startActivity(intent);
+                ((AudioVideoPlayerLollipop)context).finish();
+            }
+            else{
+                Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+                settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
+                settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                ((AudioVideoPlayerLollipop)context).startActivity(settingIntent);
+                ((AudioVideoPlayerLollipop)context).finish();
+            }
         }
         else if(context instanceof FolderLinkActivityLollipop){
             Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
@@ -66,11 +109,21 @@ public class SnackbarNavigateOption implements View.OnClickListener{
             ((FileLinkActivityLollipop)context).startActivity(settingIntent);
         }
         else if(context instanceof FileInfoActivityLollipop){
-            Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
-            settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
-            settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            ((FileInfoActivityLollipop)context).startActivity(settingIntent);
-            ((FileInfoActivityLollipop)context).finish();
+            if (isSentAsMessageSnackbar) {
+                Intent intent = new Intent(context, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("CHAT_ID", idChat);
+                ((FileInfoActivityLollipop)context).startActivity(intent);
+                ((FileInfoActivityLollipop)context).finish();
+            }
+            else{
+                Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
+                settingIntent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
+                settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                ((FileInfoActivityLollipop)context).startActivity(settingIntent);
+                ((FileInfoActivityLollipop)context).finish();
+            }
         }
         else if(context instanceof ContactFileListActivityLollipop){
             Intent settingIntent = new Intent(context, ManagerActivityLollipop.class);
