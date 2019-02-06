@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -46,6 +47,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -291,6 +293,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		moveToTrashIcon = menu.findItem(R.id.full_image_viewer_move_to_trash);
 		removeIcon = menu.findItem(R.id.full_image_viewer_remove);
 		chatIcon = menu.findItem(R.id.full_image_viewer_chat);
+		chatIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
@@ -901,11 +904,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.full_image_viewer_not_preview));
 			}
 		}
 		else{
-			Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.full_image_viewer_not_preview));
 		}
 	}
 
@@ -2296,7 +2299,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 
 		if(!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -2364,7 +2367,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -2492,10 +2495,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_correctly_renamed));
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_no_renamed));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -2528,18 +2531,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_no_moved));
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_correctly_moved));
 					finish();
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_no_moved));
 				}
 				log("move nodes request finished");
 			}
@@ -2553,12 +2556,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						statusDialog.dismiss();
 					}
 					catch (Exception ex) {}
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_correctly_removed));
 				}
 				finish();
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_no_removed));
 			}
 			log("remove request finished");
 		}
@@ -2578,7 +2581,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 				else {
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_correctly_copied));
 				}
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -2597,7 +2600,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_no_copied));
 			}
 			sendToChat = false;
 			log("copy nodes request finished");
@@ -2726,7 +2729,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -2754,7 +2757,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -2784,7 +2787,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("cN == null, i = " + i + " of " + copyHandles.length);
 					try {
 						statusDialog.dismiss();
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+						showSnackbar(getString(R.string.context_no_copied));
 					}
 					catch (Exception ex) {}
 				}
@@ -2840,6 +2843,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -2848,6 +2856,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");
 		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
 		mySnackbar.show();
 	}

@@ -110,6 +110,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
+
         display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_chat_explorer);
@@ -299,6 +300,11 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();

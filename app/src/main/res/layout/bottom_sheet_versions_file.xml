@@ -87,6 +87,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
         android:background="@color/sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -189,10 +190,10 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:tint="@color/destructive_items"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
@@ -204,7 +205,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/delete_button"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/destructive_items"
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>

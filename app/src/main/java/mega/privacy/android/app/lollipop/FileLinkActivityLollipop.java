@@ -400,7 +400,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 		if(!Util.isOnline(this))
 		{
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -591,7 +591,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					dialog.show();
 				}
 				catch(Exception ex){
-					Snackbar.make(fragmentContainer, getString(R.string.general_error_file_not_found), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.general_error_file_not_found));
 				}
 
 				return;
@@ -645,7 +645,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else
 				{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_no_copied));
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 			        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 			        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -872,7 +872,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				;
 
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -913,6 +913,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	public void showSnackbar(String s){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -921,6 +926,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");
 		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
 		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
 		mySnackbar.show();
 	}

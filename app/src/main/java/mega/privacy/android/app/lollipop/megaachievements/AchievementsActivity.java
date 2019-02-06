@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,6 +67,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     ArrayList<String> pendingContacts;
     boolean pendingAttaches = false;
 
+    DisplayMetrics outMetrics;
+
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
 		super.onCreate(savedInstanceState);
@@ -96,6 +101,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 return;
             }
         }
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_achievements);
 
@@ -275,7 +284,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 }
             }
             else{
-                Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
+                showSnackbar(getString(R.string.cancel_subscription_error));
             }
         }
         else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
@@ -370,6 +379,11 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     public void showSnackbar(String s){
         log("showSnackbar");
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();

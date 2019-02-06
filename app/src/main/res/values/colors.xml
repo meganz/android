@@ -183,4 +183,5 @@
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
 
+    <color name="destructive_items">#FFF30C14</color>
 </resources>

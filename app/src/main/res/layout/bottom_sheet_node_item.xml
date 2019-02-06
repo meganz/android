@@ -37,20 +37,45 @@
             android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/node_relative_layout_thumb">
 
-            <TextView
-                android:id="@+id/node_name_text"
+            <RelativeLayout
+                android:id="@+id/node_name_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:maxLines="1"
-                android:ellipsize="middle"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/node_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:ellipsize="middle"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+
+                <RelativeLayout
+                    android:id="@+id/node_relative_layout_icon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/node_name_text">
+
+                    <ImageView
+                        android:id="@+id/node_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.35"
+                        android:background="@null"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/node_name_text">
+                android:layout_below="@+id/node_name_layout">
 
                 <ImageView
                     android:id="@+id/node_info_versions_icon"
@@ -77,30 +102,12 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/node_relative_layout_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="47dp"
-            android:gravity="right"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/node_relative_layout_info">
-
-            <ImageView
-                android:id="@+id/node_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.35"
-                android:background="@null"/>
-
-        </RelativeLayout>
-
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
         android:background="@color/sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -328,7 +335,8 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_send_to_contact"
+                    android:alpha="0.54"
+                    android:src="@drawable/ic_send_to_contact"
                     android:visibility="visible" />
 
                 <TextView
@@ -658,10 +666,10 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:tint="@color/destructive_items"
                     android:src="@drawable/ic_rubbish_bin"
                     android:visibility="visible" />
 
@@ -673,7 +681,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/destructive_items"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -689,10 +697,10 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:tint="@color/destructive_items"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
@@ -704,7 +712,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_remove"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/destructive_items"
                     android:textSize="16sp"/>
             </LinearLayout>
 

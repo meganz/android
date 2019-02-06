@@ -305,6 +305,9 @@ public class NodeController {
         else if (context instanceof AudioVideoPlayerLollipop){
             ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+        else if (context instanceof FileInfoActivityLollipop) {
+            ((FileInfoActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
     }
 
     public boolean nodeComesFromIncoming (MegaNode node) {

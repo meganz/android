@@ -153,7 +153,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-		createFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 		startConversation = menu.findItem(R.id.cab_menu_new_chat);
 		startConversation.setVisible(false);
 
@@ -375,7 +374,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				megaApi.createFolder(title, parentNode, this);
 			}
 			else{
-				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_folder_already_exists));
 			}
 		}
 		else{
@@ -405,7 +404,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					megaApi.createFolder(title, parentNode, this);
 				}
 				else{
-					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_folder_already_exists));
 				}
 			}
 			else{
@@ -479,9 +478,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-		}
+
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
@@ -1714,6 +1712,18 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	public void showSnackbar(String s, View view){
 		log("showSnackbar");
 		Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		if (view instanceof CoordinatorLayout) {
+			final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+			params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+			snackbarLayout.setLayoutParams(params);
+		}
+		else {
+			final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+			params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+			snackbarLayout.setLayoutParams(params);
+		}
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
@@ -1928,6 +1938,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");
 		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
 		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
 		mySnackbar.show();
 	}

@@ -319,6 +319,8 @@ public class InboxFragmentLollipop extends Fragment{
 			boolean showLink = false;
 			boolean showTrash = false;
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			if (selected.size() != 0) {
