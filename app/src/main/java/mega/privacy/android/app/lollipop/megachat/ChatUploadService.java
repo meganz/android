@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -103,7 +104,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	int totalVideos = 0;
 	int totalUploadsCompleted = 0;
 	int totalUploads = 0;
-//	int currentPercentageDownsampling = 0;
 
 	MegaNode parentNode;
 
@@ -241,7 +241,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
 			if (intent.getBooleanExtra(EXTRA_COMES_FROM_FILE_EXPLORER, false)) {
-				ArrayList<String> fileFingerPrints = intent.getStringArrayListExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
+				HashMap<String, String> fileFingerprints = (HashMap<String, String>) intent.getSerializableExtra(EXTRA_UPLOAD_FILES_FINGERPRINTS);
 				long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
 				long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);
 				long[] idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS);
@@ -249,14 +249,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				if (attachFiles!=null && attachFiles.length>0 && idChats!=null && idChats.length>0) {
 					for (int i=0; i<attachFiles.length; i++) {
 						for (int j=0; j<idChats.length; j++) {
+							requestSent++;
 							megaChatApi.attachNode(idChats[j], attachFiles[i], this);
 						}
 					}
 				}
 
-				if (idPendMsgs!=null && idPendMsgs.length>0 && fileFingerPrints!=null && !fileFingerPrints.isEmpty()) {
-					for (String fingerprint : fileFingerPrints) {
-						if (fingerprint != null) {
+				if (idPendMsgs!=null && idPendMsgs.length>0 && fileFingerprints!=null && !fileFingerprints.isEmpty()) {
+					for (Map.Entry<String, String> entry : fileFingerprints.entrySet()) {
+						if (entry != null) {
+							String fingerprint = entry.getKey();
+							String path = entry.getValue();
+
+							if (fingerprint == null || path == null) {
+								log("Error, fingerprint: "+ fingerprint+" path: "+path);
+								continue;
+							}
+
 							totalUploads++;
 
 							if(!wl.isHeld()){
@@ -271,7 +280,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								PendingMessageSingle pendingMsg = null;
 								if (idPendMsgs[i] != -1) {
 									pendingMsg = dbH.findPendingMessageById(idPendMsgs[i]);
-									if (pendingMsg != null && pendingMsg.getChatId() != -1) {
+//									One transfer for file --> onTransferFinish() attach to all selected chats
+									if (pendingMsg != null && pendingMsg.getChatId() != -1 && path.equals(pendingMsg.getFilePath()) && fingerprint.equals(pendingMsg.getFingerprint())) {
 										pendingMessageSingles.add(pendingMsg);
 									}
 								}
@@ -617,6 +627,16 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if(success){
 			mapVideoDownsampling.put(returnedFile, 100);
 			downFile = new File(returnedFile);
+
+			for(int i=0; i<pendingMessages.size();i++){
+				PendingMessageSingle pendMsg = pendingMessages.get(i);
+				if(pendMsg.getVideoDownSampled()!=null && pendMsg.getVideoDownSampled().equals(returnedFile)){
+					String fingerPrint = megaApi.getFingerprint(returnedFile);
+					if (fingerPrint != null) {
+						pendMsg.setFingerprint(fingerPrint);
+					}
+				}
+			}
 		}
 		else{
 			mapVideoDownsampling.remove(returnedFile);

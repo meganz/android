@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -84,6 +85,8 @@ public class ChatExplorerFragment extends Fragment {
     ImageView emptyImageView;
     int chatStatus;
     Button inviteButton;
+    RelativeLayout contentLayout;
+    ProgressBar progressBar;
 
     boolean chatEnabled = true;
     float density;
@@ -146,6 +149,9 @@ public class ChatExplorerFragment extends Fragment {
         density = getResources().getDisplayMetrics().density;
 
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
+
+        contentLayout = (RelativeLayout) v.findViewById(R.id.content_layout_chat_explorer);
+        progressBar = (ProgressBar) v.findViewById(R.id.progressbar_chat_explorer);
 
         addLayout = (AppBarLayout) v.findViewById(R.id.linear_layout_add);
         addedList = (RecyclerView) v.findViewById(R.id.contact_adds_recycler_view);
@@ -333,6 +339,8 @@ public class ChatExplorerFragment extends Fragment {
     public void setChats(){
         log("setChats");
 
+        contentLayout.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
         new RecoverItemsTask().execute();
     }
 
@@ -841,7 +849,8 @@ public class ChatExplorerFragment extends Fragment {
             else if (context instanceof FileExplorerActivityLollipop) {
                 ((FileExplorerActivityLollipop) context).isPendingToOpenSearchView();
             }
-
+            contentLayout.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
             setListVisibility();
         }
     }

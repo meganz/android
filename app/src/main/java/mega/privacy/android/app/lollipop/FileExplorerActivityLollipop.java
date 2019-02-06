@@ -239,6 +239,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	String querySearch = "";
 	boolean isSearchExpanded = false;
 	boolean pendingToOpenSearchView = false;
+	int pendingToAttach = 0;
+	int totalAttached = 0;
+	int totalErrors = 0;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -266,6 +269,24 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish.");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+		}
+		else if (request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+			log("Attach file request finish.");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				totalAttached++;
+			}
+			else{
+				totalErrors++;
+			}
+			if (totalAttached+totalErrors == pendingToAttach) {
+				if (totalErrors == 0) {
+					showSnackbar(getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10));
+				}
+				else {
+					showSnackbar(getString(R.string.files_send_to_chat_error));
+				}
+				finishFileExplorer();
+			}
 		}
 	}
 
@@ -360,6 +381,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatExplorerFragment");
 			querySearch = savedInstanceState.getString("querySearch", "");
 			isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
+			pendingToAttach = savedInstanceState.getInt("pendingToAttach", 0);
+			totalAttached = savedInstanceState.getInt("totalAttached", 0);
+			totalErrors = savedInstanceState.getInt("totalErrors", 0);
 
 			if (isSearchExpanded) {
 				pendingToOpenSearchView = true;
@@ -373,6 +397,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			importFileF = false;
 			importFragmentSelected = -1;
 			action = null;
+			pendingToAttach = 0;
+			totalAttached = 0;
+			totalErrors = 0;
 		}
 
 		fileExplorerActivityLollipop = this;
@@ -1509,6 +1536,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		bundle.putString("querySearch", querySearch);
 		bundle.putBoolean("isSearchExpanded", isSearchExpanded);
+		bundle.putInt("pendingToAttach", pendingToAttach);
+		bundle.putInt("totalAttached", totalAttached);
+		bundle.putInt("totalErrors", totalErrors);
 	}
 	
 	@Override
@@ -1630,7 +1660,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	long createPendingMessageDBH (long idChat, long timestamp, String fingerprint, ShareInfo info) {
-		log("Id chat: "+idChat);
+		log("createPendingMessageDBH Id chat: "+idChat+" Fingerprint: "+fingerprint);
 		PendingMessageSingle pMsgSingle = new PendingMessageSingle();
 		pMsgSingle.setChatId(idChat);
 		pMsgSingle.setUploadTimestamp(timestamp);
@@ -1659,10 +1689,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		if (chatListItems != null && !chatListItems.isEmpty()) {
 			long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
-			ArrayList<String> filesToUploadFingerPrint = new ArrayList<>();
+			HashMap<String, String> filesToUploadFingerPrint= new HashMap<>();
 			if (attachNodes != null && !attachNodes.isEmpty()) {
 //			There are exists files
-				if (attachNodes.size() < filePreparedInfos.size()) {
+				if (uploadInfos != null && uploadInfos.size() > 0) {
 //					There are exist files and files for upload
 					attachNodeHandles = new long[attachNodes.size()];
 					for (int i=0; i<attachNodes.size(); i++) {
@@ -1680,7 +1710,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					for (ShareInfo info : uploadInfos) {
 						long timestamp = System.currentTimeMillis()/1000;
 						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-						filesToUploadFingerPrint.add(fingerprint);
+						filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
 						for(MegaChatRoom item : chatListItems){
 							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
 							pos++;
@@ -1690,15 +1720,18 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
 					startService(intent);
+
+					finishFileExplorer();
 				}
 				else {
 //					All files exists, not necessary start ChatUploadService
+					pendingToAttach = attachNodes.size() * chatListItems.size();
 					for (MegaNode node : attachNodes) {
 						for (MegaChatRoom item : chatListItems) {
 							megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
 						}
 					}
-//					Mostrar snackbar
+//					Show snackbar
 				}
 			}
 			else {
@@ -1707,7 +1740,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				for (ShareInfo info : filePreparedInfos) {
 					long timestamp = System.currentTimeMillis()/1000;
 					String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-					filesToUploadFingerPrint.add(fingerprint);
+					if (fingerprint == null) {
+						log("Error, fingerprint == NULL is not possible to access file for some reason");
+						continue;
+					}
+					filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
 					for(MegaChatRoom item : chatListItems){
 						idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
 						pos++;
@@ -1717,6 +1754,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
 				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
 				startService(intent);
+
+				finishFileExplorer();
 			}
 		}
 		else{
@@ -1724,7 +1763,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("ERROR null files to upload");
 			finishActivity();
 		}
+	}
 
+	void finishFileExplorer () {
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -2473,13 +2514,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
 				if (node != null) {
 					attachNodes.add(node);
-					if (filesChecked == filePreparedInfos.size()) {
-						startChatUploadService();
-					}
 				}
 			}
 			else {
 				log("Error copying node into My Chat Files");
+			}
+			if (filesChecked == filePreparedInfos.size()) {
+				startChatUploadService();
 			}
 		}
 	}

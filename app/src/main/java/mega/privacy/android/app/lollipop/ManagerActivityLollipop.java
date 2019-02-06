@@ -14195,44 +14195,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(countChat==1){
 			if(nodeHandles.length==1){
 				listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
-			}
-			else{
-				listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
-			}
-		}
-		else{
-
-			if(nodeHandles.length==1){
-				listener = new MultipleAttachChatListener(this, -1, false, counter);
-			}
-			else{
-				listener = new MultipleAttachChatListener(this, -1, true, counter);
-			}
-		}
-		if(countChat==1){
-
-			if(nodeHandles.length==1){
-				//One chat, one file
 				megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
 			}
 			else{
-				//One chat, many files
+				listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
 				for(int i=0;i<nodeHandles.length;i++){
 					megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
 				}
 			}
 		}
-		else if(countChat>1){
-
+		else{
 			if(nodeHandles.length==1){
-				//Many chats, one file
+				listener = new MultipleAttachChatListener(this, -1, false, counter);
 				for(int i=0;i<chatHandles.length;i++){
 					megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
 				}
-
 			}
 			else{
-				//Many chat, many files
+				listener = new MultipleAttachChatListener(this, -1, true, counter);
 				for(int i=0;i<chatHandles.length;i++){
 					for(int j=0;j<nodeHandles.length;j++){
 						megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
@@ -14276,17 +14256,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(chats.size()==1){
 			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
+			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
 		}
 		else{
 			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
-		}
-
-		if(chats.size()==1){
-			//One chat, one file
-			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-		}
-		else if(chats.size()>1){
-			//Many chats, one file
 			for(int i=0;i<chats.size();i++){
 				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
 			}

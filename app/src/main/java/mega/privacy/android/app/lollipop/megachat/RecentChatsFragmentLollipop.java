@@ -971,7 +971,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             log("open chat: position: "+position+" chatID: "+chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
+//            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
+            intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivityLollipop) {
                 if (((ManagerActivityLollipop) context).searchQuery != null  && !((ManagerActivityLollipop) context).searchQuery.isEmpty()) {
