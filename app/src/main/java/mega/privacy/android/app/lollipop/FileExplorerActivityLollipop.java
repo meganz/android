@@ -280,8 +280,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				totalErrors++;
 			}
 			if (totalAttached+totalErrors == pendingToAttach) {
-				if (totalErrors == 0) {
-					showSnackbar(getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10));
+				if (totalErrors == 0 || totalAttached > 0) {
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.setAction(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
+					if (chatListItems.size() == 1) {
+						intent.putExtra("CHAT_ID", chatListItems.get(0).getChatId());
+					}
+					startActivity(intent);
 				}
 				else {
 					showSnackbar(getString(R.string.files_send_to_chat_error));
@@ -346,19 +352,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		log("onConfigurationChanged");
-		super.onConfigurationChanged(newConfig);
-
-		// Checks the orientation of the screen
-//		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//
-//		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-//
-//		}
 	}
 	
 	@Override
@@ -1732,7 +1725,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
 						}
 					}
-//					Show snackbar
 				}
 			}
 			else {

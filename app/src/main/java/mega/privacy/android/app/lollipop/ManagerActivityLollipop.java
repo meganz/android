@@ -2396,6 +2396,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						finish();
 						return;
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
+						startActivity(intent);
+						finish();
+						return;
+					}
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -2731,6 +2740,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
 						update2FASetting();
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
+						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						showSnackbarSentAsMessage(chatId);
+						getIntent().setAction(null);
+						setIntent(null);
 					}
 				}
 	        }
@@ -3487,6 +3502,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
 					actionOpenFolder(handleIntent);
 					selectDrawerItemLollipop(drawerItem);
+				}
+				else if(getIntent().getAction().equals(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
+					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					showSnackbarSentAsMessage(chatId);
 				}
 
     			intent.setAction(null);
@@ -5955,6 +5974,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		openSettingsQR = true;
 		drawerItem=DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
+	}
+
+	public void moveToChatSection (long idChat) {
+		if (idChat != -1) {
+			Intent intent = new Intent(this, ChatActivityLollipop.class);
+			intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+			intent.putExtra("CHAT_ID", idChat);
+			this.startActivity(intent);
+		}
+    	drawerItem = DrawerItem.CHAT;
+    	selectDrawerItemChat();
 	}
 
 	private void getOverflowMenu() {
@@ -9642,6 +9672,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
 		return true;
+	}
+
+	public void showSnackbarSentAsMessage (long idChat) {
+		log("showSnackbarSentAsMessage");
+		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
+		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+		snackbarLayout.setLayoutParams(params);
+		mySnackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
+		mySnackbar.show();
 	}
 
 	public void showSnackbar(String s){
