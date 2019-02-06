@@ -33,6 +33,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -677,6 +678,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 showError(getString(R.string.verify_account_error_phone_number_register));
             } else if (e.getErrorCode() == MegaError.API_OK) {
                 log("verification successful");
+                Toast.makeText(this,R.string.verify_account_successfully,Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 setResult(RESULT_OK);

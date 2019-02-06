@@ -196,6 +196,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -2858,7 +2859,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		else{
 						firstLogin = getIntent().getBooleanExtra("firstLogin", firstLogin);
                         shouldShowSMSDialog = getIntent().getBooleanExtra("shouldShowSMSDialog", shouldShowSMSDialog);
-						if (firstLogin){
+						getIntent().removeExtra("shouldShowSMSDialog");
+                        if (firstLogin){
 							log("intent firstLogin==true");
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
@@ -2878,7 +2880,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     getIntent().removeExtra("upgradeAccount");
 					firstLogin = intentRec.getBooleanExtra("firstLogin", firstLogin);
                     shouldShowSMSDialog = intentRec.getBooleanExtra("shouldShowSMSDialog", shouldShowSMSDialog);
-					if(upgradeAccount){
+					intentRec.removeExtra("shouldShowSMSDialog");
+                    if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 
@@ -4356,9 +4359,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             dbH.setFirstTime(false);
 		}
 
-        //This account hasn't verified a phone number and newly registers.
+        //This account hasn't verified a phone number and first login.
+        TL.log(this,"@#@" , "shouldShowSMSDialog: " + shouldShowSMSDialog);
         if (megaApi.smsVerifiedPhoneNumber() == null && shouldShowSMSDialog) {
-            shouldShowSMSDialog = false;
             showSMSVerificationDialog();
         }
     }
@@ -14723,6 +14726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showSMSVerificationDialog() {
 	    log("showSMSVerificationDialog");
+        shouldShowSMSDialog = false;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
