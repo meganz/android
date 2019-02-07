@@ -155,6 +155,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                     titlePhoneNumber.setTextColor(Color.parseColor("#FF00BFA5"));
                     titlePhoneNumber.setVisibility(View.VISIBLE);
                 } else {
+                    phoneNumberInput.setHint(R.string.verify_account_phone_number_placeholder);
                     titlePhoneNumber.setVisibility(View.GONE);
                 }
             }
@@ -263,6 +264,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         if(phoneNumber != null){
             isPhoneNumberValid = true;
         }else{
+            phoneNumberInput.setHint("");
             isPhoneNumberValid = false;
         }
         
@@ -277,6 +279,11 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     private void showCountryCodeValidationError() {
         if (!isSelectedCountryValid) {
+            if(selectedDialCode == null) {
+                selectedCountry.setText("");
+            } else {
+                selectedCountry.setText(R.string.verify_account_counry_label);
+            }
             log("show invalid country error");
             errorInvalidCountryCode.setVisibility(View.VISIBLE);
             titleCountryCode.setVisibility(View.VISIBLE);
@@ -316,7 +323,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
             log(" RequestTxt phone number is " + phoneNumber);
             shouldDisableNextButton = true;
-            megaApi.sendSMSVerificationCode(phoneNumber,this);
+            megaApi.sendSMSVerificationCode(phoneNumber,this,true);
         }
     }
     
