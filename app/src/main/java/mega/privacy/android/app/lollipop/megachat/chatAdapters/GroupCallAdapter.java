@@ -408,6 +408,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 peer.setListener(listenerPeer);
 
                 if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+
                     megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
                 } else {
                     megaChatApi.addChatRemoteVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
@@ -551,8 +552,11 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             holder.surfaceMicroLayout.setVisibility(GONE);
             if(peer.getListener() != null){
                 if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+                    log("******onBindViewHolderGrid: MY removeChatVideoListener");
                     megaChatApi.removeChatVideoListener(chatId, -1, -1, peer.getListener());
                 }else{
+                    log("******onBindViewHolderGrid: "+peer.getName()+" removeChatVideoListener");
+
                     megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
                 }
                 if(holder.parentSurfaceView.getChildCount() == 0){
@@ -1078,7 +1082,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     }
 
     public void onDestroy(){
-        log("onDestroy()");
+        log("******** onDestroy()");
         ViewHolderGroupCall holder = null;
         for(int i=0; i<peers.size(); i++){
             if(holder == null){
@@ -1093,8 +1097,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 //Remove SurfaceView && Listener:
                 if(peer.getListener() != null){
                     if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+                        log("******** onDestroy() -(me) removeChatVideoListener");
+
                         megaChatApi.removeChatVideoListener(chatId, -1, -1, peer.getListener());
                     }else{
+                        log("******** onDestroy() - removeChatVideoListener");
+
                         megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
                     }
                     if(holder.parentSurfaceView.getChildCount() == 0){
@@ -1124,11 +1132,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
         }
 
-
     }
-
-
-
 
     public ArrayList<InfoPeerGroupCall> getPeers() {
         return peers;

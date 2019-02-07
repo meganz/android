@@ -1701,7 +1701,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     public void onDestroy(){
-        log("onDestroy");
+        log("****** onDestroy");
 
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
@@ -1734,6 +1734,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         if (bigCameraGroupCallFragment != null) {
+            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
@@ -1779,6 +1780,55 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             customHandler.removeCallbacksAndMessages(null);
         }
         clearHandlers();
+
+        if (localCameraFragment != null) {
+            localCameraFragment.removeSurfaceView();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.remove(localCameraFragment);
+            localCameraFragment = null;
+        }
+
+        if (localCameraFragmentFS != null) {
+            localCameraFragmentFS.removeSurfaceView();
+            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+            ftFS.remove(localCameraFragmentFS);
+            localCameraFragmentFS = null;
+        }
+        if (remoteCameraFragmentFS != null) {
+            remoteCameraFragmentFS.removeSurfaceView();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.remove(remoteCameraFragmentFS);
+            remoteCameraFragmentFS = null;
+        }
+
+        if (bigCameraGroupCallFragment != null) {
+            bigCameraGroupCallFragment.removeSurfaceView();
+            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+            ftFS.remove(bigCameraGroupCallFragment);
+            bigCameraGroupCallFragment = null;
+        }
+
+        peerSelected = null;
+        if(adapterList!=null){
+            adapterList.updateMode(false);
+        }
+        isManualMode = false;
+
+        if(adapterGrid!=null){
+            adapterGrid.onDestroy();
+        }
+        if(adapterList!=null){
+            adapterList.onDestroy();
+        }
+
+        peersOnCall.clear();
+        peersBeforeCall.clear();
+
+        recyclerView.setAdapter(null);
+        bigRecyclerView.setAdapter(null);
+
+        stopAudioSignals();
+        mSensorManager.unregisterListener(this);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             super.finishAndRemoveTask();
@@ -3950,6 +4000,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     }
 
                     if (bigCameraGroupCallFragment != null) {
+                        bigCameraGroupCallFragment.removeSurfaceView();
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.remove(bigCameraGroupCallFragment);
                         bigCameraGroupCallFragment = null;
@@ -4335,6 +4386,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 //First time:
                 //Remove Camera element, because with incoming, avatar is the only showed
                 if (bigCameraGroupCallFragment != null) {
+                    bigCameraGroupCallFragment.removeSurfaceView();
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(bigCameraGroupCallFragment);
                     bigCameraGroupCallFragment = null;
@@ -4359,6 +4411,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         log("createBigFragment()");
         //Remove big Camera
         if(bigCameraGroupCallFragment != null){
+            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;
@@ -4382,6 +4435,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         log("createBigAvatar()");
         //Remove big Camera
         if (bigCameraGroupCallFragment != null) {
+            bigCameraGroupCallFragment.removeSurfaceView();
             FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
             ftFS.remove(bigCameraGroupCallFragment);
             bigCameraGroupCallFragment = null;

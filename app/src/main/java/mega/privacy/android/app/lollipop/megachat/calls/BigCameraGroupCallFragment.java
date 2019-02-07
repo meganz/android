@@ -135,22 +135,27 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onDestroy(){
-        log("onDestroy");
+        log("***** onDestroy");
+        removeSurfaceView();
+        super.onDestroy();
+    }
+
+    public void removeSurfaceView(){
+        log("removeSurfaceView()");
         if(myTexture.getParent()!=null){
             if(myTexture.getParent().getParent()!=null){
-                log("onDestroy() removeView chatId: "+chatId);
+                log("removeSurfaceView() removeView chatId: "+chatId);
                 ((ViewGroup)myTexture.getParent()).removeView(myTexture);
             }
         }
         if((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))){
-            log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
+            log("****removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
             megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
         }else{
-            log("onDestroy() removeChatVideoListener chatId: "+chatId+" ( peerId = "+peerId+", clientId = "+cliendId+")");
+            log("*****removeSurfaceView() removeChatVideoListener chatId: "+chatId+" ( peerId = "+peerId+", clientId = "+cliendId+")");
             megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
 
         }
-        super.onDestroy();
     }
     @Override
     public void onResume() {
