@@ -196,7 +196,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -4360,7 +4359,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
         //This account hasn't verified a phone number and first login.
-        TL.log(this,"@#@" , "shouldShowSMSDialog: " + shouldShowSMSDialog);
         if (megaApi.smsVerifiedPhoneNumber() == null && shouldShowSMSDialog) {
             showSMSVerificationDialog();
         }
