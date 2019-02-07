@@ -384,10 +384,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								fOut.flush();
 								fOut.close();
 								log("DATA connection file compressed");
+								String fingerprint = megaApi.getFingerprint(outFile.getAbsolutePath());
 								for (PendingMessageSingle pendMsg : pendingMsgs) {
+									if (fingerprint != null) {
+										pendMsg.setFingerprint(fingerprint);
+									}
 									pendingMessages.add(pendMsg);
 								}
-								megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), true);
+								megaApi.startUploadWithTopPriority(outFile.getAbsolutePath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT+">"+pendingMsg.getId(), false);
 								log("DATA connection file uploading");
 							} catch (Exception e){
 								for (PendingMessageSingle pendMsg : pendingMsgs) {
