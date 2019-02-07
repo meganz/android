@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -28,6 +29,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.R;
@@ -174,6 +177,13 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
                 selectedCountries.add(country);
             }
         }
+        Collections.sort(selectedCountries,new Comparator<Country>() {
+        
+            @Override
+            public int compare(Country o1,Country o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
         adapter.refresh(selectedCountries);
     }
 
@@ -210,6 +220,13 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
                 e.printStackTrace();
             }
         }
+        Collections.sort(countries,new Comparator<Country>() {
+            
+            @Override
+            public int compare(Country o1,Country o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
         return countries;
     }
 
@@ -233,18 +250,21 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     public class Country {
 
-        private String name;
-        private String countryCode;
-        private String code;
+        private String name = "";
+        private String countryCode = "";
+        private String code = "";
+        private Context context;
+        private final String prefix = "country_";
 
         public Country() {
 
         }
 
         public Country(String name,String code,String countryCode) {
-            this.name = name;
+            this.context = getApplicationContext();
             this.code = code;
             this.countryCode = countryCode;
+            this.name = getTranslatableCountryName(countryCode, name);
         }
 
         public String getName() {
@@ -252,7 +272,16 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         }
 
         public void setName(String name) {
-            this.name = name;
+            this.name = getTranslatableCountryName(this.countryCode,name);
+        }
+        
+        public String getTranslatableCountryName(String countryCode,String name){
+            int stringId = context.getResources().getIdentifier(prefix + countryCode.toLowerCase(), "string", context.getPackageName());
+            if(stringId > 0){
+                return context.getString(stringId);
+            }else{
+                return name;
+            }
         }
 
         public String getCode() {
