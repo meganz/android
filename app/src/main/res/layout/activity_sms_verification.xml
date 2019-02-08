@@ -114,7 +114,7 @@
 			          android:layout_toRightOf="@+id/verify_account_phone_icon"
 			          android:background="@null"
 			          android:hint="@string/verify_account_phone_number_placeholder"
-			          android:inputType="number"
+			          android:inputType="phone"
 			          android:maxLength="20"
 			          android:maxLines="1"
 			          android:textColorHint="#8A000000"

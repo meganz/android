@@ -1,18 +1,13 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 

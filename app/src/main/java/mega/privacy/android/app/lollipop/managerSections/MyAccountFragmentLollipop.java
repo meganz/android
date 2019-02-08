@@ -677,7 +677,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 					else{
 						staging = false;
-						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+                        megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 						if (dbH != null){
 							dbH.setStaging(false);
 						}
