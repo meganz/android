@@ -1701,7 +1701,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     public void onDestroy(){
-        log("****** onDestroy");
+        log("onDestroy");
 
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
@@ -3974,8 +3974,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-//        int totalVideoParticipantsAllowed = megaChatApi.getMaxVideoCallParticipants();
-        int totalVideoParticipantsAllowed = 6;
+        int totalVideoParticipantsAllowed = megaChatApi.getMaxVideoCallParticipants();
         participantText.setText(cont+"/"+totalVideoParticipantsAllowed);
         linearParticipants.setVisibility(View.VISIBLE);
     }

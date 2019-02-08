@@ -1928,8 +1928,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-			}
-			else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
+
+			}else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
 				String messageContent = chat.getLastMessage();
 
 				char separator = 0x01;
