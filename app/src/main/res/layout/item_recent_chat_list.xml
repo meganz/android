@@ -62,10 +62,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/recent_chat_list_contact_state"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="17dp"
         android:layout_marginLeft="4dp"
-        android:background="@null"
-        android:src="@drawable/ic_g_call_started" />
+        android:background="@drawable/circle_call_ongoing"
+        android:src="@drawable/ic_call_ongoing" />
 
     <ImageView
         android:id="@+id/recent_chat_list_mute_icon"
