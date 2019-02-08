@@ -224,7 +224,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-        log("**** onSurfaceTextureDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
+        log("onSurfaceTextureDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
         bitmap = null;
         byteBuffer = null;
         surfaceWidth = 0;

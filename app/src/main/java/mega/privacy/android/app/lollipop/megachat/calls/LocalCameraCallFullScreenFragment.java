@@ -148,7 +148,6 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
             }
         }
         localFullScreenSurfaceView.setVisibility(View.GONE);
-        log("******removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
     }
 

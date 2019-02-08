@@ -2588,8 +2588,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
                         megaChatApi.startChatCall(idChat, false, this);
+
                     }else if((callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
-                        megaChatApi.answerChatCall(idChat, false, this);
+//                        megaChatApi.answerChatCall(idChat, false, this);
+                        Intent intent = new Intent(this, ChatCallActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("chatHandle", idChat);
+                        startActivity(intent);
+
                     }else{
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

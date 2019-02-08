@@ -164,7 +164,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        log("**** surfaceDestroyed():");
+        log("surfaceDestroyed():");
 
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
