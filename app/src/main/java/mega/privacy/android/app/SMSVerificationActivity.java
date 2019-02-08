@@ -313,6 +313,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private void RequestTxt() {
         log("RequestTxt shouldDisableNextButton is " + shouldDisableNextButton);
         if(!shouldDisableNextButton){
+            nextButton.setBackground(getDrawable(R.drawable.background_button_disable));
             String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
             log(" RequestTxt phone number is " + phoneNumber);
             shouldDisableNextButton = true;
@@ -337,6 +338,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         shouldDisableNextButton = false;
+        nextButton.setBackground(getDrawable(R.drawable.background_accent_button));
         nextButton.setTextColor(Color.WHITE);
         if (request.getType() == MegaRequest.TYPE_SEND_SMS_VERIFICATIONCODE) {
             log("send phone number,get code" + e.getErrorCode());
