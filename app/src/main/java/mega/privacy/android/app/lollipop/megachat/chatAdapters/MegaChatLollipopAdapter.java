@@ -39,7 +39,6 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -79,7 +78,6 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.RTFFormatter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -694,6 +692,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout mainContactMessageItemLocation;
         RoundedImageView previewContactLocation;
         RelativeLayout separatorPreviewContactLocation;
+        TextView pinnedContactLocationTitleText;
         RelativeLayout pinnedContactLocationLayout;
         TextView pinnedContactLocationInfoText;
 
@@ -1184,6 +1183,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.separatorPreviewContactLocation.getLayoutParams().width = 330;
             }
 
+            holder.pinnedContactLocationTitleText = (TextView) v.findViewById(R.id.contact_title_pinned_location);
             holder.pinnedContactLocationLayout = (RelativeLayout) v.findViewById(R.id.contact_pinned_location_layout);
             holder.pinnedContactLocationInfoText = (TextView) v.findViewById(R.id.contact_info_pinned_location);
 
@@ -3724,6 +3724,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
+            if (message.isEdited()) {
+                Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.pinnedLocationTitleText.setText(context.getString(R.string.title_geolocation_message)+" ");
+                holder.pinnedLocationTitleText.append(edited);
+            }
+            else {
+                holder.pinnedLocationTitleText.setText(context.getString(R.string.title_geolocation_message));
+            }
+
             holder.contactMessageLayout.setVisibility(View.GONE);
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
 
@@ -3859,6 +3871,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String location =Util.convertToDegrees(latitude, longitude);
 
             ((ViewHolderMessageChat) holder).pinnedContactLocationInfoText.setText(location);
+
+            if (message.isEdited()) {
+                Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
+                edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.pinnedContactLocationTitleText.setText(context.getString(R.string.title_geolocation_message)+" ");
+                holder.pinnedContactLocationTitleText.append(edited);
+            }
+            else {
+                holder.pinnedContactLocationTitleText.setText(context.getString(R.string.title_geolocation_message));
+            }
 
             if (bitmapImage != null) {
                 holder.previewContactLocation.setImageBitmap(bitmapImage);

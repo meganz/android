@@ -2014,6 +2014,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                         Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
+                        intent.putExtra("editingMessage", editingMessage);
+                        if (messageToEdit != null) {
+                            intent.putExtra("msg_id", messageToEdit.getMsgId());
+                        }
                         startActivityForResult(intent, Constants.REQUEST_CODE_SEND_LOCATION);
                     }
                 }
@@ -2262,6 +2266,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 double latitude = intent.getDoubleExtra("latitude", 0);
                 double longitude = intent.getDoubleExtra("longitude", 0);
+                editingMessage = intent.getBooleanExtra("editingMessage", false);
+                if (editingMessage) {
+                    long msgId = intent.getLongExtra("msg_id", -1);
+                    if (msgId != -1) {
+                        messageToEdit = megaChatApi.getMessage(idChat, msgId);
+                    }
+                }
                 String locationName = intent.getStringExtra("name");
                 String locationAddress = intent.getStringExtra("address");
 
@@ -2271,8 +2282,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 float longLatitude = (float)latitude;
 
-                log("Send location [longLatitude]: " + longLatitude + " [longLongitude]: " + longLongitude);
-                sendLocationMessage(longLongitude, longLatitude, encodedSnapshot);
+                if (editingMessage && messageToEdit != null) {
+                    log("editGeolocation tempId: "+ messageToEdit.getTempId()+" id: "+messageToEdit.getMsgId());
+                    if (messageToEdit.getTempId() != -1) {
+                        MegaChatMessage editedMsg = megaChatApi.editGeolocation(idChat, messageToEdit.getTempId(), longLongitude, longLatitude, encodedSnapshot);
+                        modifyLocationReceived(new AndroidMegaChatMessage(editedMsg), true);
+                    }
+                    else if (messageToEdit.getMsgId() != -1) {
+                        MegaChatMessage editedMsg = megaChatApi.editGeolocation(idChat, messageToEdit.getMsgId(), longLongitude, longLatitude, encodedSnapshot);
+                        modifyLocationReceived(new AndroidMegaChatMessage(editedMsg), false);
+                    }
+                    editingMessage = false;
+                    messageToEdit = null;
+                }
+                else {
+                    log("Send location [longLatitude]: " + longLatitude + " [longLongitude]: " + longLongitude);
+                    sendLocationMessage(longLongitude, longLatitude, encodedSnapshot);
+                }
             }
             else {
                 log("Send location bitmap null");
@@ -2897,6 +2923,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else {
             Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
+            intent.putExtra("editingMessage", editingMessage);
+            if (messageToEdit != null) {
+                intent.putExtra("msg_id", messageToEdit.getMsgId());
+            }
             startActivityForResult(intent, Constants.REQUEST_CODE_SEND_LOCATION);
         }
     }
@@ -3161,10 +3191,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                }
                 case R.id.chat_cab_menu_edit:{
                     log("Edit text");
+                    MegaChatMessage msg = messagesSelected.get(0).getMessage();
+                    MegaChatContainsMeta meta = msg.getContainsMeta();
                     editingMessage = true;
-                    messageToEdit = messagesSelected.get(0).getMessage();
-                    textChat.setText(messageToEdit.getContent());
-                    textChat.setSelection(textChat.getText().length());
+                    messageToEdit = msg;
+
+                    if (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META && meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                        sendLocation();
+                        clearSelections();
+                        hideMultipleSelect();
+                        actionMode.invalidate();
+                    }
+                    else {
+                        textChat.setText(messageToEdit.getContent());
+                        textChat.setSelection(textChat.getText().length());
+                    }
                     break;
                 }
                 case R.id.chat_cab_menu_forward:{
@@ -4046,10 +4087,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                                             startActivity(browserIntent);
                                         }else if (meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
-
+                                            String url = m.getMessage().getContent();
+                                            if (url != null) {
+                                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                                startActivity(browserIntent);
+                                            }
                                         }
                                     }else{
-
+                                        if (meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+                                            String url = m.getMessage().getContent();
+                                            if (url != null) {
+                                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                                startActivity(browserIntent);
+                                            }
+                                        }
                                     }
 
 
@@ -5067,8 +5118,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 checkMegaLink(msg);
 
+                if (msg.getContainsMeta() != null && msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
+                    log("onMessageUpdate CONTAINS_META_GEOLOCATION");
+                }
+
                 resultModify = modifyMessageReceived(androidMsg, false);
-                log("onMessageUpdate: resultModify: "+resultModify);
+                log("onMessageUpdate: resultModify: " + resultModify);
             }
         }
         else if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_STATUS)){
@@ -5405,6 +5460,126 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Error, id temp message not found!!");
         }
         return indexToChange;
+    }
+
+    public void modifyLocationReceived(AndroidMegaChatMessage editedMsg, boolean hasTempId){
+        log("modifyLocationReceived");
+        log("Edited Msg ID: "+editedMsg.getMessage().getMsgId()+" Old Msg ID: "+messageToEdit.getMsgId());
+        log("Edited Msg TEMP ID: "+editedMsg.getMessage().getTempId()+" Old Msg TEMP ID: "+messageToEdit.getTempId());
+        log("Edited Msg status: "+editedMsg.getMessage().getStatus()+" Old Msg status: "+messageToEdit.getStatus());
+        int indexToChange = -1;
+        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+
+        boolean editedMsgHasTempId = false;
+        if (editedMsg.getMessage().getTempId() != -1) {
+            editedMsgHasTempId = true;
+        }
+
+        // Iterate in reverse.
+        while(itr.hasPrevious()) {
+            AndroidMegaChatMessage messageToCheck = itr.previous();
+            log("Index: "+itr.nextIndex());
+
+            if(!messageToCheck.isUploading()){
+                log("Checking with Msg ID: "+messageToCheck.getMessage().getMsgId()+" and Msg TEMP ID: "+messageToCheck.getMessage().getTempId());
+                if (hasTempId) {
+                    if (editedMsgHasTempId && messageToCheck.getMessage().getTempId() == editedMsg.getMessage().getTempId()) {
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
+                    else if (!editedMsgHasTempId && messageToCheck.getMessage().getTempId() == editedMsg.getMessage().getMsgId()){
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
+                }
+                else {
+                    if (editedMsgHasTempId && messageToCheck.getMessage().getMsgId() == editedMsg.getMessage().getTempId()) {
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
+                    else if (!editedMsgHasTempId && messageToCheck.getMessage().getMsgId() == editedMsg.getMessage().getMsgId()){
+                        indexToChange = itr.nextIndex();
+                        break;
+                    }
+                }
+            }
+            else{
+                log("This message is uploading");
+            }
+        }
+
+        log("---------------Index to change = "+indexToChange);
+        if(indexToChange!=-1){
+            log("indexToChange == "+indexToChange);
+
+            AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
+            if(messageToUpdate.getMessage().getMsgIndex()==editedMsg.getMessage().getMsgIndex()){
+                log("modifyLocationReceived: The internal index not change");
+
+                if(editedMsg.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                    log("Modified a MANUAl SENDING msg");
+                    //Check the message to change is not the last one
+                    int lastI = messages.size()-1;
+                    if(indexToChange<lastI){
+                        //Check if there is already any MANUAL_SENDING in the queue
+                        AndroidMegaChatMessage previousMessage = messages.get(lastI);
+                        if(previousMessage.isUploading()){
+                            log("Previous message is uploading");
+                        }
+                        else{
+                            if(previousMessage.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+                                log("More MANUAL SENDING in queue");
+                                log("Removed index: "+indexToChange);
+                                messages.remove(indexToChange);
+                                appendMessageAnotherMS(editedMsg);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                    }
+                }
+
+                log("Modified message keep going");
+                messages.set(indexToChange, editedMsg);
+
+                //Update infoToShow also
+                if (indexToChange == 0) {
+                    messages.get(indexToChange).setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
+                    messages.get(indexToChange).setShowAvatar(true);
+                }
+                else{
+                    //Not first element
+                    adjustInfoToShow(indexToChange);
+                    setShowAvatar(indexToChange);
+
+                    //Create adapter
+                    if (adapter == null) {
+                        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                        adapter.setHasStableIds(true);
+                        listView.setAdapter(adapter);
+                    } else {
+                        adapter.modifyMessage(messages, indexToChange+1);
+                    }
+                }
+            }
+            else{
+                log("modifyLocationReceived: INDEX change, need to reorder");
+                messages.remove(indexToChange);
+                log("Removed index: "+indexToChange);
+                log("modifyLocationReceived: messages size: "+messages.size());
+                adapter.removeMessage(indexToChange+1, messages);
+                int scrollToP = appendMessagePosition(editedMsg);
+                if(scrollToP!=-1){
+                    if(editedMsg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
+                        mLayoutManager.scrollToPosition(scrollToP+1);
+                        //mLayoutManager.scrollToPositionWithOffset(scrollToP, Util.scaleHeightPx(20, outMetrics));
+                    }
+                }
+                log("modifyLocationReceived: messages size 2: "+messages.size());
+            }
+        }
+        else{
+            log("Error, id temp message not found!! indexToChange == -1");
+        }
     }
 
     public void loadBufferMessages(){

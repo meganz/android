@@ -582,6 +582,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                             intent.putExtra("name", name);
                             intent.putExtra("address", address);
                         }
+                        if (getIntent() !=  null) {
+                            intent.putExtra("editingMessage", getIntent().getBooleanExtra("editingMessage", false));
+                            intent.putExtra("msg_id", getIntent().getLongExtra("msg_id", -1));
+                        }
                         setResult(RESULT_OK, intent);
                         finish();
                     }
