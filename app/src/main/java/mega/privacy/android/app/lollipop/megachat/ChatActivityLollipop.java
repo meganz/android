@@ -1701,8 +1701,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }else {
                     int callsInProgress = megaChatApi.getNumCalls();
                     if(callsInProgress<=0){
-                        callMenuItem.setVisible(true);
-                        videoMenuItem.setVisible(true);
+                        callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
+                        videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                     }else{
                         callMenuItem.setVisible(false);
                         videoMenuItem.setVisible(false);

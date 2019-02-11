@@ -273,7 +273,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								megaChatApi.logout(this);
 							} else {
 								log("Chat correctly initialized");
-								megaChatApi.enableGroupChatCalls(true);
+								megaChatApi.enableGroupChatCalls(false);
 							}
 						}
 					}
