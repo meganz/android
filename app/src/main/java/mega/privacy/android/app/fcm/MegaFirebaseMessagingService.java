@@ -341,7 +341,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         megaChatApi.logout(this);
                     } else {
                         log("Chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
+                        megaChatApi.enableGroupChatCalls(false);
                     }
                 }
             }
