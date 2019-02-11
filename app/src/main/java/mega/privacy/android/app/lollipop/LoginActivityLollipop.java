@@ -584,6 +584,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             case Constants.LOGIN_FRAGMENT: {
                 if (loginFragment != null) {
                     valueReturn = loginFragment.onBackPressed();
+                    //While login, disable back.
+                    if(valueReturn == -1) {
+                        return;
+                    }
                 }
                 break;
             }

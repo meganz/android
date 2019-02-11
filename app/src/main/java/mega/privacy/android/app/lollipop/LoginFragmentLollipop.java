@@ -2892,10 +2892,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public int onBackPressed() {
         log("onBackPressed");
 
-        backWhileLogin = true;
+//        backWhileLogin = true;
 
-        if (loginClicked){
-            return 0;
+        //While login, disable the back.
+        if (loginClicked ||
+                loginProgressBar.getVisibility() == View.VISIBLE ||
+                loginFetchNodesProgressBar.getVisibility() == View.VISIBLE){
+            return -1;
         }
         else{
 
