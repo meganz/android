@@ -89,7 +89,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         if(MegaApplication.getOpenCallChatId()!=chatId){
             MegaApplication.setOpenCallChatId(chatId);
         }
-
         showCallInProgressNotification();
         return START_NOT_STICKY;
     }

@@ -1563,6 +1563,31 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    public void refreshNode(MegaChatListItem item){
+        log("refreshNode");
+        long chatHandleToUpdate = item.getChatId();
+        int indexToUpdate = -1;
+        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+        while (itrReplace.hasNext()) {
+            MegaChatListItem chat = itrReplace.next();
+            if(chat!=null){
+                if(chat.getChatId() == chatHandleToUpdate){
+                    indexToUpdate = itrReplace.nextIndex()-1;
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        if(indexToUpdate!=-1){
+            log("Index to replace: "+indexToUpdate);
+            if(adapterList!=null){
+                adapterList.notifyItemChanged(indexToUpdate);
+            }
+        }
+    }
+
     public void interactionUpdate(int position){
         log("interactionUpdate");
         MegaChatListItem chat = chats.remove(position);

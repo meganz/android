@@ -2295,5 +2295,7 @@
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
     
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
+    <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing call</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
 
 </resources>
