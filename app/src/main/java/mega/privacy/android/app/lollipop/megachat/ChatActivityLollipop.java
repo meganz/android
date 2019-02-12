@@ -2591,12 +2591,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     }else if((callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
 //                        megaChatApi.answerChatCall(idChat, false, this);
+
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("chatHandle", idChat);
                         startActivity(intent);
 
                     }else{
+
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));
@@ -6929,7 +6931,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(isGroup()){
                     log("onResume() CALL_STATUS_USER_NO_PRESENT - VISIBLE");
                     callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.join_call_layout));
+                    long callerHandle = callInProgress.getCaller();
+                    if(callerHandle != -1){
+                        String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
+                        callInProgressText.setText(textJoinCall);
+                    }else{
+                        callInProgressText.setText(getString(R.string.join_call_layout));
+                    }
                     callInProgressLayout.setOnClickListener(this);
                 }else{
                     callInProgressLayout.setVisibility(View.VISIBLE);
@@ -7359,7 +7367,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(isGroup()){
                     log("onResume() CALL_STATUS_USER_NO_PRESENT - VISIBLE");
                     callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.join_call_layout));
+                    long callerHandle = call.getCaller();
+                    if(callerHandle != -1){
+                        String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
+                        callInProgressText.setText(textJoinCall);
+                    }else{
+                        callInProgressText.setText(getString(R.string.join_call_layout));
+                    }
                     callInProgressLayout.setOnClickListener(this);
                 }else{
                     callInProgressLayout.setVisibility(View.VISIBLE);
@@ -7371,6 +7385,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 long openCallChatId = MegaApplication.getOpenCallChatId();
                 log("openCallId: "+openCallChatId);
                 if(openCallChatId!=-1){
+
                     Intent intent = new Intent(this, ChatCallActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));
@@ -7382,7 +7397,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(isGroup()){
                     log("onResume() CALL_STATUS_USER_NO_PRESENT - VISIBLE");
                     callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.join_call_layout));
+                    long callerHandle = call.getCaller();
+                    if(callerHandle != -1){
+                        String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
+                        callInProgressText.setText(textJoinCall);
+                    }else{
+                        callInProgressText.setText(getString(R.string.join_call_layout));
+                    }
                     callInProgressLayout.setOnClickListener(this);
                 }else{
                     callInProgressLayout.setVisibility(View.VISIBLE);

@@ -2589,7 +2589,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                             name = chat.getPeerFullnameByHandle(userPeerid);
                                         }
                                         InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userPeerid, userClientid, name, false, false, false, true,null);
-                                        log("*CHANGE_TYPE_CALL_COMPOSITION: JOINING -> "+userPeer.getName()+" added in peersOnCall");
+                                        log("CHANGE_TYPE_CALL_COMPOSITION: JOINING -> "+userPeer.getName()+" added in peersOnCall");
                                         peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
                                         infoUsersBar.setText(userPeer.getName()+" "+getString(R.string.contact_joined_the_call));
                                         infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));

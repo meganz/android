@@ -1377,7 +1377,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
 		if(config.isPending()==false){
-			log("****Launch local broadcast");
 			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
 			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 		}
@@ -1554,7 +1553,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
 			log("Call destroyed: "+call.getTermCode());
 		}
-
 		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 			clearIncomingCallNotification(call.getId());
 		}
@@ -1757,7 +1755,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		log("launchCallActivity: "+call.getStatus());
 		MegaApplication.setShowPinScreen(false);
 		MegaApplication.setOpenCallChatId(call.getChatid());
-
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra("chatHandle", call.getChatid());
 		i.putExtra("callId", call.getId());

@@ -1023,7 +1023,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                         paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, R.id.parent_surface_view);
                         holder.microSurface.setLayoutParams(paramsMicroSurface);
                     }
-
                 }
             }
         }else{

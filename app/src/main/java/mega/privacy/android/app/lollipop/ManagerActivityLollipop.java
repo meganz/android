@@ -640,6 +640,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
+	View callBadge;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -2060,6 +2061,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		itemView.addView(chatBadge);
 		setChatBadge();
 
+		callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
+		itemView.addView(callBadge);
+		callBadge.setVisibility(View.GONE);
+		setCallBadge();
+
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
 		//FAB buttonaB.
@@ -2752,6 +2758,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("megaChatApi is NULL");
 				}
 				setChatBadge();
+				setCallBadge();
 			}
 
 			log("onCreate - Check if there any INCOMING pendingRequest contacts");
@@ -3633,6 +3640,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			rChatFL.showMuteIcon(item);
 		}
 	}
+
+    public void updateCallIcon(MegaChatListItem item){
+        log("updateCallIcon");
+        rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+        if (rChatFL != null) {
+            rChatFL.refreshNode(item);
+        }
+    }
 
 	public void setProfileAvatar(){
 		log("setProfileAvatar");
@@ -18165,10 +18180,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return parentHandleInbox;
 	}
 
-	@Override
-	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallUpdate");
-	}
+
+    @Override
+    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+        log("onChatCallUpdate() status: "+call.getStatus());
+        if(call.getChatid() != -1){
+            if((call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED) ||
+					(call.getStatus()==MegaChatCall.CALL_STATUS_JOINING) ||
+					(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN) ||
+					(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)){
+				setCallBadge();
+				MegaChatListItem chat = megaChatApi.getChatListItem(call.getChatid());
+                updateCallIcon(chat);
+
+            }
+        }
+    }
 
 	public void setContactTitleSection(){
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
@@ -18269,6 +18296,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else {
 			chatBadge.setVisibility(View.GONE);
+		}
+	}
+
+	public void setCallBadge() {
+		log("setCallBadge");
+		if(Util.isChatEnabled() && megaChatApi != null) {
+			int numberCalls = megaChatApi.getNumCalls();
+			if(numberCalls == 0){
+				callBadge.setVisibility(View.GONE);
+			}else if(numberCalls == 1){
+				MegaHandleList chatCallInProgress = megaChatApi.getChatCalls();
+				MegaChatCall callInProgress = megaChatApi.getChatCall(chatCallInProgress.get(0));
+				if(callInProgress !=  null){
+					if((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
+						callBadge.setVisibility(View.VISIBLE);
+					}else{
+						callBadge.setVisibility(View.GONE);
+					}
+				}
+			}else{
+				callBadge.setVisibility(View.VISIBLE);
+			}
+		}else{
+			callBadge.setVisibility(View.GONE);
 		}
 	}
 
