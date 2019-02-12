@@ -342,37 +342,38 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnLongClickListener(this);
 			}
 
-			if(Util.isChatEnabled() && chat.isCallInProgress() && chat.isGroup()){
-                if(megaChatApi != null) {
-                    int numberCalls = megaChatApi.getNumCalls();
-                    if(numberCalls == 0){
-                        ((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-                    }else if(numberCalls == 1){
-                        MegaHandleList chatCallInProgress = megaChatApi.getChatCalls();
-                        MegaChatCall callInProgress = megaChatApi.getChatCall(chatCallInProgress.get(0));
-                        if(callInProgress !=  null){
-                            if((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                ((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
+			if(Util.isChatEnabled() && chat.isCallInProgress()){
+				if(chat.isGroup()){
+					log("Group chat");
+					//Group
+					if((megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
+						MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
+						if(call!=null){
+							log("chat status: "+call.getStatus());
 
+							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+								((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
 								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 								((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
-                            }else{
-                                ((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-                            }
-                        }
-                    }else{
-                        ((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
-						((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
-						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-						((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
-                    }
-                }else{
-                    ((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-                }
-            }else{
+							}else{
+								((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+							}
+						}else{
+							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+						}
+					}else{
+						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+					}
+				}else{
+					//Individual
+					((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+				}
+
+			}else{
 				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
 			}
+
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
 			((ViewHolderArchivedChatList)holder).textViewArchived.setOnClickListener(this);
