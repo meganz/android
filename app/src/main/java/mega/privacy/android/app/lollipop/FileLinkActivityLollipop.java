@@ -845,6 +845,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("none");
 		}
 	}
+
+	@Override
+	public void onBackPressed() {
+		log("onBackPressed");
+		super.callToSuperBack = true;
+		super.onBackPressed();
+	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -862,7 +869,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("URL: " + url + "___SIZE: " + size);
 
 			NodeController nC = new NodeController(this);
-			nC.downloadFileLink(document, url);
+			nC.downloadTo(document, parentPath, url);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {

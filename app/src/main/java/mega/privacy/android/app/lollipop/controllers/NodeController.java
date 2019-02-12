@@ -2290,20 +2290,38 @@ public class NodeController {
             log("is file");
             String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
+                File file = new File(localPath);
                 try {
-                    Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                    Util.copyFile(file, new File(parentPath, tempNode.getName()));
                 }catch(Exception e) {}
-                if (context instanceof FileLinkActivityLollipop) {
-                    ((FileLinkActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+
+                if (file != null && file.getParent().equals(parentPath)) {
+                    if (context instanceof FileLinkActivityLollipop) {
+                        ((FileLinkActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                    }
+                    else if (context instanceof AudioVideoPlayerLollipop) {
+                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                    }
+                    else if (context instanceof FullScreenImageViewerLollipop) {
+                        ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                    }
+                    else if (context instanceof PdfViewerActivityLollipop) {
+                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                    }
                 }
-                else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                }
-                else if (context instanceof FullScreenImageViewerLollipop) {
-                    ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                }
-                else if (context instanceof PdfViewerActivityLollipop) {
-                    ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                else {
+                    if (context instanceof FileLinkActivityLollipop) {
+                        ((FileLinkActivityLollipop) context).showSnackbar(context.getString(R.string.copy_already_downloaded));
+                    }
+                    else if (context instanceof AudioVideoPlayerLollipop) {
+                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.copy_already_downloaded));
+                    }
+                    else if (context instanceof FullScreenImageViewerLollipop) {
+                        ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.copy_already_downloaded));
+                    }
+                    else if (context instanceof PdfViewerActivityLollipop) {
+                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.copy_already_downloaded));
+                    }
                 }
             }
             else{
