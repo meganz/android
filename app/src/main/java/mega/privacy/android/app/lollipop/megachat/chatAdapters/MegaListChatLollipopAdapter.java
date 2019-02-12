@@ -343,36 +343,75 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 
 			if(Util.isChatEnabled() && chat.isCallInProgress()){
-				if(chat.isGroup()){
-					log("Group chat");
-					//Group
-					if((megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
-						MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
-						if(call!=null){
-							log("chat status: "+call.getStatus());
+				if((megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
 
-							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-								((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
+					MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
+					if(call!=null){
+						log("call status: "+call.getStatus());
+						if((chat.isGroup()) && ((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN))){
+
+							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
 								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 								((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
-							}else{
-								((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-							}
 						}else{
 							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+
+							if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_started_messages));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+								((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
+							}
 						}
 					}else{
 						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
 					}
 				}else{
-					//Individual
 					((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
 				}
-
 			}else{
 				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
 			}
+
+
+//			if(Util.isChatEnabled() && chat.isCallInProgress()){
+//				if(chat.isGroup()){
+//					log("Group chat");
+//					//Group
+//					if((megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
+//						MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
+//						if(call!=null){
+//							log("chat status: "+call.getStatus());
+//
+//							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+//								((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
+//								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
+//								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+//								((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
+//							}else{
+//
+//								((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+//								if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+//									((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_started_messages));
+//									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+//									((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
+//								}
+//
+//							}
+//						}else{
+//							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+//						}
+//					}else{
+//						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+//					}
+//				}else{
+//					//Individual
+//					((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+//				}
+//
+//			}else{
+//				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+//			}
 
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
