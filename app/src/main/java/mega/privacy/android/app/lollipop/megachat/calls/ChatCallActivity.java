@@ -1237,7 +1237,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
         if(checkPermissions()){
-            checkPermissionsWriteLog();
+//            checkPermissionsWriteLog();
             showInitialFABConfiguration();
         }
     }
@@ -2929,15 +2929,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void checkPermissionsWriteLog(){
-        log("checkPermissions:Write Log");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
-            if (!hasWriteLogPermission) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
-            }
-        }
-    }
+//    public void checkPermissionsWriteLog(){
+//        log("checkPermissionsWriteLog()");
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
+//            if (!hasWriteLogPermission) {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
+//            }
+//        }
+//    }
 
     public boolean checkPermissions(){
         log("checkPermissions:Camera && Audio");
@@ -3667,7 +3667,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-                        checkPermissionsWriteLog();
+//                        checkPermissionsWriteLog();
                         showInitialFABConfiguration();
                     }
                 }else{
@@ -3679,7 +3679,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-                        checkPermissionsWriteLog();
+//                        checkPermissionsWriteLog();
                         showInitialFABConfiguration();
                     }
                 }else{
@@ -3689,9 +3689,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case Constants.WRITE_LOG: {
                 log("WRITE_LOG");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkPermissionsWriteLog();
-                }
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    checkPermissionsWriteLog();
+//                }
                 break;
             }
         }
