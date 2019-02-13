@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -49,6 +50,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
+import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -72,6 +74,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -140,6 +143,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.mutateIcon;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
@@ -157,6 +161,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean newVisibility = false;
     boolean getMoreHistory=false;
+
+    Handler customHandler = new Handler();
+
+    MegaChatCall callChat;
+    Chronometer myChrono;
 
     int minutesLastGreen = -1;
 
@@ -607,6 +616,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         subtitleToobar.setText(" ");
         subtitleToobar.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
+        myChrono = new Chronometer(context);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
@@ -6387,7 +6397,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onStop() {
         log("onStop()");
-
         try{
             if(textChat!=null){
                 String written = textChat.getText().toString();
@@ -6398,9 +6407,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("textChat is NULL");
             }
-
-        }
-        catch (Exception e){
+        }catch (Exception e){
             log("Written message not stored on DB");
         }
         super.onStop();
@@ -6427,6 +6434,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
+        }
+        if (customHandler != null){
+            customHandler.removeCallbacksAndMessages(null);
         }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
@@ -6976,24 +6986,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         callInProgressText.setText(getString(R.string.join_call_layout));
                     }
                     callInProgressLayout.setOnClickListener(this);
+                    if (customHandler != null){
+                        customHandler.removeCallbacksAndMessages(null);
+                    }
                 }else{
                     callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.call_in_progress_layout));
+                    startClock();
                     callInProgressLayout.setOnClickListener(this);
                 }
             }else if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
                 log("onResume() CALL_STATUS_REQUEST_SENT - VISIBLE");
                 callInProgressLayout.setVisibility(View.VISIBLE);
-                callInProgressText.setText(getString(R.string.call_in_progress_layout));
+                startClock();
                 callInProgressLayout.setOnClickListener(this);
             }else{
                 log("onResume() other case - GONE");
                 callInProgressLayout.setVisibility(View.GONE);
+                if (customHandler != null){
+                    customHandler.removeCallbacksAndMessages(null);
+                }
             }
         }
         else{
             log("onResume() callInProgress != null - GONE");
             callInProgressLayout.setVisibility(View.GONE);
+            if (customHandler != null){
+                customHandler.removeCallbacksAndMessages(null);
+            }
         }
 
        if(aB != null && aB.getTitle() != null){
@@ -7397,10 +7416,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         callInProgressText.setText(getString(R.string.join_call_layout));
                     }
                     callInProgressLayout.setOnClickListener(this);
+                    if (customHandler != null){
+                        customHandler.removeCallbacksAndMessages(null);
+                    }
 
                 }else{
                     callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.call_in_progress_layout));
+                    startClock();
                     callInProgressLayout.setOnClickListener(this);
                 }
                 invalidateOptionsMenu();
@@ -7420,13 +7442,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }else if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
                 log("onResume() CALL_STATUS_REQUEST_SENT - VISIBLE");
                 callInProgressLayout.setVisibility(View.VISIBLE);
-                callInProgressText.setText(getString(R.string.call_in_progress_layout));
+                startClock();
                 callInProgressLayout.setOnClickListener(this);
                 invalidateOptionsMenu();
 
             }else{
                 log("onResume() other case - GONE");
                 callInProgressLayout.setVisibility(View.GONE);
+                if (customHandler != null){
+                    customHandler.removeCallbacksAndMessages(null);
+                }
                 callInProgressLayout.setOnClickListener(null);
                 invalidateOptionsMenu();
             }
@@ -7678,5 +7703,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+    }
+
+    private void startClock(){
+        long seconds = 0;
+        if(megaChatApi!=null){
+            callChat = megaChatApi.getChatCall(idChat);
+            if(callChat!=null){
+                seconds = callChat.getDuration();
+            }
+            long baseTime = SystemClock.uptimeMillis() - (seconds*1000);
+            myChrono.setBase(baseTime);
+            customHandler.postDelayed(updateTimerThread, 1000);
+        }
+    }
+
+    private Runnable updateTimerThread = new Runnable() {
+        public void run() {
+            long elapsedTime = SystemClock.uptimeMillis() - myChrono.getBase();
+            String textReturnCall = getString(R.string.call_in_progress_layout, getDateFromMillis(elapsedTime));
+            callInProgressText.setText(textReturnCall);
+            customHandler.postDelayed(this, 0);
+        }
+    };
+
+    public static String getDateFromMillis(long d) {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df.format(d);
     }
 }
