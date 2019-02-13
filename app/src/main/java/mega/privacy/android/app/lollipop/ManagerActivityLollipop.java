@@ -3641,13 +3641,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-    public void updateCallIcon(MegaChatListItem item){
-        log("updateCallIcon");
-        rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-        if (rChatFL != null) {
-            rChatFL.refreshNode(item);
-        }
-    }
+//    public void updateCallIcon(MegaChatListItem item){
+//        log("updateCallIcon");
+//        rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+//        if (rChatFL != null) {
+//            rChatFL.refreshNode(item);
+//        }
+//    }
 
 	public void setProfileAvatar(){
 		log("setProfileAvatar");
@@ -18190,9 +18190,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN) ||
 					(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)){
 				setCallBadge();
-				MegaChatListItem chat = megaChatApi.getChatListItem(call.getChatid());
-                updateCallIcon(chat);
 
+				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+				if (rChatFL != null) {
+                    log("onChatCallUpdate() -> refreshNode: ");
+                    rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+				}
             }
         }
     }

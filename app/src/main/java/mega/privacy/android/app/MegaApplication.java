@@ -1547,9 +1547,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallUpdate: call.getStatus "+call.getStatus());
 
-		log("onChatCallUpdate");
         stopService(new Intent(this,IncomingCallService.class));
+
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
 			log("Call destroyed: "+call.getTermCode());
 		}
@@ -1559,20 +1560,18 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaHandleList handleList = megaChatApi.getChatCalls();
 		if(handleList!=null) {
-
 			long numberOfCalls = handleList.size();
 			log("Number of calls in progress: " + numberOfCalls);
+
 			if (numberOfCalls == 1) {
-
 				if (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-
 					long chatId = handleList.get(0);
 
 					if(openCallChatId!=chatId){
 						MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 						if (callToLaunch != null) {
 							if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-								log("Launch call with status: "+callToLaunch.getStatus());
+								log("One call:Launch call with status: "+callToLaunch.getStatus());
 								launchCallActivity(callToLaunch);
 							} else {
 								log("Launch not in correct status");
@@ -1584,7 +1583,26 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					}
 				}
 			} else if (numberOfCalls > 1) {
-				log("MORE than one call in progress: " + numberOfCalls);
+				if(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS){
+
+					for(int i=0; i< handleList.size(); i++){
+						long chatId = handleList.get(i);
+						if(openCallChatId!=chatId){
+							MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
+							if (callToLaunch != null) {
+								if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+									log("Call: "+i+". Launch call with status: "+callToLaunch.getStatus());
+									launchCallActivity(callToLaunch);
+								} else {
+									log("Launch not in correct status");
+								}
+							}
+						}
+						else{
+							log("Call already opened");
+						}
+					}
+				}
 				checkQueuedCalls();
 
 			} else {
