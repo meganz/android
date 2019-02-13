@@ -57,26 +57,31 @@
         android:background="@null"
         android:src="@drawable/circle_status_contact_offline" />
 
-    <ImageView
-        android:id="@+id/recent_chat_list_call_in_progress"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/recent_chat_list_contact_state"
-        android:layout_marginTop="17dp"
-        android:layout_marginLeft="4dp"
-        android:background="@drawable/circle_call_ongoing"
-        android:src="@drawable/ic_call_ongoing" />
-
-    <ImageView
-        android:id="@+id/recent_chat_list_mute_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha="0.54"
-        android:src="@drawable/ic_mute_list"
         android:background="@null"
-        android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/recent_chat_list_contact_state"
-        android:layout_marginLeft="4dp"/>
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="10dp">
+        <ImageView
+            android:id="@+id/recent_chat_list_call_in_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/circle_call_ongoing"
+            android:src="@drawable/ic_call_ongoing" />
+
+        <ImageView
+            android:id="@+id/recent_chat_list_mute_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.54"
+            android:src="@drawable/ic_mute_list"
+            android:background="@null" />
+    </LinearLayout>
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/recent_chat_list_content"
@@ -103,7 +108,31 @@
         android:singleLine="true"
         android:maxLines="1"
         android:textColor="@color/file_list_second_row" />
-   
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:layout_below="@id/recent_chat_list_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="46dp"
+        android:gravity="right"
+        android:layout_marginTop="2dp">
+        <ImageView
+            android:id="@+id/recent_chat_list_video_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_video_small"
+            android:layout_marginRight="12dp"
+            android:visibility="gone"/>
+        <ImageView
+            android:id="@+id/recent_chat_list_micro_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_mic_off_small"
+            android:visibility="gone"/>
+    </LinearLayout>
+
     <ImageButton
         android:id="@+id/recent_chat_list_three_dots"
         android:layout_width="wrap_content"
