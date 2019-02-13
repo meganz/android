@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="344dp"
-    android:layout_height="395dp">
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -10,23 +10,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginBottom="21dp">
 
             <TextView
                 android:id="@+id/chat_link_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_marginTop="24dp"
                 android:text="@string/make_chat_private_option"
                 android:textColor="@color/name_my_account"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"/>
 
             <ImageView
                 android:id="@+id/image_chat_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
                 android:src="@drawable/ic_get_chat_link"
                 android:layout_gravity="center_horizontal"/>
 
@@ -34,12 +39,9 @@
                 android:id="@+id/text_chat_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="28dp"
-                android:layout_marginLeft="28dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginTop="14dp"
                 android:textSize="16sp"
-                android:gravity="center_horizontal"
+                android:gravity="left"
                 android:textColor="@color/mail_my_account"
                 android:layout_gravity="center_horizontal"/>
 
@@ -47,26 +49,28 @@
                 android:id="@+id/second_text_chat_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="28dp"
-                android:layout_marginLeft="28dp"
-                android:layout_marginBottom="16dp"
                 android:textSize="16sp"
-                android:gravity="center_horizontal"
+                android:gravity="left"
                 android:textColor="@color/name_my_account"
                 android:layout_gravity="center_horizontal"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:text="@string/context_create_chat_link_question_text"/>
 
             <Button
                 android:id="@+id/chat_link_button_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginTop="32dp"
                 android:paddingRight="16dp"
                 android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/background_accent_button"
                 android:textColor="@color/white"
-                android:text="@string/general_enable"/>
+                android:text="@string/general_enable"
+                style="@style/ButtonStyle"/>
 
         </LinearLayout>
 
