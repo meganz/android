@@ -502,7 +502,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(false);
+							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}
