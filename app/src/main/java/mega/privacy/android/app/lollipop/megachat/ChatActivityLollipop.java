@@ -4549,6 +4549,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int checkMegaLink(MegaChatMessage msg){
+        log("checkMegaLink");
         //Check if it is a MEGA link
         if(msg.getType()==MegaChatMessage.TYPE_NORMAL){
             if(msg.getContent()!=null){
@@ -6993,6 +6994,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     intentOpenChat.putExtra("showSnackbar", text);
                 }
                 startActivity(intentOpenChat);
+                closeChat(true);
                 finish();
             }
             else{

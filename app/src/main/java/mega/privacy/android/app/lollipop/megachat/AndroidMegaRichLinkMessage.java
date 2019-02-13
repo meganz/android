@@ -139,7 +139,7 @@ public class AndroidMegaRichLinkMessage {
                 log("folder link found");
                 return url;
             }
-            if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
+            if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
                 log("chat link found");
                 return url;
             }
@@ -162,7 +162,7 @@ public class AndroidMegaRichLinkMessage {
              return false;
         }
 
-        if ((url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
+        if ((url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
             log("IS chat link found");
             return true;
         }

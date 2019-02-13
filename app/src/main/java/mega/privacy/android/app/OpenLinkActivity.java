@@ -135,7 +135,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		}
 
 		// Chat link
-		if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
 			log("open chat url");
 
 			if (dbH == null){
