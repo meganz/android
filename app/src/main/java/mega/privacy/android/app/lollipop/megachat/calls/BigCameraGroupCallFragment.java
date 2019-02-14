@@ -31,8 +31,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     MegaChatApiAndroid megaChatApi;
     Context context;
     long chatId;
-    Long peerId;
-    Long cliendId;
+    long peerId;
+    long cliendId;
 
     public TextureView myTexture;
     MegaSurfaceRendererGroup renderer;
