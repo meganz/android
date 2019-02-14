@@ -1659,8 +1659,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     protected void hideActionBar(){
         if (aB != null && aB.isShowing()) {
             if(tB != null) {
-               tB.animate().translationY(-220).setDuration(800L)
-                        .withEndAction(new Runnable() {
+               tB.animate().translationY(-220).setDuration(800L).withEndAction(new Runnable() {
                             @Override
                             public void run() {
                                 aB.hide();
@@ -1753,14 +1752,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onDestroy(){
         log("onDestroy");
 
+        if (customHandler != null){
+            if(updateTimerThread!=null){
+                customHandler.removeCallbacks(updateTimerThread);
+            }
+            customHandler.removeCallbacksAndMessages(null);
+        }
+
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
 //            megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         }
 
-        if (customHandler != null){
-            customHandler.removeCallbacksAndMessages(null);
-        }
         clearHandlers();
 
         if (localCameraFragment != null) {
@@ -1821,13 +1824,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.callToSuperBack = false;
         super.onBackPressed();
 
+
+
+        if (customHandler != null){
+            if(updateTimerThread!=null){
+                customHandler.removeCallbacks(updateTimerThread);
+            }
+            customHandler.removeCallbacksAndMessages(null);
+        }
+
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
 //            megaChatApi.removeChatVideoListener(chatId, userHandle, this);
-        }
-
-        if (customHandler != null){
-            customHandler.removeCallbacksAndMessages(null);
         }
         clearHandlers();
 
@@ -2105,6 +2113,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                         //I have finished the group call but I can join again
                         log("Terminating call of chat: "+chatId);
+                        clearHandlers();
                         if(chat.isGroup()){
                             stopAudioSignals();
                             rtcAudioManager.stop();
@@ -2125,12 +2134,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     }
                     case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:{
                         log("CHANGE_TYPE_STATUS:USER_NO_PRESENT");
+                        clearHandlers();
 
                         break;
                     }
                     case MegaChatCall.CALL_STATUS_DESTROYED:{
                         log("CHANGE_TYPE_STATUS:DESTROYED:TERM code of the call: "+call.getTermCode());
                         //The group call has finished but I can not join again
+                        clearHandlers();
 
                         stopAudioSignals();
                         rtcAudioManager.stop();
@@ -4012,7 +4023,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         customHandler.postDelayed(updateTimerThread, 1000);
     }
 
-    private Runnable updateTimerThread = new Runnable() {
+    final Runnable updateTimerThread = new Runnable() {
         public void run() {
             long elapsedTime = SystemClock.uptimeMillis() - myChrono.getBase();
             subtitleToobar.setText(getDateFromMillis(elapsedTime));
@@ -4623,6 +4634,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
         if (handlerArrow6 != null){
             handlerArrow6.removeCallbacksAndMessages(null);
+        }
+
+        if (customHandler != null){
+            if(updateTimerThread!=null){
+                customHandler.removeCallbacks(updateTimerThread);
+            }
+            customHandler.removeCallbacksAndMessages(null);
         }
     }
 

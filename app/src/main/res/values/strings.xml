@@ -2298,5 +2298,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing call</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
+    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Tap to return to call </string>
+
 
 </resources>
