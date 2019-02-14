@@ -4192,4 +4192,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         return name;
     }
 
+    private void checkParticipants(MegaChatCall call, boolean isInProgress){
+        if(isInProgress){
+            //peersOnCall
+        }else{
+            //peersBeforeCall
+        }
+
+    }
+
 }
