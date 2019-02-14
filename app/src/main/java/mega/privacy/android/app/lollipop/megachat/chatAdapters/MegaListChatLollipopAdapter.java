@@ -244,8 +244,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					if (chat.getTitle().length() > 0){
 						String chatTitle = chat.getTitle().trim();
-						String firstLetter = chatTitle.charAt(0) + "";
-						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+						String firstLetter = "";
+						if(!chatTitle.isEmpty()){
+							firstLetter = chatTitle.charAt(0) + "";
+							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						}
+
 						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
 					}
 
@@ -1123,15 +1128,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 					if (title.length() > 0){
 						String chatTitle = title.trim();
-						String firstLetter = chatTitle.charAt(0) + "";
-						firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+						String firstLetter = "";
+						if(!chatTitle.isEmpty()){
+							firstLetter = chatTitle.charAt(0) + "";
+							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+						}
+
 						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
 					}
 
 					createGroupChatAvatar(holder);
 				}
 			}
-
 		}
 		else{
 			log("Holder is NULL: "+position);
