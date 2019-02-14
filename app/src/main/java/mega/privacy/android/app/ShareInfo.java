@@ -41,7 +41,7 @@ import mega.privacy.android.app.utils.Util;
 public class ShareInfo {
 
 	public String title = null;
-	public long lastModified;
+	private long lastModified;
 	public InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
