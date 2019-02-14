@@ -209,7 +209,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
                 log("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());
                 pendingPreviews.add(node.getHandle());
-                PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, megaChatAdapter);
+                PreviewDownloadListener listener = new PreviewDownloadListener(context, (ViewHolderMessageChat) holder, megaChatAdapter, node);
                 megaApi.getPreview(node, previewFile.getAbsolutePath(), listener);
             }
         }
@@ -5560,7 +5560,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
                                 } else if (MimeTypeList.typeForName(node.getName()).isVideo()) {
-                                    log("Contact message - Is video preview");
+                                    log("(1)Contact message - Is video preview");
                                     holder.gradientContactMessageThumbPort.setVisibility(View.VISIBLE);
                                     holder.videoIconContactMessageThumbPort.setVisibility(View.VISIBLE);
                                     holder.videoTimecontentContactMessageThumbPort.setText(timeVideo(node));
@@ -5624,7 +5624,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 
                                 } else if (MimeTypeList.typeForName(node.getName()).isVideo()) {
-                                    log("Contact message - Is video preview");
+                                    log("(2)Contact message - Is video preview");
                                     holder.gradientContactMessageThumbLand.setVisibility(View.VISIBLE);
                                     holder.videoIconContactMessageThumbLand.setVisibility(View.VISIBLE);
                                     holder.videoTimecontentContactMessageThumbLand.setText(timeVideo(node));
@@ -7846,7 +7846,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
             } else if (MimeTypeList.typeForName(node.getName()).isVideo()) {
-                log("Contact message - Is video preview");
+                log("(3)Contact message - Is video preview");
                 holder.gradientContactMessageThumbPort.setVisibility(View.VISIBLE);
                 holder.videoIconContactMessageThumbPort.setVisibility(View.VISIBLE);
                 holder.videoTimecontentContactMessageThumbPort.setText(timeVideo(node));
@@ -7913,7 +7913,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 
             } else if (MimeTypeList.typeForName(node.getName()).isVideo()) {
-                log("Contact message - Is video preview");
+                log("(4)Contact message - Is video preview");
                 holder.gradientContactMessageThumbLand.setVisibility(View.VISIBLE);
                 holder.videoIconContactMessageThumbLand.setVisibility(View.VISIBLE);
                 holder.videoTimecontentContactMessageThumbLand.setText(timeVideo(node));
@@ -7967,7 +7967,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+    private void setPreview(long handle, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaNode node) {
         log("setPreview() handle: " + handle);
 
         if (holder != null) {
@@ -7986,7 +7986,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if (holder.userHandle == megaChatApi.getMyUserHandle()) {
 
                             String name = holder.contentOwnMessageFileName.getText().toString();
-                            MegaNode node = megaApi.getNodeByHandle(handle);
 
                             log("Update my preview: " + name);
                             if (bitmap.getWidth() < bitmap.getHeight()) {
@@ -8100,7 +8099,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         } else {
                             log("Update my contacts preview");
                             String name = holder.contentContactMessageFileName.getText().toString();
-                            MegaNode node = megaApi.getNodeByHandle(handle);
 
                             if (bitmap.getWidth() < bitmap.getHeight()) {
 
@@ -8117,7 +8115,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
                                 } else if (MimeTypeList.typeForName(name).isVideo()) {
-                                    log("Contact message - Is video preview");
+                                    log("(5)Contact message - Is video preview");
 
                                     holder.gradientContactMessageThumbPort.setVisibility(View.VISIBLE);
                                     holder.videoIconContactMessageThumbPort.setVisibility(View.VISIBLE);
@@ -8192,7 +8190,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 
                                 } else if (MimeTypeList.typeForName(name).isVideo()) {
-                                    log("Contact message - Is video preview");
+                                    log("(6)Contact message - Is video preview");
                                     holder.gradientContactMessageThumbLand.setVisibility(View.VISIBLE);
                                     holder.videoIconContactMessageThumbLand.setVisibility(View.VISIBLE);
 
@@ -8200,6 +8198,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                         holder.videoTimecontentContactMessageThumbLand.setText(timeVideo(node));
                                         holder.videoTimecontentContactMessageThumbLand.setVisibility(View.VISIBLE);
                                     } else {
+                                        log("setPreview:Landscape:Node is NULL");
                                         holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
                                     }
 
@@ -8403,8 +8402,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             holder.errorUploadingLandscape.setVisibility(View.VISIBLE);
                             holder.transparentCoatingLandscape.setVisibility(View.VISIBLE);
-
-
                         }
                     } else {
                         log("Message is in progress state");
@@ -8450,11 +8447,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         Context context;
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
         MegaChatLollipopAdapter adapter;
+        MegaNode node;
 
-        PreviewDownloadListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaChatLollipopAdapter adapter) {
+        PreviewDownloadListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaChatLollipopAdapter adapter, MegaNode node) {
             this.context = context;
             this.holder = holder;
             this.adapter = adapter;
+            this.node = node;
         }
 
         @Override
@@ -8474,7 +8473,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     long handle = request.getNodeHandle();
                     pendingPreviews.remove(handle);
 
-                    setPreview(handle, holder);
+                    setPreview(handle, holder, node);
                 } else {
                     log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
                 }
@@ -8493,23 +8492,27 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public String timeVideo(MegaNode n) {
-        int duration = n.getDuration();
-        String timeString = "";
+        log("timeVideo");
+        if(n!=null){
+            int duration = n.getDuration();
+            String timeString = "";
+            log("duration: "+n.getDuration());
+            if (duration > 0) {
+                int hours = duration / 3600;
+                int minutes = (duration % 3600) / 60;
+                int seconds = duration % 60;
 
-        if (duration > 0) {
-            int hours = duration / 3600;
-            int minutes = (duration % 3600) / 60;
-            int seconds = duration % 60;
+                if (hours > 0) {
+                    timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
+                } else {
+                    timeString = String.format("%d:%02d", minutes, seconds);
+                }
 
-            if (hours > 0) {
-                timeString = String.format("%d:%d:%02d", hours, minutes, seconds);
-            } else {
-                timeString = String.format("%d:%02d", minutes, seconds);
+                log("The duration is: " + hours + " " + minutes + " " + seconds);
             }
-
-            log("The duration is: " + hours + " " + minutes + " " + seconds);
+            return timeString;
         }
-        return timeString;
+        return "";
     }
 
     public void checkItem (View v, ViewHolderMessageChat holder, int[] screenPosition, int[] dimens) {

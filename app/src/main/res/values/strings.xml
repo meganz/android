@@ -3,7 +3,7 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.5.1 (222)</string>
+    <string name="app_version" context="Not translate">3.5.2 (223)</string>
     <string name="sdk_version" context="Not translate">41d84f2</string>
     <string name="karere_version" context="Not translate">9c9b9cc</string>
 
@@ -1890,9 +1890,6 @@
     <string name="text_enable_rich_links" context="Text of the dialog to enable the rich links previews on chat">Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.</string>
 
     <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to enter the Decryption Key</string>
-
-    <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
-
 
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a stronger password</string>
 
