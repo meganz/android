@@ -520,7 +520,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    permitVerify();
+//                    permitVerify();
                 }
             }
         });
@@ -563,7 +563,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    permitVerify();
+//                    permitVerify();
                 }
             }
         });
@@ -1195,7 +1195,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             pin = sb.toString();
             log("PIN: "+pin);
             if (!isErrorShown && pin != null){
+                log("login with factor login");
                 verify2faProgressBar.setVisibility(View.VISIBLE);
+                MegaApplication.setLoggingIn(true);
                 megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
             }
         }
@@ -1530,6 +1532,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void backToLoginForm() {
+        //return to login form page
         loginLogin.setVisibility(View.VISIBLE);
         loginCreateAccount.setVisibility(View.VISIBLE);
         loginLoggingIn.setVisibility(View.GONE);
@@ -1550,6 +1553,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         serversBusyText.setVisibility(View.GONE);
         resumeSesion = false;
 
+        //reset 2fa page
+        loginVerificationLayout.setVisibility(View.GONE);
+        verify2faProgressBar.setVisibility(View.GONE);
+        firstPin.setText("");
+        secondPin.setText("");
+        thirdPin.setText("");
+        fourthPin.setText("");
+        fifthPin.setText("");
+        sixthPin.setText("");
+
+        //keep the email in login page.
         UserCredentials credentials = dbH.getCredentials();
         if (credentials != null) {
             et_user.setText(credentials.getEmail());
@@ -2189,7 +2203,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log(e.getMessage());
         }
 
-        log("onRequestFinish: " + request.getRequestString());
+        log("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
@@ -2206,6 +2220,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop)context).showAlertLoggedOut();
                 }
                 else if (error.getErrorCode() == MegaError.API_EMFAREQUIRED){
+                    log("require 2fa");
                     is2FAEnabled = true;
                     ((LoginActivityLollipop) context).showAB(tB);
                     loginLogin.setVisibility(View.GONE);
