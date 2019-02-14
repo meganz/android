@@ -4212,6 +4212,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		dbH.removeSentPendingMessages();
 
+//		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+//		if (rChatFL != null) {
+//			log("onChatCallUpdate() -> clearHandlers: ");
+//			rChatFL.clearHandlers();
+//		}
+
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
@@ -18192,9 +18198,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				setCallBadge();
 
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if (rChatFL != null) {
-                    log("onChatCallUpdate() -> refreshNode: ");
+				if ((rChatFL != null) && (rChatFL.isVisible())){
+                    log("nChatCallUpdate() -> rChatFL visible: ");
                     rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+				}else{
+					log("*onChatCallUpdate() -> rChatFL not: ");
+
 				}
             }
         }
