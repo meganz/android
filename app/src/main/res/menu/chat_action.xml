@@ -36,6 +36,13 @@
         android:title="@string/general_clear"
         MEGA:showAsAction="never" />
 
+
+    <item
+        android:id="@+id/cab_menu_archive_chat"
+        android:orderInCategory="125"
+        android:title="@string/general_archive"
+        MEGA:showAsAction="never" />
+
     <item
         android:id="@+id/cab_menu_leave_chat"
         android:orderInCategory="125"

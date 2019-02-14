@@ -243,7 +243,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Intent intent = null;
         intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra("firstTimeCam", true);
+        intent.putExtra("firstLogin", true);
         intent.putExtra("upgradeAccount", false);
         intent.putExtra("newAccount", true);
         startActivity(intent);

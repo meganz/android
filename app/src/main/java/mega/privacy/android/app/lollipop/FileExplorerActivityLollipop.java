@@ -501,8 +501,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							megaChatApi.logout(this);
 						}
 						else{
-
 							log("onCreate: Chat correctly initialized");
+							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}
@@ -1598,7 +1598,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							pMsgSingle.setFingerprint(fingerprint);
 						}
 
-						long idMessage = dbH.addPendingMessage(pMsgSingle);
+						long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
 						pMsgSingle.setId(idMessage);
 
 						if(idMessage!=-1){

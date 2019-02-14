@@ -51,6 +51,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollip
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter.ViewHolderTransfer;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.lollipop.providers.MegaProviderLollipopAdapter;
 import mega.privacy.android.app.lollipop.providers.MegaProviderLollipopAdapter.ViewHolderLollipopProvider;
 import nz.mega.sdk.MegaApiAndroid;
@@ -411,6 +412,16 @@ public class ThumbnailUtilsLollipop {
 										log("Thumbnail update");
 									}
 								}
+								else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
+									if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
+										int position = holder.getAdapterPosition();
+										adapter.notifyItemChanged(position);
+										log("Thumbnail update");
+									}
+								}
 							}
 						}
 					}
@@ -436,10 +447,10 @@ public class ThumbnailUtilsLollipop {
 
 	static class ThumbnailDownloadListenerGridBrowser implements MegaRequestListenerInterface {
 		Context context;
-		MegaNodeAdapter.ViewHolderBrowserGrid holder;
-		MegaNodeAdapter adapter;
+		RecyclerView.ViewHolder holder;
+		RecyclerView.Adapter adapter;
 
-		ThumbnailDownloadListenerGridBrowser(Context context, MegaNodeAdapter.ViewHolderBrowserGrid holder, MegaNodeAdapter adapter) {
+		ThumbnailDownloadListenerGridBrowser(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter) {
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -472,15 +483,29 @@ public class ThumbnailUtilsLollipop {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
 							if (bitmap != null) {
 								thumbnailCache.put(handle, bitmap);
-								if ((holder.document == handle)) {
-									holder.imageViewThumb.setVisibility(View.VISIBLE);
-									holder.imageViewIcon.setVisibility(View.GONE);
-									holder.imageViewThumb.setImageBitmap(bitmap);
-									holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-									holder.imageViewThumb.startAnimation(fadeInAnimation);
-									adapter.notifyDataSetChanged();
-									log("Thumbnail update");
+								if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
+									if ((((MegaNodeAdapter.ViewHolderBrowserGrid)holder).document == handle)) {
+										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
+										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
+										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
+										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
+								}
+								else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
+									if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).document == handle)) {
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
 								}
 							}
 						}
@@ -858,7 +883,7 @@ public class ThumbnailUtilsLollipop {
 
 	}
 
-	public static Bitmap getThumbnailFromMegaGrid(MegaNode document, Context context, MegaNodeAdapter.ViewHolderBrowserGrid viewHolder, MegaApiAndroid megaApi, MegaNodeAdapter adapter){
+	public static Bitmap getThumbnailFromMegaGrid(MegaNode document, Context context, RecyclerView.ViewHolder viewHolder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
 
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");
@@ -1231,10 +1256,10 @@ public class ThumbnailUtilsLollipop {
 		MegaApiAndroid megaApi;
 		File thumbFile;
 		ResizerParams param;
-		MegaNodeAdapter.ViewHolderBrowserGrid holder;
-		MegaNodeAdapter adapter;
+		RecyclerView.ViewHolder holder;
+		RecyclerView.Adapter adapter;
 
-		AttachThumbnailTaskGrid(Context context, MegaApiAndroid megaApi, MegaNodeAdapter.ViewHolderBrowserGrid holder, MegaNodeAdapter adapter)
+		AttachThumbnailTaskGrid(Context context, MegaApiAndroid megaApi, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter)
 		{
 			this.context = context;
 			this.megaApi = megaApi;
@@ -1285,18 +1310,32 @@ public class ThumbnailUtilsLollipop {
 		log("AttachThumbnailTask end");		
 	}
 
-	private static void onThumbnailGeneratedGrid(Context context, File thumbFile, MegaNode document, MegaNodeAdapter.ViewHolderBrowserGrid holder, MegaNodeAdapter adapter){
+	private static void onThumbnailGeneratedGrid(Context context, File thumbFile, MegaNode document, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter){
 		log("onThumbnailGeneratedGrid");
-		//Tengo que mostrarla
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
-		holder.imageViewThumb.setVisibility(View.VISIBLE);
-		holder.imageViewIcon.setVisibility(View.GONE);
-		holder.imageViewThumb.setImageBitmap(bitmap);
-		holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-		thumbnailCache.put(document.getHandle(), bitmap);
-		adapter.notifyDataSetChanged();
+
+		if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
+
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
+			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
+			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
+			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+			thumbnailCache.put(document.getHandle(), bitmap);
+			adapter.notifyDataSetChanged();
+		}
+		else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
+			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
+			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
+			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+			thumbnailCache.put(document.getHandle(), bitmap);
+			adapter.notifyDataSetChanged();
+		}
 
 		log("AttachThumbnailTask end");
 	}
@@ -1357,7 +1396,7 @@ public class ThumbnailUtilsLollipop {
 
 	}
 
-	public static void createThumbnailGrid(Context context, MegaNode document, MegaNodeAdapter.ViewHolderBrowserGrid holder, MegaApiAndroid megaApi, MegaNodeAdapter adapter){
+	public static void createThumbnailGrid(Context context, MegaNode document, RecyclerView.ViewHolder holder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
 
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
