@@ -125,7 +125,7 @@
 			android:alpha="0.76"
 			android:layout_marginRight="8dp"
 			android:layout_centerVertical="true"
-			android:visibility="visible"/>
+			android:visibility="gone"/>
 
 		<TextView
 			android:id="@+id/file_list_filesize"
