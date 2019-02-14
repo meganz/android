@@ -57,7 +57,6 @@ import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -3147,7 +3146,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private static void log(String log) {
-//        Util.log("LoginFragmentLollipop", log);
-        TL.log("Login","@#@" ,log );
+        Util.log("LoginFragmentLollipop", log);
     }
 }
