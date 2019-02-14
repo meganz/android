@@ -1712,6 +1712,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     archiveMenuItem.setVisible(false);
                 }else {
                     int callsInProgress = megaChatApi.getNumCalls();
+
                     if(callsInProgress <= 0){
                         callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                         callMenuItem.setEnabled(true);
@@ -1719,7 +1720,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                         videoMenuItem.setEnabled(true);
                         videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
-
                     }else{
 
                         MegaHandleList listCalls = megaChatApi.getChatCalls();

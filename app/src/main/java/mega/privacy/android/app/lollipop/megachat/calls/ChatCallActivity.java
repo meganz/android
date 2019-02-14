@@ -1276,7 +1276,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
         if(checkPermissions()){
-            checkPermissionsWriteLog();
+//            checkPermissionsWriteLog();
             showInitialFABConfiguration();
         }
     }
@@ -2929,19 +2929,27 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 thePlayer.stop();
                 thePlayer.release();
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            log("Exception stopping player");
+        }
         try{
             if (toneGenerator != null) {
                 toneGenerator.stopTone();
                 toneGenerator.release();
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            log("Exception stopping tone generator");
+
+        }
 
         try{
             if(ringtone != null){
                 ringtone.stop();
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            log("Exception stopping ringtone");
+
+        }
         try{
             if (timer != null){
                 timer.cancel();
@@ -2949,14 +2957,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (ringerTimer != null) {
                 ringerTimer.cancel();
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            log("Exception stopping ringing time");
+
+        }
         try{
             if (vibrator != null){
                 if (vibrator.hasVibrator()) {
                     vibrator.cancel();
                 }
             }
-        }catch(Exception e){}
+        }catch(Exception e){
+            log("Exception stopping vibrator");
+
+        }
         thePlayer=null;
         toneGenerator = null;
         timer = null;
@@ -3082,15 +3096,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void checkPermissionsWriteLog(){
-        log("checkPermissions:Write Log");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
-            if (!hasWriteLogPermission) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
-            }
-        }
-    }
+//    public void checkPermissionsWriteLog(){
+//        log("checkPermissionsWriteLog()");
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            boolean hasWriteLogPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED);
+//            if (!hasWriteLogPermission) {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CALL_LOG}, Constants.WRITE_LOG);
+//            }
+//        }
+//    }
 
     public boolean checkPermissions(){
         log("checkPermissions:Camera && Audio");
@@ -3776,7 +3790,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                             if((peersOnCall.get(i).getPeerId() == userPeerId) && (peersOnCall.get(i).getClientId() == userClientId)){
                                 if(!peersOnCall.get(i).isAudioOn()){
-                                    log("updateRemoteAudioStatus: "+peersOnCall.get(i).getName()+" Connected audio");
+                                    log("updateRemoteAudioStatus: (peerId = "+userPeerId+", clientId = "+userClientId+") Connected audio");
                                     peersOnCall.get(i).setAudioOn(true);
 
                                     if(peersOnCall.size()<7){
@@ -3788,19 +3802,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     }else{
                                         if(adapterList!=null){
                                             adapterList.changesInAudio(i,null);
-                                            if(peerSelected!=null){
-                                                if((peerSelected.getPeerId() == userPeerId) && (peerSelected.getClientId() == userClientId)){
-                                                    avatarBigCameraGroupCallMicro.setVisibility(GONE);
-                                                    microFragmentBigCameraGroupCall.setVisibility(GONE);
-                                                }
-                                            }
                                         }else{
                                             updatePeers(true);
-                                            if(peerSelected!=null){
-                                                if((peerSelected.getPeerId() == userPeerId) && (peerSelected.getClientId() == userClientId)){
-                                                    avatarBigCameraGroupCallMicro.setVisibility(GONE);
-                                                    microFragmentBigCameraGroupCall.setVisibility(GONE);
-                                                }
+                                        }
+                                        if(peerSelected!=null){
+                                            if((peerSelected.getPeerId() == userPeerId) && (peerSelected.getClientId() == userClientId)){
+                                                avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                                microFragmentBigCameraGroupCall.setVisibility(GONE);
                                             }
                                         }
                                     }
@@ -3816,7 +3824,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         for(int i=0;i<peersOnCall.size();i++){
                             if((peersOnCall.get(i).getPeerId() == userPeerId) && (peersOnCall.get(i).getClientId() == userClientId)){
                                 if(peersOnCall.get(i).isAudioOn()){
-                                    log("updateRemoteAudioStatus: "+peersOnCall.get(i).getName()+" Disconnected audio");
+                                    log("updateRemoteAudioStatus: (peerId = "+userPeerId+", clientId = "+userClientId+") Disconnected audio");
                                     peersOnCall.get(i).setAudioOn(false);
 
                                     if(peersOnCall.size()<7){
@@ -3828,48 +3836,33 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     }else{
                                         if(adapterList!=null){
                                             adapterList.changesInAudio(i,null);
-                                            if(peerSelected != null){
-                                                if((peerSelected.getPeerId() == userPeerId) && (peerSelected.getClientId() == userClientId)){
-                                                    if(peerSelected.isVideoOn()){
-                                                        avatarBigCameraGroupCallMicro.setVisibility(GONE);
-                                                        microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
-                                                    }else{
-                                                        avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
-                                                        microFragmentBigCameraGroupCall.setVisibility(GONE);
-                                                    }
-                                                }
-                                            }
                                         }else{
                                             updatePeers(true);
-                                            if(peerSelected != null){
-                                                if((peerSelected.getPeerId() == userPeerId) && (peerSelected.getClientId() == userClientId)){
-                                                    if(peerSelected.isVideoOn()){
-                                                        avatarBigCameraGroupCallMicro.setVisibility(GONE);
-                                                        microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
-                                                    }else{
-                                                        avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
-                                                        microFragmentBigCameraGroupCall.setVisibility(GONE);
-                                                    }
+                                        }
+
+                                        if(peerSelected != null){
+                                            if((peerSelected.getPeerId() == userPeerId) && (peerSelected.getClientId() == userClientId)){
+                                                if(peerSelected.isVideoOn()){
+                                                    avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                                    microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                                                }else{
+                                                    avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
+                                                    microFragmentBigCameraGroupCall.setVisibility(GONE);
                                                 }
                                             }
                                         }
-
                                     }
                                     break;
                                 }
                             }
                         }
                     }
-
                 }
-
             }else{
                 log("updateRemoteAudioStatus:individual");
                 supportInvalidateOptionsMenu();
             }
         }
-
-
     }
 
     @Override
@@ -3882,7 +3875,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-                        checkPermissionsWriteLog();
+//                        checkPermissionsWriteLog();
                         showInitialFABConfiguration();
                     }
                 }else{
@@ -3894,7 +3887,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissions()){
-                        checkPermissionsWriteLog();
+//                        checkPermissionsWriteLog();
                         showInitialFABConfiguration();
                     }
                 }else{
@@ -3904,9 +3897,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case Constants.WRITE_LOG: {
                 log("WRITE_LOG");
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkPermissionsWriteLog();
-                }
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    checkPermissionsWriteLog();
+//                }
                 break;
             }
         }
