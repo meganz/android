@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -56,6 +57,7 @@ import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -867,7 +869,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("No INTENT");
         }
 
-        if (credentials != null){
+        log("et_user.getText(): " + et_user.getText());
+        if (credentials != null && TextUtils.isEmpty(et_user.getText())){
             log("Credentials NOT null");
             if ((intentReceived != null) && (intentReceived.getAction() != null)){
                 if (intentReceived.getAction().equals(Constants.ACTION_REFRESH)){
@@ -1527,6 +1530,34 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    public void backToLoginForm() {
+        loginLogin.setVisibility(View.VISIBLE);
+        loginCreateAccount.setVisibility(View.VISIBLE);
+        loginLoggingIn.setVisibility(View.GONE);
+        generatingKeysText.setVisibility(View.GONE);
+        loginProgressBar.setVisibility(View.GONE);
+        loginFetchNodesProgressBar.setVisibility(View.GONE);
+
+        loginLogin.setVisibility(View.VISIBLE );
+        loginCreateAccount.setVisibility(View.VISIBLE);
+        queryingSignupLinkText.setVisibility(View.VISIBLE);
+        confirmingAccountText.setVisibility(View.GONE);
+        loginLoggingIn.setVisibility(View.GONE);
+        loginProgressBar.setVisibility(View.GONE);
+        loginFetchNodesProgressBar.setVisibility(View.GONE);
+        loggingInText.setVisibility(View.VISIBLE);
+        fetchingNodesText.setVisibility(View.GONE);
+        prepareNodesText.setVisibility(View.GONE);
+        serversBusyText.setVisibility(View.GONE);
+        resumeSesion = false;
+
+        UserCredentials credentials = dbH.getCredentials();
+        if (credentials != null) {
+            et_user.setText(credentials.getEmail());
+            et_password.requestFocus();
+        }
+    }
+
     private void onKeysGeneratedLogin(final String email, final String password) {
         log("onKeysGeneratedLogin");
 
@@ -1666,6 +1697,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("click on button_login_login");
                 hidePasswordIfVisible();
                 loginClicked = true;
+                backWhileLogin = false;
                 onLoginClick(v);
                 break;
             }
@@ -2160,6 +2192,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("onRequestFinish: " + request.getRequestString());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
+            //cancel login process by press back.
+            if(!MegaApplication.isLoggingIn()) {
+                log("terminate login process");
+                return;
+            }
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
 
@@ -2310,6 +2347,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            //cancel login process by press back.
+            if(!MegaApplication.isLoggingIn()) {
+                log("terminate login process");
+                return;
+            }
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
@@ -2892,13 +2934,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public int onBackPressed() {
         log("onBackPressed");
 
-//        backWhileLogin = true;
-
-        //While login, disable the back.
-        if (loginClicked ||
-                loginProgressBar.getVisibility() == View.VISIBLE ||
-                loginFetchNodesProgressBar.getVisibility() == View.VISIBLE){
-            return -1;
+        backWhileLogin = true;
+        if (loginClicked || MegaApplication.isLoggingIn()){
+            MegaApplication.setLoggingIn(false);
+            loginClicked = false;
+            backToLoginForm();
+            return 1;
         }
         else{
 
@@ -3106,6 +3147,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private static void log(String log) {
-        Util.log("LoginFragmentLollipop", log);
+//        Util.log("LoginFragmentLollipop", log);
+        TL.log("Login","@#@" ,log );
     }
 }
