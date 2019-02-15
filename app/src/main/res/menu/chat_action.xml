@@ -11,14 +11,6 @@
         android:enabled="true"/>
 
     <item
-        android:id="@+id/cab_menu_video_chat"
-        android:orderInCategory="105"
-        android:title="@string/tab_archive_chat"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_videocam_white"
-        android:enabled="true"/>
-
-    <item
         android:id="@+id/cab_menu_invite_chat"
         android:orderInCategory="120"
         android:title="@string/add_participants_menu_item"

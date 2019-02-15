@@ -47,6 +47,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
@@ -829,6 +830,11 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }else{
             //Contact
             String contactMail = megaChatApi.getContactEmail(peerid);
+
+            if(contactMail == null){
+                contactMail = "x";
+                //                contactMail = megaChatApi.getUserEmail(peerid, this);
+            }
 
             createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
 

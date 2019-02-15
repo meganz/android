@@ -1567,22 +1567,23 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				if (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 					long chatId = handleList.get(0);
 
-					if(openCallChatId!=chatId){
+					if (openCallChatId != chatId) {
 						MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 						if (callToLaunch != null) {
 							if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-								log("One call:Launch call with status: "+callToLaunch.getStatus());
+								log("One call:Launch call with status: " + callToLaunch.getStatus());
 								launchCallActivity(callToLaunch);
 							} else {
 								log("Launch not in correct status");
 							}
 						}
-					}
-					else{
+					} else {
 						log("Call already opened");
 					}
 				}
-			} else if (numberOfCalls > 1) {
+
+			}else if (numberOfCalls > 1) {
+				log("numberOfCalls: "+numberOfCalls+", this call status: "+call.getStatus());
 				if(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS){
 
 					for(int i=0; i< handleList.size(); i++){
