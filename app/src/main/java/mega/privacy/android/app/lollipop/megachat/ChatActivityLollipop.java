@@ -6941,6 +6941,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("onResume() other case - GONE");
                 callInProgressLayout.setVisibility(View.GONE);
             }
+            invalidateOptionsMenu();
+
         }
         else{
             log("onResume() callInProgress != null - GONE");
@@ -7352,7 +7354,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
                     callInProgressLayout.setOnClickListener(this);
                 }
-                invalidateOptionsMenu();
 
                 if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     long openCallChatId = MegaApplication.getOpenCallChatId();
@@ -7372,7 +7373,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     callInProgressLayout.setVisibility(View.VISIBLE);
                     callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
                     callInProgressLayout.setOnClickListener(this);
-                    invalidateOptionsMenu();
                 }
             }else{
 
@@ -7381,9 +7381,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("onChatCallUpdate() other case - GONE");
                     callInProgressLayout.setVisibility(View.GONE);
                     callInProgressLayout.setOnClickListener(null);
-                    invalidateOptionsMenu();
                 }
             }
+            invalidateOptionsMenu();
+
         }
     }
 
