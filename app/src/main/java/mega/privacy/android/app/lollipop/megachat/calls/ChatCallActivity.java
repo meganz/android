@@ -88,6 +88,8 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -1188,9 +1190,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }else{
             //Contact
             String contactMail = megaChatApi.getContactEmail(peerId);
-            if(contactMail==null){
-                contactMail = "x";
-//                contactMail = megaChatApi.getUserEmail(peerId,this);
+            if(contactMail == null){
+                contactMail = " ";
             }
             createDefaultBigAvatarGroupCall(peerId, clientId, fullName, contactMail);
             File avatar = null;
@@ -3788,13 +3789,49 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private String getName(long peerid){
         String name = " ";
         if(megaChatApi!=null){
+            log("getName: peerid = "+peerid);
             if(peerid == megaChatApi.getMyUserHandle()){
                 name = megaChatApi.getMyFullname();
+                log("getName: myName = "+name);
+                if(name == null){
+                    name = megaChatApi.getMyEmail();
+                    log("getName: myEmail = "+name);
+                }
             }else{
                 name = chat.getPeerFullnameByHandle(peerid);
+                log("getName: contactName = "+name);
+
+                if(name == null){
+                    name = megaChatApi.getContactEmail(peerid);
+                    log("getName: contactEmail = "+name);
+                    if(name == null){
+                        CallNonContactNameListener listener = new CallNonContactNameListener(context, peerid);
+                        megaChatApi.getUserEmail(peerid, listener);
+
+                    }
+                }
             }
         }
         return name;
+    }
+
+    public void updateNonContactName(long peerid, String peerName){
+        log("*updateNonContactName: UserEmail = "+peerName);
+        if((peersBeforeCall!=null)&&(peersBeforeCall.size()!=0)){
+            for(InfoPeerGroupCall peer:peersBeforeCall){
+                if(peerid == peer.getPeerId()){
+                    peer.setName(peerName);
+
+                }
+            }
+        }
+        if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
+            for(InfoPeerGroupCall peer:peersOnCall){
+                if(peerid == peer.getPeerId()){
+                    peer.setName(peerName);
+                }
+            }
+        }
     }
 
     private void checkParticipants(MegaChatCall call, boolean isInProgress){

@@ -830,12 +830,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }else{
             //Contact
             String contactMail = megaChatApi.getContactEmail(peerid);
-
             if(contactMail == null){
-                contactMail = "x";
-                //                contactMail = megaChatApi.getUserEmail(peerid, this);
+                contactMail = " ";
             }
-
             createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
 
             ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
@@ -883,7 +880,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                         log("setUserAvatar: megaApi is Null in Offline mode");
                         return;
                     }
-
                     if (context.getExternalCacheDir() != null){
                         megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
                     }else{
