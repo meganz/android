@@ -424,6 +424,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if(callChat!=null){
                         if(callChat.getStatus() ==  MegaChatCall.CALL_STATUS_RING_IN){
                             log("onNewIntent:RING_IN");
+
                             RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
                             layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                             layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
@@ -434,6 +435,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                         }else if(callChat.getStatus() ==  MegaChatCall.CALL_STATUS_IN_PROGRESS){
                             log("onNewIntent:IN_PROGRESS");
+                            rtcAudioManager.start(null);
                             RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                             layoutExtend.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                             layoutExtend.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
@@ -844,6 +846,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                 }else if((callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callStatus==MegaChatCall.CALL_STATUS_JOINING)){
                     log("onCreate:IN_PROGRESS");
+                    rtcAudioManager.start(null);
                     updateScreenStatusInProgress();
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
@@ -1396,7 +1399,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         bigRecyclerView.setAdapter(null);
 
         stopAudioSignals();
-
+        rtcAudioManager.stop();
         super.onDestroy();
     }
 
@@ -1450,6 +1453,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         bigRecyclerView.setAdapter(null);
 
         stopAudioSignals();
+        rtcAudioManager.stop();
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             super.finishAndRemoveTask();
         }
@@ -1683,9 +1688,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         //I have finished the group call but I can join again
                         log("Terminating call of chat: "+chatId);
                         clearHandlers();
+                        stopAudioSignals();
+                        rtcAudioManager.stop();
                         if(chat.isGroup()){
-                            stopAudioSignals();
-                            rtcAudioManager.stop();
+
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 super.finishAndRemoveTask();
                             }else {
@@ -1693,6 +1699,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             }
 
                         }else{
+
                             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 super.finishAndRemoveTask();
                             }else {
@@ -3111,6 +3118,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        log("onKeyDown");
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP: {
                 try {
