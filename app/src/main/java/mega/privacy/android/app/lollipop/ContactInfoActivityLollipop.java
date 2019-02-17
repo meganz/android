@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -1229,9 +1230,24 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
 				//If there is a call in progress
-				startVideo = false;
-				if(checkPermissionsCall()){
-					startCall(false);
+				if(megaChatApi!=null){
+					MegaHandleList listCalls = megaChatApi.getChatCalls();
+					int contCallNotPresent = 0;
+					for(int i=0; i<listCalls.size(); i++){
+						MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+						if(call!=null){
+							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+								contCallNotPresent ++ ;
+							}
+						}
+					}
+					if(contCallNotPresent == listCalls.size()){
+						log("I'm not in a call");
+						startVideo = false;
+						if(checkPermissionsCall()){
+							startCall(false);
+						}
+					}
 				}
 
 				break;
@@ -1239,9 +1255,24 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
 				//If there is a call in progress
-				startVideo = true;
-				if(checkPermissionsCall()){
-					startCall(true);
+				if(megaChatApi!=null){
+					MegaHandleList listCalls = megaChatApi.getChatCalls();
+					int contCallNotPresent = 0;
+					for(int i=0; i<listCalls.size(); i++){
+						MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+						if(call!=null){
+							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+								contCallNotPresent ++ ;
+							}
+						}
+					}
+					if(contCallNotPresent == listCalls.size()){
+						log("I'm not in a call");
+						startVideo = true;
+						if(checkPermissionsCall()){
+							startCall(true);
+						}
+					}
 				}
 				break;
 			}
