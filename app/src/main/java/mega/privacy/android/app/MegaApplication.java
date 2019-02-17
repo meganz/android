@@ -1555,6 +1555,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			log("Call destroyed: "+call.getTermCode());
 		}
 		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+			log("Call CALL_STATUS_IN_PROGRESS");
 			clearIncomingCallNotification(call.getId());
 		}
 
@@ -1760,7 +1761,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	public void checkQueuedCalls(){
 		log("checkQueuedCalls");
-
 		try{
 			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 			notificationBuilder.checkQueuedCalls();

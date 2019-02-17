@@ -884,6 +884,8 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
+
+
     public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
         log("showIncomingCallNotification");
 
@@ -921,10 +923,14 @@ public final class ChatAdvancedNotificationBuilder {
 
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                log("showIncomingCallNotification: VERSION oreo");
+
                 NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
                 channel.setShowBadge(true);
                 if (notificationManager == null) {
+                    log("showIncomingCallNotification: VERSION MAYOR MAYOR: NOTIFICATION_SERVICE");
                     notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 }
                 notificationManager.createNotificationChannel(channel);
@@ -943,8 +949,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                 if(chatToAnswer.isGroup()){
                     notificationBuilderO.setContentTitle(chatToAnswer.getTitle());
-                }
-                else{
+                }else{
                     notificationBuilderO.setContentTitle(chatToAnswer.getPeerFullname(0));
                 }
 
@@ -952,52 +957,53 @@ public final class ChatAdvancedNotificationBuilder {
                 if (largeIcon != null) {
                     notificationBuilderO.setLargeIcon(largeIcon);
                 }
-
                 notificationManager.notify(notificationId, notificationBuilderO.build());
-            }
-            else {
 
-                //No sound just vibration
-                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_stat_notify)
-                        .setContentText(context.getString(R.string.notification_subtitle_incoming))
-                        .setAutoCancel(false)
-                        .setVibrate(pattern)
-                        .addAction(actionIgnore)
-                        .addAction(actionAnswer);
+            }else {
+                log("showIncomingCallNotification: nougat");
 
-                if(chatToAnswer.isGroup()){
-                    notificationBuilder.setContentTitle(chatToAnswer.getTitle());
-                }
-                else{
-                    notificationBuilder.setContentTitle(chatToAnswer.getPeerFullname(0));
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
-                }
-
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-                    //API 25 = Android 7.1
-                    notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-                } else {
-                    notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-                }
-
-                notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bitmap largeIcon = setUserAvatar(chatToAnswer);
-                    if (largeIcon != null) {
-                        notificationBuilder.setLargeIcon(largeIcon);
-                    }
-                }
-
-                if (notificationManager == null) {
-                    notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                }
-
-                notificationManager.notify(notificationId, notificationBuilder.build());
+//                //No sound just vibration
+//                Notification.Builder notificationBuilder = new Notification.Builder(context)
+//                        .setSmallIcon(R.drawable.ic_stat_notify)
+//                        .setContentText(context.getString(R.string.notification_subtitle_incoming))
+//                        .setAutoCancel(false)
+//                        .setVibrate(pattern)
+//                        .addAction(-1, "Ignore", pendingIntentIgnore)
+//                        .addAction(-1, "Answer", pendingIntentAnswer);
+//
+//
+////                        .addAction(actionIgnore);
+////                        .addAction(actionAnswer)
+//
+//
+//                if(chatToAnswer.isGroup()){
+//                    notificationBuilder.setContentTitle(chatToAnswer.getTitle());
+//                }else{
+//                    notificationBuilder.setContentTitle(chatToAnswer.getPeerFullname(0));
+//                }
+//
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+//                }
+//                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+//                    //API 25 = Android 7.1
+//                    notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+//                } else {
+//                    notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+//                }
+////                notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    Bitmap largeIcon = setUserAvatar(chatToAnswer);
+//                    if (largeIcon != null) {
+//                        notificationBuilder.setLargeIcon(largeIcon);
+//                    }
+//                }
+//
+//                if (notificationManager == null) {
+//                    notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//                }
+//
+//                notificationManager.notify(notificationId, notificationBuilder.build());
             }
         }
         else{
@@ -1011,9 +1017,9 @@ public final class ChatAdvancedNotificationBuilder {
         MegaHandleList handleList = megaChatApi.getChatCalls();
         if(handleList!=null){
             long numberOfCalls = handleList.size();
-            log("checkQueuedCalls: Number of calls in progress: "+numberOfCalls);
+            log("Number of calls in progress: "+numberOfCalls);
             if (numberOfCalls>1){
-                log("checkQueuedCalls: MORE than one call in progress: "+numberOfCalls);
+                log("MORE than one call in progress: "+numberOfCalls);
                 MegaChatCall callInProgress = null;
                 MegaChatCall callIncoming = null;
 
@@ -1046,7 +1052,6 @@ public final class ChatAdvancedNotificationBuilder {
                     if(call!=null){
 
                         if(call.getStatus()<MegaChatCall.CALL_STATUS_IN_PROGRESS && (!call.isIgnored())){
-
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                 if(notificationManager == null){
                                     notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1098,7 +1103,7 @@ public final class ChatAdvancedNotificationBuilder {
                 }
             }
             else{
-                log("checkQueuedCalls: No calls to launch");
+                log("No calls to launch");
             }
         }
     }
