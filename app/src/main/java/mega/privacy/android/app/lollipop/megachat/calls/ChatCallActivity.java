@@ -459,8 +459,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     callChat = megaChatApi.getChatCall(chatId);
                     titleToolbar.setText(chat.getTitle());
 //                    updateSubTitle();
-                    updateScreenStatusInProgress();
-                    if(callChat!=null){
+//                    updateScreenStatusInProgress();
+                    if((callChat!=null)&&(callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
                         log("onNewIntent:Start call Service");
                         Intent intentService = new Intent(this, CallService.class);
                         intentService.putExtra("chatHandle", callChat.getChatid());
@@ -755,8 +755,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
             if ((chatId != -1) && (megaChatApi!=null)) {
-                log("onCreate:Chat id: "+chatId);
-
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
                 if (callChat == null){

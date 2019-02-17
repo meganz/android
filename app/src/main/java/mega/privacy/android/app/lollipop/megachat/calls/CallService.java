@@ -115,7 +115,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             channel.setSound(null, null);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
-
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));
@@ -172,9 +171,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         else {
 
             mBuilderCompat = new NotificationCompat.Builder(this);
-
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));

@@ -18193,13 +18193,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         if(call.getChatid() != -1){
             if((call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED) ||
 					(call.getStatus()==MegaChatCall.CALL_STATUS_JOINING) ||
-					(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN) ||
 					(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)){
 				setCallBadge();
 
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 				if ((rChatFL != null) && (rChatFL.isVisible())){
-                    log("nChatCallUpdate() -> rChatFL visible: ");
+                    log("OnChatCallUpdate() -> rChatFL visible: ");
                     rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 				}else{
 					log("*onChatCallUpdate() -> rChatFL not: ");
