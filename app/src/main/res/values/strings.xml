@@ -2299,6 +2299,8 @@
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
     <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Tap to return to call </string>
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">ANSWER</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">IGNORED</string>
 
 
 </resources>

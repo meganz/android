@@ -1660,7 +1660,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             for(int i = 0; i < listCalls.size(); i++){
                 MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
                 if(call!=null){
-                    if((call.getStatus()>=MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                    if((call.getStatus()>MegaChatCall.CALL_STATUS_RING_IN) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
                         shouldShown = true;
                         chatInCall = call.getChatid();
                         break;
@@ -1868,7 +1868,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             MegaChatCall call = megaChatApi.getChatCall((listCalls.get(i)));
             if(call!=null){
                 log("onResume: call status = "+call.getStatus());
-                if(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                if((call.getStatus() > MegaChatCall.CALL_STATUS_RING_IN)&&(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
                     showCallLayout(true, listCalls.get(i));
                     break;
                 }
@@ -1970,7 +1970,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                     if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
                         log("returnTheCall() -> ChatCallActivity");
-
                         Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("chatHandle", listCalls.get(i));

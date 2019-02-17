@@ -1228,21 +1228,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
+				//If there is a call in progress
 				startVideo = false;
 				if(checkPermissionsCall()){
 					startCall(false);
 				}
 
-//				startCall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
+				//If there is a call in progress
 				startVideo = true;
 				if(checkPermissionsCall()){
 					startCall(true);
 				}
-//				startCall(true);
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {

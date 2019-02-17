@@ -1579,19 +1579,21 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 							}
 						}
 					} else {
-						log("Call already opened");
+						log("#Call already opened");
 					}
 				}
 
 			}else if (numberOfCalls > 1) {
 				log("numberOfCalls: "+numberOfCalls+", this call status: "+call.getStatus());
-				if(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS){
+				if((call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+					log("MORE CALLS, this call status: CALL_STATUS_REQUEST_SENT || CALL_STATUS_IN_PROGRESS");
 
 					for(int i=0; i< handleList.size(); i++){
 						long chatId = handleList.get(i);
 						if(openCallChatId!=chatId){
 							MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 							if (callToLaunch != null) {
+								log("numberOfCalls: "+numberOfCalls+", launch status: "+callToLaunch.getStatus());
 								if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 									log("Call: "+i+". Launch call with status: "+callToLaunch.getStatus());
 									launchCallActivity(callToLaunch);
@@ -1603,6 +1605,42 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						else{
 							log("Call already opened");
 						}
+					}
+				}
+				if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
+					log("MORE CALLS, this call status: CALL_STATUS_RING_IN");
+
+					int contCallNotPresent = 0;
+					for(int i=0; i<handleList.size(); i++){
+						MegaChatCall callEspecific = megaChatApi.getChatCall(handleList.get(i));
+						if(callEspecific!=null){
+							if((callEspecific.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(callEspecific.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+								contCallNotPresent ++ ;
+							}
+						}
+					}
+					if(contCallNotPresent == numberOfCalls){
+						log("I'm not in any calls");
+						for(int i=0; i< handleList.size(); i++){
+							long chatId = handleList.get(i);
+							if(openCallChatId!=chatId){
+								MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
+								if (callToLaunch != null) {
+									log("launch status: "+callToLaunch.getStatus());
+									if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+										log("Call: "+i+". Launch call with status: "+callToLaunch.getStatus());
+										launchCallActivity(callToLaunch);
+									} else {
+										log("Launch not in correct status");
+									}
+								}
+							}
+							else{
+								log("Call already opened");
+							}
+						}
+					}else{
+						log("I'm already in a call");
 					}
 				}
 				checkQueuedCalls();
