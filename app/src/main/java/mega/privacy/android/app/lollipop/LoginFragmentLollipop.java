@@ -122,6 +122,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private TextView parkAccountSecondP;
     private Button parkAccountButton;
 
+    private ProgressBar loginInProgressPb;
+    private TextView loginInProgressInfo;
+
     private CountDownTimer timer;
     private boolean firstRequestUpdate = true;
 
@@ -359,6 +362,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
         bLogin.setOnClickListener(this);
+
+        loginInProgressPb = v.findViewById(R.id.pb_login_in_progress);
+        loginInProgressInfo = v.findViewById(R.id.text_login_tip);
 
         bForgotPass = (TextView) v.findViewById(R.id.button_forgot_pass);
         bForgotPass.setText(getString(R.string.forgot_pass).toUpperCase(Locale.getDefault()));
@@ -1711,6 +1717,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 hidePasswordIfVisible();
                 loginClicked = true;
                 backWhileLogin = false;
+                //disbale it
+                bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
+                bLogin.setEnabled(false);
+                //display login info
+                loginInProgressPb.setVisibility(View.VISIBLE);
+                loginInProgressInfo.setVisibility(View.VISIBLE);
+                loginInProgressInfo.setText(R.string.login_in_progress);
                 onLoginClick(v);
                 break;
             }
@@ -2205,6 +2218,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
+            //when get response, enable
+            bLogin.setEnabled(true);
+            bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
+            //hide login info
+            loginInProgressPb.setVisibility(View.GONE);
+            loginInProgressInfo.setVisibility(View.GONE);
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
                 log("terminate login process");
@@ -2260,6 +2279,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else if (error.getErrorCode() == MegaError.API_EBLOCKED){
                         errorMessage = getString(R.string.error_account_suspended);
+                    } else if(error.getErrorCode() == MegaError.API_EACCESS) {
+                        errorMessage = error.getErrorString();
                     }
                     else{
                         errorMessage = error.getErrorString();
@@ -2537,22 +2558,28 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             log("onRequestTemporaryError:onFinish:API_EAGAIN: :value: "+error.getValue());
                             if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
                                 serversBusyText.setText(getString(R.string.login_connectivity_issues));
+                                loginInProgressInfo.setText(getString(R.string.login_connectivity_issues));
                             }
                             else if(error.getValue() == MegaApiJava.RETRY_SERVERS_BUSY){
                                 serversBusyText.setText(getString(R.string.login_servers_busy));
+                                loginInProgressInfo.setText(getString(R.string.login_servers_busy));
                             }
                             else if(error.getValue() == MegaApiJava.RETRY_API_LOCK){
                                 serversBusyText.setText(getString(R.string.login_API_lock));
+                                loginInProgressInfo.setText(getString(R.string.login_API_lock));
                             }
                             else if(error.getValue() == MegaApiJava.RETRY_RATE_LIMIT){
                                 serversBusyText.setText(getString(R.string.login_API_rate));
+                                loginInProgressInfo.setText(getString(R.string.login_API_rate));
                             }
                             else{
                                 serversBusyText.setText(getString(R.string.servers_busy));
+                                loginInProgressInfo.setText(getString(R.string.servers_busy));
                             }
                         }
                         else{
                             serversBusyText.setText(getString(R.string.servers_busy));
+                            loginInProgressInfo.setText(getString(R.string.servers_busy));
                         }
                     }
                     catch (Exception e){}
