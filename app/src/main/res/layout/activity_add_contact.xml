@@ -12,13 +12,13 @@
 		android:id="@+id/add_contact_toolbar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:background="@color/camera_uploads_list_view"
-		app:titleTextColor="@color/mail_my_account"
+		app:titleTextColor="@color/name_my_account"
 		app:subtitleTextColor="@color/mail_my_account"
-		app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-		app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-		app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-		android:elevation="4dp"/>
+		android:background="?attr/colorPrimary"
+		app:popupTheme="@style/Theme.Megaactionbar"
+		app:titleTextAppearance="@style/ToolbarTitle"
+		app:subtitleTextAppearance="@style/ToolbarSubtitle"
+		app:theme="@style/Theme.Megaactionbar"/>
 
 	<LinearLayout
 		android:id="@+id/add_contacts_container"
@@ -107,9 +107,16 @@
 					android:text="@string/menu_item_scan_code"
 					android:textSize="14sp"
 					android:textColor="@color/accentColor"
-					android:paddingLeft="24dp"
+					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"
 					style="?android:attr/borderlessButtonStyle"/>
+
+				<View
+					android:id="@+id/separator_scan_qr"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:layout_alignParentBottom="true"/>
 
 			</RelativeLayout>
 
@@ -126,7 +133,7 @@
 					android:text="@string/invite_contacts"
 					android:textColor="@color/accentColor"
 					android:textSize="14sp"
-					android:paddingLeft="24dp"
+					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"
 					style="?android:attr/borderlessButtonStyle"/>
 
@@ -152,18 +159,18 @@
 					android:text="@string/new_group_chat_label"
 					android:textColor="@color/accentColor"
 					android:textSize="14sp"
-					android:paddingLeft="24dp"
+					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"
 					style="?android:attr/borderlessButtonStyle"/>
 
-			</RelativeLayout>
+				<View
+					android:id="@+id/separator_new_group"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:layout_alignParentBottom="true"/>
 
-			<View
-				android:id="@+id/separator_up"
-				android:layout_below="@+id/container_linear_layout"
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:background="@color/divider_upgrade_account"/>
+			</RelativeLayout>
 
 			<RelativeLayout
 				android:id="@+id/contacts_adds_container"
@@ -225,20 +232,22 @@
 			<RelativeLayout
 				android:id="@+id/container_list_contacts"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp">
 
 				<RelativeLayout
 					android:id="@+id/header_list"
 					android:layout_width="match_parent"
-					android:background="@color/camera_uploads_list_view"
-					android:layout_height="48dp">
+					android:layout_height="36dp">
 
 					<TextView
 						android:id="@+id/text_header_list"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true"
-						android:textColor="@color/mail_my_account"
+						android:textColor="@color/name_my_account"
+						android:fontFamily="sans-serif-light"
+						android:textStyle="bold"
 						android:textSize="14sp"
 						android:layout_marginLeft="16dp"/>
 
@@ -323,6 +332,8 @@
 				android:layout_below="@+id/contacts_adds_container"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="16dp"
 				android:background="@color/divider_upgrade_account"/>
 
 			<LinearLayout
@@ -342,7 +353,7 @@
 					android:text="@string/ekr_label"
 					android:layout_marginTop="14dp"
 					android:layout_marginLeft="16dp"
-					android:layout_marginRight="6dp" />
+					android:layout_marginRight="6dp"/>
 
 				<TextView
 					android:layout_width="match_parent"
@@ -366,6 +377,8 @@
 						android:id="@+id/separator_ekr"
 						android:layout_width="match_parent"
 						android:layout_height="1dp"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp"
 						android:background="@color/divider_upgrade_account"/>
 
 					<RelativeLayout
@@ -392,9 +405,19 @@
 							android:layout_alignParentRight="true"
 							android:layout_marginRight="-6dp"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content" />
+							android:layout_height="wrap_content"
+							android:theme="@style/ColorControlStyle"/>
 
 					</RelativeLayout>
+
+					<View
+						android:id="@+id/separator_get_chat_link"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp"
+						android:background="@color/divider_upgrade_account"
+						android:layout_alignParentBottom="true"/>
 
 				</RelativeLayout>
 
@@ -415,16 +438,17 @@
 					<RelativeLayout
 						android:id="@+id/new_group_header_list"
 						android:layout_width="match_parent"
-						android:background="@color/camera_uploads_list_view"
-						android:layout_height="48dp">
+						android:layout_height="36dp">
 
 						<TextView
 							android:id="@+id/new_group_text_header_list"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:layout_centerVertical="true"
-							android:textColor="@color/mail_my_account"
+							android:textColor="@color/name_my_account"
 							android:textSize="14sp"
+							android:fontFamily="sans-serif-light"
+							android:textStyle="bold"
 							android:layout_marginLeft="16dp"/>
 
 					</RelativeLayout>
@@ -450,5 +474,17 @@
 		</LinearLayout>
 
 	</android.support.v4.widget.NestedScrollView>
+
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab_button_next"
+		android:layout_width="@dimen/fab_button_diameter"
+		android:layout_height="@dimen/fab_button_diameter"
+		android:elevation="@dimen/elevation_low"
+		android:layout_margin="16dp"
+		android:src="@drawable/ic_send_white"
+		android:stateListAnimator="@anim/button_elevation"
+		android:tint="@android:color/white"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"/>
 
 </RelativeLayout>
