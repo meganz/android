@@ -751,14 +751,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         sendIcon.setEnabled(false);
                         sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                         log("textChat:TextChangedListener:onTextChanged:lengthInvalid2:sendStopTypingNotification");
-                        megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+                        if (chatRoom != null) {
+                            megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
-                        if(chatRoom.hasCustomTitle()){
-                            textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-                        }else{
-                            textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+                            if (chatRoom.hasCustomTitle()) {
+                                textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
+                            }
+                            else {
+                                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+                            }
                         }
-
                         textChat.setMinLines(1);
                         textChat.setMaxLines(1);
                     }
@@ -803,7 +805,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     log("textChat:TextChangedListener:onTextChanged:nonFocusTextChat:sendStopTypingNotification");
-                    megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+                    if (chatRoom != null) {
+                        megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+                    }
                 }
             }
         });
@@ -955,9 +959,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         userTypingLayout.setVisibility(View.GONE);
         userTypingText = (TextView) findViewById(R.id.user_typing_text);
 
-        Intent newIntent = getIntent();
-
-        initAfterIntent(newIntent, savedInstanceState);
+        initAfterIntent(getIntent(), savedInstanceState);
 
         log("FINISH on Create");
     }
@@ -1263,6 +1265,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(chatRoom.isPreview()){
                 log("Chat not connected:setChatSubtitle:isPreview");
                 subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                subtitleToobar.setVisibility(View.VISIBLE);
                 iconStateToolbar.setVisibility(View.GONE);
                 tB.setOnClickListener(this);
 
@@ -1287,6 +1290,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(chatRoom.isPreview()){
                     log("setChatSubtitle:isPreview");
                     subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                    subtitleToobar.setVisibility(View.VISIBLE);
                     iconStateToolbar.setVisibility(View.GONE);
                     tB.setOnClickListener(this);
 
@@ -6885,6 +6889,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putString("mOutputFilePath",mOutputFilePath);
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
+
+        if ((getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK))) {
+            closeChat(false);
+        }
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){

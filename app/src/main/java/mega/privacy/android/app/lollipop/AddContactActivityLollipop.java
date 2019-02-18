@@ -182,6 +182,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public static String EXTRA_EKR = "EKR";
     public static String EXTRA_CHAT_LINK = "chatLink";
 
+    private MenuItem sendInvitationMenuItem;
     private MenuItem scanQrMenuItem;
 
     private boolean comesFromChat;
@@ -1116,29 +1117,25 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     public void setSendInvitationVisibility() {
         if (fabButton != null) {
-            if (contactType == Constants.CONTACT_TYPE_MEGA) {
-                if (createNewGroup || onNewGroup){
-                    fabButton.setVisibility(View.VISIBLE);
-                }
-                else {
-                    fabButton.setVisibility(View.GONE);
-                }
+            if (contactType == Constants.CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup || (comesFromChat && adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0))){
+                fabButton.setVisibility(View.VISIBLE);
             }
-            else if (contactType == Constants.CONTACT_TYPE_DEVICE && adapterContacts != null) {
-                if (adapterContacts.getItemCount() > 0){
-                    fabButton.setVisibility(View.VISIBLE);
-                }
-                else {
-                    fabButton.setVisibility(View.GONE);
-                }
+            else if (contactType == Constants.CONTACT_TYPE_DEVICE && adapterContacts != null && adapterContacts.getItemCount() > 0) {
+                fabButton.setVisibility(View.VISIBLE);
             }
-            else if (adapterShare != null){
-                if (adapterShare.getItemCount() > 0){
-                    fabButton.setVisibility(View.VISIBLE);
-                }
-                else {
-                    fabButton.setVisibility(View.GONE);
-                }
+            else if (contactType == Constants.CONTACT_TYPE_BOTH && adapterShare != null && adapterShare.getItemCount() > 0){
+                fabButton.setVisibility(View.VISIBLE);
+            }
+            else {
+                fabButton.setVisibility(View.GONE);
+            }
+        }
+        if (sendInvitationMenuItem != null) {
+            if (contactType == Constants.CONTACT_TYPE_MEGA && onNewGroup) {
+                sendInvitationMenuItem.setVisible(true);
+            }
+            else {
+                sendInvitationMenuItem.setVisible(false);
             }
         }
     }
@@ -1237,6 +1234,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             scanQrMenuItem.setVisible(false);
         }
 
+        sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
+        sendInvitationMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_send_white, R.color.accentColor));
+        setSendInvitationVisibility();
+
         if (searchExpand && searchMenuItem != null) {
             searchMenuItem.expandActionView();
             if (searchView != null) {
@@ -1271,6 +1272,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             case R.id.action_scan_qr: {
                 initScanQR();
+                break;
+            }
+            case R.id.action_send_invitation: {
+                if (contactType == Constants.CONTACT_TYPE_MEGA) {
+                    setResultContacts(addedContactsMEGA, true);
+                }
+                hideKeyboard();
                 break;
             }
         }
@@ -1805,7 +1813,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
                 }
                 else if (createNewGroup && !onNewGroup) {
-                    aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
+                    aB.setTitle(getString(R.string.title_new_group).toUpperCase());
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
                     }
@@ -1817,7 +1825,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else if (contactType == Constants.CONTACT_TYPE_DEVICE){
                 aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
                 if (addedContactsPhone.size() > 0){
-                    aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
+                    aB.setSubtitle(addedContactsPhone.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsPhone.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -1826,7 +1834,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else {
                 aB.setTitle(getString(R.string.share_with).toUpperCase());
                 if (addedContactsShare.size() > 0){
-                    aB.setSubtitle(getResources().getString(R.string.selected_items, addedContactsMEGA.size()));
+                    aB.setSubtitle(addedContactsShare.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsShare.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -3016,6 +3024,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
         newGroupLayout.setVisibility(View.GONE);
         visibilityFastScroller();
+        setSendInvitationVisibility();
     }
 
     void createMyContact () {

@@ -376,6 +376,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			if(isPreview && megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS){
 				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
 				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
+				((ViewHolderParticipantsList)holder).itemLayout.setOnClickListener(null);
 			}
 
 			int permission = participant.getPrivilege();
@@ -471,51 +472,68 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
     public int getItemCount() {
 		log("getItemCount");
-		int size = participants.size();
 
-		int permission = participants.get(size-1).getPrivilege();
-
-		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			log("getItemCount: moderator type");
-			int participantNumber = participants.size()+1;
-			log("return value: "+participantNumber);
-			return participantNumber;
-		} else {
+		if (isPreview) {
 			return participants.size();
+		}
+		else {
+			int size = participants.size();
+			int permission = participants.get(size-1).getPrivilege();
+
+			if (permission == MegaChatRoom.PRIV_MODERATOR) {
+				log("getItemCount: moderator type");
+				int participantNumber = participants.size()+1;
+				log("return value: "+participantNumber);
+				return participantNumber;
+			} else {
+				return participants.size();
+			}
 		}
     }
 
 	@Override
 	public int getItemViewType(int position) {
 		log("getItemViewType: position"+position);
-		int size = participants.size();
 
-		int permission = participants.get(size-1).getPrivilege();
+		if (isPreview) {
+			return  ITEM_VIEW_TYPE_NORMAL;
+		}
+		else {
+			int size = participants.size();
 
-		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			log("getItemViewType: moderator type");
-			if (position>0) {
-				return ITEM_VIEW_TYPE_NORMAL;
+			int permission = participants.get(size-1).getPrivilege();
+
+			if (permission == MegaChatRoom.PRIV_MODERATOR) {
+				log("getItemViewType: moderator type");
+				if (position>0) {
+					return ITEM_VIEW_TYPE_NORMAL;
+				} else {
+					log("Type ADD_PARTICIPANT");
+					return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
+				}
 			} else {
-				log("Type ADD_PARTICIPANT");
-				return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
+				return ITEM_VIEW_TYPE_NORMAL;
 			}
-		} else {
-			return ITEM_VIEW_TYPE_NORMAL;
 		}
 	}
 
 	public Object getItem(int position) {
 		log("getItem: "+position);
-		int size = participants.size();
-		log("participants size: "+size);
-		int permission = participants.get(size-1).getPrivilege();
-
-		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			log("getItemViewType: moderator type");
-			return participants.get(position-1);
-		} else {
+		if (isPreview) {
 			return participants.get(position);
+		}
+		else {
+			int size = participants.size();
+			log("participants size: "+size);
+			int permission = participants.get(size-1).getPrivilege();
+
+			if (permission == MegaChatRoom.PRIV_MODERATOR) {
+				log("getItemViewType: moderator type");
+				return participants.get(position-1);
+			}
+			else {
+				return participants.get(position);
+			}
 		}
 	}
 

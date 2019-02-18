@@ -524,8 +524,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         //Set the first element = me
         participantsCount = chat.getPeerCount();
         log("Participants count: "+participantsCount);
-        long participantsLabel = participantsCount+1; //Add one to include me
-        infoNumParticipantsText.setText(getString(R.string.number_of_participants, participantsLabel));
+        if (chat.isPreview()) {
+            infoNumParticipantsText.setText(getString(R.string.number_of_participants, participantsCount));
+        }
+        else {
+            long participantsLabel = participantsCount+1; //Add one to include me
+            infoNumParticipantsText.setText(getString(R.string.number_of_participants, participantsLabel));
+        }
 
         for(int i=0;i<participantsCount;i++){
             int peerPrivilege = chat.getPeerPrivilege(i);

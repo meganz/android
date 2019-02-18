@@ -16,11 +16,11 @@
 		MEGA:showAsAction="always"
 		android:visible="false"/>
 
-	<!--<item-->
-		<!--android:id="@+id/action_send_invitation"-->
-		<!--android:orderInCategory="100"-->
-		<!--android:title="@string/context_send"-->
-		<!--MEGA:showAsAction="always"-->
-		<!--android:visible="false" />-->
+	<item
+		android:id="@+id/action_send_invitation"
+		android:orderInCategory="100"
+		android:title="@string/context_send"
+		MEGA:showAsAction="always"
+		android:visible="false" />
 
 </menu>
