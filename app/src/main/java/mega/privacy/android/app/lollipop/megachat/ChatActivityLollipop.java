@@ -2420,24 +2420,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         log("Open camera and lost the camera in the call");
-                        //Remove the local video from the video call:
-                        MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
-                        if(callInProgress != null) {
-                            if (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-                                megaChatApi.answerChatCall(idChat, true, null);
-                            } else {
-                                if (callInProgress.hasLocalVideo()) {
-                                    megaChatApi.disableVideo(idChat, null);
-                                } else {
-                                    megaChatApi.enableVideo(idChat, null);
+                        //Find the call in progress:
+                        if(megaChatApi!=null){
+                            MegaHandleList listCalls = megaChatApi.getChatCalls();
+                            if((listCalls!=null)&&(listCalls.size()!=0)){
+                                for(int i = 0; i < listCalls.size(); i++){
+                                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                                    if(call!=null){
+                                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                                            //Remove the local video from the video call:
+                                            MegaChatCall callInProgress = megaChatApi.getChatCall(listCalls.get(i));
+                                            if(callInProgress != null) {
+                                                if (callInProgress.hasLocalVideo()) {
+                                                    megaChatApi.disableVideo(listCalls.get(i), null);
+                                                }
+                                                openCameraApp();
+                                            }
+                                            break;
+                                        }
+                                    }
+
                                 }
                             }
 
-                            if ((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)) {
-                                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-                            }
-                            openCameraApp();
                         }
+
+
 
                         break;
 
@@ -2659,27 +2667,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             case R.id.media_icon_chat:
             case R.id.rl_media_icon_chat:{
-                log("onClick:media_icon_chat");
+                log("onClick:media_icon_chat: chatRoom: "+chatRoom);
                 if(fileStorageLayout.isShown()){
                     hideFileStorageSection();
                 }
                 if(emojiKeyboard!=null){
                     emojiKeyboard.hideBothKeyboard(this);
                 }
-                boolean inProgressCall = false;
-
-                MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
-                if(callInProgress != null){
-                    if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                        inProgressCall = true;
-                    }else{
-                        inProgressCall = false;
+                MegaHandleList listCalls = megaChatApi.getChatCalls();
+                int contCallNotPresent = 0;
+                for(int i=0; i<listCalls.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                    if(call!=null){
+                        if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+                            contCallNotPresent ++ ;
+                        }
                     }
-                }else{
-                    inProgressCall = false;
                 }
-
-                if(!inProgressCall){
+                if(contCallNotPresent == listCalls.size()){
                     openCameraApp();
                 }else{
                     showConfirmationOpenCamera(chatRoom);
