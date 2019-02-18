@@ -170,6 +170,10 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="ToolbarSubtitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="CollapsingToolbarContactInfo" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:textColorSecondary">@color/white</item>
     </style>
@@ -201,14 +205,6 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-
-    <style name="Theme.Add.Contacts" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/status_bar_login</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_back</item>
-        <item name="homeAsUpIndicator">@drawable/ic_back</item>
-    </style>
-
     <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:background">@color/white</item>
         <item name="android:positiveButtonText">@color/accentColor</item>
@@ -237,4 +233,5 @@
     <style name="PreferenceCategoryStyle" parent="@style/Preference.Category.Material">
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
+
 </resources>

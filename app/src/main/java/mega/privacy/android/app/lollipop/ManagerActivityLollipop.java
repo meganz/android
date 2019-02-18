@@ -17750,9 +17750,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case CHAT:{
 				if(megaChatApi!=null){
-					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(Util.mutateIcon(this, R.drawable.ic_chat, R.color.white));
-					}
+//					if(megaChatApi.getChatRooms().size()==0){
+						fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
+//					}
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
 					fabButton.setVisibility(View.VISIBLE);
 				}

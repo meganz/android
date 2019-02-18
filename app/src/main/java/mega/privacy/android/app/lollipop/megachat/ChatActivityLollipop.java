@@ -1263,6 +1263,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(chatRoom.isPreview()){
                 log("Chat not connected:setChatSubtitle:isPreview");
                 subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                iconStateToolbar.setVisibility(View.GONE);
                 tB.setOnClickListener(this);
 
                 setBottomLayout(SHOW_NOTHING_LAYOUT);
@@ -1286,6 +1287,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(chatRoom.isPreview()){
                     log("setChatSubtitle:isPreview");
                     subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                    iconStateToolbar.setVisibility(View.GONE);
                     tB.setOnClickListener(this);
 
                     setBottomLayout(SHOW_JOIN_LAYOUT);
@@ -3344,7 +3346,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                     importIcon.setVisible(false);
-
                 }else{
 
                     log("Chat with permissions");
