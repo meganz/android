@@ -1962,32 +1962,24 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("returnTheCall()");
         if(megaChatApi!=null){
             MegaHandleList listCalls = megaChatApi.getChatCalls();
-
-            for(int i = 0; i < listCalls.size(); i++){
-
-                MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                if(call!=null){
-
-                    if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                        log("returnTheCall() -> ChatCallActivity");
-                        Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("chatHandle", listCalls.get(i));
-                        startActivity(intent);
-                        break;
+            if((listCalls!=null)&&(listCalls.size()!=0)){
+                for(int i = 0; i < listCalls.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                    if(call!=null){
+                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                            log("returnTheCall() -> ChatCallActivity");
+                            Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("chatHandle", listCalls.get(i));
+                            startActivity(intent);
+                            break;
+                        }
                     }
                 }
-
             }
+
         }
     }
-
-//    public void clearHandlers(){
-//        if (customHandler != null){
-//            customHandler.removeCallbacksAndMessages(null);
-//        }
-//    }
-
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);
