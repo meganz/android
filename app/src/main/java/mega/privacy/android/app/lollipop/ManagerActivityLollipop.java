@@ -472,7 +472,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
-	boolean shouldShowSMSDialog = false;
+	private static boolean shouldShowSMSDialog = false;
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
@@ -651,6 +651,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         @Override
         public void onReceive(Context context,Intent intent) {
             if (intent != null && intent.getAction() == Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER) {
+                if(drawerLayout != null) {
+                    drawerLayout.closeDrawer(Gravity.LEFT);
+                }
+                showSnackbar(getString(R.string.verify_account_successfully));
                 refreshAddPhoneNumberButton();
             }
         }

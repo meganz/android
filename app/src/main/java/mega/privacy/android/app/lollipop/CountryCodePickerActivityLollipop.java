@@ -172,18 +172,35 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     private void search(String query) {
         selectedCountries.clear();
+        List<Country> l1 = new ArrayList<>();
+        List<Country> l2 = new ArrayList<>();
+
         for (Country country : countries) {
             if (country.name.toLowerCase().contains(query.toLowerCase())) {
-                selectedCountries.add(country);
+                if(country.name.toLowerCase().startsWith(query.toLowerCase())) {
+                    l1.add(country);
+                } else {
+                    l2.add(country);
+                }
             }
         }
-        Collections.sort(selectedCountries,new Comparator<Country>() {
-        
+        //the countries with name starts with the query string should be put first
+        Collections.sort(l1,new Comparator<Country>() {
+
             @Override
             public int compare(Country o1,Country o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
             }
         });
+        Collections.sort(l2,new Comparator<Country>() {
+
+            @Override
+            public int compare(Country o1,Country o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
+        selectedCountries.addAll(l1);
+        selectedCountries.addAll(l2);
         adapter.refresh(selectedCountries);
     }
 

@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -22,7 +21,6 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -33,7 +31,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,7 +49,7 @@ import static mega.privacy.android.app.SMSVerificationActivity.SELECTED_COUNTRY_
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 
 public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
-    
+
     private Toolbar toolbar;
     private ActionBar actionBar;
     private TextView backButton, pinError, resendTextView;
@@ -63,38 +60,38 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     private boolean isErrorShown, firstTime, pinLongClick, allowResend, isUserLocked;
     private final int RESEND_TIME_LIMIT = 30 * 1000;
     private Handler handler;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
         super.onCreate(savedInstanceState);
-        
+
         //navigation bar
         setContentView(R.layout.activity_sms_verification_receive_txt);
         toolbar = findViewById(R.id.account_verification_toolbar);
         setSupportActionBar(toolbar);
-        
+
         actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getResources().getString(R.string.verify_account_enter_code_title).toUpperCase());
-        
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(getColor(R.color.dark_primary_color));
         }
-        
+
         //labels
         Intent intent = getIntent();
         if (intent != null) {
             String phoneNumber = "(" + intent.getStringExtra(SELECTED_COUNTRY_CODE) + ") " + intent.getStringExtra(ENTERED_PHONE_NUMBER);
             TextView phoneNumberLbl = findViewById(R.id.entered_phone_number);
             phoneNumberLbl.setText(phoneNumber);
-            
+
             isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED,false);
         }
-        
+
         //resend
         resendTextView = findViewById(R.id.verify_account_resend);
         String text = getResources().getString(R.string.verify_account_resend_label);
@@ -107,7 +104,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             public void onClick(View textView) {
                 backButtonClicked();
             }
-            
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -120,13 +117,13 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         resendTextView.setText(spanString);
         resendTextView.setMovementMethod(LinkMovementMethod.getInstance());
         resendTextView.setHighlightColor(Color.TRANSPARENT);
-        
+
         //buttons
         backButton = findViewById(R.id.verify_account_back_button);
         backButton.setOnClickListener(this);
         confirmButton = findViewById(R.id.verify_account_confirm_button);
         confirmButton.setOnClickListener(this);
-        
+
         hideResendAndBackButton();
         handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -136,15 +133,15 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 showResendAndBackButton();
             }
         },RESEND_TIME_LIMIT);
-        
+
         pinError = findViewById(R.id.verify_account_pin_error);
-        
+
         //input fields
         imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        
+
         inputContainer = findViewById(R.id.verify_account_input_code_layout);
         firstPin = findViewById(R.id.verify_account_input_code_first);
         firstPin.setOnLongClickListener(this);
@@ -152,20 +149,20 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         firstPin.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-                
+
             }
-            
+
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                
+
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (firstPin.length() != 0) {
                     secondPin.requestFocus();
                     secondPin.setCursorVisible(true);
-                    
+
                     if (firstTime && !pinLongClick) {
                         secondPin.setText("");
                         thirdPin.setText("");
@@ -181,27 +178,27 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 }
             }
         });
-        
+
         secondPin = findViewById(R.id.verify_account_input_code_second);
         secondPin.setOnLongClickListener(this);
         secondPin.setOnFocusChangeListener(this);
         secondPin.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-                
+
             }
-            
+
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                
+
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (secondPin.length() != 0) {
                     thirdPin.requestFocus();
                     thirdPin.setCursorVisible(true);
-                    
+
                     if (firstTime && !pinLongClick) {
                         thirdPin.setText("");
                         fourthPin.setText("");
@@ -216,27 +213,27 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 }
             }
         });
-        
+
         thirdPin = findViewById(R.id.verify_account_input_code_third);
         thirdPin.setOnLongClickListener(this);
         thirdPin.setOnFocusChangeListener(this);
         thirdPin.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-                
+
             }
-            
+
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                
+
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (thirdPin.length() != 0) {
                     fourthPin.requestFocus();
                     fourthPin.setCursorVisible(true);
-                    
+
                     if (firstTime && !pinLongClick) {
                         fourthPin.setText("");
                         fifthPin.setText("");
@@ -250,27 +247,27 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 }
             }
         });
-        
+
         fourthPin = findViewById(R.id.verify_account_input_code_fourth);
         fourthPin.setOnLongClickListener(this);
         fourthPin.setOnFocusChangeListener(this);
         fourthPin.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-                
+
             }
-            
+
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                
+
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (fourthPin.length() != 0) {
                     fifthPin.requestFocus();
                     fifthPin.setCursorVisible(true);
-                    
+
                     if (firstTime && !pinLongClick) {
                         fifthPin.setText("");
                         sixthPin.setText("");
@@ -283,27 +280,27 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 }
             }
         });
-        
+
         fifthPin = findViewById(R.id.verify_account_input_code_fifth);
         fifthPin.setOnLongClickListener(this);
         fifthPin.setOnFocusChangeListener(this);
         fifthPin.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-                
+
             }
-            
+
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                
+
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (fifthPin.length() != 0) {
                     sixthPin.requestFocus();
                     sixthPin.setCursorVisible(true);
-                    
+
                     if (firstTime && !pinLongClick) {
                         sixthPin.setText("");
                     } else if (pinLongClick) {
@@ -315,27 +312,27 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 }
             }
         });
-        
+
         sixthPin = findViewById(R.id.verify_account_input_code_sixth);
         sixthPin.setOnLongClickListener(this);
         sixthPin.setOnFocusChangeListener(this);
         sixthPin.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s,int start,int count,int after) {
-                
+
             }
-            
+
             @Override
             public void onTextChanged(CharSequence s,int start,int before,int count) {
-                
+
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (sixthPin.length() != 0) {
                     sixthPin.setCursorVisible(true);
                     Util.hideKeyboard(SMSVerificationReceiveTxtActivity.this);
-                    
+
                     if (pinLongClick) {
                         pasteClipboard();
                     }
@@ -346,7 +343,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             }
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        
+
         firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -358,7 +355,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
         textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
         firstPin.setLayoutParams(textParams);
-        
+
         secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -371,7 +368,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
         secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
-        
+
         thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -384,7 +381,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         textParams.setMargins(0,0,Util.scaleWidthPx(25,outMetrics),0);
         thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
-        
+
         fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -397,7 +394,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
         fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
-        
+
         fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -410,7 +407,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         textParams.setMargins(0,0,Util.scaleWidthPx(8,outMetrics),0);
         fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
-        
+
         sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
         android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -447,8 +444,8 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             finish();
         }
     }
-    
-    
+
+
     @Override
     public void onClick(View v) {
         log("on click ");
@@ -467,7 +464,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 break;
         }
     }
-    
+
     @Override
     public boolean onLongClick(View v) {
         log("onLongClick");
@@ -481,11 +478,11 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 pinLongClick = true;
                 v.requestFocus();
             }
-            
+
         }
         return false;
     }
-    
+
     @Override
     public void onFocusChange(View v,boolean hasFocus) {
         log("onFocusChange");
@@ -528,7 +525,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             }
         }
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -537,7 +534,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     void pasteClipboard() {
         log("pasteClipboard");
         pinLongClick = false;
@@ -572,7 +569,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             }
         }
     }
-    
+
     private void hideError() {
         log("hideError");
         isErrorShown = false;
@@ -584,7 +581,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         fifthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
         sixthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
     }
-    
+
     private void showError(String errorMessage) {
         log("showError");
         firstTime = false;
@@ -601,7 +598,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             pinError.setText(errorMessage);
         }
     }
-    
+
     private void validateVerificationCode() {
         log("validateVerificationCode");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
@@ -623,17 +620,17 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         }
         showError(getString(R.string.verify_account_incorrect_code));
     }
-    
+
     private void confirmButtonClicked() {
         log("confirmButtonClicked");
         validateVerificationCode();
     }
-    
+
     private void backButtonClicked() {
         log("backButtonClicked");
         finish();
     }
-    
+
     private void showResendAndBackButton() {
         log("showResendAndBackButton");
         backButton.setVisibility(View.VISIBLE);
@@ -641,7 +638,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
-    
+
     private void hideResendAndBackButton() {
         log("hideResendAndBackButton");
         backButton.setVisibility(View.GONE);
@@ -649,22 +646,22 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         actionBar.setHomeButtonEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(false);
     }
-    
+
     public static void log(String message) {
         Util.log("SMSVerificationReceiveTxtActivity",message);
     }
-    
-    
+
+
     @Override
     public void onRequestStart(MegaApiJava api,MegaRequest request) {
-        
+
     }
-    
+
     @Override
     public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
-        
+
     }
-    
+
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
@@ -678,7 +675,6 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 showError(getString(R.string.verify_account_error_phone_number_register));
             } else if (e.getErrorCode() == MegaError.API_OK) {
                 log("verification successful");
-                Toast.makeText(this,R.string.verify_account_successfully,Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 setResult(RESULT_OK);
@@ -689,9 +685,9 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
             }
         }
     }
-    
+
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
-        
+
     }
 }
