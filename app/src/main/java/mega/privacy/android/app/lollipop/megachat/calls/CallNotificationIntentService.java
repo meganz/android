@@ -17,8 +17,8 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 
 public class CallNotificationIntentService extends IntentService implements MegaChatRequestListenerInterface {
 
-    public static final String ANSWER = "A";
-    public static final String IGNORE = "I";
+    public static final String ANSWER = "ANSWER";
+    public static final String IGNORE = "IGNORE";
 
     MegaChatApiAndroid megaChatApi;
     MegaApiAndroid megaApi;

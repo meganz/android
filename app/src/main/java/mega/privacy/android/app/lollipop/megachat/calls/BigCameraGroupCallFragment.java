@@ -135,7 +135,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onDestroy(){
-        log("***** onDestroy");
+        log("onDestroy");
         removeSurfaceView();
         super.onDestroy();
     }
@@ -148,13 +148,15 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                 ((ViewGroup)myTexture.getParent()).removeView(myTexture);
             }
         }
-        if((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))){
-            log("****removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
-            megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
-        }else{
-            log("*****removeSurfaceView() removeChatVideoListener chatId: "+chatId+" ( peerId = "+peerId+", clientId = "+cliendId+")");
-            megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
+        if(megaChatApi!=null){
+            if((peerId == megaChatApi.getMyUserHandle()) && (cliendId == megaChatApi.getMyClientidHandle(chatId))){
+                log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
+                megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
+            }else{
+                log("removeSurfaceView() removeChatVideoListener chatId: "+chatId+" ( peerId = "+peerId+", clientId = "+cliendId+")");
+                megaChatApi.removeChatVideoListener(chatId, peerId, cliendId, this);
 
+            }
         }
     }
     @Override

@@ -3336,15 +3336,19 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             }
         }
-        if (megaChatApi != null) {
-            if(cont==0){
-                linearParticipants.setVisibility(View.GONE);
-            }else{
+        if(cont==0){
+            linearParticipants.setVisibility(View.GONE);
+        }else{
+            if((totalVideosAllowed == 0)&&(megaChatApi != null)){
+                totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
+            }
+            if(totalVideosAllowed!=0){
                 participantText.setText(cont + "/" + totalVideosAllowed);
                 linearParticipants.setVisibility(View.VISIBLE);
+            }else{
+                linearParticipants.setVisibility(View.GONE);
+
             }
-        } else {
-            linearParticipants.setVisibility(View.GONE);
         }
     }
 
