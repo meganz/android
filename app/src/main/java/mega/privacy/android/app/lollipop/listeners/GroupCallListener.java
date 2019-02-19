@@ -28,13 +28,13 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     TextureView myTexture = null;
     MegaSurfaceRendererGroup localRenderer = null;
 
-    public GroupCallListener(Context context, TextureView myTexture, Long peerHandle) {
+    public GroupCallListener(Context context, TextureView myTexture, long peerid, long clientid) {
         log("GroupCallListener");
         this.context = context;
         this.width = 0;
         this.height = 0;
         this.myTexture = myTexture;
-        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerHandle);
+        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerid, clientid);
     }
 
 
