@@ -409,7 +409,7 @@ public class ChatExplorerFragment extends Fragment {
                     ((ChatExplorerActivity)context).showFabButton(true);
                     ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
-                else{
+                else if (context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop)context).showFabButton(true);
                     ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
@@ -674,7 +674,7 @@ public class ChatExplorerFragment extends Fragment {
                     ((ChatExplorerActivity)context).showFabButton(true);
                     ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
-                else{
+                else if (context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop)context).showFabButton(true);
                     ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
@@ -685,7 +685,7 @@ public class ChatExplorerFragment extends Fragment {
                     ((ChatExplorerActivity)context).showFabButton(false);
                     ((ChatExplorerActivity)context).setToolbarSubtitle(null);
                 }
-                else{
+                else if (context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop)context).showFabButton(false);
                     ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
                 }
@@ -765,7 +765,12 @@ public class ChatExplorerFragment extends Fragment {
                                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                                     if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                                         log("Request last green for user");
-                                        megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
+                                        if (context instanceof ChatExplorerActivity) {
+                                            megaChatApi.requestLastGreen(handle, (ChatExplorerActivity) context);
+                                        }
+                                        else if (context instanceof FileExplorerActivityLollipop) {
+                                            megaChatApi.requestLastGreen(handle, (FileExplorerActivityLollipop) context);
+                                        }
                                     }
                                 }
                             }
@@ -826,7 +831,7 @@ public class ChatExplorerFragment extends Fragment {
                 if(context instanceof  ChatExplorerActivity){
                     ((ChatExplorerActivity)context).setToolbarSubtitle(null);
                 }
-                else{
+                else if (context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
                 }
             }
@@ -837,7 +842,7 @@ public class ChatExplorerFragment extends Fragment {
                     ((ChatExplorerActivity)context).showFabButton(true);
                     ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
-                else{
+                else if (context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop) context).showFabButton(true);
                     ((FileExplorerActivityLollipop) context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
                 }
@@ -927,7 +932,7 @@ public class ChatExplorerFragment extends Fragment {
             if(context instanceof  ChatExplorerActivity){
                 ((ChatExplorerActivity)context).showFabButton(false);
             }
-            else{
+            else if (context instanceof FileExplorerActivityLollipop){
                 ((FileExplorerActivityLollipop)context).showFabButton(false);
             }
         }
@@ -949,7 +954,7 @@ public class ChatExplorerFragment extends Fragment {
                 if(context instanceof  ChatExplorerActivity){
                     ((ChatExplorerActivity)context).showFabButton(true);
                 }
-                else{
+                else if (context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop)context).showFabButton(true);
                 }
             }

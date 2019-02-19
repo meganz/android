@@ -862,18 +862,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 						ownFilePrepareTask.execute(getIntent());
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(this);
-							temp.setMessage(getString(R.string.upload_prepare));
-							temp.setCancelable(false);
-							temp.setCanceledOnTouchOutside(false);
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
+						createAndShowProgressDialog(false, R.string.upload_prepare);
 
 						cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -1544,18 +1533,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if (filePreparedInfos == null){
 						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 						ownFilePrepareTask.execute(getIntent());
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(this);
-							temp.setMessage(getString(R.string.upload_prepare));
-							temp.setCancelable(false);
-							temp.setCanceledOnTouchOutside(false);
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
+						createAndShowProgressDialog(false, R.string.upload_prepare);
 					}
 				}
 			}
@@ -1881,6 +1859,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         setResult(RESULT_OK, intent);
 		finishActivity();
     }
+
+    void createAndShowProgressDialog (boolean cancelable, int string) {
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(string));
+			temp.setCancelable(cancelable);
+			temp.setCanceledOnTouchOutside(cancelable);
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+	}
 	
 	public void buttonClick(long handle){
 		log("buttonClick");
@@ -1986,18 +1979,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				
 				OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 				ownFilePrepareTask.execute(getIntent());
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
-					temp.setCancelable(false);
-					temp.setCanceledOnTouchOutside(false);
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
+				createAndShowProgressDialog(false, R.string.upload_prepare);
 			}
 			else{
 				onIntentProcessed();
@@ -2085,7 +2067,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
 		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
 		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
 		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
 		snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
@@ -2910,16 +2892,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		ArrayList<MegaChatRoom> chats = new ArrayList<>();
 		ArrayList<MegaUser> users = new ArrayList<>();
 
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.preparing_chats));
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
+		createAndShowProgressDialog(true, R.string.preparing_chats);
 
 		for (ChatExplorerListItem item : listItems) {
 			if (item.getChat() != null) {
@@ -3052,18 +3025,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if (filePreparedInfos == null){
 					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 					filePrepareTask.execute(getIntent());
-					ProgressDialog temp = null;
-					try{
-						temp = new ProgressDialog(this);
-						temp.setMessage(getString(R.string.upload_prepare));
-						temp.setCancelable(false);
-						temp.setCanceledOnTouchOutside(false);
-						temp.show();
-					}
-					catch(Exception e){
-						return;
-					}
-					statusDialog = temp;
+					createAndShowProgressDialog(false, R.string.upload_prepare);
 				}
 				else{
                     onIntentChatProcessed(filePreparedInfos);
@@ -3074,18 +3036,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (filePreparedInfos == null){
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(getIntent());
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
-					temp.setCancelable(false);
-					temp.setCanceledOnTouchOutside(false);
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
+				createAndShowProgressDialog(false, R.string.upload_prepare);
 			}
 			else{
 				onIntentChatProcessed(filePreparedInfos);

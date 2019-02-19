@@ -1632,7 +1632,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						else{
 							ownerLabel.setText(mS.getUser());
 							ownerInfo.setText(mS.getUser());
-                            setOwnerState(user.getHandle());
+                            setOwnerState(-1);
 							createDefaultAvatar(ownerRoundeImage, user, mS.getUser());
 						}
 
@@ -2601,8 +2601,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     }
                     else {
                         showSnackbar(getString(R.string.version_history_deleted_erroneously)
-                                + getResources().getQuantityString(R.plurals.versions_delected_correctly, versionsRemoved)
-                                + getResources().getQuantityString(R.plurals.versions_delected_erroneously, errorVersionRemove));
+                                + getResources().getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved)
+                                + getResources().getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove));
                     }
                     versionsToRemove = 0;
                     versionsRemoved = 0;
