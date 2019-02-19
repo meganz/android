@@ -1233,19 +1233,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(megaChatApi!=null){
 					MegaHandleList listCalls = megaChatApi.getChatCalls();
 					int contCallNotPresent = 0;
-					for(int i=0; i<listCalls.size(); i++){
-						MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-						if(call!=null){
-							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-								contCallNotPresent ++ ;
+					if((listCalls!=null)&&(listCalls.size()>0)){
+						for(int i=0; i<listCalls.size(); i++){
+							MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+							if(call!=null){
+								if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+									contCallNotPresent ++ ;
+								}
 							}
 						}
-					}
-					if(contCallNotPresent == listCalls.size()){
-						log("I'm not in a call");
-						startVideo = false;
-						if(checkPermissionsCall()){
-							startCall(false);
+						if(contCallNotPresent == listCalls.size()){
+							log("I'm not in a call");
+							startVideo = false;
+							if(checkPermissionsCall()){
+								startCall(false);
+							}
 						}
 					}
 				}
@@ -1258,19 +1260,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(megaChatApi!=null){
 					MegaHandleList listCalls = megaChatApi.getChatCalls();
 					int contCallNotPresent = 0;
-					for(int i=0; i<listCalls.size(); i++){
-						MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-						if(call!=null){
-							if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-								contCallNotPresent ++ ;
+					if((listCalls!=null)&&(listCalls.size()>0)){
+						for(int i=0; i<listCalls.size(); i++){
+							MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+							if(call!=null){
+								if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+									contCallNotPresent ++ ;
+								}
 							}
 						}
-					}
-					if(contCallNotPresent == listCalls.size()){
-						log("I'm not in a call");
-						startVideo = true;
-						if(checkPermissionsCall()){
-							startCall(true);
+						if(contCallNotPresent == listCalls.size()){
+							log("I'm not in a call");
+							startVideo = true;
+							if(checkPermissionsCall()){
+								startCall(true);
+							}
 						}
 					}
 				}

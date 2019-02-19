@@ -607,6 +607,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	static private VideoCapturer createCameraCapturer(CameraEnumerator enumerator) {
+		log("createCameraCapturer");
 		final String[] deviceNames = enumerator.getDeviceNames();
 
 		// First, try to find front facing camera
@@ -619,7 +620,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				}
 			}
 		}
-
 		// Front facing camera not found, try something else
 		for (String deviceName : deviceNames) {
 			if (!enumerator.isFrontFacing(deviceName)) {
@@ -630,13 +630,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				}
 			}
 		}
-
 		return null;
 	}
 
 	static VideoCapturer videoCapturer = null;
 
 	static public void stopVideoCapture() {
+		log("stopVideoCapture");
+
 		if (videoCapturer != null) {
 			try {
 				videoCapturer.stopCapture();
@@ -648,6 +649,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	static public void startVideoCapture(long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+		log("startVideoCapture");
+
 		// Settings
 		boolean useCamera2 = false;
 		boolean captureToTexture = true;
@@ -677,6 +680,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	static public void startVideoCaptureWithParameters(int videoWidth, int videoHeight, int videoFps, long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+		log("startVideoCaptureWithParameters");
+
 		// Settings
 		boolean useCamera2 = false;
 		boolean captureToTexture = true;
