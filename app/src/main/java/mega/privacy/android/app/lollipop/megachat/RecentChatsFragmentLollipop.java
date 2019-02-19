@@ -1657,16 +1657,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(megaChatApi!=null){
             MegaHandleList listCalls = megaChatApi.getChatCalls();
             boolean shouldShown = false;
-            for(int i = 0; i < listCalls.size(); i++){
-                MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                if(call!=null){
-                    if((call.getStatus()>MegaChatCall.CALL_STATUS_RING_IN) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                        shouldShown = true;
-                        chatInCall = call.getChatid();
-                        break;
+            if((listCalls!=null)&&(listCalls.size()>0)){
+                for(int i = 0; i < listCalls.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                    if(call!=null){
+                        if((call.getStatus()>MegaChatCall.CALL_STATUS_RING_IN) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                            shouldShown = true;
+                            chatInCall = call.getChatid();
+                            break;
+                        }
                     }
                 }
             }
+
             log("refreshNode -> showCallLayout");
             showCallLayout(shouldShown, chatInCall);
         }
@@ -1863,18 +1866,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
 
         MegaHandleList listCalls = megaChatApi.getChatCalls();
-
-        for(int i=0; i < listCalls.size(); i++){
-            MegaChatCall call = megaChatApi.getChatCall((listCalls.get(i)));
-            if(call!=null){
-                log("onResume: call status = "+call.getStatus());
-                if((call.getStatus() > MegaChatCall.CALL_STATUS_RING_IN)&&(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                    showCallLayout(true, listCalls.get(i));
-                    break;
+        if((listCalls!=null)&&(listCalls.size()>0)){
+            for(int i=0; i < listCalls.size(); i++){
+                MegaChatCall call = megaChatApi.getChatCall((listCalls.get(i)));
+                if(call!=null){
+                    log("onResume: call status = "+call.getStatus());
+                    if((call.getStatus() > MegaChatCall.CALL_STATUS_RING_IN)&&(call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                        showCallLayout(true, listCalls.get(i));
+                        break;
+                    }
                 }
             }
         }
-
         super.onResume();
     }
 
@@ -1962,7 +1965,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("returnTheCall()");
         if(megaChatApi!=null){
             MegaHandleList listCalls = megaChatApi.getChatCalls();
-            if((listCalls!=null)&&(listCalls.size()!=0)){
+            if((listCalls!=null)&&(listCalls.size()>0)){
                 for(int i = 0; i < listCalls.size(); i++){
                     MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
                     if(call!=null){

@@ -62,7 +62,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-
         megaChatApi.addChatCallListener(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)

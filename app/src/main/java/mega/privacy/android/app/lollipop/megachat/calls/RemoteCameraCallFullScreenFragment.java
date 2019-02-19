@@ -163,7 +163,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
             }
         }
         remoteFullScreenSurfaceView.setVisibility(View.GONE);
-        log("*****removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
+        log("removeSurfaceView() removeChatVideoListener (REMOTE) chatId: "+chatId);
         megaChatApi.removeChatVideoListener(chatId, peerid, clientid, this);
     }
 

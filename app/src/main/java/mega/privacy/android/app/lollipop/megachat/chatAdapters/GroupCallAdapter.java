@@ -91,10 +91,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     boolean isManualMode = false;
     int statusBarHeight = 0;
 
-public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, boolean isGrid) {
+    public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, boolean isGrid) {
 
-    log("GroupCallAdapter(peers: "+peers.size()+")");
-
+        if(peers!=null){
+            log("GroupCallAdapter(peers: "+peers.size()+")");
+        }
         this.context = context;
         this.recyclerViewFragment = recyclerView;
         this.peers = peers;
@@ -1066,64 +1067,71 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     public void resetSize(long peerid, long clientid) {
         log("resetSize");
         if(getItemCount()!=0){
-            for(InfoPeerGroupCall peer:peers){
-                if(peer.getListener()!=null){
-                    if(peer.getListener().getWidth()!=0){
-                        peer.getListener().setWidth(0);
-                    }
-                    if(peer.getListener().getHeight()!=0){
-                        peer.getListener().setHeight(0);
-                    }
-                }
-            }
+
+           if((peers!=null)&&(peers.size()>0)){
+               for(InfoPeerGroupCall peer:peers){
+                   if(peer.getListener()!=null){
+                       if(peer.getListener().getWidth()!=0){
+                           peer.getListener().setWidth(0);
+                       }
+                       if(peer.getListener().getHeight()!=0){
+                           peer.getListener().setHeight(0);
+                       }
+                   }
+               }
+           }
+
         }
     }
 
     public void onDestroy(){
         log("onDestroy()");
         ViewHolderGroupCall holder = null;
-        for(int i=0; i<peers.size(); i++){
-            if(holder == null){
-                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
-            }
-            if(holder!=null){
-                log("onDestroy()  holder != null");
-                InfoPeerGroupCall peer = getNodeAt(i);
-                if (peer == null){
-                    return;
+        if((peers!=null)&&(peers.size()>0)) {
+            for(int i=0; i<peers.size(); i++){
+                if(holder == null){
+                    holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
                 }
-                //Remove SurfaceView && Listener:
-                if(peer.getListener() != null){
-                    if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
-                        megaChatApi.removeChatVideoListener(chatId, -1, -1, peer.getListener());
-                    }else{
-                        megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
+                if(holder!=null){
+                    log("onDestroy()  holder != null");
+                    InfoPeerGroupCall peer = getNodeAt(i);
+                    if (peer == null){
+                        return;
                     }
-                    if(holder.parentSurfaceView.getChildCount() == 0){
-                        if(peer.getListener().getSurfaceView().getParent()!=null){
-                            if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
-                                ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                    //Remove SurfaceView && Listener:
+                    if(peer.getListener() != null){
+                        if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+                            megaChatApi.removeChatVideoListener(chatId, -1, -1, peer.getListener());
+                        }else{
+                            megaChatApi.removeChatVideoListener(chatId, peer.getPeerId(), peer.getClientId(), peer.getListener());
+                        }
+                        if(holder.parentSurfaceView.getChildCount() == 0){
+                            if(peer.getListener().getSurfaceView().getParent()!=null){
+                                if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                                    ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                                }
+                            }
+                        }else{
+
+                            holder.parentSurfaceView.removeAllViews();
+                            holder.parentSurfaceView.removeAllViewsInLayout();
+                            if(peer.getListener().getSurfaceView().getParent()!=null){
+                                if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
+                                    ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
+                                }
                             }
                         }
-                    }else{
-
-                        holder.parentSurfaceView.removeAllViews();
-                        holder.parentSurfaceView.removeAllViewsInLayout();
-                        if(peer.getListener().getSurfaceView().getParent()!=null){
-                            if(peer.getListener().getSurfaceView().getParent().getParent()!=null){
-                                ((ViewGroup)peer.getListener().getSurfaceView().getParent()).removeView(peer.getListener().getSurfaceView());
-                            }
-                        }
+                        peer.getListener().getSurfaceView().setVisibility(GONE);
+                        peer.setListener(null);
                     }
-                    peer.getListener().getSurfaceView().setVisibility(GONE);
-                    peer.setListener(null);
-                }
 
-            }else{
-                log("onDestroy()  holder == null");
+                }else{
+                    log("onDestroy()  holder == null");
 
 //                notifyItemChanged(i);
-            }
+                }
+        }
+
         }
 
     }
