@@ -6232,11 +6232,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (textSubmitted) {
 						sFLol.setAllowedMultiselect(true);
 						textSubmitted = false;
-					} else if (textsearchQuery) {
+					}
+					else {
+						if (!textsearchQuery) {
+							searchQuery = newText;
+						}
 						refreshFragment(FragmentTag.SEARCH.getTag());
-					} else {
-						searchQuery = newText;
-						refreshFragment(FragmentTag.SEARCH.getTag());
+
 					}
 				}
 				else {

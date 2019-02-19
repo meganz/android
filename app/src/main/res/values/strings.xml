@@ -2325,14 +2325,14 @@
     <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Version history deleted.</string>
     <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Version history not deleted.</string>
 
-    <plurals name="versions_delected_correctly" formatted="false" context="Confirmation message after deleted file versions">
-        <item context="version item" quantity="one">%d version deleted correctly</item>
-        <item context="version items" quantity="other">%d versions deleted correctly</item>
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d version deleted successfully</item>
+        <item context="version items" quantity="other">%d versions deleted successfully</item>
     </plurals>
 
-    <plurals name="versions_delected_erroneously" formatted="false" context="Confirmation message after deleted file versions">
-        <item context="version item" quantity="one">%d version deleted erroneously</item>
-        <item context="version items" quantity="other">%d versions deleted erroneously</item>
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">%d version not deleted</item>
+        <item context="version items" quantity="other">%d versions not deleted</item>
     </plurals>
 
 </resources>
