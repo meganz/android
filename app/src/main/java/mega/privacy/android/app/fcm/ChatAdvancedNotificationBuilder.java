@@ -908,14 +908,14 @@ public final class ChatAdvancedNotificationBuilder {
             Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
             ignoreIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
             ignoreIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
-            ignoreIntent.setAction("I");
+            ignoreIntent.setAction("IGNORE");
             int requestCodeIgnore = notificationId + 1;
             PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
             Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
             answerIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
             answerIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
-            answerIntent.setAction("A");
+            answerIntent.setAction("ANSWER");
             int requestCodeAnswer = notificationId + 2;
             PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
