@@ -11,11 +11,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -27,7 +24,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +34,6 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -596,7 +591,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 									}
 									else{
 										mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -606,7 +601,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = Uri.fromFile(mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 									}
 									else{
 										mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -645,16 +640,16 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 										}
 										else{
 											log("itemClick:ERROR:httpServerGetLocalLink");
-											showSnackbar(getString(R.string.email_verification_text_error));
+											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 										}
 									}
 									else{
 										log("itemClick:ERROR:httpServerGetLocalLink");
-										showSnackbar(getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 									}
 								}
 								else {
-									showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
+									showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
 								}
 							}
 							mediaIntent.putExtra("HANDLE", node.getHandle());
@@ -716,7 +711,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 									}
 									else{
 										pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -726,7 +721,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = Uri.fromFile(mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 									}
 									else{
 										pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -762,16 +757,16 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 										}
 										else{
 											log("itemClick:ERROR:httpServerGetLocalLink");
-											showSnackbar(getString(R.string.email_verification_text_error));
+											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 										}
 									}
 									else{
 										log("itemClick:ERROR:httpServerGetLocalLink");
-										showSnackbar(getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 									}
 								}
 								else {
-									showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
+									showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
 								}
 							}
 							pdfIntent.putExtra("HANDLE", node.getHandle());
@@ -1271,7 +1266,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
 
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -1287,7 +1282,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
 
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -1386,19 +1381,19 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 								megaApi.copyNode(document, target, this);
 							} else {
 								log("TARGET: null");
-								showSnackbar(getString(R.string.import_success_error));
+								showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 							}
 						}
 						else{
 							log("DOCUMENT: null");
-							showSnackbar(getString(R.string.import_success_error));
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 						}
 					}
 
 				}
 				else{
 					log("MESSAGE is null");
-					showSnackbar(getString(R.string.import_success_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 			}
 		}
@@ -1430,7 +1425,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				}
 				else{
 					log("MESSAGE is null");
-					showSnackbar(getString(R.string.import_success_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 			}
 		}
@@ -1523,11 +1518,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				}
 				else
 				{
-					showSnackbar(getString(R.string.import_success_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 
 			}else{
-				showSnackbar(getString(R.string.import_success_message));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_message));
 			}
 		}
 	}
@@ -1745,21 +1740,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		}
 	}
 
-	public void showSnackbarNotSpace(){
-		showSnackbar(getString(R.string.error_not_enough_free_space));
-	}
-
-	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(container, s, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-		snackbarLayout.setLayoutParams(params);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+	public void showSnackbar(int type, String s){
+		showSnackbar(type, container, s, -1);
 	}
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){

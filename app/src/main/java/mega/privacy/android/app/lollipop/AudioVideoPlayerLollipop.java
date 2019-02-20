@@ -24,8 +24,6 @@ import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -124,7 +122,6 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -134,7 +131,6 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
@@ -666,7 +662,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     else {
-                        showSnackbar(getString(R.string.error_streaming));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
                     }
 
                 }
@@ -679,7 +675,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                     if (currentDocumentAuth == null){
                         log("CurrentDocumentAuth is null");
-                        showSnackbar(getString(R.string.error_streaming) + ": node not authorized");
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming) + ": node not authorized", -1);
                     }
                     else{
                         log("CurrentDocumentAuth is not null");
@@ -1163,7 +1159,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if(handleList!=null && handleList.size()>0) {
                             //Not allow to play content when a call is in progress
                             player.setPlayWhenReady(false);
-                            showSnackbar(getString(R.string.not_allow_play_alert));
+                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_allow_play_alert), -1);
                         }
                     }
 
@@ -2716,7 +2712,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         moveToRubbish = false;
         if (!mega.privacy.android.app.utils.Util.isOnline(this)){
-            showSnackbar(getString(R.string.error_server_connection_problem));
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -3033,7 +3029,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
 
         if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-            showSnackbar(getString(R.string.error_server_connection_problem));
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -3270,7 +3266,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else{
-                showSnackbar(getString(R.string.not_download));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_download), -1);
             }
         }
     }
@@ -3325,7 +3321,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
             if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-                showSnackbar(getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -3353,7 +3349,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
             if(!mega.privacy.android.app.utils.Util.isOnline(this)){
-                showSnackbar(getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -3383,7 +3379,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     log("cN == null, i = " + i + " of " + copyHandles.length);
                     try {
                         statusDialog.dismiss();
-                        showSnackbar(getString(R.string.context_no_copied));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
                     }
                     catch (Exception ex) {}
                 }
@@ -3396,7 +3392,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
-                showSnackbar(getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -3415,12 +3411,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
                 else {
                     log("TARGET: null");
-                    showSnackbar(getString(R.string.import_success_error));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
                 }
             }
             else{
                 log("DOCUMENT: null");
-                showSnackbar(getString(R.string.import_success_error));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
             }
         }
     }
@@ -3650,17 +3646,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if(countChat==errorSent+successSent){
                 if(successSent==countChat){
                     if(countChat==1){
-                        showSnackbarSentAsMessage(request.getChatHandle(), getString(R.string.sent_as_message));
+                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
                     }
                     else{
-                        showSnackbarSentAsMessage(-1, getString(R.string.sent_as_message));
+                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
                     }
                 }
                 else if(errorSent==countChat){
-                    showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
                 }
                 else{
-                    showSnackbarSentAsMessage(-1, getString(R.string.error_sent_as_message));
+                    showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
                 }
             }
         }
@@ -3671,29 +3667,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     }
 
-    public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(containerAudioVideoPlayer, s, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
-    }
-
-    public void showSnackbarSentAsMessage (long idChat, String s) {
-        log("showSnackbarSentAsMessage");
-        Snackbar mySnackbar = Snackbar.make(containerAudioVideoPlayer, s, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        mySnackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
-        mySnackbar.show();
+    public void showSnackbar(int type, String s, long idChat){
+        showSnackbar(type, containerAudioVideoPlayer, s, idChat);
     }
 
     @Override
@@ -3969,18 +3944,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
 
-    public void showSnackbarNotSpace(){
-        log("showSnackbarNotSpace");
-        Snackbar mySnackbar = Snackbar.make(containerAudioVideoPlayer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-        mySnackbar.show();
-    }
-
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         log("askSizeConfirmationBeforeDownload");
 
@@ -4099,11 +4062,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(getString(R.string.context_correctly_renamed));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
                 updateFile();
             }
             else{
-                showSnackbar(getString(R.string.context_no_renamed));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -4117,18 +4080,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     this.finish();
                 }
                 else{
-                    showSnackbar(getString(R.string.context_no_moved));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 moveToRubbish = false;
                 log("move to rubbish request finished");
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
-                    showSnackbar(getString(R.string.context_correctly_moved));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                     finish();
                 }
                 else{
-                    showSnackbar(getString(R.string.context_no_moved));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 log("move nodes request finished");
             }
@@ -4142,12 +4105,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         moveToTrashStatusDialog.dismiss();
                     }
                     catch (Exception ex) {}
-                    showSnackbar(getString(R.string.context_correctly_removed));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
                 }
                 finish();
             }
             else{
-                showSnackbar(getString(R.string.context_no_removed));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
             }
             log("remove request finished");
         }
@@ -4167,7 +4130,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
                 else {
-                    showSnackbar(getString(R.string.context_correctly_copied));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
                 }
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -4185,7 +4148,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 finish();
             }
             else{
-                showSnackbar(getString(R.string.context_no_copied));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
             sendToChat = false;
             log("copy nodes request finished");

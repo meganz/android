@@ -18,8 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -47,7 +45,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -88,7 +85,6 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
@@ -98,7 +94,6 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
@@ -904,11 +899,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
 			}
 			else{
-				showSnackbar(getString(R.string.full_image_viewer_not_preview));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
 			}
 		}
 		else{
-			showSnackbar(getString(R.string.full_image_viewer_not_preview));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
 		}
 	}
 
@@ -2299,7 +2294,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 
 		if(!Util.isOnline(this)){
-			showSnackbar(getString(R.string.error_server_connection_problem));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 			return;
 		}
 
@@ -2367,7 +2362,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
-			showSnackbar(getString(R.string.error_server_connection_problem));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 			return;
 		}
 
@@ -2495,10 +2490,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(getString(R.string.context_correctly_renamed));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
 			}
 			else{
-				showSnackbar(getString(R.string.context_no_renamed));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -2531,18 +2526,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 				else{
-					showSnackbar(getString(R.string.context_no_moved));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					showSnackbar(getString(R.string.context_correctly_moved));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
 					finish();
 				}
 				else{
-					showSnackbar(getString(R.string.context_no_moved));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
 				}
 				log("move nodes request finished");
 			}
@@ -2556,12 +2551,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						statusDialog.dismiss();
 					}
 					catch (Exception ex) {}
-					showSnackbar(getString(R.string.context_correctly_removed));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
 				}
 				finish();
 			}
 			else{
-				showSnackbar(getString(R.string.context_no_removed));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
 			}
 			log("remove request finished");
 		}
@@ -2581,7 +2576,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 				else {
-					showSnackbar(getString(R.string.context_correctly_copied));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
 				}
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -2600,7 +2595,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 			}
 			else{
-				showSnackbar(getString(R.string.context_no_copied));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 			}
 			sendToChat = false;
 			log("copy nodes request finished");
@@ -2729,7 +2724,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
 			if(!Util.isOnline(this)){
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
 			}
 
@@ -2757,7 +2752,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
 			}
 
@@ -2787,7 +2782,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("cN == null, i = " + i + " of " + copyHandles.length);
 					try {
 						statusDialog.dismiss();
-						showSnackbar(getString(R.string.context_no_copied));
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 					}
 					catch (Exception ex) {}
 				}
@@ -2840,41 +2835,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 
-	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
-	}
-
-	public void showSnackbarNotSpace(){
-		log("showSnackbarNotSpace");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-		mySnackbar.show();
-	}
-
-	public void showSnackbarSentAsMessage (long idChat, String s) {
-		log("showSnackbarSentAsMessage");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
-		snackbarLayout.setLayoutParams(params);
-		mySnackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
-		mySnackbar.show();
+	public void showSnackbar(int type, String s, long idChat){
+		showSnackbar(type, fragmentContainer, s, idChat);
 	}
 
 	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
@@ -3128,17 +3090,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if(countChat==errorSent+successSent){
 				if(successSent==countChat){
 					if(countChat==1){
-						showSnackbarSentAsMessage(request.getChatHandle(), getString(R.string.sent_as_message));
+						showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
 					}
 					else{
-						showSnackbarSentAsMessage(-1, getString(R.string.sent_as_message));
+						showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
 					}
 				}
 				else if(errorSent==countChat){
-					showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
 				}
 				else{
-					showSnackbarSentAsMessage(-1, getString(R.string.error_sent_as_message));
+					showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
 				}
 			}
 		}

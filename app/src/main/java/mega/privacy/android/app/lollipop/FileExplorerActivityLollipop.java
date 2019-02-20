@@ -5,16 +5,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -1785,7 +1782,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 
 		if (infos == null) {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
+		    showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
 			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
@@ -2063,16 +2060,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
     public void showSnackbar(String s){
-        log("showSnackbar: "+s);
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-		snackbarLayout.setLayoutParams(params);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+		showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
     }
 
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
@@ -2401,9 +2389,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);
-
-				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();*/
+				prepareNodesText.setVisibility(View.GONE);*/
 				
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();

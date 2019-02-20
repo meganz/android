@@ -592,14 +592,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                     }
                 }
                 else{
                     if(Util.isOnline(context)){
                         if(megaApi!=null){
                             if(megaApi.isLoggedIn()==0){
-                                ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                                ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                             }
                             else{
                                 ChatController chatController = new ChatController(context);
@@ -610,11 +610,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                         else{
-                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                         showNoConnectionScreen();
                     }
 //                    setChats();

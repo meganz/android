@@ -965,7 +965,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -975,7 +975,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							Uri mediaFileUri = Uri.fromFile(mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -1014,12 +1014,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							}
 							else{
 								log("itemClick:ERROR:httpServerGetLocalLink");
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 							}
 						}
 						else{
 							log("itemClick:ERROR:httpServerGetLocalLink");
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
@@ -1037,7 +1037,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 						else{
 							log("itemClick:noAvailableIntent");
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());

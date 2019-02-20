@@ -97,10 +97,10 @@ public class QRCodeSaveBottomSheetDialogFragment extends BottomSheetDialogFragme
             intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
             intent.putExtra("qrfile", true);
             getActivity().startService(intent);
-            ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.save_qr_cloud_drive, qrFile.getName()));
+            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.save_qr_cloud_drive, qrFile.getName()));
         }
         else {
-            ((QRCodeActivity) getActivity()).showSnackbar(getString(R.string.error_upload_qr));
+            ((QRCodeActivity) getActivity()).showSnackbar(null, getString(R.string.error_upload_qr));
         }
     }
 

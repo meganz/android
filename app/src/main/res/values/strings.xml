@@ -2335,4 +2335,5 @@
         <item context="version items" quantity="other">%d versions not deleted</item>
     </plurals>
 
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please, invite friends from the Contacts section.</string>
 </resources>

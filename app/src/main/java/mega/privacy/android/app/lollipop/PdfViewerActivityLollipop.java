@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -95,7 +94,6 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -422,7 +420,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
                     }
                     else {
-                        showSnackbar(getString(R.string.error_streaming));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
                     }
                 }
             }
@@ -432,7 +430,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(handle));
                 if (currentDocumentAuth == null){
                     log("CurrentDocumentAuth is null");
-                    showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_streaming)+ ": node not authorized", -1);
                 }
                 else{
                     log("CurrentDocumentAuth is not null");
@@ -1789,7 +1787,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         moveToRubbish = false;
         if (!Util.isOnline(this)){
-            showSnackbar(getString(R.string.error_server_connection_problem));
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -2105,7 +2103,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
 
         if(!Util.isOnline(this)){
-            showSnackbar(getString(R.string.error_server_connection_problem));
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -2260,7 +2258,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else {
-                showSnackbar(getString(R.string.not_download));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.not_download), -1);
             }
         }
     }
@@ -2396,7 +2394,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
             if(!Util.isOnline(this)){
-                showSnackbar(getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -2424,7 +2422,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
             if(!Util.isOnline(this)){
-                showSnackbar(getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -2454,7 +2452,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     log("cN == null, i = " + i + " of " + copyHandles.length);
                     try {
                         statusDialog.dismiss();
-                        showSnackbar(getString(R.string.context_no_copied));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
                     }
                     catch (Exception ex) {}
                 }
@@ -2467,7 +2465,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
-                showSnackbar(getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
@@ -2484,12 +2482,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     megaApi.copyNode(nodeChat, target, this);
                 } else {
                     log("TARGET: null");
-                    showSnackbar(getString(R.string.import_success_error));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
                 }
             }
             else{
                 log("DOCUMENT: null");
-                showSnackbar(getString(R.string.import_success_error));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
             }
         }
     }
@@ -2680,11 +2678,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(getString(R.string.context_correctly_renamed));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
                 updateFile();
             }
             else{
-                showSnackbar(getString(R.string.context_no_renamed));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -2698,18 +2696,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     this.finish();
                 }
                 else{
-                    showSnackbar(getString(R.string.context_no_moved));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 moveToRubbish = false;
                 log("move to rubbish request finished");
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
-                    showSnackbar(getString(R.string.context_correctly_moved));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                     finish();
                 }
                 else{
-                    showSnackbar(getString(R.string.context_no_moved));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                 }
                 log("move nodes request finished");
             }
@@ -2723,12 +2721,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         moveToTrashStatusDialog.dismiss();
                     }
                     catch (Exception ex) {}
-                    showSnackbar(getString(R.string.context_correctly_removed));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
                 }
                 finish();
             }
             else{
-                showSnackbar(getString(R.string.context_no_removed));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
             }
             log("remove request finished");
         }
@@ -2748,7 +2746,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                 }
                 else {
-                    showSnackbar(getString(R.string.context_correctly_copied));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
                 }
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -2766,7 +2764,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 finish();
             }
             else{
-                showSnackbar(getString(R.string.context_no_copied));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
             sendToChat = false;
             log("copy nodes request finished");
@@ -2815,17 +2813,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if(countChat==errorSent+successSent){
                 if(successSent==countChat){
                     if(countChat==1){
-                        showSnackbarSentAsMessage(request.getChatHandle(), getString(R.string.sent_as_message));
+                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, request.getChatHandle());
                     }
                     else{
-                        showSnackbarSentAsMessage(-1, getString(R.string.sent_as_message));
+                        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
                     }
                 }
                 else if(errorSent==countChat){
-                    showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
                 }
                 else{
-                    showSnackbarSentAsMessage(-1, getString(R.string.error_sent_as_message));
+                    showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
                 }
             }
         }
@@ -2992,29 +2990,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         return false;
     }
 
-    public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(pdfviewerContainer, s, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
-    }
-
-    public void showSnackbarSentAsMessage (long idChat, String s) {
-        log("showSnackbarSentAsMessage");
-        Snackbar mySnackbar = Snackbar.make(pdfviewerContainer, s, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        mySnackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
-        mySnackbar.show();
+    public void showSnackbar(int type, String s, long idChat){
+        showSnackbar(type, pdfviewerContainer, s, idChat);
     }
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
@@ -3060,18 +3037,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
         }
-    }
-
-    public void showSnackbarNotSpace(){
-        log("showSnackbarNotSpace");
-        Snackbar mySnackbar = Snackbar.make(pdfviewerContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-        mySnackbar.show();
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){

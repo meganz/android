@@ -17,8 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -47,7 +45,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -64,6 +61,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -1871,17 +1869,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 
-	public void showSnackbar(String message) {
+	public void showSnackbar(String s) {
 		if(scrollView!=null){
-			Snackbar snackbar = Snackbar.make(scrollView, message, Snackbar.LENGTH_LONG);
-			Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-			snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-			final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-			params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-			snackbarLayout.setLayoutParams(params);
-			TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-			snackbarTextView.setMaxLines(5);
-			snackbar.show();
+			BaseActivity.showSimpleSnackbar(this, outMetrics, scrollView, s);
 		}
 	}
 

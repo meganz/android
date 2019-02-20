@@ -12,6 +12,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -126,10 +127,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         //All send files fail
                         message = context.getResources().getString(R.string.number_no_sent, error);
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).showSnackbar(message);
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
                         else if(context instanceof ContactInfoActivityLollipop){
-                            ((ContactInfoActivityLollipop) context).showSnackbar(message);
+                            ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
                         }
                     }
                     else {
@@ -146,7 +147,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 log("Action: START_AUDIO_CALL");
                 if(context instanceof ContactInfoActivityLollipop){
                     if (e.getErrorCode() != MegaError.API_OK){
-                        ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.create_chat_error));
+                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error));
                     }
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
@@ -163,7 +164,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 log("Action: START_VIDEO_CALL");
                 if(context instanceof ContactInfoActivityLollipop){
                     if (e.getErrorCode() != MegaError.API_OK){
-                        ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.create_chat_error));
+                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error));
                     }
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
@@ -199,7 +200,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         //All send files fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter);
                         if(context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showSnackbar(message);
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
@@ -233,7 +234,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         //All send contacts fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_contacts_not_send, handles.length, totalCounter);
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).showSnackbar(message);
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
@@ -267,10 +268,10 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         //All send messages fail; Show error
                         message = context.getResources().getQuantityString(R.plurals.num_messages_not_send, handles.length, totalCounter);
                         if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).showSnackbar(message);
+                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
                         else if (context instanceof NodeAttachmentHistoryActivity) {
-                            ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
+                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
                         }
                     }
                     else {

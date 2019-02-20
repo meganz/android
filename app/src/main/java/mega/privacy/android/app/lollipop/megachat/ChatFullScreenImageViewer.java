@@ -13,8 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -34,7 +32,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -62,7 +59,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -744,15 +740,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					finish();
 				}
 				else if(e.getErrorCode()==MegaError.API_ENOENT){
-					showSnackbar(getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1));
+					showSnackbar(Constants.SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1));
 				}
 				else
 				{
-					showSnackbar(getString(R.string.import_success_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 
 			}else{
-				showSnackbar(getString(R.string.import_success_message));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_message));
 			}
 		}
 	}
@@ -836,7 +832,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
 
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -854,12 +850,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					megaApi.copyNode(nodeToImport, target, this);
 				} else {
 					log("TARGET: null");
-					showSnackbar(getString(R.string.import_success_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 			}
 			else{
 				log("DOCUMENT: null");
-				showSnackbar(getString(R.string.import_success_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 			}
 
 		}
@@ -876,7 +872,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				statusDialog.dismiss();
 			} catch(Exception ex) {};
 
-			showSnackbar(getString(R.string.error_server_connection_problem));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -900,7 +896,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (hashes == null){
 			if(url != null) {
 				if(availableFreeSpace < size) {
-					showSnackbarNotSpace();
+					showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 					return;
 				}
 				
@@ -946,12 +942,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-								showSnackbar(message);
+								showSnackbar(Constants.SNACKBAR_TYPE, message);
 							}
 						}
 						catch (Exception e){
 							String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-							showSnackbar(message);
+							showSnackbar(Constants.SNACKBAR_TYPE, message);
 						}
 						return;
 					}
@@ -973,7 +969,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 						String path = dlFiles.get(document);
 						
 						if(availableFreeSpace < document.getSize()){
-							showSnackbarNotSpace();
+							showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 							continue;
 						}
 						
@@ -988,7 +984,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						showSnackbarNotSpace();
+						showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 						continue;
 					}
 					
@@ -1007,29 +1003,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 	}
 
-	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-		snackbarLayout.setLayoutParams(params);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
-	}
-
-	public void showSnackbarNotSpace(){
-		log("showSnackbarNotSpace");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-		mySnackbar.show();
+	public void showSnackbar(int type, String s){
+		showSnackbar(type, fragmentContainer, s, -1);
 	}
 
 	public void touchImage() {
