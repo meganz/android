@@ -130,7 +130,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                             ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
                         else if(context instanceof ContactInfoActivityLollipop){
-                            ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
+                            ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
                     }
                     else {
@@ -147,7 +147,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 log("Action: START_AUDIO_CALL");
                 if(context instanceof ContactInfoActivityLollipop){
                     if (e.getErrorCode() != MegaError.API_OK){
-                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error));
+                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
                     }
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
@@ -164,7 +164,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                 log("Action: START_VIDEO_CALL");
                 if(context instanceof ContactInfoActivityLollipop){
                     if (e.getErrorCode() != MegaError.API_OK){
-                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error));
+                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.create_chat_error), -1);
                     }
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());

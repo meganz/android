@@ -846,7 +846,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			case R.id.cab_menu_send_file:{
 
 				if(!Util.isOnline(this)){
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return true;
 				}
 
@@ -1048,7 +1048,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
 		}
 		else{
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_sharing_folder));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_sharing_folder), -1);
 			log("Error sharing folder");
 		}
 	}
@@ -1283,7 +1283,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				log("Send message option");
 				if(!Util.isOnline(this)){
 
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return;
 				}
 
@@ -1331,7 +1331,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				if(!generalChatNotifications){
 					notificationsSwitch.setChecked(false);
-					showSnackbar(Constants.SNACKBAR_TYPE, "The chat notifications are disabled, go to settings to set up them");
+					showSnackbar(Constants.SNACKBAR_TYPE, "The chat notifications are disabled, go to settings to set up them", -1);
 				}
 				else{
 					boolean enabled = notificationsSwitch.isChecked();
@@ -1378,7 +1378,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
 			if (!Util.isOnline(this)) {
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
 			}
 
@@ -1489,11 +1489,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, 1);
-				showSnackbar(Constants.SNACKBAR_TYPE, message);
+				showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
 			}
 		}else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!Util.isOnline(this)) {
-                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
             
@@ -1526,7 +1526,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     try {
                         statusDialog.dismiss();
                         if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_sent_node));
+                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_sent_node), -1);
                         }
                     } catch (Exception ex) {
                     }
@@ -1628,10 +1628,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Shared folder correctly: "+request.getNodeHandle());
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_shared));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
 			}
 			else{
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_shared));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_shared), -1);
 			}
 		}else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
             try {
@@ -1641,13 +1641,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             
             if (e.getErrorCode() == MegaError.API_OK){
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
                     sharedFoldersFragment.setNodes();
                 }
             }
             else{
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_no_created));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_no_created), -1);
                     sharedFoldersFragment.setNodes();
                 }
             }
@@ -1663,14 +1663,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                     sharedFoldersFragment.clearSelections();
                     sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
                 }
             }
             else{
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                     sharedFoldersFragment.clearSelections();
                     sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
                 }
             }
             log("rename nodes request finished");
@@ -1685,7 +1685,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                     sharedFoldersFragment.clearSelections();
                     sharedFoldersFragment.hideMultipleSelect();
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied));
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
                 }
             }
             else{
@@ -1707,7 +1707,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
                     }
                 }
             }
@@ -1726,14 +1726,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
                     }
                 }
                 else{
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                     }
                 }
             }
@@ -1742,14 +1742,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                     }
                 }
                 else{
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved));
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                     }
                 }
             }
@@ -1898,11 +1898,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			log("Truncate history request finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Ok. Clear history done");
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_success));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
 			}
 			else{
 				log("Error clearing history: "+e.getErrorString());
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
@@ -1928,7 +1928,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.create_chat_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
@@ -1938,7 +1938,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error), -1);
 			}
 		}
 	}
@@ -1948,8 +1948,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	}
 
-	public void showSnackbar(int type, String s){
-		showSnackbar(type, fragmentContainer, s, -1);
+	public void showSnackbar(int type, String s, long idChat){
+		showSnackbar(type, fragmentContainer, s, idChat);
 	}
 	
 	private void sharedFolderClicked(){
@@ -2129,7 +2129,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         log("moveToTrash: ");
         moveToRubbish=true;
         if (!Util.isOnline(this)) {
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
         
@@ -2328,7 +2328,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
         
         if (!Util.isOnline(this)) {
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
         

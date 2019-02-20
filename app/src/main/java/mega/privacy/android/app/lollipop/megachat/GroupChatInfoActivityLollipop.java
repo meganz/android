@@ -589,11 +589,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(megaApi!=null && megaApi.getRootNode()!=null){
             ArrayList<MegaUser> contacts = megaApi.getContacts();
             if(contacts==null){
-                showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                showSnackbar(getString(R.string.no_contacts_invite));
             }
             else {
                 if(contacts.isEmpty()){
-                    showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                    showSnackbar(getString(R.string.no_contacts_invite));
                 }
                 else{
                     Intent in = new Intent(this, AddContactActivityLollipop.class);

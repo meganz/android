@@ -5982,7 +5982,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			this.startActivity(intent);
 		}
     	drawerItem = DrawerItem.CHAT;
-    	selectDrawerItemChat();
+    	selectDrawerItemLollipop(drawerItem);
 	}
 
 	private void getOverflowMenu() {
