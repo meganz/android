@@ -1383,7 +1383,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void showSnackbar(String s){
-        showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+        showSnackbar(fragmentContainer, s);
     }
 
 

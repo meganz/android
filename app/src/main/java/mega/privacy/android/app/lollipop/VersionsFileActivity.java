@@ -872,7 +872,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, container, s, -1);
+		showSnackbar(container, s);
 	}
 
 	public void updateSize(String size){

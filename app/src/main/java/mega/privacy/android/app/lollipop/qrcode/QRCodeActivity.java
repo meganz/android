@@ -407,10 +407,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     public void showSnackbar(View view, String s){
         if (view == null) {
-            showSnackbar(Constants.SNACKBAR_TYPE, drawerLayout, s, -1);
+            showSnackbar(drawerLayout, s);
         }
         else {
-            showSnackbar(Constants.SNACKBAR_TYPE, view, s, -1);
+            showSnackbar(view, s);
         }
     }
 

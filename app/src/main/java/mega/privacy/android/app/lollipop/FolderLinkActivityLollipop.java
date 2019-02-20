@@ -2233,7 +2233,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 	public void showSnackbar(int type, String s){
 		log("showSnackbar");
-		showSnackbar(type, fragmentContainer, s, -1);
+		showSnackbar(type, fragmentContainer, s);
 	}
 
 	public MegaNode getSelectedNode() {

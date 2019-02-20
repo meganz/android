@@ -373,7 +373,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     }
 
     public void showSnackbar(String s){
-        showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+        showSnackbar(fragmentContainer, s);
     }
 
     @Override

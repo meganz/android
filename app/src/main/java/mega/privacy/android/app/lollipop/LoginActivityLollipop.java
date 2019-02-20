@@ -234,7 +234,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showSnackbar(String message) {
-        showSnackbar(Constants.SNACKBAR_TYPE, relativeContainer, message, -1);
+        showSnackbar(relativeContainer, message);
     }
 
     public void showFragment(int visibleFragment) {
