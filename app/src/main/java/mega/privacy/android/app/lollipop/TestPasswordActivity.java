@@ -51,6 +51,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     private Button backupRecoveryKeyButton;
     private Button dismissButton;
     private RelativeLayout containerPasswordError;
+    private TextView enterPwdHint;
 
     private Drawable password_background;
 
@@ -60,6 +61,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
     MegaApiAndroid megaApi;
     DatabaseHandler dbH;
+
+    int counter = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,14 +76,18 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
         if (savedInstanceState != null){
             logout = savedInstanceState.getBoolean("logout", false);
+            counter = savedInstanceState.getInt("counter", 0);
         }
         else {
             logout = getIntent().getBooleanExtra("rememberPasswordLogout", false);
+            counter = 0;
         }
 
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
         megaApi = ((MegaApplication)getApplication()).getMegaApi();
 
+        enterPwdHint = (TextView) findViewById(R.id.enter_pwd_hint);
         passwordEditText = (EditText) findViewById(R.id.test_password_edittext);
         passwordToggle = (ImageView) findViewById(R.id.toggle_button);
         passwordErrorText = (TextView) findViewById(R.id.test_password_text_error_text);
@@ -145,29 +152,26 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         confirmPasswordButton.setOnClickListener(this);
         backupRecoveryKeyButton.setOnClickListener(this);
         dismissButton.setOnClickListener(this);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         if (logout) {
             backupRecoveryKeyButton.setText(R.string.option_export_recovery_key);
             dismissButton.setText(R.string.option_logout_anyway);
-            params.setMargins((int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getResources().getDisplayMetrics()), 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics()));
-       }
+        }
         else {
             backupRecoveryKeyButton.setText(R.string.action_export_master_key);
             dismissButton.setText(R.string.general_dismiss);
-            params.setMargins((int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 7, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, getResources().getDisplayMetrics()), 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics()));
         }
-        dismissButton.setLayoutParams(params);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("logout", logout);
+        outState.putInt("counter", counter);
     }
 
     void quitError(){
         if(containerPasswordError.getVisibility() != View.GONE){
+            enterPwdHint.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
             containerPasswordError.setVisibility(View.GONE);
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                 passwordEditText.setBackgroundDrawable(password_background);
@@ -193,16 +197,26 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                 backupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
                 passwordEditText.setEnabled(false);
                 megaApi.passwordReminderDialogSucceeded(this);
+                if (logout) {
+                    dismissButton.setText(R.string.action_logout);
+                }
             }
             else {
+                counter++;
                 porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 passwordErrorText.setText(getString(R.string.test_pwd_wrong));
+                enterPwdHint.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
                 passwordErrorText.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
                 Drawable errorIcon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
                 errorIcon.setColorFilter(porterDuffColorFilter);
                 passwordErrorImage.setImageDrawable(errorIcon);
                 confirmPasswordButton.setVisibility(View.VISIBLE);
                 backupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+                if (counter == 3) {
+                    Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
             background.setColorFilter(porterDuffColorFilter);
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
