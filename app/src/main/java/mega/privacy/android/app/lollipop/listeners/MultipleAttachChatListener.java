@@ -65,14 +65,14 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
                     if(chatId==-1){
                         if(sendMultipleFiles){
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10), -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10), -1);
                         }
                         else{
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop) context).openChat(chatId, null);
+                        ((ManagerActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
                     }
                 }
                 else{
@@ -81,10 +81,10 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             }
             else if(context instanceof ContactInfoActivityLollipop){
                 if(success>0){
-                   ((ContactInfoActivityLollipop) context).openChat(chatId, null);
+                   ((ContactInfoActivityLollipop) context).showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId);
                 }
                 else{
-                    ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error));
+                    ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
         }

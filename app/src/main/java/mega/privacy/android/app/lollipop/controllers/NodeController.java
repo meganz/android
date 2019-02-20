@@ -705,7 +705,7 @@ public class NodeController {
                 ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
             }
             else if (context instanceof ContactInfoActivityLollipop){
-                ((ContactInfoActivityLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
+                ((ContactInfoActivityLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
             }
 
             log("Not enough space");
@@ -1091,7 +1091,7 @@ public class NodeController {
                                         ((ContactFileListActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                     }
                                     else if(context instanceof ContactInfoActivityLollipop){
-                                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                                        ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                                     }
                                 }
                             }
@@ -1208,7 +1208,7 @@ public class NodeController {
                     ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, msg, -1);
                 }
                 else if(context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, msg);
+                    ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, msg, -1);
                 }
             }
         }
