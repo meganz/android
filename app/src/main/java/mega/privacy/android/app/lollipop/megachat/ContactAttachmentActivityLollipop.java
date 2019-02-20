@@ -427,7 +427,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, container, s, -1);
+		showSnackbar(container, s);
 	}
 
 	public void startConversation(long handle){

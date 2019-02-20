@@ -1240,7 +1240,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, contactLayout, s, -1);
+		showSnackbar(contactLayout, s);
 	}
 
 	public MegaUser getSelectedContact() {

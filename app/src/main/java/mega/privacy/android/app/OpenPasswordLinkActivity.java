@@ -321,7 +321,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 
 
 	public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+		showSnackbar(fragmentContainer, s);
 	}
 
 }

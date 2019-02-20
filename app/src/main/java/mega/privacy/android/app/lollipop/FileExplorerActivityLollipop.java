@@ -2060,7 +2060,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
     public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+		showSnackbar(fragmentContainer, s);
     }
 
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){

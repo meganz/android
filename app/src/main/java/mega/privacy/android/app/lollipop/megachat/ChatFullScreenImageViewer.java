@@ -1004,7 +1004,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	}
 
 	public void showSnackbar(int type, String s){
-		showSnackbar(type, fragmentContainer, s, -1);
+		showSnackbar(type, fragmentContainer, s);
 	}
 
 	public void touchImage() {

@@ -1460,7 +1460,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+		showSnackbar(fragmentContainer, s);
 	}
 
 	void hideAB(){

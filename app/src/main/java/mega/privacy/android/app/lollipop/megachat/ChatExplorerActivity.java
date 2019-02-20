@@ -359,7 +359,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void showSnackbar(String s){
-        showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+        showSnackbar(fragmentContainer, s);
     }
 
     public void chooseChats(ArrayList<ChatExplorerListItem> listItems) {

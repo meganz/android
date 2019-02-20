@@ -1276,7 +1276,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     public void showSnackbar(String s){
-        showSnackbar(Constants.SNACKBAR_TYPE, container2FA, s, -1);
+        showSnackbar(container2FA, s);
     }
 
     @Override

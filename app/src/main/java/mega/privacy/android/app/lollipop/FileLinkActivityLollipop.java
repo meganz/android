@@ -909,7 +909,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public void showSnackbar(int type, String s){
-		showSnackbar(type, fragmentContainer, s, -1);
+		showSnackbar(type, fragmentContainer, s);
 	}
 	
 	@SuppressLint("NewApi") 

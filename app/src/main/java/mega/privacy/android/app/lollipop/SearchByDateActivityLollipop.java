@@ -563,7 +563,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
 
     public void showSnackbar(String message){
-        showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, message, -1);
+        showSnackbar(fragmentContainer, message);
     }
 }
 

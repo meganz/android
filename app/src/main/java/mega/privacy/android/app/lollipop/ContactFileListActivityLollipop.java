@@ -1593,10 +1593,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		cflF = (ContactFileListFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cflF");
 		if(cflF!=null && cflF.isVisible()){
 			if(coordinatorFragment!=null){
-				showSnackbar(type, coordinatorFragment, s, -1);
+				showSnackbar(type, coordinatorFragment, s);
 			}
 			else{
-				showSnackbar(type, fragmentContainer, s, -1);
+				showSnackbar(type, fragmentContainer, s);
 			}
 		}
 	}

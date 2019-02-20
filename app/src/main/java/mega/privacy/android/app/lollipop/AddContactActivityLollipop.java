@@ -2036,7 +2036,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     public void showSnackbar(String message) {
         Util.hideKeyboard(addContactActivityLollipop, 0);
-        showSnackbar(Constants.SNACKBAR_TYPE, relativeLayout, message, -1);
+        showSnackbar(relativeLayout, message);
     }
 
     private void addMEGAFilteredContact (MegaContactAdapter contact) {

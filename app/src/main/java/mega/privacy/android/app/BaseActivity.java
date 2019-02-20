@@ -262,6 +262,41 @@ public class BaseActivity extends AppCompatActivity {
         return super.dispatchTouchEvent(event);
     }
 
+    /**
+     * Method to display a simple Snackbar.
+     *
+     * @param view Layout where the snackbar is going to show.
+     * @param s Text to shown in the snackbar
+     */
+    public void showSnackbar (View view, String s) {
+        showSnackbar(Constants.SNACKBAR_TYPE, view, s, -1);
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type There are three possible values to this param:
+     *            - Constants.SNACKBAR_TYPE: creates a simple snackbar
+     *            - Constants.MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *            - Constants.NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     * @param view Layout where the snackbar is going to show.
+     * @param s Text to shown in the snackbar
+     */
+    public void showSnackbar (int type, View view, String s) {
+        showSnackbar(type, view, s, -1);
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type There are three possible values to this param:
+     *            - Constants.SNACKBAR_TYPE: creates a simple snackbar
+     *            - Constants.MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *            - Constants.NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     * @param view Layout where the snackbar is going to show.
+     * @param s Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value, different to -1, the function of Constants.MESSAGE_SNACKBAR_TYPE ends in the specified chat
+     */
     public void showSnackbar (int type, View view, String s, long idChat) {
         log("showSnackbar: "+s);
         Display  display = getWindowManager().getDefaultDisplay();

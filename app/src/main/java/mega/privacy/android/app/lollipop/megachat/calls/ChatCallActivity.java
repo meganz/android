@@ -4378,7 +4378,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
-        showSnackbar(Constants.SNACKBAR_TYPE, fragmentContainer, s, -1);
+        showSnackbar(fragmentContainer, s);
     }
 
 }

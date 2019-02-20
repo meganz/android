@@ -1741,7 +1741,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	public void showSnackbar(int type, String s){
-		showSnackbar(type, container, s, -1);
+		showSnackbar(type, container, s);
 	}
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){

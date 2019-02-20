@@ -635,7 +635,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(Constants.SNACKBAR_TYPE, zipLayout, s, -1);
+		showSnackbar(zipLayout, s);
 	}
 
 	

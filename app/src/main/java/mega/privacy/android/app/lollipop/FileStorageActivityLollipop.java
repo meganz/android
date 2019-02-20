@@ -735,7 +735,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				else {
 					log("Mode.PICK_FILE");
 					if(adapter.getSelectedCount()<=0){
-						showSnackbar(Constants.SNACKBAR_TYPE, viewContainer, getString(R.string.error_no_selection), -1);
+						showSnackbar(viewContainer, getString(R.string.error_no_selection));
 						break;
 					}
 					new AsyncTask<Void, Void, Void>()
