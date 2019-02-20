@@ -116,7 +116,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             mNotificationManager.createNotificationChannel(channel);
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
             intent.putExtra("chatHandle", chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -166,14 +165,13 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             Notification notif = mBuilderCompatO.build();
 
             startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
-        }
-        else {
+
+        }else{
 
             mBuilderCompat = new NotificationCompat.Builder(this);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
             intent.putExtra("chatHandle", chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

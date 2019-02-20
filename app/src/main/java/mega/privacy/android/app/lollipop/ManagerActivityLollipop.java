@@ -115,6 +115,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -2758,7 +2759,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("megaChatApi is NULL");
 				}
 				setChatBadge();
-				setCallBadge();
 			}
 
 			log("onCreate - Check if there any INCOMING pendingRequest contacts");
@@ -4211,12 +4211,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onDestroy()");
 
 		dbH.removeSentPendingMessages();
-
-//		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-//		if (rChatFL != null) {
-//			log("onChatCallUpdate() -> clearHandlers: ");
-//			rChatFL.clearHandlers();
-//		}
 
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
@@ -9099,28 +9093,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
                 //Check if there is a in progress call:
-                if(megaChatApi!=null){
-                    MegaHandleList listCalls = megaChatApi.getChatCalls();
-                    int contCallNotPresent = 0;
-                    if((listCalls!=null)&&(listCalls.size()>0)){
-                        for(int i=0; i<listCalls.size(); i++){
-                            MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                            if(call!=null){
-                                if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                    contCallNotPresent ++ ;
-                                }
-                            }
-                        }
-                        if(contCallNotPresent == listCalls.size()){
-                            ScanCodeFragment fragment = new ScanCodeFragment();
-                            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
-                            Intent intent = new Intent(this, QRCodeActivity.class);
-                            intent.putExtra("contacts", true);
-                            startActivity(intent);
-                        }
-                    }
-
-                }
+				if(!this.participatingInACall()){
+					ScanCodeFragment fragment = new ScanCodeFragment();
+					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+					Intent intent = new Intent(this, QRCodeActivity.class);
+					intent.putExtra("contacts", true);
+					startActivity(intent);
+				}
 				return true;
 			}
             default:{
@@ -18210,18 +18189,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate() status: "+call.getStatus());
         if(call.getChatid() != -1){
-            if((call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED) ||
-					(call.getStatus()==MegaChatCall.CALL_STATUS_JOINING) ||
-					(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)){
+            if((call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)||(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)){
 				setCallBadge();
-
 				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 				if ((rChatFL != null) && (rChatFL.isVisible())){
-                    log("OnChatCallUpdate() -> rChatFL visible: ");
+                    log("OnChatCallUpdate() status: "+call.getStatus()+" -> rChatFL visible: ");
                     rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-				}else{
-					log("*onChatCallUpdate() -> rChatFL not: ");
-
 				}
             }
         }
@@ -18330,31 +18303,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void setCallBadge() {
-		log("setCallBadge");
 		if(Util.isChatEnabled() && megaChatApi != null) {
-			int numberCalls = megaChatApi.getNumCalls();
-			if(numberCalls == 0){
-				callBadge.setVisibility(View.GONE);
-			}else if(numberCalls == 1){
-				MegaHandleList chatCallInProgress = megaChatApi.getChatCalls();
-				if((chatCallInProgress!=null)&&(chatCallInProgress.size()>0)){
-					MegaChatCall callInProgress = megaChatApi.getChatCall(chatCallInProgress.get(0));
-					if(callInProgress !=  null){
-						if((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
-							callBadge.setVisibility(View.VISIBLE);
-						}else{
-							callBadge.setVisibility(View.GONE);
-						}
-					}
-				}else{
+			int numCalls = megaChatApi.getNumCalls();
+			if(numCalls == 0){
+                callBadge.setVisibility(View.GONE);
+			}else if(numCalls == 1){
+                if(this.participatingInACall()){
 					callBadge.setVisibility(View.GONE);
+				}else{
+					callBadge.setVisibility(View.VISIBLE);
 				}
-
 			}else{
-				callBadge.setVisibility(View.VISIBLE);
+                callBadge.setVisibility(View.VISIBLE);
 			}
-		}else{
-			callBadge.setVisibility(View.GONE);
 		}
 	}
 
