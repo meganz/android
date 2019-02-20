@@ -185,7 +185,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ProgressDialog dialog;
     ProgressDialog statusDialog;
 
-//    public MegaChatMessage lastMessageSeen = null;
     public long lastIdMsgSeen = -1;
     public long generalUnreadCount = -1;
     boolean lastSeenReceived = false;
@@ -283,7 +282,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ChatActivityLollipop chatActivity;
 
     MenuItem callMenuItem;
-//    MenuItem videoMenuItem;
     MenuItem inviteMenuItem;
     MenuItem clearHistoryMenuItem;
     MenuItem contactInfoMenuItem;
@@ -850,7 +848,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 // Get the first visible item
-//                            int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
                 if((messages!=null)&&(messages.size()>0)){
                     int lastPosition = messages.size()-1;
@@ -881,15 +878,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-
-//                if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
-//                    hideMessageJump();
-//                }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
-//                    if(newVisibility){//
-//                        showJumpMessage();
-//                    }
-//                }
-
                 if(stateHistory!=MegaChatApi.SOURCE_NONE){
                     if (dy > 0) {
                         // Scrolling up
@@ -901,9 +889,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(!scrollingUp){
                         int pos = mLayoutManager.findFirstVisibleItemPosition();
-//                if(mLayoutManager.findViewByPosition(pos).getTop()==0 && pos==0){
-//                    showSnackbar("loadMoreMessages!!!");
-//                }
                         if(pos<=NUMBER_MESSAGES_BEFORE_LOAD&&getMoreHistory){
                             log("DE->loadMessages:scrolling up");
                             isLoadingHistory = true;
@@ -915,9 +900,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         });
-
-//        listView.setAdapter(null);
-//        adapter = null;
 
         messagesContainerLayout = (RelativeLayout) findViewById(R.id.message_container_chat_layout);
 
@@ -1650,7 +1632,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        log("onCreateOptionsMenuLollipop");
+        log("onCreateOptionsMenuLollipop");
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.chat_action, menu);
@@ -1676,7 +1658,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                 callMenuItem.setEnabled(false);
                 callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
-//                callMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setVisible(false);
@@ -1701,37 +1682,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         callMenuItem.setEnabled(true);
                         callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
                     }else{
-
-                        MegaHandleList listCalls = megaChatApi.getChatCalls();
-                        int contCallNotPresent = 0;
-                        if(listCalls!=null){
-                            if(listCalls.size()>0){
-                                for(int i=0; i<listCalls.size(); i++){
-                                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                                    if(call!=null){
-                                        if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                            contCallNotPresent ++ ;
-                                        }
-                                    }
-                                }
-                                if(contCallNotPresent == listCalls.size()){
-                                    callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                                    callMenuItem.setEnabled(true);
-                                    callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
-                                }else{
-                                    callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                                    callMenuItem.setEnabled(false);
-                                    callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
-                                }
-                            }else{
-                                callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                                callMenuItem.setEnabled(true);
-                                callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
-                            }
-                        }else{
+                        if(this.participatingInACall()){
                             callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                             callMenuItem.setEnabled(false);
                             callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
+                        }else{
+                            callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
+                            callMenuItem.setEnabled(true);
+                            callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
                         }
                     }
 
@@ -2594,7 +2552,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.call_in_progress_layout:{
 
-                if(checkPermissionsCall()){
+                if((checkPermissionsCall())&&(megaChatApi!=null)){
 
                     MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                     log("call_in_progress_layout clicked: "+callInProgress.getStatus());
@@ -2603,15 +2561,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         megaChatApi.startChatCall(idChat, false, this);
 
                     }else if((callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
+
 //                        megaChatApi.answerChatCall(idChat, false, this);
-                        Intent intent = new Intent(this, ChatCallActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("chatHandle", idChat);
-                        startActivity(intent);
+                        log("showCallLayout:status:RING_IN -> getOpenCallChatId");
+                        long openCallChatId = MegaApplication.getOpenCallChatId();
+                        log("openCallId: "+openCallChatId);
+                        if(openCallChatId!=-1){
+                            Intent intent = new Intent(this, ChatCallActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("chatHandle", idChat);
+                            startActivity(intent);
+                        }
+
                     }else{
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
                         intent.putExtra("chatHandle", idChat);
                         startActivity(intent);
                     }
@@ -2685,27 +2649,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(emojiKeyboard!=null){
                     emojiKeyboard.hideBothKeyboard(this);
                 }
-                MegaHandleList listCalls = megaChatApi.getChatCalls();
-                int contCallNotPresent = 0;
-                if(listCalls!=null){
-                    if(listCalls.size()>0){
-                        for(int i=0; i<listCalls.size(); i++){
-                            MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                            if(call!=null){
-                                if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                    contCallNotPresent ++ ;
-                                }
-                            }
-                        }
-                        if(contCallNotPresent == listCalls.size()){
-                            openCameraApp();
-                        }else{
-                            showConfirmationOpenCamera(chatRoom);
-                        }
-                    }else{
-                        openCameraApp();
-                    }
+
+                if(this.participatingInACall()){
+                    showConfirmationOpenCamera(chatRoom);
+                }else{
+                    openCameraApp();
                 }
+
                 break;
             }
 
@@ -6932,60 +6882,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         activityVisible = true;
 
-        MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
-        if(callInProgress != null){
-            log("onResume() callStatus: "+callInProgress.getStatus());
-            if((callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(callInProgress.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                if(isGroup()){
-                    //Check if I'm in other call:
-                    MegaHandleList listCalls = megaChatApi.getChatCalls();
-                    int contCallNotPresent = 0;
-                    if((listCalls!=null)&&(listCalls.size()>0)){
-                        for(int i=0; i<listCalls.size(); i++){
-                            MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                            if(call!=null){
-                                if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                    contCallNotPresent ++ ;
-                                }
-                            }
-                        }
-                        if(contCallNotPresent == listCalls.size()){
-                            log("VISIBLE callInProgressLayout");
-                            callInProgressLayout.setVisibility(View.VISIBLE);
-                            long callerHandle = callInProgress.getCaller();
-                            if(callerHandle != -1){
-                                String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
-                                callInProgressText.setText(textJoinCall);
-                            }else{
-                                callInProgressText.setText(getString(R.string.join_call_layout));
-                            }
-                            callInProgressLayout.setOnClickListener(this);
-                        }else{
-                            callInProgressLayout.setVisibility(View.GONE);
-                        }
-                    }else{
-                        callInProgressLayout.setVisibility(View.GONE);
-                    }
-
-                }else{
-                    callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
-                    callInProgressLayout.setOnClickListener(this);
-                }
-            }else if((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                callInProgressLayout.setVisibility(View.VISIBLE);
-                callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
-                callInProgressLayout.setOnClickListener(this);
-            }else{
-                callInProgressLayout.setVisibility(View.GONE);
-            }
-            invalidateOptionsMenu();
-
-        }
-        else{
-            log("onResume() callInProgress != null - GONE");
-            callInProgressLayout.setVisibility(View.GONE);
-        }
+       showCallLayout(megaChatApi.getChatCall(idChat));
 
        if(aB != null && aB.getTitle() != null){
            titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
@@ -7124,7 +7021,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-//        log("onChatConnectionStateUpdate: "+newState);
+        log("onChatConnectionStateUpdate: "+newState);
 
         supportInvalidateOptionsMenu();
 
@@ -7186,30 +7083,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
 
-//        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
-//        File newFolder = new File(path);
-//        newFolder.mkdirs();
-//
-//        String file = path + "/picture.jpg";
-//        File newFile = new File(file);
-//        try {
-//            newFile.createNewFile();
-//        } catch (IOException e) {}
-//
-//        Uri outputFileUri;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-//        }
-//        else{
-//            outputFileUri = Uri.fromFile(newFile);
-//        }
-//
-//        isTakePicture = false;
-//
-//        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-//        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//        startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
     }
 
     public void uploadPicture(String path){
@@ -7278,11 +7151,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 sendMessageToUI(newNodeAttachmentMsg);
             }
 
-//                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
-//                filePaths.add("/home/jfjf.jpg");
-
             intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-
             startService(intent);
         }
         else{
@@ -7373,71 +7242,66 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        invalidateOptionsMenu();
 
         if(call.getChatid()==idChat){
             log("onChatCallUpdate() status: "+call.getStatus());
-            if((call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)){
+            showCallLayout(call);
+        }
+    }
+
+    private void showCallLayout(MegaChatCall call){
+        //Check if there is a call in this chat:
+        if(call != null){
+            log("showCallLayout: Call IN THIS CHAT");
+            if((call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
+                log("showCallLayout:status = USER_NO_PRESENT || RING_IN: "+call.getStatus());
+                //I'm not in this call in progress:
                 if(isGroup()){
-                    //Check if I'm in other call:
-                    MegaHandleList listCalls = megaChatApi.getChatCalls();
-                    int contCallNotPresent = 0;
-                    if((listCalls!=null)&&(listCalls.size()>0)){
-                        for(int i=0; i<listCalls.size(); i++){
-                            MegaChatCall callD = megaChatApi.getChatCall(listCalls.get(i));
-                            if(callD!=null){
-                                if((callD.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(callD.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                                    contCallNotPresent ++ ;
-                                }
-                            }
-                        }
-                        if(contCallNotPresent == listCalls.size()){
-                            callInProgressLayout.setVisibility(View.VISIBLE);
-                            long callerHandle = call.getCaller();
-                            if(callerHandle != -1){
-                                String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
-                                callInProgressText.setText(textJoinCall);
-                            }else{
-                                callInProgressText.setText(getString(R.string.join_call_layout));
-                            }
-                            callInProgressLayout.setOnClickListener(this);
-                        }else{
-                            callInProgressLayout.setVisibility(View.GONE);
-                        }
-                    }else{
+                    //Group
+                    if(this.participatingInACall()){
+                        //I'm in other call
                         callInProgressLayout.setVisibility(View.GONE);
+                    }else{
+                        //I'm not in any call
+                        long callerHandle = call.getCaller();
+                        if(callerHandle != -1){
+                            String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
+                            callInProgressText.setText(textJoinCall);
+                        }else{
+                            callInProgressText.setText(getString(R.string.join_call_layout));
+                        }
+                        callInProgressLayout.setVisibility(View.VISIBLE);
+                        callInProgressLayout.setOnClickListener(this);
                     }
-                 }else{
+                }else{
+                    //Individual
                     callInProgressLayout.setVisibility(View.VISIBLE);
                     callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
                     callInProgressLayout.setOnClickListener(this);
                 }
-
-//                if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-//                    long openCallChatId = MegaApplication.getOpenCallChatId();
-//                    log("openCallId: "+openCallChatId);
-//                    if(openCallChatId!=-1){
-//                        Intent intent = new Intent(this, ChatCallActivity.class);
-//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-////        intent.setAction(Long.toString(System.currentTimeMillis()));
-//                        intent.putExtra("chatHandle", idChat);
-//                        startActivity(intent);
-//                    }
-//                }
+                invalidateOptionsMenu();
 
             }else if((call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                //I'm in this call in progress:
+                log("showCallLayout:status = STATUS_REQUEST_SENT || JOINING || IN_PROGRESS: "+call.getStatus());
                 if(callInProgressLayout.getVisibility() != View.VISIBLE){
-                    callInProgressLayout.setVisibility(View.VISIBLE);
+                    invalidateOptionsMenu();
                     callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
+                    callInProgressLayout.setVisibility(View.VISIBLE);
                     callInProgressLayout.setOnClickListener(this);
                 }
             }else{
+                log("showCallLayout:group:OTHER CASE: "+call.getStatus());
                 if(callInProgressLayout.getVisibility() != View.GONE){
-                    log("onChatCallUpdate() other case - GONE");
+                    invalidateOptionsMenu();
                     callInProgressLayout.setVisibility(View.GONE);
                     callInProgressLayout.setOnClickListener(null);
                 }
             }
+        }
+        else{
+            log("showCallLayout: NO CALL IN THIS CHAT");
+            callInProgressLayout.setVisibility(View.GONE);
         }
     }
 

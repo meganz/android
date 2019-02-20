@@ -86,9 +86,9 @@
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textSize="14sp"
+            android:text="@string/call_in_progress_layout_without_time"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"/>
-
     </RelativeLayout>
 
     <LinearLayout

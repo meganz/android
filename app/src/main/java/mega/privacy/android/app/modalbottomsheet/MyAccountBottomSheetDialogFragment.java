@@ -148,7 +148,7 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
             case R.id.my_account_my_QR_code: {
                 log("option QR code");
                 //Check if there is a in progress call:
-
+                boolean activeCall = false;
                 if(megaChatApi!=null){
                     MegaHandleList listCalls = megaChatApi.getChatCalls();
                     int contCallNotPresent = 0;
@@ -161,13 +161,16 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
                                 }
                             }
                         }
-
                         if(contCallNotPresent == listCalls.size()){
-                            Intent intent = new Intent(context, QRCodeActivity.class);
-                            startActivity(intent);
+                            activeCall = false;
+                        }else{
+                            activeCall = true;
                         }
                     }
-
+                }
+                if(!activeCall){
+                    Intent intent = new Intent(context, QRCodeActivity.class);
+                    startActivity(intent);
                 }
 
                 break;
