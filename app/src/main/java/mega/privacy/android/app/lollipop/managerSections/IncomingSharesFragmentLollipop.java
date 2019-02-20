@@ -1131,7 +1131,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());

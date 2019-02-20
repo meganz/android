@@ -5,6 +5,7 @@ import android.content.Context;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -64,10 +65,10 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
                     if(chatId==-1){
                         if(sendMultipleFiles){
-                            ((ManagerActivityLollipop) context).showSnackbar((context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10)));
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10), -1);
                         }
                         else{
-                            ((ManagerActivityLollipop) context).showSnackbar((context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1)));
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1), -1);
                         }
                     }
                     else{
@@ -75,7 +76,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                     }
                 }
                 else{
-                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.files_send_to_chat_error));
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
             else if(context instanceof ContactInfoActivityLollipop){
@@ -83,7 +84,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                    ((ContactInfoActivityLollipop) context).openChat(chatId, null);
                 }
                 else{
-                    ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.files_send_to_chat_error));
+                    ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error));
                 }
             }
         }

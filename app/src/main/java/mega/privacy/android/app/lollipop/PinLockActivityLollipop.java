@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
@@ -626,7 +624,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                         else{
                         	log("PIN NOT match - show snackBar");
                         	secondRound = false;
-//                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 							showSnackbar(getString(R.string.pin_lock_not_match));
 
                             //Re-enter pass
@@ -659,14 +656,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	void showSnackbar (String s) {
-		Snackbar snackbar = Snackbar.make(coordinatorLayout, s, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-		params.gravity = Gravity.TOP;
-		snackbarLayout.setLayoutParams(params);
-		snackbar.show();
+		showSnackbar(Constants.SNACKBAR_TYPE, coordinatorLayout, s, -1);
 	}
 
 	private void add4DigitsPin(){
@@ -861,7 +851,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                         else{
                         	log("PIN NOT match - show snackBar");
                         	secondRound = false;
-//                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 							showSnackbar(getString(R.string.pin_lock_not_match));
 
                             //Re-enter pass
@@ -1028,7 +1017,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				}
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
-//		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1219,7 +1207,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				}
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
-//		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
 					att.setAttemps(attemps);
 //						dbH.setAttributes(att);
@@ -1553,7 +1540,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
                 else{
                 	log("Alphanumeric PIN NOT match - show snackBar");
                 	secondRound = false;
-//                	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
                 	showSnackbar(getString(R.string.pin_lock_not_match));
 
                     //Re-enter pass

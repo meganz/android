@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -54,7 +53,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -400,7 +398,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 		if(!Util.isOnline(this))
 		{
-			showSnackbar(getString(R.string.error_server_connection_problem));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -591,7 +589,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					dialog.show();
 				}
 				catch(Exception ex){
-					showSnackbar(getString(R.string.general_error_file_not_found));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error_file_not_found));
 				}
 
 				return;
@@ -645,7 +643,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else
 				{
-					showSnackbar(getString(R.string.context_no_copied));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 			        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 			        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -761,11 +759,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					mediaIntent.setDataAndType(parsedUri, mimeType);
 				} else {
 					log("showFile:ERROR:httpServerGetLocalLink");
-					showSnackbar(getString(R.string.email_verification_text_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 				}
 			} else {
 				log("showFile:ERROR:httpServerGetLocalLink");
-				showSnackbar(getString(R.string.email_verification_text_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 			}
 
 			mediaIntent.putExtra("HANDLE", document.getHandle());
@@ -780,7 +778,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					startActivity(mediaIntent);
 				} else {
 					log("showFile:noAvailableIntent");
-					showSnackbar("NoApp available");
+					showSnackbar(Constants.SNACKBAR_TYPE, "NoApp available");
 				}
 			}
 
@@ -821,16 +819,16 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					}
 					else{
 						log("showFile:ERROR:httpServerGetLocalLink");
-						showSnackbar(getString(R.string.email_verification_text_error));
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 					}
 				}
 				else{
 					log("showFile:ERROR:httpServerGetLocalLink");
-					showSnackbar(getString(R.string.email_verification_text_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
 				}
 			}
 			else {
-				showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
 			}
 
 			pdfIntent.putExtra("HANDLE", document.getHandle());
@@ -872,7 +870,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				;
 
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -910,29 +908,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	}
 
-	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-		snackbarLayout.setLayoutParams(params);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
-	}
-
-	public void showSnackbarNotSpace(){
-		log("showSnackbarNotSpace");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-		Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) mySnackbar.getView();
-		snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-		final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-		params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-		snackbarLayout.setLayoutParams(params);
-		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-		mySnackbar.show();
+	public void showSnackbar(int type, String s){
+		showSnackbar(type, fragmentContainer, s, -1);
 	}
 	
 	@SuppressLint("NewApi") 

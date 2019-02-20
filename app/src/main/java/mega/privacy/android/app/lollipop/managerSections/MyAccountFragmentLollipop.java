@@ -604,7 +604,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				log("Show achievements");
 
 				if(!Util.isOnline(context)){
-					((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				}
 				else{
 					Intent intent = new Intent(context, AchievementsActivity.class);

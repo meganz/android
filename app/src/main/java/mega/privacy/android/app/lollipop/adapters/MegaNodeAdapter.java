@@ -1331,11 +1331,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         log("onClick: file_list_three_dots: " + currentPosition);
         if (!Util.isOnline(context)) {
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             } else if (context instanceof FolderLinkActivityLollipop) {
-                ((FolderLinkActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((FolderLinkActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             } else if (context instanceof ContactFileListActivityLollipop) {
-                ((ContactFileListActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ContactFileListActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             }
             return;
         }

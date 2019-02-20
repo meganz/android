@@ -7,18 +7,25 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -253,6 +260,69 @@ public class BaseActivity extends AppCompatActivity {
             retryConnectionsAndSignalPresence();
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    public void showSnackbar (int type, View view, String s, long idChat) {
+        log("showSnackbar: "+s);
+        Display  display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        Snackbar snackbar = null;
+        if (type == Constants.MESSAGE_SNACKBAR_TYPE && (s==null || s.isEmpty())) {
+            snackbar = Snackbar.make(view, R.string.sent_as_message, Snackbar.LENGTH_LONG);
+        }
+        else if (type == Constants.NOT_SPACE_SNACKBAR_TYPE) {
+            snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        }
+        else {
+            snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+        }
+
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+
+        if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
+            final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
+            params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+            snackbarLayout.setLayoutParams(params);
+        }
+        else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+            params.setMargins(mega.privacy.android.app.utils.Util.px2dp(8, outMetrics),0, mega.privacy.android.app.utils.Util.px2dp(8, outMetrics), mega.privacy.android.app.utils.Util.px2dp(8, outMetrics));
+            snackbarLayout.setLayoutParams(params);
+        }
+
+        switch (type) {
+            case Constants.SNACKBAR_TYPE: {
+                TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(5);
+                snackbar.show();
+                break;
+            }
+            case Constants.MESSAGE_SNACKBAR_TYPE: {
+                snackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
+                snackbar.show();
+                break;
+            }
+            case Constants.NOT_SPACE_SNACKBAR_TYPE: {
+                snackbar.setAction("Settings", new SnackbarNavigateOption(this));
+                snackbar.show();
+                break;
+            }
+        }
+    }
+
+    public static void showSimpleSnackbar(Context context, DisplayMetrics outMetrics, View view, String s) {
+        Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
+        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+        snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
+        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
+        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
+        snackbarLayout.setLayoutParams(params);
+        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(5);
+        snackbar.show();
     }
 
     /**

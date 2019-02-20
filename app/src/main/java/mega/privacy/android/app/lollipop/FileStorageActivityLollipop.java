@@ -15,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -48,7 +46,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -738,13 +735,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				else {
 					log("Mode.PICK_FILE");
 					if(adapter.getSelectedCount()<=0){
-						Snackbar snackbar = Snackbar.make(viewContainer, getString(R.string.error_no_selection), Snackbar.LENGTH_LONG);
-						Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-						snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
-						final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-						params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-						snackbarLayout.setLayoutParams(params);
-						snackbar.show();
+						showSnackbar(Constants.SNACKBAR_TYPE, viewContainer, getString(R.string.error_no_selection), -1);
 						break;
 					}
 					new AsyncTask<Void, Void, Void>()

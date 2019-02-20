@@ -19,7 +19,6 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -32,7 +31,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -470,7 +468,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("label", contactLink);
         clipboardManager.setPrimaryClip(clip);
-        showSnackbar(getString(R.string.qrcode_link_copied));
+        ((QRCodeActivity) context).showSnackbar(v, getString(R.string.qrcode_link_copied));
     }
 
     public void createLink () {
@@ -494,20 +492,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             }
             processingDialog = temp;
         }
-    }
-
-    public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(v, s, Snackbar.LENGTH_LONG);
-
-        Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
-        final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(Util.px2dp(8, outMetrics),0,Util.px2dp(8, outMetrics), Util.px2dp(8, outMetrics));
-        snackbarLayout.setLayoutParams(params);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
     }
 
     public void initCreateQR(MegaRequest request, MegaError e){
@@ -553,7 +537,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
                 ((QRCodeActivity) context).resetSuccessfully(true);
             }
             if (createQR){
-                ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_create_successfully));
+                ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_create_successfully));
                 ((QRCodeActivity) context).createSuccessfully();
                 qrcode_copy_link.setText(getResources().getString(R.string.button_copy_link));
                 createQR = false;
@@ -585,7 +569,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             if (qrCodeFile != null && qrCodeFile.exists()){
                 qrCodeFile.delete();
             }
-            ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_successfully));
+            ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_delete_successfully));
             qrcode.setImageBitmap(Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888));
             qrcode_copy_link.setText(getResources().getString(R.string.button_create_qr));
             copyLink = false;
@@ -594,7 +578,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             ((QRCodeActivity) context).deleteSuccessfully();
         }
         else {
-            ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_not_successfully));
+            ((QRCodeActivity) context).showSnackbar(v, getResources().getString(R.string.qrcode_delete_not_successfully));
         }
     }
 
