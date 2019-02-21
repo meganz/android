@@ -575,7 +575,7 @@
                         android:id="@+id/file_properties_info_menu_added"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/file_properties_info_added"
+                        android:text="@string/file_properties_info_created"
                         android:textSize="14sp"
                         android:textColor="@color/name_my_account"
                         android:layout_marginRight="8dp"/>
@@ -619,7 +619,7 @@
                         android:id="@+id/file_properties_info_menu_created"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/file_properties_info_created"
+                        android:text="@string/file_properties_info_modified"
                         android:textSize="14sp"
                         android:textColor="@color/name_my_account"
                         android:layout_marginRight="8dp"/>

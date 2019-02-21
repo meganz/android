@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -866,8 +867,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(startVideo){
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
-			}
-			else{
+			}else{
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
 			}
 
@@ -1228,21 +1228,25 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
-				startVideo = false;
-				if(checkPermissionsCall()){
-					startCall(false);
+				if(!this.participatingInACall()){
+					log("I'm not in a call");
+					startVideo = false;
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
 				}
-
-//				startCall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
-				startVideo = true;
-				if(checkPermissionsCall()){
-					startCall(true);
+				if(!this.participatingInACall()){
+					log("I'm not in a call");
+					startVideo = true;
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
 				}
-//				startCall(true);
+
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
