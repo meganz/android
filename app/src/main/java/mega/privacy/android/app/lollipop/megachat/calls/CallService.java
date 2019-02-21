@@ -62,7 +62,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-
         megaChatApi.addChatCallListener(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -86,8 +85,9 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             log("Chat handle to call: " + chatId);
         }
 
-        MegaApplication.setOpenCallChatId(chatId);
-
+        if(MegaApplication.getOpenCallChatId()!=chatId){
+            MegaApplication.setOpenCallChatId(chatId);
+        }
         showCallInProgressNotification();
         return START_NOT_STICKY;
     }
@@ -96,7 +96,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 
         if(call.getChatid()==chatId){
-            if(call.getStatus()==MegaChatCall.CALL_STATUS_TERMINATING){
+            if(call.getStatus()==MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION){
                 log("Destroy call Service");
                 stopForeground(true);
                 mNotificationManager.cancel(Constants.NOTIFICATION_CALL_IN_PROGRESS);
@@ -114,10 +114,8 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             channel.setSound(null, null);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
-
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
             intent.putExtra("chatHandle", chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -137,12 +135,24 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
             if (chat != null) {
                 title = chat.getTitle();
-                userHandle = chat.getPeerHandle(0);
-                email = chat.getPeerEmail(0);
 
-                Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
-                if (largeIcon != null) {
-                    mBuilderCompatO.setLargeIcon(largeIcon);
+                if(chat.isGroup()){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = createDefaultAvatar(-1, title);
+                        if(largeIcon!=null){
+                            mBuilderCompatO.setLargeIcon(largeIcon);
+                        }
+                    }
+                }
+                else{
+                    userHandle = chat.getPeerHandle(0);
+                    email = chat.getPeerEmail(0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                        if(largeIcon!=null){
+                            mBuilderCompatO.setLargeIcon(largeIcon);
+                        }
+                    }
                 }
 
                 mBuilderCompatO.setContentTitle(title);
@@ -155,16 +165,13 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             Notification notif = mBuilderCompatO.build();
 
             startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
-        }
-        else {
+
+        }else{
 
             mBuilderCompat = new NotificationCompat.Builder(this);
-
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
             Intent intent = new Intent(this, ChatCallActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction(Long.toString(System.currentTimeMillis()));
             intent.putExtra("chatHandle", chatId);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -185,14 +192,26 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
             if (chat != null) {
                 title = chat.getTitle();
-                userHandle = chat.getPeerHandle(0);
-                email = chat.getPeerEmail(0);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
-                    if (largeIcon != null) {
-                        mBuilderCompat.setLargeIcon(largeIcon);
+
+                if(chat.isGroup()){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = createDefaultAvatar(-1, title);
+                        if(largeIcon!=null){
+                            mBuilderCompat.setLargeIcon(largeIcon);
+                        }
                     }
                 }
+                else{
+                    userHandle = chat.getPeerHandle(0);
+                    email = chat.getPeerEmail(0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                        if(largeIcon!=null){
+                            mBuilderCompat.setLargeIcon(largeIcon);
+                        }
+                    }
+                }
+
                 mBuilderCompat.setContentTitle(title);
                 mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
             } else {
@@ -225,24 +244,19 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 bitmap = getCircleBitmap(bitmap);
                 if (bitmap != null) {
                     return bitmap;
-
-                }
-                else{
+                }else{
                     return createDefaultAvatar(userHandle, fullName);
                 }
-            }
-            else{
+            }else{
                 return createDefaultAvatar(userHandle, fullName);
             }
-        }
-        else{
+        }else{
             return createDefaultAvatar(userHandle, fullName);
         }
     }
 
     private Bitmap getCircleBitmap(Bitmap bitmap) {
-        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(output);
 
         final int color = Color.RED;
@@ -271,13 +285,18 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
 
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
-        if (color != null) {
-            log("The color to set the avatar is " + color);
-            paintCircle.setColor(Color.parseColor(color));
-        } else {
-            log("Default color to the avatar");
-            paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+        if(userHandle!=-1){
+            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
+            if (color != null) {
+                log("The color to set the avatar is " + color);
+                paintCircle.setColor(Color.parseColor(color));
+            } else {
+                log("Default color to the avatar");
+                paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+            }
+        }
+        else{
+            paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
         }
 
         paintText.setColor(Color.WHITE);

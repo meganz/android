@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -129,6 +130,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
@@ -138,6 +141,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -152,7 +156,8 @@ import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener{
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener, MegaChatCallListenerInterface {
 
     boolean fromChatSavedInstance = false;
     int[] screenPosition;
@@ -583,6 +588,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         finish();
                         return;
                     }
+
+                    megaChatApi.addChatCallListener(this);
                 }
 
                 if (isFolderLink) {
@@ -764,6 +771,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (fromChat) {
                 fromChatSavedInstance = true;
             }
+        }
+    }
+
+    @Override
+    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+        log("onChatCallUpdate ");
+        if (player != null && player.getPlayWhenReady()) {
+            player.setPlayWhenReady(false);
         }
     }
 
@@ -1142,6 +1157,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     log("playerListener: onPlayerStateChanged: " + playbackState);
+
+                    if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
+                        MegaHandleList handleList = megaChatApi.getChatCalls();
+                        if(handleList!=null && handleList.size()>0) {
+                            //Not allow to play content when a call is in progress
+                            player.setPlayWhenReady(false);
+                            showSnackbar(getString(R.string.not_allow_play_alert));
+                        }
+                    }
+
                     playbackStateSaved = playbackState;
                     if (playbackState == Player.STATE_BUFFERING) {
                         audioContainer.setVisibility(View.GONE);
@@ -2664,7 +2689,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         fragmentContainer.setVisibility(View.GONE);
         draggableView.setDraggable(true);
 
-        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commitNowAllowingStateLoss();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -3145,24 +3170,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void downloadFile() {
 
         if (adapterType == Constants.FILE_LINK_ADAPTER){
-            MegaNode node = megaApi.getNodeByHandle(currentDocument.getHandle());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            Constants.REQUEST_WRITE_STORAGE);
-
-                    handleListM.add(node.getHandle());
-                }
-            }
-
             if (nC == null) {
                 nC = new NodeController(this);
             }
             nC.downloadFileLink(currentDocument, uri.toString());
         }
         else if (fromChat){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                    handleListM.add(nodeChat.getHandle());
+                    return;
+                }
+            }
+
             if (chatC == null){
                 chatC = new ChatController(this);
             }
@@ -3180,6 +3204,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             Constants.REQUEST_WRITE_STORAGE);
 
                     handleListM.add(node.getHandle());
+                    return;
                 }
             }
 
@@ -3190,6 +3215,39 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 nC = new NodeController(this, isFolderLink);
             }
             nC.prepareForDownload(handleList, false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode){
+            case Constants.REQUEST_WRITE_STORAGE:{
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (hasStoragePermission) {
+                    if (adapterType == Constants.FILE_LINK_ADAPTER) {
+                        if(nC==null){
+                        nC = new NodeController(this, isFolderLink);
+                    }
+                        nC.downloadFileLink(currentDocument, uri.toString());
+                    }
+                    else if (fromChat) {
+                        if (chatC == null){
+                            chatC = new ChatController(this);
+                        }
+                        if (nodeChat != null){
+                            chatC.prepareForChatDownload(nodeChat);
+                        }
+                    }
+                    else{
+                        if(nC==null){
+                            nC = new NodeController(this, isFolderLink);
+                        }
+                        nC.prepareForDownload(handleListM, false);
+                    }
+                }
+                break;
+            }
         }
     }
 
@@ -3454,6 +3512,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
             megaApi.httpServerStop();
+        }
+
+        if (megaChatApi != null) {
+            megaChatApi.removeChatCallListener(this);
         }
 
         if (megaApiFolder != null) {
@@ -3744,6 +3806,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 megaApi.removeGlobalListener(this);
                 megaApi.httpServerStop();
             }
+
+            if (megaChatApi != null) {
+                megaChatApi.removeChatCallListener(this);
+            }
+
             if (player != null){
                 player.release();
             }
