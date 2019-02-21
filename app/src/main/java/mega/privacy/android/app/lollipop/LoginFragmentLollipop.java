@@ -1409,6 +1409,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 log("startFastLogin: Chat is NOT ENABLED");
             }
+            disableLoginButton();
             megaApi.fastLogin(gSession, this);
         }
         else{
@@ -1617,6 +1618,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("onKeysGeneratedLogin: result of init ---> "+ret);
                 if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
                     log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    disableLoginButton();
                     megaApi.login(lastEmail, lastPassword, this);
                     megaChatApi.enableGroupChatCalls(false);
                 }
@@ -1634,12 +1636,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         log("2 - ERROR----> Switch OFF chat");
                         dbH.setEnabledChat(false + "");
                     }
-
+                    disableLoginButton();
                     megaApi.login(lastEmail, lastPassword, this);
                 }
             }
             else{
                 log("onKeysGeneratedLogin: Chat is NOT ENABLED");
+                disableLoginButton();
                 megaApi.login(lastEmail, lastPassword, this);
             }
         }
@@ -1663,6 +1666,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return false;
         }
         return true;
+    }
+
+    private void disableLoginButton() {
+        //disbale login button
+        bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
+        bLogin.setEnabled(false);
+        //display login info
+        loginInProgressPb.setVisibility(View.VISIBLE);
+        loginInProgressInfo.setVisibility(View.VISIBLE);
+        loginInProgressInfo.setText(R.string.login_in_progress);
     }
 
     public void onLoginClick(View v){
@@ -1717,13 +1730,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 hidePasswordIfVisible();
                 loginClicked = true;
                 backWhileLogin = false;
-                //disbale it
-                bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
-                bLogin.setEnabled(false);
-                //display login info
-                loginInProgressPb.setVisibility(View.VISIBLE);
-                loginInProgressInfo.setVisibility(View.VISIBLE);
-                loginInProgressInfo.setText(R.string.login_in_progress);
                 onLoginClick(v);
                 break;
             }
