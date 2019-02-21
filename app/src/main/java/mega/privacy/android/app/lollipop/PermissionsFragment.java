@@ -39,12 +39,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     LinearLayout allowAccessLayout;
     PermissionsImageAdapter adapter;
     ImageView imgDisplay;
+    TextView itemsText;
     TextView titleDisplay;
     TextView subtitleDisplay;
     LinearLayout itemsLayout;
-    ImageView firstItem;
-    ImageView secondItem;
-    ImageView thirdItem;
     Button notNow2Button;
     Button enableButton;
 
@@ -78,7 +76,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
         View v = inflater.inflate(R.layout.fragment_permissions, container, false);
 
-        ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH);
+        ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
 
         setupLayout = (LinearLayout) v.findViewById(R.id.setup_fragment_container);
         notNowButton = (Button) v.findViewById(R.id.not_now_button);
@@ -86,14 +84,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         setupButton = (Button) v.findViewById(R.id.setup_button);
         setupButton.setOnClickListener(this);
         allowAccessLayout = (LinearLayout) v.findViewById(R.id.allow_access_fragment_container);
+        itemsText = (TextView) v.findViewById(R.id.items_text);
         imgDisplay = (ImageView) v.findViewById(R.id.image_permissions);
         titleDisplay = (TextView) v.findViewById(R.id.title_permissions);
         subtitleDisplay = (TextView) v.findViewById(R.id.subtitle_permissions);
 
         itemsLayout = (LinearLayout) v.findViewById(R.id.items_layout);
-        firstItem = (ImageView) v.findViewById(R.id.first_item);
-        secondItem = (ImageView) v.findViewById(R.id.second_item);
-        thirdItem = (ImageView) v.findViewById(R.id.third_item);
 
         mImages = new int[] {
                 R.drawable.photos,
@@ -192,21 +188,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             }
         }
 
-        if (numItems == 3) {
-            firstItem.setVisibility(View.VISIBLE);
-            secondItem.setVisibility(View.VISIBLE);
-            thirdItem.setVisibility(View.VISIBLE);
-        }
-        else if (numItems == 2) {
-            firstItem.setVisibility(View.VISIBLE);
-            secondItem.setVisibility(View.VISIBLE);
-            thirdItem.setVisibility(View.GONE);
-        }
-        else if (numItems == 1){
+        if (numItems == 1){
             itemsLayout.setVisibility(View.GONE);
         }
-
-        setResaltedItem();
+        else {
+            itemsText.setText(getString(R.string.wizard_steps_indicator, 1, numItems));
+        }
     }
 
     @Override
@@ -217,6 +204,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 break;
             }
             case R.id.setup_button: {
+                ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
                 showAllowAccessLayout();
                 break;
             }
@@ -239,7 +227,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                         permissionsPosition++;
                         currentPermission = items[i+1];
                         setContent(currentPermission);
-                        setResaltedItem();
+                        itemsText.setText(getString(R.string.wizard_steps_indicator, currentPermission+1, numItems));
                         break;
                     }
                     else {
@@ -254,29 +242,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         imgDisplay.setImageDrawable(ContextCompat.getDrawable(context, mImages[permission]));
         titleDisplay.setText(mTitles[permission]);
         subtitleDisplay.setText(mSubtitles[permission]);
-    }
-
-    void setResaltedItem () {
-        switch(permissionsPosition){
-            case 0:{
-                firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                break;
-            }
-            case 1:{
-                firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                break;
-            }
-            case 2:{
-                firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-                thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
-                break;
-            }
-        }
     }
 
     void askForPermission () {
