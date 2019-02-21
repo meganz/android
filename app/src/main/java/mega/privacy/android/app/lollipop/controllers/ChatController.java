@@ -196,6 +196,14 @@ public class ChatController {
                 megaChatApi.archiveChat(chat.getChatId(), true, (GroupChatInfoActivityLollipop) context);
             }
         }
+        else if(context instanceof ChatActivityLollipop){
+            if(chat.isArchived()){
+                megaChatApi.archiveChat(chat.getChatId(), false,(ChatActivityLollipop) context);
+            }
+            else{
+                megaChatApi.archiveChat(chat.getChatId(), true, (ChatActivityLollipop) context);
+            }
+        }
     }
 
     public void archiveChats(ArrayList<MegaChatListItem> chats){
@@ -696,7 +704,12 @@ public class ChatController {
                     }else{
                        return "";
                     }
-                } else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
+                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";
                     switch(message.getTermCode()){
                         case MegaChatMessage.END_CALL_REASON_ENDED:{
@@ -880,6 +893,10 @@ public class ChatController {
                     }else{
                         return "";
                     }
+                }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
+                    String textToShow = context.getResources().getString(R.string.call_started_messages);
+                    builder.append(textToShow);
+                    return builder.toString();
                 }
                 else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";
@@ -1404,9 +1421,26 @@ public class ChatController {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
+                if (context instanceof ChatActivityLollipop) {
+                    ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof ChatFullScreenImageViewer){
+                    ActivityCompat.requestPermissions(((ChatFullScreenImageViewer) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+                }
             }
         }
 

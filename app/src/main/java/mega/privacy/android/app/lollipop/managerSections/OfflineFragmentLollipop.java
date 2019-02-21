@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
@@ -221,9 +222,15 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 			else if (gridLayoutManager != null){
 				View v = gridLayoutManager.findViewByPosition(position);
-				if (v != null) {
-					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-				}
+                MegaOffline offline = adapter.getItemOff(position);
+                if (v != null && offline != null) {
+                    if (MimeTypeThumbnail.typeForName(offline.getName()).isImage()){
+                        return v.findViewById(R.id.file_grid_thumbnail);
+                    } else {
+                        //videos don't have thumnail, only have icon.here should use the ImageView of icon.
+                        return v.findViewById(R.id.file_grid_icon_for_file);
+                    }
+                }
 			}
 		}
 
