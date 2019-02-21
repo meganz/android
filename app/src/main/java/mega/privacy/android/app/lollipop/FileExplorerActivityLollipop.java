@@ -1598,7 +1598,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							pMsgSingle.setFingerprint(fingerprint);
 						}
 
-						long idMessage = dbH.addPendingMessage(pMsgSingle);
+						long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
 						pMsgSingle.setId(idMessage);
 
 						if(idMessage!=-1){

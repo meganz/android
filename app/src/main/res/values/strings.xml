@@ -3,7 +3,7 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.5.1 (222)</string>
+    <string name="app_version" context="Not translate">3.5.2 (223)</string>
     <string name="sdk_version" context="Not translate">41d84f2</string>
     <string name="karere_version" context="Not translate">9c9b9cc</string>
 
@@ -288,7 +288,7 @@
     -->
     <string name="file_properties_info_size_file" context="Refers to the size of a file.">Size</string>
     <string name="file_properties_info_modified" context="when was the file modified">Modified</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Created</string>
+    <string name="file_properties_info_added" context="when was the file added in MEGA">Added</string>
     <string name="file_properties_info_created" context="when the file was created">Created</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
@@ -1892,9 +1892,6 @@
 
     <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to enter the Decryption Key</string>
 
-    <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
-
-
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a stronger password</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
@@ -2024,7 +2021,7 @@
     <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
     <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
 
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to the call</string>
+    <!--<string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to the call</string>-->
     <string name="join_call_layout" context="Title of the layout to join a group call from the chat screen">Tap to join to the call</string>
 
     <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Invite contacts</string>
@@ -2308,13 +2305,19 @@
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password is not valid.</string>
     
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play content while there is a call in progress.</string>
+
     <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">SLIDE TO CANCEL</string>
     <string name="cancel_voice_clip" context="text of button to cancel a voice clip ">CANCEL</string>
     <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
 
-
     <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned location</string>
     <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
 
+    <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing call</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
+    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Tap to return to call </string>
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">ANSWER</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">IGNORED</string>
 
 </resources>
