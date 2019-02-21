@@ -115,6 +115,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -640,6 +641,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
+	View callBadge;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -2059,6 +2061,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
 		itemView.addView(chatBadge);
 		setChatBadge();
+
+		callBadge = LayoutInflater.from(this).inflate(R.layout.bottom_call_badge, menuView, false);
+		itemView.addView(callBadge);
+		callBadge.setVisibility(View.GONE);
+		setCallBadge();
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
@@ -3656,6 +3663,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+//    public void updateCallIcon(MegaChatListItem item){
+//        log("updateCallIcon");
+//        rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+//        if (rChatFL != null) {
+//            rChatFL.refreshNode(item);
+//        }
+//    }
+
 	public void setProfileAvatar(){
 		log("setProfileAvatar");
 		File avatar = null;
@@ -4228,6 +4243,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (megaChatApi != null){
 			megaChatApi.removeChatListener(this);
 			megaChatApi.removeChatCallListener(this);
+
 		}
 
 		isStorageStatusDialogShown = false;
@@ -9104,11 +9120,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
-				ScanCodeFragment fragment = new ScanCodeFragment();
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
-				Intent intent = new Intent(this, QRCodeActivity.class);
-				intent.putExtra("contacts", true);
-				startActivity(intent);
+                //Check if there is a in progress call:
+				if(!this.participatingInACall()){
+					ScanCodeFragment fragment = new ScanCodeFragment();
+					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+					Intent intent = new Intent(this, QRCodeActivity.class);
+					intent.putExtra("contacts", true);
+					startActivity(intent);
+				}
 				return true;
 			}
             default:{
@@ -15147,6 +15166,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
 					startService(intent);
@@ -18200,7 +18220,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			if (option ==  Constants.COLOR_STATUS_BAR_ACCENT) {
-				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.accentColorDark));
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.accentColorDark));
 				changeActionBarElevation(true);
 			}
 			else if (option == Constants.COLOR_STATUS_BAR_ZERO_DELAY){
@@ -18212,7 +18232,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}, 300);
 			}
 			else if (option == Constants.COLOR_STATUS_BAR_SEARCH) {
-				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.status_bar_search));
+				window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 			}
 			else if (option == Constants.COLOR_STATUS_BAR_ZERO) {
 				window.setStatusBarColor(0);
@@ -18221,7 +18241,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.status_bar_search));
+						window.setStatusBarColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.status_bar_search));
 					}
 				}, 300);
 			}
@@ -18268,10 +18288,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return parentHandleInbox;
 	}
 
-	@Override
-	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallUpdate");
-	}
+
+    @Override
+    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+        log("onChatCallUpdate() status: "+call.getStatus());
+        if(call.getChatid() != -1){
+            if((call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)||(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+				setCallBadge();
+				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+				if ((rChatFL != null) && (rChatFL.isVisible())){
+                    log("OnChatCallUpdate() status: "+call.getStatus()+" -> rChatFL visible: ");
+                    rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+				}
+            }
+        }
+    }
 
 	public void setContactTitleSection(){
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
@@ -18372,6 +18403,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else {
 			chatBadge.setVisibility(View.GONE);
+		}
+	}
+
+	public void setCallBadge() {
+		if(Util.isChatEnabled() && megaChatApi != null) {
+			int numCalls = megaChatApi.getNumCalls();
+			if(numCalls == 0){
+                callBadge.setVisibility(View.GONE);
+			}else if(numCalls == 1){
+                if(this.participatingInACall()){
+					callBadge.setVisibility(View.GONE);
+				}else{
+					callBadge.setVisibility(View.VISIBLE);
+				}
+			}else{
+                callBadge.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 
