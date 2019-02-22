@@ -921,6 +921,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                         uriData = intentReceived.getData();
                     }
+                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)) {
+                        url = intentReceived.getDataString();
+                    }
 
                     MegaNode rootNode = megaApi.getRootNode();
                     if (rootNode != null){
