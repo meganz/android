@@ -652,6 +652,8 @@
 
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
+	<string name="settings_camera_upload_status_helper_label" context="When user enable 'camera upload' we will display this text to let user know where to find the uploading status">To check the progress of your uploads, tap the Back button, then tap Cloud Drive.</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting">Video conversion is very power consuming, MEGA will remind you to charge your device if the videos to be converted are larger than $size.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
@@ -2133,7 +2135,7 @@
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remove files older than</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
-	<string name="settings_video_compression_queue_size_popup_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Notice me when size is larger than</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Notify me when size is larger than</string>
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to convert are larger than</string>
 

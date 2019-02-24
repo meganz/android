@@ -15,6 +15,8 @@ import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.DaemonService;
 
+import static mega.privacy.android.app.utils.Util.isDeviceSupportParallelUpload;
+
 @TargetApi(21)
 public class JobUtil {
 
@@ -84,6 +86,21 @@ public class JobUtil {
         }
         log("schedule job failed");
         return START_JOB_FAILED;
+    }
+    
+    public static synchronized void startCameraUploadService(Context context){
+        if (isDeviceSupportParallelUpload() && !CameraUploadsService.isServiceRunning) {
+            Intent newIntent = new Intent(context,CameraUploadsService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                log("startCameraUploadService: starting on Oreo or above: ");
+                context.startForegroundService(newIntent);
+            } else {
+                log("startCameraUploadService: starting below Oreo  ");
+                context.startService(newIntent);
+            }
+        } else {
+            log("startCameraUploadService: service not started, isDeviceSupportParallelUpload() is " + isDeviceSupportParallelUpload() + " and isServiceRunning " + CameraUploadsService.isServiceRunning);
+        }
     }
 
 
