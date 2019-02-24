@@ -44,6 +44,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -1669,6 +1670,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void disableLoginButton() {
+        log("disable login button");
         //disbale login button
         bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
         bLogin.setEnabled(false);
@@ -1676,6 +1678,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginInProgressPb.setVisibility(View.VISIBLE);
         loginInProgressInfo.setVisibility(View.VISIBLE);
         loginInProgressInfo.setText(R.string.login_in_progress);
+    }
+
+    private void enableLoginButton() {
+        log("enable login button");
+        bLogin.setEnabled(true);
+        bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
+        loginInProgressPb.setVisibility(View.GONE);
+        loginInProgressInfo.setVisibility(View.GONE);
     }
 
     public void onLoginClick(View v){
@@ -2201,16 +2211,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void onRequestStart(MegaApiJava api, MegaRequest request)
     {
         log("onRequestStart: " + request.getRequestString());
+        if(request.getType() == MegaRequest.TYPE_LOGIN) {
+            disableLoginButton();
+        }
         if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //			loginProgressBar.setVisibility(View.GONE);
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
             loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
+            disableLoginButton();
         }
     }
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
+        //when get response, enable, hide login info
+        enableLoginButton();
         try{
             if(timer!=null){
                 timer.cancel();
@@ -2224,15 +2240,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
-            //when get response, enable
-            bLogin.setEnabled(true);
-            bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
-            //hide login info
-            loginInProgressPb.setVisibility(View.GONE);
-            loginInProgressInfo.setVisibility(View.GONE);
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
-                log("terminate login process");
+                log("terminate login process when login");
                 return;
             }
             if (error.getErrorCode() != MegaError.API_OK) {
@@ -2390,7 +2400,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
-                log("terminate login process");
+                log("terminate login process when fetch nodes");
                 return;
             }
             MegaApplication.setLoggingIn(false);
@@ -2986,6 +2996,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             MegaApplication.setLoggingIn(false);
             loginClicked = false;
             backToLoginForm();
+            //when press back, need to logout account and chat first
+            megaApi.logout();
+            megaChatApi.logout(this);
             return 1;
         }
         else{
