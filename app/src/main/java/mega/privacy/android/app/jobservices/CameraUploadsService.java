@@ -14,7 +14,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -23,24 +22,21 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.format.DateUtils;
-import android.util.Log;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
@@ -49,6 +45,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -66,6 +64,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
@@ -99,6 +98,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     static public boolean running = false;
     private Handler handler;
+    
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
     
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
@@ -1485,7 +1486,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
     }
     
-    private synchronized void transferFinished(MegaApiJava api,MegaTransfer transfer,MegaError e) {
+    private synchronized void transferFinished(final MegaApiJava api,final MegaTransfer transfer,MegaError e) {
         String path = transfer.getPath();
         if (isOverQuota) {
             return;
@@ -1506,12 +1507,38 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 File src = new File(record.getLocalPath());
                 if (src.exists()) {
                     log("Creating preview");
-//                    File previewDir = PreviewUtils.getPreviewFolder(this);
-//                    File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
-//                    File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//                    megaApi.createThumbnail(record.getLocalPath(),thumb.getAbsolutePath());
-//                    megaApi.createPreview(record.getLocalPath(),preview.getAbsolutePath());
+                    File previewDir = PreviewUtils.getPreviewFolder(this);
+                    final File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
+                    final File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+//                    megaApi.createImageThumbnail(record.getLocalPath(),thumb.getAbsolutePath());
+//                    megaApi.createPreview(finalRecord.getLocalPath(),preview.getAbsolutePath());
+                    final SyncRecord finalRecord = record;
+                    if(Util.isVideoFile(transfer.getPath())) {
+                        threadPool.execute(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                File img = new File(finalRecord.getLocalPath());
+                                if(!preview.exists()) {
+                                    CameraUploadImageProcessor.createVideoPreview(CameraUploadsService.this,img, preview);
+                                }
+                                CameraUploadImageProcessor.createVideoThumbnail(CameraUploadsService.this,api,finalRecord.getLocalPath(),thumb);
+                            }
+                        });
+                    } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+                        threadPool.execute(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                File img = new File(finalRecord.getLocalPath());
+                                if(!preview.exists()) {
+                                    CameraUploadImageProcessor.createImagePreview(img, preview);
+                                }
+                                CameraUploadImageProcessor.createImageThumbnail(CameraUploadsService.this,api,finalRecord.getLocalPath(),thumb);
+                            }
+                        });
+                    }
                 }
                 //delete database record
                 dbH.deleteSyncRecordByPath(path,isSecondary);
