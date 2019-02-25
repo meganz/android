@@ -592,16 +592,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public int fromTakePicture = -1;
 
-	public static AlertDialog rememberPasswordDialog;
-	private TextView rememberPasswordDialogText;
-	private boolean passwordReminderDialogSkipped = false;
-	private boolean passwordReminderDialogBlocked = false;
-	private CheckBox showRememberPaswordCheckBox;
-	private Button testPwdButton;
-	private Button recoveryKeyButton;
-	private Button dismissButton;
-	private boolean rememberPasswordLogout = false;
-
 	AlertDialog enable2FADialog;
 	boolean isEnable2FADialogShown = false;
 	Button enable2FAButton;
@@ -1673,12 +1663,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}else {
 			textsearchQuery = false;
 		}
-		if (passwordReminderDialogBlocked){
-			outState.putBoolean("passwordReminderDialogBlocked", true);
-		}
-		if (rememberPasswordLogout){
-			outState.putBoolean("rememberPasswordLogout", true);
-		}
 		if (passwordReminderFromMyAccount){
 			outState.putBoolean("passwordReminderFromMyAccount", true);
 		}
@@ -1742,8 +1726,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
-			passwordReminderDialogBlocked = savedInstanceState.getBoolean("passwordReminderDialogBlocked", false);
-			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
@@ -2922,7 +2904,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		megaApi.shouldShowPasswordReminderDialog(false, this);
-//		showRememberPasswordDialog(false);
 //		showTransferOverquotaDialog();
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
@@ -2983,66 +2964,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-	}
-
-	public void showRememberPasswordDialog(boolean logout){
-
-		if (logout){
-			rememberPasswordLogout = true;
-		}
-		else {
-			rememberPasswordLogout = false;
-		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_remember_password, null);
-		builder.setView(v);
-
-		rememberPasswordDialogText = (TextView) v.findViewById(R.id.dialog_remember_pwd_text);
-		showRememberPaswordCheckBox = (CheckBox) v.findViewById(R.id.dialog_remember_pwd_checkbox);
-		testPwdButton = (Button) v.findViewById(R.id.dialog_remember_pwd_test_button);
-		recoveryKeyButton = (Button) v.findViewById(R.id.dialog_remember_pwd_backup_recoverykey_button);
-		dismissButton = (Button) v.findViewById(R.id.dialog_remember_pwd_dismiss_button);
-		if (passwordReminderDialogBlocked){
-			showRememberPaswordCheckBox.setChecked(true);
-		}
-
-		showRememberPaswordCheckBox.setOnClickListener(this);
-		testPwdButton.setOnClickListener(this);
-		recoveryKeyButton.setOnClickListener(this);
-		dismissButton.setOnClickListener(this);
-
-
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		params.gravity = Gravity.RIGHT;
-		if (rememberPasswordLogout) {
-			rememberPasswordDialogText.setText(R.string.recovery_key_exported_dialog_text_logout);
-			recoveryKeyButton.setText(R.string.option_export_recovery_key);
-			dismissButton.setText(R.string.option_logout_anyway);
-		}
-		else {
-			rememberPasswordDialogText.setText(R.string.remember_pwd_dialog_text);
-			recoveryKeyButton.setText(R.string.action_export_master_key);
-			dismissButton.setText(R.string.general_dismiss);
-		}
-
-		rememberPasswordDialog = builder.create();
-		rememberPasswordDialog.setCancelable(false);
-		rememberPasswordDialog.setCanceledOnTouchOutside(false);
-		rememberPasswordDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				passwordReminderDialogBlocked = false;
-				if (passwordReminderDialogBlocked){
-					log("Do not show me again");
-					passwordReminderDialogBlocked();
-				}
-				else if (passwordReminderDialogSkipped){
-					passwordReminderDialogSkiped();
-				}
-			}
-		});
-		rememberPasswordDialog.show();
 	}
 
 	void passwordReminderDialogBlocked(){
@@ -9052,10 +8973,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("action menu logout pressed");
 				passwordReminderFromMyAccount = true;
 				megaApi.shouldShowPasswordReminderDialog(true, this);
-//				showRememberPasswordDialog(true);
-
-//				AccountController aC = new AccountController(this);
-//				aC.logout(this, megaApi);
 	        	return true;
 	        }
 	        case R.id.action_menu_cancel_subscriptions:{
@@ -12926,45 +12843,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				navigateToUpgradeAccount();
 				break;
 			}
-			case R.id.dialog_remember_pwd_checkbox: {
-				if (showRememberPaswordCheckBox.isChecked()){
-					log("passwordReminderDialogBlocked checked");
-					passwordReminderDialogBlocked = true;
-				}
-				else {
-					log("showRememberPaswordCheckBox not checked");
-					passwordReminderDialogBlocked = false;
-				}
-				break;
-			}
-			case R.id.dialog_remember_pwd_test_button: {
-				passwordReminderDialogSkipped = false;
-				rememberPasswordDialog.dismiss();
-				Intent intent = new Intent(this, TestPasswordActivity.class);
-				intent.putExtra("rememberPasswordLogout", rememberPasswordLogout);
-				startActivity(intent);
-				break;
-			}
-			case R.id.dialog_remember_pwd_backup_recoverykey_button: {
-				passwordReminderDialogSkipped = false;
-				if (rememberPasswordLogout){
-					showBottomSheetRecoveryKey();
-				}
-				else{
-					rememberPasswordDialog.dismiss();
-					exportRecoveryKey();
-				}
-				break;
-			}
-			case R.id.dialog_remember_pwd_dismiss_button: {
-				passwordReminderDialogSkipped = true;
-				rememberPasswordDialog.dismiss();
-				if (rememberPasswordLogout){
-					AccountController ac = new AccountController(this);
-					ac.logout(this, megaApi);
-				}
-				break;
-			}
 			case R.id.enable_2fa_button: {
 				if (enable2FADialog != null) {
 					enable2FADialog.dismiss();
@@ -15613,12 +15491,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
 					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
 					if (request.getFlag()){
-						if (getPasswordReminderFromMyAccount()){
-							showRememberPasswordDialog(true);
-						}
-						else {
-							showRememberPasswordDialog(false);
-						}
+						Intent intent = new Intent(this, TestPasswordActivity.class);
+						intent.putExtra("logout", getPasswordReminderFromMyAccount());
+						startActivity(intent);
 					}
 					else if (getPasswordReminderFromMyAccount()){
 						if (aC == null){

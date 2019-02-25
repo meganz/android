@@ -1818,6 +1818,7 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog 'Do you remember your password?'">Do you remember your password?</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog 'Do you remember your password?' when logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog 'Do you remember your password?'">Please test your password to ensure you remember it. If you lose your password, you will lose access to your MEGA data.</string>
     <string name="remember_pwd_dialog_do_not_show" context="'Do you remember your password?' dialog option that permits user do not show it again">Don’t show me again</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Test password</string>
@@ -1829,7 +1830,7 @@
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copy to clipboard</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export Recovery Key</string>
-    <string name="option_logout_anyway" context="Option that permits user logout">Logout anyway</string>
+    <string name="proced_to_logout" context="Option that permits user logout">Proced to logout</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Recovery Key</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Save on File System</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copied to clipboard</string>
