@@ -362,7 +362,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						}else{
 							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-
 							if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
 								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_started_messages));
 								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));

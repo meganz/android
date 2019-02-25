@@ -2302,5 +2302,10 @@
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">END %s JOIN</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">IGNORED</string>
 
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">audio calling&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">video calling&#8230;</string>
+    <string name="user_muted_the_call" context="Subtitle of the call screen when a user muted the current individual call">%s muted this call</string>
+
+
 
 </resources>

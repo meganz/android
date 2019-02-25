@@ -267,13 +267,47 @@
                                 android:layout_width="18dp"
                                 android:src="@drawable/ic_videocam_white"/>
                         </LinearLayout>
-
                     </LinearLayout>
+                </LinearLayout>
+            </android.support.v7.widget.Toolbar>
+
+            <RelativeLayout
+                android:id="@+id/mutate_call"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@id/call_toolbar"
+                android:gravity="center_horizontal"
+                android:background="@drawable/gradient_shape_callschat"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_centerInParent="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true">
+                    <ImageView
+                        android:id="@+id/image_mutate_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_mutate_layout"
+                        android:layout_marginRight="8dp"
+                        android:background="@null" />
+                    <TextView
+                        android:id="@+id/text_mutate_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="@color/white"
+                        android:text="Iron muted this call"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        android:fontFamily="roboto"/>
 
                 </LinearLayout>
 
 
-            </android.support.v7.widget.Toolbar>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/info_users_bar"
@@ -346,181 +380,241 @@
             </RelativeLayout>
 
 
-            <!-- Buttons -->
-            <LinearLayout
-                android:id="@+id/linear_buttons"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:background="@null">
 
-                <RelativeLayout
-                    android:id="@+id/relative_answer_call_fab"
-                    android:layout_width="54dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:layout_marginRight="36dp"
-                    android:gravity="bottom|center_horizontal"
-                    android:background="@android:color/transparent">
+                <!-- Buttons -->
+                <LinearLayout
+                    android:id="@+id/linear_buttons_hang"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/linear_buttons"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:background="@null">
 
                     <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/answer_call_fab"
+                        android:id="@+id/hang_fab"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
                         android:layout_gravity="bottom"
                         android:layout_marginBottom="24dp"
-                        android:layout_below="@+id/linear_arrow_call"
                         android:scaleType="center"
-                        android:src="@drawable/ic_phone_white"
-                        app:backgroundTint="@color/accentColor"
+                        android:src="@drawable/ic_w_end_call"
+                        android:background="@null"
+                        android:visibility="gone"
+                        app:backgroundTint="@color/delete_account"
                         app:borderWidth="0dp"
                         app:elevation="6dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp" />
 
-                    <LinearLayout
-                        android:id="@+id/linear_arrow_call"
-                        android:layout_width="54dp"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:orientation="vertical"
-                        android:gravity="bottom|center_horizontal"
-                        android:visibility="gone"
-                        android:background="@android:color/transparent">
-                        <ImageView
-                            android:id="@+id/first_arrow_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                        <ImageView
-                            android:id="@+id/second_arrow_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                        <ImageView
-                            android:id="@+id/third_arrow_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                        <ImageView
-                            android:id="@+id/four_arrow_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                    </LinearLayout>
+                </LinearLayout>
 
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/relative_video_fab"
-                    android:layout_width="54dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:layout_marginRight="36dp"
-                    android:gravity="bottom|center_horizontal"
+                <!-- Buttons -->
+                <LinearLayout
+                    android:id="@+id/linear_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal"
                     android:background="@null">
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/video_fab"
-                        android:layout_width="54dp"
-                        android:layout_height="54dp"
-                        android:layout_gravity="bottom"
-                        android:layout_marginBottom="24dp"
-                        android:layout_below="@+id/linear_arrow_video"
-                        android:scaleType="center"
-                        android:src="@drawable/ic_videocam_white"
-                        android:background="@null"
-                        app:backgroundTint="@color/accentColor"
-                        app:borderWidth="0dp"
-                        app:elevation="6dp"
-                        app:fabSize="normal"
-                        app:pressedTranslationZ="12dp"/>
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="36dp"
+                        android:layout_gravity="bottom|center_horizontal">
 
-                    <LinearLayout
-                        android:id="@+id/linear_arrow_video"
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/speaker_fab"
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            android:scaleType="center"
+                            android:visibility="gone"
+                            android:layout_marginBottom="24dp"
+                            android:src="@drawable/ic_speaker_on"
+                            android:background="@null"
+                            app:backgroundTint="@color/accentColor"
+                            app:borderWidth="0dp"
+                            app:elevation="6dp"
+                            app:fabSize="normal"
+                            app:pressedTranslationZ="12dp"/>
+
+                        <RelativeLayout
+                            android:id="@+id/relative_answer_call_fab"
+                            android:layout_width="54dp"
+                            android:layout_height="match_parent"
+                            android:gravity="bottom|center_horizontal"
+                            android:background="@android:color/transparent">
+
+                            <android.support.design.widget.FloatingActionButton
+                                android:id="@+id/answer_call_fab"
+                                android:layout_width="54dp"
+                                android:layout_height="54dp"
+                                android:layout_gravity="bottom"
+                                android:layout_marginBottom="24dp"
+                                android:layout_below="@+id/linear_arrow_call"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_phone_white"
+                                app:backgroundTint="@color/accentColor"
+                                app:borderWidth="0dp"
+                                app:elevation="6dp"
+                                app:fabSize="normal"
+                                app:pressedTranslationZ="12dp" />
+
+                            <LinearLayout
+                                android:id="@+id/linear_arrow_call"
+                                android:layout_width="54dp"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:orientation="vertical"
+                                android:gravity="bottom|center_horizontal"
+                                android:visibility="gone"
+                                android:background="@android:color/transparent">
+                                <ImageView
+                                    android:id="@+id/first_arrow_call"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_expand"
+                                    android:layout_centerInParent="true"
+                                    android:layout_marginTop="10dp"/>
+                                <ImageView
+                                    android:id="@+id/second_arrow_call"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_expand"
+                                    android:layout_centerInParent="true"
+                                    android:layout_marginTop="10dp"/>
+                                <ImageView
+                                    android:id="@+id/third_arrow_call"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_expand"
+                                    android:layout_centerInParent="true"
+                                    android:layout_marginTop="10dp"/>
+                                <ImageView
+                                    android:id="@+id/four_arrow_call"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_expand"
+                                    android:layout_centerInParent="true"
+                                    android:layout_marginTop="10dp"/>
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+                    </FrameLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/relative_video_fab"
                         android:layout_width="54dp"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginRight="36dp"
                         android:gravity="bottom|center_horizontal"
-                        android:visibility="gone"
-                        android:background="@null">
+                        android:background="@android:color/transparent">
 
-                        <ImageView
-                            android:id="@+id/first_arrow_video"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/video_fab"
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="24dp"
+                            android:layout_below="@+id/linear_arrow_video"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_videocam_white"
                             android:background="@null"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                        <ImageView
-                            android:id="@+id/second_arrow_video"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:background="@null"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                        <ImageView
-                            android:id="@+id/third_arrow_video"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:background="@null"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                        <ImageView
-                            android:id="@+id/four_arrow_video"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_expand"
-                            android:background="@null"
-                            android:layout_centerInParent="true"
-                            android:layout_marginTop="10dp"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                            app:backgroundTint="@color/accentColor"
+                            app:borderWidth="0dp"
+                            app:elevation="6dp"
+                            app:fabSize="normal"
+                            app:pressedTranslationZ="12dp"/>
 
+                        <LinearLayout
+                            android:id="@+id/linear_arrow_video"
+                            android:layout_width="54dp"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:orientation="vertical"
+                            android:gravity="bottom|center_horizontal"
+                            android:visibility="gone"
+                            android:background="@null">
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/micro_fab"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="24dp"
-                    android:layout_marginRight="36dp"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_record_audio_w"
-                    android:background="@null"
-                    app:backgroundTint="@color/accentColor"
-                    app:borderWidth="0dp"
-                    app:elevation="6dp"
-                    app:fabSize="normal"
-                    app:pressedTranslationZ="12dp" />
+                            <ImageView
+                                android:id="@+id/first_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:background="@null"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/second_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:background="@null"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/third_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:background="@null"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                            <ImageView
+                                android:id="@+id/four_arrow_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_expand"
+                                android:background="@null"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="10dp"/>
+                        </LinearLayout>
+                    </RelativeLayout>
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/hang_fab"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="24dp"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_w_end_call"
-                    android:background="@null"
-                    app:backgroundTint="@color/delete_account"
-                    app:borderWidth="0dp"
-                    app:elevation="6dp"
-                    app:fabSize="normal"
-                    app:pressedTranslationZ="12dp" />
-            </LinearLayout>
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp"
+                        android:layout_gravity="bottom"
+                        android:gravity="bottom">
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/micro_fab"
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            android:layout_gravity="bottom"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_record_audio_w"
+                            android:background="@null"
+                            app:backgroundTint="@color/accentColor"
+                            app:borderWidth="0dp"
+                            app:elevation="6dp"
+                            app:fabSize="normal"
+                            app:pressedTranslationZ="12dp" />
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/reject_fab"
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            android:layout_gravity="bottom"
+                            android:scaleType="center"
+                            android:src="@drawable/ic_w_end_call"
+                            android:background="@null"
+                            app:backgroundTint="@color/delete_account"
+                            app:borderWidth="0dp"
+                            app:elevation="6dp"
+                            app:fabSize="normal"
+                            app:pressedTranslationZ="12dp" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
 
         </RelativeLayout>
     </android.support.design.widget.AppBarLayout>
