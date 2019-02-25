@@ -529,7 +529,11 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 if (toUpload.exists()) {
                     log("upload node " + path);
                     totalToUpload++;
-                    megaApi.startUpload(path,parent,file.getFileName(),file.getTimestamp() / 1000,this);
+                    long lastModified = new File(file.getLocalPath()).lastModified() / 1000;
+                    if(lastModified == 0) {
+                        lastModified = file.getTimestamp() / 1000;
+                    }
+                    megaApi.startUpload(path,parent,file.getFileName(),lastModified,this);
                 } else {
                     dbH.deleteSyncRecordByPath(path,isSec);
                 }
