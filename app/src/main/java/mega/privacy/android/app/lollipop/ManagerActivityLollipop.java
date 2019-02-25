@@ -766,17 +766,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         public void onReceive(Context context,Intent intent) {
             try {
                 log("cameraUploadLauncherReceiver: start service here");
-                if (!CameraUploadsService.isServiceRunning) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        log("cameraUploadLauncherReceiver: starting on Oreo or above: ");
-                        Intent newIntent = new Intent(getApplicationContext(),CameraUploadsService.class);
-                        startForegroundService(newIntent);
-                    } else {
-                        log("cameraUploadLauncherReceiver: below Oreo doing nothing ");
-                    }
-                } else {
-                    log("cameraUploadLauncherReceiver: camera upload service has been started");
-                }
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
             } catch (Exception e) {
                 log("cameraUploadLauncherReceiver: Exception: " + e.getMessage() + "_" + e.getStackTrace());
             }
@@ -14686,6 +14676,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				storageState = newStorageState;
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
@@ -14697,6 +14688,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					showStorageAlmostFullDialog();
 				}
 				storageState = newStorageState;
+                JobUtil.startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
