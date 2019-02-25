@@ -160,14 +160,24 @@ public class AccountController implements View.OnClickListener{
     public void exportMK(String path, boolean fromOffline){
         log("exportMK");
         if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            }
+            else if (context instanceof TestPasswordActivity) {
+                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            }
             return;
         }
 
         boolean pathNull = false;
 
         String key = megaApi.exportMasterKey();
-        megaApi.masterKeyExported((ManagerActivityLollipop) context);
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.masterKeyExported((ManagerActivityLollipop) context);
+        }
+        else if (context instanceof TestPasswordActivity) {
+            megaApi.masterKeyExported((TestPasswordActivity) context);
+        }
 
         BufferedWriter out;
         try {
@@ -185,7 +195,9 @@ public class AccountController implements View.OnClickListener{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                 if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                    if (context instanceof ManagerActivityLollipop) {
+                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                    }
                 }
             }
 
@@ -198,7 +210,12 @@ public class AccountController implements View.OnClickListener{
 
             File file = new File(path);
             if(availableFreeSpace < file.length()) {
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                }
+                else if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                }
                 return;
             }
 
@@ -211,24 +228,31 @@ public class AccountController implements View.OnClickListener{
 //                message = message.replace("[A]", "\n");
 //            }
 //            catch (Exception e){}
-            if (pathNull){
-                ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                if(mAF!=null){
-                    mAF.setMkButtonText();
-                }
 
-                showConfirmationExportedDialog();
-            }
-            else {
-                if(fromOffline){
-                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+            if (context instanceof ManagerActivityLollipop) {
+                if (pathNull){
+                    ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                    MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                    if (mAF != null) {
+                        mAF.setMkButtonText();
+                    }
+
+                    showConfirmationExportedDialog();
                 }
-                else{
-                    showConfirmDialogRecoveryKeySaved();
+                else {
+                    if(fromOffline){
+                        if (context instanceof ManagerActivityLollipop) {
+                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                        }
+                    }
+                    else{
+                        showConfirmDialogRecoveryKeySaved();
+                    }
                 }
             }
-//            Util.showAlert(((ManagerActivityLollipop) context), message, null);
+            else if (context instanceof TestPasswordActivity) {
+
+            }
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
