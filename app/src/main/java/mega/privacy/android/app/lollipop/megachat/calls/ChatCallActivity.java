@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -110,6 +111,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -2235,7 +2237,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             megaChatApi.disableVideo(chatId, this);
                         } else {
                             log(" enableVideo");
-                            megaChatApi.enableVideo(chatId, this);
+                            showConfirmationConnectedVideo(chatId);
+
+//                            megaChatApi.enableVideo(chatId, this);
                         }
                     }
 
@@ -2280,7 +2284,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     }
                 }else{
                     //enable speaker
-                    log("*enable speaker");
+                    log("enable speaker");
                     if(rtcAudioManager==null){
                         rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
                     }
@@ -4282,7 +4286,36 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void refreshMutateLayout(){
+    public void showConfirmationConnectedVideo(final long chat) {
+        log("showConfirmationConnectedVideo");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        connectedMyVideo(chat);
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        String message = getResources().getString(R.string.text_to_confirmation_open_connected_video_in_call);
+        builder.setMessage(message).setPositiveButton(R.string.text_of_button_to_switch, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    private void connectedMyVideo(long chat){
+        if(megaChatApi!=null){
+            megaChatApi.enableVideo(chat, this);
+        }
+    }
+
+    private void refreshMutateLayout(){
         mutateCallLayout.setVisibility(GONE);
 
         if(!chat.isGroup()){
