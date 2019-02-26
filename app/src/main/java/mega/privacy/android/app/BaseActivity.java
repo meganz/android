@@ -140,7 +140,7 @@ public class BaseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 log("****BROADCAST TO SEND SIGNAL PRESENCE");
-                if(delaySignalPresence && megaChatApi.getPresenceConfig().isPending()==false){
+                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
                 }

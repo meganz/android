@@ -2904,6 +2904,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		megaApi.shouldShowPasswordReminderDialog(false, this);
+//		Intent intent = new Intent(this, TestPasswordActivity.class);
+//		startActivity(intent);
+
 //		showTransferOverquotaDialog();
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
