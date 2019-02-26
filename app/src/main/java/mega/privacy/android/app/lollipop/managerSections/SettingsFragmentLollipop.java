@@ -154,6 +154,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 
 	public static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
+    public static String KEY_AUTO_PLAY_SWITCH= "auto_play_switch";
 
 	public static String KEY_RECOVERY_KEY= "settings_recovery_key";
 	public static String KEY_CHANGE_PASSWORD= "settings_change_password";
@@ -175,6 +176,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	PreferenceCategory twoFACategory;
 	SwitchPreferenceCompat twoFASwitch;
+    SwitchPreferenceCompat autoPlaySwitch;
 
 	PreferenceScreen preferenceScreen;
 
@@ -344,6 +346,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		twoFASwitch = (SwitchPreferenceCompat) findPreference(KEY_2FA);
 		twoFASwitch.setOnPreferenceClickListener(this);
+		
+		autoPlaySwitch = (SwitchPreferenceCompat) findPreference(KEY_AUTO_PLAY_SWITCH);
+        autoPlaySwitch.setOnPreferenceClickListener(this);
+        boolean autoPlayEnabled = prefs.isAutoPlayEnabled();
+        autoPlaySwitch.setChecked(autoPlayEnabled);
 
 		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
 		chatAttachmentsChatListPreference.setOnPreferenceChangeListener(this);
@@ -2052,7 +2059,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
 				startActivity(intent);
 			}
-		}
+		}else if(preference.getKey().compareTo(KEY_AUTO_PLAY_SWITCH) == 0 ){
+		    boolean isChecked = autoPlaySwitch.isChecked();
+		    log("is auto play checked " + isChecked);
+            dbH.setAutoPlayEnabled(String.valueOf(isChecked));
+        
+        }
 		
 		return true;
 	}

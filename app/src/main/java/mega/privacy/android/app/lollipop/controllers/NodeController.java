@@ -911,6 +911,12 @@ public class NodeController {
                     //Check if the file is already downloaded
                     if(localPath != null){
                         log("localPath != null");
+                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                        if(!autoPlayEnabled){
+                            log("auto play disabled");
+                            Util.showSnackBar(context, context.getString(R.string.general_already_downloaded));
+                            return;
+                        }
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
                             Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
