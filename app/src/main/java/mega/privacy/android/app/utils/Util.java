@@ -96,8 +96,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -2206,6 +2211,26 @@ public class Util {
 		}
 		return true;
 	}
+	
+	public static void showSnackBar(Context context, String message){
+        if (context instanceof ChatFullScreenImageViewer){
+            ((ChatFullScreenImageViewer) context).showSnackbar(message);
+        }
+        else if (context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).showSnackbar(message);
+        }
+        else if (context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).showSnackbar(message);
+        }
+        else if (context instanceof ChatActivityLollipop){
+            ((ChatActivityLollipop) context).showSnackbar(message);
+        }
+        else if (context instanceof NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
+        }else if (context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).showSnackbar(message);
+        }
+    }
 
 	private static void log(String message) {
 		log("Util", message);

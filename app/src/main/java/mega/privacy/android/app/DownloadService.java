@@ -627,7 +627,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		{
 			try {
 				if (openFile) {
-					log("openFile true");
+                    log("openFile true");
+                    boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                    if(!autoPlayEnabled){
+                        log("auto play disabled");
+                        Util.showSnackBar(getApplicationContext(), getApplicationContext().getString(R.string.general_already_downloaded));
+                        return;
+                    }
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
