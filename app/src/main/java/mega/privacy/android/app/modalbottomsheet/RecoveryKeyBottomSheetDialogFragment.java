@@ -52,10 +52,7 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         switch(v.getId()){
             case R.id.recovery_key_copytoclipboard_layout:{
-                if (getContext() instanceof TestPasswordActivity){
-                    ((TestPasswordActivity) getContext()).finish();
-                }
-                else if (getContext() instanceof TwoFactorAuthenticationActivity) {
+                if (getContext() instanceof TwoFactorAuthenticationActivity) {
                     ((TwoFactorAuthenticationActivity) getContext()).finish();
                 }
                 AccountController aC = new AccountController(getContext());
@@ -91,12 +88,13 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         if (rKBitmap != null){
             PrintHelper printHelper = new PrintHelper(getActivity());
+            final Context context = getContext();
             printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
             printHelper.printBitmap("rKPrint", rKBitmap, new PrintHelper.OnPrintFinishCallback() {
                 @Override
                 public void onFinish() {
-                    if (getContext() instanceof TestPasswordActivity) {
-                        ((TestPasswordActivity) getContext()).dismissActivity();
+                    if (context instanceof TestPasswordActivity) {
+                        ((TestPasswordActivity) context).passwordReminderSucceeded();
                     }
                 }
             });

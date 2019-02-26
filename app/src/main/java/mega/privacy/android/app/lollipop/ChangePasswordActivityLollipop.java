@@ -43,6 +43,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -304,6 +305,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
+		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+			AccountController ac = new AccountController(this);
+			ac.logout(this, megaApi);
+		}
 		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
@@ -1275,12 +1280,18 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					progress.dismiss();
 				} catch(Exception ex) {};
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				//Intent to MyAccount
-				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-				resetPassIntent.putExtra("RESULT", 0);
-				startActivity(resetPassIntent);
-				finish();
+				if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+					AccountController ac = new AccountController(this);
+					ac.logout(this, megaApi);
+				}
+				else {
+					//Intent to MyAccount
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", 0);
+					startActivity(resetPassIntent);
+					finish();
+				}
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
