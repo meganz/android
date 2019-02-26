@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -215,85 +216,24 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 0:{
 					typeAccountText.setText(getString(R.string.free_account).toUpperCase());
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_free_crest));
+					typeAccountIcon.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_free_crest));
 					expirationAccountLayout.setVisibility(View.GONE);
 					break;
 				}
 				case 1:{
-					typeAccountText.setText(getString(R.string.pro1_account));
-					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_1_crest));
-					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
-						expirationAccountTitle.setText(getString(R.string.renews_on));
-						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
-						}
-						else{
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-						}
-					}
-					else{
-						expirationAccountTitle.setText(getString(R.string.expires_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-					}
+					setRenewExpireDate(getString(R.string.pro1_account), ContextCompat.getDrawable(context, R.drawable.ic_pro_1_crest));
 					break;
 				}
 				case 2:{
-					typeAccountText.setText(getString(R.string.pro2_account));
-					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_2_crest));
-					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
-						expirationAccountTitle.setText(getString(R.string.renews_on));
-						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
-						}
-						else{
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-						}
-					}
-					else{
-						expirationAccountTitle.setText(getString(R.string.expires_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-					}
+					setRenewExpireDate(getString(R.string.pro2_account), ContextCompat.getDrawable(context, R.drawable.ic_pro_2_crest));
 					break;
 				}
 				case 3:{
-					typeAccountText.setText(getString(R.string.pro3_account));
-					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_3_crest));
-					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
-						expirationAccountTitle.setText(getString(R.string.renews_on));
-						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
-						}
-						else{
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-						}
-					}
-					else{
-						expirationAccountTitle.setText(getString(R.string.expires_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-					}
+					setRenewExpireDate(getString(R.string.pro3_account), ContextCompat.getDrawable(context, R.drawable.ic_pro_3_crest));
 					break;
 				}
 				case 4:{
-					String textLite = getString(R.string.prolite_account);
-					typeAccountText.setText(textLite.toUpperCase());
-					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_lite_crest));
-					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
-						expirationAccountTitle.setText(getString(R.string.renews_on));
-						if(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()<=0){
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
-						}
-						else{
-							expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-						}
-					}
-					else{
-						expirationAccountTitle.setText(getString(R.string.expires_on));
-						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
-					}
+					setRenewExpireDate(getString(R.string.prolite_account).toUpperCase(), ContextCompat.getDrawable(context, R.drawable.ic_lite_crest));
 					break;
 				}
 			}
@@ -415,6 +355,25 @@ public class MyStorageFragmentLollipop extends Fragment {
 		progressBar.setProgress(usedPerc);
 	}
 
+	void setRenewExpireDate(String title, Drawable drawable) {
+		typeAccountText.setText(title);
+		typeAccountIcon.setVisibility(View.VISIBLE);
+		typeAccountIcon.setBackground(drawable);
+
+		if(myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+				&& myAccountInfo.getAccountInfo().getSubscriptionRenewTime() > 0){
+			expirationAccountTitle.setText(getString(R.string.renews_on));
+			expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+		}
+		else if (myAccountInfo.getAccountInfo().getProExpiration() > 0){
+			expirationAccountTitle.setText(getString(R.string.expires_on));
+			expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+		}
+		else {
+			log("Error. Renew date and expiration date invalids");
+			expirationAccountLayout.setVisibility(View.GONE);
+		}
+	}
 
 	public void refreshVersionsInfo(){
 
