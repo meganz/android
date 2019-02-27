@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -30,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -69,6 +71,8 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -103,6 +107,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Stack<Integer> lastPositionStack;
 
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
+
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
 	TextView transfersNumberText;
@@ -129,6 +135,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	String downloadLocationDefaultPath = Util.downloadDIR;
     
     private int placeholderCount;
+
+	RelativeLayout callInProgressLayout;
+	Chronometer callInProgressChrono;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -525,6 +534,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		downloadLocationDefaultPath = Util.getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+			}
+		}
+		else{
+			log("Chat not enabled!");
+		}
+
+
+
 		super.onCreate(savedInstanceState);
 		log("after onCreate called super");
 	}
@@ -608,6 +628,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
+			callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = (Chronometer) v.findViewById(R.id.call_in_progress_chrono);
+			callInProgressLayout.setVisibility(View.GONE);
+			callInProgressChrono.setVisibility(View.GONE);
+
+
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
 			transfersNumberText = (TextView) v.findViewById(R.id.transfers_overview_number);
@@ -650,8 +677,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
             
             setOverviewLayout();
-            
-            return v;
+			showCallLayout();
+
+
+			return v;
         } else {
             log("Grid View");
             log("FileBrowserFragmentLollipop isGrid");
@@ -830,6 +859,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 ((ManagerActivityLollipop)getActivity()).invalidateOptionsMenu();
                 break;
             }
+			case R.id.call_in_progress_layout:{
+				log("onClick:call_in_progress_layout");
+//				if(checkPermissionsCall()){
+//					returnTheCall();
+//				}
+				break;
+			}
         }
     }
     
@@ -1700,6 +1736,34 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         }
     }
+
+	public void showCallLayout(){
+		if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop)){
+			if(((ManagerActivityLollipop) context).participatingInACall()){
+				callInProgressLayout.setVisibility(View.VISIBLE);
+				callInProgressChrono.setVisibility(View.GONE);
+				callInProgressChrono.stop();
+				long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+				if(megaChatApi!=null){
+					MegaChatCall call = megaChatApi.getChatCall(chatId);
+					if(call!=null){
+						if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+							callInProgressChrono.setVisibility(View.VISIBLE);
+							callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+							callInProgressChrono.start();
+							callInProgressChrono.setFormat(" %s");
+						}
+					}
+				}
+			}else{
+				callInProgressLayout.setVisibility(View.GONE);
+				callInProgressChrono.stop();
+			}
+		}else{
+			callInProgressLayout.setVisibility(View.GONE);
+			callInProgressChrono.stop();
+		}
+	}
 
 	//refresh list when item updated
 	public void refresh(long handle) {

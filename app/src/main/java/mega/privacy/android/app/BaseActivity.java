@@ -264,6 +264,26 @@ public class BaseActivity extends AppCompatActivity {
         }
         return activeCall;
     }
+    public long getChatCallInProgress(){
+        log("getChatCallInProgress()");
+        long chatId = -1;
+        if(megaChatApi!=null){
+            MegaHandleList listCalls = megaChatApi.getChatCalls();
+            if((listCalls!=null)&&(listCalls.size()>0)){
+                for(int i = 0; i < listCalls.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                    if(call!=null){
+                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                            chatId = listCalls.get(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return chatId;
+    }
+
 
     @Override
     public void onBackPressed() {

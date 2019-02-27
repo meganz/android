@@ -258,7 +258,8 @@
                             android:layout_height="wrap_content"
                             android:visibility="gone"
                             android:textColor="@color/white"
-                            android:textSize="14sp"/>
+                            android:textSize="14sp"
+                            android:layout_marginRight="8dp"/>
 
                         <LinearLayout
                             android:id="@+id/ll_participants"
