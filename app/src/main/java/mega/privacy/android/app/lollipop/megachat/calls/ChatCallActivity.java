@@ -223,7 +223,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     FloatingActionButton speakerFAB;
     FloatingActionButton answerCallFAB;
     boolean isNecessaryCreateAdapter = true;
-
     AudioManager audioManager;
     MediaPlayer thePlayer;
 
@@ -235,7 +234,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     ViewGroup parentLocalFS;
     ViewGroup parentRemoteFS;
 
-    boolean isSpeakerOn = true;
 
     private LocalCameraCallFragment localCameraFragment = null;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
@@ -446,6 +444,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     rtcAudioManager.stop();
                     rtcAudioManager.start(null);
                 }
+                updateLocalSpeakerStatus();
 
                 if (chat.isGroup()) {
                     log("onNewIntent:group: SAME call");
@@ -465,6 +464,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     titleToolbar.setText(chat.getTitle());
                     updateSubTitle();
                     updateScreenStatus();
+                    updateLocalSpeakerStatus();
+
                     if ((callChat != null) && (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)) {
                         log("onNewIntent:Start call Service");
                         Intent intentService = new Intent(this, CallService.class);
@@ -552,6 +553,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        log("onCreate: mSensorManager-mSensor");
 
         try {
             field = PowerManager.class.getClass().getField("PROXIMITY_SCREEN_OFF_WAKE_LOCK").getInt(null);
@@ -807,7 +809,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 log("The status of the callChat is: " + callStatus);
                 titleToolbar.setText(chat.getTitle());
                 updateSubTitle();
-
+                updateLocalSpeakerStatus();
                 if (chat.isGroup()) {
                     smallElementsIndividualCallLayout.setVisibility(View.GONE);
                     bigElementsIndividualCallLayout.setVisibility(View.GONE);
@@ -1383,6 +1385,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         MegaApplication.activityPaused();
         super.onPause();
         if(mSensorManager!=null){
+            log("onPause:unregisterListener");
             mSensorManager.unregisterListener(this);
         }
     }
@@ -1405,6 +1408,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         }
         if(mSensorManager!=null){
+            log("onResume:unregisterListener&registerListener");
             mSensorManager.unregisterListener(this);
             mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -1426,6 +1430,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onDestroy() {
         log("onDestroy");
         if(mSensorManager!=null){
+            log("onDestroy:unregisterListener");
             mSensorManager.unregisterListener(this);
         }
         clearHandlers();
@@ -1484,6 +1489,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.callToSuperBack = false;
         super.onBackPressed();
         if(mSensorManager!=null){
+            log("onBackPressed:unregisterListener");
             mSensorManager.unregisterListener(this);
         }
 
@@ -1556,6 +1562,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             log("onRequestFinish: TYPE_HANG_CHAT_CALL");
             if(mSensorManager!=null){
+                log("onRequestFinish:unregisterListener");
                 mSensorManager.unregisterListener(this);
             }
 
@@ -1576,6 +1583,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
                 updateLocalVideoStatus();
                 updateLocalAudioStatus();
+
+
             } else {
                 log("Error call: " + e.getErrorString());
 
@@ -1686,7 +1695,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if (chat.isGroup()) {
                             checkParticipants(call);
 
-                        } else {
+                        }else{
                             flagMyAvatar = true;
                             setProfileMyAvatar();
                             flagContactAvatar = false;
@@ -1873,8 +1882,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                 updateLocalAudioStatus();
                             }
 
-
-
                         } else if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_DESTROYED) {
                             log("CHANGE_TYPE_SESSION_STATUS:DESTROYED");
 
@@ -1935,6 +1942,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                 }
                                 updateLocalVideoStatus();
                                 updateLocalAudioStatus();
+
                             }
                         } else {
                             log("CHANGE_TYPE_SESSION_STATUS:OTHER = "+userSession.getStatus());
@@ -2228,31 +2236,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case R.id.speaker_fab: {
                 log("Click on speaker fab");
-                if(isSpeakerOn){
-                    //disable speaker
-                    log("disable speaker");
-                    if(rtcAudioManager==null){
-                        rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
-                    }
-                    if(rtcAudioManager!=null){
-                        rtcAudioManager.activateSpeaker(false);
-                        speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
-                        speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
-                        isSpeakerOn = false;
-                    }
+
+                if(((MegaApplication) getApplication()).isSpeakerOn()){
+                    ((MegaApplication) getApplication()).setSpeakerStatus(false);
                 }else{
-                    //enable speaker
-                    log("enable speaker");
-                    if(rtcAudioManager==null){
-                        rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
-                    }
-                    if(rtcAudioManager!=null){
-                        rtcAudioManager.activateSpeaker(true);
-                        speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-                        speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
-                        isSpeakerOn = true;
-                    }
+                    ((MegaApplication) getApplication()).setSpeakerStatus(true);
                 }
+
+                updateLocalSpeakerStatus();
                 if ((callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)) {
                     ((MegaApplication) getApplication()).sendSignalPresenceActivity();
                 }
@@ -2822,6 +2813,33 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
         }
 
+    }
+
+    private void updateLocalSpeakerStatus(){
+        log("updateLocalSpeakerStatus()");
+        if(((MegaApplication) getApplication()).isSpeakerOn()){
+            //enable speaker
+            log("enable speaker");
+            if(rtcAudioManager==null){
+                rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
+            }
+            if(rtcAudioManager!=null){
+                rtcAudioManager.activateSpeaker(true);
+                speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
+            }
+        }else{
+            //disable speaker
+            log("disable speaker");
+            if(rtcAudioManager==null){
+                rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
+            }
+            if(rtcAudioManager!=null){
+                rtcAudioManager.activateSpeaker(false);
+                speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+                speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
+            }
+        }
     }
 
     public void updateRemoteVideoStatus(long userPeerId, long userClientId) {
