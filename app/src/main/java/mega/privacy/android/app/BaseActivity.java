@@ -30,6 +30,8 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaHandleList;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -95,7 +97,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        log("****onDestroy");
+        log("onDestroy");
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sslErrorReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(signalPresenceReceiver);
@@ -146,7 +148,7 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                log("BROADCAST TO SEND SIGNAL PRESENCE");
                 if(delaySignalPresence && megaChatApi.getPresenceConfig().isPending()==false){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
@@ -244,6 +246,30 @@ public class BaseActivity extends AppCompatActivity {
         catch (Exception e){
             log("retryPendingConnections:Exception: "+e.getMessage());
         }
+    }
+
+    public boolean participatingInACall(){
+        boolean activeCall = false;
+        if(megaChatApi!=null){
+            MegaHandleList listCalls = megaChatApi.getChatCalls();
+            int contCallNotPresent = 0;
+            if((listCalls!=null)&&(listCalls.size()>0)){
+                for(int i=0; i<listCalls.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                    if(call!=null){
+                        if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+                            contCallNotPresent ++ ;
+                        }
+                    }
+                }
+                if(contCallNotPresent == listCalls.size()){
+                    activeCall = false;
+                }else{
+                    activeCall = true;
+                }
+            }
+        }
+        return activeCall;
     }
 
     @Override

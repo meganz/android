@@ -894,7 +894,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				if (pixels[offset + x] == color){
 					c.drawCircle(x*resize, y*resize, 5, paint);
 				}
-				log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
+//				log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
 			}
 		}
 		paint.setColor(WHITE);
