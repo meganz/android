@@ -6,11 +6,15 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
 
@@ -33,6 +37,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
     public SurfaceView localSurfaceView;
     MegaSurfaceRenderer localRenderer;
+    ImageView microIcon;
 
     public static LocalCameraCallFragment newInstance(long chatId) {
         log("newInstance() chatId: "+chatId);
@@ -63,14 +68,16 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
         }
 
         View v = inflater.inflate(R.layout.fragment_local_camera_call, container, false);
-
+        log("onCreateView()");
         localSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-        localSurfaceView.setZOrderOnTop(true);
+        localSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = localSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localSurfaceView);
 
-        log("onCreateView() addChatLocalVideoListener chatId: "+chatId);
+        microIcon = (ImageView) v.findViewById(R.id.micro_surface_view);
+        microIcon.setVisibility(View.GONE);
+        ((ChatCallActivity)context).refreshOwntMicro();
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
@@ -135,15 +142,34 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
         super.onResume();
     }
-    public void removeSurfaceView(){
-        log("removeSurfaceView()");
-        if(localSurfaceView.getParent()!=null){
-            if(localSurfaceView.getParent().getParent()!=null){
-                log("removeSurfaceView() removeView chatId: "+chatId);
-                ((ViewGroup)localSurfaceView.getParent()).removeView(localSurfaceView);
+
+    public void showMicro(boolean isShouldShown){
+        log("showMicro");
+
+        if(microIcon!=null){
+            if(isShouldShown){
+                microIcon.setVisibility(View.VISIBLE);
+            }else{
+                microIcon.setVisibility(View.GONE);
             }
         }
-        localSurfaceView.setVisibility(View.GONE);
+    }
+
+    public void removeSurfaceView(){
+        log("removeSurfaceView()");
+        if(microIcon!=null){
+            microIcon.setVisibility(View.GONE);
+        }
+        if(localSurfaceView!=null){
+            if(localSurfaceView.getParent()!=null){
+                if(localSurfaceView.getParent().getParent()!=null){
+                    log("removeSurfaceView() removeView chatId: "+chatId);
+                    ((ViewGroup)localSurfaceView.getParent()).removeView(localSurfaceView);
+                }
+            }
+            localSurfaceView.setVisibility(View.GONE);
+        }
+
         megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }
 

@@ -228,6 +228,7 @@
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:orientation="vertical">
+
                     <TextView
                         android:id="@+id/title_toolbar"
                         android:layout_width="wrap_content"
@@ -237,10 +238,12 @@
                         android:maxLines="1"
                         android:layout_marginRight="20dp"
                         android:ellipsize="end"/>
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
                         <TextView
                             android:id="@+id/subtitle_toolbar"
                             android:layout_width="wrap_content"
@@ -248,12 +251,22 @@
                             android:textColor="@color/white"
                             android:textSize="14sp"
                             android:layout_marginRight="8dp"/>
+
+                        <Chronometer
+                            android:id="@+id/simple_chronometer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"/>
+
                         <LinearLayout
                             android:id="@+id/ll_participants"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:visibility="gone">
+
                             <TextView
                                 android:id="@+id/participants_text"
                                 android:layout_width="wrap_content"
@@ -261,18 +274,20 @@
                                 android:textColor="@color/white"
                                 android:textSize="14sp"
                                 android:layout_marginRight="4dp"/>
+
                             <ImageView
                                 android:id="@+id/participants_image"
                                 android:layout_height="18dp"
                                 android:layout_width="18dp"
                                 android:src="@drawable/ic_videocam_white"/>
+
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </android.support.v7.widget.Toolbar>
 
             <RelativeLayout
-                android:id="@+id/mutate_call"
+                android:id="@+id/mutate_own_call"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_below="@id/call_toolbar"
@@ -287,19 +302,17 @@
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true">
                     <ImageView
-                        android:id="@+id/image_mutate_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_mutate_layout"
                         android:layout_marginRight="8dp"
                         android:background="@null" />
                     <TextView
-                        android:id="@+id/text_mutate_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:textColor="@color/white"
-                        android:text="Iron muted this call"
+                        android:text="@string/muted_own_micro"
                         android:textSize="14sp"
                         android:textStyle="normal"
                         android:fontFamily="roboto"/>
@@ -307,6 +320,40 @@
                 </LinearLayout>
 
 
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/mutate_contact_call"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@id/call_toolbar"
+                android:gravity="center_horizontal"
+                android:background="@drawable/gradient_shape_callschat"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_centerInParent="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_mutate_layout"
+                        android:layout_marginRight="8dp"
+                        android:background="@null" />
+                    <TextView
+                        android:id="@+id/text_mutate_contact_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        android:fontFamily="roboto"/>
+
+                </LinearLayout>
             </RelativeLayout>
 
             <TextView
