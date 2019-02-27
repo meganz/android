@@ -3440,7 +3440,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     callInProgressChrono.setVisibility(View.VISIBLE);
                                     callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
                                     callInProgressChrono.start();
-                                    callInProgressChrono.setFormat(" %s");
+                                    callInProgressChrono.setFormat("%s");
                                 }
                             } else {
                                 subtitleToobar.setVisibility(View.VISIBLE);
@@ -3460,7 +3460,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         }
                     }
                 }
-
             } else {
                 subtitleToobar.setVisibility(GONE);
                 if(callInProgressChrono!=null){

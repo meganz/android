@@ -162,11 +162,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean newVisibility = false;
     boolean getMoreHistory=false;
 
-    Handler customHandler = new Handler();
-
     MegaChatCall callChat;
-    Chronometer myChrono;
-
     int minutesLastGreen = -1;
 
     boolean isLoadingHistory = false;
@@ -610,7 +606,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         subtitleToobar.setText(" ");
         subtitleToobar.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
-        myChrono = new Chronometer(context);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
@@ -661,7 +656,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressText = (TextView) findViewById(R.id.call_in_progress_text);
-        callInProgressChrono = (Chronometer) findViewById(R.id.simple_chronometer);
+        callInProgressChrono = (Chronometer) findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
 
         rLKeyboardTwemojiButton.setOnClickListener(this);

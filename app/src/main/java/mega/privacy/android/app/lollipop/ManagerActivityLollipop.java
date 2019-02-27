@@ -18197,6 +18197,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     log("OnChatCallUpdate() status: "+call.getStatus()+" -> rChatFL visible: ");
                     rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
 				}
+
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+				if ((fbFLol != null) && (fbFLol.isVisible())){
+					fbFLol.showCallLayout();
+				}
             }
         }
     }

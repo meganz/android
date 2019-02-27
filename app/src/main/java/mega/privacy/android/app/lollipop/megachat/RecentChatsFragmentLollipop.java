@@ -213,9 +213,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             inviteButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
         }
 
-        callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout_recent);
+        callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setOnClickListener(this);
-        callInProgressChrono = (Chronometer) v.findViewById(R.id.simple_chronometer);
+        callInProgressChrono = (Chronometer) v.findViewById(R.id.call_in_progress_chrono);
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressChrono.setVisibility(View.GONE);
 
@@ -420,14 +420,16 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 callInProgressLayout.setVisibility(View.VISIBLE);
                 callInProgressChrono.setVisibility(View.GONE);
                 callInProgressChrono.stop();
-                long chatId = getChatCallInProgress();
-                MegaChatCall call = megaChatApi.getChatCall(chatId);
-                if(call!=null){
-                    if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                        callInProgressChrono.setVisibility(View.VISIBLE);
-                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-                        callInProgressChrono.start();
-                        callInProgressChrono.setFormat(" %s");
+                long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+                if(megaChatApi!=null){
+                    MegaChatCall call = megaChatApi.getChatCall(chatId);
+                    if(call!=null){
+                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                            callInProgressChrono.setVisibility(View.VISIBLE);
+                            callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+                            callInProgressChrono.start();
+                            callInProgressChrono.setFormat(" %s");
+                        }
                     }
                 }
             }else{
@@ -671,7 +673,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 break;
             }
-            case R.id.call_in_progress_layout_recent:{
+            case R.id.call_in_progress_layout:{
                 log("onClick:call_in_progress_layout");
                 if(checkPermissionsCall()){
                     returnTheCall();
@@ -1905,38 +1907,22 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     private void returnTheCall(){
         log("returnTheCall()");
-        long chatId = getChatCallInProgress();
-        MegaChatCall call = megaChatApi.getChatCall(chatId);
-        if(call!=null){
-            if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                log("returnTheCall() -> ChatCallActivity");
-                Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("chatHandle", chatId);
-                startActivity(intent);
+        long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+        if(megaChatApi!=null){
+            MegaChatCall call = megaChatApi.getChatCall(chatId);
+            if(call!=null){
+                if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                    log("returnTheCall() -> ChatCallActivity");
+                    Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("chatHandle", chatId);
+                    startActivity(intent);
+                }
             }
         }
     }
 
-    private long getChatCallInProgress(){
-        log("getChatCallInProgress()");
-        long chatId = -1;
-        if(megaChatApi!=null){
-            MegaHandleList listCalls = megaChatApi.getChatCalls();
-            if((listCalls!=null)&&(listCalls.size()>0)){
-                for(int i = 0; i < listCalls.size(); i++){
-                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                    if(call!=null){
-                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                            chatId = listCalls.get(i);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return chatId;
-    }
+
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);
