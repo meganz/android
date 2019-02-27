@@ -318,8 +318,6 @@
                         android:fontFamily="roboto"/>
 
                 </LinearLayout>
-
-
             </RelativeLayout>
 
             <RelativeLayout

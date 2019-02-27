@@ -125,6 +125,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
+	private static boolean speakerStatus = true;
 
 	private static long openCallChatId = -1;
 
@@ -1867,4 +1868,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
 	}
+	public static boolean isSpeakerOn() {
+		return speakerStatus;
+	}
+
+	public static void setSpeakerStatus(boolean speakerStatus) {
+		MegaApplication.speakerStatus = speakerStatus;
+	}
+
+
 }
