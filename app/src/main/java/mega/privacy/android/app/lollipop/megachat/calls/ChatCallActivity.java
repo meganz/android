@@ -120,6 +120,7 @@ import android.provider.CallLog;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.setAppFontSize;
 
@@ -160,8 +161,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     LinearLayout toolbarElements;
     TextView titleToolbar;
     TextView subtitleToobar;
+    Chronometer callInProgressChrono;
+
     RelativeLayout mutateCallLayout;
     TextView mutateCallText;
+    RelativeLayout mutateOwnCallLayout;
 
     LinearLayout linearParticipants;
     TextView participantText;
@@ -211,10 +215,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     int totalVideosAllowed = 0;
 
     static ChatCallActivity chatCallActivityActivity = null;
-
-
-
-//    private MenuItem remoteAudioIcon;
 
     FloatingActionButton videoFAB;
     FloatingActionButton microFAB;
@@ -283,7 +283,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     ImageView thirdArrowVideo;
     ImageView fourArrowVideo;
 
-    Handler customHandler = new Handler();
     InfoPeerGroupCall peerSelected = null;
     boolean isManualMode = false;
     int statusBarHeight = 0;
@@ -299,34 +298,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         log("onPrepareOptionsMenu");
-//        remoteAudioIcon = menu.findItem(R.id.info_remote_audio);
-//        if(chat.isGroup()){
-//            remoteAudioIcon.setVisible(false);
-//        }else{
-//            if (callChat == null) {
-//                if (megaChatApi != null) {
-//                    callChat = megaChatApi.getChatCall(chatId);
-//                }
-//            }
-//            if (callChat != null) {
-//                MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
-//                if (userSession != null) {
-//                    if (userSession.hasAudio()) {
-//                        log("onPrepareOptionsMenu:Audio remote connected");
-//                        remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_up_white));
-//                    } else {
-//                        log("onPrepareOptionsMenu:Audio remote NOT connected");
-//                        remoteAudioIcon.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_volume_off_white));
-//                    }
-//                } else {
-//                    log("userSession is Null");
-//                }
-//                remoteAudioIcon.setVisible(true);
-//                remoteAudioIcon.setEnabled(false);
-//            } else {
-//                log("callChat is Null");
-//            }
-//        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -611,6 +582,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
         subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
+        callInProgressChrono = (Chronometer) tB.findViewById(R.id.simple_chronometer);
         linearParticipants = (LinearLayout) tB.findViewById(R.id.ll_participants);
         participantText = (TextView) tB.findViewById(R.id.participants_text);
         linearParticipants.setVisibility(View.GONE);
@@ -619,10 +591,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
 
-        mutateCallLayout = (RelativeLayout) findViewById(R.id.mutate_call);
+        mutateOwnCallLayout = (RelativeLayout) findViewById(R.id.mutate_own_call);
+        mutateOwnCallLayout.setVisibility(GONE);
+        mutateCallLayout = (RelativeLayout) findViewById(R.id.mutate_contact_call);
         mutateCallLayout.setVisibility(GONE);
-
-        mutateCallText = (TextView) findViewById(R.id.text_mutate_call);
+        mutateCallText = (TextView) findViewById(R.id.text_mutate_contact_call);
 
         smallElementsIndividualCallLayout = (RelativeLayout) findViewById(R.id.small_elements_individual_call);
         smallElementsIndividualCallLayout.setVisibility(GONE);
@@ -1368,6 +1341,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (videoFAB.getVisibility() == View.VISIBLE) {
             videoFAB.hide();
             videoFAB.setVisibility(GONE);
+            linearArrowVideo.setVisibility(GONE);
             relativeVideo.setVisibility(GONE);
         }
         if (microFAB.getVisibility() == View.VISIBLE) {
@@ -1390,6 +1364,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (answerCallFAB.getVisibility() == View.VISIBLE) {
             answerCallFAB.hide();
             answerCallFAB.setVisibility(GONE);
+            linearArrowCall.setVisibility(GONE);
             relativeCall.setVisibility(GONE);
         }
         if ((bigRecyclerViewLayout != null) && (bigRecyclerView != null) && (parentBigCameraGroupCall != null)) {
@@ -1592,25 +1567,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
 
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                videoFAB.show();
-                videoFAB.setVisibility(View.VISIBLE);
-                relativeVideo.setVisibility(View.VISIBLE);
+                showInitialFABConfiguration();
 
-                microFAB.show();
-                microFAB.setVisibility(View.VISIBLE);
-
-                speakerFAB.show();
-                speakerFAB.setVisibility(View.VISIBLE);
-
-                answerCallFAB.hide();
-                answerCallFAB.setVisibility(GONE);
-
-                rejectFAB.hide();
-                rejectFAB.setVisibility(GONE);
-
-                relativeCall.setVisibility(GONE);
-                relativeVideo.setVisibility(GONE);
-                linearArrowVideo.setVisibility(GONE);
                 if (request.getFlag() == true) {
                     log("Ok answer with video");
                 } else {
@@ -1975,8 +1933,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                         break;
                                     }
                                 }
-//                                updateLocalVideoStatus();
-//                                updateLocalAudioStatus();
+                                updateLocalVideoStatus();
+                                updateLocalAudioStatus();
                             }
                         } else {
                             log("CHANGE_TYPE_SESSION_STATUS:OTHER = "+userSession.getStatus());
@@ -2388,31 +2346,34 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                 log("showInitialFABConfiguration:RING_IN");
 
-                relativeCall.setVisibility(View.VISIBLE);
+                if(answerCallFAB.getVisibility() !=View.VISIBLE){
+                    relativeCall.setVisibility(View.VISIBLE);
+                    answerCallFAB.setVisibility(View.VISIBLE);
+                }
                 linearArrowCall.setVisibility(GONE);
 
-                answerCallFAB.show();
-                answerCallFAB.setVisibility(View.VISIBLE);
-
-                rejectFAB.show();
-                rejectFAB.setVisibility(View.VISIBLE);
-
-                relativeVideo.setVisibility(View.VISIBLE);
+                if(videoFAB.getVisibility() !=View.VISIBLE){
+                    relativeVideo.setVisibility(View.VISIBLE);
+                    videoFAB.setVisibility(View.VISIBLE);
+                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
+                    videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_videocam_white));
+                }
                 linearArrowVideo.setVisibility(GONE);
 
-                videoFAB.show();
-                videoFAB.setVisibility(View.VISIBLE);
-                videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
-                videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_videocam_white));
 
-                microFAB.hide();
-                microFAB.setVisibility(GONE);
+                if(rejectFAB.getVisibility() !=View.VISIBLE){
+                    rejectFAB.setVisibility(View.VISIBLE);
+                }
 
-                hangFAB.hide();
-                hangFAB.setVisibility(View.GONE);
-
-                speakerFAB.hide();
-                speakerFAB.setVisibility(GONE);
+                if(speakerFAB.getVisibility()!=View.INVISIBLE){
+                    speakerFAB.setVisibility(View.INVISIBLE);
+                }
+                if(microFAB.getVisibility()!=View.INVISIBLE){
+                    microFAB.setVisibility(View.INVISIBLE);
+                }
+                if(hangFAB.getVisibility()!=View.GONE){
+                    hangFAB.setVisibility(View.GONE);
+                }
 
                 if (callChat.hasVideoInitialCall()) {
                     RelativeLayout.LayoutParams layoutExtend = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -2426,8 +2387,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     videoFAB.setOnClickListener(null);
 
                     linearArrowVideo.setVisibility(View.VISIBLE);
-                    videoFAB.startAnimation(shake);
 
+                    videoFAB.startAnimation(shake);
                     animationAlphaArrows(fourArrowVideo);
                     handlerArrow1 = new Handler();
                     handlerArrow1.postDelayed(new Runnable() {
@@ -2520,8 +2481,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
                     answerCallFAB.startAnimation(shake);
-
                     linearArrowCall.setVisibility(View.VISIBLE);
+
                     animationAlphaArrows(fourArrowCall);
                     handlerArrow4 = new Handler();
                     handlerArrow4.postDelayed(new Runnable() {
@@ -2545,7 +2506,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     answerCallFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
                         public void onSwipeTop() {
                             answerCallFAB.clearAnimation();
-
                             TranslateAnimation translateAnim = new TranslateAnimation(0, 0, 0, -380);
                             translateAnim.setDuration(translationAnimationDuration);
                             translateAnim.setFillAfter(true);
@@ -2607,27 +2567,32 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             } else {
                 log("showInitialFABConfiguration:OTHER");
+
                 relativeVideo.setVisibility(View.VISIBLE);
+                if(speakerFAB.getVisibility()!=View.VISIBLE){
+                    speakerFAB.setVisibility(View.VISIBLE);
+                }
+                if(videoFAB.getVisibility()!=View.VISIBLE){
+                    videoFAB.setVisibility(View.VISIBLE);
+                }
+                if(microFAB.getVisibility()!=View.VISIBLE){
+                    microFAB.setVisibility(View.VISIBLE);
+                }
+                if(hangFAB.getVisibility()!=View.VISIBLE){
+                    hangFAB.setVisibility(View.VISIBLE);
+                }
 
-                videoFAB.show();
-                videoFAB.setVisibility(View.VISIBLE);
+                linearArrowVideo.setVisibility(GONE);
+                if(answerCallFAB.getVisibility()!=INVISIBLE){
+                    answerCallFAB.setVisibility(View.INVISIBLE);
+                    relativeCall.setVisibility(View.INVISIBLE);
+                }
 
-                microFAB.show();
-                microFAB.setVisibility(View.VISIBLE);
+                linearArrowCall.setVisibility(GONE);
+                if(rejectFAB.getVisibility()!=INVISIBLE){
+                    rejectFAB.setVisibility(View.INVISIBLE);
+                }
 
-                speakerFAB.show();
-                speakerFAB.setVisibility(View.VISIBLE);
-
-                hangFAB.show();
-                hangFAB.setVisibility(View.VISIBLE);
-
-                relativeCall.setVisibility(GONE);
-
-                answerCallFAB.hide();
-                answerCallFAB.setVisibility(GONE);
-
-                rejectFAB.hide();
-                rejectFAB.setVisibility(View.GONE);
             }
 
             if ((bigRecyclerViewLayout != null) && (bigRecyclerView != null) && (parentBigCameraGroupCall != null)) {
@@ -2741,8 +2706,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                                 ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
                                 ft.commitNowAllowingStateLoss();
-
                             }
+
                             myAvatarLayout.setVisibility(GONE);
                             parentLocal.setVisibility(View.VISIBLE);
                             fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
@@ -2778,6 +2743,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             myAvatarLayout.setVisibility(View.VISIBLE);
                         }
                     }
+                    refreshOwntMicro();
                 }
             }
         }
@@ -2852,6 +2818,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                     microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_off));
                 }
+                refreshOwntMicro();
             }
         }
 
@@ -3139,7 +3106,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
             } else {
                 log("updateRemoteAudioStatus:individual");
-                refreshMutateLayout();
+                refreshLayoutContactMicro();
             }
         }
     }
@@ -3274,33 +3241,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    public static String getDateFromMillis(long d) {
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-        df.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return df.format(d);
-    }
-
-    private void startClock() {
-        long seconds = 0;
-        if ((callChat == null) && (megaChatApi != null)) {
-            callChat = megaChatApi.getChatCall(chatId);
-        }
-        if (callChat != null) {
-            seconds = callChat.getDuration();
-        }
-        long baseTime = SystemClock.uptimeMillis() - (seconds * 1000);
-        myChrono.setBase(baseTime);
-        customHandler.postDelayed(updateTimerThread, 1000);
-    }
-
-    final Runnable updateTimerThread = new Runnable() {
-        public void run() {
-            long elapsedTime = SystemClock.uptimeMillis() - myChrono.getBase();
-            subtitleToobar.setText(getDateFromMillis(elapsedTime));
-            customHandler.postDelayed(this, 0);
-        }
-    };
-
     private class MyRingerTask extends TimerTask {
         @Override
         public void run() {
@@ -3426,6 +3366,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 if ((chat == null) && (megaChatApi != null)) {
                     chat = megaChatApi.getChatRoom(chatId);
                 }
+                subtitleToobar.setVisibility(View.VISIBLE);
+                if(callInProgressChrono!=null){
+                    callInProgressChrono.stop();
+                    callInProgressChrono.setVisibility(View.GONE);
+                }
                 if (chat != null) {
                     if (chat.isGroup()) {
                         subtitleToobar.setText(getString(R.string.outgoing_call_starting));
@@ -3439,8 +3384,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }else{
                     subtitleToobar.setText(getString(R.string.outgoing_call_starting));
                 }
+
             } else if (callChat.getStatus() <= MegaChatCall.CALL_STATUS_RING_IN) {
                 log("updateSubTitle:RING_IN");
+                subtitleToobar.setVisibility(View.VISIBLE);
+                if(callInProgressChrono!=null){
+                    callInProgressChrono.stop();
+                    callInProgressChrono.setVisibility(View.GONE);
+                }
                 subtitleToobar.setText(getString(R.string.incoming_call_starting));
 
             } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -3450,8 +3401,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
                 if (chat != null) {
                     if (chat.isGroup()) {
-                        startClock();
-//                        updateSubtitleNumberOfVideos();
+                        subtitleToobar.setVisibility(GONE);
+
+                        if(callInProgressChrono!=null){
+                            callInProgressChrono.setVisibility(View.VISIBLE);
+                            callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
+                            callInProgressChrono.start();
+                            callInProgressChrono.setFormat(" %s");
+                        }
                     } else {
                         linearParticipants.setVisibility(GONE);
                         MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
@@ -3459,19 +3416,39 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             sessionStatus = userSession.getStatus();
                             log("sessionStatus: " + sessionStatus);
                             if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
-                                startClock();
+                                subtitleToobar.setVisibility(View.GONE);
+
+                                if(callInProgressChrono!=null){
+                                    callInProgressChrono.setVisibility(View.VISIBLE);
+                                    callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
+                                    callInProgressChrono.start();
+                                    callInProgressChrono.setFormat(" %s");
+                                }
                             } else {
+                                subtitleToobar.setVisibility(View.VISIBLE);
+                                if(callInProgressChrono!=null){
+                                    callInProgressChrono.stop();
+                                    callInProgressChrono.setVisibility(View.GONE);
+                                }
                                 subtitleToobar.setText(getString(R.string.chat_connecting));
                             }
                         } else {
                             log("Error getting the session of the user");
-                            subtitleToobar.setText(null);
+                            subtitleToobar.setVisibility(GONE);
+                            if(callInProgressChrono!=null){
+                                callInProgressChrono.stop();
+                                callInProgressChrono.setVisibility(View.GONE);
+                            }
                         }
                     }
                 }
 
             } else {
-                subtitleToobar.setText(null);
+                subtitleToobar.setVisibility(GONE);
+                if(callInProgressChrono!=null){
+                    callInProgressChrono.stop();
+                    callInProgressChrono.setVisibility(View.GONE);
+                }
             }
         }
     }
@@ -3991,6 +3968,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void clearSurfacesViews() {
+        log("clearSurfacesViews");
         if (localCameraFragment != null) {
             localCameraFragment.removeSurfaceView();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -4040,11 +4018,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             handlerArrow6.removeCallbacksAndMessages(null);
         }
 
-        if (customHandler != null) {
-            if (updateTimerThread != null) {
-                customHandler.removeCallbacks(updateTimerThread);
-            }
-            customHandler.removeCallbacksAndMessages(null);
+        if(callInProgressChrono!=null){
+            callInProgressChrono.stop();
+            callInProgressChrono.setVisibility(View.GONE);
         }
     }
 
@@ -4315,10 +4291,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    private void refreshMutateLayout(){
-        mutateCallLayout.setVisibility(GONE);
-
-        if(!chat.isGroup()){
+    private void refreshLayoutContactMicro(){
+        if(!chat.isGroup()) {
             if (callChat == null) {
                 if (megaChatApi != null) {
                     callChat = megaChatApi.getChatCall(chatId);
@@ -4330,17 +4304,62 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (userSession.hasAudio()) {
                         log("onPrepareOptionsMenu:Audio remote connected");
                         mutateCallLayout.setVisibility(GONE);
-                        } else {
+                        refreshOwntMicro();
+
+                    } else {
                         log("onPrepareOptionsMenu:Audio remote NOT connected");
                         String name = chat.getPeerFirstname(0);
-                        if((name==null)||(name == " ")){
-                            name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
-                            if(name == null){
-                                name = " ";
+                        if ((name == null) || (name == " ")) {
+                            if(megaChatApi!=null){
+                                name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
+                                if (name == null) {
+                                    name = " ";
+                                }
                             }
                         }
-                        mutateCallText.setText(getString(R.string.user_muted_the_call, name));
+                        mutateCallText.setText(getString(R.string.muted_contact_micro, name));
                         mutateCallLayout.setVisibility(View.VISIBLE);
+
+                        if(mutateOwnCallLayout.getVisibility() == View.VISIBLE){
+                            mutateOwnCallLayout.setVisibility(GONE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void refreshOwntMicro(){
+        log("refreshOwntMicro");
+        if(!chat.isGroup()){
+            if (callChat == null) {
+                if(megaChatApi != null){
+                    callChat = megaChatApi.getChatCall(chatId);
+                }
+            }
+            if(callChat != null){
+                if(callChat.hasLocalAudio()){
+                    if (localCameraFragment != null){
+                        localCameraFragment.showMicro(false);
+                    }
+                    mutateOwnCallLayout.setVisibility(View.GONE);
+
+                }else{
+                    if(callChat.hasLocalVideo()){
+                        if (localCameraFragment != null){
+                            localCameraFragment.showMicro(true);
+                        }
+                        mutateOwnCallLayout.setVisibility(View.GONE);
+                    }else{
+                        if (localCameraFragment != null){
+                            localCameraFragment.showMicro(false);
+                        }
+
+                        if(mutateCallLayout.getVisibility() == View.VISIBLE){
+                            mutateOwnCallLayout.setVisibility(GONE);
+                        }else{
+                            mutateOwnCallLayout.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
             }

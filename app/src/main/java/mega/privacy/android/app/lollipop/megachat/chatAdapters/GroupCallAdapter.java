@@ -129,7 +129,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         ImageView microAvatar;
         ImageView microSurface;
         RelativeLayout qualityLayout;
-        RelativeLayout qualityIcon;
+        ImageView qualityIcon;
         TextView avatarInitialLetter;
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
@@ -185,7 +185,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holderGrid.microAvatar = (ImageView) v.findViewById(R.id.micro_avatar);
         holderGrid.microSurface = (ImageView) v.findViewById(R.id.micro_surface_view);
         holderGrid.qualityLayout = (RelativeLayout) v.findViewById(R.id.rl_quality);
-        holderGrid.qualityIcon = (RelativeLayout) v.findViewById(R.id.quality_icon);
+        holderGrid.qualityIcon = (ImageView) v.findViewById(R.id.quality_icon);
         holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
         holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
         holderGrid.avatarImage.setImageBitmap(null);

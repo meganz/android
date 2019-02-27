@@ -75,7 +75,7 @@
     <RelativeLayout
         android:id="@+id/call_in_progress_layout_recent"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="48dp"
         android:layout_below="@id/toolbar_chat"
         android:visibility="gone"
         android:background="@color/accentColor">
@@ -89,6 +89,18 @@
             android:text="@string/call_in_progress_layout_without_time"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"/>
+
+        <Chronometer
+            android:id="@+id/simple_chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@id/call_in_progress_text_recent"/>
+
     </RelativeLayout>
 
     <LinearLayout
