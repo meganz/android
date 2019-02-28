@@ -306,8 +306,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	public void onBackPressed() {
 		log("onBackPressed");
 		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
-			AccountController ac = new AccountController(this);
-			ac.logout(this, megaApi);
+			Intent intent = new Intent(this, TestPasswordActivity.class);
+			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
+			startActivity(intent);
 		}
 		super.callToSuperBack = true;
 		super.onBackPressed();
