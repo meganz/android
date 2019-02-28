@@ -32,8 +32,11 @@ import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.CameraUploadImageProcessor;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -92,6 +95,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	MegaRequestListenerInterface megaRequestListener;
 	MegaTransferListenerInterface megaTransferListener;
 
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
+
 	private int notificationId = Constants.NOTIFICATION_UPLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_UPLOAD_FINAL;
 	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_UPLOAD_ID;
@@ -107,7 +112,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	//2 - pre-overquota
 	int isOverquota = 0;
 
-	@SuppressLint("NewApi")
+    private long lastUpdated;
+
+    @SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -167,7 +174,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+	public int onStartCommand(final Intent intent,int flags,int startId) {
 		log("onStartCommand");
 		canceled = false;
 
@@ -218,7 +225,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			if (nameInMEGAEdited != null){
 				switch (checkFileToUploadRenamed(file, parentHandle, nameInMEGAEdited)) {
 					case CHECK_FILE_TO_UPLOAD_UPLOAD: {
-						log("CHECK_FILE_TO_UPLOAD_UPLOAD");
+						log("CHECK_FILE_TO_UPLOAD_UPLOAD " + nameInMEGAEdited);
 
 						if (!wl.isHeld()) {
 							wl.acquire();
@@ -504,6 +511,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
+        //refresh UI every 1 seconds to avoid too much workload on main thread
+        long now = System.currentTimeMillis();
+        if (now - lastUpdated > 1000) {
+            lastUpdated = now;
+        } else {
+            return;
+        }
 
 		long progressPercent = 0;
 
@@ -663,7 +677,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
+	public void onTransferFinish(final MegaApiJava api,final MegaTransfer transfer,MegaError error) {
 		log("****onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
@@ -721,12 +735,22 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						log("Is video!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
-						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+						final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+//						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+//						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+                        threadPool.execute(new Runnable() {
 
+                            @Override
+                            public void run() {
+                                File img = new File(transfer.getPath());
+                                if(!preview.exists()) {
+                                    CameraUploadImageProcessor.createVideoPreview(UploadService.this,img, preview);
+                                }
+                                CameraUploadImageProcessor.createVideoThumbnail(UploadService.this,api,transfer.getPath(),thumb);
+                            }
+                        });
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 
 						if (node != null) {
@@ -774,16 +798,28 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							else{
 								log("No location info");
 							}
-						}
-					} else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
+                            retriever.release();
+                        }
+                    } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
 						log("Is image!!!");
 
 						File previewDir = PreviewUtils.getPreviewFolder(this);
-						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+						final File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+						final File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+//						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+//						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+                        threadPool.execute(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                File img = new File(transfer.getPath());
+                                if(!preview.exists()) {
+                                    CameraUploadImageProcessor.createImagePreview(img, preview);
+                                }
+                                CameraUploadImageProcessor.createImageThumbnail(UploadService.this,api,transfer.getPath(),thumb);
+                            }
+                        });
 
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if (node != null) {
@@ -914,12 +950,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("****onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
 			String appData = transfer.getAppData();
-
+            log("appData: " + appData);
 			if(appData!=null){
 				return;
 			}
 
 			if (!transfer.isFolderTransfer()){
+			    log("transfer is not folder");
 				if (canceled) {
 					log("Transfer cancel: " + transfer.getFileName());
 
@@ -942,7 +979,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				mapProgressTransfers.put(transfer.getTag(), transfer);
 
 				updateProgressNotification();
-			}
+			} else {
+                log("transfer is folder");
+            }
 		}
 	}
 

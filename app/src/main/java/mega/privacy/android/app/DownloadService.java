@@ -133,8 +133,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaNode offlineNode;
 
 	boolean isLoggingIn = false;
+    private long lastUpdated;
 
-	@SuppressLint("NewApi")
+    @SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
 		super.onCreate();
@@ -1189,7 +1190,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 */
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
-
+        //refresh UI every 1 seconds to avoid too much workload on main thread
+        long now = System.currentTimeMillis();
+        if (now - lastUpdated > 1000) {
+            lastUpdated = now;
+        } else {
+            return;
+        }
 		int pendingTransfers = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
         int totalTransfers = megaApi.getTotalDownloads() + megaApiFolder.getTotalDownloads();
 
