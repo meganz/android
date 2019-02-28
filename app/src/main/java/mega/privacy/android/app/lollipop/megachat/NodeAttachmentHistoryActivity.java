@@ -1296,7 +1296,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 			MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId);
 
-			forwardChatProcessor.forward();
+			forwardChatProcessor.forward(chatRoom.isPreview());
 		}
 	}
 
