@@ -513,12 +513,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void updateProgressNotification() {
         //refresh UI every 1 seconds to avoid too much workload on main thread
         long now = System.currentTimeMillis();
-        if (now - lastUpdated > 1000) {
+        if (isOverquota == 0 && now - lastUpdated > 1000) {
             lastUpdated = now;
         } else {
             return;
         }
-
 		long progressPercent = 0;
 
 		Collection<MegaTransfer> transfers= mapProgressTransfers.values();
