@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
@@ -2099,6 +2100,23 @@ public class ChatController {
         else if(context instanceof  NodeAttachmentHistoryActivity){
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+    }
+
+    public void authorizeNodeIfPreview (boolean isPreview, MegaNode node) {
+        if (isPreview) {
+            MegaNode nodeAuthorized = megaApi.authorizeNode(node);
+            if (nodeAuthorized != null) {
+                node = nodeAuthorized;
+            }
+        }
+    }
+
+    public boolean isInAnonymousMode () {
+        if (megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS) {
+            return true;
+        }
+
+        return false;
     }
 
     public static void log(String message) {

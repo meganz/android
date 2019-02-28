@@ -2248,7 +2248,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
 
-            forwardChatProcessor.forward();
+            forwardChatProcessor.forward(chatRoom.isPreview());
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             if (resultCode == Activity.RESULT_OK) {
@@ -6659,6 +6659,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void closeChat(boolean shouldLogout){
+        log("closeChat");
         if(idChat!=-1){
             megaChatApi.closeChatRoom(idChat, this);
         }
@@ -6892,10 +6893,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putString("mOutputFilePath",mOutputFilePath);
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
-
-        if ((getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK))) {
-            closeChat(false);
-        }
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
