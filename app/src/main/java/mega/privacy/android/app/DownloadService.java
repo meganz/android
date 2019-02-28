@@ -1216,11 +1216,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if(update){
             //refresh UI every 1 seconds to avoid too much workload on main thread
-            long now = System.currentTimeMillis();
-            if (!isOverquota && now - lastUpdated > 1000) {
-                lastUpdated = now;
-            } else {
-                return;
+            if(!isOverquota) {
+                long now = System.currentTimeMillis();
+                if (now - lastUpdated > 1000) {
+                    lastUpdated = now;
+                } else {
+                    return;
+                }
             }
 			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 			log("updateProgressNotification: "+progressPercent);
