@@ -278,8 +278,6 @@
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
     <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Link público</string>
-    <string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Compartilhado com:</string>
-    -->
     <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissão</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Permissões de compartilhamento</string>
     <string name="file_properties_shared_folder_change_permissions" context="menu item">Mudar permissões</string>
@@ -1594,9 +1592,6 @@
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">CONTEÚDO</string>
     <string name="new_file_email_when_uploading" context="Title of the field email when a new contact is created to upload">EMAIL</string>
 
-    <!--<string name="context_empty_inbox" context="Title of the empty text when a fragment is empty">No files on your</string>-->
-    <!--<string name="context_empty_camera_uploads" context="Title of the empty text when a fragment is empty">No media on</string>-->
-
     <string name="forward_menu_item" context="Item of a menu to forward a message chat to another chatroom">Reenviar</string>
 
     <string name="general_attach" context="name of the button to attach file from MEGA to another app">Anexar</string>
@@ -1673,7 +1668,6 @@
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
     <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scan QR code</string>
-    <string name="invite_not_sent_link_text" context="Text of dialog shown when a contact request has not been sent with contact link">The contact link is invalid. Try with another valid link.</string>
     <string name="button_copy_link" context="get the contact link and copy it">Copiar link</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
@@ -1692,10 +1686,6 @@
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Não há arquivos nos[/B] [A]Uploads da câmera[/A] [B].[/B]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Lixeira[/A][B]vazia[/B][B].[/B]</string>
-
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">[B]Não há dados na sua[/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Não há dados na seção[/B][A]%1$s[/A][B].[/B]</string>
-    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]Não há[/B][A]%1$s[/A][B].[/B]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no archived chats">[A]Não há[/A] [B]chats[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Carregando[/A] [B]chats&#8230;[/B]</string>
