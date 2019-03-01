@@ -1790,39 +1790,40 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-
-
 	public void showCallLayout(){
-    	log("showCallLayout");
 		if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop)){
 			if(((ManagerActivityLollipop) context).participatingInACall()){
 				if(callInProgressLayout.getVisibility()!=View.VISIBLE){
 					callInProgressLayout.setVisibility(View.VISIBLE);
+
 					callInProgressChrono.setVisibility(View.GONE);
 					callInProgressChrono.stop();
+
 					long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+
 					if(megaChatApi!=null){
 						MegaChatCall call = megaChatApi.getChatCall(chatId);
 						if(call!=null){
-							if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+							if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
 								callInProgressChrono.setVisibility(View.VISIBLE);
 								callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
 								callInProgressChrono.start();
-								callInProgressChrono.setFormat(" %s");
+								callInProgressChrono.setFormat("%s");
 							}
 						}
 					}
 				}
-
 			}else{
 				callInProgressLayout.setVisibility(View.GONE);
 				callInProgressChrono.stop();
 				callInProgressChrono.setVisibility(View.GONE);
+
 			}
 		}else{
 			callInProgressLayout.setVisibility(View.GONE);
 			callInProgressChrono.stop();
 			callInProgressChrono.setVisibility(View.GONE);
+
 		}
 	}
 

@@ -1696,6 +1696,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     archiveMenuItem.setVisible(false);
 
                 }else {
+
                     if((megaChatApi.getNumCalls() <= 0)||(!this.participatingInACall())){
                         log("onPrepareOptionsMenu no calls in progress");
                         callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
@@ -1709,7 +1710,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             videoMenuItem.setEnabled(true);
                             videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
                         }
-
                     }
 
                     archiveMenuItem.setVisible(true);
@@ -7449,7 +7449,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     callInProgressChrono.setVisibility(View.VISIBLE);
                     callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
                     callInProgressChrono.start();
-                    callInProgressChrono.setFormat(" %s");
+                    callInProgressChrono.setFormat("%s");
                 }
 
                 /*Subtitle*/
@@ -7461,7 +7461,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         chronoCall.setVisibility(View.VISIBLE);
                         chronoCall.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
                         chronoCall.start();
-                        chronoCall.setFormat(" %s");
+                        chronoCall.setFormat("%s");
                     }
                     subtitleToobar.setVisibility(View.GONE);
                     usersWithVideo();

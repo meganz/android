@@ -15,6 +15,7 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         android:text="@string/call_in_progress_layout"
+        android:layout_marginRight="8dp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"/>
 
