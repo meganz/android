@@ -209,9 +209,7 @@
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Vo vašom Cloudovom úložisku nie sú žiadne súbory</string>
 	<!--<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Vyprázdniť odpadkový kôš</string>-->
-	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Žiadne príchodzie zdielané priečinky</string>
-	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Žiadne odchodzie zdieľané priečinky</string>
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Prázdny priečinok</string>
+	<string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Prázdny priečinok</string>
     
     <!--<string name="choose_account_activity" context="Title of the activity Choose Account">Vybrať účet</string>-->
 	
@@ -228,7 +226,6 @@
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Plný prístup</string>
 	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Čítanie a Zápis</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Len na čítanie</string>
-	<!--<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Zdieľané s:</string>-->
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Povolenia:</string>
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Povolenia Zdeľaní</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Zmeniť povolenia</string>
@@ -241,8 +238,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">Prijať</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Kontaktné informácie</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Obsah</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Priečinky zdieľané s:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Pomocou tlačidla nižšie si pridajte nové kontakty.</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Pomocou tlačidla nižšie si pridajte nové kontakty.</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">Účet neobsahuje žiadne kontakty. Prosím pridajte si ich cez obrazovku Kontakty.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">Nie je dostatok voľného miesta.</string>
@@ -651,7 +647,6 @@
     <string name="four_pin_lock" context="PIN with 4 digits">Štvorčíselný PIN</string>
     <string name="six_pin_lock" context="PIN with 6 digits">Šesťčíselný PIN</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">Alfanumerický PIN</string>
-    <string name="empty_inbox" context="Text that indicates that Inbox is empty">Prázdny priečinok</string>
     <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">Odoslané do Inboxu</string>
     <string name="context_no_sent_node" context="error message when sending a node to Inbox">Chyba. Neodoslané do Inboxu</string>
     <!--<string name="context_contact_invitation_sent" context="success message when sending a contact request">Žiadosť odoslaná</string>-->

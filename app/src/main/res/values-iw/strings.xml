@@ -216,9 +216,7 @@
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">אין קבצים בכונן הענן שלך</string>
 	<!--<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">רוקן את פח המחזור</string>-->
-	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">אין תיקיות שיתוף נכנסות</string>
-	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">אין תיקיות שיתוף יוצאות</string>
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">תיקייה ריקה</string>
+	<string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">תיקייה ריקה</string>
     
     <!--<string name="choose_account_activity" context="Title of the activity Choose Account">בחר חשבון</string>-->
 	
@@ -235,7 +233,6 @@
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">הרשאות מלאות</string>
 	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">קריאה וכתיבה</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">לקריאה בלבד</string>
-	<!--<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">משותף עם:</string>-->
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">הרשאות:</string>
 	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">הרשאות שיתוף</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">שנה הרשאות</string>
@@ -248,8 +245,7 @@
 	<string name="contact_accept" context="option to accept a contact invitation">אשר</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">מידע הודות איש קשר</string>	
 	<!--<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">תוכן</string>	-->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">תיקיות משותפות עם:</string>	
-	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">הוסף אנשי קשר חדשים בעזרת הכפתור שלמטה</string>	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">הוסף אנשי קשר חדשים בעזרת הכפתור שלמטה</string>
 	<!--<string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">אין אנשי קשר בחשבון. אנא הוסף אותם במסך אנשי קשר.</string>-->
 	
 	<string name="error_not_enough_free_space" context="Error message">אין מספיק מקום פנוי</string>
@@ -658,7 +654,6 @@
     <string name="four_pin_lock" context="PIN with 4 digits">קוד פתיחה בעל 4 ספרות</string>
     <string name="six_pin_lock" context="PIN with 6 digits">קוד פתיחה בעל 6 ספרות</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">קוד פתיחה בעל אותיות ומספרים</string>
-    <string name="empty_inbox" context="Text that indicates that Inbox is empty">תיקייה ריקה</string>
     <string name="context_correctly_sent_node" context="success message when sending a node to Inbox">נשלח בהצלחה</string>
     <string name="context_no_sent_node" context="error message when sending a node to Inbox">שגיאה: השליחה לא הצליחה</string>
     <!--<string name="context_contact_invitation_sent" context="success message when sending a contact request">בקשה נשלחה</string>-->
