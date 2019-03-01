@@ -273,6 +273,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								megaChatApi.logout(this);
 							} else {
 								log("Chat correctly initialized");
+								megaChatApi.enableGroupChatCalls(false);
 							}
 						}
 					}
@@ -2195,20 +2196,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
 
-		if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-			log("API_EOVERQUOTA error!!");
+		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+			if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+				if (e.getValue() != 0) {
+					log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 
-			if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
-				UserCredentials credentials = dbH.getCredentials();
-				if(credentials!=null){
-					log("Credentials is NOT null");
+					UserCredentials credentials = dbH.getCredentials();
+					if(credentials!=null){
+						log("Credentials is NOT null");
+					}
+
+					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
+					isOverquota = true;
+					log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
+
+					showTransferOverquotaNotification();
 				}
-
-				downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
-				isOverquota = true;
-				log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
-
-				showTransferOverquotaNotification();
 			}
 		}
 	}

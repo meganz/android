@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -115,7 +116,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		public View fileLayout;
 		public ImageView imageViewIcon;
 		public RelativeLayout thumbLayoutForFile;
-		public ImageView fileGridIconForFile;
 		public ImageButton imageButtonThreeDotsForFile;
 		public TextView textViewFileNameForFile;
 		public ImageView fileGridSelected;
@@ -182,7 +182,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					}else if(getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 						holder.iconView.setVisibility(View.GONE);
 						holder.imageView.setVisibility(View.VISIBLE);
-						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
 					}
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
@@ -192,7 +192,123 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}    	
     }
-    
+
+    boolean putOrDeletePosition (int pos) {
+		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
+			selectedItems.delete(pos);
+			return true;
+		}
+		else {
+			log("PUT pos: "+pos);
+			selectedItems.put(pos, true);
+			return false;
+		}
+	}
+
+	void hideMultipleSelect () {
+		if (selectedItems.size() <= 0){
+			fragment.hideMultipleSelect();
+		}
+	}
+
+	void startAnimation (final int pos, final boolean delete) {
+		if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			MegaOfflineLollipopAdapter.ViewHolderOfflineList view = (MegaOfflineLollipopAdapter.ViewHolderOfflineList) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view!=null){
+				log("Start animation: "+pos);
+				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+						if (!delete) {
+							notifyItemChanged(pos);
+						}
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						hideMultipleSelect();
+						if (delete) {
+							notifyItemChanged(pos);
+						}
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+
+					}
+				});
+				view.imageView.startAnimation(flipAnimation);
+			}
+			else {
+				hideMultipleSelect();
+				notifyItemChanged(pos);
+			}
+		}
+		else{
+			log("adapter type is GRID");
+			MegaOffline node = (MegaOffline) getItem(pos);
+			boolean isFile = false;
+			if (node != null) {
+				if (node.isFolder()) {
+					isFile = false;
+				}
+				else {
+					isFile =true;
+				}
+			}
+			MegaOfflineLollipopAdapter.ViewHolderOfflineGrid view = (MegaOfflineLollipopAdapter.ViewHolderOfflineGrid) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view != null) {
+				Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
+				if (!delete && isFile) {
+					notifyItemChanged(pos);
+					flipAnimation.setDuration(250);
+				}
+				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+					@Override
+					public void onAnimationStart(Animation animation) {
+						if (!delete) {
+							notifyItemChanged(pos);
+						}
+					}
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						hideMultipleSelect();
+						notifyItemChanged(pos);
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+
+					}
+				});
+				if (isFile) {
+					view.fileGridSelected.startAnimation(flipAnimation);
+				}
+				else {
+					view.imageViewIcon.startAnimation(flipAnimation);
+				}
+
+			}else{
+				hideMultipleSelect();
+				notifyItemChanged(pos);
+			}
+		}
+	}
+
+	boolean isRKSavedForOffline (MegaOffline currentNode) {
+		if(currentNode.getHandle().equals("0")){
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+			File file= new File(path);
+			if(file.exists()){
+				return true;
+			}
+		}
+    	return false;
+	}
+
     public void toggleSelection(int pos) {
 		log("toggleSelection");
         //Otherwise out of bounds exception happens.
@@ -203,145 +319,22 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
             pos += placeholderCount;
         }
         //Check if it's the Master Key file
-		MegaOffline currentNode = (MegaOffline) getItem(pos);
-        if(currentNode.getHandle().equals("0")){
-        	String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				notifyItemChanged(pos);
-				return;
-			}
-        }
-		
-		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
-			selectedItems.delete(pos);
+		if (isRKSavedForOffline((MegaOffline)getItem(pos))) {
+			notifyItemChanged(pos);
+			return;
 		}
-		else {
-			log("PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
-		notifyItemChanged(pos);
-		if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			MegaOfflineLollipopAdapter.ViewHolderOfflineList view = (MegaOfflineLollipopAdapter.ViewHolderOfflineList) listFragment.findViewHolderForLayoutPosition(pos);
-			if(view!=null){
-				log("Start animation: "+pos);
-				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-					@Override
-					public void onAnimationStart(Animation animation) {
 
-					}
-
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						if (selectedItems.size() <= 0){
-							fragment.hideMultipleSelect();
-						}
-					}
-
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-
-					}
-				});
-				view.imageView.startAnimation(flipAnimation);
-			}
-		}
-		else{
-            log("adapter type is GRID");
-            MegaOfflineLollipopAdapter.ViewHolderOfflineGrid view = (MegaOfflineLollipopAdapter.ViewHolderOfflineGrid) listFragment.findViewHolderForLayoutPosition(pos);
-			if(view != null) {
-                if (view.folderLayout.getVisibility() == View.VISIBLE) {
-                    Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
-                    flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-            
-                        }
-        
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            if (selectedItems.size() <= 0){
-                               fragment.hideMultipleSelect();
-                            }
-                        }
-        
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-            
-                        }
-                    });
-                    view.imageViewIcon.startAnimation(flipAnimation);
-                }else{
-                    if (selectedItems.size() <= 0){
-                        fragment.hideMultipleSelect();
-                    }
-                }
-            }
-		}
+        startAnimation(pos, putOrDeletePosition(pos));
 	}
 
 	public void toggleAllSelection(int pos) {
-        final int positionToflip = pos;
 		//Check if it's the Master Key file
-		MegaOffline currentNode = (MegaOffline) getItem(pos);
-		if(currentNode.getHandle().equals("0")){
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-			File file= new File(path);
-			if(file.exists()){
-				notifyItemChanged(pos);
-				return;
-			}
+		if (isRKSavedForOffline((MegaOffline)getItem(pos))) {
+			notifyItemChanged(pos);
+			return;
 		}
 
-		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
-			selectedItems.delete(pos);
-		}
-		else {
-			log("PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
-
-		if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			MegaOfflineLollipopAdapter.ViewHolderOfflineList view = (MegaOfflineLollipopAdapter.ViewHolderOfflineList) listFragment.findViewHolderForLayoutPosition(pos);
-			if(view!=null){
-				log("Start animation: "+pos);
-				Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-				flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-					@Override
-					public void onAnimationStart(Animation animation) {
-
-					}
-
-					@Override
-					public void onAnimationEnd(Animation animation) {
-						if (selectedItems.size() <= 0){
-							((OfflineFragmentLollipop) fragment).hideMultipleSelect();
-						}
-						notifyItemChanged(positionToflip);
-					}
-
-					@Override
-					public void onAnimationRepeat(Animation animation) {
-
-					}
-				});
-				view.imageView.startAnimation(flipAnimation);
-			}
-			else{
-				log("NULL view pos: "+positionToflip);
-				notifyItemChanged(pos);
-			}
-		}
-		else{
-			log("adapter type is GRID");
-			if (selectedItems.size() <= 0){
-				((OfflineFragmentLollipop) fragment).hideMultipleSelect();
-			}
-			notifyItemChanged(positionToflip);
-		}
+		startAnimation(pos, putOrDeletePosition(pos));
 	}
     
     public void selectAll() {
@@ -354,17 +347,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
             }
         }
     }
-
-//	public boolean isRecoveryKey(MegaOffline currentNode){
-//		log("isRecoveryKey");
-//
-//		//Check if it's the Master Key file
-//		if(currentNode.getHandle().equals("0")){
-//			return true;
-//		}else{
-//			return false;
-//		}
-//	}
     
     public void clearSelections() {
         for (int i = 0;i < this.getItemCount();i++) {
@@ -535,7 +517,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
 			
 			holder.imageViewIcon = (ImageView)v.findViewById(R.id.offline_grid_icon);
-			holder.fileGridIconForFile = (ImageView)v.findViewById(R.id.file_grid_icon_for_file);
 			holder.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
 			holder.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
 			holder.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
@@ -743,16 +724,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 //			long nodeSize = currentNode.getSize();
 //			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			
-			holder.fileGridIconForFile.setVisibility(View.VISIBLE);
-			holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
 			holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
 			
             if (multipleSelect && isItemChecked(position)) {
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
-                holder.fileGridSelected.setVisibility(View.VISIBLE);
+                holder.fileGridSelected.setImageResource(R.drawable.ic_select_folder);
             } else {
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
-                holder.fileGridSelected.setVisibility(View.GONE);
+				holder.fileGridSelected.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
 			if (MimeTypeThumbnail.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
@@ -760,7 +739,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if (currentFile.exists()){
 					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
-						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 2);
 						holder.imageView.setImageBitmap(thumb);
 						holder.imageView.setVisibility(View.VISIBLE);
 						holder.iconView.setVisibility(View.GONE);
@@ -1036,7 +1015,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public int getItemCount() {
 		log("getItemCount");
-		return mOffList.size();
+		return mOffList.size() - placeholderCount;
 	}
 
 	public int getItemCountWithoutRK(){
@@ -1120,7 +1099,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 				}
 				else {
-					imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+                    if (MimeTypeThumbnail.typeForName(mOff.getName()).isImage()){
+                        imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+                    }else{
+                        //videos don't have thumnail, only have icon.here should use the ImageView of icon.
+                        imageView = (ImageView) v.findViewById(R.id.file_grid_icon_for_file);
+                    }
 				}
 				imageView.getLocationOnScreen(screenPosition);
 				int[] dimens = new int[4];
