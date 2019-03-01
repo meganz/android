@@ -2275,8 +2275,8 @@
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
 
-    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">joined the call</string>
-    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">left the call</string>
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">You are not allowed to join this call as it has reached the maximum number of participants.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
