@@ -140,9 +140,7 @@
                             android:visibility="gone"/>
 
                     </RelativeLayout>
-
                 </RelativeLayout>
-
             <!--End layout for group calls-->
 
             <!-- Background -->
@@ -228,7 +226,6 @@
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:orientation="vertical">
-
                     <TextView
                         android:id="@+id/title_toolbar"
                         android:layout_width="wrap_content"
@@ -243,7 +240,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
-
                         <TextView
                             android:id="@+id/subtitle_toolbar"
                             android:layout_width="wrap_content"
@@ -251,7 +247,6 @@
                             android:textColor="@color/white"
                             android:textSize="14sp"
                             android:layout_marginRight="8dp"/>
-
                         <Chronometer
                             android:id="@+id/simple_chronometer"
                             android:layout_width="wrap_content"
