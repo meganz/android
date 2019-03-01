@@ -22,7 +22,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CHAT_FOLDER;
 
 //Listener for  multi forward
 public class MultipleForwardChatProcessor implements MegaChatRequestListenerInterface {
@@ -103,7 +102,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                     for (int j = 0; j < nodeList.size(); j++) {
                                         MegaNode temp = nodeList.get(j);
                                         String name = temp.getName();
-                                        MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
+                                        MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
                                         if(chatFolder==null){
                                             log("Error no chat folder - return");
                                             return;
@@ -203,7 +202,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         for (int j = 0; j < nodeList.size(); j++) {
                                             MegaNode temp = nodeList.get(j);
                                             String name = temp.getName();
-                                            MegaNode chatFolder = megaApi.getNodeByPath(CHAT_FOLDER, megaApi.getRootNode());
+                                            MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
                                             if(chatFolder==null){
                                                 log("Error no chat folder - return");
                                                 return;
