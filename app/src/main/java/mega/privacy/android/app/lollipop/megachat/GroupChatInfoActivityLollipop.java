@@ -131,6 +131,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     TextView notificationsTitle;
     TextView notificationSelectedText;
 
+    RelativeLayout sharedFilesLayout;
+    View dividerSharedFilesLayout;
+
     RelativeLayout clearChatLayout;
     View dividerClearLayout;
     RelativeLayout leaveChatLayout;
@@ -245,8 +248,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if (chat.getTitle().length() > 0){
                 String chatTitle = chat.getTitle().trim();
-                String firstLetter = chatTitle.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+                String firstLetter = "";
+                if(!chatTitle.isEmpty()){
+                    firstLetter = chatTitle.charAt(0) + "";
+                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                }
+
                 initialLetter.setText(firstLetter);
             }
 
@@ -288,6 +296,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnClickListener(this);
+
+            //Chat Shared Files Layout
+
+            sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_chat_files_shared_layout);
+            sharedFilesLayout.setOnClickListener(this);
+
+            dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
 
             //Clear chat Layout
             clearChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_clear_layout);
@@ -907,6 +922,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 break;
 
             }
+            case R.id.chat_group_contact_properties_chat_files_shared_layout:{
+                Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+                if(chat!=null){
+                    nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+                }
+                startActivity(nodeHistoryIntent);
+                break;
+            }
         }
 
     }
@@ -987,6 +1010,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         input.setError(getString(R.string.invalid_string));
                         input.requestFocus();
                     }
+                    else if(title.trim().isEmpty()){
+                        log("title trim is empty");
+                        input.setError(getString(R.string.invalid_string));
+                        input.requestFocus();
+                    }
                     else {
                         log("action DONE ime - change title");
                         changeTitle(title);
@@ -1007,6 +1035,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         String title = input.getText().toString();
                         if(title.equals("")||title.isEmpty()){
                             log("input is empty");
+                            input.setError(getString(R.string.invalid_string));
+                            input.requestFocus();
+                        }
+                        else if(title.trim().isEmpty()){
+                            log("title trim is empty");
                             input.setError(getString(R.string.invalid_string));
                             input.requestFocus();
                         }
@@ -1042,6 +1075,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 String title = input.getText().toString();
                 if(title.equals("")||title.isEmpty()){
                     log("input is empty");
+                    input.setError(getString(R.string.invalid_string));
+                    input.requestFocus();
+                }
+                else if(title.trim().isEmpty()){
+                    log("title trim is empty");
                     input.setError(getString(R.string.invalid_string));
                     input.requestFocus();
                 }
@@ -1431,8 +1469,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 if (chat.getTitle().length() > 0){
                     String chatTitle = chat.getTitle().trim();
-                    String firstLetter = chatTitle.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    String firstLetter = "";
+                    if(!chatTitle.isEmpty()){
+                        firstLetter = chatTitle.charAt(0) + "";
+                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                    }
                     initialLetter.setText(firstLetter);
                 }
 
@@ -1529,7 +1570,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("onChatPresenceLastGreen");
         int state = megaChatApi.getUserOnlineStatus(userhandle);
         if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
-            String formattedDate = TimeUtils.lastGreenDate(lastGreen);
+            String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
 
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);

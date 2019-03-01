@@ -684,7 +684,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	
 
 	public void importNode(MegaNode node){
-		log("importNodes");
+		log("importNodesFromAndroidMessages");
 
 		nodeToImport = node;
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
