@@ -241,6 +241,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
+    /*Method to know if i'm participating in any A/V call*/
     public boolean participatingInACall(){
         boolean activeCall = false;
         if(megaChatApi!=null){
@@ -264,6 +265,8 @@ public class BaseActivity extends AppCompatActivity {
         }
         return activeCall;
     }
+
+    /*Method to know which A / V call I am participating in*/
     public long getChatCallInProgress(){
         log("getChatCallInProgress()");
         long chatId = -1;

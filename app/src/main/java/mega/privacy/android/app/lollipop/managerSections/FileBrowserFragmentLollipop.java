@@ -1,9 +1,11 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -67,6 +70,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -861,9 +865,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
 			case R.id.call_in_progress_layout:{
 				log("onClick:call_in_progress_layout");
-//				if(checkPermissionsCall()){
-//					returnTheCall();
-//				}
+				if(checkPermissionsCall()){
+					returnTheCall();
+				}
 				break;
 			}
         }
@@ -1736,34 +1740,109 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         }
     }
+	public boolean checkPermissionsCall(){
+		log("checkPermissionsCall() ");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			if (!hasCameraPermission) {
+				ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+				return false;
+			}
+
+			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+			if (!hasRecordAudioPermission) {
+				ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+				return false;
+			}
+
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		switch (requestCode) {
+			case Constants.REQUEST_CAMERA: {
+				log("REQUEST_CAMERA");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						log("REQUEST_CAMERA -> returnTheCall");
+						returnTheCall();
+					}
+				}
+				break;
+			}
+			case Constants.RECORD_AUDIO: {
+				log("RECORD_AUDIO");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						log("RECORD_AUDIO -> returnTheCall");
+						returnTheCall();
+					}
+				}
+				break;
+			}
+
+		}
+	}
+
+
 
 	public void showCallLayout(){
+    	log("showCallLayout");
 		if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop)){
 			if(((ManagerActivityLollipop) context).participatingInACall()){
-				callInProgressLayout.setVisibility(View.VISIBLE);
-				callInProgressChrono.setVisibility(View.GONE);
-				callInProgressChrono.stop();
-				long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
-				if(megaChatApi!=null){
-					MegaChatCall call = megaChatApi.getChatCall(chatId);
-					if(call!=null){
-						if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-							callInProgressChrono.setVisibility(View.VISIBLE);
-							callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-							callInProgressChrono.start();
-							callInProgressChrono.setFormat(" %s");
+				if(callInProgressLayout.getVisibility()!=View.VISIBLE){
+					callInProgressLayout.setVisibility(View.VISIBLE);
+					callInProgressChrono.setVisibility(View.GONE);
+					callInProgressChrono.stop();
+					long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+					if(megaChatApi!=null){
+						MegaChatCall call = megaChatApi.getChatCall(chatId);
+						if(call!=null){
+							if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+								callInProgressChrono.setVisibility(View.VISIBLE);
+								callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+								callInProgressChrono.start();
+								callInProgressChrono.setFormat(" %s");
+							}
 						}
 					}
 				}
+
 			}else{
 				callInProgressLayout.setVisibility(View.GONE);
 				callInProgressChrono.stop();
+				callInProgressChrono.setVisibility(View.GONE);
 			}
 		}else{
 			callInProgressLayout.setVisibility(View.GONE);
 			callInProgressChrono.stop();
+			callInProgressChrono.setVisibility(View.GONE);
 		}
 	}
+
+	private void returnTheCall(){
+		log("returnTheCall()");
+		long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+		if(megaChatApi!=null){
+			MegaChatCall call = megaChatApi.getChatCall(chatId);
+			if(call!=null){
+				if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+					log("returnTheCall() -> ChatCallActivity");
+					Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.putExtra("chatHandle", chatId);
+					startActivity(intent);
+				}
+			}
+		}
+	}
+
 
 	//refresh list when item updated
 	public void refresh(long handle) {
