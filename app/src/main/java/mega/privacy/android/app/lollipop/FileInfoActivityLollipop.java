@@ -1107,7 +1107,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                 renameMenuItem.setVisible(true);
                                 moveMenuItem.setVisible(false);
                                 copyMenuItem.setVisible(true);
-                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
                                 getLinkMenuItem.setVisible(false);
                                 menu.findItem(R.id.cab_menu_file_info_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -1120,6 +1119,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                 renameMenuItem.setVisible(false);
                                 moveMenuItem.setVisible(false);
                                 copyMenuItem.setVisible(true);
+                                menu.findItem(R.id.cab_menu_file_info_copy).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
                                 rubbishMenuItem.setVisible(false);
 

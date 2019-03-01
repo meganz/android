@@ -529,6 +529,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
+
+	    menu.findItem(R.id.action_delete_version_history).setVisible(false);
 	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
