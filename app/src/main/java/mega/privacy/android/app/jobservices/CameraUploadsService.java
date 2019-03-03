@@ -1245,10 +1245,10 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         handler = new Handler();
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PAGE_SIZE = 500;
+            PAGE_SIZE = 1000;
             PAGE_SIZE_VIDEO = 50;
         } else {
-            PAGE_SIZE = 200;
+            PAGE_SIZE = 400;
             PAGE_SIZE_VIDEO = 10;
         }
         
