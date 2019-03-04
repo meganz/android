@@ -2034,7 +2034,7 @@
     <string name="confirmation_delete_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">Remove %s from this chat?</string>
 
     <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">File versions</string>
-    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1d file versions, taking a total of %2s</string>
+    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d file versions, taking a total of %2$s</string>
 
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">File Management</string>
 
