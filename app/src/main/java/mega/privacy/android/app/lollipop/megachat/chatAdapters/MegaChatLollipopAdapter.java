@@ -1731,7 +1731,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
 
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
             } else {
 
@@ -1772,7 +1772,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                 }
-            }
+                }
+            ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.VISIBLE);
@@ -1789,7 +1790,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_PORT, outMetrics);
             }
             holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
-            ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
+//            ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -1814,11 +1815,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = "";
 
-            if(message.getType()==MegaChatMessage.TYPE_CALL_STARTED){
+            if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
                 ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
+                if (((ChatActivityLollipop) context).isGroup()) {
+                    ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
+                }
+
                 textToShow = context.getResources().getString(R.string.call_started_messages);
-            }
-            else{
+
+            }else{
+
                 switch(message.getTermCode()){
                     case MegaChatMessage.END_CALL_REASON_ENDED:{
 
