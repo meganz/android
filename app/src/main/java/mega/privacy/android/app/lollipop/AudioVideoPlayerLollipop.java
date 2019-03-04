@@ -1158,7 +1158,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     log("playerListener: onPlayerStateChanged: " + playbackState);
 
                     if (playWhenReady && mega.privacy.android.app.utils.Util.isChatEnabled() && megaChatApi != null) {
-                        MegaHandleList handleList = megaChatApi.getChatCalls();
+                        MegaHandleList handleList = megaChatApi.getChatCalls(-1);
                         if(handleList!=null && handleList.size()>0) {
                             //Not allow to play content when a call is in progress
                             player.setPlayWhenReady(false);

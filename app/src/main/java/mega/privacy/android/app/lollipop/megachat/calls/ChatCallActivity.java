@@ -356,6 +356,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         log("updateScreenStatusInProgress:group:OTHER = "+callStatus);
                     }
                     checkParticipants(callChat);
+                    updateSubtitleNumberOfVideos();
                 }
 
             } else {
@@ -1974,10 +1975,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         updateRemoteAudioStatus(-1, -1);
                     }
                 }
+                updateSubtitleNumberOfVideos();
+
             } else if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
                 log("CHANGE_TYPE_SESSION_STATUS:LOCAL_AVFLAGS");
                 updateLocalVideoStatus();
                 updateLocalAudioStatus();
+
+                updateSubtitleNumberOfVideos();
 
             } else if (call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)) {
                 log("CHANGE_TYPE_SESSION_STATUS:RINGING");
@@ -2639,7 +2644,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                             }
                                         }
                                     }
-                                    updateSubtitleNumberOfVideos();
                                     break;
                                 }
                             }
@@ -2668,7 +2672,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                              }
                                          }
                                      }
-                                     updateSubtitleNumberOfVideos();
                                      break;
                                  }
                             }
@@ -2908,7 +2911,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                         }
                                     }
                                 }
-                                updateSubtitleNumberOfVideos();
                                 break;
                             }
                         }
@@ -2964,7 +2966,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                         }
                                     }
                                 }
-                                updateSubtitleNumberOfVideos();
                                 break;
                             }
                         }
@@ -3477,39 +3478,28 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-
     public void updateSubtitleNumberOfVideos() {
-        log("updateSubtitleNumberOfVideos() ");
-        int cont = 0;
-
+        log("updateSubtitleNumberOfVideos");
         if((megaChatApi!=null)&&(callChat==null)){
             callChat = megaChatApi.getChatCall(chatId);
         }
         if(callChat!=null){
-            MegaHandleList  list = callChat.getSessionsPeerid();
-            for(int i=0; i<list.size(); i++){
-                MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(i), callChat.getSessionsClientid().get(i));
-                if (userSession != null && userSession.hasVideo()) {
-                    cont ++;
-                }
-            }
-            if(callChat.hasLocalVideo()){
-                cont ++;
-            }
-        }
 
-        if(cont == 0){
-            linearParticipants.setVisibility(View.GONE);
-        }else{
-            if((totalVideosAllowed == 0)&&(megaChatApi != null)){
-                totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
-            }
-            if(totalVideosAllowed!=0){
-                participantText.setText(cont + "/" + totalVideosAllowed);
-                linearParticipants.setVisibility(View.VISIBLE);
+            int usersWithVideo = callChat.getNumParticipants(1);
+            log("updateSubtitleNumberOfVideos: usersWithVideo = "+usersWithVideo);
+
+            if(usersWithVideo > 0){
+                if((totalVideosAllowed == 0)&&(megaChatApi != null)){
+                    totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
+                }
+                if(totalVideosAllowed != 0){
+                    participantText.setText(usersWithVideo + "/" + totalVideosAllowed);
+                    linearParticipants.setVisibility(View.VISIBLE);
+                }else{
+                    linearParticipants.setVisibility(View.GONE);
+                }
             }else{
                 linearParticipants.setVisibility(View.GONE);
-
             }
         }
     }

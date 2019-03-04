@@ -18192,30 +18192,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 					int callStatus = call.getStatus();
 					switch (callStatus) {
-						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						case MegaChatCall.CALL_STATUS_RING_IN:
 						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+						case MegaChatCall.CALL_STATUS_RING_IN:
 						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-							case MegaChatCall.CALL_STATUS_DESTROYED: {
-								log("onChatCallUpdate:STATUS: USER_NO_PRESENT || RING_IN || REQUEST_SENT || IN_PROGRESS");
-								setCallBadge();
-								rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-								if ((rChatFL != null) && (rChatFL.isVisible())){
-									rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
-								}
+						case MegaChatCall.CALL_STATUS_DESTROYED:
+						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+							log("onChatCallUpdate:STATUS: REQUEST_SENT || RING_IN || IN_PROGRESS || DESTROYED || USER_NO_PRESENT");
+							setCallBadge();
+							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+							if ((rChatFL != null) && (rChatFL.isVisible())){
+								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+							}
 
-								fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-								if ((fbFLol != null) && (fbFLol.isVisible())){
-									fbFLol.showCallLayout();
-								}
-							break;
+							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+							if ((fbFLol != null) && (fbFLol.isVisible())){
+								fbFLol.showCallLayout();
+							}
+						break;
 						}
 						default:
 							break;
 					}
 
-				} else if ((call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS))||(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS))) {
-					log("onChatCallUpdate:STATUS: REMOTE_AVFLAGS || LOCAL_AVFLAGS");
 				}
 			}
 		}

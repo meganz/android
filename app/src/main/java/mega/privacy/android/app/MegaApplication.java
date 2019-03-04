@@ -1565,7 +1565,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			clearIncomingCallNotification(call.getId());
 		}
 
-		MegaHandleList handleList = megaChatApi.getChatCalls();
+		MegaHandleList handleList = megaChatApi.getChatCalls(-1);
 		if(handleList!=null) {
 			long numberOfCalls = handleList.size();
 			log("Number of calls in progress: " + numberOfCalls);
