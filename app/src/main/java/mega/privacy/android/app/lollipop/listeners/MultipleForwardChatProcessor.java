@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -65,7 +66,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         Util.log("MultipleForwardChatProcessor", log);
     }
 
-    public void forward(boolean isPreview){
+    public void forward(MegaChatRoom chatRoom){
 
         if(chatHandles.length==1){
             log("Forward to one chat");
@@ -113,7 +114,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         }
                                         MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
                                         if(nodeToAttach!=null){
-                                            cC.authorizeNodeIfPreview(isPreview, nodeToAttach);
+                                            nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                             if(chatHandles[0]==idChat){
                                                 megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), this);
                                             }
@@ -214,7 +215,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                             }
                                             MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
                                             if(nodeToAttach!=null){
-                                                cC.authorizeNodeIfPreview(isPreview, nodeToAttach);
+                                                nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                                 if(chatHandles[k]==idChat){
                                                     megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
                                                 }
