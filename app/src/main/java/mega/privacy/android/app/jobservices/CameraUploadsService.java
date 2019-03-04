@@ -1421,10 +1421,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
     private void initService(){
         log("initService()");
-
-        CAMERA_UPLOADS = getString(R.string.label_camera_upload_folder_name);
-        SECONDARY_UPLOADS = getString(R.string.label_secondary_camera_upload_folder_name);
-        PHOTO_SYNC = getString(R.string.label_photo_sync_folder_name);
         
         totalUploaded = -1;
         totalSizeToUpload = 0;

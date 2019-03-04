@@ -285,7 +285,7 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     
-    public static String CHAT_FOLDER = "My chat files";
+    public static String CHAT_FOLDER = "My Chat Files";
 
 	public static int RICH_WARNING_TRUE = 1;
 	public static int RICH_WARNING_FALSE= 0;
