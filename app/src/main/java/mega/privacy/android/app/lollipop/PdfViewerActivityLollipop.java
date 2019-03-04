@@ -350,7 +350,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     if (msgId != -1 && chatId != -1) {
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if (msgChat != null) {
-                            nodeChat = msgChat.getMegaNodeList().get(0);
+                            nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
                             if (isDeleteDialogShow) {
                                 showConfirmationDeleteNode(chatId, msgChat);
                             }
@@ -1359,55 +1359,41 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 removeMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
 
-                if(megaApi==null || !Util.isOnline(this)) {
+                if(megaApi==null || !mega.privacy.android.app.utils.Util.isOnline(this)) {
                     downloadMenuItem.setVisible(false);
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle())) {
-                        if (msgChat.isDeletable()){
-                            chatRemoveMenuItem.setVisible(true);
-                        }
-                        else {
-                            chatRemoveMenuItem.setVisible(false);
-                        }
+                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle()) && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
                     }
                     else {
-                        log("The message is not mine");
+                        chatRemoveMenuItem.setVisible(false);
+                    }
+                }
+                else if (nodeChat != null){
+                    downloadMenuItem.setVisible(true);
+                    if (chatC.isInAnonymousMode()) {
+                        importMenuItem.setVisible(false);
+                        saveForOfflineMenuItem.setVisible(false);
+                    }
+                    else {
+                        importMenuItem.setVisible(true);
+                        saveForOfflineMenuItem.setVisible(true);
+                    }
+
+                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
+                    }
+                    else {
                         chatRemoveMenuItem.setVisible(false);
                     }
                 }
                 else {
-                    if (nodeChat != null){
-                        downloadMenuItem.setVisible(true);
-                        importMenuItem.setVisible(true);
-                        saveForOfflineMenuItem.setVisible(true);
-
-                        if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()) {
-                            if((megaApi.getNodeByHandle(nodeChat.getHandle()))==null){
-                                log("The node is not mine");
-                                chatRemoveMenuItem.setVisible(false);
-                            }
-                            else{
-                                if(msgChat.isDeletable()){
-                                    chatRemoveMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatRemoveMenuItem.setVisible(false);
-                                }
-                            }
-                        }
-                        else {
-                            log("The message is not mine");
-                            chatRemoveMenuItem.setVisible(false);
-                        }
-                    }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        importMenuItem.setVisible(false);
-                        saveForOfflineMenuItem.setVisible(false);
-                        chatRemoveMenuItem.setVisible(false);
-                    }
+                    downloadMenuItem.setVisible(false);
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+                    chatRemoveMenuItem.setVisible(false);
                 }
             }
             else if (type == Constants.FILE_LINK_ADAPTER) {
@@ -1717,7 +1703,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null){
-                    chatC.saveForOffline(msgChat.getMegaNodeList());
+                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId));
                 }
                 break;
             }

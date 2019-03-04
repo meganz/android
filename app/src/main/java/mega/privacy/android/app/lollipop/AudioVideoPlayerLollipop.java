@@ -636,7 +636,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if (msgId != -1 && chatId != -1){
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if (msgChat != null){
-                            nodeChat = msgChat.getMegaNodeList().get(0);
+                            nodeChat = chatC.authorizeNodeIfPreview(msgChat.getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
                             if (isDeleteDialogShow) {
                                 showConfirmationDeleteNode(chatId, msgChat);
                             }
@@ -2160,50 +2160,36 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle())) {
-                        if (msgChat.isDeletable()){
-                            chatRemoveMenuItem.setVisible(true);
-                        }
-                        else {
-                            chatRemoveMenuItem.setVisible(false);
-                        }
+                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle()) && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
                     }
                     else {
-                        log("The message is not mine");
+                        chatRemoveMenuItem.setVisible(false);
+                    }
+                }
+                else if (nodeChat != null){
+                    downloadMenuItem.setVisible(true);
+                    if (chatC.isInAnonymousMode()) {
+                        importMenuItem.setVisible(false);
+                        saveForOfflineMenuItem.setVisible(false);
+                    }
+                    else {
+                        importMenuItem.setVisible(true);
+                        saveForOfflineMenuItem.setVisible(true);
+                    }
+
+                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable()) {
+                        chatRemoveMenuItem.setVisible(true);
+                    }
+                    else {
                         chatRemoveMenuItem.setVisible(false);
                     }
                 }
                 else {
-                    if (nodeChat != null){
-                        downloadMenuItem.setVisible(true);
-                        importMenuItem.setVisible(true);
-                        saveForOfflineMenuItem.setVisible(true);
-
-                        if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()) {
-                            if((megaApi.getNodeByHandle(nodeChat.getHandle()))==null){
-                                log("The node is not mine");
-                                chatRemoveMenuItem.setVisible(false);
-                            }
-                            else{
-                                if(msgChat.isDeletable()){
-                                    chatRemoveMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatRemoveMenuItem.setVisible(false);
-                                }
-                            }
-                        }
-                        else {
-                            log("The message is not mine");
-                            chatRemoveMenuItem.setVisible(false);
-                        }
-                    }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        importMenuItem.setVisible(false);
-                        saveForOfflineMenuItem.setVisible(false);
-                        chatRemoveMenuItem.setVisible(false);
-                    }
+                    downloadMenuItem.setVisible(false);
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+                    chatRemoveMenuItem.setVisible(false);
                 }
             }
             else if (adapterType == Constants.FILE_LINK_ADAPTER) {
@@ -2563,7 +2549,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     chatC = new ChatController(this);
                 }
                 if (msgChat != null){
-                    chatC.saveForOffline(msgChat.getMegaNodeList());
+                    chatC.saveForOffline(msgChat.getMegaNodeList(), megaChatApi.getChatRoom(chatId));
                 }
                 break;
             }

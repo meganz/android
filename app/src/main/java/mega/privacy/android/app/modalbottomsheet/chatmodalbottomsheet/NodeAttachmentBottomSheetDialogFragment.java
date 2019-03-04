@@ -411,7 +411,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     if(message!=null){
                         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                         messages.add(message);
-                        chatC.saveForOfflineWithAndroidMessages(messages);
+                        chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
                     }
                     else{
                         log("Message is NULL");

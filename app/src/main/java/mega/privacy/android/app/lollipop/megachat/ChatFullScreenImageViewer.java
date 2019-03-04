@@ -144,6 +144,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	boolean isDeleteDialogShow = false;
 
+	ChatController chatC;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -191,53 +193,42 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 
-		if(megaApi==null || (!Util.isOnline(this))){
-			downloadIcon.setVisible(false);
-			importIcon.setVisible(false);
-			saveForOfflineIcon.setVisible(false);
+        if(megaApi==null || !Util.isOnline(this)){
+            downloadIcon.setVisible(false);
+            importIcon.setVisible(false);
+            saveForOfflineIcon.setVisible(false);
 
-			if(MegaApiJava.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaChatApi.getMyUserHandle())){
+            if(MegaApiJava.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaChatApi.getMyUserHandle()) && messages.get(positionG).isDeletable()) {
+                removeIcon.setVisible(true);
+            }
+            else{
+                removeIcon.setVisible(false);
+            }
+        }
+        else if (node != null){
+            downloadIcon.setVisible(true);
+            if (chatC.isInAnonymousMode()) {
+                importIcon.setVisible(false);
+                saveForOfflineIcon.setVisible(false);
+            }
+            else {
+                importIcon.setVisible(true);
+                saveForOfflineIcon.setVisible(true);
+            }
 
-				if(messages.get(positionG).isDeletable()){
-					removeIcon.setVisible(true);
-				}
-				else{
-					removeIcon.setVisible(false);
-				}
-			}
-			else{
-				log("The message is not mine");
-				removeIcon.setVisible(false);
-			}
-		}
-		else{
-			if(node!=null){
-				if(messages.get(positionG).getUserHandle()==megaChatApi.getMyUserHandle()){
-					if((megaApi.getNodeByHandle(node.getHandle()))==null){
-						log("The node is not mine");
-						removeIcon.setVisible(false);
-					}
-					else{
-						if(messages.get(positionG).isDeletable()){
-							removeIcon.setVisible(true);
-						}
-						else{
-							removeIcon.setVisible(false);
-						}
-					}
-				}
-				else{
-					log("The message is not mine");
-					removeIcon.setVisible(false);
-				}
-			}
-			else{
-				removeIcon.setVisible(false);
-				downloadIcon.setVisible(false);
-				importIcon.setVisible(false);
-				saveForOfflineIcon.setVisible(false);
-			}
-		}
+            if (messages.get(positionG).getUserHandle()==megaChatApi.getMyUserHandle() && messages.get(positionG).isDeletable()) {
+                removeIcon.setVisible(true);
+            }
+            else {
+                removeIcon.setVisible(false);
+            }
+        }
+        else {
+            downloadIcon.setVisible(false);
+            importIcon.setVisible(false);
+            saveForOfflineIcon.setVisible(false);
+            removeIcon.setVisible(false);
+        }
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -251,7 +242,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
-					ChatController chatC = new ChatController(this);
 					chatC.prepareForChatDownload(node);
 				}
 				break;
@@ -270,7 +260,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 			case R.id.chat_full_image_viewer_download: {
 				log("download option");
-				MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
+				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 					if (!hasStoragePermission) {
@@ -281,8 +271,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 						break;
 					}
 				}
-
-				ChatController chatC = new ChatController(this);
 				chatC.prepareForChatDownload(node);
 
 				break;
@@ -290,16 +278,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 			case R.id.chat_full_image_viewer_import: {
 				log("import option");
-				MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
+				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
 				importNode(node);
 				break;
 			}
 			case R.id.chat_full_image_viewer_save_for_offline: {
 				log("save for offline option");
 //				showSnackbar("Coming soon...");
-				ChatController chatC = new ChatController(this);
 				if (messages.get(positionG) != null){
-					chatC.saveForOffline(messages.get(positionG).getMegaNodeList());
+					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(), megaChatApi.getChatRoom(chatId));
 				}
 				break;
 			}
@@ -323,6 +310,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		handler = new Handler();
 		fullScreenImageViewer = this;
+
+		chatC = new ChatController(this);
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -357,7 +346,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if(Util.isOnline(this)){
 			megaApi = app.getMegaApi();
 
-			if(megaApi==null||megaApi.getRootNode()==null){
+			if((megaApi==null||megaApi.getRootNode()==null) && !chatC.isInAnonymousMode()){
 				log("Refresh session - sdk");
 				Intent intent = new Intent(this, LoginActivityLollipop.class);
 				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -644,7 +633,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		final String parentPathC = parentPath;
 		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
-		final ChatController chatC = new ChatController(this);
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		LinearLayout confirmationLayout = new LinearLayout(this);
@@ -773,8 +761,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						ChatController cC = new ChatController(fullScreenImageViewer);
-						cC.deleteMessage(message, chatId);
+						chatC.deleteMessage(message, chatId);
 						isDeleteDialogShow = false;
 						finish();
 						break;
