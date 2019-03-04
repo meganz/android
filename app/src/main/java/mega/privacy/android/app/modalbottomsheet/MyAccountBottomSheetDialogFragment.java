@@ -150,7 +150,7 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
                 //Check if there is a in progress call:
                 boolean activeCall = false;
                 if(megaChatApi!=null){
-                    MegaHandleList listCalls = megaChatApi.getChatCalls();
+                    MegaHandleList listCalls = megaChatApi.getChatCalls(-1);
                     int contCallNotPresent = 0;
                     if((listCalls!=null)&&(listCalls.size()>0)){
                         for(int i=0; i<listCalls.size(); i++){
