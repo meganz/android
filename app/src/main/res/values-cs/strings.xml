@@ -741,11 +741,7 @@
     <string name="my_account_title" context="title of the My Account screen">Typ účtu:</string>
     <string name="expires_on" context="title of the Expiration Date">Vyprší</string>
     <string name="free_account">ZDARMA</string>
-    <string name="prolite_account" context="Not translate">Lite</string>
-    <string name="pro1_account" context="Not translate">Pro I</string>
-    <string name="pro2_account" context="Not translate">Pro II</string>
-    <string name="pro3_account" context="Not translate">Pro III</string>
-    
+
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
     -->

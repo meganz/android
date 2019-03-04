@@ -756,10 +756,6 @@
     <string name="renews_on" context="title of the Expiration Date">將於&#160;續訂</string>
     <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
     <string name="free_account">免費</string>
-    <string name="prolite_account" context="Not translate">Lite</string>
-    <string name="pro1_account" context="Not translate">PRO I</string>
-    <string name="pro2_account" context="Not translate">PRO II</string>
-    <string name="pro3_account" context="Not translate">PRO III</string>
 
     <!--
     <string name="free_storage" context="Not translate">50 GB</string>
