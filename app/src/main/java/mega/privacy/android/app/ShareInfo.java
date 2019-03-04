@@ -3,17 +3,13 @@ package mega.privacy.android.app;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -238,7 +234,9 @@ public class ShareInfo {
 		inputStream = null;
 		try {
 			inputStream = context.getContentResolver().openInputStream(uri);
-		} catch (Exception e) {
+		} catch (FileNotFoundException fileNotFound) {
+		    return;
+        } catch (Exception e) {
 			log("inputStream EXCEPTION!");
 			log(""+e);
 			String path = uri.getPath();
@@ -423,7 +421,7 @@ public class ShareInfo {
 		Cursor cursor = null;
 		try {
 			cursor = client.query(uri, null, null, null, null);
-		} catch (RemoteException e1) {
+		} catch (Exception e1) {
 			log("cursor EXCEPTION!!!");
 		}
 		if(cursor!=null){
