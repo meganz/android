@@ -51,6 +51,7 @@ public class SnackbarNavigateOption implements View.OnClickListener{
                 intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("CHAT_ID", idChat);
+                intent.putExtra("moveToChatSection", true);
                 ((FullScreenImageViewerLollipop)context).startActivity(intent);
                 ((FullScreenImageViewerLollipop)context).finish();
             }
@@ -68,6 +69,7 @@ public class SnackbarNavigateOption implements View.OnClickListener{
                 intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("CHAT_ID", idChat);
+                intent.putExtra("moveToChatSection", true);
                 ((PdfViewerActivityLollipop)context).startActivity(intent);
                 ((PdfViewerActivityLollipop)context).finish();
             }
@@ -85,6 +87,7 @@ public class SnackbarNavigateOption implements View.OnClickListener{
                 intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("CHAT_ID", idChat);
+                intent.putExtra("moveToChatSection", true);
                 ((AudioVideoPlayerLollipop)context).startActivity(intent);
                 ((AudioVideoPlayerLollipop)context).finish();
             }
@@ -114,6 +117,7 @@ public class SnackbarNavigateOption implements View.OnClickListener{
                 intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("CHAT_ID", idChat);
+                intent.putExtra("moveToChatSection", true);
                 ((FileInfoActivityLollipop)context).startActivity(intent);
                 ((FileInfoActivityLollipop)context).finish();
             }

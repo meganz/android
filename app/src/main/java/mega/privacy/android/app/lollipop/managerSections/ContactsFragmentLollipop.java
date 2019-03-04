@@ -702,7 +702,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 					menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
 					menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(getContext(), R.drawable.ic_share_contact, R.color.white));
-					menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 				else {
 					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
