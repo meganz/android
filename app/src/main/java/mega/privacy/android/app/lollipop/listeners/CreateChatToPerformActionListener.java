@@ -7,9 +7,13 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -132,13 +136,39 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                         else if(context instanceof ContactInfoActivityLollipop){
                             ((ContactInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                         }
+
+                        message = context.getResources().getQuantityString(R.plurals.num_files_not_send, handles.length, totalCounter);
+                        if (context instanceof FullScreenImageViewerLollipop) {
+                            ((FullScreenImageViewerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                        }
+                        else if (context instanceof AudioVideoPlayerLollipop) {
+                            ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                        }
+                        else if (context instanceof PdfViewerActivityLollipop) {
+                            ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                        }
+                        else if (context instanceof FileInfoActivityLollipop) {
+                            ((FileInfoActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
+                        }
                     }
                     else {
                         if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).sendFileToChatsFromContacts(chats, fileHandle);
+                            ((ManagerActivityLollipop) context).sendFileToChatsFromContacts(context, chats, fileHandle);
                         }
                         else if(context instanceof ContactInfoActivityLollipop){
-                            ((ContactInfoActivityLollipop) context).sendFileToChatsFromContacts(chats, fileHandle);
+                            ((ContactInfoActivityLollipop) context).sendFileToChatsFromContacts(context, chats, fileHandle);
+                        }
+                        else if (context instanceof FullScreenImageViewerLollipop) {
+                            ((FullScreenImageViewerLollipop) context).sendFileToChatsFromContacts(context, chats, fileHandle);
+                        }
+                        else if (context instanceof AudioVideoPlayerLollipop) {
+                            ((AudioVideoPlayerLollipop) context).sendFileToChatsFromContacts(context, chats, fileHandle);
+                        }
+                        else if (context instanceof PdfViewerActivityLollipop) {
+                            ((PdfViewerActivityLollipop) context).sendFileToChatsFromContacts(context, chats, fileHandle);
+                        }
+                        else if (context instanceof FileInfoActivityLollipop) {
+                            ((FileInfoActivityLollipop) context).sendFileToChatsFromContacts(context, chats, fileHandle);
                         }
                     }
                 }

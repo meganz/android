@@ -24,6 +24,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
@@ -31,6 +34,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 
 public class BaseActivity extends AppCompatActivity {
@@ -362,18 +366,26 @@ public class BaseActivity extends AppCompatActivity {
                 break;
             }
             case Constants.MESSAGE_SNACKBAR_TYPE: {
-                snackbar.setAction("SEE", new SnackbarNavigateOption(this, idChat));
+                snackbar.setAction("SEE", new SnackbarNavigateOption(view.getContext(), idChat));
                 snackbar.show();
                 break;
             }
             case Constants.NOT_SPACE_SNACKBAR_TYPE: {
-                snackbar.setAction("Settings", new SnackbarNavigateOption(this));
+                snackbar.setAction("Settings", new SnackbarNavigateOption(view.getContext()));
                 snackbar.show();
                 break;
             }
         }
     }
 
+    /**
+     * Method to display a simple Snackbar.
+     *
+     * @param context Context of the Activity where the snackbar has to be displayed
+     * @param outMetrics DisplayMetrics of the current device
+     * @param view Layout where the snackbar is going to show.
+     * @param s Text to shown in the snackbar
+     */
     public static void showSimpleSnackbar(Context context, DisplayMetrics outMetrics, View view, String s) {
         Snackbar snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
@@ -384,6 +396,30 @@ public class BaseActivity extends AppCompatActivity {
         TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
+    }
+
+    /**
+     * Method for send a file into one or more chats
+     *
+     * @param context Context of the Activity where the file has to be sent
+     * @param chats Chats where the file has to be sent
+     * @param fileHandle Handle of the file that has to be sent
+     */
+    public void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
+        log("sendFileToChatsFromContacts");
+
+        MultipleAttachChatListener listener = null;
+
+        if(chats.size()==1){
+            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), false, chats.size());
+            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
+        }
+        else{
+            listener = new MultipleAttachChatListener(context, -1, false, chats.size());
+            for(int i=0;i<chats.size();i++){
+                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
+            }
+        }
     }
 
     /**

@@ -1013,30 +1013,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
-		log("sendFileToChatsFromContacts");
-
-		MultipleAttachChatListener listener = null;
-
-		if(chats.size()==1){
-			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
-		}
-		else{
-			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
-		}
-
-		if(chats.size()==1){
-			//One chat, one file
-			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-		}
-		else if(chats.size()>1){
-			//Many chats, one file
-			for(int i=0;i<chats.size();i++){
-				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-			}
-		}
-	}
-
 	public void pickFolderToShare(String email){
 		log("pickFolderToShare");
 		if (email != null){

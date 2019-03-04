@@ -2617,9 +2617,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
-						String text = getIntent().getStringExtra("showSnackbar");
-						if(chatId!=-1){
-							openChat(chatId, text);
+						if (getIntent().getBooleanExtra("moveToChatSection", false)){
+							moveToChatSection(chatId);
+						}
+						else {
+							String text = getIntent().getStringExtra("showSnackbar");
+							if (chatId != -1) {
+								openChat(chatId, text);
+							}
 						}
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
@@ -3449,9 +3454,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
-					String text = getIntent().getStringExtra("showSnackbar");
-					if(chatId!=-1){
-						openChat(chatId, text);
+					if (getIntent().getBooleanExtra("moveToChatSection", false)){
+						moveToChatSection(chatId);
+					}
+					else {
+						String text = getIntent().getStringExtra("showSnackbar");
+						if (chatId != -1) {
+							openChat(chatId, text);
+						}
 					}
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
@@ -13438,7 +13448,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
-			if (chatHandles != null && chatHandles.length > 0) {
+			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
 				if (contactHandles != null && contactHandles.length > 0) {
 					ArrayList<MegaChatRoom> chats = new ArrayList<>();
 					ArrayList<MegaUser> users = new ArrayList<>();
@@ -13450,10 +13460,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 
-					for (int i=0; i<chatHandles.length; i++) {
-						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
-						if (chatRoom != null) {
-							chats.add(chatRoom);
+					if (chatHandles != null) {
+						for (int i = 0; i < chatHandles.length; i++) {
+							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+							if (chatRoom != null) {
+								chats.add(chatRoom);
+							}
 						}
 					}
 
@@ -13578,7 +13590,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			if(usersNoChat==null || usersNoChat.isEmpty()){
-				sendFileToChatsFromContacts(chats, fileHandle);
+				sendFileToChatsFromContacts(this, chats, fileHandle);
 
 			}
 			else{
@@ -14201,28 +14213,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(countChat==1){
-			openChat(chatHandles[0], null);
+			showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
 		}
 		else{
 			String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
-			showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
-		}
-	}
-
-	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
-		log("sendFileToChatsFromContacts");
-
-		MultipleAttachChatListener listener = null;
-
-		if(chats.size()==1){
-			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
-			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-		}
-		else{
-			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
-			for(int i=0;i<chats.size();i++){
-				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-			}
+			showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, message, -1);
 		}
 	}
 
@@ -15363,26 +15358,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			intent.putExtra("CHAT_ID", chatHandle);
 			this.startActivity(intent);
-
-//				log("open new chat");
-//				Intent intent = new Intent(this, ChatActivityLollipop.class);
-//				intent.setAction(Constants.ACTION_CHAT_NEW);
-//				String myMail = getMyAccountInfo().getMyUser().getEmail();
-//				intent.putExtra("CHAT_ID", request.getChatHandle());
-//				intent.putExtra("MY_MAIL", myMail);
-//
-//				boolean isGroup = request.getFlag();
-//				if(isGroup){
-//					log("GROUP");
-//					MegaChatPeerList list = request.getMegaChatPeerList();
-//					log("Size: "+list.size());
-//
-//				}
-//				else{
-//					log("NOT group");
-//				}
-//
-//				this.startActivity(intent);
 		}
 		else{
 			log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);

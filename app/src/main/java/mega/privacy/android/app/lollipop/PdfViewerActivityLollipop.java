@@ -86,6 +86,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -102,10 +103,11 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -2349,25 +2351,51 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
-            log("Send to "+chatHandles.length+" chats");
+            long[] contactHandles = intent.getLongArrayExtra("SELECTED_USERS");
+            log("Send to "+(chatHandles.length+contactHandles.length)+" chats");
 
             long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
             log("Send "+nodeHandles.length+" nodes");
 
-            countChat = chatHandles.length;
-            if (megaChatApi != null) {
-                if(countChat==1){
-                    megaChatApi.attachNode(chatHandles[0], nodeHandles[0], this);
-                }
-                else if(countChat>1){
+            if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
+                if (contactHandles != null && contactHandles.length > 0) {
+                    ArrayList<MegaChatRoom> chats = new ArrayList<>();
+                    ArrayList<MegaUser> users = new ArrayList<>();
 
-                    for(int i=0; i<chatHandles.length; i++){
+                    for (int i=0; i<contactHandles.length; i++) {
+                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+                        if (user != null) {
+                            users.add(user);
+                        }
+                    }
+
+                    if (chatHandles != null) {
+                        for (int i = 0; i < chatHandles.length; i++) {
+                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                            if (chatRoom != null) {
+                                chats.add(chatRoom);
+                            }
+                        }
+                    }
+
+                    if(nodeHandles!=null){
+                        CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, nodeHandles[0], this, CreateChatToPerformActionListener.SEND_FILE);
+                        for (MegaUser user : users) {
+                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
+                            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                            megaChatApi.createChat(false, peers, listener);
+                        }
+                    }
+                    else{
+                        log("Error on sending to chat");
+                    }
+                }
+                else {
+                    countChat = chatHandles.length;
+                    for (int i = 0; i < chatHandles.length; i++) {
                         megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
                     }
                 }
-            }
-            else{
-                log("megaChatApi is Null - cannot attach nodes");
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
