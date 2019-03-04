@@ -1769,7 +1769,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                             contactInfoMenuItem.setVisible(true);
                             callMenuItem.setVisible(true);
-                            videoMenuItem.setVisible(true);
                         }
                         leaveMenuItem.setVisible(false);
                     }
