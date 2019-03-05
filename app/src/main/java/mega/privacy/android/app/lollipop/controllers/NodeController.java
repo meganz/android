@@ -351,6 +351,35 @@ public class NodeController {
         }
     }
 
+    void requestLocalFolder (boolean highPriority, long size, long[] hashes) {
+        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+        intent.setClass(context, FileStorageActivityLollipop.class);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+        intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof FullScreenImageViewerLollipop){
+            ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof FileInfoActivityLollipop){
+            ((FileInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof ContactFileListActivityLollipop){
+            ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+    }
+
     //Old onFileClick
     public void prepareForDownloadLollipop(ArrayList<Long> handleList, final boolean highPriority){
         log("prepareForDownload: "+handleList.size()+" files to download");
@@ -383,33 +412,7 @@ public class NodeController {
             File[] fs = context.getExternalFilesDirs(null);
             if (fs.length > 1){
                 if (fs[1] == null){
-                    Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-                    intent.setClass(context, FileStorageActivityLollipop.class);
-                    intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                    if(highPriority){
-                        intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                    }
-                    if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
-                    else if(context instanceof FullScreenImageViewerLollipop){
-                        ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
-                    else if(context instanceof FileInfoActivityLollipop){
-                        ((FileInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
-                    else if(context instanceof ContactFileListActivityLollipop){
-                        ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
-                    else if(context instanceof PdfViewerActivityLollipop){
-                        ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
-                    else if(context instanceof AudioVideoPlayerLollipop){
-                        ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                    }
+                    requestLocalFolder(highPriority, size, hashes);
                 }
                 else{
                     Dialog downloadLocationDialog;
@@ -429,33 +432,7 @@ public class NodeController {
                         public void onClick(DialogInterface dialog, int which) {
                             switch(which){
                                 case 0:{
-                                    Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
-                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-                                    intent.setClass(context, FileStorageActivityLollipop.class);
-                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-                                    if(highPriority){
-                                        intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                                    }
-                                    if(context instanceof ManagerActivityLollipop){
-                                        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                    }
-                                    else if(context instanceof FullScreenImageViewerLollipop){
-                                        ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                    }
-                                    else if(context instanceof FileInfoActivityLollipop){
-                                        ((FileInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                    }
-                                    else if(context instanceof ContactFileListActivityLollipop){
-                                        ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                    }
-                                    else if(context instanceof PdfViewerActivityLollipop){
-                                        ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                    }
-                                    else if(context instanceof AudioVideoPlayerLollipop){
-                                        ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                                    }
+                                    requestLocalFolder(highPriority, sizeFinal, hashesFinal);
                                     break;
                                 }
                                 case 1:{
@@ -464,24 +441,7 @@ public class NodeController {
                                         String path = fs[1].getAbsolutePath();
                                         File defaultPathF = new File(path);
                                         defaultPathF.mkdirs();
-                                        if(context instanceof ManagerActivityLollipop){
-                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        }
-                                        else if(context instanceof FullScreenImageViewerLollipop){
-                                            ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        }
-                                        else if(context instanceof FileInfoActivityLollipop){
-                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        }
-                                        else if(context instanceof ContactFileListActivityLollipop){
-                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        }
-                                        else if(context instanceof PdfViewerActivityLollipop){
-                                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        }
-                                        else if(context instanceof AudioVideoPlayerLollipop){
-                                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
-                                        }
+                                        showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         checkSizeBeforeDownload(path, null, sizeFinal, hashesFinal, highPriority);
                                     }
                                     break;
@@ -501,33 +461,7 @@ public class NodeController {
                 }
             }
             else{
-                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-                intent.setClass(context, FileStorageActivityLollipop.class);
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                if(highPriority){
-                    intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                }
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if(context instanceof FullScreenImageViewerLollipop){
-                    ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop)  context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
+                requestLocalFolder(highPriority, size, hashes);
             }
         }
         else{
@@ -535,6 +469,60 @@ public class NodeController {
             File defaultPathF = new File(downloadLocationDefaultPath);
             defaultPathF.mkdirs();
             checkSizeBeforeDownload(downloadLocationDefaultPath, null, size, hashes, highPriority);
+        }
+    }
+
+    void showSnackbar(String s) {
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).showSnackbar(s);
+        }
+        else if(context instanceof FullScreenImageViewerLollipop){
+            ((FullScreenImageViewerLollipop) context).showSnackbar(s);
+        }
+        else if(context instanceof FileInfoActivityLollipop){
+            ((FileInfoActivityLollipop) context).showSnackbar(s);
+        }
+        else if(context instanceof ContactFileListActivityLollipop){
+            ((ContactFileListActivityLollipop) context).showSnackbar(s);
+        }
+        else if(context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).showSnackbar(s);
+        }
+        else if(context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).showSnackbar(s);
+        }
+        else if(context instanceof ContactInfoActivityLollipop){
+            ((ContactInfoActivityLollipop) context).showSnackbar(s);
+        }
+        else if (context instanceof GetLinkActivityLollipop) {
+            ((GetLinkActivityLollipop) context).showSnackbar(s);
+        }
+    }
+
+    void showSnackbarNotSpace() {
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).showSnackbarNotSpace();
+        }
+        else if(context instanceof FullScreenImageViewerLollipop){
+            ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
+        }
+        else if(context instanceof FileInfoActivityLollipop){
+            ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
+        }
+        else if(context instanceof ContactFileListActivityLollipop){
+            ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
+        }
+        else if(context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
+        }
+        else if (context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
+        }
+        else if (context instanceof ContactInfoActivityLollipop){
+            ((ContactInfoActivityLollipop) context).showSnackbarNotSpace();
+        }
+        else if (context instanceof FileLinkActivityLollipop) {
+            ((FileLinkActivityLollipop) context).showSnackbarNotSpace();
         }
     }
 
@@ -604,33 +592,7 @@ public class NodeController {
             }
             else{
                 log("NOT advancedDevices");
-
-                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-                intent.setClass(context, FileStorageActivityLollipop.class);
-                intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-                if(highPriority){
-                    intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                }
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if(context instanceof FullScreenImageViewerLollipop){
-                    ((FullScreenImageViewerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop)  context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-                }
+                requestLocalFolder(highPriority, size, hashes);
             }
         }
         else{
@@ -679,32 +641,9 @@ public class NodeController {
         catch(Exception ex){}
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
-//        ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
 
         if(availableFreeSpace < sizeC) {
-
-            if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof FullScreenImageViewerLollipop){
-                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof FileInfoActivityLollipop){
-                ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof ContactFileListActivityLollipop){
-                ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof PdfViewerActivityLollipop){
-                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if (context instanceof AudioVideoPlayerLollipop){
-                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
-            }
-            else if (context instanceof ContactInfoActivityLollipop){
-                ((ContactInfoActivityLollipop) context).showSnackbarNotSpace();
-            }
-
+            showSnackbarNotSpace();
             log("Not enough space");
             return;
         }
@@ -849,6 +788,33 @@ public class NodeController {
         }
     }
 
+    void askForPermissions () {
+        if(context instanceof ManagerActivityLollipop){
+            ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if (context instanceof FileLinkActivityLollipop) {
+            ActivityCompat.requestPermissions((FileLinkActivityLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if(context instanceof FullScreenImageViewerLollipop){
+            ActivityCompat.requestPermissions(((FullScreenImageViewerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if(context instanceof FileInfoActivityLollipop){
+            ActivityCompat.requestPermissions(((FileInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if(context instanceof ContactFileListActivityLollipop){
+            ActivityCompat.requestPermissions(((ContactFileListActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if(context instanceof PdfViewerActivityLollipop){
+            ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if(context instanceof AudioVideoPlayerLollipop){
+            ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+        else if(context instanceof ContactInfoActivityLollipop){
+            ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+        }
+    }
+
     public void download(String parentPath, String url, long size, long [] hashes, boolean highPriority){
         log("download-----------");
         log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
@@ -856,28 +822,7 @@ public class NodeController {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-
-                if(context instanceof ManagerActivityLollipop){
-                    ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if(context instanceof FullScreenImageViewerLollipop){
-                    ActivityCompat.requestPermissions(((FullScreenImageViewerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if(context instanceof FileInfoActivityLollipop){
-                    ActivityCompat.requestPermissions(((FileInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ActivityCompat.requestPermissions(((ContactFileListActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if(context instanceof PdfViewerActivityLollipop){
-                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if(context instanceof AudioVideoPlayerLollipop){
-                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if(context instanceof ContactInfoActivityLollipop){
-                    ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
+                askForPermissions();
             }
         }
 
@@ -1010,15 +955,7 @@ public class NodeController {
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        if(context instanceof ManagerActivityLollipop){
-                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
-                                        }
-                                        else if(context instanceof FileInfoActivityLollipop){
-                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
-                                        }
-                                        else if(context instanceof ContactFileListActivityLollipop){
-                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
-                                        }
+                                        showSnackbar(context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1066,30 +1003,11 @@ public class NodeController {
                                             context.startActivity(intentShare);
                                         }
 
-                                        if(context instanceof ManagerActivityLollipop){
-                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                        }
-                                        else if(context instanceof FileInfoActivityLollipop){
-                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                        }
-                                        else if(context instanceof ContactFileListActivityLollipop){
-                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                        }
+                                        showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    if(context instanceof ManagerActivityLollipop){
-                                        ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof FileInfoActivityLollipop){
-                                        ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof ContactFileListActivityLollipop){
-                                        ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof ContactInfoActivityLollipop){
-                                        ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
+                                    showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
@@ -1186,27 +1104,7 @@ public class NodeController {
                 if (numberOfNodesPending > 0){
                     msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
                 }
-                if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).showSnackbar(msg);
-                }
-                else if(context instanceof FullScreenImageViewerLollipop){
-                    ((FullScreenImageViewerLollipop) context).showSnackbar(msg);
-                }
-                else if(context instanceof FileInfoActivityLollipop){
-                    ((FileInfoActivityLollipop) context).showSnackbar(msg);
-                }
-                else if(context instanceof ContactFileListActivityLollipop){
-                    ((ContactFileListActivityLollipop) context).showSnackbar(msg);
-                }
-                else if(context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).showSnackbar(msg);
-                }
-                else if(context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop) context).showSnackbar(msg);
-                }
-                else if(context instanceof ContactInfoActivityLollipop){
-                    ((ContactInfoActivityLollipop) context).showSnackbar(msg);
-                }
+                showSnackbar(msg);
             }
         }
     }
@@ -1298,34 +1196,22 @@ public class NodeController {
     //old getPublicLinkAndShareIt
     public void exportLink(MegaNode document){
         log("exportLink");
-        if(context instanceof ManagerActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
+        if (!Util.isOnline(context)) {
+            showSnackbar(context.getString(R.string.error_server_connection_problem));
+            return;
+        }
+        else if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((ManagerActivityLollipop) context));
         }
-        if(context instanceof GetLinkActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((GetLinkActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
+        else if(context instanceof GetLinkActivityLollipop){
             megaApi.exportNode(document, ((GetLinkActivityLollipop) context));
         }
         else  if(context instanceof FullScreenImageViewerLollipop){
-            if (!Util.isOnline(context)){
-                ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((FullScreenImageViewerLollipop) context));
         }
         else  if(context instanceof FileInfoActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
             ((FileInfoActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((FileInfoActivityLollipop) context));
         }
@@ -1333,34 +1219,21 @@ public class NodeController {
 
     public void exportLinkTimestamp(MegaNode document, int timestamp){
         log("exportLinkTimestamp: "+timestamp);
-        if (context instanceof ManagerActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
+        if (!Util.isOnline(context)) {
+            showSnackbar(context.getString(R.string.error_server_connection_problem));
+        }
+        else if (context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
         }
         else if (context instanceof GetLinkActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
             megaApi.exportNode(document, timestamp, ((GetLinkActivityLollipop) context));
         }
         else if (context instanceof FullScreenImageViewerLollipop){
-            if (!Util.isOnline(context)){
-                ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, timestamp, ((FullScreenImageViewerLollipop) context));
         }
         else if (context instanceof FileInfoActivityLollipop){
-            if (!Util.isOnline(context)){
-                ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                return;
-            }
             megaApi.exportNode(document, timestamp, ((FileInfoActivityLollipop) context));
         }
     }
@@ -2116,18 +1989,7 @@ public class NodeController {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-                if (context instanceof FileLinkActivityLollipop) {
-                    ActivityCompat.requestPermissions((FileLinkActivityLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop) {
-                    ActivityCompat.requestPermissions((AudioVideoPlayerLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof FullScreenImageViewerLollipop) {
-                    ActivityCompat.requestPermissions((FullScreenImageViewerLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
-                else if (context instanceof PdfViewerActivityLollipop) {
-                    ActivityCompat.requestPermissions((PdfViewerActivityLollipop)context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
-                }
+                askForPermissions();
                 return;
             }
         }
@@ -2293,18 +2155,7 @@ public class NodeController {
                 try {
                     Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
                 }catch(Exception e) {}
-                if (context instanceof FileLinkActivityLollipop) {
-                    ((FileLinkActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                }
-                else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                }
-                else if (context instanceof FullScreenImageViewerLollipop) {
-                    ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                }
-                else if (context instanceof PdfViewerActivityLollipop) {
-                    ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                }
+                showSnackbar(context.getString(R.string.general_already_downloaded));
             }
             else{
                 log("LocalPath is NULL");
@@ -2318,18 +2169,7 @@ public class NodeController {
                         String path = dlFiles.get(document);
 
                         if(availableFreeSpace < document.getSize()){
-                            if (context instanceof FileLinkActivityLollipop) {
-                                ((FileLinkActivityLollipop) context).showSnackbarNotSpace();
-                            }
-                            else if (context instanceof AudioVideoPlayerLollipop) {
-                                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
-                            }
-                            else if (context instanceof FullScreenImageViewerLollipop) {
-                                ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
-                            }
-                            else if (context instanceof PdfViewerActivityLollipop) {
-                                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
-                            }
+                            showSnackbarNotSpace();
                             continue;
                         }
 
@@ -2347,18 +2187,7 @@ public class NodeController {
                 }
                 else if(url != null) {
                     if(availableFreeSpace < currentDocument.getSize()) {
-                        if (context instanceof FileLinkActivityLollipop) {
-                            ((FileLinkActivityLollipop) context).showSnackbarNotSpace();
-                        }
-                        else if (context instanceof AudioVideoPlayerLollipop) {
-                            ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
-                        }
-                        else if (context instanceof FullScreenImageViewerLollipop) {
-                            ((FullScreenImageViewerLollipop) context).showSnackbarNotSpace();
-                        }
-                        else if (context instanceof PdfViewerActivityLollipop) {
-                            ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
-                        }
+                        showSnackbarNotSpace();
                     }
 
                     Intent service = new Intent(context, DownloadService.class);
