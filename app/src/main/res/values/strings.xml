@@ -2263,9 +2263,6 @@
 	<string name="label_today" context="label today">Today</string>
 	<string name="label_yesterday" context="label yesterday">Yesterday</string>
 
-    <string name="label_today" context="label today">Today</string>
-    <string name="label_yesterday" context="label yesterday">Yesterday</string>
-
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
