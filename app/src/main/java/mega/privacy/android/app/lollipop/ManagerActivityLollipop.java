@@ -235,6 +235,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -259,7 +260,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
-    public static String CHAT_FOLDER = "My chat files";
 
 	//GET PRO ACCOUNT PANEL
 	LinearLayout getProLayout=null;
