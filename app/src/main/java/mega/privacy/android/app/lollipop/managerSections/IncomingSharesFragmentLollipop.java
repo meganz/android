@@ -591,7 +591,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					String textToShow = getString(R.string.context_empty_incoming);
+					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -732,7 +732,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					String textToShow = getString(R.string.context_empty_incoming);
+					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -839,7 +839,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				String textToShow = getString(R.string.context_empty_incoming);
+				String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -957,7 +957,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 						}
-						String textToShow = getString(R.string.context_empty_incoming);
+						String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -1330,7 +1330,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				String textToShow = getString(R.string.context_empty_incoming);
+				String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
