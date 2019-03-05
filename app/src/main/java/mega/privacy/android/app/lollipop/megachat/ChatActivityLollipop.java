@@ -7347,25 +7347,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
             } else if ((call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS))||(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS))) {
-                log("onChatCallUpdate:STATUS: REMOTE_AVFLAGS || LOCAL_AVFLAGS");
+                log("onChatCallUpdate: REMOTE_AVFLAGS || LOCAL_AVFLAGS");
+                usersWithVideo();
+            } else if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)) {
+                log("onChatCallUpdate:CHANGE_TYPE_CALL_COMPOSITION");
                 usersWithVideo();
             }
         }else{
             log("onChatCallUpdate: different chat");
-            /* layout */
-            callInProgressLayout.setVisibility(View.GONE);
-            if(callInProgressChrono!=null){
-                callInProgressChrono.stop();
-                callInProgressChrono.setVisibility(View.GONE);
-            }
-
-            /*Subtitle*/
-            subtitleCall.setVisibility(View.GONE);
-            if(chronoCall!=null){
-                chronoCall.stop();
-                chronoCall.setVisibility(View.GONE);
-            }
-            invalidateOptionsMenu();
+//            /* layout */
+//            callInProgressLayout.setVisibility(View.GONE);
+//            if(callInProgressChrono!=null){
+//                callInProgressChrono.stop();
+//                callInProgressChrono.setVisibility(View.GONE);
+//            }
+//
+//            /*Subtitle*/
+//            subtitleCall.setVisibility(View.GONE);
+//            if(chronoCall!=null){
+//                chronoCall.stop();
+//                chronoCall.setVisibility(View.GONE);
+//            }
+//            invalidateOptionsMenu();
         }
 
     }
@@ -7428,7 +7431,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
 
                     /* "Return" layout */
-                    callInProgressLayout.setVisibility(View.VISIBLE);
+                    callInProgressLayout.setVisibility(View.GONE);
                     callInProgressLayout.setOnClickListener(this);
                     callInProgressText.setText(getString(R.string.call_in_progress_layout));
 
