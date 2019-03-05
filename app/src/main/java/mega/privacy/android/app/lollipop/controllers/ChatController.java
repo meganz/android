@@ -2,7 +2,9 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,6 +14,7 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -1466,21 +1469,7 @@ public class ChatController {
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
                         log("File already exists!");
-                        if (context instanceof ChatFullScreenImageViewer){
-                            ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.file_already_exists));
-                        }
-                        else if (context instanceof AudioVideoPlayerLollipop){
-                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                        }
-                        else if (context instanceof PdfViewerActivityLollipop){
-                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                        }
-                        else if (context instanceof ChatActivityLollipop){
-                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
-                        }
-                        else if (context instanceof NodeAttachmentHistoryActivity){
-                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.file_already_exists));
-                        }
+                        showSnackbar(context.getString(R.string.file_already_exists));
                     }
                     else{
                         dlFiles.put(document, destination.getAbsolutePath());
@@ -1522,18 +1511,138 @@ public class ChatController {
 
     }
 
-    public void prepareForDownloadLollipop(ArrayList<MegaNode> nodeList){
+    void showSnackbar(String s) {
+        if (context instanceof ChatFullScreenImageViewer){
+            ((ChatFullScreenImageViewer) context).showSnackbar(s);
+        }
+        else if (context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).showSnackbar(s);
+        }
+        else if (context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).showSnackbar(s);
+        }
+        else if (context instanceof ChatActivityLollipop){
+            ((ChatActivityLollipop) context).showSnackbar(s);
+        }
+        else if (context instanceof NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).showSnackbar(s);
+        }
+    }
+
+    void requestLocalFolder (long size, long[] hashes) {
+        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+        intent.setClass(context, FileStorageActivityLollipop.class);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+
+        if(context instanceof ChatActivityLollipop){
+            ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof ChatFullScreenImageViewer){
+            ((ChatFullScreenImageViewer) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+    }
+
+    public void prepareForDownloadLollipop(final ArrayList<MegaNode> nodeList){
         log("prepareForDownload: "+nodeList.size()+" files to download");
+        long size = 0;
+        long[] hashes = new long[nodeList.size()];
+        for (int i=0;i<nodeList.size();i++){
+            hashes[i] = nodeList.get(i).getHandle();
+            MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
+            if (nodeTemp != null){
+                if (nodeTemp.isFile()){
+                    size += nodeTemp.getSize();
+                }
+            }
+            else{
+                log("Error - nodeTemp is NULL");
+            }
+
+        }
+        log("Number of files: "+hashes.length);
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
+        boolean askMe = Util.askMe(context);
         String downloadLocationDefaultPath = Util.getDownloadLocation(context);
 
-        File defaultPathF = new File(downloadLocationDefaultPath);
-        defaultPathF.mkdirs();
-        checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
+        if (askMe){
+            log("askMe");
+            File[] fs = context.getExternalFilesDirs(null);
+            if (fs.length > 1){
+                if (fs[1] == null){
+                    requestLocalFolder(size, hashes);
+                }
+                else{
+                    Dialog downloadLocationDialog;
+                    String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
+                    AlertDialog.Builder b=new AlertDialog.Builder(context);
+
+                    b.setTitle(context.getResources().getString(R.string.settings_storage_download_location));
+                    final long sizeFinal = size;
+                    final long[] hashesFinal = new long[hashes.length];
+                    for (int i=0; i< hashes.length; i++){
+                        hashesFinal[i] = hashes[i];
+                    }
+
+                    b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch(which){
+                                case 0:{
+                                    requestLocalFolder(sizeFinal, hashesFinal);
+                                    break;
+                                }
+                                case 1:{
+                                    File[] fs = context.getExternalFilesDirs(null);
+                                    if (fs.length > 1){
+                                        String path = fs[1].getAbsolutePath();
+                                        File defaultPathF = new File(path);
+                                        defaultPathF.mkdirs();
+                                        showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
+                                        checkSizeBeforeDownload(path, nodeList);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                    b.setNegativeButton(context.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    downloadLocationDialog = b.create();
+                    downloadLocationDialog.show();
+                }
+            }
+            else{
+                requestLocalFolder(size, hashes);
+            }
+        }
+        else{
+            log("NOT askMe");
+            File defaultPathF = new File(downloadLocationDefaultPath);
+            defaultPathF.mkdirs();
+            checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
+        }
     }
 
     public void prepareForChatDownload(ArrayList<MegaNodeList> list){
@@ -1644,59 +1753,40 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        boolean askMe = Util.askMe(context);
-        if (isInAnonymousMode()) {
-            Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeC);
-            intent.setClass(context, FileStorageActivityLollipop.class);
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+        String ask=dbH.getAttributes().getAskSizeDownload();
 
-            if(context instanceof ChatActivityLollipop){
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-            }
-            else if(context instanceof NodeAttachmentHistoryActivity){
-                ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-            }
-            else if(context instanceof ChatFullScreenImageViewer){
-                ((ChatFullScreenImageViewer) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-            }
-            else if(context instanceof PdfViewerActivityLollipop){
-                ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-            }
-            else if(context instanceof AudioVideoPlayerLollipop){
-                ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
-            }
+        if (ask==null) {
+            ask="true";
         }
-        else if (askMe) {
+
+        if (ask.equals("false")) {
+            log("SIZE: Fo not ask before downloading");
+            download(parentPathC, nodeList);
+        }
+        else{
             log("SIZE: Ask before downloading");
-            if(sizeC>104857600){
-                log("Show size confirmacion: "+sizeC);
+            if (sizeC>104857600) {
+                log("Show size confirmation: "+sizeC);
                 //Show alert
-                if(context instanceof  ChatActivityLollipop){
+                if (context instanceof ChatActivityLollipop) {
                     ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if(context instanceof ChatFullScreenImageViewer){
+                else if (context instanceof ChatFullScreenImageViewer) {
                     ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                else if (context instanceof PdfViewerActivityLollipop) {
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                else if (context instanceof AudioVideoPlayerLollipop) {
+                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof NodeAttachmentHistoryActivity){
-                    ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                else if (context instanceof NodeAttachmentHistoryActivity) {
+                    ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
             }
-            else{
+            else {
                 download(parentPathC, nodeList);
             }
-        }
-        else {
-            log("SIZE: Do not ask before downloading");
-            download(parentPathC, nodeList);
         }
     }
 
@@ -1823,12 +1913,7 @@ public class ChatController {
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        if(context instanceof  ChatActivityLollipop){
-                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
-                                        }
-                                        else if(context instanceof  NodeAttachmentHistoryActivity){
-                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.intent_not_available));
-                                        }
+                                        showSnackbar(context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1897,21 +1982,11 @@ public class ChatController {
                                             log("call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
-                                        if(context instanceof  ChatActivityLollipop){
-                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                        }
-                                        else if(context instanceof  NodeAttachmentHistoryActivity){
-                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                        }
+                                        showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    if(context instanceof  ChatActivityLollipop){
-                                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof  NodeAttachmentHistoryActivity){
-                                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
+                                    showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                             }
 
@@ -2081,12 +2156,7 @@ public class ChatController {
                 }
                 else{
                     log("MESSAGE is null");
-                    if(context instanceof  ChatActivityLollipop){
-                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
-                    }
-                    else if(context instanceof  NodeAttachmentHistoryActivity){
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
-                    }
+                    showSnackbar(context.getString(R.string.messages_forwarded_error));
                 }
             }
         }
