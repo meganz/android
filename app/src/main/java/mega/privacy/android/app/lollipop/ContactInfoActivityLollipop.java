@@ -837,7 +837,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	public void startCall(boolean startVideo){
-
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if(chatRoomTo!=null){
 

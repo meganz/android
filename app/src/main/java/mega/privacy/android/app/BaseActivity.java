@@ -260,7 +260,9 @@ public class BaseActivity extends AppCompatActivity {
         return activeCall;
     }
 
-    /*Method to know which A / V call I am participating in*/
+
+
+    /*Method to know the chat id which A / V call I am participating in*/
     public long getChatCallInProgress(){
         log("getChatCallInProgress()");
         long chatId = -1;

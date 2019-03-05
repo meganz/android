@@ -18191,6 +18191,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(call.getChatid() != -1){
 				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 					int callStatus = call.getStatus();
+					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+
 					switch (callStatus) {
 						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 						case MegaChatCall.CALL_STATUS_RING_IN:
@@ -18213,7 +18215,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						default:
 							break;
 					}
-
 				}
 			}
 		}

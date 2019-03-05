@@ -415,38 +415,33 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void showCallLayout(){
-        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop)){
-            if(((ManagerActivityLollipop) context).participatingInACall()){
-                if(callInProgressLayout.getVisibility()!=View.VISIBLE){
-                    callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressChrono.stop();
-                    callInProgressChrono.setVisibility(View.GONE);
+        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && ((ManagerActivityLollipop) context).participatingInACall()){
+            log("showCallLayout");
 
-                    long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
-
-                    if((megaChatApi!=null) && (chatId != -1)){
-                        MegaChatCall call = megaChatApi.getChatCall(chatId);
-                        if(call!=null){
-                            if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                                callInProgressChrono.setVisibility(View.VISIBLE);
-                                callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-                                callInProgressChrono.start();
-                                callInProgressChrono.setFormat("%s");
-                            }
-                        }
+            if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
+                callInProgressLayout.setVisibility(View.VISIBLE);
+            }
+            if((callInProgressChrono!=null) && (callInProgressChrono.getVisibility() != View.VISIBLE)){
+                long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+                if((megaChatApi!=null) && (chatId != -1)){
+                    MegaChatCall call = megaChatApi.getChatCall(chatId);
+                    if(call!=null){
+                        callInProgressChrono.setVisibility(View.VISIBLE);
+                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+                        callInProgressChrono.start();
+                        callInProgressChrono.setFormat("%s");
                     }
                 }
-            }else{
-                callInProgressLayout.setVisibility(View.GONE);
-                callInProgressChrono.stop();
-                callInProgressChrono.setVisibility(View.GONE);
-
             }
         }else{
-            callInProgressLayout.setVisibility(View.GONE);
-            callInProgressChrono.stop();
-            callInProgressChrono.setVisibility(View.GONE);
 
+            if(callInProgressChrono!=null){
+                callInProgressChrono.stop();
+                callInProgressChrono.setVisibility(View.GONE);
+            }
+            if(callInProgressLayout!=null){
+                callInProgressLayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -1826,6 +1821,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(aB != null && aB.getTitle() != null){
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
+
+
         showCallLayout();
 
         super.onResume();
