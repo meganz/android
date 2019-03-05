@@ -1551,11 +1551,12 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 //		}
 //	}
 
+
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 		log("onChatCallUpdate: call.getStatus "+call.getStatus());
 
-        stopService(new Intent(this,IncomingCallService.class));
+        stopService(new Intent(this, IncomingCallService.class));
 
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
 			log("Call destroyed: "+call.getTermCode());
@@ -1565,57 +1566,68 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			clearIncomingCallNotification(call.getId());
 		}
 
-		MegaHandleList handleList = megaChatApi.getChatCalls(-1);
+		MegaHandleList handleList = megaChatApi.getChatCalls();
 		if(handleList!=null) {
 			long numberOfCalls = handleList.size();
-			log("Number of calls in progress: " + numberOfCalls);
+			log("numberOfCalls = " + numberOfCalls);
 
 			if (numberOfCalls == 1) {
 				log("onChatCallUpdate: ONE CALL: status = "+call.getStatus());
 				if (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-
 					long chatId = handleList.get(0);
-
 					if (openCallChatId != chatId) {
 						MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 						if (callToLaunch != null) {
 							if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-								log("onChatCallUpdate: ONE CALL:Launch call with status: " + callToLaunch.getStatus());
+								log("onChatCallUpdate: ONE CALL:Launch call with status: " + callToLaunch.getStatus()+" -> open call");
 								launchCallActivity(callToLaunch);
 							} else {
 								log("Launch not in correct status");
 							}
 						}
 					} else {
-						log("#Call already opened");
+						log("Call already opened");
 					}
 				}
 
 			}else if (numberOfCalls > 1) {
-				log("onChatCallUpdate: "+numberOfCalls+" CALLs");
+				log("onChatCallUpdate: More Calls ");
 				if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
-					log("More calls: REQUEST_SENT");
-					for(int i=0; i<handleList.size(); i++){
-						long chatId = handleList.get(i);
-
-						if (openCallChatId != chatId) {
-							MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
-							if (callToLaunch != null) {
-								if (callToLaunch.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-									log("Launch status REQUEST_SENT");
+					log("CALL:REQUEST SENT");
+					MegaHandleList handleListRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
+					if((handleListRequestSent!=null)&&(handleListRequestSent.size()>0)) {
+						for (int i = 0; i < handleListRequestSent.size(); i++) {
+							if (openCallChatId != handleListRequestSent.get(i)) {
+								MegaChatCall callToLaunch = megaChatApi.getChatCall(handleListRequestSent.get(i));
+								if (callToLaunch != null) {
+									log("CALL:REQUEST SENT -> open call");
 									launchCallActivity(callToLaunch);
-								} else {
-									log("Launch not in correct status");
 								}
+							} else {
+								log("Call already opened");
 							}
-						} else {
-							log("Call already opened");
+						}
+					}
+                }else if ((call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)&&(!participatingInACall())){
+                    log("CALL:RING_IN");
+					MegaHandleList handleListRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+					if((handleListRingIn!=null)&&(handleListRingIn.size()>0)) {
+						for (int i = 0; i < handleListRingIn.size(); i++) {
+							if (openCallChatId != handleListRingIn.get(i)) {
+								MegaChatCall callToLaunch = megaChatApi.getChatCall(handleListRingIn.get(i));
+								if (callToLaunch != null) {
+									log("CALL:RING_IN -> open call");
+									launchCallActivity(callToLaunch);
+								}
+							} else {
+								log("Call already opened");
+							}
 						}
 					}
 
-
-				}else{
-					checkQueuedCalls();
+                }else{
+                    log("THIS CALL -call.getStatus() = "+call.getStatus());
+                    checkQueuedCalls();
 				}
 			} else {
 				log("No calls in progress");
@@ -1769,7 +1781,27 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 	}
 
-	public void checkQueuedCalls(){
+    /*Method to know if i'm participating in any A/V call*/
+    public boolean participatingInACall(){
+        boolean activeCall = false;
+        if(megaChatApi!=null){
+            MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+            MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+            MegaHandleList listCalls = megaChatApi.getChatCalls(-1);
+            if((listCallsUserNoPresent!=null)&&(listCallsRingIn!=null)&&(listCalls!=null)){
+                long totalCallsNotPresent = listCallsUserNoPresent.size() + listCallsRingIn.size();
+                if(totalCallsNotPresent == listCalls.size()){
+                    activeCall = false;
+                }else{
+                    activeCall = true;
+                }
+            }
+        }
+        return activeCall;
+    }
+
+
+    public void checkQueuedCalls(){
 		log("checkQueuedCalls");
 		try{
 			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);

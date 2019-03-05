@@ -1745,22 +1745,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if(rtcAudioManager!=null){
                             rtcAudioManager.stop();
                         }
-                        if (chat.isGroup()) {
+                        ((MegaApplication) getApplication()).setSpeakerStatus(false);
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                super.finishAndRemoveTask();
-                            } else {
-                                super.finish();
-                            }
-
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            super.finishAndRemoveTask();
                         } else {
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                super.finishAndRemoveTask();
-                            } else {
-                                super.finish();
-                            }
+                            super.finish();
                         }
+
                         break;
                     }
                     case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
@@ -1778,6 +1770,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if(rtcAudioManager!=null){
                             rtcAudioManager.stop();
                         }
+
+                        ((MegaApplication) getApplication()).setSpeakerStatus(false);
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             super.finishAndRemoveTask();
