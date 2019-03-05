@@ -572,7 +572,6 @@ public class InboxFragmentLollipop extends Fragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
 
 //			emptyImageView.setImageResource(R.drawable.inbox_empty);
-//			emptyTextView.setText(R.string.empty_inbox);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
@@ -1109,7 +1108,7 @@ public class InboxFragmentLollipop extends Fragment{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
 
-				String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_inbox));
+				String textToShow = String.format(context.getString(R.string.context_empty_inbox));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
