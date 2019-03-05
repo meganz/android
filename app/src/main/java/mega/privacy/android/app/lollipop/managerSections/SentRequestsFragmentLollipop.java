@@ -280,7 +280,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				}else{
 					emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				}
-				String textToShow = getString(R.string.sent_requests_empty);
+				String textToShow = String.format(getString(R.string.sent_requests_empty)).toUpperCase();
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -387,7 +387,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				}else{
 					emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				}
-				String textToShow = getString(R.string.sent_requests_empty);
+				String textToShow = String.format(getString(R.string.sent_requests_empty).toUpperCase());
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");

@@ -478,7 +478,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 				}
-				String textToShow = getString(R.string.context_empty_cloud_drive);
+				String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -714,7 +714,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					}
-					String textToShow = getString(R.string.context_empty_cloud_drive);
+					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -996,7 +996,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					}
-					String textToShow = getString(R.string.context_empty_cloud_drive);
+					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
