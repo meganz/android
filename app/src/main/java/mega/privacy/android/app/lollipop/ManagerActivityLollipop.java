@@ -1715,8 +1715,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		boolean selectDrawerItemPending = true;
 		//upload from device, progress dialog should show when screen orientation changes.
-        if (ProgressDialogUtil.isShowDialog) {
-            ProgressDialogUtil.showProcessFileDialog(this);
+        if (ProgressDialogUtil.shouldShowDialog) {
+            ProgressDialogUtil.showProcessFileDialog(this,null);
         }
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
@@ -13379,7 +13379,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
-			ProgressDialogUtil.showProcessFileDialog(this);
+			ProgressDialogUtil.showProcessFileDialog(this,intent);
 		}
 		else if (requestCode == Constants.CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
