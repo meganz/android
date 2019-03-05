@@ -542,6 +542,10 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
     <string name="upload_prepare" context="Status text at the beginning of an upload">Processing file</string>
+    <plurals name="upload_prepare" context="Status text at the beginning of an upload">
+        <item context="Status text at the beginning of an upload for 1 file" quantity="one">Processing file</item>
+        <item context="Status text at the beginning of an upload for 2 or more files" quantity="other">Processing files</item>
+    </plurals>
     <string name="error_temporary_unavaible" context="error message when downloading a file">Resource temporarily not available, please try again later</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Cannot open selected file</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">Upload has started</string>

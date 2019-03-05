@@ -1,7 +1,12 @@
 package mega.privacy.android.app.utils;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+
+import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
 
@@ -9,10 +14,10 @@ public class ProgressDialogUtil {
 
     private static ProgressDialog dialog;
 
-    public static boolean isShowDialog;
+    public static boolean shouldShowDialog;
+    private static boolean isPl;
 
-    public static void showProcessFileDialog(Context context) {
-        isShowDialog = true;
+    public static void showProcessFileDialog(Context context,Intent intent) {
         dialog = new ProgressDialog(context){
 
             @Override
@@ -22,13 +27,24 @@ public class ProgressDialogUtil {
         };
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage(context.getString(R.string.upload_prepare));
+        if (intent != null) {
+            ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            isPl = (imageUris != null && imageUris.size() > 1);
+            if (!isPl) {
+                ClipData clipData = intent.getClipData();
+                isPl = (clipData != null && clipData.getItemCount() > 1);
+            }
+        }
+        int i = (isPl ? 2 : 1);
+        String message = context.getResources().getQuantityString(R.plurals.upload_prepare,i);
+        dialog.setMessage(message);
+        shouldShowDialog = true;
         dialog.show();
     }
 
     public static void dissmisDialog() {
-        isShowDialog = false;
-        if(dialog.isShowing()) {
+        shouldShowDialog = false;
+        if(dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
     }
