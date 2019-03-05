@@ -1782,7 +1782,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     log("CHANGE_TYPE_SESSION_STATUS:IN_PROGRESS "+userPeer.getPeerId()+" added in peersOnCall");
 
                                     peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
-                                    infoUsersBar.setText(userPeer.getName() + " " + getString(R.string.contact_joined_the_call));
+                                    infoUsersBar.setText(getString(R.string.contact_joined_the_call, userPeer.getName()));
                                     infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
                                     infoUsersBar.setAlpha(1);
                                     infoUsersBar.setVisibility(View.VISIBLE);
@@ -1850,7 +1850,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     if ((peersOnCall.get(i).getPeerId() == userPeerId) && (peersOnCall.get(i).getClientId() == userClientId)) {
 
                                         log("CHANGE_TYPE_SESSION_STATUS:DESTROYED "+peersOnCall.get(i).getPeerId()+" removed from peersOnCall");
-                                        infoUsersBar.setText(peersOnCall.get(i).getName() + " " + getString(R.string.contact_left_the_call));
+                                        infoUsersBar.setText(getString(R.string.contact_left_the_call, peersOnCall.get(i).getName()));
                                         infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
                                         infoUsersBar.setAlpha(1);
                                         infoUsersBar.setVisibility(View.VISIBLE);

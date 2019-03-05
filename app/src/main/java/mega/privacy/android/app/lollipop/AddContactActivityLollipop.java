@@ -911,7 +911,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if(filteredContactsPhone!=null){
             if (filteredContactsPhone.size() == 0){
                 headerContacts.setVisibility(View.GONE);
-                String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -996,7 +996,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         recyclerViewList.setAdapter(adapterMEGA);
 
         if (adapterMEGA.getItemCount() == 0) {
-            String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+            String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -1039,7 +1039,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         if (adapterShareHeader.getItemCount() == 0){
-            String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+            String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
             try{
                 textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
@@ -1835,7 +1835,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
-                String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -1888,7 +1888,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
-                String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -1951,7 +1951,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
-                String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");

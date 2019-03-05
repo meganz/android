@@ -917,7 +917,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
 
-				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1005,7 +1005,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				}
-				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+				String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -1171,7 +1171,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 			}
-			String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
+			String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 			try{
 				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 				textToShow = textToShow.replace("[/A]", "</font>");

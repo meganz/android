@@ -768,7 +768,7 @@ public class SearchFragmentLollipop extends Fragment{
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						}
 
-						String textToShow = String.format(context.getString(R.string.context_empty_inbox), context.getString(R.string.section_cloud_drive));
+						String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -1400,7 +1400,7 @@ public class SearchFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
