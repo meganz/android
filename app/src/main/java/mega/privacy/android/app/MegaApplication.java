@@ -1626,7 +1626,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					}
 
                 }else{
-                    log("THIS CALL -call.getStatus() = "+call.getStatus());
+                    log("show notification -> call.getStatus() = "+call.getStatus());
                     checkQueuedCalls();
 				}
 			} else {
