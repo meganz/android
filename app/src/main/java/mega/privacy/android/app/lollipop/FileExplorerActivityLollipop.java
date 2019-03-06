@@ -563,8 +563,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
-				getSupportFragmentManager().executePendingTransactions();
+				ft.commitNowAllowingStateLoss();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -593,8 +592,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
-				getSupportFragmentManager().executePendingTransactions();
+				ft.commitNowAllowingStateLoss();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -624,8 +622,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-				ft.commit();
-				getSupportFragmentManager().executePendingTransactions();
+				ft.commitNowAllowingStateLoss();
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -785,8 +782,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 					ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
-					ft.commit();
-					getSupportFragmentManager().executePendingTransactions();
+					ft.commitNowAllowingStateLoss();
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -1602,7 +1598,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							pMsgSingle.setFingerprint(fingerprint);
 						}
 
-						long idMessage = dbH.addPendingMessage(pMsgSingle);
+						long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
 						pMsgSingle.setId(idMessage);
 
 						if(idMessage!=-1){

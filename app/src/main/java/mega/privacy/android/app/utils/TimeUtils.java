@@ -78,7 +78,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
-    public static String formatDateAndTime(MegaChatMessage lastMessage, int format){
+    public static String formatDateAndTime(Context context, MegaChatMessage lastMessage, int format){
 
         java.text.DateFormat df;
         if(format == DATE_LONG_FORMAT){
@@ -97,12 +97,12 @@ public class TimeUtils implements Comparator<Calendar> {
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
             String time = formatTime(lastMessage);
-            String formattedDate = "Today" + " " + time;
+            String formattedDate = context.getString(R.string.label_today) + " " + time;
             return formattedDate;
         }
         else if(tc.compare(cal, calYesterday)==0){
             String time = formatTime(lastMessage);
-            String formattedDate = "Yesterday" + " " + time;
+            String formattedDate = context.getString(R.string.label_yesterday) + " " + time;
             return formattedDate;
         }
         else{
@@ -123,7 +123,7 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
-    public static String formatDate(long timestamp, int format){
+    public static String formatDate(Context context, long timestamp, int format){
 
         java.text.DateFormat df;
         if(format == DATE_LONG_FORMAT){
@@ -145,10 +145,10 @@ public class TimeUtils implements Comparator<Calendar> {
         calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
-            return "Today";
+            return context.getString(R.string.label_today);
         }
         else if(tc.compare(cal, calYesterday)==0){
-            return "Yesterday";
+            return context.getString(R.string.label_yesterday);
         }
         else{
             if(tc.calculateDifferenceDays(cal, calToday)<7){
@@ -255,7 +255,7 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
-    public static String formatDateAndTime(long ts, int format){
+    public static String formatDateAndTime(Context context, long ts, int format){
 
         java.text.DateFormat df;
         if(format == DATE_LONG_FORMAT){
@@ -274,12 +274,12 @@ public class TimeUtils implements Comparator<Calendar> {
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
         if(tc.compare(cal, calToday)==0) {
             String time = formatTime(ts);
-            String formattedDate = "Today" + " " + time;
+            String formattedDate = context.getString(R.string.label_today) + " " + time;
             return formattedDate;
         }
         else if(tc.compare(cal, calYesterday)==0){
             String time = formatTime(ts);
-            String formattedDate = "Yesterday" + " " + time;
+            String formattedDate = context.getString(R.string.label_yesterday) + " " + time;
             return formattedDate;
         }
         else{

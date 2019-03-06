@@ -123,15 +123,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
     @Override
     public void onDestroy(){
         log("onDestroy");
-        if(localSurfaceView.getParent()!=null){
-            if(localSurfaceView.getParent().getParent()!=null){
-                log("onDestroy() removeView chatId: "+chatId);
-                ((ViewGroup)localSurfaceView.getParent()).removeView(localSurfaceView);
-            }
-        }
-        localSurfaceView.setVisibility(View.GONE);
-        log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
-        megaChatApi.removeChatVideoListener(chatId, -1, this);
+        removeSurfaceView();
         super.onDestroy();
     }
     @Override
@@ -152,8 +144,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
             }
         }
         localSurfaceView.setVisibility(View.GONE);
-        log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
-        megaChatApi.removeChatVideoListener(this.chatId, -1, this);
+        megaChatApi.removeChatVideoListener(chatId, -1, -1, this);
     }
 
 
