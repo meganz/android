@@ -968,7 +968,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    }
 
                     //Recover chat
-                    log("Recover chat with id: " + idChat);
                     chatRoom = megaChatApi.getChatRoom(idChat);
                     if(chatRoom==null){
                         log("Chatroom is NULL - finish activity!!");
@@ -6203,7 +6202,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("TYPE_HANG_CHAT_CALL finished with success  ---> answerChatCall chatid = "+idChat);
-                megaChatApi.startChatCall(idChat, false, this);
+
+                MegaChatCall call = megaChatApi.getChatCall(idChat);
+                if(call!=null) {
+                    if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
+                        megaChatApi.answerChatCall(idChat, false, this);
+                    }else if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ){
+                        megaChatApi.startChatCall(idChat, false, this);
+                    }
+                }
+
             }else{
                 log("ERROR WHEN TYPE_HANG_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
             }
@@ -6223,10 +6231,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("TYPE_START_CHAT_CALL finished with success");
+                log("TYPE_ANSWER_CHAT_CALL finished with success");
                 //getFlag - Returns true if it is a video-audio call or false for audio call
             }else{
-                log("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
+                log("ERROR WHEN TYPE_ANSWER_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
                 if(e.getErrorCode() == MegaChatError.ERROR_TOOMANY){
 
                     showSnackbar(getString(R.string.call_error_too_many_participants));
