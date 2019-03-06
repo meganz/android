@@ -1827,9 +1827,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if((megaChatApi!=null) && (chatId != -1)){
 			MegaChatCall call = megaChatApi.getChatCall(chatId);
 			if(call!=null){
+				MegaApplication.setShowPinScreen(false);
 				Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.putExtra("chatHandle", chatId);
+				intent.putExtra("callId", call.getId());
 				startActivity(intent);
 			}
 		}
