@@ -63,6 +63,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
 	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
+	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 
 	public static final int CHECK_FILE_TO_UPLOAD_UPLOAD = 1000;
@@ -106,6 +107,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	HashMap<Integer, MegaTransfer> mapProgressTransfers;
 	int totalUploadsCompleted = 0;
 	int totalUploads = 0;
+	int uploadCount;
+	int currentUpload;
 
 	//0 - not overquota, not pre-overquota
 	//1 - overquota
@@ -113,6 +116,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	int isOverquota = 0;
 
     private long lastUpdated;
+
+    private StringBuilder sb = new StringBuilder(256);
 
     @SuppressLint("NewApi")
 	@Override
@@ -177,7 +182,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public int onStartCommand(final Intent intent,int flags,int startId) {
 		log("onStartCommand");
 		canceled = false;
-
+        uploadCount = intent.getIntExtra(EXTRA_UPLOAD_COUNT,0);
 		if(intent == null){
 			return START_NOT_STICKY;
 		}
@@ -194,13 +199,24 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		isOverquota = 0;
 
 		onHandleIntent(intent);
-
+        log(currentUpload +" / " + uploadCount);
+        if(currentUpload == uploadCount) {
+            log("send message");
+            Intent i = new Intent(this, ManagerActivityLollipop.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setAction(Constants.SHOW_REPEATED_UPLOAD);
+            i.putExtra("MESSAGE", sb.toString());
+            startActivity(i);
+            //reset
+            currentUpload = 0;
+            sb = new StringBuilder(256);
+        }
 		return START_NOT_STICKY;
 	}
 
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
-
+        currentUpload ++;
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
 
 		if(file!=null){
@@ -248,12 +264,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						String sShow = nameInMEGAEdited + " " + getString(R.string.general_already_uploaded);
 						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
 
-						Intent i = new Intent(this, ManagerActivityLollipop.class);
-						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-						i.putExtra("MESSAGE", sShow);
-						startActivity(i);
+//						Intent i = new Intent(this, ManagerActivityLollipop.class);
+//						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
+//						i.putExtra("MESSAGE", sShow);
+//						startActivity(i);
 						log("Return - file already uploaded");
+						if(sb.length() == 0) {
+						    sb.append(sShow);
+                        } else {
+						    sb.append("\n");
+						    sb.append(sShow);
+                        }
 						return;
 
 					}
@@ -311,11 +333,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						String sShow = file.getName() + " " + getString(R.string.general_already_uploaded);
 						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
 
-						Intent i = new Intent(this, ManagerActivityLollipop.class);
-						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-						i.putExtra("MESSAGE", sShow);
-						startActivity(i);
+//						Intent i = new Intent(this, ManagerActivityLollipop.class);
+//						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
+//						i.putExtra("MESSAGE", sShow);
+//						startActivity(i);
+                        if(sb.length() == 0) {
+                            sb.append(sShow);
+                        } else {
+                            sb.append("\n");
+                            sb.append(sShow);
+                        }
 						log("Return - file already uploaded");
 						return;
 					}

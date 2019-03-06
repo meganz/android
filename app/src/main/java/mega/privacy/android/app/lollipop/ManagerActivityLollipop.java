@@ -63,6 +63,7 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -3420,7 +3421,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (intent.getAction().equals(Constants.SHOW_REPEATED_UPLOAD)){
 					log("onPostResume: Intent SHOW_REPEATED_UPLOAD");
 					String message = intent.getStringExtra("MESSAGE");
-					showSnackbar(message);
+					int lines;
+					if(!TextUtils.isEmpty(message)) {
+					    int temp = message.split("\n").length;
+					    lines = (temp > 1) ? temp : 1;
+					    lines = (lines > 10) ? 10 : lines;
+                        showSnackbar(message,lines);
+                    }
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
 					log("IPC - go to received request in Contacts");
@@ -9628,6 +9635,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		snackbar.show();
 	}
 
+    public void showSnackbar(String s,int lines){
+        log("showSnackbar");
+        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+        snackbarTextView.setMaxLines(lines);
+        snackbar.show();
+    }
+
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");
 		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
@@ -14291,6 +14306,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("EXTRA_FOLDER_PATH:" + folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
+
 				startService(uploadServiceIntent);
 			}
 		}
@@ -15049,17 +15066,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
 		}
 		else {
-			for (ShareInfo info : infos) {
-				if(info.isContact){
-					requestContactsPermissions(info, parentNode);
-				}
+            Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+            for (ShareInfo info : infos) {
+                if(info.isContact){
+                    requestContactsPermissions(info, parentNode);
+                }
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
 					startService(intent);
 				}
 			}
