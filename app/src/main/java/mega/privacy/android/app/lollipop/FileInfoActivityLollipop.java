@@ -792,10 +792,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                                 parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
                                 parent.getHandle() == megaApi.getInboxNode().getHandle()){
                             if (megaApi.getParentNode(node).getHandle() == parent.getHandle()){
-                                locationTextView.setText(megaApi.getParentNode(node).getName());
+                                locationTextView.setText(getTranslatedNameForParentNodes(parent.getHandle()));
                             }
                             else {
-                                locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ parent.getName() +")");
+                                locationTextView.setText(megaApi.getParentNode(node).getName()+" ("+ getTranslatedNameForParentNodes(parent.getHandle()) +")");
                             }
                         }
                         else {
@@ -834,7 +834,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 log("Extras is NULL");
             }
     
-            //Yuan
             listView = (RecyclerView)findViewById(R.id.file_info_contact_list_view);
             //listView.addOnItemTouchListener(this);
             listView.setItemAnimator(new DefaultItemAnimator());
@@ -865,6 +864,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         }
 	}
+	
+	private String getTranslatedNameForParentNodes(long parentHandle){
+        String translated;
+        Context context = getApplicationContext();
+        if(parentHandle == megaApi.getRootNode().getHandle()){
+            translated = context.getString(R.string.section_cloud_drive);
+        }else if(parentHandle == megaApi.getRubbishNode().getHandle()){
+            translated = context.getString(R.string.section_rubbish_bin);
+        }else if(parentHandle == megaApi.getInboxNode().getHandle()){
+            translated = context.getString(R.string.section_inbox);
+        }else {
+            translated = megaApi.getNodeByHandle(parentHandle).getName();
+        }
+        return translated;
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

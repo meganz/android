@@ -235,6 +235,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -1715,7 +1716,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onCreate after call super");
 
 		boolean selectDrawerItemPending = true;
-
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -4960,10 +4960,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		setToolbarTitle();
 
 		if(Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
 			if (parentNode == null) {
-				log("Create folder: " + Constants.CHAT_FOLDER);
-				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+				log("Create folder: " + CHAT_FOLDER);
+				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 			}
 		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -5374,10 +5374,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove all notifications");
 		}
 
-		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		MegaNode parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
 		if(parentNode == null){
-			log("Create folder: "+Constants.CHAT_FOLDER);
-			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+			log("Create folder: "+CHAT_FOLDER);
+			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 		}
 
 		setToolbarTitle();
@@ -6155,10 +6155,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				if(Util.isChatEnabled()) {
-					MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+					MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
 					if (parentNode == null) {
-						log("Create folder: " + Constants.CHAT_FOLDER);
-						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+						log("Create folder: " + CHAT_FOLDER);
+						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 					}
 				}
 				searchExpand = true;

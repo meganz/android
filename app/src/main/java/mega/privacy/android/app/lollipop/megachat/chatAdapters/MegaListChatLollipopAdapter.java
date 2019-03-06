@@ -1161,7 +1161,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(title!=null){
 				log("ChatRoom title: "+title);
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+				String date = TimeUtils.formatDateAndTime(context,chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
@@ -1209,8 +1209,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				log("ChatRoom title: "+chat.getTitle());
 				log("chat timestamp: "+chat.getLastTimestamp());
-				String date = TimeUtils.formatDateAndTime(chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
-				String dateFS = TimeUtils.formatDate(chat.getLastTimestamp(), TimeUtils.DATE_SHORT_SHORT_FORMAT);
+				String date = TimeUtils.formatDateAndTime(context,chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+				String dateFS = TimeUtils.formatDate(context,chat.getLastTimestamp(), TimeUtils.DATE_SHORT_SHORT_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
 				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;
