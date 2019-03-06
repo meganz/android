@@ -16,6 +16,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 public class IncomingMessageService extends IncomingCallService {
@@ -52,7 +53,7 @@ public class IncomingMessageService extends IncomingCallService {
                 .setAutoCancel(false);
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         int importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,"NOTIFICATION_CHANNEL_NAME",importance);
+        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
         mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
         if (mNotificationManager != null) {
             mNotificationManager.createNotificationChannel(notificationChannel);
