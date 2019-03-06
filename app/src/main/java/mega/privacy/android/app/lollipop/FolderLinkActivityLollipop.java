@@ -1101,7 +1101,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 
 				showSnackbar(msg);
-
+			}
+			else {
+				showSnackbar(getString(R.string.download_began));
 			}
 		}
 	}

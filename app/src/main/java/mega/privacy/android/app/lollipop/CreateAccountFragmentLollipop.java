@@ -322,6 +322,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         tos.setOnClickListener(this);
 
         chkTOS = (CheckBox) v.findViewById(R.id.create_account_chkTOS);
+        chkTOS.setOnClickListener(this);
 
         bRegister = (Button) v.findViewById(R.id.button_create_account_create);
         bRegister.setText(getString(R.string.create_account));
@@ -495,16 +496,32 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
     }
 
+    void hidePasswordIfVisible () {
+        if (passwdVisibility) {
+            passwdVisibility = false;
+            toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
+            showHidePassword(false);
+            toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
+            showHidePassword(true);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         log("onClick");
 
         switch (v.getId()) {
+            case R.id.create_account_chkTOS:
+                hidePasswordIfVisible();
+                break;
+
             case R.id.button_create_account_create:
+                hidePasswordIfVisible();
                 onCreateAccountClick(v);
                 break;
 
             case R.id.button_login_create:
+                hidePasswordIfVisible();
                 ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
                 break;
 
@@ -515,6 +532,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
 //				browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
 //				startActivity(browserIntent);
+                hidePasswordIfVisible();
                 try {
                     String url = "https://mega.nz/terms";
                     Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);

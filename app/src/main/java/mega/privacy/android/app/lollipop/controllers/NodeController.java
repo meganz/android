@@ -2309,6 +2309,19 @@ public class NodeController {
             else{
                 log("LocalPath is NULL");
 
+                if (context instanceof FileLinkActivityLollipop) {
+                    ((FileLinkActivityLollipop) context).showSnackbar(context.getString(R.string.download_began));
+                }
+                else if (context instanceof AudioVideoPlayerLollipop) {
+                    ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.download_began));
+                }
+                else if (context instanceof FullScreenImageViewerLollipop) {
+                    ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.download_began));
+                }
+                else if (context instanceof PdfViewerActivityLollipop) {
+                    ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.download_began));
+                }
+
                 if(tempNode != null){
                     log("Node!=null: "+tempNode.getName());
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();

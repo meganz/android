@@ -232,6 +232,50 @@ public class Util {
 		}
 	}
 
+	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
+		if(activity == null){
+			return;
+		}
+
+		try{
+			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+			dialogBuilder.setPositiveButton(
+					activity.getString(android.R.string.ok),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							if (finish) {
+								if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+									activity.finishAndRemoveTask();
+								}else{
+									activity.finish();
+								}
+							}
+						}
+					});
+			dialogBuilder.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					if (finish) {
+						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							activity.finishAndRemoveTask();
+						}else{
+							activity.finish();
+						}
+					}
+				}
+			});
+
+
+			AlertDialog dialog = dialogBuilder.create();
+			dialog.show();
+			brandAlertDialog(dialog);
+		}catch(Exception ex){
+			Util.showToast(activity, message);
+		}
+	}
+
 	/*
 	 * Build error dialog
 	 * @param message Message to display
@@ -591,19 +635,19 @@ public class Util {
 		float TB = GB * 1024;
 		
 		if (size < KB){
-			sizeString = size + " B";
+			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " KB";
+			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " MB";
+			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " GB";
+			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
 		}
 		else{
-			sizeString = decf.format(size/TB) + " TB";
+			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
 		}
 		
 		return sizeString;
