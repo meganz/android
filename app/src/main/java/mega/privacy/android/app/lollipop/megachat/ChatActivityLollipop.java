@@ -1909,6 +1909,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     long chatIdCallInProgress = this.getChatCallInProgress();
                     if(chatIdCallInProgress == chatRoom.getChatId()){
                         log("startCall:I'm in this call");
+                        MegaApplication.setShowPinScreen(false);
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("chatHandle", idChat);
@@ -1922,6 +1923,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }else{
                     if(callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
                         log("startCall:I'm not in a call, this call is ring in");
+                        MegaApplication.setShowPinScreen(false);
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.putExtra("chatHandle", idChat);

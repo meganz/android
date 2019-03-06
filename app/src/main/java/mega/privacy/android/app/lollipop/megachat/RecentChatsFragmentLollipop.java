@@ -1915,10 +1915,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if((megaChatApi!=null) && (chatId != -1)){
             MegaChatCall call = megaChatApi.getChatCall(chatId);
             if(call!=null){
-                    Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("chatHandle", chatId);
-                    startActivity(intent);
+                MegaApplication.setShowPinScreen(false);
+                Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("chatHandle", chatId);
+                intent.putExtra("callId", call.getId());
+                startActivity(intent);
             }
         }
     }
