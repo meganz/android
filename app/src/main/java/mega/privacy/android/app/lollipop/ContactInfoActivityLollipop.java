@@ -66,6 +66,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -75,6 +76,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -86,6 +88,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -165,11 +168,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout shareContactLayout;
 	View dividerShareContactLayout;
 
+	RelativeLayout sharedFilesLayout;
+	View dividerSharedFilesLayout;
+
 	//Toolbar elements
 	ImageView contactStateIcon;
 	TextView firstLineTextToolbar;
 	TextView firstLineLengthToolbar;
-	TextView secondLineTextToolbar;
+	MarqueeTextView secondLineTextToolbar;
 	TextView secondLineLengthToolbar;
 
 	RelativeLayout clearChatLayout;
@@ -286,8 +292,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
-			secondLineTextToolbar = (TextView) findViewById(R.id.second_line_toolbar);
-			secondLineTextToolbar.setSelected(true);
+			secondLineTextToolbar = (MarqueeTextView) findViewById(R.id.second_line_toolbar);
 			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
 
 			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
@@ -389,6 +394,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
+			//Chat Shared Files Layout
+
+			sharedFilesLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_files_shared_layout);
+			sharedFilesLayout.setOnClickListener(this);
+
+			dividerSharedFilesLayout = (View) findViewById(R.id.divider_chat_files_shared_layout);
+
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
 			clearChatLayout.setOnClickListener(this);
@@ -481,6 +493,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						if(chatHandle==-1){
 							notificationsLayout.setVisibility(View.GONE);
 							dividerNotificationsLayout.setVisibility(View.GONE);
+
+							sharedFilesLayout.setVisibility(View.GONE);
+							dividerSharedFilesLayout.setVisibility(View.GONE);
 						}
 						else{
 							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -489,6 +504,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					else{
 						notificationsLayout.setVisibility(View.GONE);
 						dividerNotificationsLayout.setVisibility(View.GONE);
+
+						sharedFilesLayout.setVisibility(View.GONE);
+						dividerSharedFilesLayout.setVisibility(View.GONE);
 					}
 
 					if (megaChatApi == null){
@@ -622,6 +640,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				notificationsLayout.setVisibility(View.GONE);
 				dividerNotificationsLayout.setVisibility(View.GONE);
+
+				sharedFilesLayout.setVisibility(View.GONE);
+				dividerSharedFilesLayout.setVisibility(View.GONE);
 			}
 
 		} else {
@@ -846,8 +867,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(startVideo){
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
-			}
-			else{
+			}else{
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
 			}
 
@@ -1208,21 +1228,25 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
-				startVideo = false;
-				if(checkPermissionsCall()){
-					startCall(false);
+				if(!this.participatingInACall()){
+					log("I'm not in a call");
+					startVideo = false;
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
 				}
-
-//				startCall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
-				startVideo = true;
-				if(checkPermissionsCall()){
-					startCall(true);
+				if(!this.participatingInACall()){
+					log("I'm not in a call");
+					startVideo = true;
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
 				}
-//				startCall(true);
+
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -1273,6 +1297,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						setUpIndividualChatNotifications();
 					}
 				}
+				break;
+			}
+			case R.id.chat_contact_properties_chat_files_shared_layout:{
+				Intent nodeHistoryIntent = new Intent(this, NodeAttachmentHistoryActivity.class);
+				if(chat!=null){
+					nodeHistoryIntent.putExtra("chatId", chat.getChatId());
+				}
+				startActivity(nodeHistoryIntent);
 				break;
 			}
 		}
@@ -1796,7 +1828,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			contactStateIcon.setVisibility(View.GONE);
 		}
 
-		requestLastGreen(-1);
+		if(Util.isChatEnabled()){
+			requestLastGreen(-1);
+		}
 	}
 
 	@Override
@@ -2534,8 +2568,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
+				secondLineTextToolbar.isMarqueeIsNecessary(this);
 //				secondLineTextToolbar.setText("formattedDate formattedDate formattedDate formattedDate formattedDate");
-				secondLineTextToolbar.setSelected(true);
 				secondLineLengthToolbar.setText(formattedDate);
 
 				log("Date last green: "+formattedDate);

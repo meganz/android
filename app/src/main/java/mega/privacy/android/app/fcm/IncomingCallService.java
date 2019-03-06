@@ -204,6 +204,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                         megaChatApi.logout(this);
                     } else {
                         log("Chat correctly initialized");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
             }

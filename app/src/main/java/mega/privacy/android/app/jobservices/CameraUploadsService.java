@@ -22,7 +22,6 @@ import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.provider.DocumentFile;
 import android.text.format.Time;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.io.File;
@@ -67,9 +66,9 @@ import nz.mega.sdk.MegaUserAlert;
 
 public class CameraUploadsService extends JobService implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface {
 
-    public static String PHOTO_SYNC = "PhotoSync";
-    public static String CAMERA_UPLOADS = "Camera Uploads";
-    public static String SECONDARY_UPLOADS = "Media Uploads";
+    private static String PHOTO_SYNC = "PhotoSync";
+    private static String CAMERA_UPLOADS = "Camera Uploads";
+    private static String SECONDARY_UPLOADS = "Media Uploads";
 
     private NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
@@ -1220,6 +1219,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                                     megaChatApi.logout(cameraUploadsService);
                                                 } else {
                                                     log("shouldRun: Chat correctly initialized");
+                                                    megaChatApi.enableGroupChatCalls(true);
                                                 }
                                             }
                                         }
@@ -1294,7 +1294,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);
                 }
             }
-
+            
             log("If not Camera Uploads nor Photosync");
             if (cameraUploadHandle == -1){
                 log("must create the folder");
@@ -1318,7 +1318,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);
                     }
                 }
-
+                
                 if (cameraUploadHandle == -1){
                     log("If not Camera Uploads nor Photosync--- must create the folder");
                     megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
@@ -1343,7 +1343,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                 dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                             }
                         }
-
+                        
                         //If not "Media Uploads"
                         if (secondaryUploadHandle == -1){
                             log("must create the secondary folder");
@@ -1364,7 +1364,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                     dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                                 }
                             }
-
+                            
                             //If not "Media Uploads"
                             if (secondaryUploadHandle == -1){
                                 log("must create the folder");
@@ -1387,7 +1387,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                         }
                     }
-
+                    
                     //If not "Media Uploads"
                     if (secondaryUploadHandle == -1){
                         log("must create the folder");
@@ -1403,7 +1403,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                     }
                 }
-
+                
                 //If not "Media Uploads"
                 if (secondaryUploadHandle == -1){
                     log("must create the folder");
@@ -1421,7 +1421,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
     private void initService(){
         log("initService()");
-
+        
         totalUploaded = -1;
         totalSizeToUpload = 0;
         totalToUpload = 0;
@@ -1493,8 +1493,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             try{ wl.release(); } catch(Exception ex) {}
 
         if(isOverquota){
-            //TODO Uncomment this
-//            showStorageOverquotaNotification();
+            showStorageOverquotaNotification();
         }
 
         canceled = true;
@@ -1505,6 +1504,34 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             mNotificationManager.cancel(notificationId);
         }
         jobFinished(globalParams, true);
+    }
+
+    private void showStorageOverquotaNotification(){
+        log("showStorageOverquotaNotification");
+
+        String contentText = getString(R.string.download_show_info);
+        String message = getString(R.string.overquota_alert_title);
+
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+            mBuilderCompatO
+                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+                    .setAutoCancel(true).setTicker(contentText)
+                    .setContentTitle(message).setContentText(contentText)
+                    .setOngoing(false);
+
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
+        }
     }
 
     @Override
@@ -1658,7 +1685,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("CamSync Folder UPDATED DB");
                     dbH.setCamSyncHandle(request.getNodeHandle());
                 }
-                else{
+                else if(name.contains(SECONDARY_UPLOADS)){
                     //Update in database
                     log("Secondary Folder UPDATED DB");
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());
@@ -1701,6 +1728,20 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     }
                 }
             }
+            else {
+                log("Error ("+e.getErrorCode()+"): "+request.getType()+" : "+request.getRequestString());
+                if(request.getNodeHandle()!=-1){
+                    MegaNode nodeError = megaApi.getNodeByHandle(request.getNodeHandle());
+                    if(nodeError!=null){
+                        log("Node: "+nodeError.getName());
+                    }
+                }
+
+                if (e.getErrorCode() == MegaError.API_EOVERQUOTA)
+                    isOverquota = true;
+
+                finish();
+            }
         }
     }
 
@@ -1730,7 +1771,8 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         }
 
         if(isOverquota){
-            return;
+            log("After overquota error");
+            isOverquota = false;
         }
 
         final long bytes = transfer.getTransferredBytes();
@@ -1741,6 +1783,17 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     @Override
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
         log("onTransferTemporaryError: " + transfer.getFileName());
+
+        if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+            if (e.getValue() != 0)
+                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+            else
+                log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+
+            isOverquota = true;
+
+            updateProgressNotification(totalSizeUploaded);
+        }
     }
 
     @Override
@@ -1768,12 +1821,13 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             cancel();
         }
         else{
-
-            if(isOverquota){
-                return;
-            }
-
             if (e.getErrorCode() == MegaError.API_OK) {
+
+                if(isOverquota){
+                    log("After overquota error");
+                    isOverquota = false;
+                }
+
                 log("Image Sync OK: " + transfer.getFileName());
                 totalSizeUploaded += transfer.getTransferredBytes();
                 log("IMAGESYNCFILE: " + transfer.getPath());
@@ -1901,17 +1955,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     uploadNext();
                 }
             }
-            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                log("OVERQUOTA ERROR: "+e.getErrorCode());
-
-                isOverquota = true;
-
-                cancel();
-
-            }
             else{
                 log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
-                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+
+                if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                    log("OVERQUOTA ERROR: "+e.getErrorCode());
+                    isOverquota = true;
+                }
+
                 cancel();
             }
         }
@@ -1949,10 +2000,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             }
         }
 
+        String status = isOverquota ? getString(R.string.overquota_alert_title) :
+                getString(R.string.settings_camera_notif_title);
+
         Intent intent = null;
 
         intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
+        intent.setAction(isOverquota ? Constants.ACTION_OVERQUOTA_STORAGE :
+                Constants.ACTION_CANCEL_CAM_SYNC);
 
         String info = Util.getProgressSize(this, progress, totalSizeToUpload);
 
@@ -1974,7 +2029,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOngoing(true)
                     .setContentTitle(message)
                     .setSubText(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
+                    .setContentText(status)
                     .setOnlyAlertOnce(true);
 
             notification = mBuilderCompat.build();
@@ -1987,7 +2042,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOngoing(true)
                     .setContentTitle(message)
                     .setSubText(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
+                    .setContentText(status)
                     .setOnlyAlertOnce(true);
             notification = mBuilder.getNotification();
         }
@@ -2000,7 +2055,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOngoing(true)
                     .setContentTitle(message)
                     .setContentInfo(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
+                    .setContentText(status)
                     .setOnlyAlertOnce(true);
             notification = mBuilder.getNotification();
 //					notification = mBuilder.build();
