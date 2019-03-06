@@ -326,7 +326,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 							dbH.setExtendedAccountDetailsTimestamp();
 							long mostRecentSession = megaAccountSession.getMostRecentUsage();
 
-							String date = TimeUtils.formatDateAndTime(mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
+							String date = TimeUtils.formatDateAndTime(getApplicationContext(),mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
 
 							myAccountInfo.setLastSessionFormattedDate(date);
 							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
