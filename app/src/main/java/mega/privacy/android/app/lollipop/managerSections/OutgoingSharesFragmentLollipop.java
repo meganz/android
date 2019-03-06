@@ -645,7 +645,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -780,7 +780,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -863,7 +863,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -946,7 +946,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1054,7 +1054,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1205,7 +1205,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
 
-						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
