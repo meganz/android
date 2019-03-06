@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/backup_action"
                 android:textColor="@color/mail_my_account"
-                android:textSize="8sp"
+                android:textSize="10sp"
                 android:layout_below="@id/third_par_export_MK_layout"/>
 
             <LinearLayout
@@ -99,6 +99,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:textColor="@color/white"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
                     android:text="@string/save_action"
                     android:background="@color/accentColor"
                     android:elevation="@dimen/elevation_upgrade_low"
