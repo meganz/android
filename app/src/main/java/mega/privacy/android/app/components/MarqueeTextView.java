@@ -31,6 +31,9 @@ public class MarqueeTextView extends TextView {
     }
 
     public void isMarqueeIsNecessary(Context context) {
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
         TextPaint textPaint = new TextPaint();
         textPaint.setTextSize(getPaint().getTextSize());
 

@@ -117,8 +117,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
-        }
-        else {
+        }else {
             initActivity();
         }
     }
@@ -130,7 +129,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     initActivity();
-                } else {
+                }else{
                     this.finish();
                 }
                 return;
