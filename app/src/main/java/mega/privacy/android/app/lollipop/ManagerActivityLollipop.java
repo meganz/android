@@ -6181,7 +6181,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
 		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
-		searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+		searchAutoComplete.setHint(getString(R.string.hint_action_search));
 		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 

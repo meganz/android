@@ -234,12 +234,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	FileExplorerActivityLollipop fileExplorerActivityLollipop;
 
-	String querySearch = "";
-	boolean isSearchExpanded = false;
-	boolean pendingToOpenSearchView = false;
-	int pendingToAttach = 0;
-	int totalAttached = 0;
-	int totalErrors = 0;
+	private String querySearch = "";
+	private boolean isSearchExpanded = false;
+	private boolean pendingToOpenSearchView = false;
+	private int pendingToAttach = 0;
+	private int totalAttached = 0;
+	private int totalErrors = 0;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -964,7 +964,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
 		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
-		searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+		searchAutoComplete.setHint(getString(R.string.hint_action_search));
 		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
