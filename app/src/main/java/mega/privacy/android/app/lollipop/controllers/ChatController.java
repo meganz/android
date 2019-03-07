@@ -2057,7 +2057,7 @@ public class ChatController {
         else{
             log("Proceed to import nodes to own Cloud");
             ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
-
+    
             MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
                 log("Error no chat folder - return");

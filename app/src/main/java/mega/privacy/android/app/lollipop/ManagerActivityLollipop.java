@@ -233,6 +233,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -337,7 +338,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
 
-	private int storageState = MegaApiJava.STORAGE_STATE_GREEN;
+	private int storageState = -1; //Default value (-1) indicates that is not initialized
 	private boolean isStorageStatusDialogShown = false;
 
     int orientationSaved;
@@ -1713,7 +1714,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onCreate after call super");
 
 		boolean selectDrawerItemPending = true;
-
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -2939,7 +2939,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}
 
-			checkStorageStatus(true);
+			checkCurrentStorageStatus(true);
 
 	        //INITIAL FRAGMENT
 			if(selectDrawerItemPending){
@@ -4719,7 +4719,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //					}		updateAccountDetailsVisibleInfo();
 
 					updateAccountDetailsVisibleInfo();
-					checkStorageStatus(false);
+					checkCurrentStorageStatus(false);
 				} else {
 					log("showOnlineMode - Root is NULL");
 					if (getApplicationContext() != null) {
@@ -4987,10 +4987,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		setToolbarTitle();
 
 		if(Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
 			if (parentNode == null) {
-				log("Create folder: " + Constants.CHAT_FOLDER);
-				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+				log("Create folder: " + CHAT_FOLDER);
+				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 			}
 		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -5401,10 +5401,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove all notifications");
 		}
 
-		MegaNode parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+		MegaNode parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
 		if(parentNode == null){
-			log("Create folder: "+Constants.CHAT_FOLDER);
-			megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+			log("Create folder: "+CHAT_FOLDER);
+			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 		}
 
 		setToolbarTitle();
@@ -6193,10 +6193,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				if(Util.isChatEnabled()) {
-					MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+					MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
 					if (parentNode == null) {
-						log("Create folder: " + Constants.CHAT_FOLDER);
-						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+						log("Create folder: " + CHAT_FOLDER);
+						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 					}
 				}
 				searchQuery = "";
@@ -14612,8 +14612,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * Check the current storage state.
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
-	private void checkStorageStatus(boolean onCreate) {
-		checkStorageStatus(storageState, onCreate);
+	private void checkCurrentStorageStatus(boolean onCreate) {
+		// If the current storage state is not initialized (-1) is because the app received the
+		// event informing about the storage state  during login, the ManagerActivityLollipop
+		// wasn't active and for this reason the value is stored in the MegaApplication object.
+		int storageStateToCheck = (storageState != -1) ? storageState :
+				((MegaApplication)getApplication()).getStorageState();
+
+		checkStorageStatus(storageStateToCheck, onCreate);
 	}
 
 	/**
@@ -14622,6 +14628,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
+
 		switch (newStorageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
 				log("STORAGE STATE GREEN");
@@ -14633,7 +14640,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						showProPanel();
 					}
 				}
-				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
@@ -14644,7 +14650,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				} else if (newStorageState > storageState) {
 					showStorageAlmostFullDialog();
 				}
-				storageState = newStorageState;
 				break;
 
 			case MegaApiJava.STORAGE_STATE_RED:
@@ -14655,9 +14660,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				} else if (newStorageState > storageState) {
 					showStorageFullDialog();
 				}
-				storageState = newStorageState;
 				break;
+
+			default:
+				return;
 		}
+
+		storageState = newStorageState;
 	}
 
 	/**

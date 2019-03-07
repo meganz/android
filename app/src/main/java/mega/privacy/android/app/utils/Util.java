@@ -638,19 +638,19 @@ public class Util {
 		float TB = GB * 1024;
 		
 		if (size < KB){
-			sizeString = size + " B";
+			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " KB";
+			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " MB";
+			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " GB";
+			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
 		}
 		else{
-			sizeString = decf.format(size/TB) + " TB";
+			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
 		}
 		
 		return sizeString;
