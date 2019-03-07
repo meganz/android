@@ -626,7 +626,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else
 		{
 			try {
-				if (openFile) {
+				if (openFile && app.isActivityVisible()) {
 					log("openFile true");
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){

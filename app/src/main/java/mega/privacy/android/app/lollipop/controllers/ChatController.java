@@ -1738,7 +1738,8 @@ public class ChatController {
                     log("ISFILE");
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
-                    if(localPath != null){
+                    MegaApplication app = ((MegaApplication) ((Activity)context).getApplication());
+                    if(localPath != null && app.isActivityVisible()){
                         log("localPath != null");
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
