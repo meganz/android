@@ -48,25 +48,44 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/shared_folder_contact_name"
+    <RelativeLayout
+        android:id="@+id/shared_folder_contact_name_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
-        android:layout_toLeftOf="@id/shared_folder_three_dots_layout"
         android:layout_marginTop="16dp"
-        android:layout_marginLeft="13dp"
-        android:textColor="@color/file_list_first_row"
-        android:ellipsize="middle"
-        android:textSize="16sp"
-        android:singleLine="true"
-        android:maxLines="1"/>
+        android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
+        android:layout_toLeftOf="@id/shared_folder_three_dots_layout">
+
+        <TextView
+            android:id="@+id/shared_folder_contact_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="13dp"
+            android:textColor="@color/file_list_first_row"
+            android:ellipsize="middle"
+            android:textSize="16sp"
+            android:singleLine="true"
+            android:maxLines="1"/>
+
+        <ImageView
+            android:id="@+id/shared_folder_state_icon"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_toRightOf="@+id/shared_folder_contact_name"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="4dp"
+            android:background="@null"
+            android:src="@drawable/circle_status_contact_offline"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/shared_folder_contact_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/shared_folder_contact_name"
+        android:layout_below="@id/shared_folder_contact_name_layout"
         android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
         android:layout_marginLeft="13dp"
         android:textSize="14sp"
