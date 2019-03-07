@@ -2283,6 +2283,47 @@
         <item context="version item" quantity="one">Message forwarded</item>
         <item context="version items" quantity="other">Messages forwarded</item>
     </plurals>
+    
+    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files was not sent to %d chats</item>
+    </plurals>
+
+    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d contacts was not sent to %d chats</item>
+    </plurals>
+
+    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+    </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created correctly</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Preparing files</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as message.</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">The file has not been sent to any of the selected chats</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
+
+    <string name="delete_versions" context="Action delete all file versions">Delete file versions</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete version history?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Version history deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Version history not deleted.</string>
+
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d version deleted successfully</item>
+        <item context="version items" quantity="other">%d versions deleted successfully</item>
+    </plurals>
+
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">%d version not deleted</item>
+        <item context="version items" quantity="other">%d versions not deleted</item>
+    </plurals>
+
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please, invite friends from the Contacts section.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
@@ -2297,4 +2338,5 @@
 	<string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
 	<string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignored</string>
 
+    <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
 </resources>

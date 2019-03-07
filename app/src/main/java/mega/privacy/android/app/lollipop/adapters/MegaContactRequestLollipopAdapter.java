@@ -486,7 +486,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 		if(!Util.isOnline(context)){
 			if(context instanceof ManagerActivityLollipop){
-				((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
 			}
 			return;
 		}

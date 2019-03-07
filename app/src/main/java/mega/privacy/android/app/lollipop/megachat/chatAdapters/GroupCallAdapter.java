@@ -133,6 +133,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         TextView avatarInitialLetter;
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
+        String email;
+
+        public String getEmail() {
+            return email;
+        }
+
+
+        public void setAvatarImage (Bitmap avatar) {
+            avatarImage.setImageBitmap(avatar);
+        }
         public ViewHolderGroupCall(View itemView) {
             super(itemView);
         }
@@ -834,9 +844,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if(contactMail == null){
                 contactMail = " ";
             }
+
+            holder.email = contactMail;
             createDefaultParticipantAvatarGroupCall(peerid, holder, fullName, contactMail);
 
-            ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
+            ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;
 
             if(contactMail == null){
