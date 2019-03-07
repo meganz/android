@@ -1222,75 +1222,75 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	}
 
 	void setColorFilterBlack () {
-        upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
-        drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+        drawableDots.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
         toolbar.setOverflowIcon(drawableDots);
 
         if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableRemoveLink.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             removeLinkMenuItem.setIcon(drawableRemoveLink);
         }
         if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableLink.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             getLinkMenuItem.setIcon(drawableLink);
         }
         if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableDownload.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             downloadMenuItem.setIcon(drawableDownload);
         }
         if (shareMenuItem != null) {
-            drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableShare.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             shareMenuItem.setIcon(drawableShare);
         }
         if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableLeave.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             leaveMenuItem.setIcon(drawableLeave);
         }
         if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableCopy.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             copyMenuItem.setIcon(drawableCopy);
         }
         if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.black), PorterDuff.Mode.SRC_ATOP);
+            drawableChat.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             sendToChatMenuItem.setIcon(drawableChat);
         }
     }
 
     void setColorFilterWhite () {
-        upArrow.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
-        drawableDots.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+        drawableDots.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         toolbar.setOverflowIcon(drawableDots);
 
         if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableRemoveLink.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             removeLinkMenuItem.setIcon(drawableRemoveLink);
         }
         if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableLink.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             getLinkMenuItem.setIcon(drawableLink);
         }
         if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableDownload.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             downloadMenuItem.setIcon(drawableDownload);
         }
         if (shareMenuItem != null) {
-            drawableShare.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableShare.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             shareMenuItem.setIcon(drawableShare);
         }
         if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableLeave.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             leaveMenuItem.setIcon(drawableLeave);
         }
         if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableCopy.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             copyMenuItem.setIcon(drawableCopy);
         }
         if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(ContextCompat.getColor(fileInfoActivity, R.color.white), PorterDuff.Mode.SRC_ATOP);
+            drawableChat.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             sendToChatMenuItem.setIcon(drawableChat);
         }
     }

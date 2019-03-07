@@ -2338,4 +2338,5 @@
 	<string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
 	<string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignored</string>
 
+    <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
 </resources>
