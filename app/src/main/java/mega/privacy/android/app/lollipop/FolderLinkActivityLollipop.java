@@ -1097,9 +1097,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				if (numberOfNodesPending > 0){
 					msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
 				}
-
 				showSnackbar(Constants.SNACKBAR_TYPE, msg);
-
+			}
+			else {
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.download_began));
 			}
 		}
 	}
