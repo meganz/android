@@ -52,62 +52,12 @@
                 android:elevation="@dimen/elevation_upgrade_high"
                 android:tint="@android:color/white" />
 
-        <!--        <Button
-                    android:id="@+id/get_started_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:text="@string/get_started_button"
-                    android:background="@drawable/white_rounded_corners_button"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
     </LinearLayout>
-
-    <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/chat_recent_list_view"-->
-        <!--android:clipToPadding="false"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:choiceMode="multipleChoice" />-->
 
     <include layout="@layout/item_call_in_progress_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_below="@id/toolbar_chat"/>
-
-
-    <!--<RelativeLayout-->
-        <!--android:id="@+id/call_in_progress_layout_recent"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="48dp"-->
-        <!--android:layout_below="@id/toolbar_chat"-->
-        <!--android:visibility="gone"-->
-        <!--android:background="@color/accentColor">-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/call_in_progress_text_recent"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:textSize="14sp"-->
-            <!--android:text="@string/call_in_progress_layout_without_time"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_centerHorizontal="true"/>-->
-
-        <!--<Chronometer-->
-            <!--android:id="@+id/simple_chronometer"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:visibility="gone"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:textSize="13sp"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_centerHorizontal="true"-->
-            <!--android:layout_toRightOf="@id/call_in_progress_text_recent"/>-->
-
-    <!--</RelativeLayout>-->
 
     <LinearLayout
         android:id="@+id/linear_layout_recycler"

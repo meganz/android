@@ -35,10 +35,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.View;
-
-import com.google.android.gms.dynamic.IFragmentWrapper;
-
 import org.webrtc.AndroidVideoTrackSourceObserver;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
@@ -128,7 +124,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
-	private static boolean speakerStatus = true;
+	private static boolean speakerStatus = false;
 
 	private static long openCallChatId = -1;
 
@@ -1557,6 +1553,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		log("onChatCallUpdate: call.getStatus "+call.getStatus());
 		stopService(new Intent(this, IncomingCallService.class));
 
 		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -1572,7 +1569,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				case MegaChatCall.CALL_STATUS_JOINING:
 				case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
 
-					log("onChatCallUpdate:STATUS: "+callStatus);
 					if(megaChatApi!=null){
 						MegaHandleList listAllCalls = megaChatApi.getChatCalls();
 						if(listAllCalls!=null){
@@ -1591,7 +1587,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 									}
 								} else {
 									log("onChatCallUpdate:One call: call already opened");
-
 								}
 
 							}else if(listAllCalls.size() > 1){
@@ -1616,14 +1611,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 									}
 								}else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
 									log("onChatCallUpdate:Several calls - RING_IN");
-
-									if(participatingInACall()){
-										log("onChatCallUpdate:Several calls - RING_IN: participating in a call");
+									if((megaChatApi!=null)&&(mega.privacy.android.app.utils.ChatUtil.participatingInACall(megaChatApi))){
+										log("onChatCallUpdate:Several calls - RING_IN: show notification");
 										checkQueuedCalls();
-
 									}else{
 										log("onChatCallUpdate:Several calls - RING_IN: NOT participating in a call");
-
 										MegaHandleList handleListRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
 										if((handleListRingIn!=null)&&(handleListRingIn.size()>0)) {
 											for (int i = 0; i < handleListRingIn.size(); i++) {
@@ -1659,7 +1651,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 										}
 									}
 								}else{
-									log("onChatCallUpdate:Several calls - "+callStatus+": show notification");
+									log("onChatCallUpdate:Several calls: show notification");
 									checkQueuedCalls();
 								}
 
@@ -1820,31 +1812,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				default:
 					break;
 			}
-
-		} else if ((call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS))||(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS))) {
-			log("onChatCallUpdate: REMOTE_AVFLAGS || LOCAL_AVFLAGS");
-		} else if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)) {
-			log("onChatCallUpdate:CHANGE_TYPE_CALL_COMPOSITION");
 		}
-	}
-
-	/*Method to know if i'm participating in any A/V call*/
-	public boolean participatingInACall(){
-		boolean activeCall = false;
-		if(megaChatApi!=null){
-			MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
-			MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-			MegaHandleList listCalls = megaChatApi.getChatCalls(-1);
-			if((listCallsUserNoPresent!=null)&&(listCallsRingIn!=null)&&(listCalls!=null)){
-				long totalCallsNotPresent = listCallsUserNoPresent.size() + listCallsRingIn.size();
-				if(totalCallsNotPresent == listCalls.size()){
-					activeCall = false;
-				}else{
-					activeCall = true;
-				}
-			}
-		}
-		return activeCall;
 	}
 
     public void checkQueuedCalls(){
