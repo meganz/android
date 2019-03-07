@@ -234,7 +234,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     ViewGroup parentLocalFS;
     ViewGroup parentRemoteFS;
 
-
     private LocalCameraCallFragment localCameraFragment = null;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
@@ -554,7 +553,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        log("onCreate: mSensorManager-mSensor");
 
         try {
             field = PowerManager.class.getClass().getField("PROXIMITY_SCREEN_OFF_WAKE_LOCK").getInt(null);
@@ -2738,7 +2736,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             myAvatarLayout.setVisibility(View.VISIBLE);
                         }
                     }
-                    refreshOwntMicro();
+                    refreshOwnMicro();
                 }
             }
         }
@@ -2813,7 +2811,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                     microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_off));
                 }
-                refreshOwntMicro();
+                refreshOwnMicro();
             }
         }
 
@@ -3472,7 +3470,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void updateSubtitleNumberOfVideos() {
+    private void updateSubtitleNumberOfVideos() {
         log("updateSubtitleNumberOfVideos");
         if((megaChatApi!=null)&&(callChat==null)){
             callChat = megaChatApi.getChatCall(chatId);
@@ -4280,7 +4278,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void showConfirmationConnectedVideo(final long chat) {
+    private void showConfirmationConnectedVideo(final long chat) {
         log("showConfirmationConnectedVideo");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -4322,7 +4320,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     if (userSession.hasAudio()) {
                         log("onPrepareOptionsMenu:Audio remote connected");
                         mutateCallLayout.setVisibility(GONE);
-                        refreshOwntMicro();
+                        refreshOwnMicro();
 
                     } else {
                         log("onPrepareOptionsMenu:Audio remote NOT connected");
@@ -4347,8 +4345,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void refreshOwntMicro(){
-        log("refreshOwntMicro");
+    public void refreshOwnMicro(){
+        log("refreshOwnMicro");
         if(!chat.isGroup()){
             if (callChat == null) {
                 if(megaChatApi != null){

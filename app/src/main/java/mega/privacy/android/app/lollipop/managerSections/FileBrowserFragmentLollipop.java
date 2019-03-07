@@ -71,6 +71,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -542,8 +543,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (megaChatApi == null){
 				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 			}
-		}
-		else{
+		}else{
 			log("Chat not enabled!");
 		}
 
@@ -866,7 +866,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.call_in_progress_layout:{
 				log("onClick:call_in_progress_layout");
 				if(checkPermissionsCall()){
-					returnTheCall();
+					returnCall();
 				}
 				break;
 			}
@@ -1770,8 +1770,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("REQUEST_CAMERA");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					if(checkPermissionsCall()){
-						log("REQUEST_CAMERA -> returnTheCall");
-						returnTheCall();
+						log("REQUEST_CAMERA -> returnCall");
+						returnCall();
 					}
 				}
 				break;
@@ -1780,8 +1780,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				log("RECORD_AUDIO");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					if(checkPermissionsCall()){
-						log("RECORD_AUDIO -> returnTheCall");
-						returnTheCall();
+						log("RECORD_AUDIO -> returnCall");
+						returnCall();
 					}
 				}
 				break;
@@ -1791,14 +1791,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 
     public void showCallLayout(){
-        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && ((ManagerActivityLollipop) context).participatingInACall()){
+        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && (megaChatApi!=null) &&(ChatUtil.participatingInACall(megaChatApi))){
             log("showCallLayout");
 
             if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
                 callInProgressLayout.setVisibility(View.VISIBLE);
             }
             if((callInProgressChrono!=null) && (callInProgressChrono.getVisibility() != View.VISIBLE)){
-                long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
+                long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
                 if((megaChatApi!=null) && (chatId != -1)){
                     MegaChatCall call = megaChatApi.getChatCall(chatId);
                     if(call!=null){
@@ -1821,10 +1821,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         }
     }
 
-	private void returnTheCall(){
-		log("returnTheCall()");
-		long chatId = ((ManagerActivityLollipop)context).getChatCallInProgress();
-		if((megaChatApi!=null) && (chatId != -1)){
+	private void returnCall(){
+		log("returnCall()");
+		if(megaChatApi!=null){
+			long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
 			MegaChatCall call = megaChatApi.getChatCall(chatId);
 			if(call!=null){
 				MegaApplication.setShowPinScreen(false);

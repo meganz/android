@@ -77,7 +77,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
         microIcon = (ImageView) v.findViewById(R.id.micro_surface_view);
         microIcon.setVisibility(View.GONE);
-        ((ChatCallActivity)context).refreshOwntMicro();
+        ((ChatCallActivity)context).refreshOwnMicro();
         megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
