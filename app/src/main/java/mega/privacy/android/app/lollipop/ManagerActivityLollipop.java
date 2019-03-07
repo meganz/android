@@ -18104,7 +18104,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			if (option ==  Constants.COLOR_STATUS_BAR_ACCENT) {
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.accentColorDark));
+				window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.accentColorDark));
 				changeActionBarElevation(true);
 			}
 			else if (option == Constants.COLOR_STATUS_BAR_ZERO_DELAY){
@@ -18116,7 +18116,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}, 300);
 			}
 			else if (option == Constants.COLOR_STATUS_BAR_SEARCH) {
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
+				window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_search));
 			}
 			else if (option == Constants.COLOR_STATUS_BAR_ZERO) {
 				window.setStatusBarColor(0);
@@ -18125,7 +18125,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.status_bar_search));
+						window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_search));
 					}
 				}, 300);
 			}
