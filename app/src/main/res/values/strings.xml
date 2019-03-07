@@ -2355,4 +2355,5 @@
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to share a link to the chat and new participants will not see past messages.</string>
 
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully</string>
 </resources>
