@@ -154,21 +154,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
 		}
 
-		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-
 		if (megaChatApi == null){
 			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 		}
 
-		if(megaChatApi==null||megaChatApi.getInitState()==MegaChatApi.INIT_ERROR||megaChatApi.getInitState()==0){
+		if(megaChatApi==null||megaChatApi.getInitState()==MegaChatApi.INIT_ERROR||megaChatApi.getInitState()==MegaChatApi.INIT_NOT_DONE){
 			log("Refresh session - karere");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -381,11 +371,14 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
     protected void onDestroy(){
 		log("onDestroy");
     	super.onDestroy();
-
-		megaChatApi.removeChatListener(this);
-		megaChatApi.removeNodeHistoryListener(chatId,this);
-		megaChatApi.closeNodeHistory(chatId, null);
-    	handler.removeCallbacksAndMessages(null);
+		if (megaChatApi != null) {
+			megaChatApi.removeChatListener(this);
+			megaChatApi.removeNodeHistoryListener(chatId, this);
+			megaChatApi.closeNodeHistory(chatId, null);
+		}
+		if (handler != null) {
+			handler.removeCallbacksAndMessages(null);
+		}
     }
 	
 	@Override
