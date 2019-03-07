@@ -226,7 +226,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             log("launch foreground service!");
                             Intent intent = new Intent(this,IncomingMessageService.class);
                             intent.putExtra("remoteMessage", remoteMessage);
-                            startForegroundService(intent);
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                                startForegroundService(intent);
+                            }else{
+                                startService(intent);
+                            }
                             return;
                         }
                     }
