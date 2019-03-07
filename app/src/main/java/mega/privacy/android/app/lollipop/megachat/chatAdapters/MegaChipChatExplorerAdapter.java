@@ -210,7 +210,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         else {
             createDefaultAvatar(holder, item);
 
-            ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
+            ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
             File avatar = null;
 
             long handle = -1;
