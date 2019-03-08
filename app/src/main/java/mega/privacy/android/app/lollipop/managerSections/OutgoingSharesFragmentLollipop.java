@@ -370,6 +370,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 
@@ -645,7 +647,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -780,7 +782,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -863,7 +865,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}else{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
-						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -946,7 +948,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1054,7 +1056,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+					String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1205,7 +1207,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 							emptyImageView.setImageResource(R.drawable.outgoing_shares_empty);
 						}
 
-						String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_outgoing));
+						String textToShow = String.format(context.getString(R.string.context_empty_outgoing));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -1377,7 +1379,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());

@@ -18,9 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+            app:titleTextAppearance="@style/ToolbarTitle"
+            app:popupTheme="@style/Theme.Megaactionbar.InfoScreens"
+            app:theme="@style/Theme.Megaactionbar.InfoScreens" />
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -118,7 +118,6 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
                     android:background="@color/divider_upgrade_account" />
 
                 <!-- NOTIFICATIONS LAYOUT -->
@@ -179,6 +178,7 @@
                     android:id="@+id/divider_notifications_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
                     android:background="@color/divider_upgrade_account" />
 
                 <!-- SHARED FILES LAYOUT -->
@@ -217,6 +217,7 @@
                     android:id="@+id/divider_chat_files_shared_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
                     android:background="@color/divider_upgrade_account" />
 
                 <!-- CHAT LINK LAYOUT -->
@@ -317,6 +318,7 @@
                     android:id="@+id/divider_clear_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
                     android:background="@color/divider_upgrade_account" />
 
                 <!-- ARCHIVE LAYOUT -->
@@ -352,6 +354,7 @@
                     android:id="@+id/divider_archive_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
                     android:background="@color/divider_upgrade_account" />
 
                 <!-- LEAVE LAYOUT -->

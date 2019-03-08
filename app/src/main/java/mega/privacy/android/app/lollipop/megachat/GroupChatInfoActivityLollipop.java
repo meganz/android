@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -31,8 +30,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -51,6 +48,7 @@ import java.util.Locale;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
@@ -237,25 +235,30 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             setContentView(R.layout.activity_group_chat_properties);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = this.getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-            }
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 
             fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_group_chat);
             toolbar = (Toolbar) findViewById(R.id.toolbar_group_chat_properties);
             setSupportActionBar(toolbar);
             aB = getSupportActionBar();
 
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
 
-            aB.setTitle(getString(R.string.group_chat_info_label));
+            aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
             scrollView = (android.support.v4.widget.NestedScrollView) findViewById(R.id.scroll_view_group_chat_properties);
+            new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+                @Override
+                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    if (scrollView.canScrollVertically(-1)){
+                        changeActionBarElevation(true);
+                    }
+                    else {
+                        changeActionBarElevation(false);
+                    }
+                }
+            });
 
             //Info Layout
             avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
@@ -444,6 +447,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             observersSeparator.setVisibility(View.VISIBLE);
             observersLayout.setVisibility(View.VISIBLE);
             observersNumberText.setText(chat.getNumPreviewers()+"");
+        }
+    }
+
+    public void changeActionBarElevation(boolean whitElevation){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (whitElevation) {
+                aB.setElevation(Util.px2dp(4, outMetrics));
+            }
+            else {
+                aB.setElevation(0);
+            }
         }
     }
 
@@ -682,11 +696,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(megaApi!=null && megaApi.getRootNode()!=null){
             ArrayList<MegaUser> contacts = megaApi.getContacts();
             if(contacts==null){
-                showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                showSnackbar(getString(R.string.no_contacts_invite));
             }
             else {
                 if(contacts.isEmpty()){
-                    showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+                    showSnackbar(getString(R.string.no_contacts_invite));
                 }
                 else{
                     Intent in = new Intent(this, AddContactActivityLollipop.class);
@@ -1050,15 +1064,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void copyLink(){
         log("copyLink");
-        if(chatLink!=null){
-            if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setText(chatLink);
-            } else {
-                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
-                clipboard.setPrimaryClip(clip);
-            }
+        if(chatLink!=null) {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
+            clipboard.setPrimaryClip(clip);
             showSnackbar(getString(R.string.chat_link_copied_clipboard));
         }
         else {
@@ -1233,11 +1242,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                View view = getCurrentFocus();
-                if (view != null) {
-                    InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                }
+                Util.hideKeyboard(groupChatInfoActivity, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
 
@@ -1642,11 +1647,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void showSnackbar(String s){
-        log("showSnackbar: "+s);
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(fragmentContainer, s);
     }
 
 
