@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
@@ -52,13 +53,14 @@ public class IncomingMessageService extends IncomingCallService {
                 .setContentText(getString(R.string.retrieving_message_title))
                 .setAutoCancel(false);
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
-        mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
-        if (mNotificationManager != null) {
-            mNotificationManager.createNotificationChannel(notificationChannel);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
+            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
+            if (mNotificationManager != null) {
+                mNotificationManager.createNotificationChannel(notificationChannel);
+            }
         }
-        
         if (mNotificationManager != null) {
             Notification notification = mBuilder.build();
             startForeground(notificationId,notification);
