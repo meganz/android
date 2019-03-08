@@ -1292,7 +1292,7 @@ public class OfflineFragmentLollipop extends Fragment{
 								startActivity(mediaIntent);
 							}
 							else {
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

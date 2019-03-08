@@ -28,6 +28,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 180;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
+  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER = 255;
   private Context mContext;
   private DisplayMetrics mOutMetrics;
   private int textViewMaxWidth;
@@ -79,7 +80,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
       mOutMetrics = new DisplayMetrics ();
       display.getMetrics(mOutMetrics);
-      textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
       setText(getText());
 
     }else if(mContext instanceof ArchivedChatsActivity){

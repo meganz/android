@@ -39,6 +39,7 @@ public class Constants {
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 	public static int REQUEST_CODE_FILE_INFO = 1027;
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
+	public static int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
@@ -192,6 +193,8 @@ public class Constants {
 
 	public static String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
 
+	public static String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
+
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
@@ -322,4 +325,8 @@ public class Constants {
 
 	public static int FROM_INCOMING_SHARES= 140;
 	public static int FROM_INBOX= 150;
+
+	public static final int SNACKBAR_TYPE = 0;
+	public static final int MESSAGE_SNACKBAR_TYPE = 1;
+	public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 }
