@@ -30,6 +30,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -371,7 +372,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
 
         if (!Util.isOnline(context)) {
             if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                ((ChatActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             }
         }
         else{

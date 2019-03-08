@@ -13,9 +13,12 @@
         android:id="@+id/toolbar_file_contact_list"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/Theme.Megaactionbar.InfoScreens"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:subtitleTextAppearance="@style/ToolbarSubTitle"
+        app:theme="@style/Theme.Megaactionbar.InfoScreens"
         tools:context=".FolderLinkActivityLollipop" />
 
     <android.support.design.widget.CoordinatorLayout

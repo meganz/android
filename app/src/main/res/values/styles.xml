@@ -94,6 +94,42 @@
         <item name="preferenceTheme">@style/PreferenceStyle</item>
     </style>
 
+    <style name="Theme.Megaactionbar.InfoScreens" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/white</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/status_bar_search</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="android:colorControlNormal">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/accentColor</item>
+        <item name="android:actionModeBackground">@color/accentColor</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="elevation">0dp</item>
+        <item name="android:elevation">0dp</item>
+
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
+        <!-- You can also set colorControlNormal, colorControlActivated
+             colorControlHighlight & colorSwitchThumbNormal. -->
+        <item name="preferenceTheme">@style/PreferenceStyle</item>
+    </style>
+
     <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">
         <item name="colorControlNormal">@color/white</item>
     </style>
@@ -164,6 +200,15 @@
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ToolbarSubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/mail_my_account</item>
+    </style>
+
+    <style name="ToolbarTitle.CollapsingToolbar" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">16.5sp</item>
     </style>
 
     <style name="ToolbarTitle.Secondary" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">

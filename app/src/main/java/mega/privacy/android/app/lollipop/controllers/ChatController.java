@@ -127,6 +127,21 @@ public class ChatController {
         }
     }
 
+    public void selectChatsToAttachContacts (ArrayList<MegaUser> contacts) {
+        long[] longArray = new long[contacts.size()];
+
+        for (int i=0; i<contacts.size(); i++) {
+            longArray[i] = contacts.get(i).getHandle();
+        }
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("USER_HANDLES", longArray);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+    }
+
     public void leaveChat(long chatId){
         if(context instanceof ManagerActivityLollipop){
             megaChatApi.leaveChat(chatId, (ManagerActivityLollipop) context);
@@ -1469,7 +1484,7 @@ public class ChatController {
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
                         log("File already exists!");
-                        showSnackbar(context.getString(R.string.file_already_exists));
+                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
                     }
                     else{
                         dlFiles.put(document, destination.getAbsolutePath());
@@ -1511,21 +1526,21 @@ public class ChatController {
 
     }
 
-    void showSnackbar(String s) {
+    void showSnackbar(int type, String s) {
         if (context instanceof ChatFullScreenImageViewer){
-            ((ChatFullScreenImageViewer) context).showSnackbar(s);
+            ((ChatFullScreenImageViewer) context).showSnackbar(type, s);
         }
         else if (context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).showSnackbar(s);
+            ((AudioVideoPlayerLollipop) context).showSnackbar(type, s, -1);
         }
         else if (context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).showSnackbar(s);
+            ((PdfViewerActivityLollipop) context).showSnackbar(type, s, -1);
         }
         else if (context instanceof ChatActivityLollipop){
-            ((ChatActivityLollipop) context).showSnackbar(s);
+            ((ChatActivityLollipop) context).showSnackbar(type, s, -1);
         }
         else if (context instanceof NodeAttachmentHistoryActivity){
-            ((NodeAttachmentHistoryActivity) context).showSnackbar(s);
+            ((NodeAttachmentHistoryActivity) context).showSnackbar(type, s);
         }
     }
 
@@ -1614,7 +1629,7 @@ public class ChatController {
                                         String path = fs[1].getAbsolutePath();
                                         File defaultPathF = new File(path);
                                         defaultPathF.mkdirs();
-                                        showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
+                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         checkSizeBeforeDownload(path, nodeList);
                                     }
                                     break;
@@ -1729,22 +1744,7 @@ public class ChatController {
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
-
-            if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if(context instanceof ChatFullScreenImageViewer){
-                ((ChatFullScreenImageViewer) context).showSnackbarNotSpace();
-            }
-            else if (context instanceof PdfViewerActivityLollipop){
-                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
-            }
-            else if (context instanceof AudioVideoPlayerLollipop){
-                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
-            }
-            else if (context instanceof NodeAttachmentHistoryActivity){
-                ((NodeAttachmentHistoryActivity) context).showSnackbarNotSpace();
-            }
+            showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
             log("Not enough space");
             return;
         }
@@ -1872,7 +1872,7 @@ public class ChatController {
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
                             log("Video/Audio file");
                             if (context instanceof AudioVideoPlayerLollipop){
-                                ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 File mediaFile = new File(localPath);
@@ -1913,7 +1913,7 @@ public class ChatController {
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        showSnackbar(context.getString(R.string.intent_not_available));
+                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1933,7 +1933,7 @@ public class ChatController {
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
                             log("Pdf file");
                             if (context instanceof PdfViewerActivityLollipop){
-                                ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 File pdfFile = new File(localPath);
@@ -1955,7 +1955,7 @@ public class ChatController {
                         else {
                             log("MimeTypeList other file");
                             if(context instanceof ChatFullScreenImageViewer){
-                                ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                             }
                             else {
                                 try {
@@ -1982,11 +1982,11 @@ public class ChatController {
                                             log("call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
-                                        showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                 }
                             }
 
@@ -2128,7 +2128,7 @@ public class ChatController {
         else{
             log("Proceed to import nodes to own Cloud");
             ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
-
+    
             MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
                 log("Error no chat folder - return");
@@ -2156,7 +2156,7 @@ public class ChatController {
                 }
                 else{
                     log("MESSAGE is null");
-                    showSnackbar(context.getString(R.string.messages_forwarded_error));
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
                 }
             }
         }

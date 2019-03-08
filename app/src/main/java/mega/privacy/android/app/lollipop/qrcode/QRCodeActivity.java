@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,11 +16,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,6 +75,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     private boolean contacts = false;
     private boolean inviteContacts = false;
 
+    DisplayMetrics outMetrics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +90,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             contacts = getIntent().getBooleanExtra("contacts", false);
             inviteContacts = getIntent().getBooleanExtra("inviteContacts", false);
         }
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
 
         setContentView(R.layout.activity_qr_code);
 
@@ -285,7 +291,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
                 if (qrFile == null) {
-                    showSnackbar(getString(R.string.general_error));
+                    showSnackbar(drawerLayout, getString(R.string.general_error));
                 }
                 else {
                     if (qrFile.exists()) {
@@ -304,12 +310,12 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                         }
 
                         if (availableFreeSpace < qrFile.length()) {
-                            showSnackbar(getString(R.string.error_not_enough_free_space));
+                            showSnackbar(drawerLayout, getString(R.string.error_not_enough_free_space));
                             return;
                         }
                         File newQrFile = new File(parentPath, myEmail + "QRcode.jpg");
                         if (newQrFile == null) {
-                            showSnackbar(getString(R.string.general_error));
+                            showSnackbar(drawerLayout, getString(R.string.general_error));
                         }
                         else {
                             try {
@@ -319,15 +325,15 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                                 dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
                                 src.close();
                                 dst.close();
-                                showSnackbar(getString(R.string.success_download_qr, parentPath));
+                                showSnackbar(drawerLayout, getString(R.string.success_download_qr, parentPath));
                             } catch (IOException e) {
-                                showSnackbar(getString(R.string.general_error));
+                                showSnackbar(drawerLayout, getString(R.string.general_error));
                                 e.printStackTrace();
                             }
                         }
                     }
                     else {
-                        showSnackbar(getString(R.string.error_download_qr));
+                        showSnackbar(drawerLayout, getString(R.string.error_download_qr));
                     }
                 }
             }
@@ -359,7 +365,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else {
-                showSnackbar(getString(R.string.error_share_qr));
+                showSnackbar(drawerLayout, getString(R.string.error_share_qr));
             }
         }
     }
@@ -391,19 +397,20 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     public void resetSuccessfully (boolean success) {
         log("resetSuccessfully");
         if (success){
-            showSnackbar(getString(R.string.qrcode_reset_successfully));
+            showSnackbar(drawerLayout, getString(R.string.qrcode_reset_successfully));
         }
         else {
-            showSnackbar(getString(R.string.qrcode_reset_not_successfully));
+            showSnackbar(drawerLayout, getString(R.string.qrcode_reset_not_successfully));
         }
     }
 
-    public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(drawerLayout, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+    public void showSnackbar(View view, String s){
+        if (view == null) {
+            showSnackbar(drawerLayout, s);
+        }
+        else {
+            showSnackbar(view, s);
+        }
     }
 
     public static void log(String message) {
