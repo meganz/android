@@ -178,14 +178,32 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				return START_NOT_STICKY;
 			}
 		}
-
-		isOverquota = 0;
+		
 		onHandleIntent(intent);
 		return START_NOT_STICKY;
 	}
 
-	protected void onHandleIntent(final Intent intent) {
+	private synchronized void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
+		
+		String action = intent.getAction();
+		log("action is " + action);
+		if(action != null){
+            if (Constants.ACTION_OVERQUOTA_STORAGE.equals(action)) {
+                isOverquota = 1;
+            }else if(Constants.ACTION_STORAGE_STATE_CHANGED.equals(action)){
+                isOverquota = 0;
+            }
+            if (totalFileUploads > 0) {
+                updateProgressNotification(false);
+            }
+            if (totalFolderUploads > 0) {
+                updateProgressNotification(true);
+            }
+            return;
+        }else {
+            isOverquota = 0;
+        }
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
 
@@ -937,22 +955,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 return;
             }
             
-            if (isOverquota != 0) {
-                log("After over quota error, refresh both notification");
-                isOverquota = 0;
-                if (totalFileUploads > 0) {
-                    updateProgressNotification(false);}
-                if (totalFolderUploads > 0) {
-                    updateProgressNotification(true);
-                }
+            if(transfer.isFolderTransfer()){
+                mapProgressFolderTransfers.put(transfer.getTag(), transfer);
+                updateProgressNotification(true);
             }else{
-                if(transfer.isFolderTransfer()){
-                    mapProgressFolderTransfers.put(transfer.getTag(), transfer);
-                    updateProgressNotification(true);
-                }else{
-                    mapProgressFileTransfers.put(transfer.getTag(), transfer);
-                    updateProgressNotification(false);
-                }
+                mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                updateProgressNotification(false);
             }
         }
 	}
