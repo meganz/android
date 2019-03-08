@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -222,6 +221,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private boolean createNewGroup = false;
     private String title = "";
 
+    private boolean onlyCreateGroup;
+
     @Override
     public List<ShareContactInfo> getAdapterData() {
         if (inputString != null && !inputString.equals("")) {
@@ -356,7 +357,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING) {
                         queryIfContactSouldBeAddedTask.cancel(true);
                     }
-                    hideKeyboard();
+                    Util.hideKeyboard(addContactActivityLollipop, 0);
                     queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
                     queryIfContactSouldBeAddedTask.execute(true);
                 }
@@ -472,7 +473,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING) {
                     queryIfContactSouldBeAddedTask.cancel(true);
                 }
-                hideKeyboard();
+                Util.hideKeyboard(addContactActivityLollipop, 0);
                 queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
                 queryIfContactSouldBeAddedTask.execute(true);
             }
@@ -637,7 +638,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     if (queryIfContactSouldBeAddedTask != null && queryIfContactSouldBeAddedTask.getStatus() == AsyncTask.Status.RUNNING) {
                         queryIfContactSouldBeAddedTask.cancel(true);
                     }
-                    hideKeyboard();
+                    Util.hideKeyboard(addContactActivityLollipop, 0);
                     queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
                     queryIfContactSouldBeAddedTask.execute(true);
                 }
@@ -1118,7 +1119,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    hideKeyboard();
+                    Util.hideKeyboard(addContactActivityLollipop, 0);
                     return true;
                 }
                 return false;
@@ -1234,7 +1235,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 else {
                     shareWith(addedContactsShare);
                 }
-                hideKeyboard();
+                Util.hideKeyboard(addContactActivityLollipop, 0);
                 break;
             }
             case R.id.action_scan_qr: {
@@ -1243,14 +1244,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void hideKeyboard () {
-        View view = getCurrentFocus();
-        if (view != null) {
-            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     public void refreshKeyboard() {
@@ -1308,6 +1301,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("isConfirmAddShown", isConfirmAddShown);
         outState.putString("confirmAddMail", confirmAddMail);
         outState.putBoolean("createNewGroup", createNewGroup);
+        outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
 
         saveContactsAdded(outState);
     }
@@ -1397,6 +1391,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if (comesFromChat) {
                 title = getIntent().getStringExtra("aBtitle");
             }
+            onlyCreateGroup = getIntent().getBooleanExtra("onlyCreateGroup", false);
             if (contactType == Constants.CONTACT_TYPE_MEGA || contactType == Constants.CONTACT_TYPE_BOTH){
                 multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
                 if(multipleSelectIntent==0){
@@ -1598,6 +1593,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
             confirmAddMail = savedInstanceState.getString("confirmAddMail");
             createNewGroup = savedInstanceState.getBoolean("createNewGroup", false);
+            onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
 
             if (contactType == Constants.CONTACT_TYPE_MEGA || contactType == Constants.CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
@@ -1684,6 +1680,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 queryIfHasReadContactsPermissions();
             }
         }
+
+        if (onlyCreateGroup) {
+            createNewGroup = true;
+            setTitleAB();
+            inviteContactButton.setVisibility(View.GONE);
+            newGroupChatButton.setVisibility(View.GONE);
+        }
     }
 
     void queryIfHasReadContactsPermissions() {
@@ -1731,7 +1734,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     aB.setTitle(getString(R.string.group_chat_start_conversation_label));
                 }
                 else if (createNewGroup && !onNewGroup) {
-                    aB.setTitle(getString(R.string.group_chat_start_conversation_label));
+                    if (onlyCreateGroup) {
+                        aB.setTitle(getString(R.string.title_new_group));
+                    }
+                    else {
+                        aB.setTitle(getString(R.string.group_chat_start_conversation_label));
+                    }
                     if (addedContactsMEGA.size() > 0) {
                         aB.setSubtitle(addedContactsMEGA.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsMEGA.size()));
                     }
@@ -1798,7 +1806,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             typeContactEditText.getText().clear();
         }
         typeContactEditText.clearFocus();
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
 
         boolean found = false;
         for (int i=0; i<addedContactsShare.size(); i++) {
@@ -1859,7 +1867,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (searchExpand && searchMenuItem != null) {
             searchMenuItem.collapseActionView();
         }
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
 
         if (addedContactsMEGA.contains(contact)){
             showSnackbar(getString(R.string.contact_not_added));
@@ -1912,7 +1920,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             typeContactEditText.getText().clear();
         }
         typeContactEditText.clearFocus();
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
 
         boolean found = false;
         for (int i=0; i<addedContactsPhone.size(); i++) {
@@ -2027,11 +2035,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     public void showSnackbar(String message) {
-        hideKeyboard();
-        Snackbar snackbar = Snackbar.make(relativeLayout, message, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
+        showSnackbar(relativeLayout, message);
     }
 
     private void addMEGAFilteredContact (MegaContactAdapter contact) {
@@ -2421,7 +2426,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             setError();
                         }
                         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            hideKeyboard();
+                            Util.hideKeyboard(addContactActivityLollipop, 0);
                         }
                     }
                     else{
@@ -2447,7 +2452,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             setError();
                         }
                         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            hideKeyboard();
+                            Util.hideKeyboard(addContactActivityLollipop, 0);
                         }
                     }
                     else{
@@ -2477,7 +2482,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             String s = v.getText().toString();
             log("s: "+s);
             if (s.isEmpty() || s.equals("null") || s.equals("")) {
-                hideKeyboard();
+                Util.hideKeyboard(addContactActivityLollipop, 0);
             }
             else {
                 if (contactType == Constants.CONTACT_TYPE_DEVICE) {
@@ -2487,13 +2492,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
                         queryIfContactSouldBeAddedTask.execute(false);
                         typeContactEditText.getText().clear();
-                        hideKeyboard();
+                        Util.hideKeyboard(addContactActivityLollipop, 0);
                     }
                     else {
                         setError();
                     }
                     if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        hideKeyboard();
+                        Util.hideKeyboard(addContactActivityLollipop, 0);
                     }
                 }
                 else if (contactType == Constants.CONTACT_TYPE_BOTH){
@@ -2503,13 +2508,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
                         queryIfContactSouldBeAddedTask.execute(false);
                         typeContactEditText.getText().clear();
-                        hideKeyboard();
+                        Util.hideKeyboard(addContactActivityLollipop, 0);
                     }
                     else {
                         setError();
                     }
                     if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        hideKeyboard();
+                        Util.hideKeyboard(addContactActivityLollipop, 0);
                     }
                 }
                 if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING){
@@ -2523,7 +2528,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
             if (contactType == Constants.CONTACT_TYPE_DEVICE){
                 if (addedContactsPhone.isEmpty() || addedContactsPhone == null) {
-                    hideKeyboard();
+                    Util.hideKeyboard(addContactActivityLollipop, 0);
                 }
                 else {
                     inviteContacts(addedContactsPhone);
@@ -2531,7 +2536,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             else if (contactType == Constants.CONTACT_TYPE_MEGA){
                 if (addedContactsMEGA.isEmpty() || addedContactsMEGA == null) {
-                    hideKeyboard();
+                    Util.hideKeyboard(addContactActivityLollipop, 0);
                 }
                 else {
                     setResultContacts(addedContactsMEGA, true);
@@ -2539,7 +2544,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             else {
                 if (addedContactsShare.isEmpty() || addedContactsShare == null) {
-                    hideKeyboard();
+                    Util.hideKeyboard(addContactActivityLollipop, 0);
                 }
                 else {
                     shareWith(addedContactsShare);
@@ -2850,7 +2855,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (onNewGroup) {
             returnToAddContacts();
         }
-        else if (createNewGroup) {
+        else if (createNewGroup && !onlyCreateGroup) {
             createNewGroup = false;
             aB.setSubtitle(null);
             inviteContactButton.setVisibility(View.VISIBLE);
@@ -2906,7 +2911,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         else {
             newGroup();
         }
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
     }
 
     void addParticipants(ArrayList<String> contacts) {
@@ -2914,7 +2919,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contacts);
 
         setResult(RESULT_OK, intent);
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
         finish();
     }
 
@@ -2980,7 +2985,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         setResult(RESULT_OK, intent);
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
         finish();
     }
 
@@ -3007,7 +3012,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
         setResult(RESULT_OK, intent);
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
         finish();
     }
 
@@ -3040,7 +3045,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
         setResult(RESULT_OK, intent);
-        hideKeyboard();
+        Util.hideKeyboard(addContactActivityLollipop, 0);
         finish();
     }
 

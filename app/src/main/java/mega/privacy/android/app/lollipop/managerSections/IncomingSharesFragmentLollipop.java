@@ -339,6 +339,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			boolean showSendToChat = false;
 
 			if (selected.size() != 0) {
@@ -1129,7 +1131,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
