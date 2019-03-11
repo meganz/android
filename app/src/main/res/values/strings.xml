@@ -2361,4 +2361,11 @@
 
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
 
+	<string name="contact_request_status_accepted" context="The status of pending contact request">%1$s (ACCEPTED)</string>
+	<string name="contact_request_status_deleted" context="The status of pending contact request">%1$s (DELETED)</string>
+	<string name="contact_request_status_denied" context="The status of pending contact request">%1$s (DENIED)</string>
+	<string name="contact_request_status_ignored" context="The status of pending contact request">%1$s (IGNORED)</string>
+	<string name="contact_request_status_reminded" context="The status of pending contact request">%1$s (REMINDED)</string>
+	<string name="contact_request_status_pending" context="The status of pending contact request">%1$s (PENDING)</string>
+
 </resources>
