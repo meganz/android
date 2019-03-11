@@ -235,7 +235,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             setContentView(R.layout.activity_group_chat_properties);
 
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
             fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_group_chat);
             toolbar = (Toolbar) findViewById(R.id.toolbar_group_chat_properties);
@@ -488,14 +488,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             clearChatLayout.setVisibility(View.VISIBLE);
             dividerLeaveLayout.setVisibility(View.VISIBLE);
 
-            //Show always the get link option (if not, move inside isPublic)
-            chatLinkLayout.setVisibility(View.VISIBLE);
-            chatLinkLayout.setOnClickListener(this);
-            chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
-            chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
-            chatLinkSeparator.setVisibility(View.VISIBLE);
-
             if(chat.isPublic()){
+                chatLinkLayout.setVisibility(View.VISIBLE);
+                chatLinkLayout.setOnClickListener(this);
+                chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
+                chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
+                chatLinkSeparator.setVisibility(View.VISIBLE);
+
                 privateLayout.setVisibility(View.VISIBLE);
                 privateLayout.setOnClickListener(this);
                 privateSeparator.setVisibility(View.VISIBLE);
@@ -504,6 +503,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             else{
                 log("Private chat");
+                chatLinkLayout.setVisibility(View.GONE);
+                chatLinkSeparator.setVisibility(View.GONE);
                 privateLayout.setVisibility(View.GONE);
                 privateSeparator.setVisibility(View.GONE);
             }
