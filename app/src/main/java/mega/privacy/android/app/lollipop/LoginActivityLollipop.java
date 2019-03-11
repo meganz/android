@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -235,10 +234,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     }
 
     public void showSnackbar(String message) {
-        Snackbar snackbar = Snackbar.make(relativeContainer, message, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(relativeContainer, message);
     }
 
     public void showFragment(int visibleFragment) {
@@ -329,13 +325,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment);
                 ft.commitNowAllowingStateLoss();
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-                }
                 break;
             }
             case Constants.CONFIRM_EMAIL_FRAGMENT: {

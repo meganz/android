@@ -348,6 +348,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			boolean showTrash = false;
 			boolean showShare = false;
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
@@ -963,7 +965,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -973,7 +975,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							Uri mediaFileUri = Uri.fromFile(mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -1012,12 +1014,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							}
 							else{
 								log("itemClick:ERROR:httpServerGetLocalLink");
-								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 							}
 						}
 						else{
 							log("itemClick:ERROR:httpServerGetLocalLink");
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
 						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
@@ -1035,7 +1037,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 						else{
 							log("itemClick:noAvailableIntent");
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
@@ -1326,7 +1328,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 } else {
                     emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
                 }
-                String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
+                String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
                 try {
                     textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
@@ -1609,7 +1611,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
+					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try {
 						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]","</font>");

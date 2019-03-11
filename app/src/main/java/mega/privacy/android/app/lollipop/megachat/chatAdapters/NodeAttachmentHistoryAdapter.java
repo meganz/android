@@ -599,7 +599,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.textViewFileName.setText(node.getName());
         holder.textViewMessageInfo.setText("");
 
-        String date = TimeUtils.formatDateAndTime(m.getTimestamp(), TimeUtils.DATE_LONG_FORMAT);
+        String date = TimeUtils.formatDateAndTime(context,m.getTimestamp(), TimeUtils.DATE_LONG_FORMAT);
 
         if (m.getUserHandle() == megaChatApi.getMyUserHandle()) {
             log("MY message handle!!: " + m.getMsgId());

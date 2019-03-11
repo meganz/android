@@ -377,7 +377,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									}
 									else{
 										log("shouldRun: Chat correctly initialized");
-										megaChatApi.enableGroupChatCalls(false);
+										megaChatApi.enableGroupChatCalls(true);
 									}
 								}
 							}
