@@ -347,7 +347,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
-		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY;
+		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS;
 
 		public String getTag () {
 			switch (this) {
@@ -377,6 +377,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case CREDIT_CARD: return "ccF";
 				case TURN_ON_NOTIFICATIONS: return "tonF";
 				case EXPORT_RECOVERY_KEY: return "eRKeyF";
+				case PERMISSIONS: return "pF";
 			}
 			return null;
 		}
@@ -531,13 +532,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private CentiliFragmentLollipop ctFL;
 	private CreditCardFragmentLollipop ccFL;
 	private CameraUploadFragmentLollipop cuFL;
-
 	private RecentChatsFragmentLollipop rChatFL;
-
 	private NotificationsFragmentLollipop notificFragment;
-
 	private TurnOnNotificationsFragment tonF;
 	private ExportRecoveryKeyFragment eRKeyF;
+	private PermissionsFragment pF;
 
 	ProgressDialog statusDialog;
 
@@ -641,6 +640,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
+
+	private boolean onAskingPermissionsFragment = false;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1466,8 +1467,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case Constants.REQUEST_READ_CONTACTS:{
 				log("REQUEST_READ_CONTACTS");
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-					if (hasReadContactsPermissions){
+					if (checkPermission(Manifest.permission.READ_CONTACTS)){
 						Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
 						this.startActivity(phoneContactIntent);
 					}
@@ -1484,8 +1484,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
 					log("TAKE_PICTURE_OPTION");
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-		        		if (!hasStoragePermission){
+		        		if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 		        			ActivityCompat.requestPermissions(this,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 									Constants.REQUEST_WRITE_STORAGE);
@@ -1499,8 +1498,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (fromTakePicture==Constants.TAKE_PROFILE_PICTURE){
 					log("TAKE_PROFILE_PICTURE");
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-						if (!hasStoragePermission){
+						if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 							ActivityCompat.requestPermissions(this,
 									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 									Constants.REQUEST_WRITE_STORAGE);
@@ -1531,8 +1529,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
 							log("TAKE_PICTURE_OPTION");
-							boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-							if (!hasCameraPermission){
+							if (!checkPermission(Manifest.permission.CAMERA)){
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
 							}
 							else{
@@ -1542,8 +1539,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else if (fromTakePicture==Constants.TAKE_PROFILE_PICTURE){
 							log("TAKE_PROFILE_PICTURE");
-							boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-							if (!hasCameraPermission){
+							if (!checkPermission(Manifest.permission.CAMERA)){
 								ActivityCompat.requestPermissions(this,
 										new String[]{Manifest.permission.CAMERA},
 										Constants.REQUEST_CAMERA);
@@ -1561,8 +1557,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	else{
 					if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
 						log("TAKE_PICTURE_OPTION");
-						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-						if (!hasCameraPermission){
+						if (!checkPermission(Manifest.permission.CAMERA)){
 							ActivityCompat.requestPermissions(this,
 									new String[]{Manifest.permission.CAMERA},
 									Constants.REQUEST_CAMERA);
@@ -1574,8 +1569,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (fromTakePicture==Constants.TAKE_PROFILE_PICTURE){
 						log("TAKE_PROFILE_PICTURE");
-						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-						if (!hasCameraPermission){
+						if (!checkPermission(Manifest.permission.CAMERA)){
 							ActivityCompat.requestPermissions(this,
 									new String[]{Manifest.permission.CAMERA},
 									Constants.REQUEST_CAMERA);
@@ -1595,20 +1589,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 	        	break;
 	        }
+			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
+				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+				if (pF != null) {
+//					if (pF.getCurrentPermission() == 2 && pF.askingForMicrophoneAndWriteCallsLog()) {
+//						if (grantResults.length == 1) {
+////							Do nothing, asking for microphone, still need to ask for write call logs
+//						}
+//						else {
+//							pF.setNextPermission();
+//						}
+//					}
+//					else {
+						pF.setNextPermission();
+//					}
+				}
+			}
         }
-//        switch (requestCode)
-//        {
-//            case REQUEST_WRITE_STORAGE: {
-//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//                {
-//                    //reload my activity with permission granted or use the features what required the permission
-//                } else
-//                {
-//                    Toast.makeText(this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        }
-
     }
 
 	@Override
@@ -1693,6 +1690,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
+		outState.putBoolean("onAskingPermissionsFragment", onAskingPermissionsFragment);
+		pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+		if (onAskingPermissionsFragment && pF != null) {
+			getSupportFragmentManager().putFragment(outState, FragmentTag.PERMISSIONS.getTag(), pF);
+		}
 		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
@@ -1752,6 +1754,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
+			onAskingPermissionsFragment = savedInstanceState.getBoolean("onAskingPermissionsFragment", false);
+			if (onAskingPermissionsFragment) {
+				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
+			}
 			elevation = savedInstanceState.getFloat("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", -1);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
@@ -2956,7 +2962,68 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
+
+		if (firstTimeAfterInstallation) {
+			askForAccess();
+		}
+
 		log("END onCreate");
+	}
+
+	void askForAccess () {
+    	boolean writeStorageGranted = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+    	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
+		boolean microphoneGranted = checkPermission(Manifest.permission.RECORD_AUDIO);
+//		boolean writeCallsGranted = checkPermission(Manifest.permission.WRITE_CALL_LOG);
+
+		if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted/* || !writeCallsGranted*/) {
+			deleteCurrentFragment();
+
+			if (pF == null) {
+				pF = new PermissionsFragment();
+			}
+
+			replaceFragment(pF, FragmentTag.PERMISSIONS.getTag());
+
+			onAskingPermissionsFragment = true;
+
+			tabLayoutContacts.setVisibility(View.GONE);
+			viewPagerContacts.setVisibility(View.GONE);
+			tabLayoutShares.setVisibility(View.GONE);
+			viewPagerShares.setVisibility(View.GONE);
+			tabLayoutMyAccount.setVisibility(View.GONE);
+			viewPagerMyAccount.setVisibility(View.GONE);
+			tabLayoutTransfers.setVisibility(View.GONE);
+			viewPagerTransfers.setVisibility(View.GONE);
+			abL.setVisibility(View.GONE);
+
+			fragmentContainer.setVisibility(View.VISIBLE);
+			drawerLayout.closeDrawer(Gravity.LEFT);
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+			supportInvalidateOptionsMenu();
+			hideFabButton();
+			showHideBottomNavigationView(true);
+		}
+	}
+
+	public void destroyPermissionsFragment () {
+		turnOnNotifications = false;
+
+		tB.setVisibility(View.VISIBLE);
+		abL.setVisibility(View.VISIBLE);
+
+		deleteCurrentFragment();
+
+		onAskingPermissionsFragment = false;
+
+		pF = null;
+
+		changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		supportInvalidateOptionsMenu();
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	void setContactStatus() {
@@ -3191,6 +3258,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		supportInvalidateOptionsMenu();
 		hideFabButton();
+		showHideBottomNavigationView(true);
 	}
 
 	void actionOpenFolder (long handleIntent) {
@@ -5541,8 +5609,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
+					if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 						ActivityCompat.requestPermissions(this,
 								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
@@ -5588,24 +5655,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				fragmentContainer.setVisibility(View.VISIBLE);
 
 				replaceFragment(cuFL, FragmentTag.CAMERA_UPLOADS.getTag());
-
-
-    			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions(this,
-				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								Constants.REQUEST_WRITE_STORAGE);
-					}
-
-//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//					if (!hasCameraPermission) {
-//						ActivityCompat.requestPermissions(this,
-//				                new String[]{Manifest.permission.CAMERA},
-//				                ManagerActivityLollipop.REQUEST_CAMERA);
-//					}
-
-				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -7735,14 +7784,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    case R.id.action_take_picture:{
 		    	fromTakePicture = Constants.TAKE_PICTURE_OPTION;
 		    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					boolean hasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
 					}
 
-					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+					boolean hasCameraPermission = checkPermission(Manifest.permission.CAMERA);
 					if (!hasCameraPermission) {
 						ActivityCompat.requestPermissions(this,
 				                new String[]{Manifest.permission.CAMERA},
@@ -7841,8 +7890,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_add:{
 	        	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-	    			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-	    			if (!hasStoragePermission) {
+	    			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 	    				ActivityCompat.requestPermissions(this,
 	    		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
@@ -9367,6 +9415,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (turnOnNotifications){
 			deleteTurnOnNotificationsFragment();
+			return;
+		}
+
+		if (onAskingPermissionsFragment) {
 			return;
 		}
 
@@ -11006,14 +11058,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		fromTakePicture = Constants.TAKE_PROFILE_PICTURE;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+			boolean hasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions(this,
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 						Constants.REQUEST_WRITE_STORAGE);
 			}
 
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			boolean hasCameraPermission = checkPermission(Manifest.permission.CAMERA);
 			if (!hasCameraPermission) {
 				ActivityCompat.requestPermissions(this,
 						new String[]{Manifest.permission.CAMERA},
@@ -12547,8 +12599,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("showUploadPanel");
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
+			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
 						Constants.REQUEST_READ_WRITE_STORAGE);
@@ -13095,8 +13146,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showConfirmationRemoveMK(){
 		log("showConfirmationRemoveMK");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
+			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				ActivityCompat.requestPermissions(this,
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 						Constants.REQUEST_WRITE_STORAGE);
@@ -13156,8 +13206,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showConfirmationRemoveFromOffline(){
 		log("showConfirmationRemoveFromOffline");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
+			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				ActivityCompat.requestPermissions(this,
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 						Constants.REQUEST_WRITE_STORAGE);
@@ -13210,8 +13259,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showConfirmationRemoveSomeFromOffline(final List<MegaOffline> documents){
 		log("showConfirmationRemoveSomeFromOffline");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
+			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
@@ -13518,8 +13566,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
+				if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 					ActivityCompat.requestPermissions(this,
 			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 							Constants.REQUEST_WRITE_STORAGE);
@@ -15102,8 +15149,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void requestContactsPermissions(ShareInfo info, MegaNode parentNode){
 		log("requestContactsPermissions");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-			if (!hasReadContactsPermission) {
+			if (!checkPermission(Manifest.permission.READ_CONTACTS)) {
 				log("No read contacts permission");
 				infoManager = info;
 				parentNodeManager = parentNode;
@@ -18594,6 +18640,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchMenuItem.expandActionView();
 			if (searchView != null) {
 				searchView.setQuery(querySaved, false);
+			}
+		}
+	}
+
+	public boolean checkPermission (String permission) {
+		switch (permission) {
+			case Manifest.permission.WRITE_EXTERNAL_STORAGE: {
+				return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+			}
+			case Manifest.permission.READ_EXTERNAL_STORAGE: {
+				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+			}
+			case Manifest.permission.CAMERA: {
+				return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+			}
+			case Manifest.permission.RECORD_AUDIO: {
+				return ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+			}
+			//case Manifest.permission.WRITE_CALL_LOG: {
+			//	return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED;
+			//}
+			case Manifest.permission.READ_CONTACTS: {
+				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
+			}
+			default: {
+				return false;
 			}
 		}
 	}
