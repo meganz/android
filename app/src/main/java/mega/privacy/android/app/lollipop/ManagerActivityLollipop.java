@@ -114,7 +114,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -641,6 +640,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
+
+	private boolean joiningToChatLink = false;
+	private long idJoinToChatLink = -1;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -2305,7 +2307,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();
-//						finish();
 						return;
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
@@ -2650,12 +2651,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
-
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 
 						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending = false;
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+						joiningToChatLink = true;
+						if (idJoinToChatLink == -1) {
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+						}
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -2784,9 +2798,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
-				log("Connect to chat!: "+megaChatApi.getInitState());
-
 				if(megaChatApi!=null){
+					log("Connect to chat!: "+megaChatApi.getInitState());
 					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
 						log("Connection goes!!!");
 						megaChatApi.connect(this);
@@ -2932,7 +2945,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						if (firstLogin) {
+						if (firstLogin && !joiningToChatLink) {
 							log("intent firstTimeCam2==true");
 							if (prefs != null){
 								if (prefs.getCamSyncEnabled() != null){
@@ -11032,7 +11045,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showChatLink(String link){
 		log("showChatLink: "+link);
 		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-		openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+		if (joiningToChatLink) {
+			openChatLinkIntent.setAction(Constants.ACTION_JOIN_OPEN_CHAT_LINK);
+		}
+		else {
+			openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+		}
 		openChatLinkIntent.setData(Uri.parse(link));
 		startActivity(openChatLinkIntent);
 	}
@@ -15273,6 +15291,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestStart(CHAT): "+ request.getRequestString());
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
 //			MegaApiAndroid.setLoggerObject(new AndroidLogger());
 ////			MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
@@ -15325,6 +15344,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
+				if (joiningToChatLink && idJoinToChatLink != -1) {
+					megaChatApi.autojoinPublicChat(idJoinToChatLink, this);
+				}
 				if(drawerItem == DrawerItem.CHAT){
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if(rChatFL!=null){
@@ -15412,26 +15434,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
 				showChatLink(request.getLink());
 			}
 			else {
-				log("EEEERRRRROR WHEN LOADING CHAT LINK" + e.getErrorString());
-				if(e.getErrorCode()==MegaChatError.ERROR_EXIST) {
-					//ERROR_EXIST - If the user already participates in the chat.
-					showChatLink(request.getLink());
+				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+					Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
+				}
+				else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+					Util.showAlert(this, getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
 				}
 				else{
-
-					if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-						Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
-					}
-					else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
-						Util.showAlert(this, getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
-					}
-					else{
-						Util.showAlert(this, "Error: "+getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
-					}
+					Util.showAlert(this, "Error: "+getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
 				}
 			}
 		}
@@ -15441,6 +15455,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
             else{
 				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: "+e.getErrorType());
+			}
+		}
+		else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+			joiningToChatLink = false;
+			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
+				showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
+			}
+			else {
+				log("Error joining to chat: "+ e.getErrorString());
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
 			}
 		}
 	}

@@ -956,7 +956,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Intent is not null");
             intentAction = newIntent.getAction();
             if (intentAction != null){
-                if (intentAction.equals(Constants.ACTION_OPEN_CHAT_LINK)){
+                if (intentAction.equals(Constants.ACTION_OPEN_CHAT_LINK) || intentAction.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
                     megaChatApi.openChatPreview(link, this);
                 }
@@ -1289,7 +1289,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     iconStateToolbar.setVisibility(View.GONE);
                     tB.setOnClickListener(this);
 
-                    setBottomLayout(SHOW_JOIN_LAYOUT);
+                    if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                        setBottomLayout(SHOW_NOTHING_LAYOUT);
+                    }
+                    else {
+                        setBottomLayout(SHOW_JOIN_LAYOUT);
+                    }
 
                     return;
                 }
@@ -1889,6 +1894,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 loginIntent.setAction(Constants.ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));
                 loginIntent.putExtra("idChatToJoin", idChat);
+                closeChat(true);
             }
             startActivity(loginIntent);
         }
@@ -2930,7 +2936,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.join_button:{
                 if (chatC.isInAnonymousMode()) {
-                    closeChat(true);
                     ifAnonymousModeLogin(true);
                 }
                 else {
