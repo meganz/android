@@ -3421,13 +3421,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (intent.getAction().equals(Constants.SHOW_REPEATED_UPLOAD)){
 					log("onPostResume: Intent SHOW_REPEATED_UPLOAD");
 					String message = intent.getStringExtra("MESSAGE");
-					int lines;
-					if(!TextUtils.isEmpty(message)) {
-					    int temp = message.split("\n").length;
-					    lines = (temp > 1) ? temp : 1;
-					    lines = (lines > 10) ? 10 : lines;
-                        showSnackbar(message,lines);
-                    }
+                    showSnackbar(message);
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
 					log("IPC - go to received request in Contacts");
@@ -9634,14 +9628,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
 	}
-
-    public void showSnackbar(String s,int lines){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(lines);
-        snackbar.show();
-    }
 
 	public void showSnackbarNotSpace(){
 		log("showSnackbarNotSpace");

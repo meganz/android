@@ -116,8 +116,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	int isOverquota = 0;
 
     private long lastUpdated;
-
-    private StringBuilder sb = new StringBuilder(256);
+    private int uploadedFileCount;
 
     @SuppressLint("NewApi")
 	@Override
@@ -200,16 +199,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		onHandleIntent(intent);
         log(currentUpload +" / " + uploadCount);
-        if(currentUpload == uploadCount) {
+        if(currentUpload == uploadCount && uploadedFileCount != 0) {
             log("send message");
             Intent i = new Intent(this, ManagerActivityLollipop.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-            i.putExtra("MESSAGE", sb.toString());
+            String file = getResources().getQuantityString(R.plurals.new_general_num_files,uploadedFileCount,uploadedFileCount);
+            String sShow = file + " " + getString(R.string.general_already_uploaded);
+            i.putExtra("MESSAGE", sShow);
             startActivity(i);
             //reset
             currentUpload = 0;
-            sb = new StringBuilder(256);
+            uploadedFileCount = 0;
         }
 		return START_NOT_STICKY;
 	}
@@ -261,7 +262,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
 						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-						String sShow = nameInMEGAEdited + " " + getString(R.string.general_already_uploaded);
+
 						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
 
 //						Intent i = new Intent(this, ManagerActivityLollipop.class);
@@ -270,12 +271,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 //						i.putExtra("MESSAGE", sShow);
 //						startActivity(i);
 						log("Return - file already uploaded");
-						if(sb.length() == 0) {
-						    sb.append(sShow);
-                        } else {
-						    sb.append("\n");
-						    sb.append(sShow);
-                        }
+				        uploadedFileCount++;
 						return;
 
 					}
@@ -330,7 +326,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
 						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-						String sShow = file.getName() + " " + getString(R.string.general_already_uploaded);
 						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
 
 //						Intent i = new Intent(this, ManagerActivityLollipop.class);
@@ -338,12 +333,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 //						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
 //						i.putExtra("MESSAGE", sShow);
 //						startActivity(i);
-                        if(sb.length() == 0) {
-                            sb.append(sShow);
-                        } else {
-                            sb.append("\n");
-                            sb.append(sShow);
-                        }
+                        uploadedFileCount++;
 						log("Return - file already uploaded");
 						return;
 					}
