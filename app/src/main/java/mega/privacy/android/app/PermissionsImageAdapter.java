@@ -39,7 +39,7 @@ public class PermissionsImageAdapter extends PagerAdapter {
         String[] mSubtitles =  new String[] {
                 context.getString(R.string.allow_acces_media_subtitle),
                 context.getString(R.string.allow_acces_camera_subtitle),
-                context.getString(R.string.allow_acces_calls_subtitle)
+                context.getString(R.string.allow_acces_calls_subtitle_microphone)
         };
 
         ImageView imgDisplay;
