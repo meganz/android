@@ -2239,7 +2239,17 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
-    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
+    <string name="general_setup_mega" context="Permissions screen title">Setup MEGA</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you can be able to share them with friends, exchange encrypted messages and make secure calls.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow acces to photos, media and files</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, videos and files MEGA needs your permission.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="general_enable_access" context="General enable access">Enable access</string>
+    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared files</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
@@ -2325,6 +2335,15 @@
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please, invite friends from the Contacts section.</string>
 
+    <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access.</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">Encrypted chat</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">Create your network</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA.</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">Your photos in the cloud</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we got you covered.\nCreate your account now.</string>
+
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
@@ -2338,5 +2357,8 @@
 	<string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
 	<string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignored</string>
 
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%d of %d</string>
+
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
+
 </resources>
