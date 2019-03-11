@@ -1592,17 +1592,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
 				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 				if (pF != null) {
-					if (pF.getCurrentPermission() == 2 && pF.askingForMicrophoneAndWriteCallsLog()) {
-						if (grantResults.length == 1) {
-//							Do nothing, asking for microphone, still need to ask for write call logs
-						}
-						else {
-							pF.setNextPermission();
-						}
-					}
-					else {
+//					if (pF.getCurrentPermission() == 2 && pF.askingForMicrophoneAndWriteCallsLog()) {
+//						if (grantResults.length == 1) {
+////							Do nothing, asking for microphone, still need to ask for write call logs
+//						}
+//						else {
+//							pF.setNextPermission();
+//						}
+//					}
+//					else {
 						pF.setNextPermission();
-					}
+//					}
 				}
 			}
         }
@@ -2975,9 +2975,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
     	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
 		boolean microphoneGranted = checkPermission(Manifest.permission.RECORD_AUDIO);
-		boolean writeCallsGranted = checkPermission(Manifest.permission.WRITE_CALL_LOG);
+//		boolean writeCallsGranted = checkPermission(Manifest.permission.WRITE_CALL_LOG);
 
-		if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted || !writeCallsGranted) {
+		if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted/* || !writeCallsGranted*/) {
 			deleteCurrentFragment();
 
 			if (pF == null) {
@@ -18658,9 +18658,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case Manifest.permission.RECORD_AUDIO: {
 				return ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
 			}
-			case Manifest.permission.WRITE_CALL_LOG: {
-				return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED;
-			}
+			//case Manifest.permission.WRITE_CALL_LOG: {
+			//	return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALL_LOG) == PackageManager.PERMISSION_GRANTED;
+			//}
 			case Manifest.permission.READ_CONTACTS: {
 				return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
 			}

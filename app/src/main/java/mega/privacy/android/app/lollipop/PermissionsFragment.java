@@ -55,7 +55,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     boolean readGranted = false;
     boolean cameraGranted = false;
     boolean microphoneGranted = false;
-    boolean writeCallsGranted = false;
+//    boolean writeCallsGranted = false;
 
     int[] mImages;
     String[] mTitles;
@@ -106,7 +106,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         mSubtitles =  new String[] {
                 context.getString(R.string.allow_acces_media_subtitle),
                 context.getString(R.string.allow_acces_camera_subtitle),
-                context.getString(R.string.allow_acces_calls_subtitle)
+                context.getString(R.string.allow_acces_calls_subtitle_microphone)
         };
 
 
@@ -131,7 +131,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             writeGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             cameraGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA);
             microphoneGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO);
-            writeCallsGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG);
+//            writeCallsGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG);
 
             if (!readGranted || !writeGranted) {
                 numItems++;
@@ -139,12 +139,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 if (!cameraGranted) {
                     numItems++;
                     items[1] = CAMERA;
-                    if (!microphoneGranted || !writeCallsGranted){
+                    if (!microphoneGranted/* || !writeCallsGranted*/){
                         numItems++;
                         items[2] = CALLS;
                     }
                 }
-                else if (!microphoneGranted || !writeCallsGranted) {
+                else if (!microphoneGranted/* || !writeCallsGranted*/) {
                     numItems++;
                     items[1] = CALLS;
                 }
@@ -154,14 +154,14 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             else if (!cameraGranted) {
                 numItems++;
                 items[0] = currentPermission = CAMERA;
-                if (!microphoneGranted || !writeCallsGranted) {
+                if (!microphoneGranted/* || !writeCallsGranted*/) {
                     numItems++;
                     items[1] = CALLS;
                 }
 
                 setContent(CAMERA);
             }
-            else if (!microphoneGranted || !writeCallsGranted) {
+            else if (!microphoneGranted/* || !writeCallsGranted*/) {
                 numItems++;
                 items[0] = currentPermission = CALLS;
                 setContent(CALLS);
@@ -176,7 +176,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             currentPermission = savedInstanceState.getInt("currentPermission", 0);
             items = savedInstanceState.getIntArray("items");
             microphoneGranted = savedInstanceState.getBoolean("microphoneGranted", false);
-            writeCallsGranted = savedInstanceState.getBoolean("writeCallsGranted", false);
+//            writeCallsGranted = savedInstanceState.getBoolean("writeCallsGranted", false);
 
             setContent(currentPermission);
 
@@ -291,24 +291,25 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     void askForCallsPermissions() {
-        if (!microphoneGranted && !writeCallsGranted)  {
-            log("RECORD_AUDIO and WRITE_CALL_LOG");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                    new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_CALL_LOG},
-                    PERMISSIONS_FRAGMENT);
-        }
-        else if (!microphoneGranted) {
+//        if (!microphoneGranted && !writeCallsGranted)  {
+//            log("RECORD_AUDIO and WRITE_CALL_LOG");
+//            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+//                    new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_CALL_LOG},
+//                    PERMISSIONS_FRAGMENT);
+//        }
+//        else if (!microphoneGranted) {
+        if (!microphoneGranted) {
             log("RECORD_AUDIO");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_FRAGMENT);
         }
-        else if (!writeCallsGranted) {
-            log("WRITE_CALL_LOG");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                    new String[]{Manifest.permission.WRITE_CALL_LOG},
-                    PERMISSIONS_FRAGMENT);
-        }
+//        else if (!writeCallsGranted) {
+//            log("WRITE_CALL_LOG");
+//            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+//                    new String[]{Manifest.permission.WRITE_CALL_LOG},
+//                    PERMISSIONS_FRAGMENT);
+//        }
     }
 
     void showSetupLayout () {
@@ -323,7 +324,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     public boolean askingForMicrophoneAndWriteCallsLog () {
-        if (!microphoneGranted && !writeCallsGranted) {
+        if (!microphoneGranted/* && !writeCallsGranted*/) {
             return true;
         }
         else {
@@ -344,7 +345,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         outState.putInt("currentPermission", currentPermission);
         outState.putIntArray("items", items);
         outState.putBoolean("microphoneGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO));
-        outState.putBoolean("writeCallsGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG));
+//        outState.putBoolean("writeCallsGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG));
     }
 
     @Override
