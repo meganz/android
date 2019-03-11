@@ -16,13 +16,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -54,6 +53,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +80,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -88,6 +88,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -159,7 +160,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	boolean startVideo = false;
 
 	RelativeLayout sharedFoldersLayout;
-	ImageView sharedFoldersIcon;
 	TextView sharedFoldersText;
 	Button sharedFoldersButton;
 	View dividerSharedFoldersLayout;
@@ -204,6 +204,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	float scaleH;
 
 	DatabaseHandler dbH = null;
+
+	Drawable drawableShare;
+	Drawable drawableSend;
+	Drawable drawableArrow;
+	Drawable drawableDots;
 
 	MenuItem shareMenuItem;
 	MenuItem sendFileMenuItem;
@@ -300,10 +305,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape configuration");
 
-				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_LAND, context.getResources().getDisplayMetrics());
-				appBarLayout.setLayoutParams(params);
-
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
 				firstLineTextToolbar.setMaxWidth((int) width);
 				firstLineLengthToolbar.setMaxWidth((int) width);
@@ -315,10 +316,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("Portrait configuration");
-
-				CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_APPBAR_PORT, context.getResources().getDisplayMetrics());
-				appBarLayout.setLayoutParams(params);
 
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
 				firstLineTextToolbar.setMaxWidth((int) width);
@@ -376,8 +373,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Shared folders layout
 			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
 			sharedFoldersLayout.setOnClickListener(this);
-
-			sharedFoldersIcon = (ImageView) findViewById(R.id.chat_contact_properties_shared_folder_icon);
 
 			sharedFoldersText = (TextView) findViewById(R.id.chat_contact_properties_shared_folders_label);
 
@@ -732,12 +727,23 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
 
+		drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+		drawableDots = drawableDots.mutate();
+		drawableArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+		drawableArrow = drawableArrow.mutate();
+
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+		drawableShare = drawableShare.mutate();
+		drawableSend = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
+		drawableSend = drawableSend.mutate();
+
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.contact_properties_action, menu);
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		sendFileMenuItem = menu.findItem(R.id.cab_menu_send_file);
+		sendFileMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		if(Util.isOnline(this)){
 
@@ -761,7 +767,67 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			sendFileMenuItem.setVisible(false);
 		}
 
+		appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+			@Override
+			public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
+				if (offset == 0) {
+					// Expanded
+					firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+					secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+					setColorFilterWhite();
+				}
+				else {
+					if (offset<0 && Math.abs(offset)>=appBarLayout.getTotalScrollRange()/2) {
+						// Collapsed
+						firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+						secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+						setColorFilterBlack();
+					}
+					else {
+						firstLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+						secondLineTextToolbar.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+						setColorFilterWhite();
+					}
+				}
+			}
+		});
+
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	void setColorFilterWhite () {
+
+		drawableArrow.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
+
+		drawableDots.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+		toolbar.setOverflowIcon(drawableDots);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
+		if (sendFileMenuItem != null) {
+			drawableSend.setColorFilter(ContextCompat.getColor(this, R.color.white), PorterDuff.Mode.SRC_ATOP);
+			sendFileMenuItem.setIcon(drawableSend);
+		}
+	}
+
+	void setColorFilterBlack () {
+		drawableArrow.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(drawableArrow);
+
+		drawableDots.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+		toolbar.setOverflowIcon(drawableDots);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
+		if (sendFileMenuItem != null) {
+			drawableSend.setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
+			sendFileMenuItem.setIcon(drawableSend);
+		}
 	}
 
 	@Override
@@ -781,8 +847,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			case R.id.cab_menu_send_file:{
 
 				if(!Util.isOnline(this)){
-
-					showSnackbar(getString(R.string.error_server_connection_problem));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return true;
 				}
 
@@ -866,8 +931,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(startVideo){
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
-			}
-			else{
+			}else{
 				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
 			}
 
@@ -949,30 +1013,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
-		log("sendFileToChatsFromContacts");
-
-		MultipleAttachChatListener listener = null;
-
-		if(chats.size()==1){
-			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
-		}
-		else{
-			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
-		}
-
-		if(chats.size()==1){
-			//One chat, one file
-			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-		}
-		else if(chats.size()>1){
-			//Many chats, one file
-			for(int i=0;i<chats.size();i++){
-				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-			}
-		}
-	}
-
 	public void pickFolderToShare(String email){
 		log("pickFolderToShare");
 		if (email != null){
@@ -984,7 +1024,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER);
 		}
 		else{
-			showSnackbar(getString(R.string.error_sharing_folder));
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_sharing_folder), -1);
 			log("Error sharing folder");
 		}
 	}
@@ -1219,7 +1259,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				log("Send message option");
 				if(!Util.isOnline(this)){
 
-					showSnackbar(getString(R.string.error_server_connection_problem));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return;
 				}
 
@@ -1228,21 +1268,25 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
-				startVideo = false;
-				if(checkPermissionsCall()){
-					startCall(false);
+				if(!this.participatingInACall()){
+					log("I'm not in a call");
+					startVideo = false;
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
 				}
-
-//				startCall(false);
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
-				startVideo = true;
-				if(checkPermissionsCall()){
-					startCall(true);
+				if(!this.participatingInACall()){
+					log("I'm not in a call");
+					startVideo = true;
+					if(checkPermissionsCall()){
+						startCall(startVideo);
+					}
 				}
-//				startCall(true);
+
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -1267,7 +1311,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				if(!generalChatNotifications){
 					notificationsSwitch.setChecked(false);
-					showSnackbar("The chat notifications are disabled, go to settings to set up them");
+					showSnackbar(Constants.SNACKBAR_TYPE, "The chat notifications are disabled, go to settings to set up them", -1);
 				}
 				else{
 					boolean enabled = notificationsSwitch.isChecked();
@@ -1314,7 +1358,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
 			if (!Util.isOnline(this)) {
-				showSnackbar(getString(R.string.error_server_connection_problem));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
 			}
 
@@ -1425,17 +1469,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, 1);
-				showSnackbar(message);
+				showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
 			}
 		}else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!Util.isOnline(this)) {
-                CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-                if(coordinatorFragment!=null){
-                    showSnackbar(getString(R.string.error_server_connection_problem));
-                }
-                else{
-                    showSnackbar(getString(R.string.error_server_connection_problem));
-                }
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
             
@@ -1467,14 +1505,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     log("cN == null");
                     try {
                         statusDialog.dismiss();
-                        CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                         if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                            if(coordinatorFragment!=null){
-                                showSnackbar(getString(R.string.context_no_sent_node));
-                            }
-                            else{
-                                showSnackbar(getString(R.string.context_no_sent_node));
-                            }
+                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_sent_node), -1);
                         }
                     } catch (Exception ex) {
                     }
@@ -1576,10 +1608,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Shared folder correctly: "+request.getNodeHandle());
-				showSnackbar(getString(R.string.context_correctly_shared));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
 			}
 			else{
-				showSnackbar(getString(R.string.context_no_shared));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_shared), -1);
 			}
 		}else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
             try {
@@ -1588,26 +1620,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             catch (Exception ex) {}
             
             if (e.getErrorCode() == MegaError.API_OK){
-                CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    if(coordinatorFragment!=null){
-                        showSnackbar(getString(R.string.context_folder_created));
-                    }
-                    else{
-                        showSnackbar(getString(R.string.context_folder_created));
-                    }
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
                     sharedFoldersFragment.setNodes();
                 }
             }
             else{
-                CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
-                    if(coordinatorFragment!=null){
-                        showSnackbar(getString(R.string.context_folder_no_created));
-                    }
-                    else{
-                        showSnackbar(getString(R.string.context_folder_no_created));
-                    }
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_no_created), -1);
                     sharedFoldersFragment.setNodes();
                 }
             }
@@ -1620,30 +1640,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             catch (Exception ex) {}
             
             if (e.getErrorCode() == MegaError.API_OK){
-                
-                CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                     sharedFoldersFragment.clearSelections();
                     sharedFoldersFragment.hideMultipleSelect();
-                    if(coordinatorFragment!=null){
-                        showSnackbar(getString(R.string.context_correctly_renamed));
-                    }
-                    else{
-                        showSnackbar(getString(R.string.context_correctly_renamed));
-                    }
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
                 }
             }
             else{
-                CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                     sharedFoldersFragment.clearSelections();
                     sharedFoldersFragment.hideMultipleSelect();
-                    if(coordinatorFragment!=null){
-                        showSnackbar(getString(R.string.context_no_renamed));
-                    }
-                    else{
-                        showSnackbar(getString(R.string.context_no_renamed));
-                    }
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
                 }
             }
             log("rename nodes request finished");
@@ -1655,17 +1662,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             }
             
             if (e.getErrorCode() == MegaError.API_OK){
-                
-                CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                 if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                     sharedFoldersFragment.clearSelections();
                     sharedFoldersFragment.hideMultipleSelect();
-                    if(coordinatorFragment!=null){
-                        showSnackbar(getString(R.string.context_correctly_copied));
-                    }
-                    else{
-                        showSnackbar(getString(R.string.context_correctly_copied));
-                    }
+                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
                 }
             }
             else{
@@ -1684,16 +1684,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                     finish();
                 }
                 else{
-                    CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        if(coordinatorFragment!=null){
-                            showSnackbar(getString(R.string.context_no_copied));
-                        }
-                        else{
-                            showSnackbar(getString(R.string.context_no_copied));
-                        }
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
                     }
                 }
             }
@@ -1709,59 +1703,33 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             if(moveToRubbish){
                 log("Finish move to Rubbish!");
                 if (e.getErrorCode() == MegaError.API_OK){
-                    
-                    CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        if(coordinatorFragment!=null){
-                            showSnackbar(getString(R.string.context_correctly_moved_to_rubbish));
-                        }
-                        else{
-                            showSnackbar(getString(R.string.context_correctly_moved_to_rubbish));
-                        }
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish), -1);
                     }
                 }
                 else{
-                    CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        if(coordinatorFragment!=null){
-                            showSnackbar(getString(R.string.context_no_moved));
-                        }
-                        else{
-                            showSnackbar(getString(R.string.context_no_moved));
-                        }
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                     }
                 }
             }
             else{
                 if (e.getErrorCode() == MegaError.API_OK){
-                    
-                    CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        if(coordinatorFragment!=null){
-                            showSnackbar(getString(R.string.context_correctly_moved));
-                        }
-                        else{
-                            showSnackbar(getString(R.string.context_correctly_moved));
-                        }
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                     }
                 }
                 else{
-                    CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
                     if(sharedFoldersFragment!=null && sharedFoldersFragment.isVisible()){
                         sharedFoldersFragment.clearSelections();
                         sharedFoldersFragment.hideMultipleSelect();
-                        if(coordinatorFragment!=null){
-                            showSnackbar(getString(R.string.context_no_moved));
-                        }
-                        else{
-                            showSnackbar(getString(R.string.context_no_moved));
-                        }
+                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
                     }
                 }
             }
@@ -1801,6 +1769,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
+		drawableArrow.setColorFilter(null);
+		drawableDots.setColorFilter(null);
+		drawableSend.setColorFilter(null);
+		drawableShare.setColorFilter(null);
 	}
 
 	public static void log(String message) {
@@ -1905,11 +1878,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			log("Truncate history request finish!!!");
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Ok. Clear history done");
-				showSnackbar(getString(R.string.clear_history_success));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
 			}
 			else{
 				log("Error clearing history: "+e.getErrorString());
-				showSnackbar(getString(R.string.clear_history_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
@@ -1935,7 +1908,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
-				showSnackbar(getString(R.string.create_chat_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
@@ -1945,7 +1918,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			else{
 				log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
-				showSnackbar(getString(R.string.call_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error), -1);
 			}
 		}
 	}
@@ -1955,21 +1928,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	}
 
-	public void showSnackbar(String s){
-		log("showSnackbar: "+s);
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+	public void showSnackbar(int type, String s, long idChat){
+		showSnackbar(type, fragmentContainer, s, idChat);
 	}
 	
 	private void sharedFolderClicked(){
         RelativeLayout sharedFolderLayout = (RelativeLayout)findViewById(R.id.shared_folder_list_container);
 		if(isShareFolderExpanded){
 			sharedFolderLayout.setVisibility(View.GONE);
+			if (user != null) {
+				setFoldersButtonText(megaApi.getInShares(user));
+			}
 		}
 		else{
 			sharedFolderLayout.setVisibility(View.VISIBLE);
+			sharedFoldersButton.setText(R.string.general_close);
             if (sharedFoldersFragment == null){
                 sharedFoldersFragment = new ContactSharedFolderFragment();
                 sharedFoldersFragment.setUserEmail(user.getEmail());
@@ -2136,13 +2109,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         log("moveToTrash: ");
         moveToRubbish=true;
         if (!Util.isOnline(this)) {
-            CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-            if(coordinatorFragment!=null){
-                showSnackbar(getString(R.string.error_server_connection_problem));
-            }
-            else{
-                showSnackbar(getString(R.string.error_server_connection_problem));
-            }
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
         
@@ -2341,13 +2308,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
         
         if (!Util.isOnline(this)) {
-            CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-            if(coordinatorFragment!=null){
-                showSnackbar(getString(R.string.error_server_connection_problem));
-            }
-            else{
-                showSnackbar(getString(R.string.error_server_connection_problem));
-            }
+            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
         
@@ -2375,18 +2336,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     }
     
     private void setFoldersButtonText(ArrayList<MegaNode> nodes){
-        sharedFoldersButton.setText(getDescription(nodes));
-        if(nodes.size() == 0){
-            sharedFoldersButton.setClickable(false);
-            sharedFoldersLayout.setClickable(false);
-        }
-    }
-    
-    public void showSnackbarNotSpace(){
-        log("showSnackbarNotSpace");
-        Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-        mySnackbar.show();
+		if (nodes != null) {
+			sharedFoldersButton.setText(getDescription(nodes));
+			if (nodes.size() == 0) {
+				sharedFoldersButton.setClickable(false);
+				sharedFoldersLayout.setClickable(false);
+			}
+		}
     }
     
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){

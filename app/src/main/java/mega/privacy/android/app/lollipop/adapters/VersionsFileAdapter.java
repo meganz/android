@@ -229,6 +229,10 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		return nodes;
 	}
 
+	public List<MegaNode> getNodes () {
+		return nodes;
+	}
+
 	public VersionsFileAdapter(Context _context, ArrayList<MegaNode> _nodes, RecyclerView recyclerView) {
 		this.context = _context;
 		this.nodes = _nodes;

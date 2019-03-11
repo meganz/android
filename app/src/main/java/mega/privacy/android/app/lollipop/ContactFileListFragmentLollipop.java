@@ -173,6 +173,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			inflater.inflate(R.menu.file_browser_action, menu);
 			fab.setVisibility(View.GONE);
 			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
+			checkScroll();
 			return true;
 		}
 
@@ -182,7 +183,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
-			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 0);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 3);
+			checkScroll();
 		}
 
 		@Override
@@ -276,7 +278,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		handler.removeCallbacksAndMessages(null);
+		if (handler != null) {
+			handler.removeCallbacksAndMessages(null);
+		}
 	}
 
 	@Override
@@ -314,6 +318,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 			listView.setClipToPadding(false);
 			listView.setPadding(0, valuePaddingTop, 0, valuePaddingBottom);
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_file_list_empty_text);
@@ -331,7 +342,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -364,6 +375,26 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
             itemClick(currNodePosition,null,null);
         }
 		return v;
+	}
+
+	public void checkScroll() {
+		if (listView != null) {
+			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
+				changeActionBarElevation(true);
+			}
+			else if ((adapter != null && !adapter.isMultipleSelect())) {
+				changeActionBarElevation(false);
+			}
+		}
+	}
+
+	public void changeActionBarElevation(boolean whitElevation){
+		if (whitElevation) {
+			aB.setElevation(Util.px2dp(4, outMetrics));
+		}
+		else {
+			aB.setElevation(0);
+		}
 	}
 	
 	public void showOptionsPanel(MegaNode sNode){
@@ -406,7 +437,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -479,7 +510,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -601,7 +632,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 							startActivity(mediaIntent);
 						}
 						else{
-							((ContactFileListActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							((ContactFileListActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available));
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(contactNodes.get(position).getHandle());

@@ -1,12 +1,18 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
+import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -26,17 +32,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -46,14 +55,17 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
@@ -66,6 +78,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     DatabaseHandler dbH;
 
+    MegaChatCall callChat;
+//    Chronometer myChrono;
+//    Handler customHandler = new Handler();
+
     Context context;
     ActionBar aB;
     MegaListChatLollipopAdapter adapterList;
@@ -77,6 +93,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     ArrayList<MegaChatListItem> chats;
 
+    FilterChatsTask filterChatsTask;
+
     int lastFirstVisiblePosition;
 
     int numberOfClicks = 0;
@@ -86,6 +104,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     LinearLayout emptyLayout;
     TextView emptyTextViewInvite;
     ImageView emptyImageView;
+    RelativeLayout callInProgressLayout;
+
     Button inviteButton;
     int chatStatus;
 
@@ -127,11 +147,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void checkScroll() {
         if (listView != null) {
-            if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+            if (context instanceof ManagerActivityLollipop) {
+                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                }
             }
-            else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+            else if (context instanceof ArchivedChatsActivity) {
+                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                    ((ArchivedChatsActivity) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ArchivedChatsActivity) context).changeActionBarElevation(false);
+                }
             }
         }
     }
@@ -160,9 +190,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (context instanceof ManagerActivityLollipop) {
-                    checkScroll();
-                }
+                checkScroll();
             }
         });
 //        listView.setClipToPadding(false);
@@ -194,6 +222,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             inviteButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
         }
+
+        callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout_recent);
+        callInProgressLayout.setOnClickListener(this);
+        callInProgressLayout.setVisibility(View.GONE);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
 
@@ -390,6 +422,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    public void showCallLayout(){
+        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop)){
+            if(((ManagerActivityLollipop) context).participatingInACall()){
+                callInProgressLayout.setVisibility(View.VISIBLE);
+            }else{
+                callInProgressLayout.setVisibility(View.GONE);
+            }
+        }else{
+            callInProgressLayout.setVisibility(View.GONE);
+        }
+    }
+
     public void showEmptyChatScreen(){
         log("showEmptyChatScreen");
 
@@ -581,14 +625,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                     }
                 }
                 else{
                     if(Util.isOnline(context)){
                         if(megaApi!=null){
                             if(megaApi.isLoggedIn()==0){
-                                ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                                ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                             }
                             else{
                                 ChatController chatController = new ChatController(context);
@@ -599,11 +643,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                         else{
-                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                         showNoConnectionScreen();
                     }
 //                    setChats();
@@ -619,6 +663,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     showStateInfo();
                 }
 
+                break;
+            }
+            case R.id.call_in_progress_layout_recent:{
+                log("onClick:call_in_progress_layout");
+                if(checkPermissionsCall()){
+                    returnTheCall();
+                }
                 break;
             }
         }
@@ -957,11 +1008,25 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else{
+//            clearHandlers();
             log("open chat: position: "+position+" chatID: "+chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
+//            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
+            intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
+            if (context instanceof ManagerActivityLollipop) {
+                if (((ManagerActivityLollipop) context).searchQuery != null  && !((ManagerActivityLollipop) context).searchQuery.isEmpty()) {
+                    closeSearch();
+                    ((ManagerActivityLollipop) context).closeSearchView();
+                }
+            }
+            else if (context instanceof ArchivedChatsActivity) {
+                if (((ArchivedChatsActivity) context).querySearch != null && !((ArchivedChatsActivity) context).querySearch.isEmpty()) {
+                    closeSearch();
+                    ((ArchivedChatsActivity) context).closeSearchView();
+                }
+            }
         }
     }
     /////END Multiselect/////
@@ -1563,6 +1628,38 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    public void refreshNode(MegaChatListItem item){
+        log("refreshNode -> showCallLayout");
+        //call in progress layout:
+        showCallLayout();
+
+        //elements of adapter
+        long chatHandleToUpdate = item.getChatId();
+        int indexToUpdate = -1;
+        if(chats!=null){
+            ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+            while (itrReplace.hasNext()) {
+                MegaChatListItem chat = itrReplace.next();
+                if(chat!=null){
+                    if(chat.getChatId() == chatHandleToUpdate){
+                        indexToUpdate = itrReplace.nextIndex()-1;
+                        break;
+                    }
+                }
+                else{
+                    break;
+                }
+            }
+            if(indexToUpdate!=-1){
+                log("Index to replace: "+indexToUpdate);
+                if(adapterList!=null){
+                    adapterList.notifyItemChanged(indexToUpdate);
+                }
+            }
+        }
+
+    }
+
     public void interactionUpdate(int position){
         log("interactionUpdate");
         MegaChatListItem chat = chats.remove(position);
@@ -1727,6 +1824,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(aB != null && aB.getTitle() != null){
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
+        showCallLayout();
+
+        if (context instanceof ManagerActivityLollipop) {
+            String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
+            if (searchQuery != null && ((ManagerActivityLollipop) context).searchExpand) {
+                filterChats(searchQuery);
+            }
+        }
 
         super.onResume();
     }
@@ -1758,6 +1863,165 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
            }else{
                fastScroller.setVisibility(View.VISIBLE);
            }
+        }
+    }
+
+    public void filterChats (String s) {
+        if (adapterList.isMultipleSelect()) {
+            hideMultipleSelect();
+        }
+
+        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
+            filterChatsTask.cancel(true);
+        }
+        filterChatsTask = new FilterChatsTask();
+        filterChatsTask.execute(s);
+    }
+
+    class FilterChatsTask extends AsyncTask<String, Void, Void> {
+
+        ArrayList<MegaChatListItem> filteredChats;
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            if (chats != null && !chats.isEmpty()) {
+                if (filteredChats == null) {
+                    filteredChats = new ArrayList<>();
+                } else {
+                    filteredChats.clear();
+                }
+                for (MegaChatListItem chat : chats) {
+                    if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
+                        filteredChats.add(chat);
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            adapterList.setChats(filteredChats);
+
+            if (adapterList.getItemCount() == 0){
+                log("adapterList.getItemCount() == 0");
+                listView.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.VISIBLE);
+                inviteButton.setVisibility(View.GONE);
+                String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+
+                try{
+                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[/A]", "</font>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[/B]", "</font>");
+                }
+                catch (Exception e){}
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+
+                emptyTextViewInvite.setText(result);
+                emptyTextViewInvite.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("adapterList.getItemCount() NOT = 0");
+                listView.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public void closeSearch() {
+        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
+            filterChatsTask.cancel(true);
+        }
+        adapterList.setChats(chats);
+
+        if (adapterList.getItemCount() == 0) {
+            log("adapterList.getItemCount() == 0");
+            listView.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        } else {
+            log("adapterList.getItemCount() NOT = 0");
+            listView.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+
+        }
+    }
+
+    public boolean checkPermissionsCall(){
+        log("checkPermissionsCall() ");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+                return false;
+            }
+
+            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+            if (!hasRecordAudioPermission) {
+                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+                return false;
+            }
+
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        log("onRequestPermissionsResult");
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case Constants.REQUEST_CAMERA: {
+                log("REQUEST_CAMERA");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissionsCall()){
+                        log("REQUEST_CAMERA -> returnTheCall");
+                        returnTheCall();
+                    }
+                }
+                break;
+            }
+            case Constants.RECORD_AUDIO: {
+                log("RECORD_AUDIO");
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(checkPermissionsCall()){
+                        log("RECORD_AUDIO -> returnTheCall");
+                        returnTheCall();
+                    }
+                }
+                break;
+            }
+
+        }
+    }
+
+    private void returnTheCall(){
+        log("returnTheCall()");
+        if(megaChatApi!=null){
+            MegaHandleList listCalls = megaChatApi.getChatCalls();
+            if((listCalls!=null)&&(listCalls.size()>0)){
+                for(int i = 0; i < listCalls.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                    if(call!=null){
+                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                            log("returnTheCall() -> ChatCallActivity");
+                            Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("chatHandle", listCalls.get(i));
+                            startActivity(intent);
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
