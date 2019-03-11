@@ -68,6 +68,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     String link;
     boolean isExpiredDateLink;
+    private boolean isInPasswordProtectionMode;
 
     NodeController nC;
 
@@ -212,6 +213,9 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 				expiryDateButton.setText(formattedDate);
 				expiryDateButton.setVisibility(View.VISIBLE);
                 subtitleProOnlyExpiry.setVisibility(View.GONE);
+                
+                //if previously selected expiry date then we need to expand advance section
+                showAdvanceSection();
 			}
 
             switchButtonExpiry.setEnabled(true);
@@ -268,6 +272,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         }
 
         datePickerDialog = new DatePickerDialog(context, this, year, month, day);
+        //disable past date
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
     }
 
@@ -290,31 +296,23 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             }
             case R.id.advanced_options_layout:{
                 if(linkWithKeyLayout.isShown()){
-                    advancedOptionsImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
-                    linkWithoutKeyLayout.setVisibility(View.GONE);
-                    linkDecryptionKeyLayout.setVisibility(View.GONE);
-                    linkWithKeyLayout.setVisibility(View.GONE);
-                    expiryDateLayout.setVisibility(View.GONE);
-                    passwordProtectionLayout.setVisibility(View.GONE);
-                    separatorExpiry.setVisibility(View.GONE);
-                    separatorPass.setVisibility(View.GONE);
-
+                    hideAdvanceSection();
                 }else{
-                    advancedOptionsImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
-                    linkWithoutKeyLayout.setVisibility(View.VISIBLE);
-                    linkDecryptionKeyLayout.setVisibility(View.VISIBLE);
-                    linkWithKeyLayout.setVisibility(View.VISIBLE);
-                    expiryDateLayout.setVisibility(View.VISIBLE);
-                    passwordProtectionLayout.setVisibility(View.VISIBLE);
-                    separatorExpiry.setVisibility(View.VISIBLE);
-                    separatorPass.setVisibility(View.VISIBLE);
+                   showAdvanceSection();
                 }
                 break;
             }
             case R.id.link_without_key_layout:{
+                if(isInPasswordProtectionMode){
+                    return;
+                }
                 linkWithoutKeyCheck.setChecked(true);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(false);
+				
+				//disable expiry/password options for decryption key option
+                switchButtonExpiry.setEnabled(true);
+                switchButtonProtection.setEnabled(true);
                 if(link!=null){
                     String urlString="";
                     String [] s = link.split("!");
@@ -328,6 +326,13 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 break;
             }
             case R.id.link_decryption_key_layout:{
+                if(isInPasswordProtectionMode){
+                    return;
+                }
+                
+                switchButtonExpiry.setEnabled(false);
+                switchButtonProtection.setEnabled(false);
+                switchButtonExpiry.setChecked(false);
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(true);
 				linkWithKeyCheck.setChecked(false);
@@ -344,10 +349,15 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 break;
             }
             case R.id.link_with_key_layout:{
+                if(isInPasswordProtectionMode){
+                    return;
+                }
                 linkWithoutKeyCheck.setChecked(false);
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(true);
 				linkText.setText(link);
+                switchButtonExpiry.setEnabled(true);
+                switchButtonProtection.setEnabled(true);
                 break;
             }
             case R.id.copy_button:{
@@ -486,6 +496,10 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             passwordProtectionEditText.setText(request.getPassword());
             passwordProtectionEditText.setVisibility(View.VISIBLE);
             subtitleProOnlyProtection.setVisibility(View.GONE);
+    
+            //disable the other two option if password enabled
+            isInPasswordProtectionMode = true;
+            disableCheckedTextView();
         }
     }
 
@@ -506,7 +520,6 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 break;
             }
             case R.id.switch_set_password_protection:{
-//                showDatePicker(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
                 log("Set password protection");
                 if(switchButtonProtection.isChecked()){
                     ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
@@ -516,6 +529,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                     linkText.setText(link);
                     copyButton.setEnabled(true);
                     sendButton.setEnabled(true);
+                    isInPasswordProtectionMode = false;
+                    enableCheckedTextView();
                     passwordProtectionEditText.setVisibility(View.GONE);
                     subtitleProOnlyProtection.setVisibility(View.VISIBLE);
                 }
@@ -523,5 +538,37 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 break;
             }
         }
+    }
+    
+    private void showAdvanceSection(){
+        advancedOptionsImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
+        linkWithoutKeyLayout.setVisibility(View.VISIBLE);
+        linkDecryptionKeyLayout.setVisibility(View.VISIBLE);
+        linkWithKeyLayout.setVisibility(View.VISIBLE);
+        expiryDateLayout.setVisibility(View.VISIBLE);
+        passwordProtectionLayout.setVisibility(View.VISIBLE);
+        separatorExpiry.setVisibility(View.VISIBLE);
+        separatorPass.setVisibility(View.VISIBLE);
+    }
+    
+    private void hideAdvanceSection(){
+        advancedOptionsImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
+        linkWithoutKeyLayout.setVisibility(View.GONE);
+        linkDecryptionKeyLayout.setVisibility(View.GONE);
+        linkWithKeyLayout.setVisibility(View.GONE);
+        expiryDateLayout.setVisibility(View.GONE);
+        passwordProtectionLayout.setVisibility(View.GONE);
+        separatorExpiry.setVisibility(View.GONE);
+        separatorPass.setVisibility(View.GONE);
+    }
+    
+    private void disableCheckedTextView(){
+        linkWithoutKeyCheck.setTextColor(getContext().getColor(R.color.disabled_radio_button_label));
+        linkDecryptionKeyCheck.setTextColor(getContext().getColor(R.color.disabled_radio_button_label));
+    }
+    
+    private void enableCheckedTextView(){
+        linkWithoutKeyCheck.setTextColor(getContext().getColor(R.color.name_my_account));
+        linkDecryptionKeyCheck.setTextColor(getContext().getColor(R.color.name_my_account));
     }
 }
