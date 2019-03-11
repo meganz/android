@@ -107,6 +107,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
         long peerId;
+
+        public void setImageView(Bitmap bitmap){
+            avatarImage.setImageBitmap(bitmap);
+            avatarImage.setVisibility(View.VISIBLE);
+            avatarInitialLetter.setVisibility(View.GONE);
+        }
+
         public ViewHolderGroupCall(View itemView) {
             super(itemView);
         }
@@ -184,7 +191,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         holder.peerId = peer.getPeerId();
-
         int numPeersOnCall = getItemCount();
         log("onBindViewHolderGrid() - (peerId = "+peer.getPeerId()+", clientId = "+peer.getClientId()+") of numPeersOnCall: "+numPeersOnCall);
 
@@ -536,7 +542,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }else{
             log("(peerId = "+peer.getPeerId()+", clientId = "+peer.getPeerId()+") VIDEO OFF");
             //Avatar:
-            setProfile(peer.getPeerId(), peer.getName(), null, holder);
+            setProfile(peer.getPeerId(), peer.getName(), null, holder, position);
             holder.qualityLayout.setVisibility(GONE);
 
             //Remove SurfaceView && Listener:
@@ -659,49 +665,67 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     //Group call: avatar
-    public void setProfile(long peerId, String fullName, String peerEmail, ViewHolderGroupCall holder) {
+    public void setProfile(long peerId, String fullName, String peerEmail, ViewHolderGroupCall holder, int position) {
         log("setProfile");
-        if (peerId == megaChatApi.getMyUserHandle()) {
-            //My peer, other client
-            peerEmail = megaChatApi.getMyEmail();
-        } else {
-            //Contact
-            if((peerEmail == null) || (peerId != holder.peerId)){
-                peerEmail = megaChatApi.getContactEmail(peerId);
-                if (peerEmail == null) {
-                    CallNonContactNameListener listener = new CallNonContactNameListener(context, holder, this, peerId, fullName);
-                    megaChatApi.getUserEmail(peerId, listener);
-                }
-            }
+
+        if(holder == null){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
         }
+        if(holder!=null){
+            CallNonContactNameListener listener = new CallNonContactNameListener(context, holder, this, peerId, fullName, position);
 
-        if(peerEmail!=null){
-            File avatar = null;
-            Bitmap bitmap = null;
-            ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
+            if (peerId == megaChatApi.getMyUserHandle()) {
+                //My peer, other client
+                peerEmail = megaChatApi.getMyEmail();
+            } else {
 
-            if(context!=null){
-                if((megaChatApi!=null)&&(context.getExternalCacheDir() != null)) {
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), peerEmail + ".jpg");
-                } else {
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), peerEmail + ".jpg");
+                //Contact
+                if((peerEmail == null) || (peerId != holder.peerId)){
+                    peerEmail = megaChatApi.getContactEmail(peerId);
+                    if (peerEmail == null) {
+                        megaChatApi.getUserEmail(peerId, listener);
+                    }
                 }
             }
-            if ((avatar.exists())&& (avatar.length() > 0)){
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
-                if (bitmap != null) {
-                    holder.avatarImage.setImageBitmap(bitmap);
-                    holder.avatarImage.setVisibility(View.VISIBLE);
-                    holder.avatarInitialLetter.setVisibility(GONE);
 
-                }else{
+            if(peerEmail!=null){
+                File avatar = null;
+                Bitmap bitmap = null;
+                if(context!=null){
+                    if((megaChatApi!=null)&&(context.getExternalCacheDir() != null)) {
+                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), peerEmail + ".jpg");
+                    } else {
+                        avatar = new File(context.getCacheDir().getAbsolutePath(), peerEmail + ".jpg");
+                    }
+                }
+                if ((avatar.exists())&& (avatar.length() > 0)){
+                    BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                    bOpts.inPurgeable = true;
+                    bOpts.inInputShareable = true;
+                    bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+                    if (bitmap != null) {
+                        holder.avatarImage.setImageBitmap(bitmap);
+                        holder.avatarImage.setVisibility(View.VISIBLE);
+                        holder.avatarInitialLetter.setVisibility(GONE);
+
+                    }else{
+                        createDefaultAvatar(holder, peerId, fullName, peerEmail);
+                        if(peerId !=  megaChatApi.getMyUserHandle()){
+                            avatar.delete();
+                            if (megaApi == null) {
+                                return;
+                            }
+                            if (context.getExternalCacheDir() != null) {
+                                megaApi.getUserAvatar(peerEmail, context.getExternalCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
+                            } else {
+                                megaApi.getUserAvatar(peerEmail, context.getCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
+                            }
+                        }
+                    }
+                } else {
                     createDefaultAvatar(holder, peerId, fullName, peerEmail);
-                    if(peerId !=  megaChatApi.getMyUserHandle()){
-                        avatar.delete();
+                    if(peerId != megaChatApi.getMyUserHandle()){
                         if (megaApi == null) {
                             return;
                         }
@@ -712,25 +736,17 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         }
                     }
                 }
-            } else {
-                createDefaultAvatar(holder, peerId, fullName, peerEmail);
-                if(peerId != megaChatApi.getMyUserHandle()){
-                    if (megaApi == null) {
-                        return;
-                    }
-                    if (context.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(peerEmail, context.getExternalCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
-                    } else {
-                        megaApi.getUserAvatar(peerEmail, context.getCacheDir().getAbsolutePath() + "/" + peerEmail + ".jpg", listener);
-                    }
-                }
             }
+
+        }else{
+            notifyItemChanged(position);
         }
+
     }
 
     //Group call: default my avatar
     private void createDefaultAvatar(ViewHolderGroupCall holder, long peerId, String peerName, String peerEmail){
-        log("createDefaultAvatar()");
+        log("createDefaultAvatar");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
