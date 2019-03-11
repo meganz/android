@@ -250,16 +250,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					((ViewHolderParticipantsList)holder).textViewContent.isMarqueeIsNecessary(context);
 				}
 			}
-
-			if (!multipleSelect) {
+			if (isMultipleSelect() && isItemChecked(position)) {
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
+			}
+			else {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			} else {
-
-				if (this.isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
-				} else {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
 			}
 
 			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);

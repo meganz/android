@@ -338,8 +338,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean isTurn = false;
     Handler handler;
 
-    int orientation = -1;
-
     View.OnFocusChangeListener focus = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
@@ -947,10 +945,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         userTypingText = (TextView) findViewById(R.id.user_typing_text);
 
         initAfterIntent(getIntent(), savedInstanceState);
-
-        if (savedInstanceState != null) {
-            orientation = savedInstanceState.getInt("orientation", -1);
-        }
 
         log("FINISH on Create");
     }
@@ -1892,12 +1886,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
             loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
             if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
-                loginIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+                loginIntent.setAction(Constants.ACTION_JOIN_OPEN_CHAT_LINK);
                 loginIntent.setData(Uri.parse(getIntent().getDataString()));
+                loginIntent.putExtra("idChatToJoin", idChat);
             }
-            loginIntent.putExtra("idChatToJoin", idChat);
             startActivity(loginIntent);
         }
+        finish();
     }
 
     @Override
@@ -1909,7 +1904,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case android.R.id.home: {
                 closeChat(true);
                 ifAnonymousModeLogin(false);
-                finish();
                 break;
             }
             case R.id.cab_menu_call_chat:{
@@ -2703,7 +2697,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     handlerKeyboard.removeCallbacksAndMessages(null);
                 }
                 ifAnonymousModeLogin(false);
-                finish();
             }
         }
     }
@@ -2937,6 +2930,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.join_button:{
                 if (chatC.isInAnonymousMode()) {
+                    closeChat(true);
                     ifAnonymousModeLogin(true);
                 }
                 else {
@@ -6467,7 +6461,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     showChat(null);
                     MegaChatRoom chatActive = megaChatApi.getChatRoom(idChat);
                     if (chatActive.isActive()) {
-                        if (orientation == -1 || orientation == getResources().getConfiguration().orientation) {
+                        if (!chatActive.isPreview()) {
                             showAlertChatLink(false);
                         }
                     } else {
@@ -6859,7 +6853,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putLong("generalUnreadCount", generalUnreadCount);
         outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
-        outState.putInt("orientation", getResources().getConfiguration().orientation);
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
     }
