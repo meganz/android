@@ -255,7 +255,7 @@ public class TransfersFragmentLollipop extends Fragment {
 
     public void transferFinish(int position){
 		log("transferFinish: "+position);
-		if(!tL.isEmpty()){
+		if(!tL.isEmpty() && position < tL.size()){
 			tL.remove(position);
 		}
 
