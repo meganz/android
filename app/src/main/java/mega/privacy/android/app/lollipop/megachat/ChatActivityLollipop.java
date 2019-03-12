@@ -7526,7 +7526,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             MegaChatCall call = megaChatApi.getChatCall(idChat);
             if(call!=null){
                 if(isGroup() && (subtitleCall.getVisibility() == View.VISIBLE)){
-                    int usersWithVideo = call.getNumParticipants(1);
+                    int usersWithVideo = call.getNumParticipants(MegaChatCall.VIDEO);
                     int totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
                     if((usersWithVideo > 0) && (totalVideosAllowed != 0)){
                         participantsText.setText(usersWithVideo + "/" + totalVideosAllowed);
