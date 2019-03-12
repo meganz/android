@@ -3353,7 +3353,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
         if(callChat!=null){
 
-            int usersWithVideo = callChat.getNumParticipants(1);
+            int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
             log("updateSubtitleNumberOfVideos: usersWithVideo = "+usersWithVideo);
 
             if(usersWithVideo > 0){
