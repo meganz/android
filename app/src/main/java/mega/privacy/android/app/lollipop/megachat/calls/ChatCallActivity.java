@@ -998,7 +998,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(this, bitmap, 3);
+//                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(this, bitmap, 3);
                 if (bitmap != null) {
                     if((megaChatApi != null) && (callChat == null)){
                         callChat = megaChatApi.getChatCall(chatId);
@@ -1147,7 +1147,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(this, bitmap, 3);
+//                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(this, bitmap, 3);
                 if (bitmap != null) {
                     avatarBigCameraGroupCallInitialLetter.setVisibility(GONE);
                     avatarBigCameraGroupCallImage.setVisibility(View.VISIBLE);
