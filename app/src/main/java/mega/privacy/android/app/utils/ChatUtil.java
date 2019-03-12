@@ -13,7 +13,7 @@ public class ChatUtil {
         if(megaChatApi!=null){
             MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
             MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-            MegaHandleList listCalls = megaChatApi.getChatCalls(-1);
+            MegaHandleList listCalls = megaChatApi.getChatCalls();
             if((listCallsUserNoPresent!=null)&&(listCallsRingIn!=null)&&(listCalls!=null)){
                 long totalCallsNotPresent = listCallsUserNoPresent.size() + listCallsRingIn.size();
                 if(totalCallsNotPresent == listCalls.size()){

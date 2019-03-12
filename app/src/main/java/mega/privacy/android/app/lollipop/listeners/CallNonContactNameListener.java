@@ -1,20 +1,15 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 
 import java.io.File;
-
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -87,7 +82,7 @@ public class CallNonContactNameListener implements MegaChatRequestListenerInterf
                         dbH.setNonContactEmail(mail, request.getUserHandle()+"");
                     }
                 }
-                if(holder instanceof GroupCallAdapter.ViewHolderGroupCall){
+                if((holder!=null)&&(holder instanceof GroupCallAdapter.ViewHolderGroupCall)){
                     log("onRequestFinish:GroupCallAdapter:setProfile");
                     ((GroupCallAdapter) adapter).setProfile(peerId, name, mail, (GroupCallAdapter.ViewHolderGroupCall)holder, position);
                 }else{

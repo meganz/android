@@ -1013,7 +1013,7 @@ public final class ChatAdvancedNotificationBuilder {
     public void checkQueuedCalls(){
         log("checkQueuedCalls");
 
-        MegaHandleList handleList = megaChatApi.getChatCalls(-1);
+        MegaHandleList handleList = megaChatApi.getChatCalls();
         if(handleList!=null){
             long numberOfCalls = handleList.size();
             log("Number of calls in progress: "+numberOfCalls);
