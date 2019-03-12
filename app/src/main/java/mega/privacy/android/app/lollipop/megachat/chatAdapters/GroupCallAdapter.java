@@ -703,7 +703,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     bOpts.inPurgeable = true;
                     bOpts.inInputShareable = true;
                     bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+//                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
                     if (bitmap != null) {
                         holder.avatarImage.setImageBitmap(bitmap);
                         holder.avatarImage.setVisibility(View.VISIBLE);
