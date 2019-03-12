@@ -112,6 +112,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	MyAccountInfo myAccountInfo;
 	boolean esid = false;
 
+	private int storageState = MegaApiJava.STORAGE_STATE_GREEN; //Default value
+
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
 	private static boolean firstConnect = true;
@@ -328,7 +330,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 							dbH.setExtendedAccountDetailsTimestamp();
 							long mostRecentSession = megaAccountSession.getMostRecentUsage();
 
-							String date = TimeUtils.formatDateAndTime(mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
+							String date = TimeUtils.formatDateAndTime(getApplicationContext(),mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
 
 							myAccountInfo.setLastSessionFormattedDate(date);
 							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
@@ -1357,6 +1359,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				api.getAccountDetails(null);
 			}
 			else {
+				storageState = state;
 				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
 				intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
 				intent.putExtra("state", state);
@@ -1876,4 +1879,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
 	}
+
+	public int getStorageState() { return storageState; }
 }

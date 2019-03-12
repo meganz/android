@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -60,7 +59,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -742,15 +740,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					finish();
 				}
 				else if(e.getErrorCode()==MegaError.API_ENOENT){
-					Snackbar.make(fragmentContainer, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1));
 				}
 				else
 				{
-					Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 
 			}else{
-				Snackbar.make(fragmentContainer, getString(R.string.import_success_message), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_message));
 			}
 		}
 	}
@@ -834,7 +832,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
 
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -852,12 +850,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					megaApi.copyNode(nodeToImport, target, this);
 				} else {
 					log("TARGET: null");
-					Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 				}
 			}
 			else{
 				log("DOCUMENT: null");
-				Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.import_success_error));
 			}
 
 		}
@@ -874,7 +872,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				statusDialog.dismiss();
 			} catch(Exception ex) {};
 
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -898,7 +896,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (hashes == null){
 			if(url != null) {
 				if(availableFreeSpace < size) {
-					showSnackbarNotSpace();
+					showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 					return;
 				}
 				
@@ -944,12 +942,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 								if (MegaApiUtils.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-								Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
+								showSnackbar(Constants.SNACKBAR_TYPE, message);
 							}
 						}
 						catch (Exception e){
 							String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
+							showSnackbar(Constants.SNACKBAR_TYPE, message);
 						}
 						return;
 					}
@@ -971,7 +969,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 						String path = dlFiles.get(document);
 						
 						if(availableFreeSpace < document.getSize()){
-							showSnackbarNotSpace();
+							showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 							continue;
 						}
 						
@@ -986,7 +984,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						showSnackbarNotSpace();
+						showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 						continue;
 					}
 					
@@ -1005,19 +1003,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 	}
 
-	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
-	}
-
-	public void showSnackbarNotSpace(){
-		log("showSnackbarNotSpace");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-		mySnackbar.show();
+	public void showSnackbar(int type, String s){
+		showSnackbar(type, fragmentContainer, s);
 	}
 
 	public void touchImage() {

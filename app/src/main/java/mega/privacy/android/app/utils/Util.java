@@ -54,6 +54,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,6 +104,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
 
 public class Util {
 	
@@ -115,7 +118,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -638,19 +641,19 @@ public class Util {
 		float TB = GB * 1024;
 		
 		if (size < KB){
-			sizeString = size + " B";
+			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " KB";
+			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " MB";
+			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " GB";
+			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
 		}
 		else{
-			sizeString = decf.format(size/TB) + " TB";
+			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
 		}
 		
 		return sizeString;
@@ -2165,6 +2168,14 @@ public class Util {
 					}
 				}, 500);
 			}
+			else if (option == 3) {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
+					}
+				}, 500);
+			}
 			else {
 				handler.postDelayed(new Runnable() {
 					@Override
@@ -2278,35 +2289,53 @@ public class Util {
 	}
 
 	public static  String convertToDegrees(float latitude, float longitude) {
-		StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
-		String latitudeDegrees = Location.convert(Math.abs(latitude), Location.FORMAT_MINUTES);
-		String[] latitudeSplit = latitudeDegrees.split(":");
-		builder.append(latitudeSplit[0]);
-		builder.append("°");
-		builder.append(latitudeSplit[1]);
-		builder.append("'");
+        String latitudeDegrees = Location.convert(Math.abs(latitude), Location.FORMAT_MINUTES);
+        String[] latitudeSplit = latitudeDegrees.split(":");
+        builder.append(latitudeSplit[0]);
+        builder.append("°");
+        builder.append(latitudeSplit[1]);
+        builder.append("'");
 
-		if (latitude < 0) {
-			builder.append(" S ");
-		} else {
-			builder.append(" N ");
+        if (latitude < 0) {
+            builder.append(" S ");
+        } else {
+            builder.append(" N ");
+        }
+
+        String longitudeDegrees = Location.convert(Math.abs(longitude), Location.FORMAT_MINUTES);
+        String[] longitudeSplit = longitudeDegrees.split(":");
+        builder.append(longitudeSplit[0]);
+        builder.append("°");
+        builder.append(longitudeSplit[1]);
+        builder.append("'");
+
+        if (longitude < 0) {
+            builder.append(" W");
+        } else {
+            builder.append(" E");
+        }
+
+        return builder.toString();
+    }
+
+	public static void hideKeyboard(Activity activity, int flag){
+
+		View v = activity.getCurrentFocus();
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
+	}
+
+	public static void hideKeyboardView(Context context, View v, int flag){
+
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
 		}
 
-		String longitudeDegrees = Location.convert(Math.abs(longitude), Location.FORMAT_MINUTES);
-		String[] longitudeSplit = longitudeDegrees.split(":");
-		builder.append(longitudeSplit[0]);
-		builder.append("°");
-		builder.append(longitudeSplit[1]);
-		builder.append("'");
-
-		if (longitude < 0) {
-			builder.append(" W");
-		} else {
-			builder.append(" E");
-		}
-
-		return builder.toString();
 	}
 
 	private static void log(String message) {

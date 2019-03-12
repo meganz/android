@@ -706,7 +706,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void afterTextChanged(Editable s) {
                 if (sixthPin.length()!=0){
                     sixthPin.setCursorVisible(true);
-                    hideKeyboard();
+                    Util.hideKeyboard((LoginActivityLollipop)context, 0);
 
                     if (pinLongClick) {
                         pasteClipboard();
@@ -1180,7 +1180,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     void permitVerify(){
         log("permitVerify");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-            hideKeyboard();
+            Util.hideKeyboard((LoginActivityLollipop)context, 0);
             if (sb.length()>0) {
                 sb.delete(0, sb.length());
             }
@@ -1196,14 +1196,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 verify2faProgressBar.setVisibility(View.VISIBLE);
                 megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
             }
-        }
-    }
-
-    void hideKeyboard(){
-
-        View v = ((LoginActivityLollipop) context).getCurrentFocus();
-        if (v != null){
-            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
 
@@ -2677,10 +2669,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                View view = ((LoginActivityLollipop) context).getCurrentFocus();
-                if (view != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                }
+                Util.hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -2840,10 +2829,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                View view = ((LoginActivityLollipop) context).getCurrentFocus();
-                if (view != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                }
+                Util.hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
