@@ -122,6 +122,21 @@ public class ChatController {
         }
     }
 
+    public void selectChatsToAttachContacts (ArrayList<MegaUser> contacts) {
+        long[] longArray = new long[contacts.size()];
+
+        for (int i=0; i<contacts.size(); i++) {
+            longArray[i] = contacts.get(i).getHandle();
+        }
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("USER_HANDLES", longArray);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+    }
+
     public void leaveChat(long chatId){
         if(context instanceof ManagerActivityLollipop){
             megaChatApi.leaveChat(chatId, (ManagerActivityLollipop) context);
@@ -1465,19 +1480,19 @@ public class ChatController {
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
                         log("File already exists!");
                         if (context instanceof ChatFullScreenImageViewer){
-                            ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.file_already_exists));
+                            ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
                         }
                         else if (context instanceof AudioVideoPlayerLollipop){
-                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                            ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists), -1);
                         }
                         else if (context instanceof PdfViewerActivityLollipop){
-                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                            ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists), -1);
                         }
                         else if (context instanceof ChatActivityLollipop){
-                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.file_already_exists));
+                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists), -1);
                         }
                         else if (context instanceof NodeAttachmentHistoryActivity){
-                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.file_already_exists));
+                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
                         }
                     }
                     else{
@@ -1641,19 +1656,19 @@ public class ChatController {
         if(availableFreeSpace < sizeC) {
 
             if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).showSnackbarNotSpace();
+                ((ChatActivityLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
             }
             else if(context instanceof ChatFullScreenImageViewer){
-                ((ChatFullScreenImageViewer) context).showSnackbarNotSpace();
+                ((ChatFullScreenImageViewer) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
             }
             else if (context instanceof PdfViewerActivityLollipop){
-                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
+                ((PdfViewerActivityLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
             }
             else if (context instanceof AudioVideoPlayerLollipop){
-                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
+                ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
             }
             else if (context instanceof NodeAttachmentHistoryActivity){
-                ((NodeAttachmentHistoryActivity) context).showSnackbarNotSpace();
+                ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
             }
             log("Not enough space");
             return;
@@ -1777,7 +1792,7 @@ public class ChatController {
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
                             log("Video/Audio file");
                             if (context instanceof AudioVideoPlayerLollipop){
-                                ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 File mediaFile = new File(localPath);
@@ -1819,10 +1834,10 @@ public class ChatController {
                                     }
                                     else {
                                         if(context instanceof  ChatActivityLollipop){
-                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available), -1);
                                         }
                                         else if(context instanceof  NodeAttachmentHistoryActivity){
-                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
                                         }
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1843,7 +1858,7 @@ public class ChatController {
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
                             log("Pdf file");
                             if (context instanceof PdfViewerActivityLollipop){
-                                ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                             }
                             else {
                                 File pdfFile = new File(localPath);
@@ -1865,7 +1880,7 @@ public class ChatController {
                         else {
                             log("MimeTypeList other file");
                             if(context instanceof ChatFullScreenImageViewer){
-                                ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                             }
                             else {
                                 try {
@@ -1893,19 +1908,19 @@ public class ChatController {
                                             context.startActivity(intentShare);
                                         }
                                         if(context instanceof  ChatActivityLollipop){
-                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                                         }
                                         else if(context instanceof  NodeAttachmentHistoryActivity){
-                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                         }
                                     }
                                 }
                                 catch (Exception e){
                                     if(context instanceof  ChatActivityLollipop){
-                                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
                                     }
                                     else if(context instanceof  NodeAttachmentHistoryActivity){
-                                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                             }
@@ -2042,7 +2057,7 @@ public class ChatController {
         else{
             log("Proceed to import nodes to own Cloud");
             ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
-
+    
             MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
                 log("Error no chat folder - return");
@@ -2071,10 +2086,10 @@ public class ChatController {
                 else{
                     log("MESSAGE is null");
                     if(context instanceof  ChatActivityLollipop){
-                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
+                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error), -1);
                     }
                     else if(context instanceof  NodeAttachmentHistoryActivity){
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
                     }
                 }
             }

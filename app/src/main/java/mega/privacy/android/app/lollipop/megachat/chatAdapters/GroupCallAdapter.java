@@ -107,12 +107,12 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         RelativeLayout parentSurfaceView;
         RelativeLayout surfaceMicroLayout;
         long peerId;
-
         public void setImageView(Bitmap bitmap){
             avatarImage.setImageBitmap(bitmap);
             avatarImage.setVisibility(View.VISIBLE);
             avatarInitialLetter.setVisibility(View.GONE);
         }
+
 
         public ViewHolderGroupCall(View itemView) {
             super(itemView);

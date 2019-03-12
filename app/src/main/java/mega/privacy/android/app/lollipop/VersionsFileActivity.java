@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -28,8 +27,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -41,7 +38,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.PositionDividerItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
@@ -96,8 +93,10 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
+	MenuItem deleteVersionsMenuItem;
 
 	Handler handler;
+	DisplayMetrics outMetrics;
 
 	private class GetVersionsSizeTask extends AsyncTask<String, Void, String> {
 
@@ -195,7 +194,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			log("onDestroyActionMode");
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
-			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 3);
 		}
 
 		@Override
@@ -267,17 +266,12 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		megaApi.addGlobalListener(this);
 
 		handler = new Handler();
+
+		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
 
 		setContentView(R.layout.activity_versions_file);
 
@@ -288,7 +282,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 //			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setTitle(getString(R.string.title_section_versions));
+		aB.setTitle(getString(R.string.title_section_versions).toUpperCase());
 
 		container = (RelativeLayout) findViewById(R.id.versions_main_layout);
 
@@ -297,11 +291,18 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
 		listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
-		listView.addItemDecoration(new PositionDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				checkScroll();
+			}
+		});
 
 		emptyImage = (ImageView) findViewById(R.id.versions_file_empty_image);
 		emptyText = (TextView) findViewById(R.id.versions_file_empty_text);
@@ -358,6 +359,28 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			}
 		}
 	}
+
+	void checkScroll (){
+		if (listView != null) {
+			if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
+				changeActionBarElevation(true);
+			}
+			else if (adapter != null && !adapter.isMultipleSelect()) {
+				changeActionBarElevation(false);
+			}
+		}
+	}
+
+	public void changeActionBarElevation(boolean whitElevation){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (whitElevation) {
+				aB.setElevation(Util.px2dp(4, outMetrics));
+			}
+			else {
+				aB.setElevation(0);
+			}
+		}
+	}
 	
 	public void showOptionsPanel(MegaNode sNode, int sPosition){
 		log("showOptionsPanel");
@@ -390,6 +413,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
+		deleteVersionsMenuItem = menu.findItem(R.id.action_delete_version_history);
 
 		menu.findItem(R.id.action_folder_contacts_list_share_folder).setVisible(false);
 
@@ -416,10 +440,44 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		    	selectAll();
 		    	return true;
 		    }
+			case R.id.action_delete_version_history: {
+				showDeleteVersionHistoryDialog();
+				return true;
+			}
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+
+	void showDeleteVersionHistoryDialog () {
+		log("showDeleteVersionHistoryDialog");
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						deleteVersionHistory();
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.title_delete_version_history);
+		builder.setMessage(R.string.text_delete_version_history).setPositiveButton(R.string.context_delete, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	void deleteVersionHistory () {
+		Intent intent = new Intent();
+		intent.putExtra("deleteVersionHistory", true);
+		setResult(RESULT_OK, intent);
+		finish();
 	}
 
 	// Clear all selected items
@@ -814,11 +872,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(container, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+		showSnackbar(container, s);
 	}
 
 	public void updateSize(String size){

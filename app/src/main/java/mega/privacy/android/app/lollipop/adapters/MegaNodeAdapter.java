@@ -490,6 +490,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
 
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(275,outMetrics));
+            } else {
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(210,outMetrics));
+            }
+
             holderList.textViewFileSize = (TextView)v.findViewById(R.id.file_list_filesize);
 
             holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);
@@ -1325,11 +1331,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         log("onClick: file_list_three_dots: " + currentPosition);
         if (!Util.isOnline(context)) {
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             } else if (context instanceof FolderLinkActivityLollipop) {
-                ((FolderLinkActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((FolderLinkActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             } else if (context instanceof ContactFileListActivityLollipop) {
-                ((ContactFileListActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ContactFileListActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             }
             return;
         }

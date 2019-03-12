@@ -16,9 +16,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:titleTextAppearance="@style/ToolbarTitle"
+                app:popupTheme="@style/Theme.Megaactionbar.InfoScreens"
+                app:theme="@style/Theme.Megaactionbar.InfoScreens"
                 tools:context=".ContactPropertiesActivityLollipop" />
 
             <FrameLayout

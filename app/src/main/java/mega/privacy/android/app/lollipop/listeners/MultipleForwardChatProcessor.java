@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
+
 //Listener for  multi forward
 public class MultipleForwardChatProcessor implements MegaChatRequestListenerInterface {
 
@@ -334,11 +335,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     //No messages forwarded
                     int totalErrors = error+errorNotAvailable;
                     if(totalErrors==errorNotAvailable){
-                        ((ChatActivityLollipop) context).showSnackbar(context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
+                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors), -1);
                     }
                     else{
                         String text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
-                        ((ChatActivityLollipop) context).showSnackbar(text);
+                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, text, -1);
                     }
 
                     ((ChatActivityLollipop) context).removeProgressDialog();
@@ -359,7 +360,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                         text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
                     }
 
-                    ((NodeAttachmentHistoryActivity) context).showSnackbar(text);
+                    ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, text);
 
 //                    if(chatHandles.length==1){
 //                        ((NodeAttachmentHistoryActivity) context).openChatAfterForward(chatHandles[0], text);
@@ -372,11 +373,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     //No messages forwarded
                     int totalErrors = error+errorNotAvailable;
                     if(totalErrors==errorNotAvailable){
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, totalErrors, totalErrors));
                     }
                     else{
                         String text = context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, totalErrors, totalErrors);
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(text);
+                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, text);
                     }
                 }
                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
