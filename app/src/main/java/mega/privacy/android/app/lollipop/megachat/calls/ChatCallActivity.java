@@ -30,7 +30,6 @@ import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -38,7 +37,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -97,6 +95,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import android.provider.CallLog;
+
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
@@ -1695,7 +1695,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     log("CHANGE_TYPE_SESSION_STATUS:IN_PROGRESS "+userPeer.getPeerId()+" added in peersOnCall");
 
                                     peersOnCall.add((peersOnCall.size() == 0 ? 0 : (peersOnCall.size() - 1)), userPeer);
-                                    infoUsersBar.setText(userPeer.getName() + " " + getString(R.string.contact_joined_the_call));
+                                    infoUsersBar.setText(getString(R.string.contact_joined_the_call, userPeer.getName()));
                                     infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
                                     infoUsersBar.setAlpha(1);
                                     infoUsersBar.setVisibility(View.VISIBLE);
@@ -1761,7 +1761,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                                     if ((peersOnCall.get(i).getPeerId() == userPeerId) && (peersOnCall.get(i).getClientId() == userClientId)) {
 
                                         log("CHANGE_TYPE_SESSION_STATUS:DESTROYED "+peersOnCall.get(i).getPeerId()+" removed from peersOnCall");
-                                        infoUsersBar.setText(peersOnCall.get(i).getName() + " " + getString(R.string.contact_left_the_call));
+                                        infoUsersBar.setText(getString(R.string.contact_left_the_call, peersOnCall.get(i).getName()));
                                         infoUsersBar.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
                                         infoUsersBar.setAlpha(1);
                                         infoUsersBar.setVisibility(View.VISIBLE);
@@ -3914,12 +3914,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
     }
 
-    public void showSnackbar(String s) {
-        log("showSnackbar: " + s);
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+    public void showSnackbar(String s){
+        log("showSnackbar: "+s);
+        showSnackbar(fragmentContainer, s);
     }
 
     private String getName(long peerid) {

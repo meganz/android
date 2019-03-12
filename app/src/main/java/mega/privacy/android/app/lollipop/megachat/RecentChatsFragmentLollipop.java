@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -86,6 +87,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     ArrayList<MegaChatListItem> chats;
 
+    FilterChatsTask filterChatsTask;
+
     int lastFirstVisiblePosition;
 
     int numberOfClicks = 0;
@@ -140,11 +143,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void checkScroll() {
         if (listView != null) {
-            if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+            if (context instanceof ManagerActivityLollipop) {
+                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                }
             }
-            else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+            else if (context instanceof ArchivedChatsActivity) {
+                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
+                    ((ArchivedChatsActivity) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ArchivedChatsActivity) context).changeActionBarElevation(false);
+                }
             }
         }
     }
@@ -173,9 +186,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (context instanceof ManagerActivityLollipop) {
-                    checkScroll();
-                }
+                checkScroll();
             }
         });
 //        listView.setClipToPadding(false);
@@ -631,14 +642,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                     }
                 }
                 else{
                     if(Util.isOnline(context)){
                         if(megaApi!=null){
                             if(megaApi.isLoggedIn()==0){
-                                ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                                ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                             }
                             else{
                                 ChatController chatController = new ChatController(context);
@@ -649,11 +660,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                         else{
-                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_enable_chat_before_login));
+                            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_enable_chat_before_login), -1);
                         }
                     }
                     else{
-                        ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+                        ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                         showNoConnectionScreen();
                     }
 //                    setChats();
@@ -1018,8 +1029,21 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             log("open chat: position: "+position+" chatID: "+chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
+//            intent.putExtra("CHAT_ID", chats.get(position).getChatId());
+            intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
+            if (context instanceof ManagerActivityLollipop) {
+                if (((ManagerActivityLollipop) context).searchQuery != null  && !((ManagerActivityLollipop) context).searchQuery.isEmpty()) {
+                    closeSearch();
+                    ((ManagerActivityLollipop) context).closeSearchView();
+                }
+            }
+            else if (context instanceof ArchivedChatsActivity) {
+                if (((ArchivedChatsActivity) context).querySearch != null && !((ArchivedChatsActivity) context).querySearch.isEmpty()) {
+                    closeSearch();
+                    ((ArchivedChatsActivity) context).closeSearchView();
+                }
+            }
         }
     }
     /////END Multiselect/////
@@ -1820,6 +1844,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         showCallLayout();
 
+        if (context instanceof ManagerActivityLollipop) {
+            String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
+            if (searchQuery != null && ((ManagerActivityLollipop) context).searchExpand) {
+                filterChats(searchQuery);
+            }
+        }
+
         super.onResume();
     }
 
@@ -1850,6 +1881,93 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
            }else{
                fastScroller.setVisibility(View.VISIBLE);
            }
+        }
+    }
+
+    public void filterChats (String s) {
+        if (adapterList.isMultipleSelect()) {
+            hideMultipleSelect();
+        }
+
+        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
+            filterChatsTask.cancel(true);
+        }
+        filterChatsTask = new FilterChatsTask();
+        filterChatsTask.execute(s);
+    }
+
+    class FilterChatsTask extends AsyncTask<String, Void, Void> {
+
+        ArrayList<MegaChatListItem> filteredChats;
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            if (chats != null && !chats.isEmpty()) {
+                if (filteredChats == null) {
+                    filteredChats = new ArrayList<>();
+                } else {
+                    filteredChats.clear();
+                }
+                for (MegaChatListItem chat : chats) {
+                    if (chat.getTitle().toLowerCase().contains(strings[0].toLowerCase())) {
+                        filteredChats.add(chat);
+                    }
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            adapterList.setChats(filteredChats);
+
+            if (adapterList.getItemCount() == 0){
+                log("adapterList.getItemCount() == 0");
+                listView.setVisibility(View.GONE);
+                emptyLayout.setVisibility(View.VISIBLE);
+                inviteButton.setVisibility(View.GONE);
+                String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+
+                try{
+                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[/A]", "</font>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[/B]", "</font>");
+                }
+                catch (Exception e){}
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+
+                emptyTextViewInvite.setText(result);
+                emptyTextViewInvite.setVisibility(View.VISIBLE);
+            }
+            else{
+                log("adapterList.getItemCount() NOT = 0");
+                listView.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    public void closeSearch() {
+        if (filterChatsTask != null && filterChatsTask.getStatus() != AsyncTask.Status.FINISHED) {
+            filterChatsTask.cancel(true);
+        }
+        adapterList.setChats(chats);
+
+        if (adapterList.getItemCount() == 0) {
+            log("adapterList.getItemCount() == 0");
+            listView.setVisibility(View.GONE);
+            emptyLayout.setVisibility(View.VISIBLE);
+        } else {
+            log("adapterList.getItemCount() NOT = 0");
+            listView.setVisibility(View.VISIBLE);
+            emptyLayout.setVisibility(View.GONE);
+
         }
     }
 
