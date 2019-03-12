@@ -1284,6 +1284,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             subtitleToobar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) participantsLabel, participantsLabel)));
                             if(subtitleCall.getVisibility()!=View.VISIBLE){
                                 subtitleToobar.setVisibility(View.VISIBLE);
+                                subtitleCall.setVisibility(View.GONE);
                             }
                             iconStateToolbar.setVisibility(View.GONE);
                         }
@@ -1331,11 +1332,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Chat is archived");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                     else{
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                 }
@@ -1355,12 +1358,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Chat is archived");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                     else{
                         if(!chatRoom.isActive()){
                             subtitleToobar.setText(adjustForLargeFont(getString(R.string.inactive_chat)));
                             subtitleToobar.setVisibility(View.VISIBLE);
+                            subtitleCall.setVisibility(View.GONE);
                             iconStateToolbar.setVisibility(View.GONE);
                         }
                         else{
@@ -1449,14 +1454,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         subtitleToobar.setText(adjustForLargeFont(customSubtitle.toString()));
-        subtitleToobar.setVisibility(View.VISIBLE);
+        if(subtitleCall.getVisibility()!=View.VISIBLE){
+            subtitleToobar.setVisibility(View.VISIBLE);
+        }
         iconStateToolbar.setVisibility(View.GONE);
     }
 
     public void setLastGreen(String date){
         subtitleToobar.setText(date);
         subtitleToobar.isMarqueeIsNecessary(this);
-        subtitleToobar.setVisibility(View.VISIBLE);
+        if(subtitleCall.getVisibility()!=View.VISIBLE){
+            subtitleToobar.setVisibility(View.VISIBLE);
+        }
     }
 
     public void requestLastGreen(int state){
