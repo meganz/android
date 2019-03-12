@@ -7423,7 +7423,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     //Group:
                     log("showCallLayout: USER_NO_PRESENT || RING_IN - Group");
 
-                    subtitleCall.setVisibility(View.VISIBLE);
+                    subtitleCall.setVisibility(View.GONE);
                     if(chronoCall!=null){
                         chronoCall.stop();
                         chronoCall.setVisibility(View.GONE);
