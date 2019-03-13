@@ -33,9 +33,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 public class BaseActivity extends AppCompatActivity {
 

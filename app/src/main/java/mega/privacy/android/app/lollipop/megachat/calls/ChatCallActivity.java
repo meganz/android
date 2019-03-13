@@ -256,8 +256,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_calls_chat, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
