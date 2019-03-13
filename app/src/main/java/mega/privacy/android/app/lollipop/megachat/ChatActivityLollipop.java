@@ -1918,12 +1918,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     long chatIdCallInProgress = ChatUtil.getChatCallInProgress(megaChatApi);
                     if(chatIdCallInProgress == chatRoom.getChatId()){
                         log("startCall:I'm in this call");
-                        MegaApplication.setShowPinScreen(false);
-                        Intent intent = new Intent(this, ChatCallActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("chatHandle", idChat);
-                        startActivity(intent);
-
+                        ChatUtil.returnCall(this, megaChatApi);
                     }else{
                         log("startCall:I'm in other call");
                         showConfirmationToJoinCall(chatRoom);

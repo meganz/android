@@ -1,5 +1,9 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
+import android.content.Intent;
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -49,6 +53,38 @@ public class ChatUtil {
         return chatId;
     }
 
+    /*Method to return to the call which I am participating*/
+    public static void returnCall(Context context, MegaChatApiAndroid megaChatApi){
+        log("returnCall()");
+        if(megaChatApi!=null){
+            long chatId = getChatCallInProgress(megaChatApi);
+            MegaChatCall call = megaChatApi.getChatCall(chatId);
+            if(call!=null){
+                MegaApplication.setShowPinScreen(false);
+                Intent intent = new Intent(context, ChatCallActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("chatHandle", chatId);
+                intent.putExtra("callId", call.getId());
+                context.startActivity(intent);
+            }
+        }
+    }
+
+    /*Method to know if a call is established*/
+    public static boolean isEstablishedCall(MegaChatApiAndroid megaChatApi, long chatId){
+        if(megaChatApi!=null){
+            MegaChatCall call = megaChatApi.getChatCall(chatId);
+            if(call != null){
+                if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                    return true;
+                }else{
+                    return false;
+
+                }
+            }
+        }
+        return false;
+    }
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
     }

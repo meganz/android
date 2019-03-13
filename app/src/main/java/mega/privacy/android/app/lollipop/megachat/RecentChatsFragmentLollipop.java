@@ -685,7 +685,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             case R.id.call_in_progress_layout:{
                 log("onClick:call_in_progress_layout");
                 if(checkPermissionsCall()){
-                    returnCall();
+                    ChatUtil.returnCall(context, megaChatApi);
                 }
                 break;
             }
@@ -2002,7 +2002,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsCall()){
                         log("REQUEST_CAMERA -> returnTheCall");
-                        returnCall();
+                        ChatUtil.returnCall(context, megaChatApi);
                     }
                 }
                 break;
@@ -2012,7 +2012,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsCall()){
                         log("RECORD_AUDIO -> returnTheCall");
-                        returnCall();
+                        ChatUtil.returnCall(context, megaChatApi);
                     }
                 }
                 break;
@@ -2021,22 +2021,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-
-    private void returnCall(){
-        log("returnCall() -> getChatCallInProgress");
-        if(megaChatApi!=null){
-            long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
-            MegaChatCall call = megaChatApi.getChatCall(chatId);
-            if(call!=null){
-                MegaApplication.setShowPinScreen(false);
-                Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("chatHandle", chatId);
-                intent.putExtra("callId", call.getId());
-                startActivity(intent);
-            }
-        }
-    }
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);
