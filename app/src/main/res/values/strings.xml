@@ -2365,9 +2365,6 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
 
-    <string name="text_to_confirmation_open_connected_video_in_call" context="Text of the confirmation dialog to connected the video in the call">Switch to video call?</string>
-    <string name="text_of_button_to_switch" context="Text of button to confirm changing the audio call to video call">Switch</string>
-
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
 </resources>

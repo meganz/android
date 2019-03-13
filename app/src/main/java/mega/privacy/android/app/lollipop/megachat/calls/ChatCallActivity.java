@@ -2077,8 +2077,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             megaChatApi.disableVideo(chatId, this);
                         } else {
                             log(" enableVideo");
-                            showConfirmationConnectedVideo(chatId);
-//                            megaChatApi.enableVideo(chatId, this);
+                            megaChatApi.enableVideo(chatId, this);
                         }
                     }
 
@@ -4145,35 +4144,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     }
                 }
             }
-        }
-    }
-
-    private void showConfirmationConnectedVideo(final long chat) {
-        log("showConfirmationConnectedVideo");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        connectedMyVideo(chat);
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message = getResources().getString(R.string.text_to_confirmation_open_connected_video_in_call);
-        builder.setMessage(message).setPositiveButton(R.string.text_of_button_to_switch, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
-
-    private void connectedMyVideo(long chat){
-        if(megaChatApi!=null){
-            megaChatApi.enableVideo(chat, this);
         }
     }
 
