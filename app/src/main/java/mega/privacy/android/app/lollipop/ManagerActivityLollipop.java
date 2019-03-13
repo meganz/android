@@ -2269,7 +2269,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		rootNode = megaApi.getRootNode();
-		if (rootNode == null){
+		if (rootNode == null || LoginActivityLollipop.isBackFromLoginPage){
 			 if (getIntent() != null){
 			 	log("Action: "+getIntent().getAction());
 				if (getIntent().getAction() != null){

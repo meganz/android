@@ -100,6 +100,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     String firstNameTemp = null;
     String lastNameTemp = null;
 
+    static boolean isBackFromLoginPage;
+    static boolean isFetchedNodes;
+
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -198,7 +201,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-
+        isBackFromLoginPage = false;
         showFragment(visibleFragment);
     }
 
