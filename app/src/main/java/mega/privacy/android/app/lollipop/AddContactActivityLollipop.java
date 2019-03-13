@@ -1040,7 +1040,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setAdapter(adapterMEGA);
 
             if (adapterMEGA.getItemCount() == 0) {
-                String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
+                String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -1158,7 +1158,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
-        searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+        searchAutoComplete.setHint(getString(R.string.hint_action_search));
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 

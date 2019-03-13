@@ -208,13 +208,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     optionClearHistory.setVisibility(View.GONE);
                 }
                 else{
-                    if(chat.isActive()){
-                        if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
-                            optionClearHistory.setVisibility(View.VISIBLE);
-                        }
-                        else{
-                            optionClearHistory.setVisibility(View.GONE);
-                        }
+                    if(chat.isActive() && chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                        optionClearHistory.setVisibility(View.VISIBLE);
                     }
                     else{
                         optionClearHistory.setVisibility(View.GONE);

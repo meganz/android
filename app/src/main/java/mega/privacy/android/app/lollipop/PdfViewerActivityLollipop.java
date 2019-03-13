@@ -1361,7 +1361,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 removeMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
 
-                if(megaApi==null || !mega.privacy.android.app.utils.Util.isOnline(this)) {
+                if(megaApi==null || !Util.isOnline(this)) {
                     downloadMenuItem.setVisible(false);
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);

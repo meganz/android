@@ -91,12 +91,10 @@ public class AndroidMegaRichLinkMessage {
         while (m.find()) {
             String url = m.group();
             log("URL extracted: " + url);
-            if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
-                log("file link found");
+            if (isFileLink(url)) {
                 return links.toArray(new String[links.size()]);
             }
-            if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
-                log("folder link found");
+            if (isFolderLink(url)) {
                 links.add(url);
                 return links.toArray(new String[links.size()]);
             }
@@ -131,21 +129,26 @@ public class AndroidMegaRichLinkMessage {
         while (m.find()) {
             String url = m.group();
             log("URL extracted: " + url);
-            if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
-                log("file link found");
+            if (isFileLink(url)) {
                 return url;
             }
-            if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
-                log("folder link found");
+            if (isFolderLink(url)) {
                 return url;
             }
-            if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
-                log("chat link found");
+            if (isChatLink(url)) {
                 return url;
             }
         }
 
         return null;
+    }
+
+    public static boolean isFolderLink(String url) {
+        if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
+            log("folder link found");
+            return true;
+        }
+        return false;
     }
 
     public static boolean isFileLink(String url) {
@@ -157,12 +160,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isChatLink(String url) {
-
-        if (url == null) {
-             return false;
-        }
-
-        if ((url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
+        if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
             log("IS chat link found");
             return true;
         }
