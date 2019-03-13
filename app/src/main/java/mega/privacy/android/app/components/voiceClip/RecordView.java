@@ -256,11 +256,9 @@ public class RecordView extends RelativeLayout {
             try {
                 if(audioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
                     if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0){
-//                        int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                         int volume_level1= audioManager.getStreamVolume(AudioManager.STREAM_RING);
                         if(volume_level1!=0) {
-
-                            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
+                            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
                             player = new MediaPlayer();
                             AssetFileDescriptor afd = context.getResources().openRawResourceFd(soundRes);
                             if (afd == null) return;
@@ -280,25 +278,6 @@ public class RecordView extends RelativeLayout {
                             });
                             player.setLooping(false);
                         }
-//                        if(volume!=0){
-//                            player = new MediaPlayer();
-//                            AssetFileDescriptor afd = context.getResources().openRawResourceFd(soundRes);
-//                            if (afd == null) return;
-//
-//                            player.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
-//
-//                            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-//                            afd.close();
-//                            player.prepare();
-//                            player.start();
-//                            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                                @Override
-//                                public void onCompletion(MediaPlayer mp) {
-//                                    mp.release();
-//                                }
-//                            });
-//                            player.setLooping(false);
-//                        }
                     }
                 }
             } catch (IOException e) {
