@@ -6,17 +6,11 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.TypedArray;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.content.res.AppCompatResources;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -30,13 +24,9 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import java.io.IOException;
-
 import io.supercharge.shimmerlayout.ShimmerLayout;
 import mega.privacy.android.app.R;
-
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class RecordView extends RelativeLayout {
@@ -68,6 +58,7 @@ public class RecordView extends RelativeLayout {
     private int RECORD_FINISHED = R.raw.record_finished;
     private int RECORD_ERROR = R.raw.record_error;
     private MediaPlayer player;
+    private AudioManager audioManager;;
     private AnimationHelper animationHelper;
     private View layoutLock;
     private ImageView imageLock, imageArrow;
@@ -158,7 +149,7 @@ public class RecordView extends RelativeLayout {
         });
 
         hideViews(true);
-
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
     }
 
@@ -263,20 +254,53 @@ public class RecordView extends RelativeLayout {
             if (soundRes == 0)
                 return;
             try {
-                player = new MediaPlayer();
-                AssetFileDescriptor afd = context.getResources().openRawResourceFd(soundRes);
-                if (afd == null) return;
-                player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                afd.close();
-                player.prepare();
-                player.start();
-                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mp.release();
+                if(audioManager.getRingerMode()!=AudioManager.RINGER_MODE_SILENT){
+                    if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0){
+//                        int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                        int volume_level1= audioManager.getStreamVolume(AudioManager.STREAM_RING);
+                        if(volume_level1!=0) {
+
+                            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_RING);
+                            player = new MediaPlayer();
+                            AssetFileDescriptor afd = context.getResources().openRawResourceFd(soundRes);
+                            if (afd == null) return;
+                            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                            afd.close();
+                            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                            float log1 = (float) (1 - Math.log(maxVolume - volume_level1) / Math.log(maxVolume));
+                            player.setVolume(log1, log1);
+
+                            player.prepare();
+                            player.start();
+                            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    mp.release();
+                                }
+                            });
+                            player.setLooping(false);
+                        }
+//                        if(volume!=0){
+//                            player = new MediaPlayer();
+//                            AssetFileDescriptor afd = context.getResources().openRawResourceFd(soundRes);
+//                            if (afd == null) return;
+//
+//                            player.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+//
+//                            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+//                            afd.close();
+//                            player.prepare();
+//                            player.start();
+//                            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                                @Override
+//                                public void onCompletion(MediaPlayer mp) {
+//                                    mp.release();
+//                                }
+//                            });
+//                            player.setLooping(false);
+//                        }
                     }
-                });
-                player.setLooping(false);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -320,8 +344,6 @@ public class RecordView extends RelativeLayout {
         firstY = motionEvent.getRawY();
         lastX = motionEvent.getRawX();
         lastY = motionEvent.getRawY();
-
-//        lockOffset = (float) (recordBtn.getX() / 2.5);
         isLocked = false;
         playSound(RECORD_START);
 
@@ -428,26 +450,6 @@ public class RecordView extends RelativeLayout {
 
                         recordBtn.setTranslationY(-(firstY - motionEvent.getRawY()));
                         recordBtn.setTranslationX(0);
-
-//                        if ((-(firstY - motionEvent.getRawY())) < -lockOffset) {
-//                            if(!isLocked){
-//                                if (recordListener != null) {
-//                                    log("onActionMove() LOCKING ");
-//                                    recordListener.onLock();
-//                                    recordBtn.setTranslationY(0);
-//                                    recordBtn.setTranslationX(0);
-//                                    userBehaviour = UserBehaviour.LOCKING;
-//                                    showLock(false);
-//                                    slideToCancelLayout.stopShimmerAnimation();
-//                                    slideToCancelLayout.setVisibility(GONE);
-//                                    cancelRecordLayout.setVisibility(VISIBLE);
-//                                    isLocked = true;
-//                                }
-//                            }
-//                            return;
-//                        }
-//                        recordBtn.setTranslationY(-(firstY - motionEvent.getRawY()));
-//                        recordBtn.setTranslationX(0);
                     }
                 }
             }
@@ -510,63 +512,6 @@ public class RecordView extends RelativeLayout {
             recordBtn.setTranslationY(0);
             recordBtn.setTranslationX(0);
             isLocked = false;
-
-//            if(userBehaviour == UserBehaviour.LOCKING){
-//                showLock(false);
-//                firstX = 0;
-//                firstY = 0;
-//                lastX = 0;
-//                lastY = 0;
-//                userBehaviour = UserBehaviour.NONE;
-//                recordBtn.setTranslationY(0);
-//                recordBtn.setTranslationX(0);
-//                isLocked = false;
-////                counterTime.stop();
-////                slideToCancelLayout.stopShimmerAnimation();
-//
-//
-//            }else if(userBehaviour == UserBehaviour.CANCELING){//
-//                animationHelper.setStartRecorded(false);
-//                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-//                showLock(false);
-//                counterTime.stop();
-//                slideToCancelLayout.stopShimmerAnimation();
-//                recordBtn.setTranslationY(0);
-//                recordBtn.setTranslationX(0);
-//                firstX = 0;
-//                firstY = 0;
-//                lastX = 0;
-//                lastY = 0;
-//                userBehaviour = UserBehaviour.NONE;
-//                isLocked = false;
-//
-//            }else{
-//                if (recordListener != null && !isSwiped) {
-//                    recordListener.onFinish(elapsedTime);
-//                }
-//                animationHelper.setStartRecorded(false);
-//                if (!isSwiped) {
-//                    playSound(RECORD_FINISHED);
-//                }
-//                //if user has swiped then do not hide SmallMic since it will be hidden after swipe Animation
-//                hideViews(!isSwiped);
-//                if (!isSwiped) {
-//                    animationHelper.clearAlphaAnimation(true);
-//                }
-//                animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtn, slideToCancelLayout, initialX, difX);
-//                showLock(false);
-//                counterTime.stop();
-//                slideToCancelLayout.stopShimmerAnimation();
-//
-//                firstX = 0;
-//                firstY = 0;
-//                lastX = 0;
-//                lastY = 0;
-//                userBehaviour = UserBehaviour.NONE;
-//                recordBtn.setTranslationY(0);
-//                recordBtn.setTranslationX(0);
-//                isLocked = false;
-//            }
         }
     }
 
