@@ -48,6 +48,10 @@ public class MegaChatSession {
     return megachatJNI.MegaChatSession_getPeerid(swigCPtr, this);
   }
 
+  public long getClientid() {
+    return megachatJNI.MegaChatSession_getClientid(swigCPtr, this);
+  }
+
   public boolean hasAudio() {
     return megachatJNI.MegaChatSession_hasAudio(swigCPtr, this);
   }

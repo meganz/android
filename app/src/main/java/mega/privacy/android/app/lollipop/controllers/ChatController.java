@@ -1760,7 +1760,7 @@ public class ChatController {
         }
 
         if (ask.equals("false")) {
-            log("SIZE: Fo not ask before downloading");
+            log("SIZE: Do not ask before downloading");
             download(parentPathC, nodeList);
         }
         else{

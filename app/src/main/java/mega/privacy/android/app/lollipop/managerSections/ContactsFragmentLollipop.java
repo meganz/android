@@ -621,14 +621,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						log("Selected contact NULL");
 						break;
 					}
-//					if(users.size()  == 1){
-//						((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
-//					}
-//					else{
-//						for(int i=0;i<users.size();i++){
-//							contactHandles.add(users.get(i).getHandle());
-//						}
-////					((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
 					ArrayList<String> contactsNewGroup = new ArrayList<>();
 					for(int i=0;i<users.size();i++){
 						contactsNewGroup.add(users.get(i).getEmail());
