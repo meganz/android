@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -241,26 +242,22 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.rlGeneral.setLayoutParams(lp);
         }
 
-        if(megaChatApi!=null){
-            MegaChatCall call = megaChatApi.getChatCall(chatId);
-            if(call != null){
-                if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                    holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if(getItemCount() < 7){
-                                ((ChatCallActivity) context).remoteCameraClick();
-                            }else{
-                                ((ChatCallActivity) context).itemClicked(peer);
-                            }
-                        }
-                    });
-                }else{
-                    holder.rlGeneral.setOnClickListener(null);
-
+        if(ChatUtil.isEstablishedCall(megaChatApi, chatId)){
+            holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(getItemCount() < 7){
+                        ((ChatCallActivity) context).remoteCameraClick();
+                    }else{
+                        ((ChatCallActivity) context).itemClicked(peer);
+                    }
                 }
-            }
+            });
+        }else{
+            holder.rlGeneral.setOnClickListener(null);
+
         }
+
 
         holder.avatarImage.setImageBitmap(null);
         holder.avatarInitialLetter.setText("");
@@ -495,30 +492,20 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
-                if(megaChatApi!=null){
-                    MegaChatCall call = megaChatApi.getChatCall(chatId);
-                    if(call != null){
-                        if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                            holder.microSurface.setVisibility(View.VISIBLE);
-                        }else{
-                            holder.microSurface.setVisibility(View.GONE);
-                        }
-                    }
+                if(ChatUtil.isEstablishedCall(megaChatApi, chatId)) {
+                    holder.microSurface.setVisibility(View.VISIBLE);
+                }else{
+                    holder.microSurface.setVisibility(View.GONE);
                 }
             }
 
             if(peer.isGoodQuality()){
                 holder.qualityLayout.setVisibility(View.GONE);
             }else{
-                if(megaChatApi!=null){
-                    MegaChatCall call = megaChatApi.getChatCall(chatId);
-                    if(call != null){
-                        if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                            holder.qualityLayout.setVisibility(View.VISIBLE);
-                        }else{
-                            holder.qualityLayout.setVisibility(View.GONE);
-                        }
-                    }
+                if(ChatUtil.isEstablishedCall(megaChatApi, chatId)) {
+                    holder.qualityLayout.setVisibility(View.VISIBLE);
+                }else{
+                    holder.qualityLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -607,15 +594,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if(peer.isAudioOn()){
                 holder.microAvatar.setVisibility(View.GONE);
             }else{
-                if(megaChatApi!=null){
-                    MegaChatCall call = megaChatApi.getChatCall(chatId);
-                    if(call != null){
-                        if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                            holder.microAvatar.setVisibility(View.VISIBLE);
-                        }else{
-                            holder.microAvatar.setVisibility(View.GONE);
-                        }
-                    }
+
+                if(ChatUtil.isEstablishedCall(megaChatApi, chatId)) {
+                    holder.microAvatar.setVisibility(View.VISIBLE);
+                }else{
+                    holder.microAvatar.setVisibility(View.GONE);
                 }
             }
 

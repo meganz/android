@@ -3269,9 +3269,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         subtitleToobar.setText(getString(R.string.outgoing_call_starting));
                     }else{
                         if(callChat.hasVideoInitialCall())   {
-                            subtitleToobar.setText(getString(R.string.outgoing_video_call_starting));
+                            subtitleToobar.setText(getString(R.string.outgoing_video_call_starting).toLowerCase());
                         }else{
-                            subtitleToobar.setText(getString(R.string.outgoing_audio_call_starting));
+                            subtitleToobar.setText(getString(R.string.outgoing_audio_call_starting).toLowerCase());
                         }
                     }
                 }else{
