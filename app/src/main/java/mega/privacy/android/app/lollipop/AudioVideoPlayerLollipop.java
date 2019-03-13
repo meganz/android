@@ -323,8 +323,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean isZip = false;
     GetMediaFilesTask getMediaFilesTask;
 
-    boolean sendToChat = false;
-
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -2480,14 +2478,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-                    MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-                    if (attachNode != null) {
-                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-                    }
-                }
-                else {
-                    nC.selectChatsToSendNodes(longArray);
+
+                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                if (attachNode != null) {
+                    nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
                 }
 
                 break;
@@ -4156,17 +4150,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-                        && adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-                    log("Incoming node copied to Send to chat");
-                    MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-                    if (attachNode != null) {
-                        nC.selectChatsToSendNode(attachNode);
-                    }
-                }
-                else {
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-                }
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
                 log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -4185,7 +4169,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             else{
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
             }
-            sendToChat = false;
             log("copy nodes request finished");
         }
     }
@@ -4547,9 +4530,5 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public boolean isCreatingPlaylist () {
         return creatingPlaylist;
-    }
-
-    public void setSendToChat (boolean sendToChat) {
-        this.sendToChat = sendToChat;
     }
 }
