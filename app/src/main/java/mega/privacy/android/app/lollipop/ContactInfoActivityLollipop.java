@@ -1895,14 +1895,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				if(fromContacts){
 					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 					intent.putExtra("CHAT_ID", request.getChatHandle());
 					this.startActivity(intent);
 					finish();
 				}
 				else{
 					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 					intent.putExtra("CHAT_ID", request.getChatHandle());
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intent);
