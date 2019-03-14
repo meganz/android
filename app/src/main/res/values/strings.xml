@@ -2304,10 +2304,6 @@
         <item context="version items" quantity="other">Messages forwarded</item>
     </plurals>
 
-    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">SLIDE TO CANCEL</string>
-    <string name="cancel_voice_clip" context="text of button to cancel a voice clip ">CANCEL</string>
-    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
-
     <string name="title_geolocation_message" context="Title of a chat message that contains geolocation info">Pinned location</string>
     <string name="attachment_upload_panel_from_device" context="Text of the button to indicate an attachment upload from file system">From File System</string>
 
@@ -2377,5 +2373,9 @@
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%d of %d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
+
+    <string name="recording_less_than_second" context="Text to inform that to make a recording you have to keep pressed the record button more than one second">Tap and hold to record, release to send.</string>
+    <string name="slide_to_cancel" context="label shown when slide to cancel a voice clip">SLIDE TO CANCEL</string>
+    <string name="error_message_voice_clip" context="Error message when trying to play a voice clip that it is not available">This voice clip is not available</string>
 
 </resources>

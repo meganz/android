@@ -249,11 +249,13 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void paramsRecordButton(int marginBottomVoicleButton){
-        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fragment.getLayoutParams();
-        lp.setMargins(0,0,0, marginBottomVoicleButton);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        fragment.setLayoutParams(lp);
+        if(fragment!=null){
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fragment.getLayoutParams();
+            lp.setMargins(0,0,0, marginBottomVoicleButton);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            fragment.setLayoutParams(lp);
+        }
     }
 
     public void setListenerActivated(boolean listenerActivated) {

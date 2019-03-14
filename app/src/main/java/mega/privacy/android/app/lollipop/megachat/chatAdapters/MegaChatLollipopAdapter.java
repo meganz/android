@@ -9543,6 +9543,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public boolean stopCurrentPlaying() {
+        log("stopCurrentPlaying");
         if((messages != null)&&(messages.size()!=0)){
             for(int positionInMessages = 0; positionInMessages < messages.size(); positionInMessages++){
                 AndroidMegaChatMessage currentMessage = messages.get(positionInMessages);

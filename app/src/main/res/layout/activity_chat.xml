@@ -412,7 +412,7 @@
                         android:id="@+id/bubble_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tap and hold to record, release to send."
+                        android:text="@string/recording_less_than_second"
                         android:textSize="12sp"
                         android:gravity="center"
                         android:layout_gravity="center"

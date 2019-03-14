@@ -12,7 +12,6 @@
     android:paddingBottom="10dp"
     android:visibility="visible">
 
-    <!--android:layout_alignBottom="@id/layout_lock"-->
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="wrap_content"
@@ -22,7 +21,7 @@
         android:layout_alignParentBottom="true"
         android:background="@null"
         app:shimmer_animation_duration="1500"
-        app:shimmer_color="#ffffff"
+        app:shimmer_color="@color/white"
         app:shimmer_reverse_animation="true">
 
         <LinearLayout
@@ -48,7 +47,6 @@
         </LinearLayout>
     </io.supercharge.shimmerlayout.ShimmerLayout>
 
-    <!--android:layout_alignBottom="@id/layout_lock"-->
     <RelativeLayout
         android:id="@+id/rl_cancel_record"
         android:layout_width="wrap_content"
@@ -63,7 +61,7 @@
             android:background="@android:color/transparent"
             android:layout_centerInParent="true"
             android:fontFamily="roboto"
-            android:text="@string/cancel_voice_clip"
+            android:text="@string/button_cancel"
             android:textColor="@color/delete_account"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -100,7 +98,6 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <!--android:layout_alignBottom="@id/layout_lock"-->
     <ImageView
         android:id="@+id/glowing_mic"
         android:layout_width="wrap_content"
@@ -112,7 +109,6 @@
         android:src="@drawable/ic_mic_on"
         android:tint="@color/delete_account" />
 
-    <!--android:layout_alignBottom="@id/layout_lock"-->
     <ImageView
         android:id="@+id/basket_img"
         android:layout_width="wrap_content"
@@ -125,14 +121,12 @@
         android:tint="@color/delete_account"
         android:visibility="gone" />
 
-    <!--android:layout_alignBottom="@id/layout_lock"-->
     <Chronometer
-        android:id="@+id/counter_tv"
+        android:id="@+id/chrono_voice_clip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/glowing_mic"
-        android:text="00:00"
         android:textColor="@color/delete_account"
         android:textSize="16sp"
         android:textStyle="bold" />
