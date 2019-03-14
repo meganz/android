@@ -2117,9 +2117,49 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
+
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable encrypted key rotation</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.</string>
+
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a chat link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted a chat link.[/B]</string>
+
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete link</string>
+
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat link</string>
+
+    <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
 
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
+
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">%d participants</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">Join</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">Observers</string>
+
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Chat link error</string>
+
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Chat init error on loading link</string>
+
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were part of. Do you want to join to the chat again?</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat</string>
+
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you cannot open it again.</string>
+
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
+
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid chat link</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted key rotation</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key rotation is slightly more secure, but does not allow you to share a link to the chat and new participants will not see past messages.</string>
+    <string name="action_open_chat_link" context="Menu item">Open chat link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
 
@@ -2229,6 +2269,10 @@
         <item context="Singular of participant. 1 participant" quantity="one">%d participant</item>
         <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
+
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Set a title to the chat before getting the chat link</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Recurring subscription can be cancelled any time before the renewal date.</string>
@@ -2357,7 +2401,18 @@
 	<string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
 	<string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignored</string>
 
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the link you are about to delete.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to share a link to the chat and new participants will not see past messages.</string>
+
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully</string>
+
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%d of %d</string>
+
 
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
 
