@@ -114,7 +114,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -145,7 +144,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -640,6 +639,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
+
+	private boolean joiningToChatLink = false;
+	private long idJoinToChatLink = -1;
 
 	private boolean onAskingPermissionsFragment = false;
 
@@ -2303,6 +2305,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						finish();
 						return;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						intent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(intent);
+						finish();
+						return;
+					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -2644,6 +2656,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						getIntent().setAction(null);
 						setIntent(null);
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending = false;
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+						joiningToChatLink = true;
+						if (idJoinToChatLink == -1) {
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+						}
+
+						getIntent().setAction(null);
+						setIntent(null);
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_SETTINGS)) {
 						log("Chat notification: SHOW_SETTINGS");
 						selectDrawerItemPending=false;
@@ -2768,9 +2804,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
-				log("Connect to chat!: "+megaChatApi.getInitState());
-
 				if(megaChatApi!=null){
+					log("Connect to chat!: "+megaChatApi.getInitState());
 					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
 						log("Connection goes!!!");
 						megaChatApi.connect(this);
@@ -2916,7 +2951,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						if (firstLogin) {
+						if (firstLogin && !joiningToChatLink) {
 							log("intent firstTimeCam2==true");
 							if (prefs != null){
 								if (prefs.getCamSyncEnabled() != null){
@@ -5903,6 +5938,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     public void checkScrollElevation() {
 
+    	if(drawerItem==null){
+    		return;
+		}
+
         switch (drawerItem) {
             case CLOUD_DRIVE: {
 				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
@@ -7360,6 +7399,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					searchMenuItem.setVisible(true);
 
+					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
+					importLinkMenuItem.setVisible(true);
+
 					//Hide
 					searchByDate.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -7370,7 +7412,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					addMenuItem.setEnabled(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
@@ -10895,7 +10936,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		input.getBackground().mutate().clearColorFilter();
 		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(input, params);
-		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+		if(drawerItem == DrawerItem.CLOUD_DRIVE){
+			input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+		}
+		else if(drawerItem == DrawerItem.CHAT){
+			input.setImeActionLabel(getString(R.string.action_open_chat_link),EditorInfo.IME_ACTION_DONE);
+		}
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
@@ -10953,7 +10999,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.context_open_link_title));
+		if(drawerItem == DrawerItem.CLOUD_DRIVE){
+			builder.setTitle(getString(R.string.context_open_link_title));
+		}
+		else if(drawerItem == DrawerItem.CHAT){
+			builder.setTitle(getString(R.string.action_open_chat_link));
+		}
+
 		builder.setPositiveButton(getString(R.string.context_open_link),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -10966,7 +11018,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							openLinkDialog.dismiss();
 						}
 						catch(Exception e){}
-						nC.importLink(value);
+						if(drawerItem == DrawerItem.CLOUD_DRIVE){
+							nC.importLink(value);
+						}
+						else if(drawerItem == DrawerItem.CHAT){
+							megaChatApi.checkChatLink(value, managerActivity);
+						}
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -10988,7 +11045,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						input.requestFocus();
 						return true;
 					}
-					nC.importLink(value);
+					if(drawerItem == DrawerItem.CLOUD_DRIVE){
+						nC.importLink(value);
+					}
+					else if(drawerItem == DrawerItem.CHAT){
+						megaChatApi.checkChatLink(value, managerActivity);
+					}
 					try{
 						openLinkDialog.dismiss();
 					}
@@ -11021,9 +11083,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					openLinkDialog.dismiss();
 				}
 				catch(Exception e){}
-				nC.importLink(value);
+
+				if(drawerItem == DrawerItem.CLOUD_DRIVE){
+					nC.importLink(value);
+				}
+				else if(drawerItem == DrawerItem.CHAT){
+					megaChatApi.checkChatLink(value, managerActivity);
+				}
 			}
 		});
+	}
+
+	public void showChatLink(String link){
+		log("showChatLink: "+link);
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+		if (joiningToChatLink) {
+			openChatLinkIntent.setAction(Constants.ACTION_JOIN_OPEN_CHAT_LINK);
+		}
+		else {
+			openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+		}
+		openChatLinkIntent.setData(Uri.parse(link));
+		startActivity(openChatLinkIntent);
 	}
 
 	public void takePicture(){
@@ -14118,16 +14199,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
-					log("create group chat with participants: "+peers.size());
-
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-					if(chatTitle!=null){
-						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
-						megaChatApi.createChat(true, peers, listener);
+					boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
+					boolean chatLink = false;
+					if (!isEKR) {
+						chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
 					}
-					else{
-						megaChatApi.createChat(true, peers, this);
-					}
+
+					createGroupChat(peers, chatTitle, chatLink, isEKR);
 				}
 			}
 		}
@@ -14198,7 +14277,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR){
+
+		log("create group chat with participants: "+peers.size());
+
+		if (isEKR) {
+			megaChatApi.createChat(true, peers, chatTitle, this);
+		}
+		else {
+			if(chatLink){
+				if(chatTitle!=null && !chatTitle.isEmpty()){
+					CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
+					megaChatApi.createPublicChat(peers, chatTitle, listener);
+				}
+				else{
+					Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+				}
+			}
+			else{
+				megaChatApi.createPublicChat(peers, chatTitle, this);
+			}
+		}
+	}
+
 	public void sendFilesToChats (ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] nodeHandles) {
+
 		MultipleAttachChatListener listener = null;
 
 		if (chatHandles == null && chats != null) {
@@ -15234,6 +15337,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestStart(CHAT): "+ request.getRequestString());
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
 //			MegaApiAndroid.setLoggerObject(new AndroidLogger());
 ////			MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
@@ -15286,6 +15390,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
+				if (joiningToChatLink && idJoinToChatLink != -1) {
+					megaChatApi.autojoinPublicChat(idJoinToChatLink, this);
+				}
 				if(drawerItem == DrawerItem.CHAT){
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if(rChatFL!=null){
@@ -15372,8 +15479,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
+				showChatLink(request.getLink());
+			}
+			else {
+				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+					Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
+				}
+				else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+					Util.showAlert(this, getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
+				}
+				else{
+					Util.showAlert(this, "Error: "+getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
+				}
+			}
+		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
-
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: "+request.getFlag());
             }
@@ -15381,7 +15503,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: "+e.getErrorType());
 			}
 		}
-
+		else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+			joiningToChatLink = false;
+			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
+				showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
+			}
+			else {
+				log("Error joining to chat: "+ e.getErrorString());
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+			}
+		}
 	}
 
 	@Override
@@ -15389,7 +15520,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean loadMessages){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 
@@ -15404,14 +15535,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("open new chat: " + chatHandle);
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
-			if(loadMessages){
-				intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-			}
-			else{
-				intent.setAction(Constants.ACTION_NEW_CHAT);
-			}
-
+			intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 			intent.putExtra("CHAT_ID", chatHandle);
+			if(publicLink){
+				intent.putExtra("PUBLIC_LINK", errorCode);
+			}
 			this.startActivity(intent);
 		}
 		else{
@@ -17700,9 +17828,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case CHAT:{
 				if(megaChatApi!=null){
-					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(Util.mutateIcon(this, R.drawable.ic_chat, R.color.white));
-					}
+//					if(megaChatApi.getChatRooms().size()==0){
+						fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
+//					}
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
 					fabButton.setVisibility(View.VISIBLE);
 				}
