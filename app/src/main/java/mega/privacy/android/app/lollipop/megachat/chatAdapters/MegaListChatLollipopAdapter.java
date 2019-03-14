@@ -359,8 +359,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
 					if(call!=null){
 						log("call status: "+call.getStatus());
-						if((chat.isGroup()) && ((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN))){
-
+						if((chat.isGroup()) && ((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT))){
 							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
 							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
 							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -370,7 +369,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						}else{
 							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-
 							if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
 								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_started_messages));
 								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -598,7 +596,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}else if(viewType == ITEM_VIEW_TYPE_ARCHIVED_CHATS){
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_archived_chat_option_list, parent, false);
 			holder = new ViewHolderArchivedChatList(v);
-
 			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_archived_chat_option_list_layout);
 
 			((ViewHolderArchivedChatList)holder).textViewArchived = (TextView) v.findViewById(R.id.archived_chat_option_text);

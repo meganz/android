@@ -2337,7 +2337,7 @@
         <item context="version item" quantity="one">Message forwarded</item>
         <item context="version items" quantity="other">Messages forwarded</item>
     </plurals>
-    
+
     <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
         <item context="Plural of file. 2 files" quantity="other">%d files was not sent to %d chats</item>
@@ -2395,11 +2395,7 @@
 
 	<string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
 	<string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
-	<string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
-	<string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
-	<string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Tap to return to call</string>
-	<string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Answer</string>
-	<string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignored</string>
+	<string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call ">%s started a group call. Tap to join.</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
@@ -2413,7 +2409,17 @@
 
     <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%d of %d</string>
 
-
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
 
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call from a chat conversation, from the list of chats or from cloud drive section">Tap to return to call </string>
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">END &#38; JOIN</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">IGNORED</string>
+
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Audio calling&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Video calling&#8230;</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
 </resources>
