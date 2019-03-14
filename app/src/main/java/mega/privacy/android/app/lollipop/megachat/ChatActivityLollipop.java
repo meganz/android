@@ -110,6 +110,8 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAtt
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -132,6 +134,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
+import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
@@ -169,16 +172,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean newVisibility = false;
     boolean getMoreHistory=false;
 
-    Handler customHandler = new Handler();
-
     MegaChatCall callChat;
-    Chronometer myChrono;
-
     int minutesLastGreen = -1;
 
     boolean isLoadingHistory = false;
-
-    MenuItem importIcon;
 
     private AlertDialog errorOpenChatDialog;
 
@@ -244,6 +241,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     TextView titleToolbar;
     MarqueeTextView subtitleToobar;
+    LinearLayout subtitleCall;
+    Chronometer chronoCall;
+    LinearLayout participantsLayout;
+    TextView participantsText;
     ImageView iconStateToolbar;
 
     ImageView privateIconToolbar;
@@ -289,6 +290,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     RelativeLayout callInProgressLayout;
     TextView callInProgressText;
+    Chronometer callInProgressChrono;
+
+    boolean startVideo = false;
 
     EmojiEditText textChat;
     ImageButton sendIcon;
@@ -304,7 +308,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ChatActivityLollipop chatActivity;
 
+    MenuItem importIcon;
     MenuItem callMenuItem;
+    MenuItem videoMenuItem;
     MenuItem inviteMenuItem;
     MenuItem clearHistoryMenuItem;
     MenuItem contactInfoMenuItem;
@@ -623,18 +629,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         subtitleToobar.setMarqueeRepeatLimit(-1);
         subtitleToobar.setSingleLine(true);
         subtitleToobar.setHorizontallyScrolling(true);
+        subtitleCall = (LinearLayout) tB.findViewById(R.id.subtitle_call);
+        chronoCall = (Chronometer) tB.findViewById(R.id.chrono_call);
+        participantsLayout = (LinearLayout) tB.findViewById(R.id.ll_participants);
+        participantsText = (TextView) tB.findViewById(R.id.participants_text);
         iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
         privateIconToolbar = (ImageView) tB.findViewById(R.id.private_icon_toolbar);
 
         titleToolbar.setText(" ");
         subtitleToobar.setText(" ");
         subtitleToobar.setVisibility(View.GONE);
+        subtitleCall.setVisibility(View.GONE);
+        chronoCall.setVisibility(View.GONE);
+        participantsLayout.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
-        myChrono = new Chronometer(context);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         emptyLayout = (LinearLayout) findViewById(R.id.empty_messages_layout);
@@ -687,6 +698,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressText = (TextView) findViewById(R.id.call_in_progress_text);
+        callInProgressChrono = (Chronometer) findViewById(R.id.call_in_progress_chrono);
+        callInProgressChrono.setVisibility(View.GONE);
 
         rLKeyboardTwemojiButton.setOnClickListener(this);
         rLMediaButton.setOnClickListener(this);
@@ -1024,9 +1037,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showChat(String textSnackbar){
-
         if(idChat!=-1) {
-
             //REcover chat
             log("Recover chat with id: " + idChat);
             chatRoom = megaChatApi.getChatRoom(idChat);
@@ -1248,6 +1259,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("setChatSubtitle:isPreview");
             subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
             subtitleToobar.setVisibility(View.VISIBLE);
+            subtitleCall.setVisibility(View.GONE);
             iconStateToolbar.setVisibility(View.GONE);
             tB.setOnClickListener(this);
 
@@ -1260,6 +1272,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("Chat not connected:setChatSubtitle:isPreview");
                 subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
                 subtitleToobar.setVisibility(View.VISIBLE);
+                subtitleCall.setVisibility(View.GONE);
                 iconStateToolbar.setVisibility(View.GONE);
                 tB.setOnClickListener(this);
 
@@ -1269,11 +1282,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             subtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
             subtitleToobar.setVisibility(View.VISIBLE);
+            subtitleCall.setVisibility(View.GONE);
             iconStateToolbar.setVisibility(View.GONE);
 
             tB.setOnClickListener(null);
-        }
-        else{
+
+        }else{
+
             log("karere connection state: "+megaChatApi.getConnectionState());
             log("chat connection state: "+megaChatApi.getChatConnectionState(idChat));
 
@@ -1281,11 +1296,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if (chatRoom.isGroup()) {
                 tB.setOnClickListener(this);
-
                 if(chatRoom.isPreview()){
                     log("setChatSubtitle:isPreview");
                     subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
                     subtitleToobar.setVisibility(View.VISIBLE);
+                    subtitleCall.setVisibility(View.GONE);
                     iconStateToolbar.setVisibility(View.GONE);
                     tB.setOnClickListener(this);
 
@@ -1300,39 +1315,54 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else {
                     log("Check permissions group chat");
-                    if(permission==MegaChatRoom.PRIV_RO) {
+                    if (permission == MegaChatRoom.PRIV_RO) {
                         log("Permission RO");
                         setBottomLayout(SHOW_NOTHING_LAYOUT);
 
-                        if(chatRoom.isArchived()){
+                        writingContainerLayout.setVisibility(View.GONE);
+                        mediaButton.setVisibility(View.GONE);
+                        sendContactButton.setVisibility(View.GONE);
+                        pickFileSystemButton.setVisibility(View.GONE);
+                        pickCloudDriveButton.setVisibility(View.GONE);
+                        pickFileStorageButton.setVisibility(View.GONE);
+
+
+                        if (chatRoom.isArchived()) {
                             log("Chat is archived");
                             subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                             subtitleToobar.setVisibility(View.VISIBLE);
+                            subtitleCall.setVisibility(View.GONE);
                             iconStateToolbar.setVisibility(View.GONE);
 
-                        }else{
+                        } else {
                             subtitleToobar.setText(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
                             subtitleToobar.setVisibility(View.VISIBLE);
+                            subtitleCall.setVisibility(View.GONE);
                             iconStateToolbar.setVisibility(View.GONE);
                         }
-                    }
-                    else if(permission==MegaChatRoom.PRIV_RM) {
+                    } else if (permission == MegaChatRoom.PRIV_RM) {
                         log("Permission RM");
                         setBottomLayout(SHOW_NOTHING_LAYOUT);
+                        writingContainerLayout.setVisibility(View.GONE);
+                        mediaButton.setVisibility(View.GONE);
+                        sendContactButton.setVisibility(View.GONE);
+                        pickFileSystemButton.setVisibility(View.GONE);
+                        pickCloudDriveButton.setVisibility(View.GONE);
+                        pickFileStorageButton.setVisibility(View.GONE);
 
-                        if(chatRoom.isArchived()){
+                        if (chatRoom.isArchived()) {
                             log("Chat is archived");
                             subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                             subtitleToobar.setVisibility(View.VISIBLE);
+                            subtitleCall.setVisibility(View.GONE);
                             iconStateToolbar.setVisibility(View.GONE);
-                        }
-                        else{
-                            if(!chatRoom.isActive()){
+                        } else {
+                            if (!chatRoom.isActive()) {
                                 subtitleToobar.setText(adjustForLargeFont(getString(R.string.inactive_chat)));
                                 subtitleToobar.setVisibility(View.VISIBLE);
+                                subtitleCall.setVisibility(View.GONE);
                                 iconStateToolbar.setVisibility(View.GONE);
-                            }
-                            else{
+                            } else {
                                 subtitleToobar.setText(null);
                                 subtitleToobar.setVisibility(View.GONE);
                                 iconStateToolbar.setVisibility(View.GONE);
@@ -1343,10 +1373,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("permission: "+permission);
                         setBottomLayout(SHOW_WRITING_LAYOUT);
 
+                        writingContainerLayout.setVisibility(View.VISIBLE);
+                        mediaButton.setVisibility(View.VISIBLE);
+                        sendContactButton.setVisibility(View.VISIBLE);
+                        pickFileSystemButton.setVisibility(View.VISIBLE);
+                        pickCloudDriveButton.setVisibility(View.VISIBLE);
+                        pickFileStorageButton.setVisibility(View.VISIBLE);
+
                         if(chatRoom.isArchived()){
                             log("Chat is archived");
                             subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                             subtitleToobar.setVisibility(View.VISIBLE);
+                            subtitleCall.setVisibility(View.GONE);
                             iconStateToolbar.setVisibility(View.GONE);
                         }
                         else{
@@ -1356,7 +1394,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             else{
                                 long participantsLabel = chatRoom.getPeerCount()+1; //Add one to include me
                                 subtitleToobar.setText(adjustForLargeFont(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, (int) participantsLabel, participantsLabel)));
-                                subtitleToobar.setVisibility(View.VISIBLE);
+                                if(subtitleCall.getVisibility()!=View.VISIBLE){
+                                    subtitleToobar.setVisibility(View.VISIBLE);
+                                    subtitleCall.setVisibility(View.GONE);
+                                }
                                 iconStateToolbar.setVisibility(View.GONE);
                             }
                         }
@@ -1391,17 +1432,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         tB.setOnClickListener(null);
                     }
 
+                    writingContainerLayout.setVisibility(View.GONE);
+                    mediaButton.setVisibility(View.GONE);
+                    sendContactButton.setVisibility(View.GONE);
+                    pickFileSystemButton.setVisibility(View.GONE);
+                    pickCloudDriveButton.setVisibility(View.GONE);
+                    pickFileStorageButton.setVisibility(View.GONE);
+                    subtitleCall.setVisibility(View.GONE);
+
                     setBottomLayout(SHOW_NOTHING_LAYOUT);
 
                     if(chatRoom.isArchived()){
                         log("Chat is archived");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                     else{
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                 }
@@ -1415,12 +1466,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Chat is archived");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                     else{
                         if(!chatRoom.isActive()){
                             subtitleToobar.setText(adjustForLargeFont(getString(R.string.inactive_chat)));
                             subtitleToobar.setVisibility(View.VISIBLE);
+                            subtitleCall.setVisibility(View.GONE);
                             iconStateToolbar.setVisibility(View.GONE);
                         }
                         else{
@@ -1526,14 +1579,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         subtitleToobar.setText(adjustForLargeFont(customSubtitle.toString()));
-        subtitleToobar.setVisibility(View.VISIBLE);
+        if(subtitleCall.getVisibility()!=View.VISIBLE){
+            subtitleToobar.setVisibility(View.VISIBLE);
+        }
         iconStateToolbar.setVisibility(View.GONE);
     }
 
     public void setLastGreen(String date){
         subtitleToobar.setText(date);
         subtitleToobar.isMarqueeIsNecessary(this);
-        subtitleToobar.setVisibility(View.VISIBLE);
+        if(subtitleCall.getVisibility()!=View.VISIBLE){
+            subtitleToobar.setVisibility(View.VISIBLE);
+        }
     }
 
     public void requestLastGreen(int state){
@@ -1556,6 +1613,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Chat not connected");
             subtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
             subtitleToobar.setVisibility(View.VISIBLE);
+            subtitleCall.setVisibility(View.GONE);
             iconStateToolbar.setVisibility(View.GONE);
         }
         else{
@@ -1564,6 +1622,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("Chat is archived");
                 subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                 subtitleToobar.setVisibility(View.VISIBLE);
+                subtitleCall.setVisibility(View.GONE);
                 iconStateToolbar.setVisibility(View.GONE);
             }
             else if(!chatRoom.isGroup()){
@@ -1572,50 +1631,52 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(state == MegaChatApi.STATUS_ONLINE){
                     log("This user is connected");
                     subtitleToobar.setText(adjustForLargeFont(getString(R.string.online_status)));
-                    subtitleToobar.setVisibility(View.VISIBLE);
+                    if(subtitleCall.getVisibility()!=View.VISIBLE){
+                        subtitleToobar.setVisibility(View.VISIBLE);
+                    }
                     iconStateToolbar.setVisibility(View.VISIBLE);
                     iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-                }
-                else{
+
+                }else{
 
                     if(state == MegaChatApi.STATUS_AWAY){
                         log("This user is away");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
-                        subtitleToobar.setVisibility(View.VISIBLE);
+                        if(subtitleCall.getVisibility()!=View.VISIBLE){
+                            subtitleToobar.setVisibility(View.VISIBLE);
+                        }
                         iconStateToolbar.setVisibility(View.VISIBLE);
                         iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
 
-                    }
-                    else if(state == MegaChatApi.STATUS_BUSY){
+                    }else if(state == MegaChatApi.STATUS_BUSY){
                         log("This user is busy");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
-                        subtitleToobar.setVisibility(View.VISIBLE);
+                        if(subtitleCall.getVisibility()!=View.VISIBLE){
+                            subtitleToobar.setVisibility(View.VISIBLE);
+                        }
                         iconStateToolbar.setVisibility(View.VISIBLE);
                         iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
 
-                    }
-                    else if(state == MegaChatApi.STATUS_OFFLINE){
+                    }else if(state == MegaChatApi.STATUS_OFFLINE){
                         log("This user is offline");
                         subtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
                         subtitleToobar.setVisibility(View.VISIBLE);
+                        subtitleCall.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.VISIBLE);
                         iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
 
-                    }
-                    else if(state == MegaChatApi.STATUS_INVALID){
+                    }else if(state == MegaChatApi.STATUS_INVALID){
                         log("INVALID status: "+state);
                         subtitleToobar.setText(null);
                         subtitleToobar.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
-                    }
-                    else{
+                    }else{
                         log("This user status is: "+state);
                         subtitleToobar.setText(null);
                         subtitleToobar.setVisibility(View.GONE);
                         iconStateToolbar.setVisibility(View.GONE);
                     }
                 }
-
             }
         }
     }
@@ -1737,6 +1798,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         inflater.inflate(R.menu.chat_action, menu);
 
         callMenuItem = menu.findItem(R.id.cab_menu_call_chat);
+        videoMenuItem = menu.findItem(R.id.cab_menu_video_chat);
         inviteMenuItem = menu.findItem(R.id.cab_menu_invite_chat);
         clearHistoryMenuItem = menu.findItem(R.id.cab_menu_clear_history_chat);
         contactInfoMenuItem = menu.findItem(R.id.cab_menu_contact_info_chat);
@@ -1751,132 +1813,146 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onPrepareOptionsMenu");
 
         if(chatRoom!=null){
-            if(chatRoom.isPreview()){
+            log("onPrepareOptionsMenu chatRoom!=null)");
+            callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
+            callMenuItem.setEnabled(false);
+            callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
+            if (chatRoom.isGroup()) {
+                videoMenuItem.setVisible(false);
+            }else{
+                videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
+                videoMenuItem.setEnabled(false);
+                videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.white_50_opacity));
+            }
+
+
+            if ((chatRoom.isPreview()) || (megaChatApi.getConnectionState() != MegaChatApi.CONNECTED)
+                        || (megaChatApi.getChatConnectionState(idChat) != MegaChatApi.CHAT_CONNECTION_ONLINE)) {
                 leaveMenuItem.setVisible(false);
-                callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                callMenuItem.setEnabled(false);
-                callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
                 contactInfoMenuItem.setVisible(false);
                 archiveMenuItem.setVisible(false);
-
             }else {
-
-                if (megaChatApi.getConnectionState() != MegaChatApi.CONNECTED) {
-                    leaveMenuItem.setVisible(false);
+                if(megaChatApi.getNumCalls() <= 0){
                     callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                    callMenuItem.setEnabled(false);
-                    callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
-                    clearHistoryMenuItem.setVisible(false);
-                    inviteMenuItem.setVisible(false);
-                    contactInfoMenuItem.setVisible(false);
-                    archiveMenuItem.setVisible(false);
-                }else {
-                    int callsInProgress = megaChatApi.getNumCalls();
+                    callMenuItem.setEnabled(true);
+                    callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
 
-                    if(callsInProgress <= 0){
+                    if (chatRoom.isGroup()) {
+                        videoMenuItem.setVisible(false);
+                    }else{
+                        videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
+                        videoMenuItem.setEnabled(true);
+                        videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
+                    }
+
+                }else{
+                    if( (megaChatApi!=null) && (!ChatUtil.participatingInACall(megaChatApi)) && (!megaChatApi.hasCallInChatRoom(chatRoom.getChatId()))){
                         callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                         callMenuItem.setEnabled(true);
                         callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
-                    }else{
-                        if(this.participatingInACall()){
-                            callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                            callMenuItem.setEnabled(false);
-                            callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
+
+                        if (chatRoom.isGroup()) {
+                            videoMenuItem.setVisible(false);
                         }else{
-                            callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
-                            callMenuItem.setEnabled(true);
-                            callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
+                            videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
+                            videoMenuItem.setEnabled(true);
+                            videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
                         }
-                    }
-
-                    archiveMenuItem.setVisible(true);
-                    if(chatRoom.isArchived()){
-                        archiveMenuItem.setTitle(getString(R.string.general_unarchive));
-                    }
-                    else{
-                        archiveMenuItem.setTitle(getString(R.string.general_archive));
-                    }
-
-                    int permission = chatRoom.getOwnPrivilege();
-                    log("Permission in the chat: " + permission);
-                    if (chatRoom.isGroup()) {
-
-                        if (permission == MegaChatRoom.PRIV_MODERATOR) {
-
-                            inviteMenuItem.setVisible(true);
-
-                            int lastMessageIndex = messages.size() - 1;
-                            if (lastMessageIndex >= 0) {
-                                AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
-                                if (!lastMessage.isUploading()) {
-                                    if (lastMessage.getMessage().getType() == MegaChatMessage.TYPE_TRUNCATE) {
-                                        log("Last message is TRUNCATE");
-                                        clearHistoryMenuItem.setVisible(false);
-                                    } else {
-                                        log("Last message is NOT TRUNCATE");
-                                        clearHistoryMenuItem.setVisible(true);
-                                    }
-                                } else {
-                                    log("Last message is UPLOADING");
-                                    clearHistoryMenuItem.setVisible(true);
-                                }
-                            }
-                            else {
-                                clearHistoryMenuItem.setVisible(false);
-                            }
-
-                            leaveMenuItem.setVisible(true);
-                        } else if (permission == MegaChatRoom.PRIV_RM) {
-                            log("Group chat PRIV_RM");
-                            leaveMenuItem.setVisible(false);
-                            clearHistoryMenuItem.setVisible(false);
-                            inviteMenuItem.setVisible(false);
-                            callMenuItem.setVisible(false);
-                        } else if (permission == MegaChatRoom.PRIV_RO) {
-                            log("Group chat PRIV_RO");
-                            leaveMenuItem.setVisible(true);
-                            clearHistoryMenuItem.setVisible(false);
-                            inviteMenuItem.setVisible(false);
-                            callMenuItem.setVisible(false);
-                        } else if(permission == MegaChatRoom.PRIV_STANDARD){
-                            log("Group chat PRIV_STANDARD");
-                            leaveMenuItem.setVisible(true);
-                            clearHistoryMenuItem.setVisible(false);
-                            inviteMenuItem.setVisible(false);
-
-                        }else{
-                            log("Permission: " + permission);
-                            leaveMenuItem.setVisible(true);
-                            clearHistoryMenuItem.setVisible(false);
-                            inviteMenuItem.setVisible(false);
-                            callMenuItem.setVisible(false);
-                        }
-
-                        contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
-                        contactInfoMenuItem.setVisible(true);
-                    }
-                    else {
-                        inviteMenuItem.setVisible(false);
-                        if (permission == MegaChatRoom.PRIV_RO) {
-                            clearHistoryMenuItem.setVisible(false);
-                            contactInfoMenuItem.setVisible(false);
-                            callMenuItem.setVisible(false);
-                        } else {
-                            clearHistoryMenuItem.setVisible(true);
-                            contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
-                            contactInfoMenuItem.setVisible(true);
-                            callMenuItem.setVisible(true);
-                        }
-                        leaveMenuItem.setVisible(false);
                     }
                 }
+
+                archiveMenuItem.setVisible(true);
+                if(chatRoom.isArchived()){
+                    archiveMenuItem.setTitle(getString(R.string.general_unarchive));
+                }
+                else{
+                    archiveMenuItem.setTitle(getString(R.string.general_archive));
+                }
+
+                int permission = chatRoom.getOwnPrivilege();
+                log("Permission in the chat: " + permission);
+                if (chatRoom.isGroup()) {
+
+                    if (permission == MegaChatRoom.PRIV_MODERATOR) {
+
+                        inviteMenuItem.setVisible(true);
+
+                        int lastMessageIndex = messages.size() - 1;
+                        if (lastMessageIndex >= 0) {
+                            AndroidMegaChatMessage lastMessage = messages.get(lastMessageIndex);
+                            if (!lastMessage.isUploading()) {
+                                if (lastMessage.getMessage().getType() == MegaChatMessage.TYPE_TRUNCATE) {
+                                    log("Last message is TRUNCATE");
+                                    clearHistoryMenuItem.setVisible(false);
+                                } else {
+                                    log("Last message is NOT TRUNCATE");
+                                    clearHistoryMenuItem.setVisible(true);
+                                }
+                            } else {
+                                log("Last message is UPLOADING");
+                                clearHistoryMenuItem.setVisible(true);
+                            }
+                        }
+                        else {
+                            clearHistoryMenuItem.setVisible(false);
+                        }
+
+                        leaveMenuItem.setVisible(true);
+                    } else if (permission == MegaChatRoom.PRIV_RM) {
+                        log("Group chat PRIV_RM");
+                        leaveMenuItem.setVisible(false);
+                        clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                    } else if (permission == MegaChatRoom.PRIV_RO) {
+                        log("Group chat PRIV_RO");
+                        leaveMenuItem.setVisible(true);
+                        clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                    } else if(permission == MegaChatRoom.PRIV_STANDARD){
+                        log("Group chat PRIV_STANDARD");
+                        leaveMenuItem.setVisible(true);
+                        clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
+                    }else{
+                        log("Permission: " + permission);
+                        leaveMenuItem.setVisible(true);
+                        clearHistoryMenuItem.setVisible(false);
+                        inviteMenuItem.setVisible(false);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                    }
+
+                    contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
+                    contactInfoMenuItem.setVisible(true);
+                }
+                else {
+                    inviteMenuItem.setVisible(false);
+                    if (permission == MegaChatRoom.PRIV_RO) {
+                        clearHistoryMenuItem.setVisible(false);
+                        contactInfoMenuItem.setVisible(false);
+                        callMenuItem.setVisible(false);
+                        videoMenuItem.setVisible(false);
+                    } else {
+                        clearHistoryMenuItem.setVisible(true);
+                        contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                        contactInfoMenuItem.setVisible(true);
+                        callMenuItem.setVisible(true);
+                    }
+                    leaveMenuItem.setVisible(false);
+                }
             }
+
         }else{
             log("Chatroom NULL on create menu");
             leaveMenuItem.setVisible(false);
             callMenuItem.setVisible(false);
+            videoMenuItem.setVisible(false);
             clearHistoryMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             contactInfoMenuItem.setVisible(false);
@@ -1913,6 +1989,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
+                log("cab_menu_call_chat");
+                startVideo = false;
+                if(checkPermissionsCall()){
+                    startCall();
+                }
+                break;
+            }
+            case R.id.cab_menu_video_chat:{
+                log("cab_menu_video_chat");
+                startVideo = true;
                 if(checkPermissionsCall()){
                     startCall();
                 }
@@ -1955,11 +2041,47 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return super.onOptionsItemSelected(item);
     }
 
-    public void startCall(){
-        megaChatApi.startChatCall(chatRoom.getChatId(), false, this);
+    private void startCall(){
+        log("startCall ");
+        if(megaChatApi != null){
+            MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
+            if(callInThisChat != null){
+                log("startCall there is a call in this chat");
+
+                if((megaChatApi!=null)&&(ChatUtil.participatingInACall(megaChatApi))){
+                    long chatIdCallInProgress = ChatUtil.getChatCallInProgress(megaChatApi);
+                    if(chatIdCallInProgress == chatRoom.getChatId()){
+                        log("startCall:I'm in this call");
+                        ChatUtil.returnCall(this, megaChatApi);
+                    }else{
+                        log("startCall:I'm in other call");
+                        showConfirmationToJoinCall(chatRoom);
+                    }
+
+                }else{
+                    if(callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
+                        log("startCall:I'm not in a call, this call is ring in");
+                        MegaApplication.setShowPinScreen(false);
+                        Intent intent = new Intent(this, ChatCallActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("chatHandle", idChat);
+                        startActivity(intent);
+
+                    }else if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
+                        log("startCall:I'm not in a call, this call is user no present");
+                        megaChatApi.startChatCall(idChat, startVideo, this);
+                    }
+                }
+            }else{
+                if((megaChatApi!=null)&&(!ChatUtil.participatingInACall(megaChatApi))){
+                    log("startCall there is not a call in this chat and i'm not in other call");
+                    megaChatApi.startChatCall(idChat, startVideo, this);
+                }
+            }
+        }
     }
 
-    public boolean checkPermissionsCall(){
+    private boolean checkPermissionsCall(){
         log("checkPermissionsCall() ");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -1980,7 +2102,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return true;
     }
 
-    public boolean checkPermissionsTakePicture(){
+    private boolean checkPermissionsTakePicture(){
         log("checkPermissionsCall");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2002,7 +2124,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return true;
     }
 
-    public boolean checkPermissionsReadStorage(){
+    private boolean checkPermissionsReadStorage(){
         log("checkPermissionsReadStorage");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2517,6 +2639,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private void endCall(long chatHang){
+        log("endCall");
+        if(megaChatApi!=null){
+            megaChatApi.hangChatCall(chatHang, this);
+        }
+    }
+
+    private void showConfirmationToJoinCall(final MegaChatRoom c){
+        log("showConfirmationToJoinCall");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        log("showConfirmationToJoinCall: END & JOIN");
+                        //Find the call in progress:
+                        if(megaChatApi!=null){
+                            endCall(ChatUtil.getChatCallInProgress(megaChatApi));
+                        }
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        String message= getResources().getString(R.string.text_join_call);
+        builder.setTitle(R.string.title_join_call);
+        builder.setMessage(message).setPositiveButton(context.getString(R.string.answer_call_incoming), dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
     public void showConfirmationOpenCamera(final MegaChatRoom c){
         log("showConfirmationOpenCamera");
 
@@ -2528,31 +2685,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Open camera and lost the camera in the call");
                         //Find the call in progress:
                         if(megaChatApi!=null){
-                            MegaHandleList listCalls = megaChatApi.getChatCalls();
-                            if((listCalls!=null)&&(listCalls.size()>0)){
-                                for(int i = 0; i < listCalls.size(); i++){
-                                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                                    if(call!=null){
-                                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                                            //Remove the local video from the video call:
-                                            MegaChatCall callInProgress = megaChatApi.getChatCall(listCalls.get(i));
-                                            if(callInProgress != null) {
-                                                if (callInProgress.hasLocalVideo()) {
-                                                    megaChatApi.disableVideo(listCalls.get(i), null);
-                                                }
-                                                openCameraApp();
-                                            }
-                                            break;
-                                        }
-                                    }
+                            long chatIdCallInProgress = ChatUtil.getChatCallInProgress(megaChatApi);
 
+                            MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
+                            if(callInProgress!=null){
+                                if(callInProgress.hasLocalVideo()){
+                                    megaChatApi.disableVideo(chatIdCallInProgress, null);
                                 }
+                                openCameraApp();
                             }
-
                         }
-
-
-
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -2721,34 +2863,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.call_in_progress_layout:{
-
-                if((checkPermissionsCall())&&(megaChatApi!=null)){
-
-                    MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
-                    log("call_in_progress_layout clicked: "+callInProgress.getStatus());
-
-                    if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
-                        megaChatApi.startChatCall(idChat, false, this);
-
-                    }else if((callInProgress.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
-
-//                        megaChatApi.answerChatCall(idChat, false, this);
-                        log("showCallLayout:status:RING_IN -> getOpenCallChatId");
-                        long openCallChatId = MegaApplication.getOpenCallChatId();
-                        log("openCallId: "+openCallChatId);
-                        if(openCallChatId!=-1){
-                            Intent intent = new Intent(this, ChatCallActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.putExtra("chatHandle", idChat);
-                            startActivity(intent);
-                        }
-
-                    }else{
-                        Intent intent = new Intent(this, ChatCallActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("chatHandle", idChat);
-                        startActivity(intent);
-                    }
+                log("call_in_progress_layout");
+                startVideo = false;
+                if(checkPermissionsCall()){
+                    startCall();
                 }
                 break;
             }
@@ -2820,7 +2938,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     emojiKeyboard.hideBothKeyboard(this);
                 }
 
-                if(this.participatingInACall()){
+                if((megaChatApi!=null)&&(ChatUtil.participatingInACall(megaChatApi))){
                     showConfirmationOpenCamera(chatRoom);
                 }else{
                     openCameraApp();
@@ -6335,57 +6453,68 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("Ok. Clear history done");
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
                 hideMessageJump();
-            }
-            else{
+            }else{
                 log("Error clearing history: "+e.getErrorString());
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
             }
+        }else if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("TYPE_HANG_CHAT_CALL finished with success  ---> answerChatCall chatid = "+idChat);
+                if(megaChatApi!=null){
+                    MegaChatCall call = megaChatApi.getChatCall(idChat);
+                    if(call!=null) {
+                        if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
+                            megaChatApi.answerChatCall(idChat, false, this);
+                        }else if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ){
+                            megaChatApi.startChatCall(idChat, false, this);
+                        }
+                    }
+                }
+            }else{
+                log("ERROR WHEN TYPE_HANG_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
+            }
+
         }else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("TYPE_START_CHAT_CALL finished with success");
                 //getFlag - Returns true if it is a video-audio call or false for audio call
-            }
-            else{
+            }else{
                 log("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
                 if(e.getErrorCode() == MegaChatError.ERROR_TOOMANY){
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
                 }else{
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error), -1);
                 }
-
-
             }
+
         }else if(request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("TYPE_START_CHAT_CALL finished with success");
+                log("TYPE_ANSWER_CHAT_CALL finished with success");
                 //getFlag - Returns true if it is a video-audio call or false for audio call
-            }
-            else{
-                log("ERROR WHEN TYPE_START_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
+            }else{
+                log("ERROR WHEN TYPE_ANSWER_CHAT_CALL e.getErrorCode(): " + e.getErrorString());
                 if(e.getErrorCode() == MegaChatError.ERROR_TOOMANY){
 
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), -1);
                 }else{
-
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.call_error), -1);
                 }
-
-
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
+
+        }else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
             log("Remove participant: "+request.getUserHandle()+" my user: "+megaChatApi.getMyUserHandle());
 
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Participant removed OK");
                 invalidateOptionsMenu();
+
             }
             else{
                 log("EEEERRRRROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.remove_participant_error), -1);
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM){
+
+        }else if(request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM){
             log("Request type: "+MegaChatRequest.TYPE_INVITE_TO_CHATROOM);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.add_participant_success), -1);
@@ -6398,8 +6527,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.add_participant_error), -1);
                 }
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+        }else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
             try{
                 statusDialog.dismiss();
             } catch(Exception ex) {};
@@ -6420,13 +6549,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(request.getMegaChatMessage());
                 sendMessageToUI(androidMsgSent);
-            }
-            else{
+
+            }else{
                 log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
+
+        }else if(request.getType() == MegaChatRequest.TYPE_REVOKE_NODE_MESSAGE){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Node revoked correctly, msg id: "+request.getMegaChatMessage().getMsgId());
             }
@@ -6434,8 +6563,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("NOT revoked correctly");
                 showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_revoking_node), -1);
             }
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+
+        }else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
             log("Create chat request finish!!!");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
 
@@ -6524,8 +6653,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
             log("TYPE_LAST_GREEN requested");
-        }
-        else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+
+        }else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
             long chatHandle = request.getChatHandle();
             chatRoom = megaChatApi.getChatRoom(chatHandle);
             String chatTitle = chatRoom.getTitle();
@@ -6550,13 +6679,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Chat unarchived");
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.success_unarchive_chat, chatTitle), -1);
                 }
-            }
-            else{
+
+            }else{
                 if(request.getFlag()){
                     log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_archive_chat, chatTitle), -1);
-                }
-                else{
+                }else{
                     log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
                     showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_unarchive_chat, chatTitle), -1);
                 }
@@ -6619,7 +6747,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
-
+        if(callInProgressChrono!=null){
+            callInProgressChrono.stop();
+            callInProgressChrono.setVisibility(View.GONE);
+        }
+        if(callInProgressLayout!=null){
+            callInProgressLayout.setVisibility(View.GONE);
+        }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
 
         super.onDestroy();
@@ -7133,9 +7267,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             activityVisible = true;
-
             showCallLayout(megaChatApi.getChatCall(idChat));
-
             if(aB != null && aB.getTitle() != null){
                 titleToolbar.setText(adjustForLargeFont(titleToolbar.getText().toString()));
             }
@@ -7471,66 +7603,191 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+        if (call.getChatid() == idChat) {
+            if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 
-        if(call.getChatid()==idChat){
-            log("onChatCallUpdate() status: "+call.getStatus());
-            showCallLayout(call);
+                int callStatus = call.getStatus();
+                switch (callStatus) {
+                    case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+                    case MegaChatCall.CALL_STATUS_RING_IN:
+                    case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+                        log("onChatCallUpdate:STATUS: "+callStatus);
+                        showCallLayout(call);
+                        break;
+                    }
+
+                    case MegaChatCall.CALL_STATUS_DESTROYED: {
+                        log("onChatCallUpdate:STATUS: DESTROYED");
+
+                        subtitleToobar.setVisibility(View.VISIBLE);
+                        if (subtitleCall.getVisibility() != View.GONE) {
+                            subtitleCall.setVisibility(View.GONE);
+                            if (chronoCall != null) {
+                                chronoCall.stop();
+                                chronoCall.setVisibility(View.GONE);
+                            }
+                        }
+                        if (callInProgressLayout.getVisibility() != View.GONE) {
+                            callInProgressLayout.setVisibility(View.GONE);
+                            callInProgressLayout.setOnClickListener(null);
+                            if (callInProgressChrono != null) {
+                                callInProgressChrono.stop();
+                                callInProgressChrono.setVisibility(View.GONE);
+                            }
+                        }
+                        invalidateOptionsMenu();
+                        break;
+                    }
+
+                    default:
+                        break;
+                }
+
+            } else if ((call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS))||(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) || (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION))) {
+                log("onChatCallUpdate: REMOTE_AVFLAGS || LOCAL_AVFLAGS || COMPOSITION");
+                usersWithVideo();
+            }
+        }else{
+            log("onChatCallUpdate: different chat");
         }
     }
 
     private void showCallLayout(MegaChatCall call){
-        //Check if there is a call in this chat:
-        if(call != null){
-            log("showCallLayout: Call IN THIS CHAT");
-            if((call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN)){
-                log("showCallLayout:status = USER_NO_PRESENT || RING_IN: "+call.getStatus());
-                //I'm not in this call in progress:
+        log("showCallLayout");
+        if((call==null)&&(megaChatApi!=null)){
+            call = megaChatApi.getChatCall(idChat);
+        }
+        if(call!=null){
+            if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+                log("showCallLayout: USER_NO_PRESENT || RING_IN");
+
                 if(isGroup()){
-                    //Group
-                    if(this.participatingInACall()){
-                        //I'm in other call
-                        callInProgressLayout.setVisibility(View.GONE);
-                    }else{
-                        //I'm not in any call
-                        long callerHandle = call.getCaller();
-                        if(callerHandle != -1){
-                            String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
-                            callInProgressText.setText(textJoinCall);
-                        }else{
-                            callInProgressText.setText(getString(R.string.join_call_layout));
-                        }
-                        callInProgressLayout.setVisibility(View.VISIBLE);
-                        callInProgressLayout.setOnClickListener(this);
+                    //Group:
+                    log("showCallLayout: USER_NO_PRESENT || RING_IN - Group");
+
+                    subtitleCall.setVisibility(View.GONE);
+                    if(chronoCall!=null){
+                        chronoCall.stop();
+                        chronoCall.setVisibility(View.GONE);
                     }
-                }else{
-                    //Individual
+                    subtitleToobar.setVisibility(View.GONE);
+                    usersWithVideo();
+
+                    long callerHandle = call.getCaller();
+                    if(callerHandle != -1){
+                        String textJoinCall = getString(R.string.join_call_layout_in_group_call, getPeerFullName(callerHandle));
+                        callInProgressText.setText(textJoinCall);
+                    }else{
+                        callInProgressText.setText(getString(R.string.join_call_layout));
+                    }
                     callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
                     callInProgressLayout.setOnClickListener(this);
+
+                    if(callInProgressChrono!=null){
+                        callInProgressChrono.stop();
+                        callInProgressChrono.setVisibility(View.GONE);
+                    }
+                    usersWithVideo();
+
+                }else{
+                    //Individual:
+                    log("showCallLayout: USER_NO_PRESENT || RING_IN - Individual");
+
+                    subtitleToobar.setVisibility(View.VISIBLE);
+                    subtitleCall.setVisibility(View.GONE);
+                    if(chronoCall!=null){
+                        chronoCall.stop();
+                        chronoCall.setVisibility(View.GONE);
+                    }
+
+                    callInProgressLayout.setVisibility(View.GONE);
+                    callInProgressLayout.setOnClickListener(this);
+                    callInProgressText.setText(getString(R.string.call_in_progress_layout));
+
+                    if(callInProgressChrono!=null){
+                        callInProgressChrono.stop();
+                        callInProgressChrono.setVisibility(View.GONE);
+                    }
+                }
+
+            }else if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+                log("showCallLayout: REQUEST_SENT");
+
+                subtitleToobar.setVisibility(View.VISIBLE);
+                subtitleCall.setVisibility(View.GONE);
+                if(chronoCall!=null){
+                    chronoCall.stop();
+                    chronoCall.setVisibility(View.GONE);
+                }
+
+                callInProgressLayout.setVisibility(View.VISIBLE);
+                callInProgressLayout.setOnClickListener(this);
+                callInProgressText.setText(getString(R.string.call_in_progress_layout));
+                if(callInProgressChrono!=null){
+                    callInProgressChrono.stop();
+                    callInProgressChrono.setVisibility(View.GONE);
+                }
+
+
+            }else if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                log("showCallLayout: IN_PROGRESS");
+
+                callInProgressLayout.setVisibility(View.VISIBLE);
+                callInProgressLayout.setOnClickListener(this);
+                callInProgressText.setText(getString(R.string.call_in_progress_layout));
+                if(callInProgressChrono!=null){
+                    callInProgressChrono.setVisibility(View.VISIBLE);
+                    callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+                    callInProgressChrono.start();
+                    callInProgressChrono.setFormat("%s");
+                }
+
+                if(isGroup()) {
+                    log("showCallLayout: IN_PROGRESS - Group");
+
+                    //Group:
+                    subtitleCall.setVisibility(View.VISIBLE);
+                    if(chronoCall!=null){
+                        chronoCall.setVisibility(View.VISIBLE);
+                        chronoCall.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+                        chronoCall.start();
+                        chronoCall.setFormat("%s");
+                    }
+                    subtitleToobar.setVisibility(View.GONE);
+                    usersWithVideo();
+
+                }else{
+                    log("showCallLayout: IN_PROGRESS - Individual");
+
+                    //Individual:
+                    subtitleCall.setVisibility(View.GONE);
+                    subtitleToobar.setVisibility(View.VISIBLE);
+                    if(chronoCall!=null){
+                        chronoCall.stop();
+                        chronoCall.setVisibility(View.GONE);
+                    }
                 }
                 invalidateOptionsMenu();
-
-            }else if((call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                //I'm in this call in progress:
-                log("showCallLayout:status = STATUS_REQUEST_SENT || JOINING || IN_PROGRESS: "+call.getStatus());
-                if(callInProgressLayout.getVisibility() != View.VISIBLE){
-                    invalidateOptionsMenu();
-                    callInProgressText.setText(getString(R.string.call_in_progress_layout_without_time));
-                    callInProgressLayout.setVisibility(View.VISIBLE);
-                    callInProgressLayout.setOnClickListener(this);
-                }
-            }else{
-                log("showCallLayout:group:OTHER CASE: "+call.getStatus());
-                if(callInProgressLayout.getVisibility() != View.GONE){
-                    invalidateOptionsMenu();
-                    callInProgressLayout.setVisibility(View.GONE);
-                    callInProgressLayout.setOnClickListener(null);
-                }
             }
         }
-        else{
-            log("showCallLayout: NO CALL IN THIS CHAT");
-            callInProgressLayout.setVisibility(View.GONE);
+    }
+
+    private  void usersWithVideo(){
+        if(megaChatApi!=null){
+            MegaChatCall call = megaChatApi.getChatCall(idChat);
+            if(call!=null){
+                if(isGroup() && (subtitleCall.getVisibility() == View.VISIBLE)){
+                    int usersWithVideo = call.getNumParticipants(MegaChatCall.VIDEO);
+                    int totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
+                    if((usersWithVideo > 0) && (totalVideosAllowed != 0)){
+                        participantsText.setText(usersWithVideo + "/" + totalVideosAllowed);
+                        participantsLayout.setVisibility(View.VISIBLE);
+                    }else{
+                        participantsLayout.setVisibility(View.GONE);
+                    }
+                }
+            }
         }
     }
 

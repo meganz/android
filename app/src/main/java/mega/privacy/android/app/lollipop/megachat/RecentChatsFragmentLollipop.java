@@ -39,13 +39,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -57,6 +55,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -65,7 +64,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
@@ -77,10 +75,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     MegaChatApiAndroid megaChatApi;
 
     DatabaseHandler dbH;
-
-    MegaChatCall callChat;
-//    Chronometer myChrono;
-//    Handler customHandler = new Handler();
 
     Context context;
     ActionBar aB;
@@ -104,12 +98,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     LinearLayout emptyLayout;
     TextView emptyTextViewInvite;
     ImageView emptyImageView;
+
+    //Call
     RelativeLayout callInProgressLayout;
+    Chronometer callInProgressChrono;
 
     Button inviteButton;
     int chatStatus;
 
-//    boolean chatEnabled = true;
     float density;
     DisplayMetrics outMetrics;
     Display display;
@@ -223,9 +219,11 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             inviteButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
         }
 
-        callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout_recent);
+        callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setOnClickListener(this);
+        callInProgressChrono = (Chronometer) v.findViewById(R.id.call_in_progress_chrono);
         callInProgressLayout.setVisibility(View.GONE);
+        callInProgressChrono.setVisibility(View.GONE);
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout);
 
@@ -423,14 +421,33 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void showCallLayout(){
-        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop)){
-            if(((ManagerActivityLollipop) context).participatingInACall()){
+        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && (megaChatApi!=null) &&(ChatUtil.participatingInACall(megaChatApi))){
+            log("showCallLayout");
+
+            if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
                 callInProgressLayout.setVisibility(View.VISIBLE);
-            }else{
-                callInProgressLayout.setVisibility(View.GONE);
+            }
+            if((callInProgressChrono!=null) && (callInProgressChrono.getVisibility() != View.VISIBLE)){
+                long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
+                if((megaChatApi!=null) && (chatId != -1)){
+                    MegaChatCall call = megaChatApi.getChatCall(chatId);
+                    if(call!=null){
+                        callInProgressChrono.setVisibility(View.VISIBLE);
+                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+                        callInProgressChrono.start();
+                        callInProgressChrono.setFormat("%s");
+                    }
+                }
             }
         }else{
-            callInProgressLayout.setVisibility(View.GONE);
+
+            if(callInProgressChrono!=null){
+                callInProgressChrono.stop();
+                callInProgressChrono.setVisibility(View.GONE);
+            }
+            if(callInProgressLayout!=null){
+                callInProgressLayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -665,10 +682,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
                 break;
             }
-            case R.id.call_in_progress_layout_recent:{
+            case R.id.call_in_progress_layout:{
                 log("onClick:call_in_progress_layout");
                 if(checkPermissionsCall()){
-                    returnTheCall();
+                    ChatUtil.returnCall(context, megaChatApi);
                 }
                 break;
             }
@@ -1657,7 +1674,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
             }
         }
-
     }
 
     public void interactionUpdate(int position){
@@ -1824,6 +1840,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(aB != null && aB.getTitle() != null){
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
+
+
         showCallLayout();
 
         if (context instanceof ManagerActivityLollipop) {
@@ -1984,7 +2002,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsCall()){
                         log("REQUEST_CAMERA -> returnTheCall");
-                        returnTheCall();
+                        ChatUtil.returnCall(context, megaChatApi);
                     }
                 }
                 break;
@@ -1994,7 +2012,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsCall()){
                         log("RECORD_AUDIO -> returnTheCall");
-                        returnTheCall();
+                        ChatUtil.returnCall(context, megaChatApi);
                     }
                 }
                 break;
@@ -2003,27 +2021,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    private void returnTheCall(){
-        log("returnTheCall()");
-        if(megaChatApi!=null){
-            MegaHandleList listCalls = megaChatApi.getChatCalls();
-            if((listCalls!=null)&&(listCalls.size()>0)){
-                for(int i = 0; i < listCalls.size(); i++){
-                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                    if(call!=null){
-                        if((call.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                            log("returnTheCall() -> ChatCallActivity");
-                            Intent intent = new Intent(((ManagerActivityLollipop) context), ChatCallActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.putExtra("chatHandle", listCalls.get(i));
-                            startActivity(intent);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);

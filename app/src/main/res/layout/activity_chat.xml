@@ -15,22 +15,9 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <!--<android.support.v7.widget.Toolbar-->
-                <!--android:id="@+id/toolbar_chat"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:minHeight="?attr/actionBarSize"-->
-                <!--android:background="?attr/colorPrimary"-->
-                <!--android:elevation="4dp"-->
-                <!--app:titleTextAppearance="@style/ToolbarTitle"-->
-                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
-                <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
-                <!--tools:context=".lollipop.megachat.ChatActivityLollipop" />-->
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
@@ -94,6 +81,7 @@
                             android:layout_alignParentTop="true"
                             android:visibility="gone"/>
                     </RelativeLayout>
+
                     <mega.privacy.android.app.components.MarqueeTextView
                         android:id="@+id/subtitle_toolbar"
                         android:layout_width="wrap_content"
@@ -104,6 +92,41 @@
                         android:singleLine="true"
                         android:ellipsize="none"
                         android:layout_marginRight="0dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/subtitle_call"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <Chronometer
+                            android:id="@+id/chrono_call"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:layout_marginRight="8dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/ll_participants"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+                            <TextView
+                                android:id="@+id/participants_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:layout_marginRight="4dp"/>
+                            <ImageView
+                                android:layout_height="18dp"
+                                android:layout_width="18dp"
+                                android:src="@drawable/ic_videocam_white"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </android.support.v7.widget.Toolbar>
@@ -470,23 +493,10 @@
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/call_in_progress_layout"
+            <include layout="@layout/item_call_in_progress_layout"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_below="@+id/toolbar_chat"
-                android:background="@color/accentColor">
-
-                <TextView
-                    android:id="@+id/call_in_progress_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"/>
-
-            </RelativeLayout>
+                android:layout_height="48dp"
+                android:layout_below="@id/toolbar_chat"/>
         </RelativeLayout>
 
     </RelativeLayout>

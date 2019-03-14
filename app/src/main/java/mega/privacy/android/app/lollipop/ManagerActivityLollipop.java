@@ -191,6 +191,8 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -9250,12 +9252,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				if(!this.participatingInACall()){
-					ScanCodeFragment fragment = new ScanCodeFragment();
-					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
-					Intent intent = new Intent(this, QRCodeActivity.class);
-					intent.putExtra("contacts", true);
-					startActivity(intent);
+				if(megaChatApi!=null) {
+
+					if (!ChatUtil.participatingInACall(megaChatApi)) {
+						ScanCodeFragment fragment = new ScanCodeFragment();
+						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+						Intent intent = new Intent(this, QRCodeActivity.class);
+						intent.putExtra("contacts", true);
+						startActivity(intent);
+					}
 				}
 				return true;
 			}
@@ -18346,21 +18351,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return parentHandleInbox;
 	}
 
+	@Override
+	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		if(call!=null){
+			if(call.getChatid() != -1){
+				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+					int callStatus = call.getStatus();
+					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
 
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate() status: "+call.getStatus());
-        if(call.getChatid() != -1){
-            if((call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)||(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-				setCallBadge();
-				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if ((rChatFL != null) && (rChatFL.isVisible())){
-                    log("OnChatCallUpdate() status: "+call.getStatus()+" -> rChatFL visible: ");
-                    rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+					switch (callStatus) {
+						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+						case MegaChatCall.CALL_STATUS_RING_IN:
+						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+						case MegaChatCall.CALL_STATUS_DESTROYED:
+						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+							setCallBadge();
+							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+							if ((rChatFL != null) && (rChatFL.isVisible())){
+								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+							}
+
+							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+							if ((fbFLol != null) && (fbFLol.isVisible())){
+								fbFLol.showCallLayout();
+							}
+							break;
+						}
+
+						default:
+							break;
+					}
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 
 	public void setContactTitleSection(){
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
@@ -18470,10 +18494,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(numCalls == 0){
                 callBadge.setVisibility(View.GONE);
 			}else if(numCalls == 1){
-                if(this.participatingInACall()){
-					callBadge.setVisibility(View.GONE);
-				}else{
-					callBadge.setVisibility(View.VISIBLE);
+				if(megaChatApi!=null){
+					if(ChatUtil.participatingInACall(megaChatApi)){
+						callBadge.setVisibility(View.GONE);
+					}else{
+						callBadge.setVisibility(View.VISIBLE);
+					}
 				}
 			}else{
                 callBadge.setVisibility(View.VISIBLE);
