@@ -1266,9 +1266,9 @@
 	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Transfer quota</string>
 	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Transfer quota</string>
 
-	<string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
+    <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Plan</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Storage space</string>
-    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer Quota</string>
+    <string name="transfer_quota" context="Title of the section about the transfer quota in the storage tab in My Account Section">Transfer quota</string>
 
     <string name="available_space" context="Label in section the storage tab in My Account Section">Available</string>
     <string name="not_available" context="Label in section the storage tab in My Account Section when no info info is received">not available</string>
@@ -1697,7 +1697,7 @@
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Empty [/B][A]Rubbish Bin[/A][B].[/B]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files in your [/B][A]Inbox[/A][B].[/B]</string>
-	<string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive ">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive ">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]Contacts[/A][B].[/B]</string>
 
@@ -1736,11 +1736,11 @@
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to a breach of MEGA’s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
-	<string name="label_file_size_byte" context="size in byte">B</string>
-	<string name="label_file_size_kilo_byte" context="size in kilobyte">KB</string>
-	<string name="label_file_size_mega_byte" context="size in megabyte">MB</string>
-	<string name="label_file_size_giga_byte" context="size in gigabyte">GB</string>
-	<string name="label_file_size_tera_byte" context="size in terabyte">TB</string>
+    <string name="label_file_size_byte" context="size in byte">B</string>
+    <string name="label_file_size_kilo_byte" context="size in kilobyte">KB</string>
+    <string name="label_file_size_mega_byte" context="size in megabyte">MB</string>
+    <string name="label_file_size_giga_byte" context="size in gigabyte">GB</string>
+    <string name="label_file_size_tera_byte" context="size in terabyte">TB</string>
 
     <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
         <item context="version item" quantity="one">%1$d version</item>
@@ -2129,9 +2129,6 @@
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete link</string>
 
     <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat link</string>
-
-    <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
-
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
 
@@ -2293,7 +2290,7 @@
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
     <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
-    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared files</string>
+    <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
 
@@ -2314,8 +2311,9 @@
     <string name="last_seen_today" context="String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m.">[A]Last seen [/A]today %1$s</string>
     <string name="last_seen_long_time_ago" context="String that appears when we show the last activity of a contact, but it's been a long time ago that we don't see any activity from that user">[A]Last seen [/A]a long time ago</string>
     <string name="last_seen_general" context="String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. ">[A]Last seen [/A]%1$s %2$s</string>
-	<string name="label_today" context="label today">Today</string>
-	<string name="label_yesterday" context="label yesterday">Yesterday</string>
+
+    <string name="label_today" context="label today">Today</string>
+    <string name="label_yesterday" context="label yesterday">Yesterday</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No [/B][A]Shared Files[/A][B].[/B]</string>
 
@@ -2393,9 +2391,10 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password you have entered is not valid.</string>
 
-	<string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
-	<string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
-	<string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call ">%s started a group call. Tap to join.</string>
+    <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
+    <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
@@ -2407,14 +2406,11 @@
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully</string>
 
-    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%d of %d</string>
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
 
     <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
-
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from a chat conversation, from the list of chats or from cloud drive section">Tap to return to call </string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">END &#38; JOIN</string>
-    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">IGNORED</string>
-
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">End &#38; Join</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignore</string>
     <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Audio calling&#8230;</string>
     <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Video calling&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
