@@ -105,7 +105,7 @@ import nz.mega.sdk.MegaNode;
 
 public class Util {
 	
-	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
+	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 2000;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
@@ -114,7 +114,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -796,54 +796,9 @@ public class Util {
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
-		MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
-
-//		try {
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//			String currentDateandTime = sdf.format(new Date());
-//
-//			message = "(" + currentDateandTime + ") - " + message;
-//		}
-//		catch (Exception e){}
-
-//		File logFile=null;
-//		if (DEBUG) {
-//			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
-//		}
-
-//		if (fileLogger) {
-//			//Send the log to a file
-//
-//			String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + logDIR + "/";
-//			//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
-//			File dirFile = new File(dir);
-//			if (!dirFile.exists()) {
-//				dirFile.mkdirs();
-//				logFile = new File(dirFile, "log.txt");
-//				if (!logFile.exists()) {
-//					try {
-//						logFile.createNewFile();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			} else {
-//				logFile = new File(dirFile, "log.txt");
-//				if (!logFile.exists()) {
-//					try {
-//						logFile.createNewFile();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//
-//			if (logFile != null && logFile.exists()) {
-//				appendStringToFile(origin + ": " + message + "\n", logFile);
-//			}
-//		}
+	    if(fileLoggerSDK || fileLoggerKarere || DEBUG){
+            MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
+        }
 	}
 
 	public static boolean appendStringToFile(final String appendContents, final File file) {

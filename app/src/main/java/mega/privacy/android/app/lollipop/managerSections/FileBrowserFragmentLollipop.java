@@ -74,6 +74,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
+
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
@@ -127,7 +129,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
-    
+    private long lastTimeOnTransferUpdate;
     private int placeholderCount;
 
 	public void activateActionMode(){
@@ -746,13 +748,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		log("setOverviewLayout");
 		//Check transfers in progress
 		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-		
-		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
-		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 		
 		if (pendingTransfers > 0) {
-			log("Transfers in progress");
+		    //do not refresh to frequent to avoid performance issue
+            long now = System.currentTimeMillis();
+            if ((now - lastTimeOnTransferUpdate) > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+                lastTimeOnTransferUpdate = now;
+            }else{
+                return;
+            }
+            
+            log("Transfers in progress");
+            totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+            totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
+            totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
 			transfersOverViewLayout.setVisibility(View.VISIBLE);
 			dotsOptionsTransfersLayout.setOnClickListener(this);
 			actionLayout.setOnClickListener(this);
@@ -772,6 +781,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			
 			int inProgress = totalTransfers - pendingTransfers + 1;
+			//fix when file gets copied, inProgress become negative
+			inProgress = inProgress > 0 ? inProgress : 0;
 			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
 			transfersNumberText.setText(progressText);
 			

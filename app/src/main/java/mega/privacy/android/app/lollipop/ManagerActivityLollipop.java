@@ -63,9 +63,9 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Display;
@@ -108,7 +108,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -458,8 +457,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	ArrayList<MegaNode> searchNodes;
 	public int levelsSearch = -1;
 	boolean openLink = false;
-
-	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
 	public int orderCloud = MegaApiJava.ORDER_DEFAULT_ASC;
 	public int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -9181,8 +9178,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void refreshRubbishBin () {
-		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
-		if (rubbishBinFLol != null){
+        if(rubbishBinFLol == null){
+            rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
+        }
+		if (rubbishBinFLol != null && rubbishBinFLol.isVisible()){
 			ArrayList<MegaNode> nodes;
 			if(parentHandleRubbish == -1){
 				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
@@ -12697,8 +12696,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void refreshCloudDrive () {
-		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-		if (fbFLol != null){
+	    if(fbFLol == null){
+            fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+        }
+		if (fbFLol != null && fbFLol.isVisible()){
 			ArrayList<MegaNode> nodes;
 			if(parentHandleBrowser==-1){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
@@ -16140,7 +16141,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
 				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
+				if (fbFLol != null && fbFLol.isAdded()){
 					fbFLol.setOverviewLayout();
 				}
 
@@ -16165,7 +16166,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				log("REQUEST OK - wait for onTransferFinish()");
 				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
+				if (fbFLol != null && fbFLol.isAdded()){
 					fbFLol.setOverviewLayout();
 				}
 				supportInvalidateOptionsMenu();
@@ -16768,9 +16769,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void onNodesCloudDriveUpdate() {
 		log("onNodesCloudDriveUpdate");
-
-		rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
-		if (rubbishBinFLol != null) {
+		
+		if(rubbishBinFLol == null){
+            rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
+        }
+		if (rubbishBinFLol != null && rubbishBinFLol.isVisible()) {
 			rubbishBinFLol.hideMultipleSelect();
 
 			if (isClearRubbishBin) {
@@ -16788,8 +16791,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void onNodesInboxUpdate() {
-		iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
-		if (iFLol != null){
+        log("onNodesInboxUpdate");
+	    if(iFLol == null){
+            iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
+        }
+		if (iFLol != null && iFLol.isVisible()){
 		    iFLol.hideMultipleSelect();
 			iFLol.refresh();
 		}
@@ -16797,13 +16803,77 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void onNodesSearchUpdate() {
 		log("onNodesSearchUpdate");
-		sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-		if (sFLol != null){
+		if(sFLol == null){
+            sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
+        }
+		if (sFLol != null && sFLol.isVisible()){
 			//stop from query for empty string.
 			textSubmitted = true;
 			sFLol.refresh();
 		}
 	}
+	
+	private void onNodesCameraUploadUpdate(){
+        if(cuFL == null){
+            cuFL = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+        }
+        if (cuFL != null && cuFL.isVisible()) {
+            long cameraUploadHandle = cuFL.getPhotoSyncHandle();
+            MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+            log("cameraUploadHandle: " + cameraUploadHandle);
+            if (nps != null) {
+                log("nps != null");
+                ArrayList<MegaNode> nodes = megaApi.getChildren(nps,MegaApiJava.ORDER_MODIFICATION_DESC);
+                
+                if (firstNavigationLevel) {
+                    cuFL.setNodes(nodes);
+                } else {
+                    if (getIsSearchEnabled()) {
+                        if ((searchByDate != null) && (searchDate != null)) {
+                            ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate,nodes);
+                            cuFL.setNodes(nodesSearch);
+                            isSearchEnabled = true;
+                        } else {
+                            cuFL.setNodes(nodes);
+                            
+                        }
+                    } else {
+                        cuFL.setNodes(nodes);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void onNodesMediaUploadUpdate(){
+        if(muFLol == null){
+            muFLol = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
+        }
+        if (muFLol != null && muFLol.isVisible()) {
+            long cameraUploadHandle = muFLol.getPhotoSyncHandle();
+            MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+            log("mediaUploadsHandle: " + cameraUploadHandle);
+            if (nps != null) {
+                log("nps != null");
+                ArrayList<MegaNode> nodes = megaApi.getChildren(nps,MegaApiJava.ORDER_MODIFICATION_DESC);
+                if (firstNavigationLevel) {
+                    muFLol.setNodes(nodes);
+                } else {
+                    if (getIsSearchEnabled()) {
+                        if ((searchByDate != null) && (searchDate != null)) {
+                            ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate,nodes);
+                            muFLol.setNodes(nodesSearch);
+                            isSearchEnabled = true;
+                        } else {
+                            muFLol.setNodes(nodes);
+                        }
+                    } else {
+                        muFLol.setNodes(nodes);
+                    }
+                }
+            }
+        }
+    }
 
 	public void refreshIncomingSharesList () {
 		if (sharesPageAdapter != null) {
@@ -16877,110 +16947,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-		log("onNodesUpdateLollipop");
-
-		try {
-			statusDialog.dismiss();
-		}
-		catch (Exception ex) {}
-
-		boolean updateContacts = false;
-
-		if(updatedNodes!=null){
-			//Verify is it is a new item to the inbox
-			for(int i=0;i<updatedNodes.size(); i++){
-				MegaNode updatedNode = updatedNodes.get(i);
-
-				if(!updateContacts){
-					if(updatedNode.isInShare()){
-						updateContacts = true;
-					}
-				}
-
-				if(updatedNode.getParentHandle()==inboxNode.getHandle()){
-					log("New element to Inbox!!");
-					setInboxNavigationDrawer();
-				}
-			}
-		}
-
-		if(updateContacts){
-			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if (cFLol != null){
-				log("Incoming update - update contacts section");
-				cFLol.updateShares();
-			}
-		}
-
-		onNodesCloudDriveUpdate();
-
-		onNodesSearchUpdate();
-
-		onNodesSharedUpdate();
-
-		onNodesInboxUpdate();
-
-		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-		if (cuFL != null){
-			long cameraUploadHandle = cuFL.getPhotoSyncHandle();
-			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-			log("cameraUploadHandle: " + cameraUploadHandle);
-			if (nps != null){
-				log("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-
-				if(firstNavigationLevel){
-					cuFL.setNodes(nodes);
-				}else{
-					if(getIsSearchEnabled()){
-						if((searchByDate != null)&&(searchDate !=null)){
-							ArrayList<MegaNode> nodesSearch = cuFL.searchDate(searchDate, nodes);
-							cuFL.setNodes(nodesSearch);
-							isSearchEnabled = true;
-						}else{
-							cuFL.setNodes(nodes);
-
-						}
-					}else{
-						cuFL.setNodes(nodes);
-
-					}
-
-
-				}
-			}
-		}
-
-		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-		if (muFLol != null){
-			long cameraUploadHandle = muFLol.getPhotoSyncHandle();
-			MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-			log("mediaUploadsHandle: " + cameraUploadHandle);
-			if (nps != null){
-				log("nps != null");
-				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-				if(firstNavigationLevel){
-					muFLol.setNodes(nodes);
-				}else{
-					if(getIsSearchEnabled()){
-						if((searchByDate != null)&&(searchDate !=null)){
-							ArrayList<MegaNode> nodesSearch = muFLol.searchDate(searchDate, nodes);
-							muFLol.setNodes(nodesSearch);
-							isSearchEnabled = true;
-						}else{
-							muFLol.setNodes(nodes);
-						}
-					}else{
-						muFLol.setNodes(nodes);
-
-					}
-
-				}
-			}
-		}
-
-		setToolbarTitle();
-		supportInvalidateOptionsMenu();
+        log("onNodesUpdateLollipop");
+        try {
+            statusDialog.dismiss();
+        } catch (Exception ex) {
+            log(ex.getMessage());
+        }
+        
+        boolean updateContacts = false;
+        
+        if (updatedNodes != null) {
+            //Verify is it is a new item to the inbox
+            for (int i = 0;i < updatedNodes.size();i++) {
+                MegaNode updatedNode = updatedNodes.get(i);
+                
+                if (!updateContacts) {
+                    if (updatedNode.isInShare()) {
+                        updateContacts = true;
+                    }
+                }
+                
+                if (updatedNode.getParentHandle() == inboxNode.getHandle()) {
+                    log("New element to Inbox!!");
+                    setInboxNavigationDrawer();
+                }
+    
+                refreshModuleView(updatedNode, false);
+            }
+        }
+        
+        if (updateContacts) {
+            if(cFLol == null){
+                cFLol = (ContactsFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
+            }
+            if (cFLol != null && cFLol.isVisible()) {
+                log("Incoming update - update contacts section");
+                cFLol.updateShares();
+            }
+        }
+        
+        //setToolbarTitle();
+        //supportInvalidateOptionsMenu();
 	}
 
 	@Override
@@ -17171,141 +17178,132 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String size = Util.getSizeString(transfer.getTotalBytes());
 		AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 
-		completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
-		if(completedTFLol!=null){
-			completedTFLol.transferFinish(completedTransfer);
-		}
-	}
+		if(completedTFLol == null){
+            completedTFLol = (CompletedTransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
+        }
+        if(completedTFLol != null && completedTFLol.isVisible()){
+            completedTFLol.transferFinish(completedTransfer);
+        }
+    }
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("-------------------onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getFileName() + " - " + transfer.getTag());
-
-		if(transfer.isStreamingTransfer()){
-			return;
-		}
-
-		if(transferCallback<transfer.getNotificationNumber()) {
-
-			transferCallback = transfer.getNotificationNumber();
-
-			long now = Calendar.getInstance().getTimeInMillis();
-			lastTimeOnTransferUpdate = now;
-
-			if(!transfer.isFolderTransfer()){
-				transfersInProgress.add(transfer.getTag());
-
-				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
-					fbFLol.setOverviewLayout();
-				}
-
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-				if (tFLol != null){
-					tFLol.transferStart(transfer);
-				}
-			}
-		}
+        long notificationNumber = transfer.getNotificationNumber();
+        log("onTransferStart: " + notificationNumber + "-" + transfer.getFileName() + " - " + transfer.getTag());
+        
+        if (transfer.isStreamingTransfer()) {
+            return;
+        }
+        
+        if (transferCallback < notificationNumber) {
+            transferCallback = notificationNumber;
+            if (!transfer.isFolderTransfer()) {
+                transfersInProgress.add(transfer.getTag());
+                
+                if (fbFLol == null) {
+                    fbFLol = (FileBrowserFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+                }
+                if (fbFLol != null && fbFLol.isAdded()) {
+                    fbFLol.setOverviewLayout();
+                }
+                
+                if (tFLol == null) {
+                    tFLol = (TransfersFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
+                }
+                if (tFLol != null && tFLol.isAdded()) {
+                    tFLol.transferStart(transfer);
+                }
+            }
+        }
 	}
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log("--------------onTransferFinish: "+transfer.getFileName() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
-
-		if(transfer.isStreamingTransfer()){
-			return;
-		}
-
-		if(transferCallback<transfer.getNotificationNumber()) {
-
-			transferCallback = transfer.getNotificationNumber();
-			long now = Calendar.getInstance().getTimeInMillis();
-			lastTimeOnTransferUpdate = now;
-
-			if(!transfer.isFolderTransfer()){
-				ListIterator li = transfersInProgress.listIterator();
-				int index = 0;
-				while(li.hasNext()) {
-					Integer next = (Integer) li.next();
-					if(next == transfer.getTag()){
-						index=li.previousIndex();
-						break;
-					}
-				}
-
-				if(!transfersInProgress.isEmpty()){
-					transfersInProgress.remove(index);
-					log("The transfer with index : "+index +"has been removed, left: "+transfersInProgress.size());
-				}
-				else{
-					log("The transferInProgress is EMPTY");
-				}
-
-				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
-					addCompletedTransfer(transfer);
-				}
-
-				int pendingTransfers = 	megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-
-				if(pendingTransfers<=0){
-					if(transfersBottomSheet!=null){
-						if(transfersBottomSheet.isAdded()){
-							transfersBottomSheet.dismiss();
-						}
-					}
-					if (pauseTransfersMenuIcon != null) {
-						pauseTransfersMenuIcon.setVisible(false);
-						playTransfersMenuIcon.setVisible(false);
-						cancelAllTransfersMenuItem.setVisible(false);
-					}
-				}
-
-                onNodesCloudDriveUpdate();
-				onNodesInboxUpdate();
-				onNodesSearchUpdate();
-				onNodesSharedUpdate();
-
-				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-				if (tFLol != null){
-					tFLol.transferFinish(index);
-				}
-				else{
-					log("tF is null!");
-				}
-			}
-		}
-	}
+        log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag() + "- " + transfer.getNotificationNumber());
+        
+        if (transfer.isStreamingTransfer()) {
+            return;
+        }
+        
+        if (transferCallback < transfer.getNotificationNumber()) {
+            transferCallback = transfer.getNotificationNumber();
+            if (!transfer.isFolderTransfer()) {
+                ListIterator li = transfersInProgress.listIterator();
+                int index = 0;
+                while (li.hasNext()) {
+                    Integer next = (Integer)li.next();
+                    if (next == transfer.getTag()) {
+                        index = li.previousIndex();
+                        break;
+                    }
+                }
+                
+                if (!transfersInProgress.isEmpty()) {
+                    transfersInProgress.remove(index);
+                    log("The transfer with index : " + index + "has been removed, left: " + transfersInProgress.size());
+                } else {
+                    log("The transferInProgress is EMPTY");
+                }
+                
+                if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
+                    addCompletedTransfer(transfer);
+                }
+                
+                int pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+                
+                if (pendingTransfers <= 0) {
+                    if (transfersBottomSheet != null) {
+                        if (transfersBottomSheet.isAdded()) {
+                            transfersBottomSheet.dismiss();
+                        }
+                    }
+                    if (pauseTransfersMenuIcon != null) {
+                        pauseTransfersMenuIcon.setVisible(false);
+                        playTransfersMenuIcon.setVisible(false);
+                        cancelAllTransfersMenuItem.setVisible(false);
+                    }
+                }
+                
+                refreshModuleView(megaApi.getNodeByHandle(transfer.getNodeHandle()), true);
+                
+                if (tFLol == null) {
+                    tFLol = (TransfersFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
+                }
+                if (tFLol != null && tFLol.isAdded()) {
+                    tFLol.transferFinish(index);
+                }
+            }
+        }
+    }
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
-
-		if(transfer.isStreamingTransfer()){
-			return;
-		}
-
-		long now = Calendar.getInstance().getTimeInMillis();
-		if((now - lastTimeOnTransferUpdate)>Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-			log("Update onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
-			lastTimeOnTransferUpdate = now;
-
-			if (!transfer.isFolderTransfer()){
-				if(transferCallback<transfer.getNotificationNumber()){
-					transferCallback = transfer.getNotificationNumber();
-
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-					if (fbFLol != null){
-						fbFLol.setOverviewLayout();
-					}
-
-					tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
-					if (tFLol != null){
-						tFLol.transferUpdate(transfer);
-					}
-
-				}
-			}
-		}
+        log("onTransferUpdate");
+        
+        if (transfer.isStreamingTransfer()) {
+            return;
+        }
+        
+        if (!transfer.isFolderTransfer()) {
+            if (transferCallback < transfer.getNotificationNumber()) {
+                transferCallback = transfer.getNotificationNumber();
+                
+                if(fbFLol == null){
+                    fbFLol = (FileBrowserFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+                }
+                if (fbFLol != null && fbFLol.isAdded()) {
+                    fbFLol.setOverviewLayout();
+                }
+                
+                if(tFLol == null){
+                    tFLol = (TransfersFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
+                }
+                if (tFLol != null && tFLol.isAdded()) {
+                    tFLol.transferUpdate(transfer);
+                }
+                
+            }
+        }
 	}
 
 	@Override
@@ -17316,7 +17314,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getValue() != 0) {
 				log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-				if (fbFLol != null){
+				if (fbFLol != null && fbFLol.isAdded()){
 					fbFLol.setOverviewLayout();
 				}
 			}
@@ -17329,15 +17327,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
 		log("onTransferData");
-
-//		if(Util.isVideoFile(transfer.getPath())){
-//		log("Is video!!!");
-//		ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-//	}
-//	else{
-//		log("NOT video!");
-//	}
-
 		return true;
 	}
 
@@ -18564,6 +18553,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setTextSubmitted () {
 	    if (searchView != null) {
 	        searchView.setQuery(searchQuery, true);
+        }
+    }
+    
+    private void refreshModuleView(MegaNode node, boolean isTransfer){
+        //no need to refresh the whole app but only the module that is currently visible to user
+        switch (drawerItem) {
+            case CLOUD_DRIVE:
+                long parentHandle = node == null ? -1 : node.getParentHandle();
+                MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+                long grandParentHandle = -1;
+                if (parentNode != null) {
+                    grandParentHandle = parentNode.getParentHandle();
+                }
+
+                //user need to see changes if in current folder or one level above
+                if (parentHandleBrowser == parentHandle || parentHandleBrowser == grandParentHandle) {
+                    onNodesCloudDriveUpdate();
+                }
+
+                //refresh progress bar
+                if(isTransfer && fbFLol != null && fbFLol.isAdded()){
+                    fbFLol.setOverviewLayout();
+                }
+                break;
+            case INBOX:
+                if(megaApi.isInInbox(node)){
+                    onNodesInboxUpdate();
+                }
+                break;
+            case SHARED_ITEMS:
+                onNodesSharedUpdate();
+                break;
+            case SEARCH:
+                onNodesSearchUpdate();
+                break;
+            case CAMERA_UPLOADS:
+                if (isCameraUploads(node)) {
+                    onNodesCameraUploadUpdate();
+                }
+                break;
+            case MEDIA_UPLOADS:
+                if (isCameraUploads(node)) {
+                    onNodesMediaUploadUpdate();
+                }
+                break;
+            case RUBBISH_BIN:
+                refreshRubbishBin();
+                break;
+            default:
+                break;
         }
     }
 }

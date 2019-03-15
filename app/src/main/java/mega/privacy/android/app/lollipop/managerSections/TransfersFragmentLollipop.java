@@ -31,6 +31,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
+
 
 public class TransfersFragmentLollipop extends Fragment {
 
@@ -52,7 +54,7 @@ public class TransfersFragmentLollipop extends Fragment {
 	TransfersFragmentLollipop transfersFragment = this;
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
-
+    private long lastTimeOnTransferUpdate;
 	ArrayList<MegaTransfer> tL = null;
 
 	private Handler handler;
@@ -212,6 +214,13 @@ public class TransfersFragmentLollipop extends Fragment {
 
 	public void transferUpdate(MegaTransfer transfer){
         log("transferUpdate");
+        long now = System.currentTimeMillis();
+        if ((now - lastTimeOnTransferUpdate) > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+            lastTimeOnTransferUpdate = now;
+        }else{
+            return;
+        }
+        
         try{
 			ListIterator li = tL.listIterator();
 			int index = 0;
@@ -273,20 +282,26 @@ public class TransfersFragmentLollipop extends Fragment {
 		if(!transfer.isStreamingTransfer()){
 			tL.add(transfer);
 		}
-
-		adapter.notifyItemInserted(tL.size()-1);
-
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
+		
+        if (tL.size() == 0){
+            emptyImage.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+        }
 		else{
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
-		}
-	}
+            emptyImage.setVisibility(View.GONE);
+            emptyText.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
+        }
+        
+        long now = System.currentTimeMillis();
+        if ((now - lastTimeOnTransferUpdate) > ONTRANSFERUPDATE_REFRESH_MILLIS) {
+            lastTimeOnTransferUpdate = now;
+        }else{
+            return;
+        }
+        adapter.notifyDataSetChanged();
+    }
 
 	private static void log(String log) {
 		Util.log("TransfersFragmentLollipop", log);
