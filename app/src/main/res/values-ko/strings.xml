@@ -2291,7 +2291,6 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">진행중인 통화</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s님이 그룹 통화를 시작하였습니다. 참여하려면 탭하세요.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">통화로 돌아가려면 탭하세요</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">응답</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시됨</string>
 

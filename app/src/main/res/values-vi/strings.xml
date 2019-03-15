@@ -2291,7 +2291,6 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Cuộc Gọi Đang Diễn Ra</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s vừa bắt đầu một cuộc gọi nhóm. Chạm vào để tham gia.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Chạm vào để quay trở lại cuộc gọi %s</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Chạm vào để quay trở lại cuộc gọi</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Trả lời</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Đã bỏ qua</string>
 
