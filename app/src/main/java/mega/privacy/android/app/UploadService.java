@@ -157,7 +157,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             megaChatApi.saveCurrentState();
         }
 
-        resetDownloadNumbers();
+        resetUploadNumbers();
 		super.onDestroy();
 	}
 
@@ -386,7 +386,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         log("****onQueueComplete");
         releaseLocks();
         if (isOverquota != 0) {
-            //todo need to check here
             if (totalFileUploads > 0) {
                 showStorageOverQuotaNotification(false);
             }
@@ -410,7 +409,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         errorCount = 0;
         copiedCount = 0;
         
-        resetDownloadNumbers();
+        resetUploadNumbers();
         
         log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
         isForeground = false;
@@ -681,7 +680,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				return;
 			}
 			
-			//todo
             transfersCount++;
             if(transfer.isFolderTransfer()){
                 mapProgressFolderTransfers.put(transfer.getTag(), transfer);
@@ -705,7 +703,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 return;
             }
             
-            //todo
             transfersCount--;
             if(transfer.isFolderTransfer()){
                 totalFolderUploadsCompleted++;
@@ -945,7 +942,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				return;
 			}
             
-            //todo
             if (canceled) {
                 log("Transfer cancel: " + transfer.getFileName());
                 releaseLocks();
@@ -986,7 +982,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					else {
 						log("STORAGE OVER QUOTA ERROR: " + e.getErrorCode());
-						//todo update notification
                         if (totalFileUploads > 0) {
                             updateProgressNotification(false);
                         }
@@ -1144,8 +1139,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         }
     }
     
-    private void resetDownloadNumbers(){
-        log("resetDownloadNumbers");
+    private void resetUploadNumbers(){
+        log("resetUploadNumbers");
         totalFileUploads = 0;
         totalFileUploadsCompleted = 0;
         totalFileUploadsCompletedSuccessfully = 0;
