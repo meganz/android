@@ -319,6 +319,8 @@ public class InboxFragmentLollipop extends Fragment{
 			boolean showLink = false;
 			boolean showTrash = false;
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			if (selected.size() != 0) {
@@ -768,7 +770,7 @@ public class InboxFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
