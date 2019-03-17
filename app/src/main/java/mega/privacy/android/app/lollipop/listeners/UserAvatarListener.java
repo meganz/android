@@ -38,38 +38,33 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         if (e.getErrorCode() == MegaError.API_OK) {
-            
-            if (context instanceof ChatCallActivity) {
-                ((ChatCallActivity)context).setProfileContactAvatar();
-            } else {
-                if (holder.contactMail.compareTo(request.getEmail()) == 0) {
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null) {
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
-                    } else {
-                        avatar = new File(context.getCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
-                    }
-                    Bitmap bitmap = null;
-                    if (avatar.exists()) {
-                        if (avatar.length() > 0) {
-                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                            bOpts.inPurgeable = true;
-                            bOpts.inInputShareable = true;
-                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
-                            if (bitmap == null) {
-                                avatar.delete();
-                            } else {
+            if (holder.contactMail.compareTo(request.getEmail()) == 0) {
+                File avatar = null;
+                if (context.getExternalCacheDir() != null) {
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
+                } else {
+                    avatar = new File(context.getCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
+                }
+                Bitmap bitmap = null;
+                if (avatar.exists()) {
+                    if (avatar.length() > 0) {
+                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                        bOpts.inPurgeable = true;
+                        bOpts.inInputShareable = true;
+                        bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
+                        if (bitmap == null) {
+                            avatar.delete();
+                        } else {
 //								holder.imageView.setImageBitmap(bitmap);
-                                if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsGrid) {
-                                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,3);
-                                    ((MegaContactsLollipopAdapter.ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
-                                } else if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsList) {
-                                    ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
-                                } else if (holder instanceof LastContactsAdapter.ViewHolder) {
-                                    ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
-                                }
-                                holder.contactInitialLetter.setVisibility(View.GONE);
+                            if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsGrid) {
+                                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,3);
+                                ((MegaContactsLollipopAdapter.ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
+                            } else if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsList) {
+                                ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
+                            } else if (holder instanceof LastContactsAdapter.ViewHolder) {
+                                ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
                             }
+                            holder.contactInitialLetter.setVisibility(View.GONE);
                         }
                     }
                 }

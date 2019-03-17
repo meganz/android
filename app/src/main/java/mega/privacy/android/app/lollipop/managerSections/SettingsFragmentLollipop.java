@@ -1365,7 +1365,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (preference.getKey().compareTo("settings_chat_list_status") == 0){
 			log("onPreferenceChage: change status chat");
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			statusChatListPreference.setSummary(statusChatListPreference.getEntry());
@@ -1375,7 +1375,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (preference.getKey().compareTo("settings_chat_send_originals") == 0){
 			log("onPreferenceChage: change send originals chat");
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1428,7 +1428,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 							Util.setFileLoggerSDK(false);
 							numberOfClicksSDK = 0;
 							MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
-                            ((ManagerActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
+                            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
 						}
 					}
 					catch(Exception e){
@@ -1459,7 +1459,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 							Util.setFileLoggerKarere(false);
 							numberOfClicksKarere = 0;
 							MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.settings_disable_logs));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.settings_disable_logs), -1);
 						}
 					}
 					catch(Exception e){
@@ -1483,12 +1483,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				if (MegaApplication.isShowInfoChatMessages() == false) {
 					MegaApplication.setShowInfoChatMessages(true);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar("Action to show info of chat messages is enabled");
+					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, "Action to show info of chat messages is enabled", -1);
 				}
 				else{
 					MegaApplication.setShowInfoChatMessages(false);
 					numberOfClicksAppVersion = 0;
-					((ManagerActivityLollipop)context).showSnackbar("Action to show info of chat messages is disabled");
+					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, "Action to show info of chat messages is disabled", -1);
 				}
 			}
 		}
@@ -1587,7 +1587,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("Changing the secondary uploads");
 
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1684,7 +1684,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
 			log("Changing the MEGA folder for secondary uploads");
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -1695,7 +1695,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("Changing camera upload");
 			if(!cameraUpload){
 				if (!Util.isOnline(context)){
-					((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 					return false;
 				}
 			}
@@ -1724,7 +1724,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("KEY_CHAT_ENABLE");
 
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				chatEnableSwitch.setChecked(chatEnabled);
 				return false;
 			}
@@ -1751,7 +1751,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (preference.getKey().compareTo(KEY_AUTOAWAY_ENABLE) == 0){
 			log("KEY_AUTOAWAY_ENABLE");
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			statusConfig = megaChatApi.getPresenceConfig();
@@ -1772,7 +1772,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (preference.getKey().compareTo(KEY_RICH_LINKS_ENABLE) == 0){
 
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1789,7 +1789,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("Change KEY_ENABLE_VERSIONS");
 
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1804,7 +1804,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("Change KEY_ENABLE_RB_SCHEDULER");
 
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1831,7 +1831,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1841,7 +1841,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("Change KEY_ENABLE_LAST_GREEN_CHAT");
 
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1856,14 +1856,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			((ManagerActivityLollipop)context).showAutoAwayValueDialog();
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_PERSISTENCE) == 0){
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 
@@ -1992,7 +1992,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
 			log("Changing the MEGA folder for camera uploads");
 			if (!Util.isOnline(context)){
-				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return false;
 			}
 			Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
@@ -2065,17 +2065,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		if (cameraUpload){
 			log("Camera ON");
-
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
+			if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				log("No storage permission");
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 						Constants.REQUEST_WRITE_STORAGE);
 			}
 
-			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-			if (!hasCameraPermission){
+			if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
 				log("No camera permission");
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 						new String[]{Manifest.permission.CAMERA},
