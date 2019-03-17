@@ -22,7 +22,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -44,7 +43,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -877,7 +875,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         log("et_user.getText(): " + et_user.getText());
-        if (credentials != null && TextUtils.isEmpty(et_user.getText())){
+        if (credentials != null && !((LoginActivityLollipop) context).isBackFromLoginPage){
             log("Credentials NOT null");
             if ((intentReceived != null) && (action != null)){
                 if (action.equals(Constants.ACTION_REFRESH)){
@@ -1001,7 +999,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             else{
                 MegaNode rootNode = megaApi.getRootNode();
-                if (rootNode != null){
+                if (rootNode != null && !((LoginActivityLollipop)context).isFetchedNodes){
 
                     log("rootNode != null");
                     Intent intent = new Intent(context, ManagerActivityLollipop.class);
@@ -1560,12 +1558,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         fifthPin.setText("");
         sixthPin.setText("");
 
-        //keep the email in login page.
-        UserCredentials credentials = dbH.getCredentials();
-        if (credentials != null) {
-            et_user.setText(credentials.getEmail());
-            et_password.requestFocus();
-        }
+        et_user.requestFocus();
     }
 
     private void onKeysGeneratedLogin(final String email, final String password) {
@@ -2202,6 +2195,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
             loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
+            ((LoginActivityLollipop)context).isFetchedNodes = true;
             disableLoginButton();
         }
     }
@@ -2386,6 +2380,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("terminate login process when fetch nodes");
                 return;
             }
+            ((LoginActivityLollipop)context).isFetchedNodes = false;
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
@@ -2973,9 +2968,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             MegaApplication.setLoggingIn(false);
             loginClicked = false;
             backToLoginForm();
-            //when press back, need to logout account and chat first
-            megaApi.logout();
-            megaChatApi.logout(this);
+            megaChatApi.logout();
             return 1;
         }
         else{
@@ -2992,6 +2985,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 return 1;
             }
 
+            ((LoginActivityLollipop) context).isBackFromLoginPage = true;
             ((LoginActivityLollipop) context).showFragment(Constants.TOUR_FRAGMENT);
             return 1;
         }
