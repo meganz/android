@@ -311,7 +311,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                             chatHandles[i] = chats.get(i).getChatId();
                         }
                         MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(context, chatHandles, handles, idChat);
-                        forwardChatProcessor.forward();
+                        forwardChatProcessor.forward(megaChatApi.getChatRoom(idChat));
                     }
                 }
             }
