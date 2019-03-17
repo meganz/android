@@ -80,6 +80,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -901,10 +903,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	public void startCall(boolean startVideo){
-
 		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
 		if(chatRoomTo!=null){
-
 			if(megaChatApi.getChatCall(chatRoomTo.getChatId())!=null){
 				Intent i = new Intent(this, ChatCallActivity.class);
 				i.putExtra("chatHandle", chatRoomTo.getChatId());
@@ -1268,25 +1268,28 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_chat_call_layout:{
 				log("Start audio call option");
-				if(!this.participatingInACall()){
-					log("I'm not in a call");
-					startVideo = false;
-					if(checkPermissionsCall()){
-						startCall(startVideo);
+				if(megaChatApi!=null){
+					if(!ChatUtil.participatingInACall(megaChatApi)){
+						log("I'm not in a call");
+						startVideo = false;
+						if(checkPermissionsCall()){
+							startCall(startVideo);
+						}
 					}
 				}
 				break;
 			}
 			case R.id.chat_contact_properties_chat_video_layout:{
 				log("Star video call option");
-				if(!this.participatingInACall()){
-					log("I'm not in a call");
-					startVideo = true;
-					if(checkPermissionsCall()){
-						startCall(startVideo);
+				if(megaChatApi!=null) {
+					if (!ChatUtil.participatingInACall(megaChatApi)) {
+						log("I'm not in a call");
+						startVideo = true;
+						if (checkPermissionsCall()) {
+							startCall(startVideo);
+						}
 					}
 				}
-
 				break;
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
@@ -1892,14 +1895,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				if(fromContacts){
 					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 					intent.putExtra("CHAT_ID", request.getChatHandle());
 					this.startActivity(intent);
 					finish();
 				}
 				else{
 					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(Constants.ACTION_NEW_CHAT);
+					intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 					intent.putExtra("CHAT_ID", request.getChatHandle());
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intent);

@@ -87,30 +87,16 @@
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/call_in_progress_layout_recent"
+        <include layout="@layout/item_call_in_progress_layout"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:layout_below="@id/linear_layout_add"
-            android:visibility="gone"
-            android:background="@color/accentColor">
-
-            <TextView
-                android:id="@+id/call_in_progress_text_recent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:text="@string/call_in_progress_layout_without_time"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"/>
-        </RelativeLayout>
+            android:layout_height="48dp"
+            android:layout_below="@id/linear_layout_add"/>
 
         <LinearLayout
             android:id="@+id/linear_layout_recycler"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_below="@id/call_in_progress_layout_recent">
+            android:layout_below="@id/call_in_progress_layout">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
