@@ -33,6 +33,8 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 
 public class BaseActivity extends AppCompatActivity {
@@ -151,9 +153,12 @@ public class BaseActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 log("BROADCAST TO SEND SIGNAL PRESENCE");
-                if(delaySignalPresence && megaChatApi.getPresenceConfig().isPending()==false){
-                    delaySignalPresence = false;
-                    retryConnectionsAndSignalPresence();
+                MegaChatPresenceConfig config = megaChatApi.getPresenceConfig();
+                if(config != null) {
+                    if(delaySignalPresence && !config.isPending()){
+                        delaySignalPresence = false;
+                        retryConnectionsAndSignalPresence();
+                    }
                 }
             }
         }
