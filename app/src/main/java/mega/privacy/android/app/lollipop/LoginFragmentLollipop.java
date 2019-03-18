@@ -1270,13 +1270,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 int ret = megaChatApi.getInitState();
 
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
                     log("enableChat: result of init ---> "+ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1348,7 +1349,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
 
                 int ret = megaChatApi.getInitState();
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     log("initial: INIT STATE: "+ret);
 
                     ret = megaChatApi.init(gSession);
@@ -1358,6 +1359,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {

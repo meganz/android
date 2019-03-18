@@ -1813,7 +1813,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onPrepareOptionsMenu");
 
         if(chatRoom!=null){
-            log("onPrepareOptionsMenu chatRoom!=null)");
+            log("onPrepareOptionsMenu chatRoom!=null");
             callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
@@ -1828,6 +1828,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if ((chatRoom.isPreview()) || (megaChatApi.getConnectionState() != MegaChatApi.CONNECTED)
                         || (megaChatApi.getChatConnectionState(idChat) != MegaChatApi.CHAT_CONNECTION_ONLINE)) {
+                log("onPrepareOptionsMenu chatRoom.isPreview || megaChatApi.getConnectionState() "+megaChatApi.getConnectionState()+" || megaChatApi.getChatConnectionState(idChat) "+(megaChatApi.getChatConnectionState(idChat)));
+
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
@@ -1924,8 +1926,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         leaveMenuItem.setVisible(true);
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
-                        callMenuItem.setVisible(false);
-                        videoMenuItem.setVisible(false);
                     }
 
                     contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
@@ -1942,7 +1942,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         clearHistoryMenuItem.setVisible(true);
                         contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                         contactInfoMenuItem.setVisible(true);
-                        callMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
                 }
