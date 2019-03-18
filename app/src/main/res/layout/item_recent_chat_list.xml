@@ -43,6 +43,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="13dp"
         android:singleLine="true"
+        android:background="@color/blue"
         android:maxLines="1"
         android:textColor="@color/black" />
 
@@ -98,6 +99,7 @@
         android:layout_marginLeft="16dp"
         android:textSize="14sp"
         android:singleLine="true"
+        android:background="@color/tour_bar_red"
         android:maxLines="1"
         android:textColor="@color/accentColor" />
 

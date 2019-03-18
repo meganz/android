@@ -543,7 +543,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         toolbarElements =(LinearLayout)tB.findViewById(R.id.toolbar_elements);
         titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
         titleToolbar.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
-        titleToolbar.setMaxEllipsize(Util.scaleWidthPx(100, outMetrics));
         titleToolbar.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
 
         subtitleToobar = (TextView)tB.findViewById(R.id.subtitle_toolbar);

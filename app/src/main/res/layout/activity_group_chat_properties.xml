@@ -85,7 +85,7 @@
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="13dp">
 
-                        <TextView
+                        <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/chat_group_contact_properties_info_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                             android:singleLine="true"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:textSize="18dp" />
+                            android:textSize="20sp" />
 
                         <ImageView
                             android:id="@+id/chat_group_contact_properties_edit_icon"
@@ -110,7 +110,7 @@
                             android:layout_gravity="left|center_vertical"
                             android:layout_below="@+id/chat_group_contact_properties_info_title"
                             android:textColor="@color/mail_my_account"
-                            android:textSize="14dp" />
+                            android:textSize="14sp" />
 
                     </RelativeLayout>
 

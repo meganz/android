@@ -134,11 +134,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             holder.titleText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
             holder.titleText.setMaxWidth(Util.scaleWidthPx(100, outMetrics));
-            holder.titleText.setMaxEllipsize(Util.scaleWidthPx(120, outMetrics));
         }else{
             holder.titleText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
             holder.titleText.setMaxWidth(Util.scaleWidthPx(100, outMetrics));
-            holder.titleText.setMaxEllipsize(Util.scaleWidthPx(120, outMetrics));
         }
 
         v.setTag(holder);

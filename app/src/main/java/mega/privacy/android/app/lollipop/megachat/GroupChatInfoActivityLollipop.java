@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -51,6 +52,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -123,7 +125,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     LinearLayout infoLayout;
     RelativeLayout avatarLayout;
-    TextView infoTitleChatText;
+    EmojiTextView infoTitleChatText;
     TextView infoNumParticipantsText;
     RelativeLayout infoTextContainerLayout;
     ImageView editImageView;
@@ -291,12 +293,19 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             paramsInfoText.leftMargin = Util.scaleWidthPx(16, outMetrics);
             infoTextContainerLayout.setLayoutParams(paramsInfoText);
 
-            infoTitleChatText = (TextView) findViewById(R.id.chat_group_contact_properties_info_title);
+            infoTitleChatText = (EmojiTextView) findViewById(R.id.chat_group_contact_properties_info_title);
             log("The full title of chat: "+chat.getTitle());
             infoTitleChatText.setText(chat.getTitle());
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
 
-            infoTitleChatText.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                infoTitleChatText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+                infoTitleChatText.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+            }else{
+                infoTitleChatText.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
+                infoTitleChatText.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+            }
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();

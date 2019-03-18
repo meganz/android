@@ -544,26 +544,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxEllipsize(Util.scaleWidthPx(170, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
-
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(12, outMetrics));
 			}else{
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxEllipsize(Util.scaleWidthPx(160, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(170, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(21, outMetrics));
 			}
 
 
 			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxEllipsize(Util.scaleWidthPx(250, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.px2dp(10, outMetrics));
 			}else{
-				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxEllipsize(Util.scaleWidthPx(190, outMetrics));
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.px2dp(15, outMetrics));
 			}
 
 			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
