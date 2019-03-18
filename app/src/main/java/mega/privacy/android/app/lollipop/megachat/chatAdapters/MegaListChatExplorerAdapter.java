@@ -108,6 +108,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         public void setAvatarImage(Bitmap avatarImage) {
             this.avatarImage.setImageBitmap(avatarImage);
+            initialLetter.setVisibility(View.GONE);
         }
     }
 
