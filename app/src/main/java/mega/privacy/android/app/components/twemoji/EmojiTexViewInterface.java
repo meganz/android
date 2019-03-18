@@ -20,4 +20,13 @@ public interface EmojiTexViewInterface {
 
     /** sets the emoji size in pixels with the provided resource and invalidates the text and renders it with the new size when {@code shouldInvalidate} is true */
     void setEmojiSizeRes(@DimenRes int res, boolean shouldInvalidate);
+
+    /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size */
+    int getMaxEllipsize();
+
+    /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size */
+    void setMaxEllipsize(int maxEllipsize);
+
+    /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size */
+    void setMaxEllipsize(int maxEllipsize, boolean shouldInvalidate);
 }

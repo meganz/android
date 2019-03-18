@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -73,6 +74,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -96,17 +98,15 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import android.provider.CallLog;
+import static mega.privacy.android.app.utils.Util.context;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
-import static mega.privacy.android.app.utils.Util.context;
 
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
     MegaUser myUser;
-    Chronometer myChrono;
-
     public static int REMOTE_VIDEO_NOT_INIT = -1;
     public static int REMOTE_VIDEO_ENABLED = 1;
     public static int REMOTE_VIDEO_DISABLED = 0;
@@ -128,7 +128,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     AppBarLayout appBarLayout;
     Toolbar tB;
     LinearLayout toolbarElements;
-    TextView titleToolbar;
+    EmojiTextView titleToolbar;
     TextView subtitleToobar;
     Chronometer callInProgressChrono;
 
@@ -536,19 +536,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
+        aB.setDisplayShowHomeEnabled(true);
         aB.setTitle(null);
         aB.setSubtitle(null);
 
-        toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
-        titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
-        titleToolbar.setText(" ");
-        subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
+        toolbarElements =(LinearLayout)tB.findViewById(R.id.toolbar_elements);
+        titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
+        titleToolbar.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
+        titleToolbar.setMaxEllipsize(Util.scaleWidthPx(100, outMetrics));
+        titleToolbar.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
+
+        subtitleToobar = (TextView)tB.findViewById(R.id.subtitle_toolbar);
         callInProgressChrono = (Chronometer) tB.findViewById(R.id.simple_chronometer);
-        linearParticipants = (LinearLayout) tB.findViewById(R.id.ll_participants);
+        linearParticipants = (LinearLayout)tB. findViewById(R.id.ll_participants);
         participantText = (TextView) tB.findViewById(R.id.participants_text);
         linearParticipants.setVisibility(View.GONE);
-
-        myChrono = new Chronometer(context);
 
         totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
 

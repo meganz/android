@@ -86,6 +86,7 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -239,7 +240,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     LinearLayout toolbarElements;
     RelativeLayout toolbarElementsInside;
 
-    TextView titleToolbar;
+    EmojiTextView titleToolbar;
     MarqueeTextView subtitleToobar;
     LinearLayout subtitleCall;
     Chronometer chronoCall;
@@ -615,13 +616,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setTitle(null);
         aB.setSubtitle(null);
 
-        aB.setTitle(null);
-        aB.setSubtitle(null);
-
         tB.setOnClickListener(this);
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         toolbarElementsInside = (RelativeLayout) findViewById(R.id.toolbar_elements_inside);
-        titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
+        titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            titleToolbar.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+        }else{
+            titleToolbar.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
+        }
         subtitleToobar = (MarqueeTextView) tB.findViewById(R.id.subtitle_toolbar);
         subtitleToobar.setFocusable(true);
         subtitleToobar.setFocusableInTouchMode(true);
@@ -636,8 +639,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
         privateIconToolbar = (ImageView) tB.findViewById(R.id.private_icon_toolbar);
 
-        titleToolbar.setText(" ");
-        subtitleToobar.setText(" ");
         subtitleToobar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
         chronoCall.setVisibility(View.GONE);

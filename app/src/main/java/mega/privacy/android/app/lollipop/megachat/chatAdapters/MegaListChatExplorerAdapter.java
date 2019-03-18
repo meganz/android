@@ -98,7 +98,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
-        EmojiTextView participantsText;
+        TextView participantsText;
 
         String email;
 
@@ -129,15 +129,16 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
         holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
         holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
-        holder.participantsText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_participants);
+        holder.participantsText = (TextView) v.findViewById(R.id.chat_explorer_list_participants);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             holder.titleText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-            holder.participantsText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-        }
-        else{
+            holder.titleText.setMaxWidth(Util.scaleWidthPx(100, outMetrics));
+            holder.titleText.setMaxEllipsize(Util.scaleWidthPx(120, outMetrics));
+        }else{
             holder.titleText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-            holder.participantsText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+            holder.titleText.setMaxWidth(Util.scaleWidthPx(100, outMetrics));
+            holder.titleText.setMaxEllipsize(Util.scaleWidthPx(120, outMetrics));
         }
 
         v.setTag(holder);
