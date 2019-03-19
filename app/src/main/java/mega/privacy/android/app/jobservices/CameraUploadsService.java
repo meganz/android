@@ -25,6 +25,8 @@ import android.support.v4.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -42,6 +44,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.CameraUploadImageProcessor;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.JobUtil;
@@ -64,7 +67,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
@@ -117,6 +119,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     String localPathSecondary = "";
     long secondaryUploadHandle = -1;
     MegaNode secondaryUploadNode = null;
+
+    private DateFormat sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
     
     boolean isLoggingIn = false;
     
@@ -529,12 +533,57 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 if (toUpload.exists()) {
                     log("upload node " + path);
                     totalToUpload++;
-                    megaApi.startUpload(path,parent,file.getFileName(),file.getTimestamp() / 1000,this);
+                    long lastModified = getLastModifiedTime(file);
+                    megaApi.startUpload(path,parent,file.getFileName(),lastModified / 1000,this);
                 } else {
                     dbH.deleteSyncRecordByPath(path,isSec);
                 }
             }
         }
+    }
+
+    private long getLastModifiedTime(SyncRecord file) {
+        String originalPath = file.getLocalPath();
+        long lastModified;
+        try {
+            ExifInterface exif = new ExifInterface(originalPath);
+            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
+            lastModified = sFormatter.parse(s).getTime();
+            if (lastModified == 0) {
+                lastModified = new File(originalPath).lastModified();
+                if (lastModified == 0) {
+                    lastModified = file.getTimestamp();
+                }
+            }
+        } catch (Exception e) {
+            lastModified = new File(originalPath).lastModified();
+            if (lastModified == 0) {
+                lastModified = file.getTimestamp();
+            }
+        }
+        return lastModified;
+    }
+
+    private long getLastModifiedTime(Media media) {
+        String originalPath = media.filePath;
+        long lastModified;
+        try {
+            ExifInterface exif = new ExifInterface(originalPath);
+            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
+            lastModified = sFormatter.parse(s).getTime();
+            if (lastModified == 0) {
+                lastModified = new File(originalPath).lastModified();
+                if (lastModified == 0) {
+                    lastModified = media.timestamp;
+                }
+            }
+        } catch (Exception e) {
+            lastModified = new File(originalPath).lastModified();
+            if (lastModified == 0) {
+                lastModified = media.timestamp;
+            }
+        }
+        return lastModified;
     }
     
     private void saveDataToDB(ArrayList<SyncRecord> list) {
@@ -588,7 +637,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 } while ((inCloud || inDatabase));
             } else {
                 do {
-                    fileName = Util.getPhotoSyncNameWithIndex(file.getTimestamp(),file.getLocalPath(),photoIndex);
+                    fileName = Util.getPhotoSyncNameWithIndex(getLastModifiedTime(file),file.getLocalPath(),photoIndex);
                     photoIndex++;
                     
                     inCloud = megaApi.getChildNode(parent,fileName) != null;
@@ -638,7 +687,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
         long uploadNodeHandle = uploadNode.getHandle();
         int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
-        
+
         while (mediaList.size() > 0) {
             log("if (mediaList.size() > 0)");
             final Media media = mediaList.poll();
@@ -672,7 +721,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                         photoFinalName = media.filePath;
                         log("Keep the camera file name: " + photoFinalName);
                     } else {
-                        photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp,media.filePath,photoIndex);
+                        photoFinalName = Util.getPhotoSyncNameWithIndex(getLastModifiedTime(media),media.filePath,photoIndex);
                         log("CHANGE the camera file name: " + photoFinalName);
                     }
                     
@@ -717,12 +766,12 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             if (nodeExists == null) {
                 log("UPLOAD THE FILE: " + media.filePath);
                 Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(media.timestamp);
+                cal.setTimeInMillis(getLastModifiedTime(media));
                 log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
                 boolean photoAlreadyExists = false;
                 ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode,MegaApiJava.ORDER_ALPHABETICAL_ASC);
                 for (int i = 0;i < nL.size();i++) {
-                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp,media.filePath)) == 0)) {
+                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(getLastModifiedTime(media),media.filePath)) == 0)) {
                         photoAlreadyExists = true;
                     }
                 }
@@ -806,12 +855,12 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         protected Boolean rename(MegaNode nodeExists) {
             log("rename the file: " + media.filePath);
             Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(media.timestamp);
+            cal.setTimeInMillis(getLastModifiedTime(media));
             log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
             boolean photoAlreadyExists = false;
             ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode,MegaApiJava.ORDER_ALPHABETICAL_ASC);
             for (int i = 0;i < nL.size();i++) {
-                if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp,media.filePath)) == 0) {
+                if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(getLastModifiedTime(media),media.filePath)) == 0) {
                     photoAlreadyExists = true;
                 }
             }
@@ -820,14 +869,14 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 int photoIndex = 0;
                 this.photoFinalName = null;
                 do {
-                    photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp,media.filePath,photoIndex);
+                    photoFinalName = Util.getPhotoSyncNameWithIndex(getLastModifiedTime(media),media.filePath,photoIndex);
                     photoIndex++;
                 } while (megaApi.getChildNode(uploadNode,photoFinalName) != null);
                 
                 log("photoFinalName: " + photoFinalName + "______" + photoIndex);
                 megaApi.renameNode(nodeExists,photoFinalName,CameraUploadsService.this);
                 log("RENAMED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
-                
+
                 return true;
             } else {
                 return false;
@@ -893,6 +942,9 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                             return 6;
                             
                         } else {
+                            if(!localPath.endsWith(File.separator)) {
+                                localPath += File.separator;
+                            }
                             log("Localpath: " + localPath);
                         }
                     }
@@ -1027,6 +1079,10 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             } else {
                 secondaryEnabled = true;
                 localPathSecondary = prefs.getLocalPathSecondaryFolder();
+                if(!localPathSecondary.endsWith(File.separator)) {
+                    localPathSecondary += File.separator;
+                }
+                log("localPathSecondary: " + localPathSecondary);
             }
         }
         
@@ -1189,10 +1245,10 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         handler = new Handler();
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PAGE_SIZE = 500;
+            PAGE_SIZE = 1000;
             PAGE_SIZE_VIDEO = 50;
         } else {
-            PAGE_SIZE = 200;
+            PAGE_SIZE = 400;
             PAGE_SIZE_VIDEO = 10;
         }
         
@@ -1785,10 +1841,9 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     }
     
     private synchronized void updateProgressNotification() {
-        
-        //refresh UI every 2 seconds to avoid too much workload on main thread
+        //refresh UI every 1 seconds to avoid too much workload on main thread
         long now = System.currentTimeMillis();
-        if (now - lastUpdated > 2000) {
+        if (now - lastUpdated > 1000) {
             lastUpdated = now;
         } else {
             return;
@@ -2047,6 +2102,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
                 } else {
                     log("No location info");
                 }
+                retriever.release();
             } else {
                 ExifInterface exif = new ExifInterface(filePath);
                 exif.getLatLong(output);

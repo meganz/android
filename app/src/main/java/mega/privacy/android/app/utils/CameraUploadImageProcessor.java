@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices;
+package mega.privacy.android.app.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -12,11 +12,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUtilsAndroid;
 
