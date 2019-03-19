@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,13 +12,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -58,22 +57,23 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -82,7 +82,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -97,7 +99,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener {
+public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
@@ -157,6 +159,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	MenuItem createFolderMenuItem;
 	MenuItem newChatMenuItem;
+	MenuItem searchMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
 	private long fragmentHandle  = -1;
@@ -188,7 +191,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	private int tabShown = CLOUD_TAB;
 
-	ArrayList<MegaChatListItem> chatListItems;
+	ArrayList<MegaChatRoom> chatListItems;
 
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
@@ -222,6 +225,22 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     private android.support.v7.app.AlertDialog renameDialog;
 	HashMap<String, String> nameFiles = new HashMap<>();
 
+	MegaNode myChatFilesNode;
+	ArrayList<MegaNode> attachNodes = new ArrayList<>();
+	ArrayList<ShareInfo> uploadInfos = new ArrayList<>();
+	int filesChecked = 0;
+
+	SearchView searchView;
+
+	FileExplorerActivityLollipop fileExplorerActivityLollipop;
+
+	private String querySearch = "";
+	private boolean isSearchExpanded = false;
+	private boolean pendingToOpenSearchView = false;
+	private int pendingToAttach = 0;
+	private int totalAttached = 0;
+	private int totalErrors = 0;
+
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -247,7 +266,31 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish.");
-			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+		}
+		else if (request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+			log("Attach file request finish.");
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				totalAttached++;
+			}
+			else{
+				totalErrors++;
+			}
+			if (totalAttached+totalErrors == pendingToAttach) {
+				if (totalErrors == 0 || totalAttached > 0) {
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.setAction(Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
+					if (chatListItems.size() == 1) {
+						intent.putExtra("CHAT_ID", chatListItems.get(0).getChatId());
+					}
+					startActivity(intent);
+				}
+				else {
+					showSnackbar(getString(R.string.files_send_to_chat_error));
+				}
+				finishFileExplorer();
+			}
 		}
 	}
 
@@ -307,19 +350,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    }
 	    return super.onKeyDown(keyCode, event);
 	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		log("onConfigurationChanged");
-		super.onConfigurationChanged(newConfig);
-
-		// Checks the orientation of the screen
-//		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//
-//		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-//
-//		}
-	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -339,6 +369,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			importFragmentSelected = savedInstanceState.getInt("importFragmentSelected", -1);
 			action = savedInstanceState.getString("action", null);
 			nameFiles = (HashMap<String, String>) savedInstanceState.getSerializable("nameFiles");
+			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatExplorerFragment");
+			querySearch = savedInstanceState.getString("querySearch", "");
+			isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
+			pendingToAttach = savedInstanceState.getInt("pendingToAttach", 0);
+			totalAttached = savedInstanceState.getInt("totalAttached", 0);
+			totalErrors = savedInstanceState.getInt("totalErrors", 0);
+
+			if (isSearchExpanded) {
+				pendingToOpenSearchView = true;
+			}
 		}
 		else{
 			log("Bundle is NULL");
@@ -348,7 +388,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			importFileF = false;
 			importFragmentSelected = -1;
 			action = null;
+			pendingToAttach = 0;
+			totalAttached = 0;
+			totalErrors = 0;
 		}
+
+		fileExplorerActivityLollipop = this;
 				
 		dbH = DatabaseHandler.getDbHandler(this);
 		credentials = dbH.getCredentials();
@@ -443,12 +488,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-			}
+			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 
 			log("hide action bar");
 			if (!MegaApplication.isLoggingIn()) {
@@ -514,13 +554,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
-			}
+			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
 			afterLoginAndFetch();
 		}
@@ -825,16 +859,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 						ownFilePrepareTask.execute(getIntent());
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(this);
-							temp.setMessage(getString(R.string.upload_prepare));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
+						createAndShowProgressDialog(false, R.string.upload_prepare);
 
 						cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -903,13 +928,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
-	public void changeActionBarElevation(boolean whitElevation){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (whitElevation) {
-				abL.setElevation(Util.px2dp(4, outMetrics));
-			}
-			else {
-				abL.setElevation(0);
+	public void changeActionBarElevation(boolean whitElevation) {
+		chatExplorer = getChatExplorerFragment();
+		if (chatExplorer == null || chatExplorer.isHidden()) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if (whitElevation) {
+					abL.setElevation(Util.px2dp(4, outMetrics));
+				}
+				else {
+					abL.setElevation(0);
+				}
 			}
 		}
 	}
@@ -921,12 +949,70 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.file_explorer_action, menu);
-	    
+
+	    searchMenuItem = menu.findItem(R.id.cab_menu_search);
+	    searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
+	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
+
+		searchView = (SearchView) searchMenuItem.getActionView();
+
+		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
+		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		searchAutoComplete.setHint(getString(R.string.hint_action_search));
+		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+
+		if (searchView != null){
+			searchView.setIconifiedByDefault(true);
+		}
+
+		searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+			@Override
+			public boolean onMenuItemActionExpand(MenuItem item) {
+				isSearchExpanded = true;
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.enableSearch(true);
+				}
+				return true;
+			}
+
+			@Override
+			public boolean onMenuItemActionCollapse(MenuItem item) {
+				isSearchExpanded = false;
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.enableSearch(false);
+				}
+				return true;
+			}
+		});
+
+		searchView.setMaxWidth(Integer.MAX_VALUE);
+		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				log("onQueryTextSubmit: "+query);
+				Util.hideKeyboard(fileExplorerActivityLollipop, 0);
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				querySearch = newText;
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.search(newText);
+				}
+				return true;
+			}
+		});
 
 //	    if(iSharesExplorer != null){
 //	    	if (iSharesExplorer.deepBrowserTree==0){
@@ -940,7 +1026,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    
 	    return super.onCreateOptionsMenu(menu);
 	}
-	
+
+	public void isPendingToOpenSearchView () {
+		if (pendingToOpenSearchView) {
+			String query = querySearch;
+			searchMenuItem.expandActionView();
+			searchView.setQuery(query, false);
+			pendingToOpenSearchView = false;
+		}
+	}
+
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenuLollipop");
@@ -952,8 +1047,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if(index==0){
 				if(isChatFirst){
+					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(true);
+					newChatMenuItem.setVisible(false);
 				}
 				else{
 					//CLOUD TAB
@@ -1048,8 +1144,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					newChatMenuItem.setVisible(false);
 				}
 				else{
+					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
-					newChatMenuItem.setVisible(true);
+					newChatMenuItem.setVisible(false);
 				}
 			}
 
@@ -1067,7 +1164,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						case INCOMING_FRAGMENT:{
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
-							if(iSharesExplorer != null && iSharesExplorer.isAdded()){
+							if(iSharesExplorer != null){
 								if (deepBrowserTree > 0) {
 									//Check the folder's permissions
 									long parentH = iSharesExplorer.getParentHandle();
@@ -1091,7 +1188,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							break;
 						}
 						case CHAT_FRAGMENT:{
-							newChatMenuItem.setVisible(true);
+							newChatMenuItem.setVisible(false);
+							searchMenuItem.setVisible(true);
 							break;
 						}
 					}
@@ -1188,7 +1286,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						case CLOUD_FRAGMENT: {
 							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 
-							if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+							if(cDriveExplorer!=null){
 								if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
 									setRootTitle();
 								}
@@ -1201,7 +1299,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						case INCOMING_FRAGMENT:{
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 
-							if(iSharesExplorer!=null && iSharesExplorer.isAdded()){
+							if(iSharesExplorer!=null){
 								if(deepBrowserTree==0){
 									setRootTitle();
 								}
@@ -1254,12 +1352,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
-						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
-							showFabButton(true);
-						}
-						else{
-							showFabButton(false);
-						}
+//						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
+//							showFabButton(true);
+//						}
+//						else{
+//							showFabButton(false);
+//						}
 					}
 					else if(f instanceof CloudDriveExplorerFragmentLollipop){
 
@@ -1329,12 +1427,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
-						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
-							showFabButton(true);
-						}
-						else{
-							showFabButton(false);
-						}
+//						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
+//							showFabButton(true);
+//						}
+//						else{
+//							showFabButton(false);
+//						}
 					}
 					else if(f instanceof IncomingSharesExplorerFragmentLollipop){
 
@@ -1411,6 +1509,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		bundle.putInt("importFragmentSelected", importFragmentSelected);
 		bundle.putString("action", action);
 		bundle.putSerializable("nameFiles", nameFiles);
+
+		if (getChatExplorerFragment() != null) {
+			getSupportFragmentManager().putFragment(bundle, "chatExplorerFragment", getChatExplorerFragment());
+		}
+
+		bundle.putString("querySearch", querySearch);
+		bundle.putBoolean("isSearchExpanded", isSearchExpanded);
+		bundle.putInt("pendingToAttach", pendingToAttach);
+		bundle.putInt("totalAttached", totalAttached);
+		bundle.putInt("totalErrors", totalErrors);
 	}
 	
 	@Override
@@ -1422,16 +1530,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if (filePreparedInfos == null){
 						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 						ownFilePrepareTask.execute(getIntent());
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(this);
-							temp.setMessage(getString(R.string.upload_prepare));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
+						createAndShowProgressDialog(false, R.string.upload_prepare);
 					}
 				}
 			}
@@ -1484,7 +1583,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (importFileF) {
 				switch (importFragmentSelected) {
 					case CLOUD_FRAGMENT: {
-						if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+						if(cDriveExplorer!=null){
 							if (cDriveExplorer.onBackPressed() == 0){
 								chooseFragment(IMPORT_FRAGMENT);
 							}
@@ -1501,9 +1600,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						break;
 					}
 					case CHAT_FRAGMENT:{
-						if(chatExplorer!=null && chatExplorer.isAdded()){
+						chatExplorer = getChatExplorerFragment();
+						if(chatExplorer!=null){
 							showFabButton(false);
-							chatExplorer.clearSelections();
+//							chatExplorer.clearSelections();
 							chooseFragment(IMPORT_FRAGMENT);
 						}
 						break;
@@ -1514,7 +1614,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 			}
-			else if(cDriveExplorer!=null && cDriveExplorer.isAdded()){
+			else if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
 					finishActivity();
 				}
@@ -1523,6 +1623,151 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		else{
 			super.callToSuperBack = true;
 			super.onBackPressed();
+		}
+
+		setToolbarSubtitle(null);
+	}
+
+	long createPendingMessageDBH (long idChat, long timestamp, String fingerprint, ShareInfo info) {
+		log("createPendingMessageDBH Id chat: "+idChat+" Fingerprint: "+fingerprint);
+		PendingMessageSingle pMsgSingle = new PendingMessageSingle();
+		pMsgSingle.setChatId(idChat);
+		pMsgSingle.setUploadTimestamp(timestamp);
+		pMsgSingle.setFilePath(info.getFileAbsolutePath());
+		pMsgSingle.setName(info.getTitle());
+		pMsgSingle.setFingerprint(fingerprint);
+		long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
+		pMsgSingle.setId(idMessage);
+
+		if(idMessage!=-1){
+			log("name of the file: "+info.getTitle());
+			log("size of the file: "+info.getSize());
+		}
+		else{
+			log("Error when adding pending msg to the database");
+		}
+		return idMessage;
+	}
+
+	void startChatUploadService () {
+		log("Launch chat upload with files "+filePreparedInfos.size());
+		filesChecked = 0;
+		long[] attachNodeHandles;
+		ArrayList<Long> pendMsgArray = new ArrayList<>();
+		Intent intent = new Intent(this, ChatUploadService.class);
+
+		if (chatListItems != null && !chatListItems.isEmpty()) {
+			long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
+			HashMap<String, String> filesToUploadFingerPrint= new HashMap<>();
+			if (attachNodes != null && !attachNodes.isEmpty()) {
+//			There are exists files
+				if (uploadInfos != null && uploadInfos.size() > 0) {
+//					There are exist files and files for upload
+					attachNodeHandles = new long[attachNodes.size()];
+					for (int i=0; i<attachNodes.size(); i++) {
+						attachNodeHandles[i] = attachNodes.get(i).getHandle();
+					}
+
+					long[] attachIdChats = new long[chatListItems.size()];
+					for (int i=0; i<chatListItems.size(); i++) {
+						attachIdChats[i] = chatListItems.get(i).getChatId();
+					}
+					intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
+					intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles);
+
+					int pos = 0;
+					for (ShareInfo info : uploadInfos) {
+						long timestamp = System.currentTimeMillis()/1000;
+						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+						filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
+						for(MegaChatRoom item : chatListItems){
+							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+							pos++;
+						}
+					}
+					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
+					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+					startService(intent);
+
+					finishFileExplorer();
+				}
+				else {
+//					All files exists, not necessary start ChatUploadService
+					pendingToAttach = attachNodes.size() * chatListItems.size();
+					for (MegaNode node : attachNodes) {
+						for (MegaChatRoom item : chatListItems) {
+							megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
+						}
+					}
+				}
+			}
+			else {
+//			All files for upload
+				int pos = 0;
+				for (ShareInfo info : filePreparedInfos) {
+					long timestamp = System.currentTimeMillis()/1000;
+					String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+					if (fingerprint == null) {
+						log("Error, fingerprint == NULL is not possible to access file for some reason");
+						continue;
+					}
+					filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
+					for(MegaChatRoom item : chatListItems){
+						idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+						pos++;
+					}
+				}
+				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
+				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+				startService(intent);
+
+				finishFileExplorer();
+			}
+		}
+		else{
+			filePreparedInfos = null;
+			log("ERROR null files to upload");
+			finishActivity();
+		}
+	}
+
+	void finishFileExplorer () {
+		if (statusDialog != null) {
+			try {
+				statusDialog.dismiss();
+			}
+			catch(Exception ex){}
+		}
+
+		filePreparedInfos = null;
+		log("finish!!!");
+		finishActivity();
+	}
+
+	void checkIfFilesExistsInMEGA () {
+		for (ShareInfo info : filePreparedInfos) {
+			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+			MegaNode node = megaApi.getNodeByFingerprint(fingerprint);
+			if (node != null) {
+				if (node.getParentHandle() == myChatFilesNode.getHandle()) {
+//					File is in My Chat Files --> Add to attach
+					attachNodes.add(node);
+					filesChecked++;
+				}
+				else {
+//					File is in Cloud --> Copy in My Chat Files
+					megaApi.copyNode(node, myChatFilesNode, this);
+				}
+			}
+			else {
+				uploadInfos.add(info);
+				filesChecked++;
+			}
+		}
+		if (filesChecked == filePreparedInfos.size()) {
+			startChatUploadService();
 		}
 	}
 
@@ -1537,120 +1782,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 
 		if (infos == null) {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
+		    showSnackbar(getString(R.string.upload_can_not_open));
 		}
 		else {
-			log("Launch chat upload with files "+infos.size());
-			for (ShareInfo info : infos) {
-				Intent intent = new Intent(this, ChatUploadService.class);
-
-				long timestamp = System.currentTimeMillis()/1000;
-
-				if(chatListItems!=null){
-					for(int i=0; i < chatListItems.size();i++){
-						MegaChatListItem item = chatListItems.get(i);
-						long idChat = item.getChatId();
-						log("Id chat: "+idChat);
-						PendingMessageSingle pMsgSingle = new PendingMessageSingle();
-						pMsgSingle.setChatId(idChat);
-						pMsgSingle.setUploadTimestamp(timestamp);
-
-						if (MimeTypeList.typeForName(info.getFileAbsolutePath()).isImage()) {
-
-							if(sendOriginalAttachments){
-								String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-								pMsgSingle.setFilePath(info.getFileAbsolutePath());
-								pMsgSingle.setName(info.getTitle());
-								pMsgSingle.setFingerprint(fingerprint);
-
-							}
-							else{
-								File previewDir = PreviewUtils.getPreviewFolder(this);
-								String nameFilePreview = info.getTitle();
-								File preview = new File(previewDir, nameFilePreview);
-
-								boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());
-
-								if(isPreview){
-									log("Preview: "+preview.getAbsolutePath());
-									String fingerprint = megaApi.getFingerprint(preview.getAbsolutePath());
-
-									pMsgSingle.setFilePath(preview.getAbsolutePath());
-									pMsgSingle.setName(info.getTitle());
-									pMsgSingle.setFingerprint(fingerprint);
-								}
-								else{
-									log("No preview");
-									String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-									pMsgSingle.setFilePath(info.getFileAbsolutePath());
-									pMsgSingle.setName(info.getTitle());
-									pMsgSingle.setFingerprint(fingerprint);
-								}
-							}
-						}
-						else{
-							String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-
-							pMsgSingle.setFilePath(info.getFileAbsolutePath());
-							pMsgSingle.setName(info.getTitle());
-							pMsgSingle.setFingerprint(fingerprint);
-						}
-
-						long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
-						pMsgSingle.setId(idMessage);
-
-						if(idMessage!=-1){
-							intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
-
-							log("name of the file: "+info.getTitle());
-							log("size of the file: "+info.getSize());
-
-							intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-
-							startService(intent);
-						}
-						else{
-							log("Error when adding pending msg to the database");
-						}
-					}
-				}
-				else{
-					filePreparedInfos = null;
-					log("ERROR null files to upload");
-					finishActivity();
-				}
-
+			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			if(myChatFilesNode == null){
+				log("Create folder: "+Constants.CHAT_FOLDER);
+				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), this);
 			}
-
-			if (statusDialog != null) {
-				try {
-					statusDialog.dismiss();
-				}
-				catch(Exception ex){}
+			else {
+				checkIfFilesExistsInMEGA();
 			}
-
-			if(chatListItems.size()==1){
-				MegaChatListItem chatItem = chatListItems.get(0);
-				long idChat = chatItem.getChatId();
-				if(chatItem!=null){
-					Intent intent = new Intent(this, ManagerActivityLollipop.class);
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-					intent.putExtra("CHAT_ID", idChat);
-					startActivity(intent);
-				}
-			}
-			else{
-				Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
-				chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
-				startActivity(chatIntent);
-			}
-
-			filePreparedInfos = null;
-			log("finish!!!");
-			finishActivity();
 		}
 	}
 	
@@ -1671,7 +1813,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
-				Snackbar.make(fragmentContainer,getString(R.string.upload_can_not_open),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.upload_can_not_open));
 				return;
 			}
 			else {
@@ -1686,7 +1828,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.upload_began));
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -1714,6 +1856,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         setResult(RESULT_OK, intent);
 		finishActivity();
     }
+
+    void createAndShowProgressDialog (boolean cancelable, int string) {
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(string));
+			temp.setCancelable(cancelable);
+			temp.setCanceledOnTouchOutside(cancelable);
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+	}
 	
 	public void buttonClick(long handle){
 		log("buttonClick");
@@ -1819,16 +1976,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				
 				OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 				ownFilePrepareTask.execute(getIntent());
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
+				createAndShowProgressDialog(false, R.string.upload_prepare);
 			}
 			else{
 				onIntentProcessed();
@@ -1912,11 +2060,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
     public void showSnackbar(String s){
-        log("showSnackbar: "+s);
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+		showSnackbar(fragmentContainer, s);
     }
 
     private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
@@ -1928,8 +2072,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			file = Util.createTemporalTextFile(name, data);
 		}
 		if(file!=null){
-			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
-
+			showSnackbar(getString(R.string.upload_began));
 			Intent intent = new Intent(this, UploadService.class);
 			intent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 			intent.putExtra(UploadService.EXTRA_NAME, file.getName());
@@ -1942,7 +2085,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finishActivity();
 		}
 		else{
-			Snackbar.make(fragmentContainer,getString(R.string.email_verification_text_error),Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.email_verification_text_error));
 		}
 	}
 
@@ -2062,7 +2205,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				megaApi.createFolder(title, parentNode, this);
 			}
 			else{
-				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+				showSnackbar(getString(R.string.context_folder_already_exists));
 			}
 		}
 		else{
@@ -2092,7 +2235,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					megaApi.createFolder(title, parentNode, this);
 				}
 				else{
-					Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
+					showSnackbar(getString(R.string.context_folder_already_exists));
 				}
 			}
 			else{
@@ -2132,51 +2275,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (error.getErrorCode() == MegaError.API_OK){
-
-				if(tabShown==CLOUD_TAB){
-					String gcFTag;
-					if(isChatFirst){
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-					}
-					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					}
-					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-					if (cDriveExplorer != null){
-						cDriveExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleCloud = request.getNodeHandle();
-						log("The handle of the created folder is: "+parentHandleCloud);
-					}						
+			myChatFilesNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			if (myChatFilesNode != null && myChatFilesNode.getHandle() == request.getNodeHandle()) {
+				checkIfFilesExistsInMEGA();
+			}
+			else {
+				try {
+					statusDialog.dismiss();
 				}
-				else if (tabShown == NO_TABS){
-					if (importFileF && importFragmentSelected != -1) {
-						switch (importFragmentSelected) {
-							case CLOUD_FRAGMENT: {
-								if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
-									cDriveExplorer.navigateToFolder(request.getNodeHandle());
-								}
-								break;
-							}
-							case INCOMING_FRAGMENT: {
-								if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
-									iSharesExplorer.navigateToFolder(request.getNodeHandle());
-								}
-								break;
-							}
-						}
-					}
-					else if (cDriveExplorer != null){
-						cDriveExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleCloud = request.getNodeHandle();
-					}
-					else{
+				catch (Exception ex) {}
+
+				if (error.getErrorCode() == MegaError.API_OK){
+
+					if(tabShown==CLOUD_TAB){
 						String gcFTag;
 						if(isChatFirst){
 							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
@@ -2188,23 +2299,60 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (cDriveExplorer != null){
 							cDriveExplorer.navigateToFolder(request.getNodeHandle());
 							parentHandleCloud = request.getNodeHandle();
+							log("The handle of the created folder is: "+parentHandleCloud);
 						}
 					}
-					log("The handle of the created folder is: "+parentHandleCloud);
-				}
-				else{
-
-					String gcFTag;
-					if(isChatFirst){
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+					else if (tabShown == NO_TABS){
+						if (importFileF && importFragmentSelected != -1) {
+							switch (importFragmentSelected) {
+								case CLOUD_FRAGMENT: {
+									if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
+										cDriveExplorer.navigateToFolder(request.getNodeHandle());
+									}
+									break;
+								}
+								case INCOMING_FRAGMENT: {
+									if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
+										iSharesExplorer.navigateToFolder(request.getNodeHandle());
+									}
+									break;
+								}
+							}
+						}
+						else if (cDriveExplorer != null){
+							cDriveExplorer.navigateToFolder(request.getNodeHandle());
+							parentHandleCloud = request.getNodeHandle();
+						}
+						else{
+							String gcFTag;
+							if(isChatFirst){
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+							}
+							else{
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+							}
+							cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+							if (cDriveExplorer != null){
+								cDriveExplorer.navigateToFolder(request.getNodeHandle());
+								parentHandleCloud = request.getNodeHandle();
+							}
+						}
+						log("The handle of the created folder is: "+parentHandleCloud);
 					}
 					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-					}
-					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-					if (iSharesExplorer != null){
-						iSharesExplorer.navigateToFolder(request.getNodeHandle());
-						parentHandleIncoming = request.getNodeHandle();
+
+						String gcFTag;
+						if(isChatFirst){
+							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+						}
+						else{
+							gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+						}
+						iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+						if (iSharesExplorer != null){
+							iSharesExplorer.navigateToFolder(request.getNodeHandle());
+							parentHandleIncoming = request.getNodeHandle();
+						}
 					}
 				}
 			}
@@ -2241,9 +2389,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);
-
-				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();*/
+				prepareNodesText.setVisibility(View.GONE);*/
 				
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
@@ -2276,13 +2422,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if (error.getErrorCode() == MegaError.API_OK){
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					Window window = this.getWindow();
-					window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-					window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-					window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
-				}
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
@@ -2331,6 +2472,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				}
 			}	
+		}
+		else if (request.getType() == MegaRequest.TYPE_COPY) {
+			filesChecked++;
+			if (error.getErrorCode() == MegaError.API_OK) {
+				MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+				if (node != null) {
+					attachNodes.add(node);
+				}
+			}
+			else {
+				log("Error copying node into My Chat Files");
+			}
+			if (filesChecked == filePreparedInfos.size()) {
+				startChatUploadService();
+			}
 		}
 	}
 
@@ -2440,6 +2596,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void setToolbarSubtitle(String s) {
+		aB.setSubtitle(s);
+	}
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -2460,11 +2620,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(megaApi!=null && megaApi.getRootNode()!=null){
 					ArrayList<MegaUser> contacts = megaApi.getContacts();
 					if(contacts==null){
-						showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+						showSnackbar(getString(R.string.no_contacts_invite));
 					}
 					else {
 						if(contacts.isEmpty()){
-							showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
+							showSnackbar(getString(R.string.no_contacts_invite));
 						}
 						else{
 							Intent in = new Intent(this, AddContactActivityLollipop.class);
@@ -2505,6 +2665,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else{
+					log("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
 					for (int i=0; i<contactsData.size(); i++){
 						MegaUser user = megaApi.getContact(contactsData.get(i));
@@ -2513,41 +2674,44 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					log("create group chat with participants: "+peers.size());
+
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-					if(chatTitle!=null){
-						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
-						megaChatApi.createChat(true, peers, listener);
+					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
+					if (isEKR) {
+						megaChatApi.createChat(true, peers, chatTitle, this);
 					}
-					else{
-						megaChatApi.createChat(true, peers, this);
+					else {
+						final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
+
+						if(chatLink){
+							if(chatTitle!=null && !chatTitle.isEmpty()){
+								CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
+								megaChatApi.createPublicChat(peers, chatTitle, listener);
+							}
+							else{
+								Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+							}
+						}
+						else{
+							megaChatApi.createPublicChat(peers, chatTitle, this);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
 		log("onRequestFinishCreateChat");
 
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 			//Update chat view
-			String chatTag1;
-			if (importFileF) {
-				chatTag1  ="chatExplorer";
-			}
-			else {
-				if (isChatFirst) {
-					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
-				}
-				else {
-					chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
-				}
-			}
-			chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
-			if(chatExplorer!=null && chatExplorer.isAdded()){
+			chatExplorer = getChatExplorerFragment();
+			if(chatExplorer!=null){
 				chatExplorer.setChats();
 			}
+			showSnackbar(getString(R.string.new_group_chat_created));
 		}
 		else{
 			log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
@@ -2725,38 +2889,88 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		});
 	}
 
+	void getChatAdded (ArrayList<ChatExplorerListItem> listItems) {
+		ArrayList<MegaChatRoom> chats = new ArrayList<>();
+		ArrayList<MegaUser> users = new ArrayList<>();
+
+		createAndShowProgressDialog(true, R.string.preparing_chats);
+
+		for (ChatExplorerListItem item : listItems) {
+			if (item.getChat() != null) {
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(item.getChat().getChatId());
+				if (chatRoom != null) {
+					chats.add(chatRoom);
+				}
+			}
+			else if (item.getContact() != null && item.getContact().getMegaUser() != null) {
+				users.add(item.getContact().getMegaUser());
+			}
+		}
+
+		if (!users.isEmpty()) {
+			CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, users, -1, this, CreateChatToPerformActionListener.SEND_FILE_EXPLORER_CONTENT);
+
+			for (MegaUser user : users) {
+				MegaChatPeerList peers = MegaChatPeerList.createInstance();
+				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+				megaChatApi.createChat(false, peers, listener);
+			}
+		}
+		else {
+			sendToChats(chats);
+		}
+	}
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");
 
 		switch(v.getId()) {
 			case R.id.fab_file_explorer: {
-
-				String chatTag1;
-				if (importFileF) {
-					chatTag1  ="chatExplorer";
-				}
-				else {
-					if(isChatFirst){
-						chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					}
-					else{
-						chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+				chatExplorer = getChatExplorerFragment();
+				if(chatExplorer!=null){
+					if(chatExplorer.getAddedChats()!=null){
+//						sendToChats(chatExplorer.getAddedChats());
+						getChatAdded(chatExplorer.getAddedChats());
 					}
 				}
-				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
-				if(chatExplorer!=null && chatExplorer.isAdded()){
-					if(chatExplorer.getSelectedChats()!=null){
-						sendToChats(chatExplorer.getSelectedChats());
+				break;
+			}
+			case R.id.new_group_button: {
+				if(megaApi!=null && megaApi.getRootNode()!=null){
+					ArrayList<MegaUser> contacts = megaApi.getContacts();
+					if(contacts==null){
+						showSnackbar(getString(R.string.no_contacts_invite));
 					}
+					else {
+						if(contacts.isEmpty()){
+							showSnackbar(getString(R.string.no_contacts_invite));
+						}
+						else{
+							Intent intent = new Intent(this, AddContactActivityLollipop.class);
+							intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+							intent.putExtra("onlyCreateGroup", true);
+							startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
+						}
+					}
+				}
+				else{
+					log("Online but not megaApi");
+					Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
 				break;
 			}
 		}
 	}
 
-	public void sendToChats(ArrayList<MegaChatListItem> chatListItems){
-		log("sendToChats");
+	public void sendToChats(ArrayList<MegaChatRoom> chatListItems){
+
+		if (statusDialog != null) {
+			try {
+				statusDialog.dismiss();
+			}
+			catch(Exception ex){}
+		}
 
 		this.chatListItems = chatListItems;
 
@@ -2792,7 +3006,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 
 				if(chatListItems.size()==1){
-					MegaChatListItem chatItem = chatListItems.get(0);
+					MegaChatRoom chatItem = chatListItems.get(0);
 					long idChat = chatItem.getChatId();
 					if(chatItem!=null){
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -2812,16 +3026,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if (filePreparedInfos == null){
 					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 					filePrepareTask.execute(getIntent());
-					ProgressDialog temp = null;
-					try{
-						temp = new ProgressDialog(this);
-						temp.setMessage(getString(R.string.upload_prepare));
-						temp.show();
-					}
-					catch(Exception e){
-						return;
-					}
-					statusDialog = temp;
+					createAndShowProgressDialog(false, R.string.upload_prepare);
 				}
 				else{
                     onIntentChatProcessed(filePreparedInfos);
@@ -2832,16 +3037,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (filePreparedInfos == null){
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(getIntent());
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
+				createAndShowProgressDialog(false, R.string.upload_prepare);
 			}
 			else{
 				onIntentChatProcessed(filePreparedInfos);
@@ -3246,6 +3442,67 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		return m.find();
+	}
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+	}
+
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+	}
+
+	@Override
+	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+		int state = megaChatApi.getUserOnlineStatus(userhandle);
+		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
+			String formattedDate = TimeUtils.lastGreenDate(this, lastGreen);
+			if (userhandle != megaChatApi.getMyUserHandle()) {
+				chatExplorer = getChatExplorerFragment();
+				if (chatExplorer != null) {
+					chatExplorer.updateLastGreenContact(userhandle, formattedDate);
+				}
+			}
+		}
+	}
+
+	ChatExplorerFragment getChatExplorerFragment () {
+		String chatTag1;
+		if (importFileF) {
+			chatTag1  ="chatExplorer";
+		}
+		else {
+			if(isChatFirst){
+				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			}
+			else{
+				chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			}
+		}
+		return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
+	}
+
+	public void collapseSearchView () {
+		if (searchMenuItem != null) {
+			searchMenuItem.collapseActionView();
+		}
 	}
 
 	public long getParentHandleCloud() {
