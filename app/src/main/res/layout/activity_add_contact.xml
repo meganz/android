@@ -8,297 +8,483 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
 
+	<android.support.v7.widget.Toolbar
+		android:id="@+id/add_contact_toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		app:titleTextColor="@color/name_my_account"
+		app:subtitleTextColor="@color/mail_my_account"
+		android:background="?attr/colorPrimary"
+		app:popupTheme="@style/Theme.Megaactionbar"
+		app:titleTextAppearance="@style/ToolbarTitle"
+		app:subtitleTextAppearance="@style/ToolbarSubtitle"
+		app:theme="@style/Theme.Megaactionbar"/>
+
 	<LinearLayout
-		android:id="@+id/container_linear_layout"
+		android:id="@+id/add_contacts_container"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:background="@color/white">
+		android:layout_below="@+id/add_contact_toolbar">
 
 		<LinearLayout
-			android:id="@+id/container_toolbar"
+			android:id="@+id/container_linear_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
-			android:background="@color/white"
-			android:layout_marginBottom="4dp"
-			android:elevation="4dp">
+			android:background="@color/white">
 
-			<android.support.v7.widget.Toolbar
-				android:id="@+id/add_contact_toolbar"
+			<RelativeLayout
+				android:id="@+id/layout_type_mail"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/camera_uploads_list_view"
-				app:titleTextColor="@color/mail_my_account"
-				app:subtitleTextColor="@color/mail_my_account"
-				app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+				android:layout_height="60dp"
+				android:background="@color/white">
+
+				<EditText
+					android:id="@+id/type_mail_edittext"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:maxLines="1"
+					android:hint="@string/type_mail"
+					android:textColorHint="@color/mail_my_account"
+					android:textSize="14sp"
+					android:textColor="@color/text_login"
+					android:layout_marginLeft="18dp"
+					android:layout_marginRight="18dp"
+					android:layout_centerVertical="true"
+					android:inputType="textEmailAddress"
+					android:textCursorDrawable="@drawable/cursor_color"
+					android:backgroundTint="@color/white"/>
+
+				<RelativeLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginRight="18dp"
+					android:layout_marginLeft="22dp"
+					android:layout_marginTop="-10dp"
+					android:id="@+id/add_contact_email_error"
+					android:layout_below="@id/type_mail_edittext">
+
+					<ImageView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:id="@+id/login_email_text_error_icon"
+						android:layout_alignParentRight="true"
+						android:src="@drawable/ic_input_warning"
+						android:tint="@color/login_warning"/>
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:id="@+id/login_email_text_error_text"
+						android:textColor="@color/login_warning"
+						android:layout_toLeftOf="@id/login_email_text_error_icon"
+						android:layout_alignParentLeft="true"
+						android:text="@string/invalid_email_to_invite"
+						android:layout_centerInParent="true"/>
+
+				</RelativeLayout>
+
+				<View
+					android:id="@+id/separator_type"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:layout_alignParentBottom="true"/>
+
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/layout_scan_qr"
+				android:layout_width="match_parent"
+				android:layout_height="56dp"
+				android:background="@color/white">
+
+				<Button
+					android:id="@+id/scan_qr_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/menu_item_scan_code"
+					android:textSize="14sp"
+					android:textColor="@color/accentColor"
+					android:paddingLeft="16dp"
+					android:layout_centerVertical="true"
+					style="?android:attr/borderlessButtonStyle"/>
+
+				<View
+					android:id="@+id/separator_scan_qr"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:layout_alignParentBottom="true"/>
+
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/layout_invite_contact"
+				android:layout_width="match_parent"
+				android:layout_height="56dp"
+				android:background="@color/white">
+
+				<Button
+					android:id="@+id/invite_contact_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/invite_contacts"
+					android:textColor="@color/accentColor"
+					android:textSize="14sp"
+					android:paddingLeft="16dp"
+					android:layout_centerVertical="true"
+					style="?android:attr/borderlessButtonStyle"/>
+
+				<View
+					android:id="@+id/separator_invite_contact"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:layout_alignParentBottom="true"/>
+
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/layout_group_chat"
+				android:layout_width="match_parent"
+				android:layout_height="56dp"
+				android:background="@color/white">
+
+				<Button
+					android:id="@+id/group_chat_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/new_group_chat_label"
+					android:textColor="@color/accentColor"
+					android:textSize="14sp"
+					android:paddingLeft="16dp"
+					android:layout_centerVertical="true"
+					style="?android:attr/borderlessButtonStyle"/>
+
+				<View
+					android:id="@+id/separator_new_group"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:background="@color/divider_upgrade_account"
+					android:layout_alignParentBottom="true"/>
+
+			</RelativeLayout>
+
+			<RelativeLayout
+				android:id="@+id/contacts_adds_container"
+				android:layout_width="match_parent"
+				android:layout_height="90dp"
+				android:background="@color/white"
+				android:layout_below="@id/add_contact_toolbar">
+
+				<android.support.v7.widget.RecyclerView
+					android:id="@+id/contact_adds_recycler_view"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:orientation="horizontal"
+					android:layout_centerHorizontal="true"/>
+
+			</RelativeLayout>
+
 
 		</LinearLayout>
 
 		<RelativeLayout
-			android:id="@+id/layout_type_mail"
+			android:id="@+id/add_contact_list_layout"
 			android:layout_width="match_parent"
-			android:layout_height="60dp"
+			android:layout_height="match_parent"
+			android:layout_below="@id/container_linear_layout"
 			android:background="@color/white">
 
-			<EditText
-				android:id="@+id/type_mail_edittext"
+			<LinearLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:maxLines="1"
-				android:hint="@string/type_mail"
-				android:textColorHint="@color/mail_my_account"
-				android:textSize="14sp"
-				android:textColor="@color/text_login"
-				android:layout_marginLeft="18dp"
-				android:layout_marginRight="18dp"
-				android:layout_centerVertical="true"
-				android:inputType="textEmailAddress|text"
-				android:textCursorDrawable="@drawable/cursor_color"
-				android:backgroundTint="@color/white"
-				android:singleLine="true"/>
-
-			<RelativeLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginRight="18dp"
-				android:layout_marginLeft="22dp"
-				android:layout_marginTop="-10dp"
-				android:id="@+id/add_contact_email_error"
-				android:layout_below="@id/type_mail_edittext">
+				android:layout_height="match_parent"
+				android:orientation="vertical"
+				android:layout_centerInParent="true">
 
 				<ImageView
+					android:id="@+id/add_contact_list_empty_image"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:id="@+id/login_email_text_error_icon"
-					android:layout_alignParentRight="true"
-					android:src="@drawable/ic_input_warning"
-					android:tint="@color/login_warning"/>
+					android:layout_gravity="center_horizontal"/>
 
 				<TextView
+					android:id="@+id/add_contact_list_empty_text"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:id="@+id/login_email_text_error_text"
-					android:textColor="@color/login_warning"
-					android:layout_toLeftOf="@id/login_email_text_error_icon"
-					android:layout_alignParentLeft="true"
-					android:text="@string/invalid_email_to_invite"
-					android:layout_centerInParent="true"/>
+					android:gravity="center"
+					android:layout_gravity="center_horizontal"
+					android:textColor="@color/text_secondary"
+					android:textSize="18sp"/>
+
+				<ProgressBar
+					android:id="@+id/add_contact_progress_bar"
+					style="?android:attr/progressBarStyleLargeInverse"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal"
+					android:visibility="gone"
+					android:layout_marginTop="10dp" />
+			</LinearLayout>
+
+			<RelativeLayout
+				android:id="@+id/container_list_contacts"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp">
+
+				<RelativeLayout
+					android:id="@+id/header_list"
+					android:layout_width="match_parent"
+					android:layout_height="36dp">
+
+					<TextView
+						android:id="@+id/text_header_list"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
+						android:textColor="@color/name_my_account"
+						android:fontFamily="sans-serif-light"
+						android:textStyle="bold"
+						android:textSize="14sp"
+						android:layout_marginLeft="16dp"/>
+
+				</RelativeLayout>
+
+				<FrameLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_below="@+id/header_list">
+
+					<android.support.v7.widget.RecyclerView
+						android:id="@+id/add_contact_list"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:choiceMode="multipleChoice"
+						android:orientation="vertical"/>
+
+				</FrameLayout>
+
+				<mega.privacy.android.app.components.scrollBar.FastScroller
+					android:id="@+id/fastscroll"
+					android:orientation="vertical"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:layout_alignParentRight="true"
+					android:layout_below="@+id/header_list"/>
 
 			</RelativeLayout>
-
-			<LinearLayout
-				android:id="@+id/separator_type"
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:background="@color/sliding_panel_separator"
-				android:orientation="vertical"
-				android:layout_alignParentBottom="true"/>
-
-		</RelativeLayout>
-
-		<RelativeLayout
-			android:id="@+id/layout_scan_qr"
-			android:layout_width="match_parent"
-			android:layout_height="56dp"
-			android:background="@color/white">
-
-			<Button
-				android:id="@+id/scan_qr_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/menu_item_scan_code"
-				android:textSize="14sp"
-				android:textColor="@color/accentColor"
-				android:paddingLeft="24dp"
-				android:layout_centerVertical="true"
-				style="?android:attr/borderlessButtonStyle"/>
-
-		</RelativeLayout>
-
-		<RelativeLayout
-			android:id="@+id/layout_invite_contact"
-			android:layout_width="match_parent"
-			android:layout_height="56dp"
-			android:background="@color/white">
-
-			<Button
-				android:id="@+id/invite_contact_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/invite_contacts"
-				android:textColor="@color/accentColor"
-				android:textSize="14sp"
-				android:paddingLeft="24dp"
-				android:layout_centerVertical="true"
-				style="?android:attr/borderlessButtonStyle"/>
-
-			<LinearLayout
-				android:id="@+id/separator_invite_contact"
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:background="@color/sliding_panel_separator"
-				android:orientation="vertical"
-				android:layout_alignParentBottom="true"/>
-
-		</RelativeLayout>
-
-		<RelativeLayout
-			android:id="@+id/layout_group_chat"
-			android:layout_width="match_parent"
-			android:layout_height="56dp"
-			android:background="@color/white">
-
-			<Button
-				android:id="@+id/group_chat_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/new_group_chat_label"
-				android:textColor="@color/accentColor"
-				android:textSize="14sp"
-				android:paddingLeft="24dp"
-				android:layout_centerVertical="true"
-				style="?android:attr/borderlessButtonStyle"/>
-
-		</RelativeLayout>
-
-		<LinearLayout
-			android:id="@+id/separator_up"
-			android:layout_below="@+id/container_linear_layout"
-			android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:background="@color/sliding_panel_separator"
-			android:orientation="vertical"/>
-
-		<RelativeLayout
-			android:id="@+id/contacts_adds_container"
-			android:layout_width="match_parent"
-			android:layout_height="90dp"
-			android:background="@color/white"
-			android:layout_below="@id/add_contact_toolbar">
-
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/contact_adds_recycler_view"
-				android:layout_width="wrap_content"
-				android:layout_height="match_parent"
-				android:orientation="horizontal"
-				android:layout_centerHorizontal="true"/>
-
-			<android.support.design.widget.FloatingActionButton
-				android:id="@+id/image_group_floating_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:elevation="@dimen/elevation_low"
-				android:layout_marginLeft="16sp"
-				android:layout_marginRight="16dp"
-				android:layout_centerVertical="true"
-				android:src="@drawable/ic_w_take_photo"/>
-
-			<EditText
-				android:id="@+id/name_group_edittext"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:maxLines="1"
-				android:background="@android:color/transparent"
-				android:layout_centerVertical="true"
-				android:layout_toRightOf="@+id/image_group_floating_button"
-				android:layout_marginRight="16dp"
-				android:hint="@string/hint_type_group"
-				android:textSize="16sp"
-				android:textColorHint="@color/mail_my_account"
-				android:textColor="@color/name_my_account"
-				android:fontFamily="roboto"
-				android:visibility="gone"/>
 
 		</RelativeLayout>
 
 	</LinearLayout>
 
-	<RelativeLayout
-		android:id="@+id/add_contact_list_layout"
+	<android.support.v4.widget.NestedScrollView
+		android:id="@+id/new_group_layout"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_below="@id/container_linear_layout"
-		android:background="@color/white">
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/add_contact_toolbar"
+		android:visibility="gone">
 
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:orientation="vertical"
-			android:layout_centerInParent="true">
-
-			<ImageView
-				android:id="@+id/add_contact_list_empty_image"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_horizontal"/>
-
-            <TextView
-                android:id="@+id/add_contact_list_empty_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-				android:layout_gravity="center_horizontal"
-                android:textColor="@color/text_secondary"
-                android:textSize="18sp"/>
-
-			<ProgressBar
-				android:id="@+id/add_contact_progress_bar"
-				style="?android:attr/progressBarStyleLargeInverse"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_horizontal"
-				android:visibility="gone"
-				android:layout_marginTop="10dp" />
-        </LinearLayout>
-
-		<RelativeLayout
-			android:id="@+id/container_list_contacts"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
+			android:orientation="vertical">
 
 			<RelativeLayout
-				android:id="@+id/header_list"
+				android:id="@+id/new_group_contacts_adds_container"
 				android:layout_width="match_parent"
-				android:background="@color/camera_uploads_list_view"
-				android:layout_height="48dp">
+				android:layout_height="90dp"
+				android:background="@color/white"
+				android:layout_below="@id/add_contact_toolbar">
 
-				<TextView
-					android:id="@+id/text_header_list"
+				<android.support.design.widget.FloatingActionButton
+					android:id="@+id/image_group_floating_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:elevation="@dimen/elevation_low"
+					android:layout_marginLeft="16sp"
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true"
+					android:src="@drawable/ic_w_take_photo"/>
+
+				<EditText
+					android:id="@+id/name_group_edittext"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
+					android:maxLines="1"
+					android:background="@android:color/transparent"
 					android:layout_centerVertical="true"
-					android:textColor="@color/mail_my_account"
-					android:textSize="14sp"
-					android:layout_marginLeft="16dp"/>
+					android:layout_toRightOf="@+id/image_group_floating_button"
+					android:layout_marginRight="16dp"
+					android:hint="@string/hint_type_group"
+					android:textSize="16sp"
+					android:textColorHint="@color/mail_my_account"
+					android:textColor="@color/name_my_account"
+					android:fontFamily="roboto"/>
 
 			</RelativeLayout>
 
-			<FrameLayout
+			<View
+				android:id="@+id/separator_name_group"
+				android:layout_below="@+id/contacts_adds_container"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/header_list">
+				android:layout_height="1dp"
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="16dp"
+				android:background="@color/divider_upgrade_account"/>
 
-				<android.support.v7.widget.RecyclerView
-					android:id="@+id/add_contact_list"
+			<LinearLayout
+				android:id="@+id/ekr_layout"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:orientation="vertical">
+
+				<android.support.v7.widget.SwitchCompat
+					android:id="@+id/ekr_switch"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:choiceMode="multipleChoice"
-					android:orientation="vertical"/>
+					android:textSize="16sp"
+					android:textColor="@color/name_my_account"
+					android:fontFamily="roboto"
+					android:checked="false"
+					android:text="@string/ekr_label"
+					android:layout_marginTop="14dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="6dp"/>
 
-			</FrameLayout>
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="13dp"
+					android:textSize="14sp"
+					android:textColor="@color/mail_my_account"
+					android:fontFamily="roboto"
+					android:text="@string/ekr_explanation"
+					android:layout_marginBottom="7dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"/>
 
-			<mega.privacy.android.app.components.scrollBar.FastScroller
-				android:id="@+id/fastscroll"
-				android:orientation="vertical"
-				android:layout_width="wrap_content"
+				<RelativeLayout
+					android:id="@+id/get_chat_link_layout"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_below="@+id/contacts_adds_container">
+
+					<View
+						android:id="@+id/separator_ekr"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp"
+						android:background="@color/divider_upgrade_account"/>
+
+					<RelativeLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="15dp"
+						android:layout_marginBottom="15dp"
+						android:layout_below="@+id/separator_ekr"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp">
+
+						<TextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_centerVertical="true"
+							android:textSize="16sp"
+							android:textColor="@color/name_my_account"
+							android:fontFamily="roboto"
+							android:text="@string/get_chat_link_option"/>
+
+						<CheckBox
+							android:id="@+id/get_chat_link_checkbox"
+							android:layout_centerVertical="true"
+							android:layout_alignParentRight="true"
+							android:layout_marginRight="-6dp"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:theme="@style/ColorControlStyle"/>
+
+					</RelativeLayout>
+
+					<View
+						android:id="@+id/separator_get_chat_link"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp"
+						android:background="@color/divider_upgrade_account"
+						android:layout_alignParentBottom="true"/>
+
+				</RelativeLayout>
+
+			</LinearLayout>
+
+			<RelativeLayout
+				android:id="@+id/new_group_add_contact_list_layout"
+				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:layout_alignParentRight="true"
-				android:layout_below="@+id/header_list"/>
+				android:layout_below="@id/container_linear_layout"
+				android:background="@color/white">
 
-		</RelativeLayout>
+				<RelativeLayout
+					android:id="@+id/new_group_container_list_contacts"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
 
-	</RelativeLayout>
+					<RelativeLayout
+						android:id="@+id/new_group_header_list"
+						android:layout_width="match_parent"
+						android:layout_height="36dp">
+
+						<TextView
+							android:id="@+id/new_group_text_header_list"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:layout_centerVertical="true"
+							android:textColor="@color/name_my_account"
+							android:textSize="14sp"
+							android:fontFamily="sans-serif-light"
+							android:textStyle="bold"
+							android:layout_marginLeft="16dp"/>
+
+					</RelativeLayout>
+
+					<FrameLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_below="@+id/new_group_header_list">
+
+						<android.support.v7.widget.RecyclerView
+							android:id="@+id/new_group_add_contact_list"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:choiceMode="multipleChoice"
+							android:orientation="vertical"/>
+
+					</FrameLayout>
+
+				</RelativeLayout>
+
+			</RelativeLayout>
+
+		</LinearLayout>
+
+	</android.support.v4.widget.NestedScrollView>
+
+	<android.support.design.widget.FloatingActionButton
+		android:id="@+id/fab_button_next"
+		android:layout_width="@dimen/fab_button_diameter"
+		android:layout_height="@dimen/fab_button_diameter"
+		android:elevation="@dimen/elevation_low"
+		android:layout_margin="16dp"
+		android:src="@drawable/ic_send_white"
+		android:stateListAnimator="@anim/button_elevation"
+		android:tint="@android:color/white"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"/>
+
 </RelativeLayout>

@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -151,6 +150,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     AlertDialog helpDialog;
     boolean isHelpDialogShown = false;
 
+    TwoFactorAuthenticationActivity twoFactorAuthenticationActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,6 +173,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
         }
+
+        twoFactorAuthenticationActivity = this;
 
         tB = (Toolbar) findViewById(R.id.toolbar);
         if(tB==null){
@@ -488,7 +491,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             public void afterTextChanged(Editable s) {
                 if (sixthPin.length()!=0){
                     sixthPin.setCursorVisible(true);
-                    hideKeyboard();
+                    Util.hideKeyboard(twoFactorAuthenticationActivity, 0);
 
                     if (pinLongClick) {
                         pasteClipboard();
@@ -749,7 +752,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         log("permitVerify");
         if (confirm2FAIsShown && firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
                 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-            hideKeyboard();
+            Util.hideKeyboard(this, 0);
             if (sb.length()>0) {
                 sb.delete(0, sb.length());
             }
@@ -883,14 +886,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             else {
                 showSnackbar(getResources().getString(R.string.qr_seed_text_error));
             }
-        }
-    }
-
-    void hideKeyboard(){
-
-        View v = this.getCurrentFocus();
-        if (v != null){
-            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
 
@@ -1281,11 +1276,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     public void showSnackbar(String s){
-        log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(container2FA, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(container2FA, s);
     }
 
     @Override

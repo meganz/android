@@ -921,10 +921,9 @@ public final class ChatAdvancedNotificationBuilder {
             int requestCodeAnswer = notificationId + 2;
             PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
-            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_started,
-                    context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
-            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_call_rejected,
-                    context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
+            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming), pendingIntentAnswer).build();
+            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming), pendingIntentIgnore).build();
+
 
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 

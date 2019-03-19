@@ -81,39 +81,47 @@
 		android:layout_toLeftOf="@id/file_list_three_dots_layout"
 		android:layout_centerVertical="true"
 		android:visibility="gone"/>
-    
-    <ImageView
-        android:id="@+id/file_list_public_link"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/link_ic"
-		android:background="@null"
-		android:alpha="0.35"
-        android:layout_centerVertical="true"
-		android:layout_marginRight="12dp"
-		android:layout_marginLeft="12dp"
-        android:layout_toLeftOf="@id/file_list_three_dots_layout"/>
-        
-	<TextView
-		android:id="@+id/file_list_filename"
-		android:layout_width="wrap_content"
+
+	<RelativeLayout
+		android:id="@+id/file_list_filename_layout"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/container_thumbnail"
-		android:layout_toLeftOf="@id/file_list_public_link"
+		android:layout_toLeftOf="@id/file_list_three_dots_layout"
 		android:layout_marginTop="15dp"
-		android:layout_marginLeft="12dp"
-		android:textColor="@color/file_list_first_row"
-		android:maxLines="1"
-		android:singleLine="true"
-		android:ellipsize="middle"
-		android:textSize="16sp"/>
+		android:layout_marginLeft="12dp">
+
+		<TextView
+			android:id="@+id/file_list_filename"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textColor="@color/file_list_first_row"
+			android:maxLines="1"
+			android:singleLine="true"
+			android:ellipsize="middle"
+			android:textSize="16sp"/>
+
+		<ImageView
+			android:id="@+id/file_list_public_link"
+			android:layout_width="16dp"
+			android:layout_height="16dp"
+			android:src="@drawable/link_ic"
+			android:background="@null"
+			android:alpha="0.35"
+			android:layout_centerVertical="true"
+			android:layout_toRightOf="@+id/file_list_filename"
+			android:layout_marginTop="6dp"
+			android:layout_marginRight="6dp"
+			android:layout_marginLeft="6dp"/>
+
+	</RelativeLayout>
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/container_thumbnail"
-		android:layout_toLeftOf="@id/file_list_public_link"
-		android:layout_below="@+id/file_list_filename"
+		android:layout_toLeftOf="@id/file_list_incoming_permissions"
+		android:layout_below="@+id/file_list_filename_layout"
 		android:layout_marginLeft="13dp">
 
 		<ImageView
