@@ -280,10 +280,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             infoLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_info_layout);
             infoLayout.setVisibility(View.VISIBLE);
-            LinearLayout.LayoutParams paramsInfo = (LinearLayout.LayoutParams) infoLayout.getLayoutParams();
-            paramsInfo.leftMargin = Util.scaleWidthPx(16, outMetrics);
-            paramsInfo.topMargin = Util.scaleHeightPx(2, outMetrics);
-            infoLayout.setLayoutParams(paramsInfo);
             avatarLayout = (RelativeLayout) findViewById(R.id.chat_group_properties_avatar_layout);
 
             infoTextContainerLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_info_text_container);
@@ -1371,7 +1367,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             log("Participants count: "+participantsCount);
             for(int i=0;i<participantsCount;i++){
-
                 if(request.getUserHandle()==participants.get(i).getHandle()){
                     participantToUpdate = participants.get(i);
 
@@ -1381,10 +1376,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
 
-            if(index!=-1&&participantToUpdate!=null){
+            if(index!=-1 && participantToUpdate!=null){
                 participants.set(index,participantToUpdate);
 //                adapter.setParticipants(participants);
-                adapter.updateParticipant(index, participants);
+                adapter.updateParticipant(index+1, participants);
             }
 
         }
