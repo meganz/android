@@ -98,7 +98,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6.1_228";
+	static final public String USER_AGENT = "MEGAAndroid/3.6.1_229";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
