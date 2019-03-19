@@ -123,6 +123,7 @@ public class AppRTCAudioManager {
     if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE)
         && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
       if (proximitySensor.sensorReportsNearState()) {
+
         // Sensor reports that a "handset is being held up to a person's ear",
         // or "something is covering the light sensor".
         setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
@@ -195,7 +196,6 @@ public class AppRTCAudioManager {
   }
 
   public void start(AudioManagerEvents audioManagerEvents) {
-    Log.d(TAG, "start");
     ThreadUtils.checkIsOnMainThread();
     if (amState == AudioManagerState.RUNNING) {
       Log.e(TAG, "AudioManager is already active");
@@ -513,6 +513,7 @@ public class AppRTCAudioManager {
       userSelectedAudioDevice = AudioDevice.NONE;
     }
     if (hasWiredHeadset && userSelectedAudioDevice == AudioDevice.SPEAKER_PHONE) {
+
       // If user selected speaker phone, but then plugged wired headset then make
       // wired headset as user selected device.
       userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
@@ -520,6 +521,7 @@ public class AppRTCAudioManager {
     if (!hasWiredHeadset && userSelectedAudioDevice == AudioDevice.WIRED_HEADSET) {
       // If user selected wired headset, but then unplugged wired headset then make
       // speaker phone as user selected device.
+
       userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
     }
 
