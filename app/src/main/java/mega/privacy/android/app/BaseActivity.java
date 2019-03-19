@@ -239,7 +239,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 if(!(this instanceof ChatCallActivity)){
                     log("Send signal presence if needed");
-                    if(megaChatApi.isSignalActivityRequired()){
+                    if(megaChatApi != null && megaChatApi.isSignalActivityRequired()){
                         megaChatApi.signalPresenceActivity();
                     }
                 }
