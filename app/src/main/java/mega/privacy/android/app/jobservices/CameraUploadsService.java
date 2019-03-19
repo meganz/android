@@ -543,47 +543,49 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     }
 
     private long getLastModifiedTime(SyncRecord file) {
-        String originalPath = file.getLocalPath();
-        long lastModified;
-        try {
-            ExifInterface exif = new ExifInterface(originalPath);
-            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
-            lastModified = sFormatter.parse(s).getTime();
-            if (lastModified == 0) {
-                lastModified = new File(originalPath).lastModified();
-                if (lastModified == 0) {
-                    lastModified = file.getTimestamp();
-                }
-            }
-        } catch (Exception e) {
-            lastModified = new File(originalPath).lastModified();
-            if (lastModified == 0) {
-                lastModified = file.getTimestamp();
-            }
-        }
-        return lastModified;
+        return file.getTimestamp();
+//        String originalPath = file.getLocalPath();
+//        long lastModified;
+//        try {
+//            ExifInterface exif = new ExifInterface(originalPath);
+//            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
+//            lastModified = sFormatter.parse(s).getTime();
+//            if (lastModified == 0) {
+//                lastModified = new File(originalPath).lastModified();
+//                if (lastModified == 0) {
+//                    lastModified = file.getTimestamp();
+//                }
+//            }
+//        } catch (Exception e) {
+//            lastModified = new File(originalPath).lastModified();
+//            if (lastModified == 0) {
+//                lastModified = file.getTimestamp();
+//            }
+//        }
+//        return lastModified;
     }
 
     private long getLastModifiedTime(Media media) {
-        String originalPath = media.filePath;
-        long lastModified;
-        try {
-            ExifInterface exif = new ExifInterface(originalPath);
-            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
-            lastModified = sFormatter.parse(s).getTime();
-            if (lastModified == 0) {
-                lastModified = new File(originalPath).lastModified();
-                if (lastModified == 0) {
-                    lastModified = media.timestamp;
-                }
-            }
-        } catch (Exception e) {
-            lastModified = new File(originalPath).lastModified();
-            if (lastModified == 0) {
-                lastModified = media.timestamp;
-            }
-        }
-        return lastModified;
+        return media.timestamp;
+//        String originalPath = media.filePath;
+//        long lastModified;
+//        try {
+//            ExifInterface exif = new ExifInterface(originalPath);
+//            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
+//            lastModified = sFormatter.parse(s).getTime();
+//            if (lastModified == 0) {
+//                lastModified = new File(originalPath).lastModified();
+//                if (lastModified == 0) {
+//                    lastModified = media.timestamp;
+//                }
+//            }
+//        } catch (Exception e) {
+//            lastModified = new File(originalPath).lastModified();
+//            if (lastModified == 0) {
+//                lastModified = media.timestamp;
+//            }
+//        }
+//        return lastModified;
     }
     
     private void saveDataToDB(ArrayList<SyncRecord> list) {

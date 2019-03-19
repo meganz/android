@@ -1386,6 +1386,9 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			cameraUploadHow.setSummary(wifi);
+            if (Util.isDeviceSupportParallelUpload()) {
+                cancelAllJobs(context);
+            }
 			handler.postDelayed(new Runnable() {
 				
 				@Override

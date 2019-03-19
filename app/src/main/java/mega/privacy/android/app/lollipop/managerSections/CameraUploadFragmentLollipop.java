@@ -1801,7 +1801,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
+							String localPath = null;//findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
 							if (localPath != null  && (megaApi.getFingerprint(psHMegaNode) != null && megaApi.getFingerprint(psHMegaNode).equals(megaApi.getFingerprint(localPath)))){
 								File mediaFile = new File(localPath);
 

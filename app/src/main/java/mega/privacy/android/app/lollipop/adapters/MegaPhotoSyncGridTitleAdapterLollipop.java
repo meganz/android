@@ -1279,7 +1279,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             }
                             mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
                         }
-                        String localPath = findLocalPath(file.getName(), file.getSize(), file);
+                        String localPath = null;//findLocalPath(file.getName(), file.getSize(), file);
                         if (localPath != null && (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
                             File mediaFile = new File(localPath);
 
