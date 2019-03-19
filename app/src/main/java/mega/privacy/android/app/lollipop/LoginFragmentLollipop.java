@@ -1391,6 +1391,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("startFastLogin: Chat is NOT ENABLED");
             }
             megaApi.fastLogin(gSession, this);
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING))  {
+                log("megaChatApi.refreshUrl()");
+                megaChatApi.refreshUrl();
+            }
         }
         else{
             log("Another login is proccessing");
