@@ -179,7 +179,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     }
 
     void showError (boolean correct) {
-        hideKeyboard();
+        Util.hideKeyboard(this, 0);
         if(containerPasswordError.getVisibility() == View.GONE){
             containerPasswordError.setVisibility(View.VISIBLE);
             Drawable background = password_background.mutate().getConstantState().newDrawable();
@@ -210,14 +210,6 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             } else{
                 passwordEditText.setBackground(background);
             }
-        }
-    }
-
-    void hideKeyboard (){
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 

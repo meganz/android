@@ -41,6 +41,7 @@ public class Constants {
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 	public static int REQUEST_CODE_FILE_INFO = 1027;
 	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
+	public static int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
@@ -183,8 +184,9 @@ public class Constants {
 	public static String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
 	public static String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
 
+	public static String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
+	public static String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
-	public static String ACTION_NEW_CHAT = "NEW_CHAT";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
 	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
@@ -197,6 +199,8 @@ public class Constants {
 	public static String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
 
 	public static String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
+
+	public static String ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE = "ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE";
 
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
@@ -288,9 +292,8 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
-
-
-	public static String CHAT_FOLDER = "My chat files";
+    
+    public static String CHAT_FOLDER = "My chat files";
 
 	public static int RICH_WARNING_TRUE = 1;
 	public static int RICH_WARNING_FALSE= 0;
@@ -327,4 +330,8 @@ public class Constants {
 
 	public static int FROM_INCOMING_SHARES= 140;
 	public static int FROM_INBOX= 150;
+
+	public static final int SNACKBAR_TYPE = 0;
+	public static final int MESSAGE_SNACKBAR_TYPE = 1;
+	public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 }

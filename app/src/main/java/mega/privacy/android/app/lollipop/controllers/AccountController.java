@@ -162,7 +162,7 @@ public class AccountController implements View.OnClickListener{
     public void exportMK(String path, boolean fromOffline){
         log("exportMK");
         if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -185,8 +185,7 @@ public class AccountController implements View.OnClickListener{
             log("Export in: "+path);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
+                if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 }
             }
@@ -200,7 +199,7 @@ public class AccountController implements View.OnClickListener{
 
             File file = new File(path);
             if(availableFreeSpace < file.length()) {
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
                 return;
             }
 
@@ -224,7 +223,7 @@ public class AccountController implements View.OnClickListener{
             }
             else {
                 if(fromOffline){
-                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
                 }
                 else{
                     showConfirmDialogRecoveryKeySaved();

@@ -3360,6 +3360,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return id;
 	}
 
+	public long addPendingMessageFromExplorer(PendingMessageSingle message){
+		ContentValues values = new ContentValues();
+		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId()+""));
+		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp()+""));
+		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.getFilePath()));
+		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.getFingerprint()));
+		values.put(KEY_PENDING_MSG_NAME, encrypt(message.getName()));
+		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER);
+
+		long id = db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
+		return id;
+	}
+
 	public PendingMessageSingle findPendingMessageById(long messageId){
 		log("findPendingMessageById");
 //		String id = messageId+"";
