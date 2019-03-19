@@ -1085,15 +1085,9 @@ public class ChatController {
             String handleString = MegaApiJava.userHandleToBase64(userHandle);
             log("The user handle to find is: "+handleString);
             MegaUser contact = megaApi.getContact(handleString);
-            if(contact!=null){
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    log("Is contact!");
-                    return getContactFullName(userHandle);
-                }
-                else{
-                    log("Old contact");
-                    return getNonContactFullName(userHandle);
-                }
+            if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                log("Is contact!");
+                return getContactFullName(userHandle);
             }
             else{
                 log("Non contact");
