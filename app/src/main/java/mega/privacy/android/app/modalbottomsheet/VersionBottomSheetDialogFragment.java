@@ -16,7 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -119,8 +122,8 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
             nodeName.setText(node.getName());
 
             long nodeSize = node.getSize();
-            nodeInfo.setText(Util.getSizeString(nodeSize));
-            nodeIconLayout.setVisibility(View.GONE);
+            String fileInfo = Util.getSizeString(nodeSize) + " . " + getNodeDate(node);
+            nodeInfo.setText(fileInfo);
 
             if (node.hasThumbnail()) {
                 log("Node has thumbnail");
@@ -208,6 +211,13 @@ public class VersionBottomSheetDialogFragment extends BottomSheetDialogFragment 
 //        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public String getNodeDate(MegaNode node){
+
+        Calendar calendar = Util.calculateDateFromTimestamp(node.getModificationTime());
+        String format3 = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(calendar.getTime());
+        return format3;
     }
 
 

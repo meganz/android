@@ -316,7 +316,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro1.setText(resultA);
 
-					String textToShowB = "[A] "+(account.getStorage() / 1024)+" TB [/A] "+getString(R.string.tab_my_account_storage);
+					String textToShowB = "[A] "+(account.getStorage() / 1024)+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -331,7 +331,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					storageSectionPro1.setText(resultB);
 
 
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
 					try{
 						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
 						textToShowC = textToShowC.replace("[/A]", "</font>");
@@ -378,7 +378,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro2.setText(resultA);
 
-					String textToShowB = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.tab_my_account_storage);
+					String textToShowB = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -393,7 +393,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					storageSectionPro2.setText(resultB);
 
 
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
 					try{
 						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
 						textToShowC = textToShowC.replace("[/A]", "</font>");
@@ -440,7 +440,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionPro3.setText(resultA);
 
-					String textToShowB = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.tab_my_account_storage);
+					String textToShowB = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -455,7 +455,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					storageSectionPro3.setText(resultB);
 
 
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
 					try{
 						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
 						textToShowC = textToShowC.replace("[/A]", "</font>");
@@ -501,7 +501,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					monthSectionLite.setText(resultA);
 
-					String textToShowB = "[A] "+account.getStorage()+" GB [/A] "+getString(R.string.tab_my_account_storage);
+					String textToShowB = "[A] "+account.getStorage()+" GB [/A] "+getString(R.string.label_storage_upgrade_account);
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -516,7 +516,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					storageSectionLite.setText(resultB);
 
 
-					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+					String textToShowC = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
 					try{
 						textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
 						textToShowC = textToShowC.replace("[/A]", "</font>");

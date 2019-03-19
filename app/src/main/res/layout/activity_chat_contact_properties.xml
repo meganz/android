@@ -12,21 +12,26 @@
         <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="168dp"
         android:fitsSystemWindows="true">
 
-            <android.support.design.widget.CollapsingToolbarLayout
-             android:id="@+id/collapse_toolbar"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:fitsSystemWindows="true"
-             android:background="@color/content_text_background"
-             app:collapsedTitleTextAppearance="@style/ToolbarTitle.Secondary"
-             app:contentScrim="?attr/colorPrimary"
-             app:theme="@style/CollapsingToolbarContactInfo"
-             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-             app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText"
-             app:titleEnabled="false">
+            <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
+                android:id="@+id/collapse_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:fitsSystemWindows="true"
+                app:contentScrim="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:theme="@style/Theme.Megaactionbar.InfoScreens"
+                app:collapsedTitleTextAppearance="@style/ToolbarTitle"
+                app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
+                app:expandedTitleGravity="start|top"
+                app:expandedTitleMarginTop="86dp"
+                app:expandedTitleMarginStart="72dp"
+                app:expandedTitleMarginBottom="14dp"
+                app:maxLines="2"
+                app:lineSpacingMultiplier="1.2">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -108,8 +113,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:titleTextAppearance="@style/ToolbarTitle"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:popupTheme="@style/Theme.Megaactionbar.InfoScreens"
+                    app:theme="@style/Theme.Megaactionbar.InfoScreens"
                     app:layout_collapseMode="pin"/>
 
                 <RelativeLayout
@@ -147,7 +152,7 @@
                         android:paddingBottom="9dp"/>
                 </RelativeLayout>
 
-            </android.support.design.widget.CollapsingToolbarLayout>
+            </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
 
