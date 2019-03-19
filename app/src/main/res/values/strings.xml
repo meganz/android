@@ -2419,7 +2419,6 @@
     <string name="title_tour_four" cotext="Title of fourth tour screen">Your photos in the cloud</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we got you covered.\nCreate your account now.</string>
 
-	<string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
 	<string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
 	<string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call ">%s started a group call. Tap to join.</string>
 
