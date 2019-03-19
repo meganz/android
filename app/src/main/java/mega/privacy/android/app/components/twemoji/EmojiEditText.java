@@ -44,6 +44,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         setText(getText());
     }
 
+
     @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
         if(text.toString().equals("")){
         }else{
@@ -58,6 +59,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     }
 
     @Override @CallSuper public void input(final Emoji emoji) {
+//        log("input = "+emoji);
         if (emoji != null) {
             final int start = getSelectionStart();
             final int end = getSelectionEnd();

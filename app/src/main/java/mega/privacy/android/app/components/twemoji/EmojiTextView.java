@@ -29,8 +29,10 @@ import mega.privacy.android.app.utils.Util;
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface{
 
   private float emojiSize;
-  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 180;
-  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
+  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
+    public static final int TITLE_CHAT_TEXTVIEW_WIDTH_LANDSCAPE = 300;
+
+    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER = 255;
   public static final int TITLE_TEXTVIEW_RECENT_CHAT = 100;
 
@@ -71,130 +73,102 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
         a.recycle();
       }
     }
+    if(mContext!=null){
+        if(mContext instanceof GroupChatInfoActivityLollipop){
+            //Title chat in group info:
+            log("EmojiTextView: GroupChatInfoActivityLollipop: ");
+            display = ((GroupChatInfoActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
+            mOutMetrics = new DisplayMetrics ();
+            display.getMetrics(mOutMetrics);
 
-      if(mContext instanceof GroupChatInfoActivityLollipop){
-          //Title chat in group info:
+            if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                textViewMaxWidth = Util.scaleWidthPx(TITLE_CHAT_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+            }else{
+                textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+            }
+            setText(getText());
 
-          log("EmojiTextView: GroupChatInfoActivityLollipop: ");
-          display = ((GroupChatInfoActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
-          mOutMetrics = new DisplayMetrics ();
-          display.getMetrics(mOutMetrics);
+        }else if (mContext instanceof ManagerActivityLollipop) {
+            log("EmojiTextView: ManagerActivityLollipop: ");
 
-          if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-              textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
-          }else{
-              textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+            display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
+            mOutMetrics = new DisplayMetrics ();
+            display.getMetrics(mOutMetrics);
+            if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+            }else{
+                textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+            }
+            setText(getText());
+
+        }else if(mContext instanceof ChatExplorerActivity){
+            log("EmojiTextView: ChatExplorerActivity: ");
+
+            display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
+            mOutMetrics = new DisplayMetrics ();
+            display.getMetrics(mOutMetrics);
+            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
+            setText(getText());
+
+        }else if(mContext instanceof ArchivedChatsActivity){
+            log("EmojiTextView: ArchivedChatsActivity: ");
+
+            display = ((ArchivedChatsActivity)mContext).getWindowManager().getDefaultDisplay();
+            mOutMetrics = new DisplayMetrics ();
+            display.getMetrics(mOutMetrics);
+            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+            setText(getText());
+
+        }else if(mContext instanceof ChatCallActivity){
+            log("EmojiTextView: ChatCallActivity: ");
+
+            display = ((ChatCallActivity)mContext).getWindowManager().getDefaultDisplay();
+            mOutMetrics = new DisplayMetrics ();
+            display.getMetrics(mOutMetrics);
+            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+            setText(getText());
+
+        } else if (mContext instanceof ChatActivityLollipop) {
+            log("EmojiTextView: ChatActivityLollipop: ");
+
+            display = ((ChatActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
+            mOutMetrics = new DisplayMetrics ();
+            display.getMetrics(mOutMetrics);
+            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+            setText(getText());
+
+        }else {
+            if (mContext instanceof ContextWrapper) {
+                Context inContext = ((ContextWrapper) mContext).getBaseContext();
+                if (inContext != null) {
+                  if (inContext instanceof ChatActivityLollipop) {
+                        log("EmojiTextView:ContextWrapper: ChatActivityLollipop: ");
+                        display = ((ChatActivityLollipop)inContext).getWindowManager().getDefaultDisplay();
+                        mOutMetrics = new DisplayMetrics ();
+                        display.getMetrics(mOutMetrics);
+                        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
+                        setText(getText());
+
+                  } else if (inContext instanceof ChatCallActivity) {
+                        log("EmojiTextView:ContextWrapper: ChatCallActivity: ");
+                        display = ((ChatCallActivity)inContext).getWindowManager().getDefaultDisplay();
+                        mOutMetrics = new DisplayMetrics ();
+                        display.getMetrics(mOutMetrics);
+                        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
+                        setText(getText());
+                  }
+                }
+          } else {
+                log("EmojiTextView:ContextWrapper: OTHER: ");
+                setText(getText());
           }
-          setText(getText());
+        }
+    }else{
+        log("EmojiTextView:OTHER: ");
+        setText(getText());
 
-      }else if (mContext instanceof ManagerActivityLollipop) {
-          log("EmojiTextView: ManagerActivityLollipop: ");
+    }
 
-          display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
-          mOutMetrics = new DisplayMetrics ();
-          display.getMetrics(mOutMetrics);
-          if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-              textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
-          }else{
-              textViewMaxWidth = Util.px2dp(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
-          }
-          log("EmojiTextView: ManagerActivityLollipop: textViewMaxWidth = "+textViewMaxWidth);
-
-          setText(getText());
-
-      }else if(mContext instanceof ChatExplorerActivity){
-          log("EmojiTextView: ChatExplorerActivity: ");
-
-          display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-          mOutMetrics = new DisplayMetrics ();
-          display.getMetrics(mOutMetrics);
-          textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
-          setText(getText());
-
-      }else if(mContext instanceof ArchivedChatsActivity){
-          log("EmojiTextView: ArchivedChatsActivity: ");
-
-          display = ((ArchivedChatsActivity)mContext).getWindowManager().getDefaultDisplay();
-          mOutMetrics = new DisplayMetrics ();
-          display.getMetrics(mOutMetrics);
-          textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
-          setText(getText());
-      }else {
-          log("EmojiTextView: OTHER: ");
-          setText(getText());
-      }
-
-
-
-
-//    if(mContext instanceof ChatCallActivity){
-//      Display display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
-//      mOutMetrics = new DisplayMetrics ();
-//      display.getMetrics(mOutMetrics);
-//      if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-//        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
-//      }else{
-//        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
-//      }
-//      setText(getText());
-//    }else {
-//      if (mContext != null) {
-//        if (mContext instanceof ManagerActivityLollipop) {
-//          Display display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
-//          mOutMetrics = new DisplayMetrics ();
-//          display.getMetrics(mOutMetrics);
-//          if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-//            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
-//          }else{
-//            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
-//          }
-//          setText(getText());
-//        } else if (mContext instanceof ChatExplorerActivity) {
-//          Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-//          mOutMetrics = new DisplayMetrics ();
-//          display.getMetrics(mOutMetrics);
-//          textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
-//          setText(getText());
-//        } else if (mContext instanceof ArchivedChatsActivity) {
-//          Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-//          mOutMetrics = new DisplayMetrics ();
-//          display.getMetrics(mOutMetrics);
-//          textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
-//          setText(getText());
-//        } else if (mContext instanceof ChatActivityLollipop) {
-//          Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-//          mOutMetrics = new DisplayMetrics ();
-//          display.getMetrics(mOutMetrics);
-//          textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
-//          setText(getText());
-//        } else {
-//          if (mContext instanceof ContextWrapper) {
-//            Context inContext = ((ContextWrapper) mContext).getBaseContext();
-//            if (inContext != null) {
-//              if (inContext instanceof ChatActivityLollipop) {
-//                Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-//                mOutMetrics = new DisplayMetrics ();
-//                display.getMetrics(mOutMetrics);
-//                textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
-//                setText(getText());
-//              } else if (inContext instanceof ChatCallActivity) {
-//                Display display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-//                mOutMetrics = new DisplayMetrics ();
-//                display.getMetrics(mOutMetrics);
-//                textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_CHAT_EXPLORER, mOutMetrics);
-//                setText(getText());
-//              }
-//
-//            }
-//          } else {
-//            super.setText(spannableStringBuilder, type);
-//
-//          }
-//        }
-//      }
-//    }
-//
-//    setText(getText());
   }
   @Override public void setText(CharSequence rawText, BufferType type) {
     log("setText");
@@ -205,73 +179,62 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
       EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
-      if(mContext != null){
+      if(mContext!=null){
           if(mContext instanceof GroupChatInfoActivityLollipop){
-              log("setText() GroupChatInfoActivityLollipop");
+              //Title chat in group info:
+              log("setText: GroupChatInfoActivityLollipop: textViewMaxWidth = "+textViewMaxWidth);
               CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
               super.setText(textF, type);
-          }else
-if(mContext instanceof ManagerActivityLollipop){
-    log("setText() ManagerActivityLollipop textViewMaxWidth = "+textViewMaxWidth);
-            CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-              super.setText(textF, type);
-          }else  if(mContext instanceof ChatExplorerActivity) {
-    log("setText() ChatExplorerActivity");
 
-    CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+          }else if (mContext instanceof ManagerActivityLollipop) {
+              log("setText: ManagerActivityLollipop: ");
+
+              CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+              super.setText(textF, type);
+          }else if(mContext instanceof ChatExplorerActivity){
+              log("setText: ChatExplorerActivity: ");
+
+              CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
               super.setText(textF, type);
           }else if(mContext instanceof ArchivedChatsActivity){
-    log("setText() ArchivedChatsActivity");
-
-    CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+              log("setText: ArchivedChatsActivity: ");
+              CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
               super.setText(textF, type);
-          }else  if(mContext instanceof ChatActivityLollipop){
-    log("setText() ChatActivityLollipop");
 
-    super.setText(spannableStringBuilder, type);
-          }else{
-    log("setText() OTHER");
+          }else if(mContext instanceof ChatCallActivity){
+              log("setText: ChatCallActivity: ");
+              CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+              super.setText(textF, type);
 
-    super.setText(spannableStringBuilder, type);
+          } else if (mContext instanceof ChatActivityLollipop) {
+              log("setText: ChatActivityLollipop: ");
+              super.setText(spannableStringBuilder, type);
+
+          }else {
+              if (mContext instanceof ContextWrapper) {
+                  Context inContext = ((ContextWrapper) mContext).getBaseContext();
+                  if (inContext != null) {
+                      if (inContext instanceof ChatActivityLollipop) {
+                          log("setText:ContextWrapper: ChatActivityLollipop: ");
+                          CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+                          super.setText(textF, type);
+
+                      } else if (inContext instanceof ChatCallActivity) {
+                          log("setText:ContextWrapper: ChatCallActivity: ");
+                          CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+                          super.setText(textF, type);
+                      }
+                  }
+              } else {
+                  log("setText:ContextWrapper: OTHER: "+mContext);
+                  super.setText(spannableStringBuilder, type);
+              }
           }
+      }else{
+          log("setText: mContext == NULL ");
+          super.setText(spannableStringBuilder, type);
       }
 
-//      if(mContext instanceof ChatCallActivity){
-//        log(" ChatCallActivity");
-//        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-//        super.setText(textF, type);
-//      }else{
-//        if(mContext != null){
-//          if(mContext instanceof ManagerActivityLollipop){
-//            super.setText(spannableStringBuilder, type);
-//          }else   if(mContext instanceof ChatExplorerActivity){
-//            super.setText(spannableStringBuilder, type);
-//          }else   if(mContext instanceof ArchivedChatsActivity){
-//            super.setText(spannableStringBuilder, type);
-//          }else   if(mContext instanceof ChatActivityLollipop){
-//            super.setText(spannableStringBuilder, type);
-//
-//          }else {
-//            if(mContext instanceof ContextWrapper){
-//              Context inContext = ((ContextWrapper) mContext).getBaseContext();
-//              if(inContext !=null){
-//                if(inContext instanceof ChatActivityLollipop){
-//                  CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-//                  super.setText(textF, type);
-//                }else if(inContext instanceof ChatCallActivity){
-//                  CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-//                  super.setText(textF, type);
-//                }
-//
-//              }
-//            }else{
-//              super.setText(spannableStringBuilder, type);
-//
-//            }
-//          }
-//        }
-//
-//      }
   }
 
   @Override

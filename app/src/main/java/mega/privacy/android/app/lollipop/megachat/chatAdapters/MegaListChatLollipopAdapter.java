@@ -546,7 +546,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(12, outMetrics));
 			}else{
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(21, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(20, outMetrics));
 			}
 
 

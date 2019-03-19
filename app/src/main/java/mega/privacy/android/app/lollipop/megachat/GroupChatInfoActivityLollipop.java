@@ -52,6 +52,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -301,16 +302,16 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 infoTitleChatText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-                infoTitleChatText.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+                infoTitleChatText.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
             }else{
                 infoTitleChatText.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
                 infoTitleChatText.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
             }
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
-            RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
-            paramsEditIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
-            editImageView.setLayoutParams(paramsEditIcon);
+//            RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
+//            paramsEditIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
+//            editImageView.setLayoutParams(paramsEditIcon);
             editImageView.setOnClickListener(this);
 
             //Notifications Layout
@@ -767,7 +768,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void changeTitle(String title){
-        log("changeTitle: "+title);
         ChatController cC = new ChatController(groupChatInfoActivity);
         cC.changeTitle(chatHandle, title);
     }
@@ -1159,8 +1159,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void showRenameGroupDialog(boolean fromGetLink){
-        log("showRenameGroupDialog");
-
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1181,7 +1179,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
         }
 
-        final EditText input = new EditText(this);
+//        final EditText input = new EditText(this);
+        final EmojiEditText input = new EmojiEditText(this);
         int maxLength = 30;
         input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
 
@@ -1192,6 +1191,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        input.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
