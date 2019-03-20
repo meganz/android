@@ -17455,7 +17455,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
-					tFLol.transferFinish(index);
+					tFLol.transferFinish(transfer.getTag());
 				}
 				else{
 					log("tF is null!");
