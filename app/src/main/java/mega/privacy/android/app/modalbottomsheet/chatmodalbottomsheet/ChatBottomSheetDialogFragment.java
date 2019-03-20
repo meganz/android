@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -61,7 +62,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public ImageView iconStateChatPanel;
     public TextView titleMailContactChatPanel;
     public RoundedImageView chatImageView;
-    public TextView chatInitialLetter;
+    public EmojiTextView chatInitialLetter;
     public TextView infoChatText;
     public LinearLayout optionInfoChat;
     public LinearLayout optionLeaveChat;
@@ -141,7 +142,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         titleNameContactChatPanel = (EmojiTextView) contentView.findViewById(R.id.chat_list_chat_name_text);
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_mail_text);
         chatImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_chat_list_thumbnail);
-        chatInitialLetter = (TextView) contentView.findViewById(R.id.sliding_chat_list_initial_letter);
+        chatInitialLetter = (EmojiTextView) contentView.findViewById(R.id.sliding_chat_list_initial_letter);
+        chatInitialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
         infoChatText = (TextView) contentView.findViewById(R.id.chat_list_info_chat_text);
         optionInfoChat = (LinearLayout) contentView.findViewById(R.id.chat_list_info_chat_layout);
         optionLeaveChat= (LinearLayout) contentView.findViewById(R.id.chat_list_leave_chat_layout);
@@ -420,8 +422,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
         if (chat.getTitle() != null) {
             if (chat.getTitle().trim().length() > 0) {
-                String firstLetter = chat.getTitle().charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+               String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
                 chatInitialLetter.setText(firstLetter);
                 chatInitialLetter.setTextColor(Color.WHITE);
                 chatInitialLetter.setVisibility(View.VISIBLE);
@@ -443,7 +444,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             }
         }
         chatInitialLetter.setTextSize(22);
-        ////
+
     }
 
     @Override

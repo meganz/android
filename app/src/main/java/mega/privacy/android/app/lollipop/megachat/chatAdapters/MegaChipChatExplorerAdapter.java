@@ -30,6 +30,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -322,7 +323,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
-        String firstLetter = item.getTitle().charAt(0) + "";
+        String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
 
         log("Draw letter: "+firstLetter);
         Rect bounds = new Rect();
@@ -330,7 +331,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
         int xPos = (c.getWidth()/2);
         int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-        c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+        c.drawText(firstLetter, xPos, yPos, paintText);
 
         holder.avatar.setImageBitmap(defaultAvatar);;
     }

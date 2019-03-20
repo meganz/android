@@ -38,6 +38,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -94,7 +95,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         RelativeLayout itemLayout;
         RoundedImageView avatarImage;
-        TextView initialLetter;
+        EmojiTextView initialLetter;
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
@@ -125,7 +126,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
         holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
-        holder.initialLetter = (TextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
+        holder.initialLetter = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
+        holder.initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
         holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
         holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
         holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
@@ -152,9 +154,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if (chat != null && chat.isGroup()) {
             if (item.getTitle().length() > 0){
-                String chatTitle = item.getTitle().trim();
-                String firstLetter = chatTitle.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = ChatUtil.getFirstLetter(item.getTitle());
                 holder.initialLetter.setText(firstLetter);
             }
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
@@ -435,8 +435,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if (fullName != null){
             if (fullName.trim().length() > 0){
-                String firstLetter = fullName.charAt(0) + "";
-                firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                String firstLetter = ChatUtil.getFirstLetter(fullName);
+
                 holder.initialLetter.setText(firstLetter);
                 holder.initialLetter.setTextColor(Color.WHITE);
                 holder.initialLetter.setVisibility(View.VISIBLE);

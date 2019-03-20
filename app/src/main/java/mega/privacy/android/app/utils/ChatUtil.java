@@ -2,7 +2,12 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 import android.content.Intent;
+
+import java.util.Locale;
+
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -87,6 +92,23 @@ public class ChatUtil {
     }
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
+    }
+
+    public static String getFirstLetter(String title){
+        String result = "";
+        title = title.trim();
+
+        if(!title.isEmpty()){
+            String lastEmoji = title.substring(0,2);
+            int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
+            if(numEmojis >0 ){
+                result = lastEmoji + "";
+            }else{
+                result = title.charAt(0) + "";
+                result = result.toUpperCase(Locale.getDefault());
+            }
+        }
+        return result;
     }
 
     private static void log(String message) {

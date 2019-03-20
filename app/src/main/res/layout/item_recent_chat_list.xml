@@ -23,7 +23,7 @@
             rounded:border_width="0dp"
             rounded:corner_radius="30dp" />
 
-        <TextView
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/recent_chat_list_initial_letter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

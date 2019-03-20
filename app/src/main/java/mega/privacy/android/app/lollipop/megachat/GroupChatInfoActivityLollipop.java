@@ -69,6 +69,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListe
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -126,7 +127,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     boolean generalChatNotifications = true;
 
     CoordinatorLayout fragmentContainer;
-    TextView initialLetter;
+    EmojiTextView initialLetter;
     RoundedImageView avatarImageView;
 
     android.support.v4.widget.NestedScrollView scrollView;
@@ -272,17 +273,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             //Info Layout
             avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
-            initialLetter = (TextView) findViewById(R.id.chat_group_properties_initial_letter);
-
+            initialLetter = (EmojiTextView) findViewById(R.id.chat_group_properties_initial_letter);
+            initialLetter.setEmojiSize(Util.scaleWidthPx(25, outMetrics));
             if (chat.getTitle().length() > 0){
-                String chatTitle = chat.getTitle().trim();
-
-                String firstLetter = "";
-                if(!chatTitle.isEmpty()){
-                    firstLetter = chatTitle.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                }
-
+                String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
                 initialLetter.setText(firstLetter);
             }
 
@@ -1762,12 +1756,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 infoTitleChatText.setText(chat.getTitle());
 
                 if (chat.getTitle().length() > 0){
-                    String chatTitle = chat.getTitle().trim();
-                    String firstLetter = "";
-                    if(!chatTitle.isEmpty()){
-                        firstLetter = chatTitle.charAt(0) + "";
-                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-                    }
+                    String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
                     initialLetter.setText(firstLetter);
                 }
 

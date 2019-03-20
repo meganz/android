@@ -32,7 +32,7 @@
                 rounded:border_width="0dp"
                 rounded:corner_radius="20dp" />
 
-            <TextView
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/sliding_chat_list_initial_letter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

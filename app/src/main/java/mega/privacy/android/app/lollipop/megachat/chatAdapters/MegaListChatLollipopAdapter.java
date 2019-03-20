@@ -42,6 +42,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.scrollBar.Utils;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -53,6 +54,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -135,7 +137,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			super(arg0);
 		}
 		RoundedImageView imageView;
-		TextView contactInitialLetter;
+		EmojiTextView contactInitialLetter;
 		EmojiTextView textViewContactName;
 		EmojiTextView textViewContent;
 		TextView textViewDate;
@@ -248,14 +250,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 
 					if (chat.getTitle().length() > 0){
-						String chatTitle = chat.getTitle().trim();
-
-						String firstLetter = "";
-						if(!chatTitle.isEmpty()){
-							firstLetter = chatTitle.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						}
-
+						String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
 						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
 					}
 
@@ -275,9 +270,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
 
 						if (chat.getTitle().length() > 0){
-							String chatTitle = chat.getTitle().trim();
-							String firstLetter = chatTitle.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+							String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
 							((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
 						}
 
@@ -540,21 +533,21 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).muteIcon = (ImageView) v.findViewById(R.id.recent_chat_list_mute_icon);
 
 			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
-			((ViewHolderNormalChatList)holder).contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
-
+			((ViewHolderNormalChatList)holder).contactInitialLetter = (EmojiTextView) v.findViewById(R.id.recent_chat_list_initial_letter);
+			((ViewHolderNormalChatList)holder).contactInitialLetter.setEmojiSize(Util.scaleWidthPx(30,outMetrics));
 			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(15, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
 			}else{
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.px2dp(20, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
 			}
 
 
 			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.px2dp(10, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
 			}else{
-				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.px2dp(15, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
 			}
 
 			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
@@ -674,6 +667,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		float density  = context.getResources().getDisplayMetrics().density;
 
 		String firstLetter = ((ViewHolderNormalChatList)holder).contactInitialLetter.getText().toString();
+
 		if(firstLetter.trim().isEmpty()){
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.INVISIBLE);
 		}
@@ -743,6 +737,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if (((ViewHolderNormalChatList)holder).contactMail.length() > 0){
 					log("email TEXT: " + ((ViewHolderNormalChatList)holder).contactMail);
 					log("email TEXT AT 0: " + ((ViewHolderNormalChatList)holder).contactMail.charAt(0));
+
 					String firstLetter = ((ViewHolderNormalChatList)holder).contactMail.charAt(0) + "";
 					firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 					((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
@@ -1167,14 +1162,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				else{
 					if (title.length() > 0){
-						String chatTitle = title.trim();
-
-						String firstLetter = "";
-						if(!chatTitle.isEmpty()){
-							firstLetter = chatTitle.charAt(0) + "";
-							firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-						}
-
+						String firstLetter = ChatUtil.getFirstLetter(title);
 						((ViewHolderNormalChatList)holder).contactInitialLetter.setText(firstLetter);
 					}
 
