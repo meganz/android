@@ -58,9 +58,9 @@ public final class EmojiManager {
           }
         }
       }else{
-        log(" the text has MEGA emojis");
-
         if(emojiManager.isOnlyEmojis(text.toString())){
+          log("the text = isOnlyEmojis");
+
           for (int i = 0; i < findAllEmojis.size(); i++) {
             final EmojiRange location = findAllEmojis.get(i);
             text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

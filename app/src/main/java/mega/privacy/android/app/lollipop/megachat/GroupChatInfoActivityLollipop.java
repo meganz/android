@@ -19,8 +19,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -53,6 +57,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -112,6 +117,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     float scaleW;
     float scaleH;
     float scaleText;
+    int maxNewTitleLenght = 0;
+    CharSequence beforeString = "";
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -295,23 +302,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             infoTextContainerLayout.setLayoutParams(paramsInfoText);
 
             infoTitleChatText = (EmojiTextView) findViewById(R.id.chat_group_contact_properties_info_title);
-            log("The full title of chat: "+chat.getTitle());
             infoTitleChatText.setText(chat.getTitle());
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
-
-
             if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 infoTitleChatText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-                infoTitleChatText.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
             }else{
                 infoTitleChatText.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
-                infoTitleChatText.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
             }
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
-//            RelativeLayout.LayoutParams paramsEditIcon = (RelativeLayout.LayoutParams) editImageView.getLayoutParams();
-//            paramsEditIcon.leftMargin = Util.scaleWidthPx(8, outMetrics);
-//            editImageView.setLayoutParams(paramsEditIcon);
             editImageView.setOnClickListener(this);
 
             //Notifications Layout
@@ -320,8 +319,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             notificationsLayout.setVisibility(View.VISIBLE);
 
             notificationsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_title);
-//            notificationSelectedText = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_option);
-
             notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnClickListener(this);
 
@@ -1179,24 +1176,36 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
         }
 
-//        final EditText input = new EditText(this);
         final EmojiEditText input = new EmojiEditText(this);
-        int maxLength = 30;
-        input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
 
         layout.addView(input, params);
 
         input.setSingleLine();
-        input.setText(chat.getTitle());
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        input.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            input.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+        }else{
+            input.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
+        }
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(chat.getTitle());
+        if(numEmojis > 0){
+            int realLenght = ((chat.getTitle().length() - (numEmojis*2)) + (numEmojis*4));
+            if(realLenght>27){
+                input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(chat.getTitle().length())});
+            }else{
+                input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
+            }
+        }else{
+            input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
+        }
 
+        input.setText(chat.getTitle());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
@@ -1214,6 +1223,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     }
                     else {
                         log("action DONE ime - change title");
+                        log("A title = "+title);
+
                         changeTitle(title);
                         changeTitleDialog.dismiss();
                     }
@@ -1242,6 +1253,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         }
                         else {
                             log("positive button pressed - change title");
+                            log("B title = "+title);
+
                             changeTitle(title);
                             changeTitleDialog.dismiss();
                         }
@@ -1278,8 +1291,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
                 else {
                     log("positive button pressed - change title");
-                    changeTitle(title);
-                    changeTitleDialog.dismiss();
+                    log("C title = "+title);
+                        changeTitle(title);
+                        changeTitleDialog.dismiss();
+
                 }
             }
         });

@@ -28,6 +28,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -56,7 +57,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
-    public TextView titleNameContactChatPanel;
+    public EmojiTextView titleNameContactChatPanel;
     public ImageView iconStateChatPanel;
     public TextView titleMailContactChatPanel;
     public RoundedImageView chatImageView;
@@ -137,7 +138,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         iconStateChatPanel.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
         iconStateChatPanel.setMaxHeight(Util.scaleHeightPx(6,outMetrics));
 
-        titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_name_text);
+        titleNameContactChatPanel = (EmojiTextView) contentView.findViewById(R.id.chat_list_chat_name_text);
         titleMailContactChatPanel = (TextView) contentView.findViewById(R.id.chat_list_chat_mail_text);
         chatImageView = (RoundedImageView) contentView.findViewById(R.id.sliding_chat_list_thumbnail);
         chatInitialLetter = (TextView) contentView.findViewById(R.id.sliding_chat_list_initial_letter);
@@ -154,6 +155,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         archiveChatIcon = (ImageView) contentView.findViewById(R.id.file_archive_chat_image);
 
         titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+        titleNameContactChatPanel.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
         titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
         optionInfoChat.setOnClickListener(this);

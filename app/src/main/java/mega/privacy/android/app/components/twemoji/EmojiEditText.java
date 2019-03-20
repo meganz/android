@@ -7,23 +7,25 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
 import android.support.annotation.Px;
 import android.support.v7.widget.AppCompatEditText;
+import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
-
-//Reference implementation for an EditText with emoji support
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
     private float emojiSize;
+    private Context mContext;
 
     public EmojiEditText(final Context context) {
         this(context, null);
+        mContext = context;
     }
     public EmojiEditText(final Context context, final AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         if (!isInEditMode()) {
             EmojiManager.getInstance().verifyInstalled();
         }
@@ -44,7 +46,6 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         setText(getText());
     }
 
-
     @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
         if(text.toString().equals("")){
         }else{
@@ -52,14 +53,27 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
                 final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
                 final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
                 EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
+
+                if(mContext instanceof GroupChatInfoActivityLollipop){
+                    int numEmojis = EmojiManager.getInstance().getNumEmojis(getText());
+                    if(numEmojis > 0){
+                        int realLenght = ((getText().length() - (numEmojis*2)) + (numEmojis*4));
+                        if(realLenght>27){
+                            setFilters(new InputFilter[] {new InputFilter.LengthFilter(getText().length())});
+                        }else{
+                            setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
+                        }
+                    }else{
+                        setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
+                    }
+                }
                 super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
             }
-
         }
     }
 
     @Override @CallSuper public void input(final Emoji emoji) {
-//        log("input = "+emoji);
+        log("input = "+emoji);
         if (emoji != null) {
             final int start = getSelectionStart();
             final int end = getSelectionEnd();
@@ -81,31 +95,6 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         dispatchKeyEvent(event);
     }
 
-//    @Override public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-//        return new SoftKeyboardInputConnection(super.onCreateInputConnection(outAttrs), true);
-//    }
-//
-//    private class SoftKeyboardInputConnection extends InputConnectionWrapper {
-//
-//        public SoftKeyboardInputConnection(InputConnection target, boolean mutable) {
-//            super(target, mutable);
-//        }
-//
-//        @Override
-//        public boolean sendKeyEvent(KeyEvent event) {
-//            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-//                backspace();
-//            }
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-//            backspace();
-//            return false;
-//        }
-//    }
-
     @Override public final void setEmojiSize(@Px final int pixels) {
         setEmojiSize(pixels, true);
     }
@@ -125,4 +114,5 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     public static void log(String message) {
         Util.log("EmojiEditText", message);
     }
+
 }
