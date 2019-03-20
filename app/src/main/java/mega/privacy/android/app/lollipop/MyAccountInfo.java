@@ -186,6 +186,8 @@ public class MyAccountInfo {
         this.accountInfo = accountInfo;
         log("***Renews ts: "+accountInfo.getSubscriptionRenewTime());
         log("***Renews on: "+Util.getDateString(accountInfo.getSubscriptionRenewTime()));
+        log("***Expires ts:"+accountInfo.getProExpiration());
+        log("***Expires on: "+Util.getDateString(accountInfo.getProExpiration()));
     }
 
     public int getAccountType() {

@@ -90,8 +90,6 @@ public class SearchFragmentLollipop extends Fragment{
 
     MegaNodeAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	ProgressBar progressBar;
 	MegaApiAndroid megaApi;
 	RelativeLayout transfersOverViewLayout;
@@ -286,7 +284,7 @@ public class SearchFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
-			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SEARCH_DELAY);
 			checkScroll();
 		}
 
@@ -305,6 +303,8 @@ public class SearchFragmentLollipop extends Fragment{
 			boolean showRemoveLink = false;
 			boolean showTrash = false;
 			boolean itemsSelected = false;
+
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
 
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -608,9 +608,6 @@ public class SearchFragmentLollipop extends Fragment{
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 			progressBar.setVisibility(View.GONE);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_text);
-
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
@@ -630,10 +627,6 @@ public class SearchFragmentLollipop extends Fragment{
 	
 			recyclerView.setAdapter(adapter);
 			fastScroller.setRecyclerView(recyclerView);
-
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-			recyclerView.setLayoutParams(params);
 			
 			setNodes(nodes);
 
@@ -666,10 +659,6 @@ public class SearchFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
-
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
 
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
@@ -737,8 +726,6 @@ public class SearchFragmentLollipop extends Fragment{
 
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
-				
-				contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
 				((ManagerActivityLollipop)context).parentHandleSearch= n.getHandle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -756,7 +743,6 @@ public class SearchFragmentLollipop extends Fragment{
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
-					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
@@ -766,7 +752,7 @@ public class SearchFragmentLollipop extends Fragment{
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						}
 
-						String textToShow = String.format(context.getString(R.string.context_empty_inbox), context.getString(R.string.section_cloud_drive));
+						String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -809,7 +795,6 @@ public class SearchFragmentLollipop extends Fragment{
 				else{
 					log("folder with files");
 					recyclerView.setVisibility(View.VISIBLE);
-					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -923,7 +908,7 @@ public class SearchFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
@@ -1187,9 +1172,7 @@ public class SearchFragmentLollipop extends Fragment{
 			log("levels > 0");
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch));
 			if (parentNode != null){
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 				recyclerView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -1205,13 +1188,11 @@ public class SearchFragmentLollipop extends Fragment{
 					log("nodes.size: "+nodes.size());
 					if(nodes.size()>0){
 						recyclerView.setVisibility(View.VISIBLE);
-						contentText.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
 					}
 					else{
 						recyclerView.setVisibility(View.GONE);
-						contentText.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
 						emptyTextView.setVisibility(View.VISIBLE);
 					}
@@ -1258,17 +1239,13 @@ public class SearchFragmentLollipop extends Fragment{
 			setNodes(nodes);
 			visibilityFastScroller();
 
-			contentText.setText(MegaApiUtils.getInfoNode(nodes, (ManagerActivityLollipop)context));
 			if(nodes!=null){
 				log("nodes.size: "+nodes.size());
 				if(nodes.size()>0){
-					contentText.setVisibility(View.VISIBLE);
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-				}
-				else{
-					contentText.setVisibility(View.GONE);
+				}else{
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
@@ -1312,7 +1289,6 @@ public class SearchFragmentLollipop extends Fragment{
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}else{
 				nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
 			}
@@ -1380,7 +1356,6 @@ public class SearchFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				log("no results");
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
@@ -1398,7 +1373,7 @@ public class SearchFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					}
-					String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
@@ -1440,8 +1415,6 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 			}
 			else{
-//				contentTextLayout.setVisibility(View.GONE);
-//				contentText.setText(MegaApiUtils.getInfoNode(nodes, context));
 //				recyclerView.setVisibility(View.VISIBLE);
 //				emptyImageView.setVisibility(View.GONE);
 //				emptyTextView.setVisibility(View.GONE);
