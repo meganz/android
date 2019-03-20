@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
@@ -44,6 +45,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.utils.CameraUploadImageProcessor;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
@@ -72,8 +74,9 @@ import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_PENDING;
 import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 
-public class CameraUploadsService extends Service implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
+public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
     
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
@@ -108,7 +111,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     
     private boolean isOverQuota = false;
     private boolean canceled;
-    
+    private boolean pauseByNetworkStateChange;
+
     DatabaseHandler dbH;
     
     MegaPreferences prefs;
@@ -175,7 +179,22 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
     public IBinder onBind(Intent intent) {
         return null;
     }
-    
+
+    public void onTypeChanges(int type) {
+        log("onTypeChanges: " + type);
+        prefs = dbH.getPreferences();
+        if(prefs != null) {
+            if(type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi())) {
+                //pause the sync
+                pauseByNetworkStateChange = true;
+//                finish();
+            } else {
+                pauseByNetworkStateChange = false;
+            }
+            megaApi.pauseTransfers(pauseByNetworkStateChange);
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
         log("public int onStartCommand(Intent intent, int flags, int startId)");
@@ -213,6 +232,12 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         }
         log("STARTS NOW");
         return START_NOT_STICKY;
+    }
+
+    private void registerNetworkTypeChangeReceiver() {
+        NetworkTypeChangeReceiver receiver = NetworkTypeChangeReceiver.getInstance();
+        registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        receiver.setCallback(this);
     }
     
     private Thread createWorkerThread() {
@@ -430,6 +455,7 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         log("prepareUpload primaryList " + primaryList.size() + " secondaryList " + secondaryList.size() + " primaryVideoList " + primaryVideoList.size() + " secondaryVideoList " + secondaryVideoList.size());
         pendingUploadsList = getPendingList(primaryList,false,false);
         saveDataToDB(pendingUploadsList);
+        prefs = dbH.getPreferences();
         pendingVideoUploadsList = getPendingList(primaryVideoList,false,true);
         saveDataToDB(pendingVideoUploadsList);
         
@@ -1235,7 +1261,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
         if (!lock.isHeld()) {
             lock.acquire();
         }
-        
+
+        pauseByNetworkStateChange = false;
         lastUpdated = 0;
         totalUploaded = 0;
         totalToUpload = 0;
@@ -1291,6 +1318,8 @@ public class CameraUploadsService extends Service implements MegaChatRequestList
             dbH.deleteAllSyncRecords(TYPE_ANY);
             dbH.saveShouldClearCamsyncRecords(false);
         }
+
+        registerNetworkTypeChangeReceiver();
     }
     
     private void handleException(Exception e) {
