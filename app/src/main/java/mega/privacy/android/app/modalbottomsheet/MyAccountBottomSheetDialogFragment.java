@@ -15,12 +15,17 @@ import android.widget.LinearLayout;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaHandleList;
 
 public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -35,6 +40,9 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
     public LinearLayout optionTakePicture;
     public LinearLayout optionRemovePicture;
     public LinearLayout optionQRcode;
+    MegaChatApiAndroid megaChatApi;
+
+
 
     DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -48,6 +56,10 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if(megaChatApi==null){
+            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
 
         aC = new AccountController(context);
@@ -135,8 +147,32 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
             }
             case R.id.my_account_my_QR_code: {
                 log("option QR code");
-                Intent intent = new Intent(context, QRCodeActivity.class);
-                startActivity(intent);
+                //Check if there is a in progress call:
+                boolean activeCall = false;
+                if(megaChatApi!=null){
+                    MegaHandleList listCalls = megaChatApi.getChatCalls();
+                    int contCallNotPresent = 0;
+                    if((listCalls!=null)&&(listCalls.size()>0)){
+                        for(int i=0; i<listCalls.size(); i++){
+                            MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
+                            if(call!=null){
+                                if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
+                                    contCallNotPresent ++ ;
+                                }
+                            }
+                        }
+                        if(contCallNotPresent == listCalls.size()){
+                            activeCall = false;
+                        }else{
+                            activeCall = true;
+                        }
+                    }
+                }
+                if(!activeCall){
+                    Intent intent = new Intent(context, QRCodeActivity.class);
+                    startActivity(intent);
+                }
+
                 break;
             }
         }
