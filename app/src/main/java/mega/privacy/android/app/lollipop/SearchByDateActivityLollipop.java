@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -564,10 +563,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
 
     public void showSnackbar(String message){
-        Snackbar snackbar = Snackbar.make(fragmentContainer,message,Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(fragmentContainer, message);
     }
 }
 
