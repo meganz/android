@@ -616,7 +616,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                     photo.setBackground(null);
                     photo.setPadding(0, 0, 0, 0);
-                    click_unselected.setVisibility(View.VISIBLE);
+                    click_unselected.setVisibility(View.GONE);
                 }
             }
             else{
@@ -721,7 +721,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     photo.setBackground(null);
                     photo.setPadding(0, 0, 0, 0);
                     gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
-                    click_unselected.setVisibility(View.VISIBLE);
+                    click_unselected.setVisibility(View.GONE);
                 }
             }
             else{

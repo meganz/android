@@ -88,6 +88,9 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
                 android:fontFamily="sans-serif"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="center"
                 android:textSize="18sp"/>
         </LinearLayout>
     </RelativeLayout>
