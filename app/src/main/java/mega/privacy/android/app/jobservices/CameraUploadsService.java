@@ -466,11 +466,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             pendingVideoUploadsListSecondary = getPendingList(secondaryVideoList,true,true);
             saveDataToDB(pendingVideoUploadsListSecondary);
         }
-        
+        if(stopped) {
+            return;
+        }
         //need to maintain timestamp for better performance
         updateTimeStamp();
         List<SyncRecord> finalList = dbH.findAllPendingSyncRecords();
-        
+
         if (finalList.size() == 0) {
             log("pending upload list is empty, now check view compression status");
             if (isCompressedVideoPending()) {
@@ -615,6 +617,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private void saveDataToDB(ArrayList<SyncRecord> list) {
         log("saveDataToDB list length is " + list.size());
         for (SyncRecord file : list) {
+            if(stopped) {
+                return;
+            }
             SyncRecord exist = dbH.recordExists(file.getOriginFingerprint(),file.isSecondary(),file.isCopyOnly());
             if (exist != null) {
                 if (exist.getTimestamp() < file.getTimestamp()) {
@@ -715,6 +720,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         int type = isVideo ? SyncRecord.TYPE_VIDEO : SyncRecord.TYPE_PHOTO;
 
         while (mediaList.size() > 0) {
+            if(stopped) {
+                break;
+            }
             log("if (mediaList.size() > 0)");
             final Media media = mediaList.poll();
             if (dbH.localPathExists(localPath,isSecondary,SyncRecord.TYPE_ANY)) {
