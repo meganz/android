@@ -1448,10 +1448,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    if(dbH.shouldClearCamsyncRecords()){
-                        dbH.deleteAllSyncRecords(TYPE_ANY);
-                        dbH.saveShouldClearCamsyncRecords(false);
-                    }
                     if (Util.isDeviceSupportParallelUpload()) {
                         startJob(context);
                     }else{
@@ -2326,10 +2322,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				@Override
 				public void run() {
 					log("Now I start the service");
-                    if(dbH.shouldClearCamsyncRecords()){
-                        dbH.deleteAllSyncRecords(TYPE_ANY);
-                        dbH.saveShouldClearCamsyncRecords(false);
-                    }
 					if (Util.isDeviceSupportParallelUpload()) {
                         startJob(context);
                     }else {
@@ -2397,10 +2389,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				@Override
 				public void run() {
 					log("Now I start the service");
-                    if(dbH.shouldClearCamsyncRecords()){
-                        dbH.deleteAllSyncRecords(TYPE_ANY);
-                        dbH.saveShouldClearCamsyncRecords(false);
-                    }
 					if (Util.isDeviceSupportParallelUpload()) {
                         startJob(context);
                     }else{
@@ -2533,10 +2521,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					@Override
 					public void run() {
 						log("Now I start the service");
-                        if(dbH.shouldClearCamsyncRecords()){
-                            dbH.deleteAllSyncRecords(TYPE_ANY);
-                            dbH.saveShouldClearCamsyncRecords(false);
-                        }
 						if (Util.isDeviceSupportParallelUpload()) {
                             startJob(context);
                         }else{
