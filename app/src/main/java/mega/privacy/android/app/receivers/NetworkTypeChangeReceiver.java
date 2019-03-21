@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import mega.privacy.android.app.utils.TL;
+import mega.privacy.android.app.utils.Util;
 
 public class NetworkTypeChangeReceiver extends BroadcastReceiver {
 
@@ -58,7 +58,6 @@ public class NetworkTypeChangeReceiver extends BroadcastReceiver {
     }
 
     private void log(String message) {
-//        Util.log("NetworkTypeChangeReceiver", message);
-        TL.log("NetworkTypeChangeReceiver","#!#",message);
+        Util.log("NetworkTypeChangeReceiver", message);
     }
 }
