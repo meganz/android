@@ -56,12 +56,12 @@
         android:layout_alignParentBottom="true"
         android:visibility="gone">
         <TextView
+            android:id="@+id/text_cancel_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:layout_centerInParent="true"
             android:fontFamily="roboto"
-            android:text="@string/button_cancel"
             android:textColor="@color/delete_account"
             android:textSize="14sp"
             android:textStyle="bold" />

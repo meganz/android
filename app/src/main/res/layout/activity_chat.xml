@@ -19,18 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!--<android.support.v7.widget.Toolbar-->
-                <!--android:id="@+id/toolbar_chat"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:minHeight="?attr/actionBarSize"-->
-                <!--android:background="?attr/colorPrimary"-->
-                <!--android:elevation="4dp"-->
-                <!--app:titleTextAppearance="@style/ToolbarTitle"-->
-                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
-                <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
-                <!--tools:context=".lollipop.megachat.ChatActivityLollipop" />-->
-
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_maps"
                 android:layout_width="match_parent"

@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.io.IOException;
+import java.util.Locale;
+
 import io.supercharge.shimmerlayout.ShimmerLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
@@ -43,6 +45,7 @@ public class RecordView extends RelativeLayout {
     private TextView slideToCancel;
     private ShimmerLayout slideToCancelLayout;
     private RelativeLayout cancelRecordLayout;
+    private TextView textCancelRecord;
     private ImageView arrow;
     private float initialX,initialY, basketInitialY, difX = 0;
     private float basketInitialX = 0;
@@ -118,6 +121,8 @@ public class RecordView extends RelativeLayout {
         basketImg = view.findViewById(R.id.basket_img);
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
         cancelRecordLayout = view.findViewById(R.id.rl_cancel_record);
+        textCancelRecord = view.findViewById(R.id.text_cancel_record);
+        textCancelRecord.setText(context.getString(R.string.button_cancel).toUpperCase(Locale.getDefault()));
         layoutLock = view.findViewById(R.id.layout_lock);
         imageLock = view.findViewById(R.id.image_lock);
         imageArrow = view.findViewById(R.id.image_arrow);
