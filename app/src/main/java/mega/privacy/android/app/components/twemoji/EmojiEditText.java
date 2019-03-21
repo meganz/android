@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
@@ -47,27 +48,27 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     }
 
     @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
-        if(text.toString().equals("")){
-        }else{
-            if(lengthAfter>lengthBefore){
+
+        if(mContext instanceof GroupChatInfoActivityLollipop){
+            if(text.toString().equals("")){
+            }else{
                 final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
                 final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
                 EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
-
-                if(mContext instanceof GroupChatInfoActivityLollipop){
-                    int numEmojis = EmojiManager.getInstance().getNumEmojis(getText());
-                    if(numEmojis > 0){
-                        int realLenght = ((getText().length() - (numEmojis*2)) + (numEmojis*4));
-                        if(realLenght>27){
-                            setFilters(new InputFilter[] {new InputFilter.LengthFilter(getText().length())});
-                        }else{
-                            setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
-                        }
-                    }else{
-                        setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
-                    }
-                }
+                int maxAllowed = ChatUtil.getMaxAllowed(getText());
+                setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
                 super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
+            }
+
+        }else{
+            if(text.toString().equals("")){
+            }else{
+                if(lengthAfter>lengthBefore){
+                    final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+                    final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+                    EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
+                    super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
+                }
             }
         }
     }

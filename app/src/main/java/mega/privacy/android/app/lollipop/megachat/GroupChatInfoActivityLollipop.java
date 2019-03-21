@@ -1186,19 +1186,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        int numEmojis = EmojiManager.getInstance().getNumEmojis(chat.getTitle());
-        if(numEmojis > 0){
-            int realLenght = ((chat.getTitle().length() - (numEmojis*2)) + (numEmojis*4));
-            if(realLenght>27){
-                input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(chat.getTitle().length())});
-            }else{
-                input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
-            }
-        }else{
-            input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(30)});
-        }
-
+        int maxAllowed = ChatUtil.getMaxAllowed(chat.getTitle());
+        input.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
         input.setText(chat.getTitle());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

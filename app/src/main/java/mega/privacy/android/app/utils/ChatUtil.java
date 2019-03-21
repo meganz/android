@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 
 import java.util.Locale;
 
@@ -15,6 +16,8 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
 public class ChatUtil {
+    public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 27;
+
 
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi){
@@ -92,6 +95,20 @@ public class ChatUtil {
     }
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
+    }
+
+    public static int getMaxAllowed(@Nullable final CharSequence text){
+        int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
+        if(numEmojis > 0){
+            int realLenght = ((text.length() - (numEmojis*2)) + (numEmojis*4));
+            if(realLenght>=MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
+                return text.length();
+            }else{
+                return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+            }
+        }else{
+            return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
+        }
     }
 
     public static String getFirstLetter(String title){
