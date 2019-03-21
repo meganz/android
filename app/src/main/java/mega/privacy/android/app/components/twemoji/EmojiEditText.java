@@ -74,7 +74,6 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     }
 
     @Override @CallSuper public void input(final Emoji emoji) {
-        log("input = "+emoji);
         if (emoji != null) {
             final int start = getSelectionStart();
             final int end = getSelectionEnd();
