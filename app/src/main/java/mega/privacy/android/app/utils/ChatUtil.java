@@ -102,9 +102,9 @@ public class ChatUtil {
             String lastEmoji = title.substring(0,2);
             int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
             if(numEmojis >0 ){
-                result = lastEmoji + "";
+                result = lastEmoji;
             }else{
-                result = title.charAt(0) + "";
+                result = String.valueOf(title.charAt(0));
                 result = result.toUpperCase(Locale.getDefault());
             }
         }

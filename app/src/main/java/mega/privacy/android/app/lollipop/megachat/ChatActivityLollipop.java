@@ -620,6 +620,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         toolbarElementsInside = (RelativeLayout) findViewById(R.id.toolbar_elements_inside);
         titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
+
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             titleToolbar.setEmojiSize(Util.scaleWidthPx(12, outMetrics));
         }else{

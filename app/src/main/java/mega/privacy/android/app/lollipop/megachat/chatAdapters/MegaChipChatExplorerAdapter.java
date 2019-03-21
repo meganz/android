@@ -27,6 +27,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
@@ -64,7 +65,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             super(itemView);
         }
 
-        TextView textViewName;
+        EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
         RelativeLayout itemLayout;
@@ -96,7 +97,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder = new ViewHolderChips(v);
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
-        holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
+        holder.textViewName = (EmojiTextView) v.findViewById(R.id.name_chip);
+        holder.textViewName.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);

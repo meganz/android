@@ -30,13 +30,14 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
-    public static final int TITLE_TOOLBAR_PORTRAIT = 300;
+    public static final int TITLE_TOOLBAR__CHAT_PORTRAIT = 150;
+    public static final int TITLE_TOOLBAR__CALL_PORTRAIT = 200;
     public static final int TITLE_TOOLBAR_LANDSCAPE = 300;
     public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
 
   private Context mContext;
   private Display display;
-  private DisplayMetrics mOutMetrics;
+  private DisplayMetrics mOutMetrics = new DisplayMetrics ();
   private int textViewMaxWidth;
 
   public EmojiTextView(final Context context) {
@@ -74,7 +75,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     if(mContext!=null){
         if(mContext instanceof GroupChatInfoActivityLollipop){
             display = ((GroupChatInfoActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
-            mOutMetrics = new DisplayMetrics ();
             display.getMetrics(mOutMetrics);
             if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
@@ -85,7 +85,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
         }else if (mContext instanceof ManagerActivityLollipop) {
             display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
-            mOutMetrics = new DisplayMetrics ();
             display.getMetrics(mOutMetrics);
             if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
@@ -96,14 +95,12 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
         }else if(mContext instanceof ChatExplorerActivity){
             display = ((ChatExplorerActivity)mContext).getWindowManager().getDefaultDisplay();
-            mOutMetrics = new DisplayMetrics ();
             display.getMetrics(mOutMetrics);
             textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
             setText(getText());
 
         }else if(mContext instanceof ArchivedChatsActivity){
             display = ((ArchivedChatsActivity)mContext).getWindowManager().getDefaultDisplay();
-            mOutMetrics = new DisplayMetrics ();
             display.getMetrics(mOutMetrics);
             textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
             setText(getText());
@@ -115,23 +112,21 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
                 if (inContext != null) {
                   if (inContext instanceof ChatActivityLollipop) {
                       display = ((ChatActivityLollipop)inContext).getWindowManager().getDefaultDisplay();
-                      mOutMetrics = new DisplayMetrics ();
                       display.getMetrics(mOutMetrics);
                       if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                           textViewMaxWidth = Util.scaleWidthPx(TITLE_TOOLBAR_LANDSCAPE, mOutMetrics);
                       }else{
-                          textViewMaxWidth = Util.scaleWidthPx(TITLE_TOOLBAR_PORTRAIT, mOutMetrics);
+                          textViewMaxWidth = Util.scaleWidthPx(TITLE_TOOLBAR__CHAT_PORTRAIT, mOutMetrics);
                       }
                       setText(getText());
 
                   } else if (inContext instanceof ChatCallActivity) {
                         display = ((ChatCallActivity)inContext).getWindowManager().getDefaultDisplay();
-                        mOutMetrics = new DisplayMetrics ();
                         display.getMetrics(mOutMetrics);
                         if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                           textViewMaxWidth = Util.scaleWidthPx(TITLE_TOOLBAR_LANDSCAPE, mOutMetrics);
                         }else{
-                          textViewMaxWidth = Util.scaleWidthPx(TITLE_TOOLBAR_PORTRAIT, mOutMetrics);
+                          textViewMaxWidth = Util.scaleWidthPx(TITLE_TOOLBAR__CALL_PORTRAIT, mOutMetrics);
                         }
                         setText(getText());
                   }
@@ -156,8 +151,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
       if(mContext!=null){
-          if((mContext instanceof GroupChatInfoActivityLollipop) || (mContext instanceof ManagerActivityLollipop) ||
-                  (mContext instanceof ChatExplorerActivity) || (mContext instanceof ArchivedChatsActivity)){
+          if((mContext instanceof GroupChatInfoActivityLollipop) || (mContext instanceof ManagerActivityLollipop) || (mContext instanceof ArchivedChatsActivity) || (mContext instanceof ChatExplorerActivity)) {
               CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
               super.setText(textF, type);
 
