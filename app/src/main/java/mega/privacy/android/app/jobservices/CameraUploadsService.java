@@ -172,6 +172,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("onDestroy()");
         super.onDestroy();
         isServiceRunning = false;
+        unregisterReceiver(NetworkTypeChangeReceiver.getInstance());
     }
     
     @Nullable
