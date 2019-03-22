@@ -1174,6 +1174,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         layout.addView(input, params);
 
+        input.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
+        input.setLongClickable(false);
+
         input.setSingleLine();
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));

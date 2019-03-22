@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
@@ -49,7 +50,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
 
     @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
 
-        if(mContext instanceof GroupChatInfoActivityLollipop){
+        if((mContext instanceof GroupChatInfoActivityLollipop) || (mContext instanceof AddContactActivityLollipop)){
             if(text.toString().equals("")){
             }else{
                 final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
@@ -72,6 +73,25 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
             }
         }
     }
+//
+//    @Override
+//    public boolean onTextContextMenuItem(int id) {
+//        // React:
+//        switch (id){
+//            case android.R.id.paste:
+//                log("******** onTextContextMenuItem:paste = ");
+//                onTextPaste();
+//                return false;
+//        }
+//        return true;
+//    }
+//
+//    /**
+//     * Text was pasted into the EditText.
+//     */
+//    public void onTextPaste(){
+//        log("********+ onTExtPaste = ");
+//    }
 
     @Override @CallSuper public void input(final Emoji emoji) {
         if (emoji != null) {
