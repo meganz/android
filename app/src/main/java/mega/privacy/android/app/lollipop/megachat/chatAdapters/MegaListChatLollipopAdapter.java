@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -43,6 +44,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.scrollBar.Utils;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -1151,10 +1153,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			String title = chat.getTitle();
 
 			if(title!=null){
-				log("ChatRoom title: "+title);
+				log(" ChatRoom title: "+title);
 				log("chat timestamp: "+chat.getLastTimestamp());
 				String date = TimeUtils.formatDateAndTime(context,chat.getLastTimestamp(), TimeUtils.DATE_LONG_FORMAT);
 				log("date timestamp: "+date);
+				int maxAllowed = ChatUtil.getMaxAllowed(title);
+				((ViewHolderNormalChatList)holder).textViewContactName.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
+
 				((ViewHolderNormalChatList)holder).textViewContactName.setText(title);
 
 				if(!chat.isGroup()){

@@ -30,7 +30,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
-  public static final int TITLE_TOOLBAR__CHAT_PORTRAIT = 150;
+  public static final int TITLE_TOOLBAR__CHAT_PORTRAIT = 170;
   public static final int TITLE_TOOLBAR__CALL_PORTRAIT = 200;
   public static final int TITLE_TOOLBAR_LANDSCAPE = 300;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;

@@ -73,25 +73,6 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
             }
         }
     }
-//
-//    @Override
-//    public boolean onTextContextMenuItem(int id) {
-//        // React:
-//        switch (id){
-//            case android.R.id.paste:
-//                log("******** onTextContextMenuItem:paste = ");
-//                onTextPaste();
-//                return false;
-//        }
-//        return true;
-//    }
-//
-//    /**
-//     * Text was pasted into the EditText.
-//     */
-//    public void onTextPaste(){
-//        log("********+ onTExtPaste = ");
-//    }
 
     @Override @CallSuper public void input(final Emoji emoji) {
         if (emoji != null) {

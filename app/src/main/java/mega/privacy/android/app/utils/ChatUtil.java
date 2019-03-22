@@ -97,12 +97,41 @@ public class ChatUtil {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
     }
 
+    public static String charWithoutInvalidCharacters(@Nullable final CharSequence text){
+        String result = text.toString();
+        int position = -1;
+        for (int i = (text.length()-1); i >= 0; i--){
+            if((!Character.isLetterOrDigit(text.charAt(i)))&&(!Character.isWhitespace(text.charAt(i)))){
+                CharSequence lastChars = text.subSequence((i-2), i);
+                int numEmojis = EmojiManager.getInstance().getNumEmojis(lastChars);
+                if(numEmojis>0){
+                    position = i;
+                    break;
+                }
+            }else{
+                position = i;
+                break;
+            }
+        }
+
+        if(position != -1){
+            result = text.subSequence(0, position).toString();
+        }
+        return result;
+    }
+
     public static int getMaxAllowed(@Nullable final CharSequence text){
         int numEmojis = EmojiManager.getInstance().getNumEmojis(text);
         if(numEmojis > 0){
             int realLenght = ((text.length() - (numEmojis*2)) + (numEmojis*4));
             if(realLenght>=MAX_ALLOWED_CHARACTERS_AND_EMOJIS){
                 return text.length();
+//                if(realLenght>=30){
+//                    String newTitle = ChatUtil.charWithoutInvalidCharacters(text);
+//                    return newTitle.length();
+//                }else{
+//                    return text.length();
+//                }
             }else{
                 return MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
             }
@@ -128,8 +157,10 @@ public class ChatUtil {
         return result;
     }
 
+
+
     private static void log(String message) {
-        log("UtilChat", message);
+        log("ChatUtil", message);
     }
 
 }
