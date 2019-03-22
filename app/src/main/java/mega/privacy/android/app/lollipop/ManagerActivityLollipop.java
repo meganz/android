@@ -2667,7 +2667,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						if (Util.isChatEnabled()) {
+							megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						}
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -2676,11 +2678,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending = false;
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
-						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
-						joiningToChatLink = true;
-						if (idJoinToChatLink == -1) {
-							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+						if (Util.isChatEnabled()) {
+							megaChatApi.checkChatLink(getIntent().getDataString(), this);
+							idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+							joiningToChatLink = true;
+							if (idJoinToChatLink == -1) {
+								showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+							}
 						}
 
 						getIntent().setAction(null);
@@ -15588,7 +15592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
 				showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
 			}
-			else {
+			else if (e.getErrorCode()!= MegaChatError.ERROR_EXIST){
 				log("Error joining to chat: "+ e.getErrorString());
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
 			}
