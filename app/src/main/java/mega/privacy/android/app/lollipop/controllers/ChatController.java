@@ -1228,77 +1228,20 @@ public class ChatController {
 
     public String getNonContactFullName(long userHandle){
         NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
-        if(nonContact!=null){
+        if(nonContact!=null) {
             String fullName = nonContact.getFullName();
 
-            if(fullName!=null){
-                if(fullName.isEmpty()){
-                    log("1-Put email as fullname");
-                    String email = nonContact.getEmail();
-                    if(email!=null){
-                        if(email.isEmpty()){
-                            return "";
-                        }
-                        else{
-                            if (email.trim().length() <= 0){
-                                return "";
-                            }
-                            else{
-                                return email;
-                            }
-                        }
-                    }
-                    else{
-                        return "";
-                    }
-                }
-                else{
-                    if (fullName.trim().length() <= 0){
-                        log("2-Put email as fullname");
-                        String email = nonContact.getEmail();
-                        if(email!=null){
-                            if(email.isEmpty()){
-                                return "";
-                            }
-                            else{
-                                if (email.trim().length() <= 0){
-                                    return "";
-                                }
-                                else{
-                                    return email;
-                                }
-                            }
-                        }
-                        else{
-                            return "";
-                        }
-                    }
-                    else{
-                        return fullName;
-                    }
-                }
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                return fullName;
             }
-            else{
-                log("3-Put email as fullname");
+            else {
                 String email = nonContact.getEmail();
-                if(email!=null){
-                    if(email.isEmpty()){
-                        return "";
-                    }
-                    else{
-                        if (email.trim().length() <= 0){
-                            return "";
-                        }
-                        else{
-                            return email;
-                        }
-                    }
-                }
-                else{
-                    return "";
+                if (email != null && email.trim().isEmpty()) {
+                    return email;
                 }
             }
         }
+
         return "";
     }
 
@@ -1343,25 +1286,11 @@ public class ChatController {
         log("getParticipantFullName: "+userHandle);
         String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
-        if(fullName!=null){
-            if(fullName.isEmpty()){
-                log("1-Put email as fullname");
-                String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
-                return participantEmail;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
-                    log("2-Put email as fullname");
-                    String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
-                    return participantEmail;
-                }
-                else{
-                    return fullName;
-                }
-            }
+        if(fullName!=null && !fullName.trim().isEmpty()) {
+            return fullName;
         }
-        else{
-            log("3-Put email as fullname");
+        else {
+            log("1-Put email as fullname");
             String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
             return participantEmail;
         }
