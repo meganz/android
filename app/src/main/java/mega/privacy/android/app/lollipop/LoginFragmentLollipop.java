@@ -525,7 +525,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-//                    permitVerify();
                 }
             }
         });
@@ -568,7 +567,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-//                    permitVerify();
                 }
             }
         });
@@ -1538,13 +1536,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginProgressBar.setVisibility(View.GONE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
 
-        loginLogin.setVisibility(View.VISIBLE );
-        loginCreateAccount.setVisibility(View.VISIBLE);
         queryingSignupLinkText.setVisibility(View.VISIBLE);
         confirmingAccountText.setVisibility(View.GONE);
-        loginLoggingIn.setVisibility(View.GONE);
-        loginProgressBar.setVisibility(View.GONE);
-        loginFetchNodesProgressBar.setVisibility(View.GONE);
         loggingInText.setVisibility(View.VISIBLE);
         fetchingNodesText.setVisibility(View.GONE);
         prepareNodesText.setVisibility(View.GONE);
