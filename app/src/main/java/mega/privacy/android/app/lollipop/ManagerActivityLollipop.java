@@ -191,7 +191,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -647,9 +646,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private boolean onAskingPermissionsFragment = false;
 
-	private AlertDialog openchatLinkDialog;
-	private EditText openChatLinkText;
-	private RelativeLayout openChatLinkError;
+	private String openLinkUrl;
+	private EditText openLinkText;
+	private RelativeLayout openLinkError;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -2789,12 +2788,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						markNotificationsSeen(true);
-
-						handleInviteContact = getIntent().getLongExtra("handle", 0);
-
-						drawerItem = DrawerItem.CONTACTS;
-						indexContacts = 0;
-						selectDrawerItemLollipop(drawerItem);
+						openContactLink(getIntent().getLongExtra("handle", 0));
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
 						update2FASetting();
@@ -3009,6 +3003,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		log("END onCreate");
+	}
+
+	public void openContactLink (long handle) {
+    	dismissOpenLinkDialog();
+		handleInviteContact = handle;
+		log("openContactLink Handle to invite a contact: "+handle);
+		drawerItem = DrawerItem.CONTACTS;
+		indexContacts = 0;
+		selectDrawerItemLollipop(drawerItem);
 	}
 
 	void askForAccess () {
@@ -3589,12 +3592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
 					markNotificationsSeen(true);
-
-					handleInviteContact = getIntent().getLongExtra("handle", 0);
-
-					drawerItem = DrawerItem.CONTACTS;
-					indexContacts = 0;
-					selectDrawerItemLollipop(drawerItem);
+					openContactLink(getIntent().getLongExtra("handle", 0));
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
@@ -5789,7 +5787,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		case CONTACTS:{
 				showHideBottomNavigationView(true);
 				selectDrawerItemContacts();
-				supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
@@ -7014,10 +7011,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						sortByMenuItem.setVisible(false);
 					}
 					if (handleInviteContact != 0) {
+						log("onCreateOptionsMenu Handle to invite a contact: "+handleInviteContact);
 						if (cFLol != null) {
 							cFLol.invite(handleInviteContact);
 						}
 						handleInviteContact = 0;
+					}
+					else {
+						log("onCreateOptionsMenu Handle to invite a contact: "+handleInviteContact);
 					}
 
 					//Hide
@@ -7825,12 +7826,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return true;
 			}
 		    case R.id.action_import_link:{
-		    	if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-					showImportLinkDialog();
-				}
-				else if (drawerItem == DrawerItem.CHAT) {
-					showOpenChatLinkDialog();
-				}
+				showOpenLinkDialog();
 		    	return true;
 		    }
 		    case R.id.action_take_picture:{
@@ -10934,39 +10930,85 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	void showOpenChatLinkError(boolean show) {
-		if (openchatLinkDialog != null) {
+	void showOpenLinkError(boolean show) {
+		if (openLinkDialog != null) {
 			if (show) {
-				openChatLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-				openChatLinkText.getBackground().mutate().clearColorFilter();
-				openChatLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
-				openChatLinkError.setVisibility(View.VISIBLE);
+				openLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+				openLinkText.getBackground().mutate().clearColorFilter();
+				openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+				openLinkError.setVisibility(View.VISIBLE);
 			}
 			else {
-				if (openChatLinkError.getVisibility() == View.VISIBLE) {
-					openChatLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-					openChatLinkText.getBackground().mutate().clearColorFilter();
-					openChatLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-					openChatLinkError.setVisibility(View.GONE);
+				if (openLinkError.getVisibility() == View.VISIBLE) {
+					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					openLinkText.getBackground().mutate().clearColorFilter();
+					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					openLinkError.setVisibility(View.GONE);
 				}
 			}
 		}
 	}
 
-	void dismissOpenChatLinkDialog() {
+	void dismissOpenLinkDialog() {
 		try {
-			openchatLinkDialog.dismiss();
+			openLinkDialog.dismiss();
 		} catch (Exception e) {}
 	}
 
-	public void showOpenChatLinkDialog() {
+	void openLink (String link) {
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			int error = nC.importLink(link);
+			switch (error) {
+				case 1: {
+					log("Do nothing: correct file link");
+					dismissOpenLinkDialog();
+					break;
+				}
+				case 2: {
+					log("Do nothing: correct folder link");
+					dismissOpenLinkDialog();
+					break;
+				}
+				case 3: {
+					log("Show error: correct chat link");
+					openLinkUrl = link;
+					showSnackbar(Constants.OPEN_LINK_SNACKBAR_TYPE, openLinkDialog.getCurrentFocus(), getString(R.string.valid_chat_link), -1);
+					showOpenLinkError(true);
+					break;
+				}
+				case 4: {
+					log("Show error: correct contact link");
+					openLinkUrl = link;
+					showSnackbar(Constants.OPEN_LINK_SNACKBAR_TYPE,  openLinkDialog.getCurrentFocus(), getString(R.string.valid_contact_link), -1);
+					showOpenLinkError(true);
+					break;
+				}
+				case -1: {
+					log("Show error: invalid link");
+					showOpenLinkError(true);
+					break;
+				}
+			}
+		}
+		else if (drawerItem == DrawerItem.CHAT) {
+			megaChatApi.checkChatLink(link, managerActivity);
+		}
+	}
+
+	public String getLinkUrlDialog () {
+		return openLinkUrl;
+	}
+
+	public void showOpenLinkDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_open_chat_link, null);
+		View v = inflater.inflate(R.layout.dialog_open_link, null);
 		builder.setView(v);
 
-		openChatLinkText = (EditText) v.findViewById(R.id.chat_link_text);
-		openChatLinkText.addTextChangedListener(new TextWatcher() {
+		TextView title = (TextView) v.findViewById(R.id.link_title);
+
+		openLinkText = (EditText) v.findViewById(R.id.link_text);
+		openLinkText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -10979,200 +11021,65 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				showOpenChatLinkError(false);
+				showOpenLinkError(false);
 			}
 		});
 
-		openChatLinkText.setOnEditorActionListener(new OnEditorActionListener() {
+		openLinkText.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					megaChatApi.checkChatLink(openChatLinkText.getText().toString(), managerActivity);
+					Util.hideKeyboardView(managerActivity, v, 0);
+					openLink(openLinkText.getText().toString());
 					return true;
 				}
 				return false;
 			}
 		});
 
-		openChatLinkError = (RelativeLayout) v.findViewById(R.id.chat_link_error);
-		openChatLinkError.setVisibility(View.GONE);
+		openLinkError = (RelativeLayout) v.findViewById(R.id.link_error);
+		openLinkError.setVisibility(View.GONE);
+		TextView errorText = (TextView) v.findViewById(R.id.link_error_text);
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+			title.setText(R.string.action_open_link);
+			openLinkText.setHint(R.string.hint_paste_link);
+			errorText.setText(R.string.invalid_file_folder_link);
+		}
+		else if (drawerItem == DrawerItem.CHAT) {
+			title.setText(R.string.action_open_chat_link);
+			openLinkText.setHint(R.string.hint_enter_chat_link);
+			errorText.setText(R.string.invalid_chat_link_args);
+		}
 
 		OnClickListener clickListener = new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				switch (v.getId()) {
-					case R.id.chat_link_cancel_button: {
-						dismissOpenChatLinkDialog();
+					case R.id.link_cancel_button: {
+						dismissOpenLinkDialog();
 						break;
 					}
-					case R.id.chat_link_open_button: {
-						megaChatApi.checkChatLink(openChatLinkText.getText().toString(), managerActivity);
+					case R.id.link_open_button: {
+						Util.hideKeyboardView(managerActivity, v, 0);
+						openLink(openLinkText.getText().toString());
 						break;
 					}
 				}
 			}
 		};
 
-		Button cancelButton = (Button) v.findViewById(R.id.chat_link_cancel_button);
+		Button cancelButton = (Button) v.findViewById(R.id.link_cancel_button);
 		cancelButton.setOnClickListener(clickListener);
-		Button openButton = (Button) v.findViewById(R.id.chat_link_open_button);
+		Button openButton = (Button) v.findViewById(R.id.link_open_button);
 		openButton.setOnClickListener(clickListener);
 
-		openchatLinkDialog = builder.create();
-		openchatLinkDialog.setCanceledOnTouchOutside(false);
+		openLinkDialog = builder.create();
+		openLinkDialog.setCanceledOnTouchOutside(false);
 
 		try {
-			openchatLinkDialog.show();
+			openLinkDialog.show();
 		}catch (Exception e){}
-	}
-
-	public void showImportLinkDialog(){
-		log("showImportLinkDialog");
-		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-
-	    final EditText input = new EditText(this);
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine(false);
-
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		layout.addView(input, params);
-		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
-
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-//		params_icon.width = Util.scaleWidthPx(24, outMetrics);
-//		params_icon.width = 80;
-//		params_icon.height = Util.scaleHeightPx(24, outMetrics);
-//		params_icon.height = 80;
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(ManagerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.context_open_link_title));
-		builder.setPositiveButton(getString(R.string.context_open_link),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-
-						try{
-							openLinkDialog.dismiss();
-						}
-						catch(Exception e){}
-						nC.importLink(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setView(layout);
-		openLinkDialog = builder.create();
-		openLinkDialog.show();
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-						return true;
-					}
-					nC.importLink(value);
-					try{
-						openLinkDialog.dismiss();
-					}
-					catch(Exception e){}
-					return true;
-				}
-				try{
-					openLinkDialog.dismiss();
-				}
-				catch(Exception e){}
-				return false;
-			}
-		});
-
-		openLinkDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-					return;
-				}
-
-				try{
-					openLinkDialog.dismiss();
-				}
-				catch(Exception e){}
-
-				nC.importLink(value);
-			}
-		});
 	}
 
 	public void showChatLink(String link){
@@ -15563,15 +15470,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
 				showChatLink(request.getLink());
-				dismissOpenChatLinkDialog();
+				dismissOpenLinkDialog();
 			}
 			else {
 				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-					dismissOpenChatLinkDialog();
+					dismissOpenLinkDialog();
 					Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
 				}
 				else {
-					showOpenChatLinkError(true);
+					showOpenLinkError(true);
 				}
 			}
 		}

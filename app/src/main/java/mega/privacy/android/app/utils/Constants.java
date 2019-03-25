@@ -330,4 +330,5 @@ public class Constants {
 	public static final int SNACKBAR_TYPE = 0;
 	public static final int MESSAGE_SNACKBAR_TYPE = 1;
 	public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
+	public static final int OPEN_LINK_SNACKBAR_TYPE = 4;
 }
