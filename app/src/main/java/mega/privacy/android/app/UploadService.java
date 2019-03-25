@@ -326,31 +326,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 	}
-	
-	private void startFileUpload(long lastModified,long parentHandle,String nameInMEGA,File file){
-        if (!wl.isHeld()) {
-            wl.acquire();
-        }
-        if (!lock.isHeld()) {
-            lock.acquire();
-        }
-        
-        totalUploads++;
-        
-        if (lastModified == 0) {
-            if (nameInMEGA != null) {
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
-            } else {
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),this);
-            }
-        } else {
-            if (nameInMEGA != null) {
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,lastModified / 1000,this);
-            } else {
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),lastModified / 1000,this);
-            }
-        }
-    }
 
 	int checkFileToUploadRenamed (File file, long parentHandle, String nameInMEGAEdited) {
 		MegaNode nodeEditedExistsInFolder = megaApi.getNodeByPath(nameInMEGAEdited, megaApi.getNodeByHandle(parentHandle));
