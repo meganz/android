@@ -15592,8 +15592,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
 				showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
 			}
-			else if (e.getErrorCode()!= MegaChatError.ERROR_EXIST){
+			else{
 				log("Error joining to chat: "+ e.getErrorString());
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(request.getChatHandle());
+				if (chatRoom != null && (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR
+						|| chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO)) {
+					log("Error joining to chat: I'm already a participant");
+					return;
+				}
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
 			}
 		}
