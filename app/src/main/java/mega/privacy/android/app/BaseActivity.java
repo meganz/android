@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -350,6 +351,12 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.setAction("Settings", new SnackbarNavigateOption(view.getContext()));
                 snackbar.show();
                 break;
+            }
+            case Constants.OPEN_LINK_SNACKBAR_TYPE: {
+                if (view.getContext() instanceof ManagerActivityLollipop) {
+                    snackbar.setAction(R.string.context_open_link, new SnackbarNavigateOption(view.getContext(), ((ManagerActivityLollipop) view.getContext()).getLinkUrlDialog()));
+                }
+                snackbar.show();
             }
         }
     }
