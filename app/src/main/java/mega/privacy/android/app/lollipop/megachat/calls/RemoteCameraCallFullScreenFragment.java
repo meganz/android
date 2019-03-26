@@ -79,7 +79,8 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
         remoteFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_remote_video);
         remoteFullScreenSurfaceView.setOnClickListener(this);
-        remoteFullScreenSurfaceView.setZOrderMediaOverlay(true);
+        remoteFullScreenSurfaceView.setZOrderOnTop(false);
+        remoteFullScreenSurfaceView.setZOrderMediaOverlay(false);
         SurfaceHolder remoteSurfaceHolder = remoteFullScreenSurfaceView.getHolder();
         remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);
@@ -140,15 +141,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     @Override
     public void onDestroy(){
         log("onDestroy");
-        if(remoteFullScreenSurfaceView.getParent()!=null){
-            if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
-                log("onDestroy() removeView chatId: "+chatId);
-                ((ViewGroup)remoteFullScreenSurfaceView.getParent()).removeView(remoteFullScreenSurfaceView);
-            }
-        }
-        log("onDestroy() removeChatVideoListener (REMOTE) chatId: "+chatId);
-        remoteFullScreenSurfaceView.setVisibility(View.GONE);
-        megaChatApi.removeChatVideoListener(chatId, peerid, clientid, this);
+        removeSurfaceView();
         super.onDestroy();
     }
 
@@ -163,7 +156,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     }
 
     public void removeSurfaceView(){
-        log("removeSurfaceView()");
+        log("*removeSurfaceView()");
         if(remoteFullScreenSurfaceView.getParent()!=null){
             if(remoteFullScreenSurfaceView.getParent().getParent()!=null){
                 log("removeSurfaceView() removeView chatId: "+chatId);

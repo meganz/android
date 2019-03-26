@@ -321,12 +321,14 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                 int ret = megaChatApi.getInitState();
 
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
                     log("result of init ---> " + ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE) {
                         log("condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
+
                     } else if (ret == MegaChatApi.INIT_ERROR) {
                         log("condition ret == MegaChatApi.INIT_ERROR");
                         if (chatSettings == null) {
@@ -339,6 +341,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             dbH.setEnabledChat(false + "");
                         }
                         megaChatApi.logout(this);
+
                     } else {
                         log("Chat correctly initialized");
                         megaChatApi.enableGroupChatCalls(true);

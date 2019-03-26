@@ -281,7 +281,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     }
 
     void showError (boolean correct) {
-        hideKeyboard();
+        Util.hideKeyboard(this, 0);
         if(containerPasswordError.getVisibility() == View.INVISIBLE){
             containerPasswordError.setVisibility(View.VISIBLE);
             Drawable background = password_background.mutate().getConstantState().newDrawable();
@@ -320,14 +320,6 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             } else{
                 passwordEditText.setBackground(background);
             }
-        }
-    }
-
-    void hideKeyboard (){
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
@@ -469,10 +461,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
     public void showSnackbar(String s){
         log("showSnackbar");
-        Snackbar snackbar = Snackbar.make(findViewById(R.id.container_layout), s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(findViewById(R.id.container_layout), s);
     }
 
     @Override

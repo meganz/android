@@ -161,7 +161,7 @@ public class AccountController implements View.OnClickListener{
         log("exportMK");
         if (!Util.isOnline(context)){
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             }
             else if (context instanceof TestPasswordActivity) {
                 ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
@@ -215,7 +215,7 @@ public class AccountController implements View.OnClickListener{
             File file = new File(path);
             if(availableFreeSpace < file.length()) {
                 if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
                 }
                 else if (context instanceof TestPasswordActivity) {
                     ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
@@ -240,7 +240,7 @@ public class AccountController implements View.OnClickListener{
                 else {
                     if(fromOffline){
                         if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
                         }
                     }
                     else{
