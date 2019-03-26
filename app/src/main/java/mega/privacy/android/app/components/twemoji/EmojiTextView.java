@@ -143,9 +143,10 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   }
   @Override public void setText(CharSequence rawText, BufferType type) {
     log("setText");
-
       CharSequence text = rawText == null ? "" : rawText;
-      SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+      String resultTExt = EmojiUtilsShortcodes.emojify(text.toString());
+      SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultTExt);
+
       Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
       float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
       EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
@@ -161,6 +162,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
                   Context inContext = ((ContextWrapper) mContext).getBaseContext();
                   if (inContext != null) {
                       if ((inContext instanceof ChatActivityLollipop) ||(inContext instanceof ChatCallActivity) ) {
+
                           CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
                           super.setText(textF, type);
                       }

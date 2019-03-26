@@ -35,6 +35,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.util.Log;
+
 import org.webrtc.AndroidVideoTrackSourceObserver;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
@@ -48,6 +49,7 @@ import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
@@ -536,8 +538,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
 //		if(Util.isChatEnabled()){}
-		EmojiManager.install(new TwitterEmojiProvider());
+		EmojiManagerShortcodes.initEmojiData(getApplicationContext());
 
+		EmojiManager.install(new TwitterEmojiProvider());
 		final EmojiCompat.Config config;
 		if (USE_BUNDLED_EMOJI) {
 			log("use Bundle emoji");

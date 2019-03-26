@@ -87,6 +87,7 @@ import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -1125,6 +1126,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 titleToolbar.setText(chatRoom.getTitle());
+//                String text = "**A :cat:, :dog: and a :mouse: became friends<3. For :dog:'s birthday party, they all had :hamburger:s, :fries:s, :cookie:s and :cake:.";
+//                log("************+ setText = "+text);
+//                String resultTExt = EmojiUtilsShortcodes.emojify(text);
+//                log("***** resultTExt = "+resultTExt);
                 setChatSubtitle();
 
                 if (!chatRoom.isPublic() && chatRoom.isGroup()) {
