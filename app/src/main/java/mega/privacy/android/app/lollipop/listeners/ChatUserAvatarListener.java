@@ -1,14 +1,10 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-
 import java.io.File;
-
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
@@ -36,11 +32,10 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestFinish(): "+e.getErrorCode());
-        if (e.getErrorCode() == MegaError.API_OK){
 
+        if (e.getErrorCode() == MegaError.API_OK){
             Bitmap bitmap;
             String email;
-
             if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
                 MegaListChatLollipopAdapter.ViewHolderNormalChatList viewHolder = (MegaListChatLollipopAdapter.ViewHolderNormalChatList) holder;
                 if(viewHolder !=null && viewHolder.getContactMail()!=null && request.getEmail()!=null){
@@ -79,21 +74,6 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                         bitmap = getBitmap(email);
                         if (bitmap != null) {
                             viewHolder.setAvatar(bitmap);
-                        }
-                    }
-                }
-                else{
-                    log("Adapter cannot be updated - null");
-                }
-            }
-            else if (holder instanceof GroupCallAdapter.ViewHolderGroupCall) {
-                GroupCallAdapter.ViewHolderGroupCall viewHolder = (GroupCallAdapter.ViewHolderGroupCall) holder;
-                if(viewHolder !=null && viewHolder.getEmail()!=null && request.getEmail()!=null){
-                    email = viewHolder.getEmail();
-                    if (email.compareTo(request.getEmail()) == 0){
-                        bitmap = getBitmap(email);
-                        if (bitmap != null) {
-                            viewHolder.setAvatarImage(bitmap);
                         }
                     }
                 }

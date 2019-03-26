@@ -36,7 +36,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -256,29 +255,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public boolean participatingInACall(){
-        boolean activeCall = false;
-        if(megaChatApi!=null){
-            MegaHandleList listCalls = megaChatApi.getChatCalls();
-            int contCallNotPresent = 0;
-            if((listCalls!=null)&&(listCalls.size()>0)){
-                for(int i=0; i<listCalls.size(); i++){
-                    MegaChatCall call = megaChatApi.getChatCall(listCalls.get(i));
-                    if(call!=null){
-                        if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
-                            contCallNotPresent ++ ;
-                        }
-                    }
-                }
-                if(contCallNotPresent == listCalls.size()){
-                    activeCall = false;
-                }else{
-                    activeCall = true;
-                }
-            }
-        }
-        return activeCall;
-    }
+
 
     @Override
     public void onBackPressed() {

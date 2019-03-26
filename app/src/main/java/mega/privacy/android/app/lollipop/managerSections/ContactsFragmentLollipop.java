@@ -53,6 +53,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -620,15 +621,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 						log("Selected contact NULL");
 						break;
 					}
-					if(users.size()  == 1){
-						((ManagerActivityLollipop) context).startOneToOneChat(users.get(0));
-					}else{
-						for(int i=0;i<users.size();i++){
-							contactHandles.add(users.get(i).getHandle());
-						}
-
-						((ManagerActivityLollipop)context).startGroupConversation(contactHandles);
+					ArrayList<String> contactsNewGroup = new ArrayList<>();
+					for(int i=0;i<users.size();i++){
+						contactsNewGroup.add(users.get(i).getEmail());
 					}
+
+					Intent intent = new Intent(context, AddContactActivityLollipop.class);
+					intent.putStringArrayListExtra("contactsNewGroup", contactsNewGroup);
+					intent.putExtra("newGroup", true);
+					intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+					((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
+//					}
 
 					clearSelections();
 					hideMultipleSelect();

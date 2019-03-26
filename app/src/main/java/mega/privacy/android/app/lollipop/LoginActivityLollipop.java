@@ -248,33 +248,18 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 log("showLoginFragment");
                 if (loginFragment == null) {
                     loginFragment = new LoginFragmentLollipop();
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        loginFragment.setEmailTemp(emailTemp);
-                        loginFragment.setPasswdTemp(passwdTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
-                } else {
-                    if ((passwdTemp != null) && (emailTemp != null)) {
-                        loginFragment.setEmailTemp(emailTemp);
-                        loginFragment.setPasswdTemp(passwdTemp);
-//						emailTemp = null;
-//						passwdTemp = null;
-//						nameTemp = null;
-                    }
+                }
+                if ((passwdTemp != null) && (emailTemp != null)) {
+                    loginFragment.setEmailTemp(emailTemp);
+                    loginFragment.setPasswdTemp(passwdTemp);
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = this.getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
-                }
+                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+
 //				getFragmentManager()
 //						.beginTransaction()
 //						.attach(loginFragment)

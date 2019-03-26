@@ -1,15 +1,19 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -30,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -65,10 +70,14 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -103,6 +112,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	Stack<Integer> lastPositionStack;
 
 	MegaApiAndroid megaApi;
+	MegaChatApiAndroid megaChatApi;
+
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
 	TextView transfersNumberText;
@@ -129,6 +140,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	String downloadLocationDefaultPath = Util.downloadDIR;
     
     private int placeholderCount;
+
+	RelativeLayout callInProgressLayout;
+	Chronometer callInProgressChrono;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -527,6 +541,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		downloadLocationDefaultPath = Util.getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+			}
+		}else{
+			log("Chat not enabled!");
+		}
+
+
+
 		super.onCreate(savedInstanceState);
 		log("after onCreate called super");
 	}
@@ -610,6 +634,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
+			callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = (Chronometer) v.findViewById(R.id.call_in_progress_chrono);
+			callInProgressLayout.setVisibility(View.GONE);
+			callInProgressChrono.setVisibility(View.GONE);
+
+
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
 			transfersNumberText = (TextView) v.findViewById(R.id.transfers_overview_number);
@@ -652,8 +683,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
             
             setOverviewLayout();
-            
-            return v;
+			showCallLayout();
+
+
+			return v;
         } else {
             log("Grid View");
             log("FileBrowserFragmentLollipop isGrid");
@@ -832,6 +865,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 ((ManagerActivityLollipop)getActivity()).invalidateOptionsMenu();
                 break;
             }
+			case R.id.call_in_progress_layout:{
+				log("onClick:call_in_progress_layout");
+				if(checkPermissionsCall()){
+					ChatUtil.returnCall(context, megaChatApi);
+				}
+				break;
+			}
         }
     }
     
@@ -1699,6 +1739,86 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 fastScroller.setVisibility(View.GONE);
             } else {
                 fastScroller.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+	public boolean checkPermissionsCall(){
+		log("checkPermissionsCall() ");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+			boolean hasCameraPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+			if (!hasCameraPermission) {
+				ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
+				return false;
+			}
+
+			boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
+			if (!hasRecordAudioPermission) {
+				ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, Constants.RECORD_AUDIO);
+				return false;
+			}
+
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		log("onRequestPermissionsResult");
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		switch (requestCode) {
+			case Constants.REQUEST_CAMERA: {
+				log("REQUEST_CAMERA");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						log("REQUEST_CAMERA -> returnCall");
+						ChatUtil.returnCall(context, megaChatApi);
+					}
+				}
+				break;
+			}
+			case Constants.RECORD_AUDIO: {
+				log("RECORD_AUDIO");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					if(checkPermissionsCall()){
+						log("RECORD_AUDIO -> returnCall");
+						ChatUtil.returnCall(context, megaChatApi);
+					}
+				}
+				break;
+			}
+
+		}
+	}
+
+    public void showCallLayout(){
+        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && (megaChatApi!=null) &&(ChatUtil.participatingInACall(megaChatApi))){
+            log("showCallLayout");
+
+            if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
+                callInProgressLayout.setVisibility(View.VISIBLE);
+            }
+            if((callInProgressChrono!=null) && (callInProgressChrono.getVisibility() != View.VISIBLE)){
+                long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
+                if((megaChatApi!=null) && (chatId != -1)){
+                    MegaChatCall call = megaChatApi.getChatCall(chatId);
+                    if(call!=null){
+                        callInProgressChrono.setVisibility(View.VISIBLE);
+                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
+                        callInProgressChrono.start();
+                        callInProgressChrono.setFormat("%s");
+                    }
+                }
+            }
+
+        }else{
+            if(callInProgressChrono!=null){
+                callInProgressChrono.stop();
+                callInProgressChrono.setVisibility(View.GONE);
+            }
+            if(callInProgressLayout!=null){
+                callInProgressLayout.setVisibility(View.GONE);
             }
         }
     }
