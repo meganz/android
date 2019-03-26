@@ -89,8 +89,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
-//import com.vdurmont.emoji.EmojiManager;
-//import com.vdurmont.emoji.EmojiParser;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -4759,12 +4757,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementMessageLayout.setVisibility(View.GONE);
             holder.contentContactMessageLayout.setVisibility(View.VISIBLE);
 
-
             if (messages.get(position - 1).isShowAvatar()) {
-                ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
-                setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle, false);
+                holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
+                setContactAvatar( holder, userHandle, holder.fullNameTitle, false);
             } else {
-                ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
+                holder.layoutAvatarMessages.setVisibility(View.GONE);
             }
 
             if (message.isEdited()) {
@@ -7585,14 +7582,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         notifyItemChanged(pos);
         if (selectedItems.size() <= 0){
-                    ((ChatActivityLollipop) context).hideMultipleSelect();
+            ((ChatActivityLollipop) context).hideMultipleSelect();
 
         }
 //        ((ChatActivityLollipop) context).hideMultipleSelect();
 
         }
 
+    public void toggleDeselection(int pos) {
 
+        if(isItemChecked(pos)){
+            selectedItems.delete(pos);
+            notifyItemChanged(pos);
+            if (selectedItems.size() <= 0){
+                ((ChatActivityLollipop) context).hideMultipleSelect();
+            }else{
+                ((ChatActivityLollipop) context).updateActionModeTitle();
+            }
+        }
+
+    }
 
 
 
@@ -7631,8 +7640,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        notifyDataSetChanged();
     }
 
-    private boolean isItemChecked(int position) {
-        return selectedItems.get(position);
+    public boolean isItemChecked(int position) {
+        if((selectedItems!=null)&& (selectedItems.size()>0)){
+            return selectedItems.get(position);
+        }else{
+            return false;
+        }
     }
 
     public int getSelectedItemCount() {
@@ -7720,10 +7733,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages) {
-        log("removeMessage: size: " + messages.size());
+        log("removeMessage: position = "+position+", size: " + messages.size());
         this.messages = messages;
         notifyItemRemoved(position);
-
         if (position == messages.size()) {
             log("No need to update more");
         } else {
