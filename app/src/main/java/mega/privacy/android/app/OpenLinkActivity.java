@@ -79,7 +79,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		catch (UnsupportedEncodingException e) {}
 		url.replace(' ', '+');
 		if(url.startsWith("mega://")){
-			url = url.replace("mega://", "https://mega.co.nz/");
+			url = url.replace("mega://", "https://mega.nz/");
 		}
 
 		if (url.startsWith("https://www.mega.co.nz")){
@@ -88,6 +88,10 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		if (url.startsWith("https://www.mega.nz")){
 			url = url.replace("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length()-1);
 		}
 		
 		log("url " + url);

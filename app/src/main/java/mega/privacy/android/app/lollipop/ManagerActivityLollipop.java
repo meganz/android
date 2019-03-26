@@ -2668,6 +2668,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemPending=false;
 
 						if (Util.isChatEnabled()) {
+							log("ACTION_OPEN_CHAT_LINK: "+getIntent().getDataString());
 							megaChatApi.checkChatLink(getIntent().getDataString(), this);
 						}
 
