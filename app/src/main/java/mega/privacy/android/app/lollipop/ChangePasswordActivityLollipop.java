@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -34,6 +33,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -605,7 +605,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					hideKeyboard();
+					Util.hideKeyboard(changePasswordActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -743,7 +743,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	void permitVerify(){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard();
+			Util.hideKeyboard(changePasswordActivity, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -795,14 +795,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					sixthPin.setText("");
 				}
 			}
-		}
-	}
-
-	void hideKeyboard(){
-
-		View v = getCurrentFocus();
-		if (v != null){
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
 	}
 
@@ -1053,7 +1045,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		if(!Util.isOnline(this))
 		{
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -1480,11 +1472,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+		showSnackbar(fragmentContainer, s);
 	}
 
 	void hideAB(){
