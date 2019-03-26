@@ -7583,27 +7583,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyItemChanged(pos);
         if (selectedItems.size() <= 0){
             ((ChatActivityLollipop) context).hideMultipleSelect();
-
         }
-//        ((ChatActivityLollipop) context).hideMultipleSelect();
-
-        }
-
-    public void toggleDeselection(int pos) {
-
-        if(isItemChecked(pos)){
-            selectedItems.delete(pos);
-            notifyItemChanged(pos);
-            if (selectedItems.size() <= 0){
-                ((ChatActivityLollipop) context).hideMultipleSelect();
-            }else{
-                ((ChatActivityLollipop) context).updateActionModeTitle();
-            }
-        }
-
     }
-
-
 
     public void selectAll() {
         for (int i = 0; i < this.getItemCount(); i++) {
@@ -7740,9 +7721,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("No need to update more");
         } else {
             log("Update until end");
-            int itemCount = messages.size() - position;
+            int itemCount = messages.size()  - position;
             log("itemCount: " + itemCount);
-            notifyItemRangeChanged(position, itemCount);
+            notifyItemRangeChanged(position, messages.size() );
         }
     }
 

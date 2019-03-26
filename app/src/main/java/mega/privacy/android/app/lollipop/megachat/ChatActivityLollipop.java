@@ -5268,12 +5268,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if(indexToChange!=-1) {
-
-            if(adapter.isItemChecked(indexToChange+1)){
-                adapter.toggleDeselection(indexToChange+1);
-
-            }
-
             messages.remove(indexToChange);
             log("Removed index: " + indexToChange + " positionNewMessagesLayout: "+ positionNewMessagesLayout +" messages size: " + messages.size());
 //                adapter.notifyDataSetChanged();
@@ -5287,7 +5281,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Decrease generalUnread:Position where new messages layout is show: " + positionNewMessagesLayout);
                     generalUnreadCount--;
                 }
-//                adapter.notifyItemChanged(positionNewMessagesLayout);
+                adapter.notifyItemChanged(positionNewMessagesLayout);
             }
 
             if(!messages.isEmpty()){
@@ -5316,8 +5310,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
             adapter.removeMessage(indexToChange+1, messages);
-        }
-        else{
+            adapter.clearSelections();
+            hideMultipleSelect();
+        }else{
             log("index to change not found");
         }
     }
