@@ -69,6 +69,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private int errorCount = 0;
 	private int copiedCount = 0;
+	private int childUploadSucceeded = 0;
+	private int childUploadFailed = 0;
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -142,6 +144,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        megaApi.addTransferListener(this);
 	}
 
 	@Override
@@ -151,6 +154,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		if(megaApi != null) {
 			megaApi.removeRequestListener(this);
+            megaApi.removeTransferListener(this);
 		}
 
         if (megaChatApi != null){
@@ -185,7 +189,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private synchronized void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
-		
+        
+        MegaTransferListenerInterface placeHolderListener = null;
 		String action = intent.getAction();
 		log("action is " + action);
 		if(action != null){
@@ -219,10 +224,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             acquireLock();
             totalFolderUploads++;
 			if (nameInMEGA != null){
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
+                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,placeHolderListener);
 			}
 			else{
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), placeHolderListener);
 			}
 		}
 		else {
@@ -232,7 +237,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						log("CHECK_FILE_TO_UPLOAD_UPLOAD");
                         acquireLock();
 						totalFileUploads++;
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, placeHolderListener);
 						break;
 					}
 					case CHECK_FILE_TO_UPLOAD_COPY: {
@@ -264,9 +269,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						totalFileUploads++;
 
 						if (nameInMEGA != null) {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA,lastModified / 1000,this);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA,lastModified / 1000,placeHolderListener);
 						} else {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), placeHolderListener);
 						}
 						break;
 					}
@@ -283,9 +288,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						totalFileUploads++;
 
 						if (nameInMEGA != null) {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, placeHolderListener);
 						} else {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), placeHolderListener);
 						}
 						break;
 
@@ -505,10 +510,23 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         
         if (isOverquota == 0) {
             String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification,totalFolderUploadsCompletedSuccessfully,totalFolderUploadsCompletedSuccessfully);
-            long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
-            String totalBytes = Formatter.formatFileSize(UploadService.this,transferredBytes);
-            String size = getString(R.string.general_total_size,totalBytes);
-            notifyNotification(notificationTitle,size,notificationIdFinalForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
+            String notificationSubTitle;
+    
+            if (childUploadSucceeded > 0 && childUploadFailed > 0) {
+                String uploadedString = getResources().getQuantityString(R.plurals.upload_service_final_notification,childUploadSucceeded,childUploadSucceeded);
+                String errorString = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
+                notificationSubTitle = uploadedString + ", " + errorString;
+            } else if (childUploadSucceeded > 0) {
+                notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification,childUploadSucceeded,childUploadSucceeded);
+            } else if(childUploadFailed > 0){
+                notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
+            }else{
+                long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
+                String totalBytes = Formatter.formatFileSize(UploadService.this,transferredBytes);
+                notificationSubTitle = getString(R.string.general_total_size,totalBytes);
+            }
+            
+            notifyNotification(notificationTitle,notificationSubTitle,notificationIdFinalForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
         }
     }
     
@@ -680,6 +698,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				return;
 			}
 			
+			if(isTransferBelongsToFolderTransfer(transfer)){
+			    return;
+            }
+			
             transfersCount++;
             if(transfer.isFolderTransfer()){
                 mapProgressFolderTransfers.put(transfer.getTag(), transfer);
@@ -697,6 +719,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("transfer.getPath:" + transfer.getPath());
 		
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+            
+            if(isTransferBelongsToFolderTransfer(transfer)){
+                if (error.getErrorCode() == MegaError.API_OK) {
+                    childUploadSucceeded++;
+                }else{
+                    childUploadFailed++;
+                }
+                return;
+            }
 		    
             String appData = transfer.getAppData();
             if(appData!=null){
@@ -735,7 +766,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
 					log("Upload OK: " + transfer.getFileName());
-					if(transfer.isFolderTransfer() && transfer.getTotalBytes() == transfer.getTransferredBytes()){
+					if(transfer.isFolderTransfer()){
                         totalFolderUploadsCompletedSuccessfully++;
                     }else{
                         totalFileUploadsCompletedSuccessfully++;
@@ -934,8 +965,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log("****onTransferUpdate");
-        
+  
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
+            
+            if(isTransferBelongsToFolderTransfer(transfer)){
+                return;
+            }
+            
 			String appData = transfer.getAppData();
 
 			if(appData!=null){
@@ -966,6 +1002,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+            if(isTransferBelongsToFolderTransfer(transfer)){
+                return;
+            }
 			switch (e.getErrorCode())
 			{
 				case MegaError.API_EOVERQUOTA:
@@ -1147,6 +1186,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         totalFolderUploadsCompleted = 0;
         totalFolderUploads = 0;
         totalFolderUploadsCompletedSuccessfully = 0;
+        childUploadFailed = 0;
+        childUploadSucceeded = 0;
     }
     
     class UploadProgress{
@@ -1168,5 +1209,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         public long getInProgress() {
             return inProgress;
         }
+    }
+    
+    private boolean isTransferBelongsToFolderTransfer(MegaTransfer transfer){
+        return transfer.getFolderTransferTag() > 0;
     }
 }
