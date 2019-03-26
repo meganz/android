@@ -2427,5 +2427,5 @@
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
-
+    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
 </resources>

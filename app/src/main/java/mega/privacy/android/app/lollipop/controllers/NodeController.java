@@ -1146,7 +1146,7 @@ public class NodeController {
             openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFileIntent);
-            return 1;
+            return Constants.FILE_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
             Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
@@ -1154,17 +1154,17 @@ public class NodeController {
             openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
-            return 2;
+            return Constants.FOLDER_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
-            return 3;
+            return Constants.CHAT_LINK;
         }
         else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
-            return 4;
+            return Constants.CONTACT_LINK;
         }
 
         log("wrong url");
-        return -1;
+        return Constants.ERROR_LINK;
     }
 
     //old getPublicLinkAndShareIt

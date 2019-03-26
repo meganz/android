@@ -23,8 +23,6 @@ public class SnackbarNavigateOption implements View.OnClickListener{
     Context context;
     long idChat;
     boolean isSentAsMessageSnackbar = false;
-    String url;
-    boolean isOpenLinkSnackbar = false;
 
     public SnackbarNavigateOption(Context context) {
 
@@ -37,12 +35,6 @@ public class SnackbarNavigateOption implements View.OnClickListener{
         isSentAsMessageSnackbar = true;
     }
 
-    public SnackbarNavigateOption (Context context, String url) {
-        this.context = context;
-        this.url = url;
-        isOpenLinkSnackbar = true;
-    }
-
     @Override
     public void onClick(View v) {
         //Intent to Settings
@@ -50,18 +42,6 @@ public class SnackbarNavigateOption implements View.OnClickListener{
         if(context instanceof ManagerActivityLollipop){
             if (isSentAsMessageSnackbar) {
                 ((ManagerActivityLollipop) context).moveToChatSection(idChat);
-            }
-            else if (isOpenLinkSnackbar) {
-                if (AndroidMegaRichLinkMessage.isChatLink(url)) {
-                    ((ManagerActivityLollipop) context).showChatLink(url);
-                }
-                else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
-                    String[] s = url.split("C!");
-                    if (s!= null && s.length>1) {
-                        long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
-                        ((ManagerActivityLollipop) context).openContactLink(handle);
-                    }
-                }
             }
             else {
                 ((ManagerActivityLollipop) context).moveToSettingsSectionStorage();

@@ -352,12 +352,6 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.show();
                 break;
             }
-            case Constants.OPEN_LINK_SNACKBAR_TYPE: {
-                if (view.getContext() instanceof ManagerActivityLollipop) {
-                    snackbar.setAction(R.string.context_open_link, new SnackbarNavigateOption(view.getContext(), ((ManagerActivityLollipop) view.getContext()).getLinkUrlDialog()));
-                }
-                snackbar.show();
-            }
         }
     }
 
