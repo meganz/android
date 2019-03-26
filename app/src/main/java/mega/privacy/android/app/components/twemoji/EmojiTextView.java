@@ -144,8 +144,8 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   @Override public void setText(CharSequence rawText, BufferType type) {
     log("setText");
       CharSequence text = rawText == null ? "" : rawText;
-      String resultTExt = EmojiUtilsShortcodes.emojify(text.toString());
-      SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultTExt);
+      String resultText = EmojiUtilsShortcodes.emojify(text.toString());
+      SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(resultText);
 
       Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
       float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;

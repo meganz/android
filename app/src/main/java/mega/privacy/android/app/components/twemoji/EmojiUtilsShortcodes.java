@@ -23,7 +23,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
      * @return Emoji
      */
     public static EmojiShortcodes getEmoji(String code) {
-        Log.d("EmojiUtils","*****getEmoji 1  code = "+code);
         Matcher m = shortCodePattern.matcher(code);
         if (m.find()) {
             code = m.group(1);
@@ -59,14 +58,12 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
      * @return emojified String
      */
     public static String emojify(String text) {
-        Log.d("EmojiUtils","*****emojify 1");
         return emojify(text, 0);
 
     }
 
     private static String emojify(String text, int startIndex) {
         // remove previous handle since we won't be handling emoticons
-        Log.d("EmojiUtils","*****emojify 2");
 
         text = processStringWithRegex(text, shortCodeOrHtmlEntityPattern, startIndex, true);
 
@@ -74,7 +71,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
         // this will avoid conflicts with shortcodes. For Example: :p:p should
         // not be processed as shortcode, but as emoticon
         text = processStringWithRegex(text, shortCodeOrHtmlEntityPattern, startIndex, true);
-        Log.d("EmojiUtils","*****emojify 9 - text "+text);
 
         return text;
     }
@@ -88,36 +84,22 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
      */
     private static String processStringWithRegex(String text, Pattern pattern, int startIndex, boolean recurseEmojify) {
         //System.out.println(text);
-        Log.d("EmojiUtils","*****processStringWithRegex 1  ");
-
         Matcher matcher = pattern.matcher(text);
         StringBuffer sb = new StringBuffer();
         int resetIndex = 0;
 
         if(startIndex > 0) {
-            Log.d("EmojiUtils","*****processStringWithRegex 2  ");
-
             matcher.region(startIndex, text.length());
         }
 
         while (matcher.find()) {
-            Log.d("EmojiUtils","*****processStringWithRegex 3  ");
-
             String emojiCode = matcher.group();
-            Log.d("EmojiUtils","*****processStringWithRegex 3.1  ");
-
             EmojiShortcodes emoji = getEmoji(emojiCode);
-            Log.d("EmojiUtils","*****processStringWithRegex 3.2  ");
-
             // replace matched tokens with emojis
 
             if(emoji!=null) {
-                Log.d("EmojiUtils","*****processStringWithRegex 4  ");
-
                 matcher.appendReplacement(sb, emoji.getEmoji());
             } else {
-                Log.d("EmojiUtils","*****processStringWithRegex 5  ");
-
                 if(htmlSurrogateEntityPattern2.matcher(emojiCode).matches()) {
                     String highSurrogate1 = matcher.group("H1");
                     String highSurrogate2 = matcher.group("H2");
@@ -150,19 +132,14 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
             }
 
         }
-        Log.d("EmojiUtils","*****processStringWithRegex 6  ");
 
         matcher.appendTail(sb);
 
         //do not recurse emojify when coming here through htmlSurrogateEntityPattern2..so we get a chance to check if the tail
         //is part of a surrogate entity
         if(recurseEmojify && resetIndex > 0) {
-            Log.d("EmojiUtils","*****processStringWithRegex 7  ");
-
             return emojify(sb.toString(), resetIndex);
         }
-        Log.d("EmojiUtils","*****processStringWithRegex 8 -   "+sb.toString());
-
         return sb.toString();
     }
 
@@ -173,7 +150,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
      * @return returns count of emojis
      */
     public static int countEmojis(String text) {
-Log.d("SHORTCODES","***** countEmojis");
         String htmlifiedText = htmlify(text);
         // regex to identify html entitities in htmlified text
         Matcher matcher = htmlEntityPattern.matcher(htmlifiedText);

@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -142,15 +143,16 @@ public class ChatUtil {
 
     public static String getFirstLetter(String title){
         String result = "";
-        title = title.trim();
+        String resultTitle = EmojiUtilsShortcodes.emojify(title);
+        resultTitle = resultTitle.trim();
 
-        if(!title.isEmpty()){
-            String lastEmoji = title.substring(0,2);
+        if(!resultTitle.isEmpty()){
+            String lastEmoji = resultTitle.substring(0,2);
             int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
             if(numEmojis >0 ){
                 result = lastEmoji;
             }else{
-                result = String.valueOf(title.charAt(0));
+                result = String.valueOf(resultTitle.charAt(0));
                 result = result.toUpperCase(Locale.getDefault());
             }
         }

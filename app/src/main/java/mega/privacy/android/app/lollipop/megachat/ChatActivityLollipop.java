@@ -1126,10 +1126,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 titleToolbar.setText(chatRoom.getTitle());
-//                String text = "**A :cat:, :dog: and a :mouse: became friends<3. For :dog:'s birthday party, they all had :hamburger:s, :fries:s, :cookie:s and :cake:.";
-//                log("************+ setText = "+text);
-//                String resultTExt = EmojiUtilsShortcodes.emojify(text);
-//                log("***** resultTExt = "+resultTExt);
                 setChatSubtitle();
 
                 if (!chatRoom.isPublic() && chatRoom.isGroup()) {
