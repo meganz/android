@@ -53,6 +53,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,6 +102,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
@@ -635,19 +638,19 @@ public class Util {
 		float TB = GB * 1024;
 		
 		if (size < KB){
-			sizeString = size + " B";
+			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " KB";
+			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " MB";
+			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " GB";
+			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
 		}
 		else{
-			sizeString = decf.format(size/TB) + " TB";
+			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
 		}
 		
 		return sizeString;
@@ -2109,6 +2112,14 @@ public class Util {
 					}
 				}, 500);
 			}
+			else if (option == 3) {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
+					}
+				}, 500);
+			}
 			else {
 				handler.postDelayed(new Runnable() {
 					@Override
@@ -2205,6 +2216,23 @@ public class Util {
 			}
 		}
 		return true;
+	}
+
+	public static void hideKeyboard(Activity activity, int flag){
+
+		View v = activity.getCurrentFocus();
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
+	}
+
+	public static void hideKeyboardView(Context context, View v, int flag){
+
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
 	}
 
 	private static void log(String message) {

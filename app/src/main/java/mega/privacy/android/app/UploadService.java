@@ -61,6 +61,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
 	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
+	public static String EXTRA_LAST_MODIFIED = "MEGA_FILE_LAST_MODIFIED";
 	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
@@ -227,12 +228,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
 		String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 		String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
-
+		long lastModified = intent.getLongExtra(EXTRA_LAST_MODIFIED, 0);
 		if (file.isDirectory()) {
 			totalUploads++;
 
 			if (nameInMEGA != null){
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
 			}
 			else{
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
@@ -292,7 +293,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						totalUploads++;
 
 						if (nameInMEGA != null) {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA,lastModified / 1000,this);
 						} else {
 							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 						}

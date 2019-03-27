@@ -319,6 +319,8 @@ public class InboxFragmentLollipop extends Fragment{
 			boolean showLink = false;
 			boolean showTrash = false;
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setIcon(Util.mutateIconSecondary(context, R.drawable.ic_send_to_contact, R.color.white));
+
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			if (selected.size() != 0) {
@@ -570,7 +572,6 @@ public class InboxFragmentLollipop extends Fragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
 
 //			emptyImageView.setImageResource(R.drawable.inbox_empty);
-//			emptyTextView.setText(R.string.empty_inbox);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
@@ -769,7 +770,7 @@ public class InboxFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
@@ -1033,38 +1034,49 @@ public class InboxFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
-		if (parentNode != null) {
-			log("ParentNode: "+parentNode.getName());
+		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleInbox)) {
+			((ManagerActivityLollipop) context).comesFromNotifications = false;
+			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
+			((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+			((ManagerActivityLollipop)context).parentHandleInbox = ((ManagerActivityLollipop)context).comesFromNotificationHandleSaved;
+			((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-			((ManagerActivityLollipop) context).parentHandleInbox = parentNode.getHandle();
-			((ManagerActivityLollipop) context).setToolbarTitle();
-
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			setNodes(nodes);
-
-			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
-				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
-			}
-			log("Scroll to "+lastVisiblePosition+" position");
-
-			if(lastVisiblePosition>=0){
-
-				if(((ManagerActivityLollipop) context).isList){
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-				else{
-					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-			}
 			return 2;
 		}
-		else{
-			return 0;
+		else {
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
+			if (parentNode != null) {
+				log("ParentNode: "+parentNode.getName());
+
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+				((ManagerActivityLollipop) context).parentHandleInbox = parentNode.getHandle();
+				((ManagerActivityLollipop) context).setToolbarTitle();
+
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				setNodes(nodes);
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					if(((ManagerActivityLollipop) context).isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
+				return 2;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 
@@ -1107,7 +1119,7 @@ public class InboxFragmentLollipop extends Fragment{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
 
-				String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_inbox));
+				String textToShow = String.format(context.getString(R.string.context_empty_inbox));
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");

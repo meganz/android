@@ -76,6 +76,23 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
     }
 
+    public void changeActionBarElevation () {
+        if (scrollView != null) {
+            if (scrollView.canScrollVertically(-1)) {
+                ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+            }
+            else {
+                ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        changeActionBarElevation();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -95,12 +112,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollView.canScrollVertically(-1)){
-                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-                }
-                else {
-                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-                }
+                changeActionBarElevation();
             }
         });
 
