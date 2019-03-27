@@ -828,7 +828,9 @@ public final class ChatAdvancedNotificationBuilder {
 
     public void showSimpleNotification(){
         log("showSimpleNotification");
-
+    
+        Intent myService = new Intent(context, IncomingMessageService.class);
+        context.stopService(myService);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.enableVibration(false);
@@ -1204,6 +1206,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             log("generateChatNotification:POST Android O");
+            Intent myService = new Intent(context, IncomingMessageService.class);
+            context.stopService(myService);
             newGenerateChatNotification(request);
         }
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

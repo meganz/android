@@ -136,6 +136,8 @@ import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.IncomingMessageService;
+import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -4760,6 +4762,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void updateNavigationToolbarIcon(){
 		log("updateNavigationToolbarIcon");
+        Intent myService = new Intent(this, IncomingMessageService.class);
+        stopService(myService);
 		//Just working on 4.4.+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
