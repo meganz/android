@@ -7621,12 +7621,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        notifyDataSetChanged();
     }
 
-    public boolean isItemChecked(int position) {
-        if((selectedItems!=null)&& (selectedItems.size()>0)){
-            return selectedItems.get(position);
-        }else{
-            return false;
-        }
+    private boolean isItemChecked(int position) {
+        return selectedItems.get(position);
     }
 
     public int getSelectedItemCount() {
@@ -7714,7 +7710,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages) {
-        log("removeMessage: position = "+position+", size: " + messages.size());
+        log("removeMessage: size: " + messages.size());
         this.messages = messages;
         notifyItemRemoved(position);
         if (position == messages.size()) {
@@ -7723,7 +7719,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Update until end");
             int itemCount = messages.size()  - position;
             log("itemCount: " + itemCount);
-            notifyItemRangeChanged(position, messages.size() );
+            notifyItemRangeChanged(position, itemCount);
         }
     }
 

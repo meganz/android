@@ -3661,9 +3661,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         updateActionModeTitle();
     }
 
-    public void updateActionModeTitle() {
+    private void updateActionModeTitle() {
         try {
-            actionMode.setTitle(adapter.getSelectedMessages().size()+"");
+            actionMode.setTitle(adapter.getSelectedMessages()+"");
             actionMode.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -5296,7 +5296,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     //Not first element
                     if(indexToChange==messages.size()){
-                        log("The last message removed, do not check more messages  ---  setShowAvatar = "+(indexToChange-1));
+                        log("The last message removed, do not check more messages");
                         setShowAvatar(indexToChange-1);
                         return;
                     }

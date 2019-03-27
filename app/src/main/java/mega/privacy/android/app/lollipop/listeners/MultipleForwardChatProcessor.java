@@ -329,8 +329,6 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                     //A message has been forwarded
                     String text = null;
                     int totalErrors = error+errorNotAvailable;
-                    log("totalErrors = "+totalErrors+", chatHandles.length "+chatHandles.length);
-
                     if(totalErrors == 0){
                         if(chatHandles.length>1) {
                             text = context.getString(R.string.messages_forwarded_success);
