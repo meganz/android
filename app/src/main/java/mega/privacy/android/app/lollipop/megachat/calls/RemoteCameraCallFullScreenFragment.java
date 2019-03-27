@@ -79,7 +79,8 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
         remoteFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_remote_video);
         remoteFullScreenSurfaceView.setOnClickListener(this);
-        remoteFullScreenSurfaceView.setZOrderMediaOverlay(true);
+        remoteFullScreenSurfaceView.setZOrderOnTop(false);
+        remoteFullScreenSurfaceView.setZOrderMediaOverlay(false);
         SurfaceHolder remoteSurfaceHolder = remoteFullScreenSurfaceView.getHolder();
         remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);

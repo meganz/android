@@ -596,15 +596,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_account_type_button:{
 				log("Upgrade Account button");
+				((ManagerActivityLollipop) context).setAccountFragmentPreUpgradeAccount(Constants.MY_ACCOUNT_FRAGMENT);
 				((ManagerActivityLollipop)context).showUpAF();
-
 				break;
 			}
 			case R.id.my_account_achievements_layout:{
 				log("Show achievements");
 
 				if(!Util.isOnline(context)){
-					((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+					((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				}
 				else{
 					Intent intent = new Intent(context, AchievementsActivity.class);
