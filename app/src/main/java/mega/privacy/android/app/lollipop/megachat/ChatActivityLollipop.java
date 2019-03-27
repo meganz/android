@@ -3663,7 +3663,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void updateActionModeTitle() {
         try {
-            actionMode.setTitle(adapter.getSelectedMessages()+"");
+            actionMode.setTitle(adapter.getSelectedItemCount()+"");
             actionMode.invalidate();
         } catch (Exception e) {
             e.printStackTrace();
