@@ -224,7 +224,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						setUserAvatar(holder, userHandleEncoded);
 					}
 				}
-				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.GONE);
+				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
 
 				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
