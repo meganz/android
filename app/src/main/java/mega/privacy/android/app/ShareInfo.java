@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.Util;
 public class ShareInfo {
 
 	public String title = null;
+	private long lastModified;
 	public InputStream inputStream = null;
 	public long size = -1;
 	private File file = null;
@@ -74,6 +75,10 @@ public class ShareInfo {
 	public long getSize() {
 		return size;
 	}
+
+	public long getLastModified() {
+	    return lastModified;
+    }
 	
 	/*
 	 * Process incoming Intent and get list of ShareInfo objects
@@ -449,6 +454,10 @@ public class ShareInfo {
 				}
 			}
 		}
+		int lastModifiedIndex = cursor.getColumnIndex("last_modified");
+		if(lastModifiedIndex != -1) {
+		    this.lastModified = cursor.getLong(lastModifiedIndex);
+        }
 
 		if (size == -1 || inputStream == null) {
 			log("Keep going");

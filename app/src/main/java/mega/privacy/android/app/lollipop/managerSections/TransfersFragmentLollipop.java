@@ -253,8 +253,21 @@ public class TransfersFragmentLollipop extends Fragment {
 		adapter.notifyItemChanged(index);
 	}
 
-    public void transferFinish(int position){
-		log("transferFinish: "+position);
+    public void transferFinish(int transferTag){
+		log("transferFinish: transferTag is " + transferTag);
+		int position = -1;
+        for (int i=0; i<tL.size(); i++) {
+            MegaTransfer transfer = tL.get(i);
+            if(transfer.getTag() == transferTag){
+                position = i;
+                break;
+            }
+        }
+
+		if(position == -1){
+		    return;
+        }
+
 		if(!tL.isEmpty() && position < tL.size()){
 			tL.remove(position);
 		}

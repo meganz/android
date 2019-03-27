@@ -1632,15 +1632,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			case R.id.relative_layout_file_list_browser_camera_upload_on_off:{
 				if(type==TYPE_CAMERA){
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+						boolean hasStoragePermission = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 						if (!hasStoragePermission) {
 							ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 									Constants.REQUEST_WRITE_STORAGE);
 						}
 
-						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-						if (!hasCameraPermission){
+						if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
 							ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 									new String[]{Manifest.permission.CAMERA},
 									Constants.REQUEST_CAMERA);
@@ -1662,15 +1661,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			case R.id.cam_sync_button_ok:{
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					boolean hasStoragePermission = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
 					if (!hasStoragePermission) {
 						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
 					}
-					
-					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-	        		if (!hasCameraPermission){
+
+	        		if (!((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA)){
 	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
 				                new String[]{Manifest.permission.CAMERA},
 								Constants.REQUEST_CAMERA);
@@ -1832,7 +1830,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
 									context.startActivity(mediaIntent);
 								} else {
-									((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+									((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available), -1);
 									adapterList.notifyDataSetChanged();
 									ArrayList<Long> handleList = new ArrayList<Long>();
 									handleList.add(psHMegaNode.getHandle());

@@ -155,7 +155,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 					String s =  v.getText().toString();
 					inputString = v.getText().toString();
 					if (s.isEmpty() || s.equals("null") || s.equals("")) {
-						hideKeyboard();
+						Util.hideKeyboard((AchievementsActivity) context, 0);
 					}
 					else {
 						boolean isValid = isValidEmail(s);
@@ -174,7 +174,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
 					log("second");
 					if (mails.isEmpty()) {
-						hideKeyboard();
+						Util.hideKeyboard((AchievementsActivity) context, 0);
 					}
 					else {
 						((AchievementsActivity)context).inviteFriends(mails);
@@ -288,14 +288,6 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 				InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputMethodManager.restartInput(view);
 			}
-		}
-	}
-
-	public void hideKeyboard () {
-		View view = ((AchievementsActivity) context).getCurrentFocus();
-		if (view != null) {
-			InputMethodManager inputMethodManager = (InputMethodManager) ((AchievementsActivity) context).getSystemService(Context.INPUT_METHOD_SERVICE);
-			inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
 		}
 	}
 
