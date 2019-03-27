@@ -292,7 +292,9 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                  if(request.getChatHandle()==idChat){
                      AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(request.getMegaChatMessage());
                      if(androidMsgSent!=null){
-                         ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
+                         if(context instanceof  ChatActivityLollipop){
+                             ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
+                         }
                      }
                  }
                  checkTotalMessages();
