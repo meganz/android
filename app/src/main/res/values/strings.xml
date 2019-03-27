@@ -2420,6 +2420,8 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
 
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Already downloaded. Copied to selected path.</string>
+
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
 
