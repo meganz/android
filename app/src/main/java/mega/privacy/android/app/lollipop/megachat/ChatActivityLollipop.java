@@ -3012,7 +3012,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void sendMessage(String text){
         log("sendMessage: "+text);
-
         MegaChatMessage msgSent = megaChatApi.sendMessage(idChat, text);
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
         sendMessageToUI(androidMsgSent);
@@ -5310,8 +5309,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
             adapter.removeMessage(indexToChange+1, messages);
-            adapter.clearSelections();
-            hideMultipleSelect();
+            if(adapter!=null){
+                if(adapter.isMultipleSelect()){
+                    clearSelections();
+                    hideMultipleSelect();
+                }
+            }
         }else{
             log("index to change not found");
         }
@@ -7018,8 +7021,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(text!=null){
                 showSnackbar(Constants.SNACKBAR_TYPE, text, -1);
             }
-        }
-        else{
+        }else{
             if(chatHandle!=-1){
                 log("Open chat to forward messages");
 

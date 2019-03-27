@@ -101,7 +101,6 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             break;
                         }
                         case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-
                             if(messageToForward.getUserHandle()!=megaChatApi.getMyUserHandle()){
                                 MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                 if(nodeList != null) {
@@ -136,14 +135,12 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         MegaNode temp = nodeList.get(j);
                                         if(chatHandles[0]==idChat){
                                             megaChatApi.attachNode(chatHandles[0], temp.getHandle(), this);
-                                        }
-                                        else{
+                                        }else{
                                             megaChatApi.attachNode(chatHandles[0], temp.getHandle(), this);
                                         }
                                     }
                                 }
                             }
-
                             break;
                         }case MegaChatMessage.TYPE_CONTAINS_META:{
                             MegaChatContainsMeta meta = messageToForward.getContainsMeta();
@@ -245,7 +242,6 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         }
                                     }
                                 }
-
                                 break;
                             }case MegaChatMessage.TYPE_CONTAINS_META:{
                                 MegaChatContainsMeta meta = messageToForward.getContainsMeta();
@@ -289,16 +285,29 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         log("onRequestFinish");
 
-        if(e.getErrorCode() == MegaError.API_ENOENT){
-            errorNotAvailable++;
-            log("MultipleForwardChatProcessor: "+context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, errorNotAvailable, errorNotAvailable)+" "+e.getErrorCode());
-        }
-        else if (e.getErrorCode() != MegaError.API_OK){
-            error++;
-            log("Attach node error: "+e.getErrorString()+"__"+e.getErrorCode());
+        if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("File sent correctly ");
+                 if(request.getChatHandle()==idChat){
+                     AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(request.getMegaChatMessage());
+                     if(androidMsgSent!=null){
+                         ((ChatActivityLollipop) context).sendMessageToUI(androidMsgSent);
+                     }
+                 }
+                 checkTotalMessages();
+
+            }else{
+                if(e.getErrorCode() == MegaError.API_ENOENT){
+                    errorNotAvailable++;
+                    log("MultipleForwardChatProcessor: "+context.getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, errorNotAvailable, errorNotAvailable)+" "+e.getErrorCode());
+                }else{
+                    error++;
+                    log("Attach node error: "+e.getErrorString()+"__"+e.getErrorCode());
+                }
+            }
         }
 
-        checkTotalMessages();
     }
 
     @Override
@@ -312,14 +321,16 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         if(totalMessages >= chatHandles.length*idMessages.length){
 
             log("All messages processed");
-
             int success = totalMessages - error - errorNotAvailable;
 
             if(context instanceof ChatActivityLollipop){
+
                 if(success>0){
                     //A message has been forwarded
                     String text = null;
                     int totalErrors = error+errorNotAvailable;
+                    log("totalErrors = "+totalErrors+", chatHandles.length "+chatHandles.length);
+
                     if(totalErrors == 0){
                         if(chatHandles.length>1) {
                             text = context.getString(R.string.messages_forwarded_success);
@@ -334,8 +345,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
 
                     if(chatHandles.length==1){
                         ((ChatActivityLollipop) context).openChatAfterForward(chatHandles[0], text);
-                    }
-                    else {
+                    }else {
                         ((ChatActivityLollipop) context).openChatAfterForward(-1, text);
                     }
                 }
