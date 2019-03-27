@@ -971,7 +971,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 							context.startActivity(mediaIntent);
 						}
 						else {
-							((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
@@ -1227,43 +1227,54 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish));
-		if (parentNode != null){
-			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
+		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleRubbish)) {
+			((ManagerActivityLollipop) context).comesFromNotifications = false;
+			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
+			((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+			((ManagerActivityLollipop)context).parentHandleRubbish = ((ManagerActivityLollipop)context).comesFromNotificationHandleSaved;
+			((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			((ManagerActivityLollipop)context).parentHandleRubbish = parentNode.getHandle();
-
-			((ManagerActivityLollipop)context).setToolbarTitle();
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			addSectionTitle(nodes,adapter.getAdapterType());
-			adapter.setNodes(nodes);
-
-			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
-				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
-			}
-			log("Scroll to "+lastVisiblePosition+" position");
-
-			if(lastVisiblePosition>=0){
-				if(((ManagerActivityLollipop)context).isList){
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-				else{
-					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-			}
-
-//			adapter.setParentHandle(parentHandle);
-			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			return 2;
 		}
-		else{
-			return 0;
+		else {
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleRubbish));
+			if (parentNode != null){
+				recyclerView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				((ManagerActivityLollipop)context).parentHandleRubbish = parentNode.getHandle();
+
+				((ManagerActivityLollipop)context).setToolbarTitle();
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				addSectionTitle(nodes,adapter.getAdapterType());
+				adapter.setNodes(nodes);
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+					if(((ManagerActivityLollipop)context).isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
+
+//			adapter.setParentHandle(parentHandle);
+				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+				return 2;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 	
