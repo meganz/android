@@ -92,7 +92,6 @@ import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
-import static mega.privacy.android.app.utils.JobUtil.startJob;
 import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
 
 
@@ -1801,8 +1800,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = null;//findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
-							if (localPath != null  && (megaApi.getFingerprint(psHMegaNode) != null && megaApi.getFingerprint(psHMegaNode).equals(megaApi.getFingerprint(localPath)))){
+//							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
+							String localPath = Util.findLocalPath(psHMegaNode);
+
+                            if (localPath != null && checkFingerprint(psHMegaNode,localPath)) {
 								File mediaFile = new File(localPath);
 
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1867,6 +1868,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			log("isGrid");
 		}
 	}
+
+    private boolean checkFingerprint(MegaNode node,String localPath) {
+        String nodeFingerprint = node.getFingerprint();
+        String nodeOriginalFingerprint = node.getOriginalFingerprint();
+
+        String fileFingerprint = megaApi.getFingerprint(localPath);
+        if (fileFingerprint != null) {
+            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
+        }
+        return false;
+    }
 
 	public String findLocalPath (String fileName, long fileSize, MegaNode file) {
 		log("findLocalPath");

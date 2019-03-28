@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -39,6 +38,7 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -49,7 +49,6 @@ import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +58,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.github.barteksc.pdfviewer.util.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -112,8 +109,9 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
-	
-	public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
+
+    public static final String PATTERN = "yyyy-MM-dd HH.mm.ss";
+    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
@@ -1018,6 +1016,56 @@ public class Util {
 			
 		return file.getAbsolutePath().contains(tmp.getParent());
 	}
+
+    /**
+     * Find the local path of a video node.
+     *
+     * @param node MegaNode in cloud drive which should be a video.
+     * @return Corresponding local path of the node.
+     */
+    public static String findLocalPath (MegaNode node) {
+        String path = queryByNameAndSize(MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
+        if(path == null) {
+            path = queryByNameAndSize(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);
+        }
+
+        if(path == null) {
+            path = queryByNameOrSize(MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
+            if(path == null) {
+                path = queryByNameOrSize(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);
+            }
+        }
+        // if needed, can add file system scanning here.
+        return path;
+    }
+
+    @Nullable
+    private static String query(Uri uri,String selection,MegaNode node) {
+        String fileName = node.getName();
+        long fileSize = node.getSize();
+        String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+        Cursor cursor = context.getContentResolver().query(uri,new String[] { MediaStore.Video.Media.DATA },selection,selectionArgs,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            String path = cursor.getString(dataColumn);
+            cursor.close();
+            File localFile = new File(path);
+            if (localFile.exists()) {
+                return path;
+            }
+        }
+        return null;
+    }
+
+    private static String queryByNameOrSize(Uri uri,MegaNode node) {
+        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? OR " + MediaStore.Video.Media.SIZE + " = ?";
+        return query(uri,selection,node);
+    }
+
+    private static String queryByNameAndSize(Uri uri,MegaNode node) {
+        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
+        return query(uri,selection,node);
+    }
 	
 	/*
 	 * Check is file belongs to the app and temporary
@@ -1162,114 +1210,18 @@ public class Util {
 		
 		return speedString;
 	}
-	
-	public static String getPhotoSyncName (long timeStamp, String fileName){
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
 
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "." + extension;
-		
-		return photoSyncName;
+	public static String getPhotoSyncName (long timeStamp, String fileName){
+        DateFormat sdf = new SimpleDateFormat(PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
-		
-		if (photoIndex == 0){
-			return getPhotoSyncName(timeStamp, fileName);
-		}
-		
-		String photoSyncName = null;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(timeStamp);
-		
-		String extension = "";
-		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
-		}
-				
-		String year;
-		String month;
-		String day;
-		String hour;
-		String minute;
-		String second;
-		
-		year = cal.get(Calendar.YEAR) + "";
-		month = (cal.get(Calendar.MONTH)+1) + "";
-		if ((cal.get(Calendar.MONTH) + 1) < 10){
-			month = "0" + month;
-		}
-		
-		day = cal.get(Calendar.DAY_OF_MONTH) + "";
-		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
-			day = "0" + day;
-		}
-		
-		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
-		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
-			hour = "0" + hour;
-		}
-		
-		minute = cal.get(Calendar.MINUTE) + "";
-		if (cal.get(Calendar.MINUTE) < 10){
-			minute = "0" + minute;
-		}
-		
-		second = cal.get(Calendar.SECOND) + "";
-		if (cal.get(Calendar.SECOND) < 10){
-			second = "0" + second;
-		}
-
-		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "_" + photoIndex + "." + extension;
-		
-		return photoSyncName;
+        if(photoIndex == 0) {
+            return getPhotoSyncName(timeStamp, fileName);
+        }
+        DateFormat sdf = new SimpleDateFormat(PATTERN,Locale.getDefault());
+        return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
 	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){

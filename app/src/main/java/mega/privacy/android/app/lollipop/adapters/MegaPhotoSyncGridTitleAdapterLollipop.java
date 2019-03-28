@@ -1279,8 +1279,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             }
                             mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
                         }
-                        String localPath = null;//findLocalPath(file.getName(), file.getSize(), file);
-                        if (localPath != null && (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
+                        String localPath = Util.findLocalPath(file);
+                        if (localPath != null && checkFingerprint(file,localPath)) {
                             File mediaFile = new File(localPath);
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1362,6 +1362,17 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 clearSelections();
             }
         }
+    }
+
+    private boolean checkFingerprint(MegaNode node,String localPath) {
+        String nodeFingerprint = node.getFingerprint();
+        String nodeOriginalFingerprint = node.getOriginalFingerprint();
+
+        String fileFingerprint = megaApi.getFingerprint(localPath);
+        if (fileFingerprint != null) {
+            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
+        }
+        return false;
     }
 
     void notifyItem (int type, final MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int pos) {
