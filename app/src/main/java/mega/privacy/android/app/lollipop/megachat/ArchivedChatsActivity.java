@@ -169,8 +169,9 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        log("onBackPressed");
         super.callToSuperBack = true;
+        super.onBackPressed();
     }
 
     @Override

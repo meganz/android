@@ -7385,6 +7385,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 					if (searchExpand) {
 						openSearchView();
@@ -7395,7 +7396,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else {
 						if (Util.isOnline(this)) {
 							newChatMenuItem.setVisible(true);
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 							if (rChatFL != null && rChatFL.getItemCount() > 0) {
 								selectMenuItem.setVisible(true);
 							} else {
@@ -7408,7 +7408,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setStatusMenuItem.setVisible(false);
 						}
 					}
-					searchMenuItem.setVisible(true);
+					if (rChatFL != null && rChatFL.getItemCount() > 0) {
+						searchMenuItem.setVisible(true);
+					} else {
+						searchMenuItem.setVisible(false);
+					}
 
 					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
 					importLinkMenuItem.setVisible(true);
