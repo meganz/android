@@ -83,7 +83,7 @@
                     </RelativeLayout>
 
                     <mega.privacy.android.app.components.MarqueeTextView
-                        android:id="@+id/subtitle_toolbar"
+                        android:id="@+id/individual_subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
@@ -91,6 +91,21 @@
                         android:visibility="gone"
                         android:singleLine="true"
                         android:ellipsize="none"
+                        android:layout_marginRight="0dp"/>
+
+                    <TextView
+                        android:id="@+id/groupal_subtitle_toolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
                         android:layout_marginRight="0dp"/>
 
                     <LinearLayout
