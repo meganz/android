@@ -108,7 +108,11 @@ public class AndroidMegaRichLinkMessage {
         try {
             urlIn = URLDecoder.decode(urlIn, "UTF-8");
         }
-        catch (UnsupportedEncodingException e) {}
+        catch (Exception e) {
+            log("Error decoding URL: " + urlIn);
+            log(e.toString());
+        }
+
         urlIn.replace(' ', '+');
         if(urlIn.startsWith("mega://")){
             urlIn = urlIn.replace("mega://", "https://mega.co.nz/");
