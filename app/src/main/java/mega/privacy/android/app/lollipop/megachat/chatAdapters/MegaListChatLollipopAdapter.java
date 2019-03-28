@@ -224,7 +224,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						setUserAvatar(holder, userHandleEncoded);
 					}
 				}
-				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.GONE);
+				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
 
 				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
@@ -820,6 +820,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			selectedItems.put(pos, true);
 		}
 
+		if (!(listFragment.findViewHolderForLayoutPosition(pos) instanceof ViewHolderNormalChatList)) {
+			return;
+		}
+
 		ViewHolderNormalChatList view = (ViewHolderNormalChatList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){
 			log("Start animation: "+pos);
@@ -865,6 +869,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		if (!(listFragment.findViewHolderForLayoutPosition(pos) instanceof ViewHolderNormalChatList)) {
+			return;
+		}
 
 		ViewHolderNormalChatList view = (ViewHolderNormalChatList) listFragment.findViewHolderForLayoutPosition(pos);
 		if(view!=null){

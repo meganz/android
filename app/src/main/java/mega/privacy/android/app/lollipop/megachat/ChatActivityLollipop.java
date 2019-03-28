@@ -37,6 +37,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -327,6 +328,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean visibilityMessageJump=false;
     boolean isTurn = false;
     Handler handler;
+
+    private boolean isShareLinkDialogDismissed = false;
 
     private ActionMode actionMode;
 
@@ -851,6 +854,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         typeMessageJump = savedInstanceState.getInt("typeMessageJump",-1);
                         visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
                         mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
+                        isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
 
                         if(visibilityMessageJump){
                             if(typeMessageJump == TYPE_MESSAGE_NEW_MESSAGE){
@@ -875,22 +879,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("ACTION_CHAT_SHOW_MESSAGES");
                         isOpeningChat = true;
 
-                        text = newIntent.getStringExtra("showSnackbar");
-                        if (text == null) {
-
-                            int errorCode = newIntent.getIntExtra("PUBLIC_LINK", 1);
-                            if(errorCode!=1){
-                                if(errorCode==MegaChatError.ERROR_OK){
-                                    text = getString(R.string.chat_link_copied_clipboard);
-                                }
-                                else{
-                                    log("initAfterIntent:publicLinkError:errorCode");
-                                    text = getString(R.string.general_error) + ": " + errorCode;
+                        int errorCode = newIntent.getIntExtra("PUBLIC_LINK", 1);
+                        if (savedInstanceState == null) {
+                            text = newIntent.getStringExtra("showSnackbar");
+                            if (text == null) {
+                                if (errorCode != 1) {
+                                    if (errorCode == MegaChatError.ERROR_OK) {
+                                        text = getString(R.string.chat_link_copied_clipboard);
+                                    }
+                                    else {
+                                        log("initAfterIntent:publicLinkError:errorCode");
+                                        text = getString(R.string.general_error) + ": " + errorCode;
+                                    }
                                 }
                             }
                         }
-                    }
+                        else if (errorCode != 1 && errorCode == MegaChatError.ERROR_OK && !isShareLinkDialogDismissed) {
+                                text = getString(R.string.chat_link_copied_clipboard);
+                        }
 
+                    }
                     showChat(text);
                 }
             }
@@ -1033,7 +1041,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 chatRelativeLayout.setVisibility(View.GONE);
 
                 if(textSnackbar!=null){
-                    showSnackbar(Constants.SNACKBAR_TYPE, textSnackbar, -1);
+                    String chatLink = getIntent().getStringExtra("CHAT_LINK");
+                    if (chatLink != null && !isShareLinkDialogDismissed) {
+                        showShareChatLinkDialog(chatLink);
+                    }
+                    else {
+                        showSnackbar(Constants.SNACKBAR_TYPE, textSnackbar, -1);
+                    }
                 }
 
                 loadHistory();
@@ -1045,6 +1059,72 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         log("FINISH on Create");
+    }
+
+    void showShareChatLinkDialog (final String link) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
+        builder.setView(v);
+        final AlertDialog shareLinkDialog = builder.create();
+
+        TextView nameGroup = (TextView) v.findViewById(R.id.group_name_text);
+        nameGroup.setText(chatRoom.getTitle());
+        TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
+        chatLinkText.setText(link);
+
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.copy_button: {
+                        if(link!=null){
+                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+                            clipboard.setPrimaryClip(clip);
+                            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.chat_link_copied_clipboard), -1);
+                            shareLinkDialog.dismiss();
+                            dismissShareChatLinkDialog(shareLinkDialog);
+                        }
+                        break;
+                    }
+                    case R.id.share_button: {
+                        if (link != null) {
+                            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                            sharingIntent.setType("text/plain");
+                            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, link);
+                            startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)));
+                            dismissShareChatLinkDialog(shareLinkDialog);
+                        }
+                        break;
+                    }
+                    case R.id.dismiss_button: {
+                        dismissShareChatLinkDialog(shareLinkDialog);
+                        break;
+                    }
+                }
+            }
+        };
+
+        Button cancelButton = (Button) v.findViewById(R.id.copy_button);
+        cancelButton.setOnClickListener(clickListener);
+        Button shareButton = (Button) v.findViewById(R.id.share_button);
+        shareButton.setOnClickListener(clickListener);
+        Button dismissButton = (Button) v.findViewById(R.id.dismiss_button);
+        dismissButton.setOnClickListener(clickListener);
+
+        shareLinkDialog.setCancelable(false);
+        shareLinkDialog.setCanceledOnTouchOutside(false);
+        try {
+            shareLinkDialog.show();
+        }catch (Exception e){}
+    }
+
+    void dismissShareChatLinkDialog(AlertDialog shareLinkDialog) {
+        try {
+            shareLinkDialog.dismiss();
+        } catch (Exception e) {}
+        isShareLinkDialogDismissed = true;
     }
 
     public void loadHistory(){
@@ -1118,6 +1198,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         subtitleCall.setVisibility(View.GONE);
     }
 
+    void setPreviewGroupalSubtitle () {
+        long participants = chatRoom.getPeerCount();
+        if (participants > 0) {
+            groupalSubtitleToolbar.setVisibility(View.VISIBLE);
+            groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, participants)));
+        }
+        else {
+            groupalSubtitleToolbar.setVisibility(View.GONE);
+        }
+    }
 
     public void setChatSubtitle(){
         log("setChatSubtitle");
@@ -1129,7 +1219,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if (chatC.isInAnonymousMode() && megaChatApi.getChatConnectionState(idChat)==MegaChatApi.CHAT_CONNECTION_ONLINE) {
             log("setChatSubtitle:isPreview");
-            groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+            setPreviewGroupalSubtitle();
             tB.setOnClickListener(this);
 
             setBottomLayout(SHOW_JOIN_LAYOUT);
@@ -1139,7 +1229,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(chatRoom.isPreview()){
                 log("Chat not connected:setChatSubtitle:isPreview");
-                groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                setPreviewGroupalSubtitle();
                 tB.setOnClickListener(this);
 
                 setBottomLayout(SHOW_NOTHING_LAYOUT);
@@ -1165,7 +1255,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 tB.setOnClickListener(this);
                 if(chatRoom.isPreview()){
                     log("setChatSubtitle:isPreview");
-                    groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                    setPreviewGroupalSubtitle();
                     tB.setOnClickListener(this);
 
                     if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
@@ -6577,6 +6667,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putLong("generalUnreadCount", generalUnreadCount);
         outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
+        outState.putBoolean("isShareLinkDialogDismissed", isShareLinkDialogDismissed);
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
     }
