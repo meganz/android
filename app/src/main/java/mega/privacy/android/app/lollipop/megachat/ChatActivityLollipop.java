@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -49,6 +50,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -583,8 +586,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         voiceClipLayout.setVisibility(View.GONE);
 
         bubbleLayout = (LinearLayout) findViewById(R.id.bubble_layout);
-        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.grey_achievements_invite_friends));
-        myBubble.setCornerRadius(20);
+        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.turn_on_notifications_text));
+        myBubble.setCornerRadius(30);
         myBubble.setPointerAlignment(BubbleDrawable.RIGHT);
         myBubble.setPadding(25, 25, 25, 25);
         bubbleLayout.setBackground(myBubble);
@@ -604,6 +607,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setColorFilter(null);
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        keyboardTwemojiButton.setVisibility(View.VISIBLE);
+        mediaButton.setVisibility(View.VISIBLE);
+        pickAttachButton.setVisibility(View.VISIBLE);
+        pickFileStorageButton.setVisibility(View.VISIBLE);
         sendIcon.setVisibility(View.GONE);
         record.setRecordView(voiceClipLayout);
 
@@ -1845,6 +1852,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             record.setVisibility(View.VISIBLE);
             sendIcon.setVisibility(View.GONE);
             textChat.setVisibility(View.GONE);
+
+            keyboardTwemojiButton.setVisibility(View.INVISIBLE);
+            mediaButton.setVisibility(View.INVISIBLE);
+            pickAttachButton.setVisibility(View.INVISIBLE);
+            pickFileStorageButton.setVisibility(View.INVISIBLE);
+
             voiceClipLayout.setVisibility(View.VISIBLE);
 
             try {
@@ -1869,6 +1882,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setColorFilter(null);
         record.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        keyboardTwemojiButton.setVisibility(View.VISIBLE);
+        mediaButton.setVisibility(View.VISIBLE);
+        pickAttachButton.setVisibility(View.VISIBLE);
+        pickFileStorageButton.setVisibility(View.VISIBLE);
         sendIcon.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.GONE);
         textChat.setVisibility(View.VISIBLE);
@@ -1893,6 +1910,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         record.setColorFilter(null);
         record.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_mic_on));
         record.setVisibility(View.VISIBLE);
+        keyboardTwemojiButton.setVisibility(View.VISIBLE);
+        mediaButton.setVisibility(View.VISIBLE);
+        pickAttachButton.setVisibility(View.VISIBLE);
+        pickFileStorageButton.setVisibility(View.VISIBLE);
         sendIcon.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.GONE);
         textChat.setVisibility(View.VISIBLE);
@@ -2776,36 +2797,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     textChat.setText("", TextView.BufferType.EDITABLE);
                 }
-
-
-//                if((fileStorageF != null)&&(fileStorageF.isMultipleselect())){
-//                    fileStorageF.sendImages();
-//                }else{
-//
-//                    if(!text.isEmpty()) {
-//
-//                        if (editingMessage) {
-//                            log("onClick:send_message_icon_chat:editingMessage");
-//                            editMessage(text);
-//                            clearSelections();
-//                            hideMultipleSelect();
-//                            actionMode.invalidate();
-//                        } else {
-//                            log("onClick:send_message_icon_chat:sendindMessage");
-//                            sendMessage(text);
-//                        }
-//
-////                        textChat.getText().clear();
-//                        textChat.setText("", TextView.BufferType.EDITABLE);
-//                    }
-//                }
-
                 break;
             }
             case R.id.keyboard_twemoji_chat:
             case R.id.rl_keyboard_twemoji_chat:{
                 log("onClick:keyboard_icon_chat:  ");
-                if(!isRecordingNow()){
+//                if(!isRecordingNow()){
                     if(fileStorageLayout.isShown()){
                         hideFileStorageSection();
                     }
@@ -2825,7 +2822,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             emojiKeyboard.showEmojiKeyboard();
                         }
                     }
-                }
+//                }
                 break;
             }
 
@@ -2846,7 +2843,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.rl_pick_file_storage_icon_chat:{
                 log("file storage icon ");
 
-                if(!isRecordingNow()){
+//                if(!isRecordingNow()){
                     if(fileStorageLayout.isShown()){
                         hideFileStorageSection();
                     }else{
@@ -2888,7 +2885,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                     }
-                }
+//                }
 
                 break;
             }
@@ -2904,10 +2901,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_attach_chat:
             case R.id.rl_attach_icon_chat: {
                 log("Show attach bottom sheet");
-                if(!isRecordingNow()) {
+//                if(!isRecordingNow()) {
                     hideKeyboard();
                     showSendAttachmentBottomSheet();
-                }
+//                }
                 break;
             }
 		}

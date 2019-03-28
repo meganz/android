@@ -6159,7 +6159,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(nodeListOwn.size()==1) {
             MegaNode node = nodeListOwn.get(0);
             if (MimeTypeList.typeForName(node.getName()).isAudio()) {
-                holder.totalDurationOfVoiceClip = (node.getDuration() * 1000);
+                if(node.getDuration()<0){
+                    holder.totalDurationOfVoiceClip = (- node.getDuration())*1000;
+                }else{
+                    holder.totalDurationOfVoiceClip = (node.getDuration() * 1000);
+
+                }
             }
         }
 
@@ -6202,14 +6207,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
             holder.contactMessageLayout.setVisibility(View.GONE);
 
-            String messageContent = "";
-
-            if (message.getContent() != null) {
-                messageContent = message.getContent();
-            }
-
-            AndroidMegaChatMessage androidMsg = messages.get(position - 1);
-
             holder.contentOwnMessageLayout.setVisibility(View.VISIBLE);
             holder.ownManagementMessageLayout.setVisibility(View.GONE);
             holder.contentOwnMessageText.setVisibility(View.GONE);
@@ -6241,7 +6238,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageVoiceClipDuration.setVisibility(View.VISIBLE);
             holder.contentOwnMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
-
             holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
             holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.totalDurationOfVoiceClip);
 

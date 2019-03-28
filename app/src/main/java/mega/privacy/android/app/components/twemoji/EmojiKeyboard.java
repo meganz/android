@@ -173,7 +173,7 @@ public class EmojiKeyboard extends LinearLayout {
         log("hideBothKeyboard()");
         hideEmojiKeyboard();
         hideLetterKeyboard();
-        emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
+        emojiIcon.setImageResource(R.drawable.ic_emojicon);
     }
 
     public void showLetterKeyboard(){
@@ -189,7 +189,7 @@ public class EmojiKeyboard extends LinearLayout {
                 if (imm == null) return;
                 imm.showSoftInput(view, 0, null);
                 isLetterKeyboardShown = true;
-                emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
+                emojiIcon.setImageResource(R.drawable.ic_emojicon);
                 paramsRecordButton(marginBottom);
             } else {
                 throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
