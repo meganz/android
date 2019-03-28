@@ -1731,8 +1731,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     if(fullName.trim().length()<=0){
                         log("Ask for name!");
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
-                        megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), listener);
-                        megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), listener);
+                        megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
+                        megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                     }
                     else{
                         log("Exists name!");
@@ -1741,8 +1741,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 else{
                     log("Ask for name!");
                     ChatNonContactNameListener listener = new ChatNonContactNameListener(context);
-                    megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), listener);
-                    megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), listener);
+                    megaChatApi.getUserFirstname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
+                    megaChatApi.getUserLastname(chatToCheck.getPeerHandle(i), chatToCheck.getAuthorizationToken(), listener);
                 }
             }
         }
