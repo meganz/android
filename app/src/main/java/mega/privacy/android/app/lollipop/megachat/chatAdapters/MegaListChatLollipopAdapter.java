@@ -1262,9 +1262,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void showMuteIcon(int position){
 		log("showMuteIcon");
-		if(holder == null){
-			holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
-		}
+		holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
 
 		if(holder!=null){
 			MegaChatListItem chatToShow = chats.get(position);
