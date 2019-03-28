@@ -281,7 +281,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					mk = getIntent().getStringExtra("MK");
 					if(mk==null){
 						log("MK is NULL - close activity");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 
 					title.setText(getString(R.string.title_enter_new_password));
@@ -292,7 +292,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
 						log("link is NULL - close activity");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
 
@@ -833,7 +833,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					log("reset pass on click");
 					if (linkToReset == null) {
 						log("link is NULL");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					} else {
 						if (mk == null) {
 							log("proceed to park account");
@@ -1255,7 +1255,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 							}
 						}
 						else {
-							showSnackbar(getString(R.string.email_verification_text_error));
+							showSnackbar(getString(R.string.general_text_error));
 						}
 					}
 					else {

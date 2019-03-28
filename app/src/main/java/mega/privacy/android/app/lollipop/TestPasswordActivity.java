@@ -69,7 +69,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     private Button testPasswordDismissButton;
     private RelativeLayout containerPasswordError;
     private TextView enterPwdHint;
-    private Button procedToLogout;
+    private Button proceedToLogout;
 
     private ProgressBar progressBar;
 
@@ -140,8 +140,8 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         testPasswordDismissButton = (Button) findViewById(R.id.test_password_dismiss_button);
         testPasswordDismissButton.setOnClickListener(this);
         containerPasswordError = (RelativeLayout) findViewById(R.id.test_password_text_error);
-        procedToLogout = (Button) findViewById(R.id.proced_to_logout_button);
-        procedToLogout.setOnClickListener(this);
+        proceedToLogout = (Button) findViewById(R.id.proceed_to_logout_button);
+        proceedToLogout.setOnClickListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.GONE);
@@ -149,10 +149,10 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         if (isLogout()) {
             passwordReminderCloseButton.setVisibility(View.VISIBLE);
             dialogTest.setText(R.string.remember_pwd_dialog_text_logout);
-            passwordReminderDismissButton.setText(R.string.proced_to_logout);
+            passwordReminderDismissButton.setText(R.string.proceed_to_logout);
             passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
             testPasswordDismissButton.setVisibility(View.GONE);
-            procedToLogout.setVisibility(View.VISIBLE);
+            proceedToLogout.setVisibility(View.VISIBLE);
         }
         else {
             passwordReminderCloseButton.setVisibility(View.GONE);
@@ -160,7 +160,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             passwordReminderDismissButton.setText(R.string.general_dismiss);
             passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
             testPasswordDismissButton.setVisibility(View.VISIBLE);
-            procedToLogout.setVisibility(View.GONE);
+            proceedToLogout.setVisibility(View.GONE);
         }
 
         passwordEditText.getBackground().clearColorFilter();
@@ -408,7 +408,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                     onBackPressed();
                 }
             }
-            case R.id.proced_to_logout_button: {
+            case R.id.proceed_to_logout_button: {
                 dismissActivity(true);
                 break;
             }
