@@ -342,7 +342,7 @@ public class AccountController implements View.OnClickListener{
                 }
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
         }
         else if (context instanceof TestPasswordActivity) {
@@ -361,7 +361,7 @@ public class AccountController implements View.OnClickListener{
                 }
             }
             else {
-                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.email_verification_text_error));
+                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.general_text_error));
             }
         }
     }
@@ -428,7 +428,7 @@ public class AccountController implements View.OnClickListener{
             }
         }
         else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
         }
 
         return null;

@@ -2617,7 +2617,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							selectDrawerItemLollipop(drawerItem);
 							selectDrawerItemPending=false;
 							log("Error when changing pass - show error message");
-							Util.showAlert(this,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+							Util.showAlert(this,getString(R.string.general_text_error), getString(R.string.general_error_word));
 						}
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_RESET_PASS)){
@@ -2997,10 +2997,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		megaApi.shouldShowPasswordReminderDialog(false, this);
-//		Intent intent = new Intent(this, TestPasswordActivity.class);
-//		startActivity(intent);
 
-//		showTransferOverquotaDialog();
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
@@ -15371,7 +15368,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			startService(intent);
 		}
 		else{
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 		}
 	}
 
@@ -15638,7 +15635,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else if (e.getErrorCode() != MegaError.API_ESID){
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
@@ -16055,7 +16052,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
@@ -16075,7 +16072,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error when asking for change mail link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
@@ -16107,7 +16104,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error when asking for recovery pass link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
@@ -16136,7 +16133,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (verify2FADialog != null && verify2FADialog.isShowing()){
 					verify2FADialog.dismiss();
 				}
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
         }
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
@@ -16151,7 +16148,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("Error cancelling account: "+e.getErrorCode());
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+				Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){

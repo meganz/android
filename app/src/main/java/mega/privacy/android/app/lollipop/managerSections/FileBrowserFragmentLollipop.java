@@ -1005,7 +1005,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -1015,7 +1015,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							Uri mediaFileUri = Uri.fromFile(mediaFile);
 							if(mediaFileUri==null){
 								log("itemClick:ERROR:NULLmediaFileUri");
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 							}
 							else{
 								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
@@ -1054,12 +1054,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							}
 							else{
 								log("itemClick:ERROR:httpServerGetLocalLink");
-								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+								((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 							}
 						}
 						else{
 							log("itemClick:ERROR:httpServerGetLocalLink");
-							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+							((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
 						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
