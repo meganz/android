@@ -1120,14 +1120,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                             }
                                             
                                             int ret = megaChatApi.getInitState();
-                                            
-                                            if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
+
+                                            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
                                                 ret = megaChatApi.init(gSession);
                                                 log("shouldRun: result of init ---> " + ret);
                                                 chatSettings = dbH.getChatSettings();
                                                 if (ret == MegaChatApi.INIT_NO_CACHE) {
                                                     log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-                                                    
+                                                    megaChatApi.enableGroupChatCalls(true);
+
                                                 } else if (ret == MegaChatApi.INIT_ERROR) {
                                                     log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
                                                     if (chatSettings == null) {
