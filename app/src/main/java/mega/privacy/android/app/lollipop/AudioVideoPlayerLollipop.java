@@ -4398,6 +4398,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         else {
                             n = megaApi.getNodeByHandle(mediaHandles.get(i));
                         }
+                        //either authorizeNode or getNodeByHandle can return null, so need to check
+                        if(n == null){
+                            continue;
+                        }
                         mSource = null;
                         boolean isOnMegaDownloads = false;
                         localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
