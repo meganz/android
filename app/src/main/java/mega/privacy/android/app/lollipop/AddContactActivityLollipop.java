@@ -183,6 +183,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private MenuItem sendInvitationMenuItem;
     private MenuItem scanQrMenuItem;
+    private MenuItem inviteContactMenuItem;
 
     private boolean comesFromChat;
 
@@ -215,14 +216,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private RelativeLayout typeContactLayout;
     private EditText typeContactEditText;
     private RelativeLayout scanQRButton;
-    private Button scanQRButton2;
     private RelativeLayout inviteContactButton;
-    private Button inviteContactButton2;
     private RelativeLayout newGroupChatButton;
-    private Button newGroupChatButton2;
+    private RelativeLayout newChatLinkButton;
     private boolean isConfirmAddShown = false;
     private String confirmAddMail;
     private boolean createNewGroup = false;
+    private boolean createNewChatLink = false;
     private String title = "";
 
     private LinearLayout addContactsLayout;
@@ -1236,6 +1236,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             scanQrMenuItem.setVisible(false);
         }
 
+        inviteContactMenuItem = menu.findItem(R.id.action_invite_contact);
+        inviteContactMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_add_contact, R.color.black));
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                && contactType == Constants.CONTACT_TYPE_MEGA && !createNewGroup && !comesFromChat && !onNewGroup) {
+            inviteContactMenuItem.setVisible(true);
+        }
+        else {
+            inviteContactMenuItem.setVisible(false);
+        }
+
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
         sendInvitationMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_send_white, R.color.accentColor));
         setSendInvitationVisibility();
@@ -1345,6 +1355,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("isConfirmAddShown", isConfirmAddShown);
         outState.putString("confirmAddMail", confirmAddMail);
         outState.putBoolean("createNewGroup", createNewGroup);
+        outState.putBoolean("createNewChatLink", createNewChatLink);
         outState.putBoolean("isEKREnabled", isEKREnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
@@ -1558,19 +1569,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         });
         scanQRButton = (RelativeLayout) findViewById(R.id.layout_scan_qr);
         scanQRButton.setOnClickListener(this);
-        scanQRButton2 = (Button) findViewById(R.id.scan_qr_button);
-        scanQRButton2.setOnClickListener(this);
         scanQRButton.setVisibility(View.GONE);
         inviteContactButton = (RelativeLayout) findViewById(R.id.layout_invite_contact);
         inviteContactButton.setOnClickListener(this);
-        inviteContactButton2 = (Button) findViewById(R.id.invite_contact_button);
-        inviteContactButton2.setOnClickListener(this);
         inviteContactButton.setVisibility(View.GONE);
         newGroupChatButton = (RelativeLayout) findViewById(R.id.layout_group_chat);
         newGroupChatButton.setOnClickListener(this);
-        newGroupChatButton2 = (Button) findViewById(R.id.group_chat_button);
-        newGroupChatButton2.setOnClickListener(this);
         newGroupChatButton.setVisibility(View.GONE);
+        newChatLinkButton = (RelativeLayout) findViewById(R.id.layout_chat_link);
+        newChatLinkButton.setOnClickListener(this);
+        newChatLinkButton.setVisibility(View.GONE);
         addContactsLayout = (LinearLayout) findViewById(R.id.add_contacts_container);
         addedContactsRecyclerView = (RecyclerView) findViewById(R.id.contact_adds_recycler_view);
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
@@ -1598,8 +1606,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             if (!comesFromChat && !newGroup) {
-                inviteContactButton.setVisibility(View.VISIBLE);
+                if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    inviteContactButton.setVisibility(View.VISIBLE);
+                }
                 newGroupChatButton.setVisibility(View.VISIBLE);
+                newChatLinkButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(linearLayoutManager);
             headerContacts.setVisibility(View.VISIBLE);
@@ -1666,6 +1677,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
             confirmAddMail = savedInstanceState.getString("confirmAddMail");
             createNewGroup = savedInstanceState.getBoolean("createNewGroup", false);
+            createNewChatLink = savedInstanceState.getBoolean("createNewChatLink", false);
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
@@ -1677,6 +1689,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     setTitleAB();
                     inviteContactButton.setVisibility(View.GONE);
                     newGroupChatButton.setVisibility(View.GONE);
+                    newChatLinkButton.setVisibility(View.GONE);
                 }
 
                 if (savedaddedContacts == null && contactType == Constants.CONTACT_TYPE_MEGA) {
@@ -1762,6 +1775,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             setTitleAB();
             inviteContactButton.setVisibility(View.GONE);
             newGroupChatButton.setVisibility(View.GONE);
+            newChatLinkButton.setVisibility(View.GONE);
 
         }
 
@@ -2861,13 +2875,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.scan_qr_button:
             case R.id.layout_scan_qr: {
                 log("Scan QR code pressed");
                 initScanQR();
                 break;
             }
-            case R.id.invite_contact_button:
             case R.id.layout_invite_contact: {
                 log("Invite contact pressed");
                 Intent in = new Intent(this, AddContactActivityLollipop.class);
@@ -2875,7 +2887,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
             }
-            case R.id.group_chat_button:
             case R.id.layout_group_chat: {
                 log("New group chat pressed");
                 createNewGroup = true;
@@ -2883,6 +2894,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 setTitleAB();
                 inviteContactButton.setVisibility(View.GONE);
                 newGroupChatButton.setVisibility(View.GONE);
+                newChatLinkButton.setVisibility(View.GONE);
                 break;
             }
             case R.id.ekr_switch: {
@@ -2890,6 +2902,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 setGetChatLinkVisibility();
                 break;
             }
+            case R.id.layout_chat_link:
+                createNewChatLink = true;
             case R.id.fab_button_next: {
                 if (contactType == Constants.CONTACT_TYPE_DEVICE){
                     inviteContacts(addedContactsPhone);
@@ -2948,17 +2962,22 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         super.onBackPressed();
 
         if (onNewGroup) {
-            returnToAddContacts();
-            createMyContact();
             if (addedContactsMEGA.contains(myContact)) {
                 addedContactsMEGA.remove(myContact);
             }
+            returnToAddContacts();
+            createMyContact();
+        }
+        else if (createNewGroup && newGroup) {
+            finish();
         }
         else if (createNewGroup && (!newGroup || !onlyCreateGroup)) {
             createNewGroup = false;
+            createNewChatLink = false;
             aB.setSubtitle(null);
             inviteContactButton.setVisibility(View.VISIBLE);
             newGroupChatButton.setVisibility(View.VISIBLE);
+            newChatLinkButton.setVisibility(View.VISIBLE);
             filteredContactMEGA.clear();
             filteredContactMEGA.addAll(visibleContactsMEGA);
             setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
@@ -3033,6 +3052,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
         newGroupLayout.setVisibility(View.GONE);
+        if (createNewChatLink) {
+            createNewChatLink = false;
+            findViewById(R.id.ekr_layout).setVisibility(View.VISIBLE);
+        }
         visibilityFastScroller();
         setSendInvitationVisibility();
     }
@@ -3078,6 +3101,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         addContactsLayout.setVisibility(View.GONE);
         newGroupLayout.setVisibility(View.VISIBLE);
+        if (createNewChatLink) {
+            findViewById(R.id.ekr_layout).setVisibility(View.GONE);
+        }
         setSendInvitationVisibility();
         setMegaAdapterContacts(addedContactsMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT);
         visibilityFastScroller();
@@ -3099,25 +3125,24 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 
-        if(getChatLinkBox.isChecked()){
-            if(chatTitle!=null && !chatTitle.isEmpty()){
-                String trimChatTitle = chatTitle.trim();
-                if(trimChatTitle.isEmpty()){
-                    Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
-                    return;
-                }
-            }
-            else if(chatTitle==null || chatTitle.isEmpty()){
-                Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
-                return;
-            }
+        if((getChatLinkBox.isChecked() || createNewChatLink) && (chatTitle == null || chatTitle.trim().isEmpty())){
+            new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal)
+                    .setTitle(getString(R.string.enter_group_name))
+                    .setMessage(getString(R.string.alert_enter_group_name))
+                    .setPositiveButton("OK",null)
+                    .show();
+            return;
         }
 
         if(chatTitle!=null){
             intent.putExtra(EXTRA_CHAT_TITLE, chatTitle);
         }
 
-        if(onNewGroup){
+        if (createNewChatLink) {
+            intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
+            intent.putExtra(EXTRA_CHAT_LINK, true);
+        }
+        else if(onNewGroup){
             intent.putExtra(EXTRA_EKR, isEKREnabled);
             intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
             intent.putExtra(EXTRA_CHAT_LINK, getChatLinkBox.isChecked());

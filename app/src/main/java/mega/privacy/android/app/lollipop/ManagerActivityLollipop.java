@@ -5928,12 +5928,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showHideBottomNavigationView(false);
 				bottomNavigationCurrentItem = CHAT_BNV;
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				if (visibleContacts.size() == 0 || visibleContacts.isEmpty() || visibleContacts == null){
-					hideFabButton();
-				}
-				else {
-					showFabButton();
-				}
+				showFabButton();
 				break;
 			}
     	}
@@ -12098,24 +12093,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void chooseAddContactDialog(boolean isMegaContact){
 		log("chooseAddContactDialog");
-
-		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
-
 			if(megaApi!=null && megaApi.getRootNode()!=null){
-				ArrayList<MegaUser> contacts = megaApi.getContacts();
-				if(contacts==null){
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-				}
-				else {
-					if(contacts.isEmpty()){
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-					}
-					else{
-						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
-					}
-				}
+				Intent in = new Intent(this, AddContactActivityLollipop.class);
+				in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+				startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 			}
 			else{
 				log("Online but not megaApi");
@@ -12128,24 +12110,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void addContactFromPhone(){
-
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
-
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-//			if (!hasReadContactsPermission) {
-//				log("No read contacts permission");
-//				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-//						new String[]{Manifest.permission.READ_CONTACTS},
-//						Constants.REQUEST_READ_CONTACTS);
-//				return;
-//			}
-//		}
-//
-//		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
-//		this.startActivity(phoneContactIntent);
 	}
 
 	public void showNewContactDialog(){
@@ -17920,9 +17887,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case CHAT:{
 				if(megaChatApi!=null){
-//					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
-//					}
+					fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
 					fabButton.setVisibility(View.VISIBLE);
 				}

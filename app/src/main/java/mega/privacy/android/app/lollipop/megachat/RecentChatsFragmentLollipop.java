@@ -454,9 +454,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("showEmptyChatScreen");
 
         listView.setVisibility(View.GONE);
-        if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop)context).hideFabButton();
-        }
 
         String textToShowB = "";
 
