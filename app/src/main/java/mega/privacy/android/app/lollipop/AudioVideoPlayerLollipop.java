@@ -973,6 +973,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             else{
                 ArrayList<MegaNode> nodes = null;
                 if (adapterType == Constants.FOLDER_LINK_ADAPTER) {
+                    if(megaApiFolder == null){
+                        MegaApplication app = (MegaApplication)getApplication();
+                        megaApiFolder = app.getMegaApiFolder();
+                    }
                     if (parentNodeHandle == -1) {
                         parentNode = megaApiFolder.getRootNode();
                     }
