@@ -237,19 +237,21 @@ public class AccountController implements View.OnClickListener{
                     }
                     showConfirmationExportedDialog();
                 }
-                else {
-                    if(fromOffline){
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
-                        }
-                    }
-                    else{
-                        showConfirmDialogRecoveryKeySaved();
-                    }
+                else if(fromOffline) {
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
+                }
+                else{
+                    showConfirmDialogRecoveryKeySaved();
                 }
             }
             else if (context instanceof TestPasswordActivity) {
-                showConfirmationExportedDialog();
+                if (pathNull) {
+                    showConfirmationExportedDialog();
+                }
+                else {
+                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
             }
 
         }catch (FileNotFoundException e) {
