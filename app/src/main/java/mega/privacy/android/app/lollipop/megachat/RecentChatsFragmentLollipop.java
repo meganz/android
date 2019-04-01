@@ -648,7 +648,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                                 ChatController chatController = new ChatController(context);
                                 log("onCLick: enableChat");
                                 chatController.enableChat();
-                                getActivity().supportInvalidateOptionsMenu();
+                                getActivity().invalidateOptionsMenu();
                                 ((ManagerActivityLollipop)context).enableChat();
                             }
                         }
@@ -1329,13 +1329,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                                     listView.setVisibility(View.VISIBLE);
                                     emptyLayout.setVisibility(View.GONE);
                                 }
+
+                                if (chats.isEmpty()) {
+                                    ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                                }
                             }
                         }
                     }
                     else{
                         log("New unarchived element:refresh chat list");
-
                         setChats();
+                        if (chats.size() == 1) {
+                            ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                        }
                     }
                     //Update last position
                     if(adapterList!=null){
@@ -1348,6 +1354,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     else{
                         listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(78, outMetrics));
                     }
+
+                    checkScroll();
                 }
                 else if(context instanceof ArchivedChatsActivity){
                     if(item.isArchived()){
@@ -1383,6 +1391,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                                 if (adapterList.getItemCount() == 0){
                                     log("adapterList.getItemCount() == 0");
                                     showEmptyChatScreen();
+                                    ((ArchivedChatsActivity) context).invalidateOptionsMenu();
                                 }
                                 else{
                                     log("adapterList.getItemCount() NOT = 0");
@@ -1392,6 +1401,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                     }
+                    checkScroll();
                 }
             }
         }
@@ -1781,6 +1791,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             if (searchQuery != null && ((ManagerActivityLollipop) context).searchExpand) {
                 filterChats(searchQuery);
             }
+            ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
 
         super.onResume();

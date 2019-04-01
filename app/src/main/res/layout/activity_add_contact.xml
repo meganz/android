@@ -184,7 +184,7 @@
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:text="@string/new_chat_link_button"
+					android:text="@string/new_chat_link_label"
 					android:textColor="@color/accentColor"
 					android:textSize="14sp"
 					android:textAllCaps="true"

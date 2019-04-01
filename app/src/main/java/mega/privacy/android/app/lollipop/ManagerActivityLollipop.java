@@ -7403,9 +7403,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setStatusMenuItem.setVisible(false);
 						}
 					}
-					if (rChatFL != null && rChatFL.getItemCount() > 0) {
+					ArrayList<MegaChatListItem> chats = megaChatApi.getChatListItems();
+					if (chats != null && !chats.isEmpty()) {
 						searchMenuItem.setVisible(true);
-					} else {
+					}
+					else {
 						searchMenuItem.setVisible(false);
 					}
 
