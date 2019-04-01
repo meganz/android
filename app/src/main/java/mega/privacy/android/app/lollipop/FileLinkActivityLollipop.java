@@ -491,7 +491,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 				}else{
 
-					preview = PreviewUtils.getPreviewFromFolder(document, this);
+					preview = PreviewUtils.getPreviewFromFolderForFileLink(document, this);
 					if (preview != null){
 						PreviewUtils.previewCache.put(document.getHandle(), preview);
 						imageView.setImageBitmap(preview);
