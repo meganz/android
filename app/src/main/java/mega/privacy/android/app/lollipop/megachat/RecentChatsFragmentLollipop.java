@@ -215,9 +215,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            inviteButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-        }
 
         callInProgressLayout = (RelativeLayout) v.findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setOnClickListener(this);
@@ -488,7 +485,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         }
 
-        textToShowB = String.format(context.getString(R.string.recent_chat_empty));
+        textToShowB = String.format(context.getString(R.string.recent_chat_empty).toUpperCase());
         try{
             textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");

@@ -249,6 +249,19 @@
 					android:textColor="@color/text_secondary"
 					android:textSize="18sp"/>
 
+				<TextView
+					android:id="@+id/add_contact_list_empty_subtext"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:gravity="center"
+					android:layout_marginTop="12dp"
+					android:layout_marginLeft="34dp"
+					android:layout_marginRight="34dp"
+					android:textSize="14sp"
+					android:lineSpacingMultiplier="1.29"
+					android:textColor="@color/grey_achievements_invite_friends_sub"
+					android:text="@string/invite_contacts_to_start_chat"/>
+
 				<ProgressBar
 					android:id="@+id/add_contact_progress_bar"
 					style="?android:attr/progressBarStyleLargeInverse"
