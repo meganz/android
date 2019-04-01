@@ -482,7 +482,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);
 
-            inviteButton.setText(getString(R.string.menu_add_contact));
+            inviteButton.setText(getString(R.string.contact_invite));
             inviteButton.setVisibility(View.VISIBLE);
 
 
