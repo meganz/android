@@ -2666,57 +2666,43 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			log("copy nodes request finished");
 		}else if (request.getType() == MegaRequest.TYPE_SHARE){
             log(" MegaRequest.TYPE_SHARE");
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(removeShare){
+            String message;
+            if (statusDialog != null) {
+                statusDialog.dismiss();
+            }
+            if (e.getErrorCode() == MegaError.API_OK) {
+                if (removeShare) {
                     log("OK onRequestFinish remove");
-
-                    removeShare=false;
+                    removeShare = false;
                     adapter.setShareList(listContacts);
                     listView.invalidate();
-                }
-                else if(changeShare){
+                    message = getString(R.string.context_share_correctly_removed);
+                } else if (changeShare) {
                     log("OK onRequestFinish change");
                     permissionsDialog.dismiss();
-                    statusDialog.dismiss();
-                    changeShare=false;
+                    changeShare = false;
                     adapter.setShareList(listContacts);
                     listView.invalidate();
+                    message = getString(R.string.context_permissions_changed);
+                } else {
+                    message = getString(R.string.context_correctly_shared);
                 }
-                else{
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
-                }
-            }
-            else{
-                if(removeShare){
+            } else {
+                if (removeShare) {
                     log("ERROR onRequestFinish remove");
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_contact_not_removed), -1);
-                    removeShare=false;
-                }
-                if(changeShare){
+                    removeShare = false;
+                    message = getString(R.string.context_contact_not_removed);
+                } else if (changeShare) {
                     log("ERROR onRequestFinish change");
-                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_permissions_not_changed), -1);
+                    changeShare = false;
+                    message = getString(R.string.context_permissions_not_changed);
+                }else{
+                    message = getString(R.string.context_no_shared);
                 }
             }
+            showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
             log("Finish onRequestFinish");
-        }
-
-		if (request.getType() == MegaRequest.TYPE_SHARE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-			if (e.getErrorCode() == MegaError.API_OK){
-			    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_shared), -1);
-				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-			}
-			else{
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_shared), -1);
-			}
-		}
-
-
-		if(request.getType() == MegaApiJava.USER_ATTR_AVATAR){
+        } else if(request.getType() == MegaApiJava.USER_ATTR_AVATAR){
 			try{
 				statusDialog.dismiss();
 			}catch (Exception ex){}
