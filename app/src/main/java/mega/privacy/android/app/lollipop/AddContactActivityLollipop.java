@@ -2925,7 +2925,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             case R.id.layout_chat_link: {
                 createNewChatLink = true;
-                setNextLayout();
+                newGroup();
                 break;
             }
             case R.id.fab_button_next: {
@@ -3099,7 +3099,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         visibilityFastScroller();
         setSendInvitationVisibility();
         setSearchVisibility();
-        if (visibleContactsMEGA == null || visibleContactsMEGA.isEmpty()) {
+        if (createNewChatLink || visibleContactsMEGA == null || visibleContactsMEGA.isEmpty()) {
             onBackPressed();
         }
     }
@@ -3131,7 +3131,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         onNewGroup = true;
         searchExpand = false;
         if (aB != null) {
-            aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+            if (createNewChatLink) {
+                aB.setTitle(getString(R.string.new_chat_link_label).toUpperCase());
+            }
+            else {
+                aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+            }
             aB.setSubtitle(getString(R.string.subtitle_new_group));
         }
 
