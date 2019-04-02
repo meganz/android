@@ -631,7 +631,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					intent.putExtra("newGroup", true);
 					intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 					((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
-//					}
 
 					clearSelections();
 					hideMultipleSelect();
