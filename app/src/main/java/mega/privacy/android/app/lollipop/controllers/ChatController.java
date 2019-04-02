@@ -1236,7 +1236,7 @@ public class ChatController {
             }
             else {
                 String email = nonContact.getEmail();
-                if (email != null && email.trim().isEmpty()) {
+                if (email != null && !email.trim().isEmpty()) {
                     return email;
                 }
             }
