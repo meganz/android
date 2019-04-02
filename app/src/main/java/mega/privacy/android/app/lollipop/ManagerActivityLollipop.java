@@ -7012,14 +7012,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						sortByMenuItem.setVisible(false);
 					}
 					if (handleInviteContact != 0) {
-						log("onCreateOptionsMenu Handle to invite a contact: "+handleInviteContact);
 						if (cFLol != null) {
 							cFLol.invite(handleInviteContact);
 						}
 						handleInviteContact = 0;
-					}
-					else {
-						log("onCreateOptionsMenu Handle to invite a contact: "+handleInviteContact);
 					}
 
 					//Hide

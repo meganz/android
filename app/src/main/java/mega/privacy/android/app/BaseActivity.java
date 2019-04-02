@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
