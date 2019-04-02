@@ -37,7 +37,6 @@
 
     <string name="general_retry" context="Button to try retry some action">Retry</string>
     <string name="general_open_browser" context="Button to open the default web browser">Open browser</string>
-
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     -->
@@ -518,6 +517,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -2104,7 +2104,7 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Chat activity</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">You may have new messages</string>
-
+	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Rubbish Bin Clearing Scheduler</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">The Rubbish Bin is cleared for you automatically.</string>
 
@@ -2415,6 +2415,8 @@
     <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Starting video call&#8230;</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Already downloaded. Copied to selected path.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
