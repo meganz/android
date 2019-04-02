@@ -1336,12 +1336,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     @Override
-    public void onBackPressed() {
-        super.callToSuperBack = true;
-        super.onBackPressed();
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
     }

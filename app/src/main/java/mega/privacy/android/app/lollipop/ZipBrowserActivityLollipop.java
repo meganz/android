@@ -824,7 +824,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		log("onBackPressed, currentPath: "+currentPath);
 		
 		if(depth<3){
-			super.callToSuperBack = true;
 			super.onBackPressed();
 			
 		} 

@@ -2944,8 +2944,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     @Override
     public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if (onNewGroup) {
             returnToAddContacts();
@@ -2968,7 +2967,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             containerAddedContactsRecyclerView.setVisibility(View.GONE);
         }
         else {
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }
