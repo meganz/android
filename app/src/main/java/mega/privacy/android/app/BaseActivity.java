@@ -43,7 +43,6 @@ public class BaseActivity extends AppCompatActivity {
 
     private AlertDialog sslErrorDialog;
 
-    protected boolean callToSuperBack = false;
     boolean delaySignalPresence = false;
 
     @Override
@@ -255,9 +254,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         retryConnectionsAndSignalPresence();
-        if(callToSuperBack){
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override

@@ -1542,8 +1542,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed: "+tabShown);
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		String cFTag;
 		if(tabShown==CLOUD_TAB){
@@ -1623,7 +1622,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		}
 

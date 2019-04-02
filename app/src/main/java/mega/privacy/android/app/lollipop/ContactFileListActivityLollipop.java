@@ -1299,16 +1299,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onBackPressed() {
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
-		if (cflF != null){
-			if (cflF.isVisible()){
-				if (cflF.onBackPressed() == 0){
-					super.callToSuperBack = true;
-					super.onBackPressed();
-				}
-			}
+		if (cflF != null && cflF.isVisible() && cflF.onBackPressed() == 0){
+			super.onBackPressed();
 		}
 	}
 

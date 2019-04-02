@@ -3822,11 +3822,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if (!onPlaylist){
-            super.callToSuperBack = true;
             super.onBackPressed();
             if (megaApi != null) {
                 megaApi.removeTransferListener(this);

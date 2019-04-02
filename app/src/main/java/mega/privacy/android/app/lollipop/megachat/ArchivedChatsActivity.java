@@ -168,12 +168,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        super.callToSuperBack = true;
-    }
-
-    @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
         if (item != null){
             log("onChatListItemUpdate:" + item.getTitle());
