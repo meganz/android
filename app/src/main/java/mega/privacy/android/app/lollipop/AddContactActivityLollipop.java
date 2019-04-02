@@ -47,6 +47,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -130,6 +131,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     ImageView emptyImageView;
     TextView emptyTextView;
     TextView emptySubTextView;
+    Button emptyInviteButton;
     ProgressBar progressBar;
     RecyclerView addedContactsRecyclerView;
     RelativeLayout containerAddedContactsRecyclerView;
@@ -1665,6 +1667,19 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
         emptySubTextView = (TextView) findViewById(R.id.add_contact_list_empty_subtext);
+        emptyInviteButton = (Button) findViewById(R.id.add_contact_list_empty_invite_button);
+        emptyInviteButton.setText(R.string.contact_invite);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) emptySubTextView.getLayoutParams();
+            params1.setMargins(Util.px2dp(34, outMetrics), 0, Util.px2dp(34, outMetrics), 0);
+            emptyTextView.setLayoutParams(params1);
+            LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) emptyInviteButton.getLayoutParams();
+            params2.setMargins(0, Util.px2dp(5, outMetrics), 0, Util.px2dp(32, outMetrics));
+            emptyInviteButton.setLayoutParams(params2);
+        }
+
+        emptyInviteButton.setOnClickListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.add_contact_progress_bar);
 
@@ -1803,15 +1818,18 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             emptyTextView.setVisibility(View.VISIBLE);
             if (contactType == Constants.CONTACT_TYPE_MEGA && (addedContactsMEGA == null || addedContactsMEGA.isEmpty())) {
                 emptySubTextView.setVisibility(View.VISIBLE);
+                emptyInviteButton.setVisibility(View.VISIBLE);
             }
             else {
                 emptySubTextView.setVisibility(View.GONE);
+                emptyInviteButton.setVisibility(View.GONE);
             }
         }
         else {
             emptyImageView.setVisibility(View.GONE);
             emptyTextView.setVisibility(View.GONE);
             emptySubTextView.setVisibility(View.GONE);
+            emptyInviteButton.setVisibility(View.GONE);
         }
     }
 
@@ -2905,6 +2923,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 initScanQR();
                 break;
             }
+            case R.id.add_contact_list_empty_invite_button:
             case R.id.layout_invite_contact: {
                 log("Invite contact pressed");
                 Intent in = new Intent(this, AddContactActivityLollipop.class);

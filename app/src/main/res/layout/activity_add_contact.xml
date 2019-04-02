@@ -228,49 +228,72 @@
 			android:layout_below="@id/container_linear_layout"
 			android:background="@color/white">
 
-			<LinearLayout
+			<ScrollView
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:orientation="vertical"
 				android:layout_centerInParent="true">
 
-				<ImageView
-					android:id="@+id/add_contact_list_empty_image"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_horizontal"/>
-
-				<TextView
-					android:id="@+id/add_contact_list_empty_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:gravity="center"
-					android:layout_gravity="center_horizontal"
-					android:textColor="@color/text_secondary"
-					android:textSize="18sp"/>
-
-				<TextView
-					android:id="@+id/add_contact_list_empty_subtext"
+				<LinearLayout
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:gravity="center"
-					android:layout_marginTop="12dp"
-					android:layout_marginLeft="34dp"
-					android:layout_marginRight="34dp"
-					android:textSize="14sp"
-					android:lineSpacingMultiplier="1.29"
-					android:textColor="@color/grey_achievements_invite_friends_sub"
-					android:text="@string/invite_contacts_to_start_chat"/>
+					android:layout_height="match_parent"
+					android:orientation="vertical">
 
-				<ProgressBar
-					android:id="@+id/add_contact_progress_bar"
-					style="?android:attr/progressBarStyleLargeInverse"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center_horizontal"
-					android:visibility="gone"
-					android:layout_marginTop="10dp" />
-			</LinearLayout>
+					<ImageView
+						android:id="@+id/add_contact_list_empty_image"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_horizontal"/>
+
+					<TextView
+						android:id="@+id/add_contact_list_empty_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:gravity="center"
+						android:layout_gravity="center_horizontal"
+						android:textColor="@color/text_secondary"
+						android:textSize="18sp"/>
+
+					<TextView
+						android:id="@+id/add_contact_list_empty_subtext"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:gravity="center"
+						android:layout_marginTop="12dp"
+						android:layout_marginLeft="34dp"
+						android:layout_marginRight="34dp"
+						android:textSize="14sp"
+						android:lineSpacingMultiplier="1.29"
+						android:textColor="@color/grey_achievements_invite_friends_sub"
+						android:text="@string/invite_contacts_to_start_chat"/>
+
+					<Button
+						android:id="@+id/add_contact_list_empty_invite_button"
+						android:layout_width="wrap_content"
+						android:minWidth="96dp"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_horizontal"
+						android:gravity="center"
+						android:layout_marginTop="32dp"
+						android:layout_marginBottom="32dp"
+						android:paddingLeft="20dp"
+						android:paddingRight="20dp"
+						android:paddingTop="10dp"
+						android:paddingBottom="10dp"
+						android:textColor="@color/accentColor"
+						android:textSize="16sp"
+						android:background="@drawable/background_button_border_accent"
+						style="?android:attr/borderlessButtonStyle"/>
+
+					<ProgressBar
+						android:id="@+id/add_contact_progress_bar"
+						style="?android:attr/progressBarStyleLargeInverse"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center_horizontal"
+						android:visibility="gone"
+						android:layout_marginTop="10dp" />
+				</LinearLayout>
+			</ScrollView>
 
 			<RelativeLayout
 				android:id="@+id/container_list_contacts"
