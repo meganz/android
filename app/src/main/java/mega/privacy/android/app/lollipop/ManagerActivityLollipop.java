@@ -635,6 +635,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public long comesFromNotificationHandle = -1;
 	public long comesFromNotificationHandleSaved = -1;
 	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
+	private boolean isCreatingChatFolder = false;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -5122,9 +5123,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if(Util.isChatEnabled()) {
 			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			if (parentNode == null) {
+			if (parentNode == null && !isCreatingChatFolder) {
 				log("Create folder: " + CHAT_FOLDER);
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
+                isCreatingChatFolder = true;
+				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
 			}
 		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -5536,9 +5538,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		MegaNode parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-		if(parentNode == null){
+		if(parentNode == null && !isCreatingChatFolder){
 			log("Create folder: "+CHAT_FOLDER);
-			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
+            isCreatingChatFolder = true;
+			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
 		}
 
 		setToolbarTitle();
@@ -6325,9 +6328,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				if(Util.isChatEnabled()) {
 					MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-					if (parentNode == null) {
+					if (parentNode == null && !isCreatingChatFolder) {
 						log("Create folder: " + CHAT_FOLDER);
-						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
+                        isCreatingChatFolder = true;
+						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), ManagerActivityLollipop.this);
 					}
 				}
 				searchQuery = "";
@@ -16634,9 +16638,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				statusDialog.dismiss();
 			}
 			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
+            if(isCreatingChatFolder && CHAT_FOLDER.equals(request.getName())){
+                isCreatingChatFolder = false;
+                return;
+            }
+            if (e.getErrorCode() == MegaError.API_OK){
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
 					if (fbFLol != null){
