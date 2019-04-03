@@ -17514,15 +17514,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else {
 				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-			}
-   
-			//work around - SDK does not return over quota error for folder upload,
-            //so need to be notified from global listener
-            if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
-                log("onTransferTemporaryError: over quota");
-                Intent intent = new Intent(this,UploadService.class);
-                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
-                startService(intent);
+                //work around - SDK does not return over quota error for folder upload,
+                //so need to be notified from global listener
+                if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                    log("onTransferTemporaryError: over quota");
+                    Intent intent = new Intent(this,UploadService.class);
+                    intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                    startService(intent);
+                }
             }
         }
 	}
