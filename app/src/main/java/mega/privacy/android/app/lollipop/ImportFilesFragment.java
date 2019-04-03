@@ -126,20 +126,23 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         incomingButton = (RelativeLayout) v.findViewById(R.id.incoming_layout);
         incomingButton.setOnClickListener(this);
         ArrayList<MegaNode> inShares = megaApi.getInShares();
-        if (inShares != null) {
-            if (inShares.size() <= 0) {
-                incomingButton.setVisibility(View.GONE);
-            }
-            else {
-                incomingButton.setVisibility(View.VISIBLE);
-            }
+        if (inShares == null || inShares.size() <= 0) {
+            incomingButton.setVisibility(View.GONE);
         }
         else {
-            incomingButton.setVisibility(View.GONE);
+            incomingButton.setVisibility(View.VISIBLE);
         }
 
         chatButton = (RelativeLayout) v.findViewById(R.id.chat_layout);
         chatButton.setOnClickListener(this);
+
+        if (Util.isChatEnabled()) {
+            chatButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            chatButton.setVisibility(View.GONE);
+        }
+
         showMoreLayout = (RelativeLayout) v.findViewById(R.id.show_more_layout);
         showMoreLayout.setOnClickListener(this);
         showMoreText  = (TextView) v.findViewById(R.id.show_more_text);
