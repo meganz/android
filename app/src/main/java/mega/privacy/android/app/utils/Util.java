@@ -2225,21 +2225,21 @@ public class Util {
 	
 	public static void showSnackBar(Context context, String message){
         if (context instanceof ChatFullScreenImageViewer){
-            ((ChatFullScreenImageViewer) context).showSnackbar(message);
+            ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE,message);
         }
         else if (context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).showSnackbar(message);
+            ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
         }
         else if (context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).showSnackbar(message);
+            ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
         }
         else if (context instanceof ChatActivityLollipop){
-            ((ChatActivityLollipop) context).showSnackbar(message);
+            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
         }
         else if (context instanceof NodeAttachmentHistoryActivity){
-            ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
+            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE,message);
         }else if (context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).showSnackbar(message);
+            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
         }
     }
 
