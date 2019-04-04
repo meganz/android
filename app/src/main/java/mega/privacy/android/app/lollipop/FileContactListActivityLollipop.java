@@ -1167,8 +1167,13 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 		statusDialog = temp;
-
-		FileContactMultipleRequestListener removeMultipleListener = new FileContactMultipleRequestListener(Constants.MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER, this);
+        FileContactMultipleRequestListener.RequestCompletedCallback callback = new FileContactMultipleRequestListener.RequestCompletedCallback() {
+            @Override
+            public void onRequestCompleted(String message) {
+                showSnackbar(message);
+            }
+        };
+		FileContactMultipleRequestListener removeMultipleListener = new FileContactMultipleRequestListener(Constants.MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER, this,callback);
 		for(int j=0;j<shares.size();j++){
 			if(shares.get(j).getUser()!=null){
 				MegaUser u = megaApi.getContact(shares.get(j).getUser());

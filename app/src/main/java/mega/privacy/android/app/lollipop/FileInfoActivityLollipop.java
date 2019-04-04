@@ -366,11 +366,45 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     private class ActionBarCallBack implements ActionMode.Callback {
 
+        private void checkShares(List<MegaShare> shares, int newPermission){
+            if(shares != null && !shares.isEmpty()){
+                log("Size array----- " + shares.size());
+                if(shares.size() > 1){
+                    FileContactMultipleRequestListener.RequestCompletedCallback callback = new FileContactMultipleRequestListener.RequestCompletedCallback() {
+                        @Override
+                        public void onRequestCompleted(String message) {
+                            editMultipleSharesCallback(message);
+                        }
+                    };
+                    FileContactMultipleRequestListener changeMultipleListener = new FileContactMultipleRequestListener(Constants.MULTIPLE_CHANGE_PERMISSION, FileInfoActivityLollipop.this,callback);
+                    for (int i = 0;i < shares.size();i++) {
+                        String userId = shares.get(i).getUser();
+                        changePermission(userId, newPermission,changeMultipleListener);
+                    }
+                }else {
+                    String userId = shares.get(0).getUser();
+                    changePermission(userId, newPermission,FileInfoActivityLollipop.this);
+                }
+            }else{
+                log("Size array----- is null or empty");
+            }
+        }
+    
+        private void changePermission(String userId,int newPermission,MegaRequestListenerInterface callback) {
+            if (userId != null) {
+                MegaUser megaUser = megaApi.getContact(userId);
+                if (megaUser != null) {
+                    megaApi.share(node,megaUser,newPermission,callback);
+                } else {
+                    megaApi.share(node,userId,newPermission,callback);
+                }
+            }
+        }
+        
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             log("onActionItemClicked");
             final List<MegaShare> shares = adapter.getSelectedShares();
-
             switch(item.getItemId()){
                 case R.id.action_file_contact_list_permissions:{
 
@@ -381,75 +415,33 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                     dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
+                            if(permissionsDialog != null){
+                                permissionsDialog.dismiss();
+                            }
                             removeShare = false;
                             changeShare = true;
-                            ProgressDialog temp = null;
+                            ProgressDialog temp;
                             try{
                                 temp = new ProgressDialog(fileInfoActivityLollipop);
                                 temp.setMessage(getString(R.string.context_permissions_changing_folder));
                                 temp.show();
                             }
                             catch(Exception e){
+                                log(e.getMessage());
                                 return;
                             }
                             statusDialog = temp;
                             switch(item) {
-                                case 0:{
-                                    if(shares!=null){
-
-                                        if(shares.size()!=0){
-                                            log("Size array----- "+shares.size());
-                                            for(int j=0;j<shares.size();j++){
-                                                if(shares.get(j).getUser()!=null){
-                                                    MegaUser u = megaApi.getContact(shares.get(j).getUser());
-                                                    if(u!=null){
-                                                        megaApi.share(node, u, MegaShare.ACCESS_READ, fileInfoActivityLollipop);
-                                                    }
-                                                    else{
-                                                        megaApi.share(node, shares.get(j).getUser(), MegaShare.ACCESS_READ, fileInfoActivityLollipop);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                case MegaShare.ACCESS_READ: {
+                                    checkShares(shares,MegaShare.ACCESS_READ);
                                     break;
                                 }
-                                case 1:{
-                                    if(shares!=null){
-                                        if(shares.size()!=0){
-                                            log("Size array----- "+shares.size());
-                                            for(int j=0;j<shares.size();j++){
-                                                if(shares.get(j).getUser()!=null){
-                                                    MegaUser u = megaApi.getContact(shares.get(j).getUser());
-                                                    if(u!=null){
-                                                        megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileInfoActivityLollipop);
-                                                    }
-                                                    else{
-                                                        megaApi.share(node, shares.get(j).getUser(), MegaShare.ACCESS_READWRITE, fileInfoActivityLollipop);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
+                                case MegaShare.ACCESS_READWRITE:{
+                                    checkShares(shares,MegaShare.ACCESS_READWRITE);
                                     break;
                                 }
-                                case 2:{
-                                    if(shares!=null){
-                                        if(shares.size()!=0){
-                                            for(int j=0;j<shares.size();j++){
-                                                if(shares.get(j).getUser()!=null){
-                                                    MegaUser u = megaApi.getContact(shares.get(j).getUser());
-                                                    if(u!=null){
-                                                        megaApi.share(node, u, MegaShare.ACCESS_FULL, fileInfoActivityLollipop);
-                                                    }
-                                                    else{
-                                                        megaApi.share(node, shares.get(j).getUser(), MegaShare.ACCESS_FULL, fileInfoActivityLollipop);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                case MegaShare.ACCESS_FULL:{
+                                    checkShares(shares,MegaShare.ACCESS_FULL);
                                     break;
                                 }
                             }
@@ -461,14 +453,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     break;
                 }
                 case R.id.action_file_contact_list_delete:{
-
-                    removeShare = true;
-                    changeShare = false;
-
                     if(shares!=null){
-
                         if(shares.size()!=0){
-
                             if (shares.size() > 1) {
                                 log("Remove multiple contacts");
                                 showConfirmationRemoveMultipleContactFromShare(shares);
@@ -3322,11 +3308,24 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         super.callToSuperBack = true;
         super.onBackPressed();
 	}
+	
+	public void editMultipleSharesCallback(String message){
+	    if(statusDialog != null){
+            statusDialog.dismiss();
+        }
+        
+        if(adapter!=null){
+            if(adapter.isMultipleSelect()){
+                adapter.clearSelections();
+                hideMultipleSelect();
+            }
+        }
+        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, message, -1);
+    }
 
 	public void showSnackbar(int type, String s, long idChat){
 	    showSnackbar(type, fragmentContainer, s, idChat);
 	}
-
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
         log("openAdvancedDevices");
@@ -3605,10 +3604,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         ProgressDialog temp = new ProgressDialog(this);
             temp.setMessage(getString(R.string.context_removing_contact_folder));
             temp.show();
-
+    
+        removeShare = true;
+        changeShare = false;
         statusDialog = temp;
         if (email != null){
-            removeShare = true;
             megaApi.share(node, email, MegaShare.ACCESS_UNKNOWN, this);
         }
         else{
@@ -3675,6 +3675,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     public void removeMultipleShares(List<MegaShare> shares){
         log("removeMultipleShares");
+        removeShare = true;
+        changeShare = false;
         ProgressDialog temp = null;
         try{
             temp = new ProgressDialog(this);
@@ -3685,13 +3687,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             return;
         }
         statusDialog = temp;
-        
-        FileContactMultipleRequestListener removeMultipleListener = new FileContactMultipleRequestListener(Constants.MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER, this);
+    
+        FileContactMultipleRequestListener.RequestCompletedCallback callback = new FileContactMultipleRequestListener.RequestCompletedCallback() {
+            @Override
+            public void onRequestCompleted(String message) {
+                editMultipleSharesCallback(message);
+            }
+        };
+        FileContactMultipleRequestListener removeMultipleListener = new FileContactMultipleRequestListener(Constants.MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER, this, callback);
         for(int j=0;j<shares.size();j++){
             if(shares.get(j).getUser()!=null){
                 MegaUser u = megaApi.getContact(shares.get(j).getUser());
                 if(u!=null){
-                    megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileInfoActivityLollipop);
+                    megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, removeMultipleListener);
                 }
                 else{
                     megaApi.share(node, shares.get(j).getUser(), MegaShare.ACCESS_UNKNOWN, removeMultipleListener);
