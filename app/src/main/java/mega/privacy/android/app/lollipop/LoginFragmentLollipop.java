@@ -54,6 +54,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -2969,13 +2970,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void onClick(DialogInterface dialog,int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        //TODO @#@ Have to delete local Credentials?
-//                        if(dbH != null) {
-//                            dbH.clearCredentials();
-//                        }
                         backToLoginForm();
                         //do real logout
-                        megaApi.logout();
+                        AccountController.logout(context,megaApi);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
