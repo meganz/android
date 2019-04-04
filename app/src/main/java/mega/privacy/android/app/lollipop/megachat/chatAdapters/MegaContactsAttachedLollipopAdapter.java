@@ -887,7 +887,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 		if(!Util.isOnline(context)){
 			if(context instanceof ManagerActivityLollipop){
-				((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+				((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
 			}
 			return;
 		}

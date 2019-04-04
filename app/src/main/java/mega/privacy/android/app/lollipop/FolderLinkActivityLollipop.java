@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -81,7 +80,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -901,20 +899,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		
 		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
+		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
 			
 		if (askMe){
 
@@ -1042,7 +1027,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					numberOfNodesToDownload++;
 
 					if(availableFreeSpace < document.getSize()){
-						showSnackbarNotSpace();
+						showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 						continue;
 					}
 
@@ -1079,7 +1064,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			else if(url != null) {
 				if(availableFreeSpace < size) {
-					showSnackbarNotSpace();
+					showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
 					continue;
 				}
 				Intent service = new Intent(this, DownloadService.class);
@@ -1099,9 +1084,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				if (numberOfNodesPending > 0){
 					msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
 				}
-
-				showSnackbar(msg);
-
+				showSnackbar(Constants.SNACKBAR_TYPE, msg);
+			}
+			else {
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.download_began));
 			}
 		}
 	}
@@ -1145,7 +1131,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			log("URL: " + url + "___SIZE: " + size);
 	
 			downloadTo (parentPath, url, size, hashes);
-//			Snackbar.make(fragmentContainer, getResources().getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 
@@ -1154,7 +1139,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
 
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
 			}
 
@@ -1186,15 +1171,15 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 								megaApi.copyNode(node, target, importLinkMultipleListener);
 								//megaApi.copyNode(node, target, this);
 							}else{
-								Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+								showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 							}
 						}
 					}else{
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 					}
 				}else{
 					log("selected Nodes selectes is empty");
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 				}
 			}else{
 				log("no multiple select");
@@ -1207,14 +1192,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							importLinkMultipleListener = new MultipleRequestListenerLink(this, cont, cont, FOLDER_LINK);
 							megaApi.copyNode(selectedNode, target, importLinkMultipleListener);
 						}else{
-							Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 						}
 					}else{
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 					}
 				}else{
 					log("selected Node is NULL");
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 				}
 			}
 		}
@@ -1284,7 +1269,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							dialog.show();
 						}
 						catch(Exception ex){
-							Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error_folder_not_found));
 							finish();
 						}
 					}
@@ -1318,7 +1303,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						dialog.show();
 					}
 					catch(Exception ex){
-						Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error_folder_not_found));
 						finish();
 					}
 				}
@@ -1342,12 +1327,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					finish();
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 				}
 
 			}else{
 				log("onRequestFinish:OK");
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied));
 				clearSelections();
 				hideMultipleSelect();
 			}
@@ -1393,7 +1378,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							dialog.show();
 						}
 						catch(Exception ex){
-							Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error_folder_not_found));
 							finish();
 						}
 					}
@@ -1533,7 +1518,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						dialog.show(); 
 					}
 					catch(Exception ex){
-						Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error_folder_not_found));
 		    			finish();
 					}
 				}
@@ -1576,7 +1561,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					dialog.show();
 				}
 				catch(Exception ex){
-					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error_folder_not_found));
 					finish();
 				}
 			}
@@ -1877,7 +1862,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							startActivity(mediaIntent);
 						}
 						else{
-							Snackbar.make(fragmentContainer, getResources().getString(R.string.intent_not_available), Snackbar.LENGTH_SHORT).show();
+							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available));
 							adapterList.notifyDataSetChanged();
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
@@ -2120,15 +2105,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	}
 
 	public void importNode(){
-//		if (megaApi.getRootNode() == null){
-//			log("megaApi bad fetch nodes");
-//			Snackbar.make(fragmentContainer, getString(R.string.session_problem), Snackbar.LENGTH_LONG).show();
-//		}
-//		else{
-			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
-			startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
-//		}		
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
 	}
 
 	public void downloadNode(){
@@ -2240,19 +2219,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 	}
 
-	public void showSnackbarNotSpace(){
-		log("showSnackbarNotSpace");
-		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
-		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
-		mySnackbar.show();
-	}
-
-	public void showSnackbar(String s){
+	public void showSnackbar(int type, String s){
 		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+		showSnackbar(type, fragmentContainer, s);
 	}
 
 	public MegaNode getSelectedNode() {

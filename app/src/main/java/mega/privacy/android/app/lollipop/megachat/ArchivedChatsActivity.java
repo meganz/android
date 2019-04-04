@@ -4,18 +4,24 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -38,14 +44,12 @@ import nz.mega.sdk.MegaChatRoom;
 
 public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
+    AppBarLayout abL;
     Toolbar tB;
     ActionBar aB;
     FrameLayout fragmentContainer;
     RecentChatsFragmentLollipop archivedChatsFragment;
     FloatingActionButton fab;
-
-    MenuItem createFolderMenuItem;
-    MenuItem newChatMenuItem;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
 
@@ -53,6 +57,17 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     MegaChatApiAndroid megaChatApi;
 
     public long selectedChatItemId;
+
+    DisplayMetrics outMetrics;
+
+    MenuItem searchMenuItem;
+    SearchView searchView;
+
+    ArchivedChatsActivity archivedChatsActivity;
+
+    String querySearch = "";
+    boolean isSearchExpanded = false;
+    boolean pendingToOpenSearchView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,34 +106,37 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
         megaChatApi.addChatListener(this);
 
+        archivedChatsActivity = this;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics ();
+
+        display.getMetrics(outMetrics);
+
         setContentView(R.layout.activity_chat_explorer);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_chat_explorer);
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
         fab.setVisibility(View.GONE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
         //Set toolbar
+        abL = (AppBarLayout) findViewById(R.id.app_bar_layout_chat_explorer);
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if(aB!=null){
-            aB.setTitle(getString(R.string.archived_chats_title_section));
+            aB.setTitle(getString(R.string.archived_chats_title_section).toUpperCase());
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         }
         else{
             log("aB is null");
         }
 
-        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+//        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+        badgeDrawable = new BadgeDrawerArrowDrawable(this);
 
         updateNavigationToolbarIcon();
 
@@ -126,9 +144,36 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             archivedChatsFragment = new RecentChatsFragmentLollipop().newInstance();
         }
 
+        if (savedInstanceState != null) {
+            querySearch = savedInstanceState.getString("querySearch", "");
+            isSearchExpanded = savedInstanceState.getBoolean("isSearchExpanded", isSearchExpanded);
+
+            if (isSearchExpanded) {
+                pendingToOpenSearchView = true;
+            }
+        }
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_chat_explorer, archivedChatsFragment, "archivedChatsFragment");
         ft.commitNow();
+    }
+
+    public void changeActionBarElevation(boolean whitElevation){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (whitElevation) {
+                abL.setElevation(Util.px2dp(4, outMetrics));
+            }
+            else {
+                abL.setElevation(0);
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        log("onBackPressed");
+        super.callToSuperBack = true;
+        super.onBackPressed();
     }
 
     @Override
@@ -162,6 +207,14 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("querySearch", querySearch);
+        outState.putBoolean("isSearchExpanded", isSearchExpanded);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
 
@@ -174,12 +227,88 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_archived_chats, menu);
+
+        searchMenuItem = menu.findItem(R.id.action_search);
+        searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
+
+        searchView = (SearchView) searchMenuItem.getActionView();
+
+        SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
+        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
+        searchAutoComplete.setHint(getString(R.string.hint_action_search));
+        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+        v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
+
+        if (searchView != null){
+            searchView.setIconifiedByDefault(true);
+        }
+
+        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                isSearchExpanded = true;
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                isSearchExpanded = false;
+                archivedChatsFragment.closeSearch();
+                supportInvalidateOptionsMenu();
+                return true;
+            }
+        });
+
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                log("onQueryTextSubmit: "+query);
+                Util.hideKeyboard(archivedChatsActivity, 0);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                querySearch = newText;
+                archivedChatsFragment.filterChats(newText);
+                return true;
+            }
+        });
+
+        if (pendingToOpenSearchView) {
+            String query = querySearch;
+            searchMenuItem.expandActionView();
+            searchView.setQuery(query, false);
+            pendingToOpenSearchView = false;
+        }
+
+        ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
+        if (archivedChats != null && !archivedChats.isEmpty()) {
+            searchMenuItem.setVisible(true);
+        }
+        else {
+            searchMenuItem.setVisible(false);
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public void closeSearchView () {
+        if (searchMenuItem != null && searchMenuItem.isActionViewExpanded()) {
+            searchMenuItem.collapseActionView();
+        }
+    }
+
     public void showSnackbar(String s){
         log("showSnackbar: "+s);
-        Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-        TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-        snackbarTextView.setMaxLines(5);
-        snackbar.show();
+        showSnackbar(fragmentContainer, s);
     }
 
     public void changeStatusBarColor(int option) {
@@ -203,7 +332,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             int numberUnread = megaChatApi.getUnreadChats();
 
             if(numberUnread==0){
-                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
             }
             else{
 
@@ -220,7 +349,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             }
         }
         else{
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black);
         }
     }
 
