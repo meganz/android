@@ -14919,10 +14919,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
-
-		switch (newStorageState) {
-			case MegaApiJava.STORAGE_STATE_GREEN:
-				log("STORAGE STATE GREEN");
+        Intent intent = new Intent(this,UploadService.class);
+        switch (newStorageState) {
+            case MegaApiJava.STORAGE_STATE_GREEN:
+                log("STORAGE STATE GREEN");
+                intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+                startService(intent);
 				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					log("ACCOUNT TYPE FREE");
@@ -14935,6 +14937,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
+                intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+                startService(intent);
 				if (onCreate && isStorageStatusDialogShown) {
 					isStorageStatusDialogShown = false;
 					showStorageAlmostFullDialog();
@@ -17655,22 +17659,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else {
 				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-			}
-		}
+                //work around - SDK does not return over quota error for folder upload,
+                //so need to be notified from global listener
+                if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                    log("onTransferTemporaryError: over quota");
+                    Intent intent = new Intent(this,UploadService.class);
+                    intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                    startService(intent);
+                }
+            }
+        }
 	}
 
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
 		log("onTransferData");
-
-//		if(Util.isVideoFile(transfer.getPath())){
-//		log("Is video!!!");
-//		ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-//	}
-//	else{
-//		log("NOT video!");
-//	}
-
 		return true;
 	}
 
