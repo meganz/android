@@ -2337,7 +2337,7 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Incoming call&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Calling&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Message contains invalid metadata</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Message contains invalid metadata</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2401,6 +2401,8 @@
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">The password you have entered is not valid.</string>
 
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file or has not been possible to unzip successfully.</string>
+
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
@@ -2438,5 +2440,4 @@
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Enter group name</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA\'s encrypted chat.</string>
-
 </resources>
