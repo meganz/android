@@ -2133,10 +2133,18 @@ public class NodeController {
             log("is file");
             String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
+                File file = new File(localPath);
                 try {
-                    Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                    Util.copyFile(file, new File(parentPath, tempNode.getName()));
                 }catch(Exception e) {}
-                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+
+                if (file != null && file.getParent().equals(parentPath)) {
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                }
+                else {
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                }
+
             }
             else{
                 log("LocalPath is NULL");

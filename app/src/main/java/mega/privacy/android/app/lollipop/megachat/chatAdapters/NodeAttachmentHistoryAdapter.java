@@ -625,9 +625,9 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                     if (!(holder.nameRequestedAction)) {
                         log("3-Call for nonContactName: " + m.getUserHandle());
                         holder.nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom.isPreview());
+                        megaChatApi.getUserFirstname(userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom.getAuthorizationToken(), listener);
+                        megaChatApi.getUserLastname(userHandle, ((NodeAttachmentHistoryActivity)context).chatRoom.getAuthorizationToken(), listener);
                         megaChatApi.getUserEmail(userHandle, listener);
                     } else {
                         log("4-Name already asked and no name received: " + m.getUserHandle());
