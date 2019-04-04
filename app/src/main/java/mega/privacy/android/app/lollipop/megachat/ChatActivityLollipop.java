@@ -992,15 +992,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
 
-                if (!chatRoom.isPublic() && chatRoom.isGroup()) {
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titleToolbar.getLayoutParams();
-                    params.addRule(RelativeLayout.LEFT_OF, privateIconToolbar.getId());
-                    titleToolbar.setLayoutParams(params);
+                if (!chatRoom.isPublic()) {
                     privateIconToolbar.setVisibility(View.VISIBLE);
-                } else {
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titleToolbar.getLayoutParams();
-                    params.addRule(RelativeLayout.LEFT_OF, iconStateToolbar.getId());
-                    titleToolbar.setLayoutParams(params);
+                }
+                else {
                     privateIconToolbar.setVisibility(View.GONE);
                 }
 
