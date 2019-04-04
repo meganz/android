@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -53,9 +54,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1644,9 +1647,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return true;
     }
 
+    private boolean canLogin = true;
     private void disableLoginButton() {
         log("disable login button");
         //disbale login button
+        canLogin = false;
         bLogin.setBackground(context.getDrawable(R.drawable.background_button_disable));
         bLogin.setEnabled(false);
         //display login info
@@ -1656,6 +1661,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void enableLoginButton() {
+        canLogin = true;
         log("enable login button");
         bLogin.setEnabled(true);
         bLogin.setBackground(context.getDrawable(R.drawable.background_accent_button));
@@ -2280,7 +2286,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if(!errorMessage.isEmpty()){
-                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                        if(!backWhileLogin) {
+                            ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                        }
                     }
 
                     if(chatSettings==null) {
@@ -2373,7 +2381,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("terminate login process when fetch nodes");
                 return;
             }
-            ((LoginActivityLollipop)context).isFetchedNodes = false;
+            LoginActivityLollipop.isFetchedNodes = false;
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
@@ -2432,7 +2440,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         errorMessage = error.getErrorString();
-                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                        if(!backWhileLogin) {
+                            ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                        }
                     }
                 }
                 else{
@@ -2953,16 +2963,53 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         super.onDestroy();
     }
 
+    private void showConfirmLogoutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog,int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //TODO @#@ Have to delete local Credentials?
+//                        if(dbH != null) {
+//                            dbH.clearCredentials();
+//                        }
+                        backToLoginForm();
+                        //do real logout
+                        megaApi.logout();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        dialog.dismiss();
+                        backWhileLogin = false;
+                        loginClicked = true;
+                        if(!TextUtils.isEmpty(et_user.getText()) && !TextUtils.isEmpty(et_password.getText())) {
+                            //user has provided new account
+                            submitForm();
+                        } else {
+                            startFastLogin();
+                        }
+                        break;
+                }
+            }
+        };
+        String message= "Cancel current login";
+        builder.setCancelable(false).setMessage(message).setPositiveButton("YES", dialogClickListener)
+                .setNegativeButton("NO", dialogClickListener).show();
+    }
+
     public int onBackPressed() {
         log("onBackPressed");
 
         backWhileLogin = true;
-        if (loginClicked || MegaApplication.isLoggingIn()){
+        if (MegaApplication.isLoggingIn()){
             MegaApplication.setLoggingIn(false);
             loginClicked = false;
-            backToLoginForm();
+            //once press back while loginning, logout
+            megaApi.localLogout();
             megaChatApi.logout();
-            return 1;
+            showConfirmLogoutDialog();
+            return 2;
         }
         else{
 
