@@ -95,9 +95,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	Stack<Integer> lastPositionStack;
 
 	MegaApiAndroid megaApi;
-	
-	TextView contentText;	
-	RelativeLayout contentTextLayout;
 
 	float density;
 	DisplayMetrics outMetrics;
@@ -540,13 +537,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_text);
-
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-			recyclerView.setLayoutParams(params);
-
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersOverViewLayout.setVisibility(View.GONE);
 
@@ -582,8 +572,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -636,20 +624,12 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				}
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
 
 			log("Deep browser tree: "+((ManagerActivityLollipop)context).deepBrowserTreeIncoming);
 
-			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}else{
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-			}
 			return v;
 		}
 		else{
@@ -676,9 +656,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 
 			if (adapter == null){
@@ -708,13 +685,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming == 0){
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}else{
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-			}						
-			
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
@@ -722,8 +692,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			visibilityFastScroller();
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -777,8 +745,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -816,21 +782,12 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-		}else{
-			if(parentNode!=null){
-				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-			}
-		}
 		visibilityFastScroller();
 		clearSelections();
 		hideMultipleSelect();
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.GONE);
-			contentText.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -884,8 +841,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 		}else{
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
-			contentText.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
@@ -935,8 +890,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType() );
 
@@ -947,8 +900,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1002,8 +953,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -1320,8 +1269,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		if (adapter.getItemCount() == 0){
 			log("adapter.getItemCount() = 0");
 			recyclerView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.GONE);
-			contentText.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1378,12 +1325,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		else{
 			log("adapter.getItemCount() != 0");
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
-			contentText.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
-		contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 	}
 
 	public void setOrderNodes(){
@@ -1495,95 +1439,110 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
-			//In the beginning of the navigation
-			log("deepBrowserTree==0");
-			((ManagerActivityLollipop)context).parentHandleIncoming = -1;
-			((ManagerActivityLollipop)context).setToolbarTitle();
-			findNodes();
-			visibilityFastScroller();
-//				adapterList.setNodes(nodes);
-			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
-			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
-				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
-			}
-			log("Scroll to "+lastVisiblePosition+" position");
+        if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationsLevel == (((ManagerActivityLollipop) context).deepBrowserTreeIncoming)) {
+			((ManagerActivityLollipop) context).comesFromNotifications = false;
+			((ManagerActivityLollipop) context).comesFromNotificationsLevel = 0;
+			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
+            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+			((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(((ManagerActivityLollipop) context).comesFromNotificationDeepBrowserTreeIncoming);
+			((ManagerActivityLollipop) context).comesFromNotificationDeepBrowserTreeIncoming = -1;
+			((ManagerActivityLollipop) context).setParentHandleIncoming(((ManagerActivityLollipop) context).comesFromNotificationHandleSaved);
+			((ManagerActivityLollipop) context).comesFromNotificationHandleSaved = -1;
+			((ManagerActivityLollipop) context).refreshIncomingShares();
 
-			if(lastVisiblePosition>=0){
+			return 4;
+        }
+		else {
+			((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				if(((ManagerActivityLollipop)context).isList){
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-				else{
-					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-			}
+			if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
+				//In the beginning of the navigation
 
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			((ManagerActivityLollipop) context).showFabButton();
-
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			return 3;
-		}
-		else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
-			log("deepTree>0");
-
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
-			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
-
-			if (parentNode != null){
-				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-
-				((ManagerActivityLollipop)context).parentHandleIncoming = parentNode.getHandle();
-
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				((ManagerActivityLollipop)context).setToolbarTitle();
-
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-				addSectionTitle(nodes,adapter.getAdapterType() );
-
-				adapter.setNodes(nodes);
+				log("deepBrowserTree==0");
+				((ManagerActivityLollipop) context).parentHandleIncoming = -1;
+				((ManagerActivityLollipop) context).setToolbarTitle();
+				findNodes();
 				visibilityFastScroller();
+				//				adapterList.setNodes(nodes);
+				recyclerView.setVisibility(View.VISIBLE);
 				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
+				if (!lastPositionStack.empty()) {
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					log("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				log("Scroll to " + lastVisiblePosition + " position");
 
-				if(lastVisiblePosition>=0){
 
-					if(((ManagerActivityLollipop)context).isList){
+				if (lastVisiblePosition >= 0) {
+
+					if (((ManagerActivityLollipop) context).isList) {
 						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
-					else{
+					else {
 						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
 				}
+
+				((ManagerActivityLollipop) context).showFabButton();
+
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+
+				return 3;
+			}
+			else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
+				log("deepTree>0");
+
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
+
+				if (parentNode != null){
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+
+					((ManagerActivityLollipop)context).parentHandleIncoming = parentNode.getHandle();
+
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+					((ManagerActivityLollipop)context).setToolbarTitle();
+
+					nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+					addSectionTitle(nodes,adapter.getAdapterType() );
+
+					adapter.setNodes(nodes);
+					visibilityFastScroller();
+					int lastVisiblePosition = 0;
+					if(!lastPositionStack.empty()){
+						lastVisiblePosition = lastPositionStack.pop();
+						log("Pop of the stack "+lastVisiblePosition+" position");
+					}
+					log("Scroll to "+lastVisiblePosition+" position");
+
+					if(lastVisiblePosition>=0){
+
+						if(((ManagerActivityLollipop)context).isList){
+							mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+						}
+						else{
+							gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+						}
+					}
+				}
+
+				((ManagerActivityLollipop) context).showFabButton();
+				return 2;
+			}
+			else{
+				log("ELSE deepTree");
+//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
+				return 0;
 			}
 
-			((ManagerActivityLollipop) context).showFabButton();
-			return 2;
-		}
-		else{
-			log("ELSE deepTree");
-//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
-			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
-			return 0;
 		}
 	}
 

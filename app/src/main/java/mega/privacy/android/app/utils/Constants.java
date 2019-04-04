@@ -178,8 +178,9 @@ public class Constants {
 	public static String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
 	public static String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
 
+	public static String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
+	public static String ACTION_JOIN_OPEN_CHAT_LINK = "JOIN_OPEN_CHAT_LINK";
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
-	public static String ACTION_NEW_CHAT = "NEW_CHAT";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
 	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
@@ -287,8 +288,10 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
-    
-    public static String CHAT_FOLDER = "My chat files";
+    public static String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
+
+
+	public static String CHAT_FOLDER = "My chat files";
 
 	public static int RICH_WARNING_TRUE = 1;
 	public static int RICH_WARNING_FALSE= 0;

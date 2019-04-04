@@ -21,6 +21,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -169,8 +171,9 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        log("onBackPressed");
         super.callToSuperBack = true;
+        super.onBackPressed();
     }
 
     @Override
@@ -284,6 +287,14 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             searchMenuItem.expandActionView();
             searchView.setQuery(query, false);
             pendingToOpenSearchView = false;
+        }
+
+        ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
+        if (archivedChats != null && !archivedChats.isEmpty()) {
+            searchMenuItem.setVisible(true);
+        }
+        else {
+            searchMenuItem.setVisible(false);
         }
 
         return super.onCreateOptionsMenu(menu);

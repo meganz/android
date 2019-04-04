@@ -156,6 +156,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String action = null;
     private String url = null;
     private long parentHandle = -1;
+    private long idChatToJoin = -1;
 
     private String emailTemp = null;
     private String passwdTemp = null;
@@ -869,57 +870,59 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         if (credentials != null){
             log("Credentials NOT null");
-            if ((intentReceived != null) && (intentReceived.getAction() != null)){
-                if (intentReceived.getAction().equals(Constants.ACTION_REFRESH)){
+            if ((intentReceived != null) && (action != null)){
+                if (action.equals(Constants.ACTION_REFRESH)){
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
                     return v;
                 }
-                else if (intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING)){
+                else if (action.equals(Constants.ACTION_REFRESH_STAGING)){
                     twoFA = true;
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
                     return v;
                 }
-                else if (intentReceived.getAction().equals(Constants.ACTION_ENABLE_CHAT)){
+                else if (action.equals(Constants.ACTION_ENABLE_CHAT)){
                     log("with credentials -> intentReceived ACTION_ENABLE_CHAT");
                     enableChat();
                     return v;
                 }
                 else{
 
-                    if(intentReceived.getAction()!=null){
-                        action = intentReceived.getAction();
-                        log("Action: "+action);
-                    }
-
-                    if(intentReceived.getAction().equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
+                    if(action.equals(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)){
                         url = intentReceived.getDataString();
                     }
-                    else if(intentReceived.getAction().equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
+                    else if(action.equals(Constants.ACTION_IMPORT_LINK_FETCH_NODES)){
                         url = intentReceived.getDataString();
                     }
-                    else if(intentReceived.getAction().equals(Constants.ACTION_CHANGE_MAIL)){
+                    else if(action.equals(Constants.ACTION_CHANGE_MAIL)){
                         log("intent received ACTION_CHANGE_MAIL");
                         url = intentReceived.getDataString();
                     }
-                    else if(intentReceived.getAction().equals(Constants.ACTION_CANCEL_ACCOUNT)){
+                    else if(action.equals(Constants.ACTION_CANCEL_ACCOUNT)){
                         log("intent received ACTION_CANCEL_ACCOUNT");
                         url = intentReceived.getDataString();
                     }
-                    else if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)){
+                    else if (action.equals(Constants.ACTION_FILE_PROVIDER)){
                         uriData = intentReceived.getData();
                         extras = intentReceived.getExtras();
                         url = null;
                     }
-                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_HANDLE_NODE)){
+                    else if(action.equals(Constants.ACTION_OPEN_HANDLE_NODE)){
                         url = intentReceived.getDataString();
                     }
-                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
+                    else if(action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
                         uriData = intentReceived.getData();
                     }
-                    else if(intentReceived.getAction().equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
+                    else if(action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                         uriData = intentReceived.getData();
+                    }
+                    else if(action.equals(Constants.ACTION_OPEN_CHAT_LINK)) {
+                        url = intentReceived.getDataString();
+                    }
+                    else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                        url = intentReceived.getDataString();
+                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
 
                     MegaNode rootNode = megaApi.getRootNode();
@@ -1058,29 +1061,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("Credentials IS NULL");
             if ((intentReceived != null)) {
                 log("INTENT NOT NULL");
-                if (intentReceived.getAction() != null) {
+                if (action != null) {
                     log("ACTION NOT NULL");
                     Intent intent;
-                    if (intentReceived.getAction().equals(Constants.ACTION_FILE_PROVIDER)) {
+                    if (action.equals(Constants.ACTION_FILE_PROVIDER)) {
                         intent = new Intent(context, FileProviderActivity.class);
                         if (extras != null) {
                             intent.putExtras(extras);
                         }
                         intent.setData(uriData);
-
                         intent.setAction(action);
-
-                        action = Constants.ACTION_FILE_PROVIDER;
-                    } else if (intentReceived.getAction().equals(Constants.ACTION_FILE_EXPLORER_UPLOAD)) {
-                        action = Constants.ACTION_FILE_EXPLORER_UPLOAD;
-                        //					uriData = intentReceived.getData();
-                        //					log("URI: "+uriData);
-                        //					extras = intentReceived.getExtras();
-                        //					url = null;
+                    }
+                    else if (action.equals(Constants.ACTION_FILE_EXPLORER_UPLOAD)) {
                         ((LoginActivityLollipop)context).showSnackbar(getString(R.string.login_before_share));
-                    } else if (intentReceived.getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)) {
-                        log("ManagerActivityLollipop.ACTION_EXPORT_MASTER_KEY");
-                        action = Constants.ACTION_EXPORT_MASTER_KEY;
+                    }
+                    else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                        url = intentReceived.getDataString();
+                        idChatToJoin = intentReceived.getLongExtra("idChatToJoin", -1);
                     }
                 }
             }
@@ -1273,13 +1270,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 int ret = megaChatApi.getInitState();
 
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
                     log("enableChat: result of init ---> "+ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1351,7 +1349,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
 
                 int ret = megaChatApi.getInitState();
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     log("initial: INIT STATE: "+ret);
 
                     ret = megaChatApi.init(gSession);
@@ -1361,6 +1359,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1392,6 +1391,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("startFastLogin: Chat is NOT ENABLED");
             }
             megaApi.fastLogin(gSession, this);
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING))  {
+                log("megaChatApi.refreshUrl()");
+                megaChatApi.refreshUrl();
+            }
         }
         else{
             log("Another login is proccessing");
@@ -2000,6 +2003,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 log("ACTION_EXPORT_MK");
                                 intent.setAction(action);
                             }
+                            else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK) && url != null) {
+                                intent.setAction(action);
+                                intent.setData(Uri.parse(url));
+                                if (idChatToJoin != -1) {
+                                    intent.putExtra("idChatToJoin", idChatToJoin);
+                                }
+                            }
                         }
                     }
                     else{
@@ -2044,30 +2054,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //										}
                                 if (action.equals(Constants.ACTION_FILE_PROVIDER)){
                                     intent = new Intent(context, FileProviderActivity.class);
-                                    if(extras != null)
-                                    {
+                                    if(extras != null){
                                         intent.putExtras(extras);
                                     }
-                                    if(uriData != null)
-                                    {
+                                    if(uriData != null){
                                         intent.setData(uriData);
                                     }
                                 }
                                 else if (action.equals(Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
                                     intent = new Intent(context, FileLinkActivityLollipop.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    action = Constants.ACTION_OPEN_MEGA_LINK;
                                     intent.setData(uriData);
                                 }
                                 else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                                     intent = new Intent(context, FolderLinkActivityLollipop.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                     intent.setData(uriData);
                                 }
                                 else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                                     intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
-                                    action = Constants.ACTION_OPEN_CONTACTS_SECTION;
+                                }
+                                else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+                                    if (idChatToJoin != -1) {
+                                        intent.putExtra("idChatToJoin", idChatToJoin);
+                                    }
                                 }
                                 intent.setAction(action);
                                 if (url != null){
@@ -2085,6 +2095,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 log("The action is: "+action);
                                 intent.setAction(action);
                             }
+                            if (url != null){
+                                intent.setData(Uri.parse(url));
+                            }
                         }
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     }
@@ -2101,22 +2114,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop)context).finish();
                 }
             }
-
-//                    loginLogin.setVisibility(View.GONE);
-//                    loginDelimiter.setVisibility(View.GONE);
-//                    loginCreateAccount.setVisibility(View.GONE);
-//                    queryingSignupLinkText.setVisibility(View.GONE);
-//                    confirmingAccountText.setVisibility(View.GONE);
-//                    loginLoggingIn.setVisibility(View.VISIBLE);
-//                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-////				generatingKeysText.setVisibility(View.VISIBLE);
-//                    loginProgressBar.setVisibility(View.VISIBLE);
-//                    loginFetchNodesProgressBar.setVisibility(View.GONE);
-//                    loggingInText.setVisibility(View.VISIBLE);
-//                    fetchingNodesText.setVisibility(View.GONE);
-//                    prepareNodesText.setVisibility(View.GONE);
-//                    initizalizingChatText.setVisibility(View.VISIBLE);
-//                    serversBusyText.setVisibility(View.GONE);
         }
         else{
             log("Go to ChooseAccountFragment");

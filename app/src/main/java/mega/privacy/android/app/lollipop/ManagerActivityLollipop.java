@@ -114,7 +114,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -135,6 +134,8 @@ import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.IncomingMessageService;
+import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -145,7 +146,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -192,6 +193,8 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -413,7 +416,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public boolean turnOnNotifications = false;
 
 	static DrawerItem drawerItem = null;
-	static DrawerItem lastDrawerItem = null;
+	DrawerItem drawerItemPreUpgradeAccount = null;
+	int accountFragmentPreUpgradeAccount = -1;
 	static MenuItem drawerMenuItem = null;
 	LinearLayout fragmentLayout;
 	BottomNavigationViewEx bNV;
@@ -626,6 +630,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isFirstTime2fa = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
+	public boolean comesFromNotifications = false;
+	public int comesFromNotificationsLevel = 0;
+	public long comesFromNotificationHandle = -1;
+	public long comesFromNotificationHandleSaved = -1;
+	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -641,7 +650,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	View chatBadge;
 	View callBadge;
 
+	private boolean joiningToChatLink = false;
+	private long idJoinToChatLink = -1;
+
 	private boolean onAskingPermissionsFragment = false;
+
+	private AlertDialog openchatLinkDialog;
+	private EditText openChatLinkText;
+	private RelativeLayout openChatLinkError;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1690,6 +1706,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 		outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem);
 		outState.putBoolean("searchExpand", searchExpand);
+		outState.putBoolean("comesFromNotifications", comesFromNotifications);
+		outState.putInt("comesFromNotificationsLevel", comesFromNotificationsLevel);
+		outState.putLong("comesFromNotificationHandle", comesFromNotificationHandle);
+		outState.putLong("comesFromNotificationHandleSaved", comesFromNotificationHandleSaved);
 		outState.putBoolean("onAskingPermissionsFragment", onAskingPermissionsFragment);
 		pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 		if (onAskingPermissionsFragment && pF != null) {
@@ -1698,6 +1718,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putFloat("elevation", abL.getElevation());
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
+		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
+		outState.putInt("accountFragmentPreUpgradeAccount", accountFragmentPreUpgradeAccount);
+		outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
 	}
 
 	@Override
@@ -1754,6 +1777,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 			bottomNavigationCurrentItem = savedInstanceState.getInt("bottomNavigationCurrentItem", -1);
 			searchExpand = savedInstanceState.getBoolean("searchExpand", false);
+			comesFromNotifications = savedInstanceState.getBoolean("comesFromNotifications", false);
+			comesFromNotificationsLevel = savedInstanceState.getInt("comesFromNotificationsLevel", 0);
+			comesFromNotificationHandle = savedInstanceState.getLong("comesFromNotificationHandle", -1);
+			comesFromNotificationHandleSaved = savedInstanceState.getLong("comesFromNotificationHandleSaved", -1);
 			onAskingPermissionsFragment = savedInstanceState.getBoolean("onAskingPermissionsFragment", false);
 			if (onAskingPermissionsFragment) {
 				pF = (PermissionsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.PERMISSIONS.getTag());
@@ -1761,6 +1788,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			elevation = savedInstanceState.getFloat("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", -1);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
+			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
+			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
+			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
 		}
 		else{
 			log("Bundle is NULL");
@@ -2303,6 +2333,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						finish();
 						return;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						intent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(intent);
+						finish();
+						return;
+					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -2644,6 +2684,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						getIntent().setAction(null);
 						setIntent(null);
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+
+						if (Util.isChatEnabled()) {
+							log("ACTION_OPEN_CHAT_LINK: "+getIntent().getDataString());
+							megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						}
+
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if (getIntent().getAction().equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending = false;
+						if (Util.isChatEnabled()) {
+							megaChatApi.checkChatLink(getIntent().getDataString(), this);
+							idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+							joiningToChatLink = true;
+							if (idJoinToChatLink == -1) {
+								showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+							}
+						}
+
+						getIntent().setAction(null);
+						setIntent(null);
+					}
 					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_SETTINGS)) {
 						log("Chat notification: SHOW_SETTINGS");
 						selectDrawerItemPending=false;
@@ -2676,6 +2745,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_SHOW_UPGRADE_ACCOUNT)){
 						log("intent from chat - show my account");
+						drawerItemPreUpgradeAccount = drawerItem;
 						drawerItem=DrawerItem.ACCOUNT;
 						accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 						selectDrawerItemLollipop(drawerItem);
@@ -2768,9 +2838,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("onCreate - Check if there any unread chat");
 			if(Util.isChatEnabled()){
-				log("Connect to chat!: "+megaChatApi.getInitState());
-
 				if(megaChatApi!=null){
+					log("Connect to chat!: "+megaChatApi.getInitState());
 					if((megaChatApi.getInitState()!=MegaChatApi.INIT_ERROR)){
 						log("Connection goes!!!");
 						megaChatApi.connect(this);
@@ -2916,7 +2985,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 					else{
-						if (firstLogin) {
+						if (firstLogin && !joiningToChatLink) {
 							log("intent firstTimeCam2==true");
 							if (prefs != null){
 								if (prefs.getCamSyncEnabled() != null){
@@ -4691,6 +4760,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void updateNavigationToolbarIcon(){
 		log("updateNavigationToolbarIcon");
+        Intent myService = new Intent(this, IncomingMessageService.class);
+        stopService(myService);
 		//Just working on 4.4.+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
@@ -5540,7 +5611,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				setToolbarTitle();
 				showFabButton();
 				showHideBottomNavigationView(false);
-				bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
+				if (!comesFromNotifications) {
+					bottomNavigationCurrentItem = CLOUD_DRIVE_BNV;
+				}
 				setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 				log("END selectDrawerItem for Cloud Drive");
     			break;
@@ -5632,7 +5705,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			setToolbarTitle();
 				showFabButton();
 				showHideBottomNavigationView(false);
-				bottomNavigationCurrentItem = OFFLINE_BNV;
+				if (!comesFromNotifications) {
+					bottomNavigationCurrentItem = OFFLINE_BNV;
+				}
 				setBottomNavigationMenuItemChecked(OFFLINE_BNV);
     			break;
     		}
@@ -5662,7 +5737,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			supportInvalidateOptionsMenu();
 				showFabButton();
 				showHideBottomNavigationView(false);
-				bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
+				if (!comesFromNotifications) {
+					bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
+				}
 				setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
       			break;
     		}
@@ -5695,7 +5772,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			setToolbarTitle();
 				showFabButton();
 				showHideBottomNavigationView(false);
-				bottomNavigationCurrentItem = MEDIA_UPLOADS_BNV;
+				if (!comesFromNotifications) {
+					bottomNavigationCurrentItem = MEDIA_UPLOADS_BNV;
+				}
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
       			break;
     		}
@@ -5741,7 +5820,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				showFabButton();
 				showHideBottomNavigationView(false);
-				bottomNavigationCurrentItem = SHARED_BNV;
+				if (!comesFromNotifications) {
+					bottomNavigationCurrentItem = SHARED_BNV;
+				}
 				setBottomNavigationMenuItemChecked(SHARED_BNV);
     			break;
     		}
@@ -5880,14 +5961,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				selectDrawerItemChat();
 				supportInvalidateOptionsMenu();
 				showHideBottomNavigationView(false);
-				bottomNavigationCurrentItem = CHAT_BNV;
+				if (!comesFromNotifications) {
+					bottomNavigationCurrentItem = CHAT_BNV;
+				}
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				if (visibleContacts.size() == 0 || visibleContacts.isEmpty() || visibleContacts == null){
-					hideFabButton();
-				}
-				else {
-					showFabButton();
-				}
+				showFabButton();
 				break;
 			}
     	}
@@ -5902,6 +5980,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
     public void checkScrollElevation() {
+
+    	if(drawerItem==null){
+    		return;
+		}
 
         switch (drawerItem) {
             case CLOUD_DRIVE: {
@@ -7335,6 +7417,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 					if (searchExpand) {
 						openSearchView();
@@ -7345,7 +7428,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else {
 						if (Util.isOnline(this)) {
 							newChatMenuItem.setVisible(true);
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 							if (rChatFL != null && rChatFL.getItemCount() > 0) {
 								selectMenuItem.setVisible(true);
 							} else {
@@ -7358,7 +7440,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setStatusMenuItem.setVisible(false);
 						}
 					}
-					searchMenuItem.setVisible(true);
+					ArrayList<MegaChatListItem> chats = megaChatApi.getChatListItems();
+					if (chats != null && !chats.isEmpty()) {
+						searchMenuItem.setVisible(true);
+					}
+					else {
+						searchMenuItem.setVisible(false);
+					}
+
+					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
+					importLinkMenuItem.setVisible(true);
 
 					//Hide
 					searchByDate.setVisible(false);
@@ -7370,7 +7461,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					addMenuItem.setEnabled(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
@@ -7596,6 +7686,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
 							backToDrawerItem(CLOUD_DRIVE_BNV);
 						}
+						else if (drawerItem == DrawerItem.ACCOUNT) {
+							if (comesFromNotifications) {
+								comesFromNotifications = false;
+								selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+							}
+							else {
+								backToDrawerItem(bottomNavigationCurrentItem);
+							}
+						}
 						else {
 							backToDrawerItem(bottomNavigationCurrentItem);
 						}
@@ -7701,13 +7800,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						switch(accountFragment){
 							case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
-								log("Back to MyAccountFragment");
+								log("Back to ~MyAccountFragment~ -> drawerItemPreUpgradeAccount");
 								setFirstNavigationLevel(true);
 								displayedAccountType=-1;
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+								if (drawerItemPreUpgradeAccount != null) {
+									if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
+										if (accountFragmentPreUpgradeAccount == -1) {
+											accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
+										}
+										else {
+											accountFragment = accountFragmentPreUpgradeAccount;
+										}
+									}
+									drawerItem = drawerItemPreUpgradeAccount;
+								}
+								else {
+									accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
+									drawerItem = DrawerItem.ACCOUNT;
+								}
 								selectDrawerItemLollipop(drawerItem);
-								setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 								return true;
 							}
 							case Constants.CC_FRAGMENT:{
@@ -7778,7 +7889,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return true;
 			}
 		    case R.id.action_import_link:{
-		    	showImportLinkDialog();
+		    	if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					showImportLinkDialog();
+				}
+				else if (drawerItem == DrawerItem.CHAT) {
+					showOpenChatLinkDialog();
+				}
 		    	return true;
 		    }
 		    case R.id.action_take_picture:{
@@ -9156,6 +9272,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		return true;
 	    	}
 	        case R.id.action_menu_upgrade_account:{
+	        	accountFragmentPreUpgradeAccount = accountFragment;
+	        	drawerItemPreUpgradeAccount = drawerItem;
 	        	drawerItem = DrawerItem.ACCOUNT;
 	        	setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
@@ -9209,12 +9327,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.action_scan_qr: {
 				log("action menu scan QR code pressed");
                 //Check if there is a in progress call:
-				if(!this.participatingInACall()){
-					ScanCodeFragment fragment = new ScanCodeFragment();
-					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
-					Intent intent = new Intent(this, QRCodeActivity.class);
-					intent.putExtra("contacts", true);
-					startActivity(intent);
+				if(megaChatApi!=null) {
+
+					if (!ChatUtil.participatingInACall(megaChatApi)) {
+						ScanCodeFragment fragment = new ScanCodeFragment();
+						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commitNowAllowingStateLoss();
+						Intent intent = new Intent(this, QRCodeActivity.class);
+						intent.putExtra("contacts", true);
+						startActivity(intent);
+					}
 				}
 				return true;
 			}
@@ -9592,16 +9713,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 	    			if (maFLol != null){
 	    				if (maFLol.onBackPressed() == 0){
-							backToDrawerItem(bottomNavigationCurrentItem);
+	    					if (comesFromNotifications) {
+	    						comesFromNotifications = false;
+	    						selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+							}
+							else {
+								backToDrawerItem(bottomNavigationCurrentItem);
+							}
 	    				}
 	    			}
 	    			return;
 	    		}
 	    		case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
-					log("Back to MyAccountFragment");
+					log("Back to ~MyAccountFragment~ -> drawerItemPreUpgradeAccount");
 					displayedAccountType=-1;
-					drawerItem = DrawerItem.ACCOUNT;
-					accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+					if (drawerItemPreUpgradeAccount != null) {
+						if (drawerItemPreUpgradeAccount == DrawerItem.ACCOUNT) {
+							if (accountFragmentPreUpgradeAccount == -1) {
+								accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
+							}
+							else {
+								accountFragment = accountFragmentPreUpgradeAccount;
+							}
+						}
+						drawerItem = drawerItemPreUpgradeAccount;
+					}
+					else {
+						accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
+						drawerItem = DrawerItem.ACCOUNT;
+					}
 					selectDrawerItemLollipop(drawerItem);
 	    			return;
 	    		}
@@ -10879,6 +11019,98 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	void showOpenChatLinkError(boolean show) {
+		if (openchatLinkDialog != null) {
+			if (show) {
+				openChatLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
+				openChatLinkText.getBackground().mutate().clearColorFilter();
+				openChatLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
+				openChatLinkError.setVisibility(View.VISIBLE);
+			}
+			else {
+				if (openChatLinkError.getVisibility() == View.VISIBLE) {
+					openChatLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					openChatLinkText.getBackground().mutate().clearColorFilter();
+					openChatLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					openChatLinkError.setVisibility(View.GONE);
+				}
+			}
+		}
+	}
+
+	void dismissOpenChatLinkDialog() {
+		try {
+			openchatLinkDialog.dismiss();
+		} catch (Exception e) {}
+	}
+
+	public void showOpenChatLinkDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_open_chat_link, null);
+		builder.setView(v);
+
+		openChatLinkText = (EditText) v.findViewById(R.id.chat_link_text);
+		openChatLinkText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				showOpenChatLinkError(false);
+			}
+		});
+
+		openChatLinkText.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					megaChatApi.checkChatLink(openChatLinkText.getText().toString(), managerActivity);
+					return true;
+				}
+				return false;
+			}
+		});
+
+		openChatLinkError = (RelativeLayout) v.findViewById(R.id.chat_link_error);
+		openChatLinkError.setVisibility(View.GONE);
+
+		OnClickListener clickListener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				switch (v.getId()) {
+					case R.id.chat_link_cancel_button: {
+						dismissOpenChatLinkDialog();
+						break;
+					}
+					case R.id.chat_link_open_button: {
+						megaChatApi.checkChatLink(openChatLinkText.getText().toString(), managerActivity);
+						break;
+					}
+				}
+			}
+		};
+
+		Button cancelButton = (Button) v.findViewById(R.id.chat_link_cancel_button);
+		cancelButton.setOnClickListener(clickListener);
+		Button openButton = (Button) v.findViewById(R.id.chat_link_open_button);
+		openButton.setOnClickListener(clickListener);
+
+		openchatLinkDialog = builder.create();
+		openchatLinkDialog.setCanceledOnTouchOutside(false);
+
+		try {
+			openchatLinkDialog.show();
+		}catch (Exception e){}
+	}
+
 	public void showImportLinkDialog(){
 		log("showImportLinkDialog");
 		LinearLayout layout = new LinearLayout(this);
@@ -10896,6 +11128,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(input, params);
 		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
@@ -11021,9 +11254,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					openLinkDialog.dismiss();
 				}
 				catch(Exception e){}
+
 				nC.importLink(value);
 			}
 		});
+	}
+
+	public void showChatLink(String link){
+		log("showChatLink: "+link);
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+		if (joiningToChatLink) {
+			openChatLinkIntent.setAction(Constants.ACTION_JOIN_OPEN_CHAT_LINK);
+		}
+		else {
+			openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+		}
+		openChatLinkIntent.setData(Uri.parse(link));
+		startActivity(openChatLinkIntent);
 	}
 
 	public void takePicture(){
@@ -11418,6 +11665,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			{
 				generalDialog.dismiss();
 				//Show UpgradeAccountActivity
+				drawerItemPreUpgradeAccount = drawerItem;
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 				selectDrawerItemAccount();
@@ -11927,24 +12175,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void chooseAddContactDialog(boolean isMegaContact){
 		log("chooseAddContactDialog");
-
-		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
-
 			if(megaApi!=null && megaApi.getRootNode()!=null){
-				ArrayList<MegaUser> contacts = megaApi.getContacts();
-				if(contacts==null){
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-				}
-				else {
-					if(contacts.isEmpty()){
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-					}
-					else{
-						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
-					}
-				}
+				Intent in = new Intent(this, AddContactActivityLollipop.class);
+				in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+				startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 			}
 			else{
 				log("Online but not megaApi");
@@ -11957,24 +12192,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void addContactFromPhone(){
-
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
-
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-//			if (!hasReadContactsPermission) {
-//				log("No read contacts permission");
-//				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-//						new String[]{Manifest.permission.READ_CONTACTS},
-//						Constants.REQUEST_READ_CONTACTS);
-//				return;
-//			}
-//		}
-//
-//		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
-//		this.startActivity(phoneContactIntent);
 	}
 
 	public void showNewContactDialog(){
@@ -12926,10 +13146,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void navigateToUpgradeAccount(){
 		log("navigateToUpgradeAccount");
-		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
 		getProLayout.setVisibility(View.GONE);
+		drawerItemPreUpgradeAccount = drawerItem;
 		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
@@ -12966,6 +13186,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
+		comesFromNotifications = true;
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -13087,6 +13308,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.upgrade_navigation_view: {
 				isFirstTimeCam();
 				drawerLayout.closeDrawer(Gravity.LEFT);
+				drawerItemPreUpgradeAccount = drawerItem;
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
@@ -14118,16 +14340,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
-					log("create group chat with participants: "+peers.size());
-
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-					if(chatTitle!=null){
-						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
-						megaChatApi.createChat(true, peers, listener);
+					boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
+					boolean chatLink = false;
+					if (!isEKR) {
+						chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
 					}
-					else{
-						megaChatApi.createChat(true, peers, this);
-					}
+
+					createGroupChat(peers, chatTitle, chatLink, isEKR);
 				}
 			}
 		}
@@ -14198,7 +14418,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void createGroupChat(MegaChatPeerList peers, String chatTitle, boolean chatLink, boolean isEKR){
+
+		log("create group chat with participants: "+peers.size());
+
+		if (isEKR) {
+			megaChatApi.createChat(true, peers, chatTitle, this);
+		}
+		else {
+			if(chatLink){
+				if(chatTitle!=null && !chatTitle.isEmpty()){
+					CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
+					megaChatApi.createPublicChat(peers, chatTitle, listener);
+				}
+				else{
+					Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
+				}
+			}
+			else{
+				megaChatApi.createPublicChat(peers, chatTitle, this);
+			}
+		}
+	}
+
 	public void sendFilesToChats (ArrayList<MegaChatRoom> chats, long[] chatHandles, long[] nodeHandles) {
+
 		MultipleAttachChatListener listener = null;
 
 		if (chatHandles == null && chats != null) {
@@ -15234,6 +15478,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+		log("onRequestStart(CHAT): "+ request.getRequestString());
 //		if (request.getType() == MegaChatRequest.TYPE_INITIALIZE){
 //			MegaApiAndroid.setLoggerObject(new AndroidLogger());
 ////			MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
@@ -15261,7 +15506,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish");
-			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
 			log("remove from chat finish!!!");
@@ -15286,6 +15531,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("CONNECT CHAT finished ");
+				if (joiningToChatLink && idJoinToChatLink != -1) {
+					megaChatApi.autojoinPublicChat(idJoinToChatLink, this);
+				}
 				if(drawerItem == DrawerItem.CHAT){
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 					if(rChatFL!=null){
@@ -15372,8 +15620,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
+				showChatLink(request.getLink());
+				dismissOpenChatLinkDialog();
+			}
+			else {
+				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+					dismissOpenChatLinkDialog();
+					Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
+				}
+				else {
+					showOpenChatLinkError(true);
+				}
+			}
+		}
 		else if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
-
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: "+request.getFlag());
             }
@@ -15381,7 +15643,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: "+e.getErrorType());
 			}
 		}
-
+		else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+			joiningToChatLink = false;
+			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
+				showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
+			}
+			else{
+				log("Error joining to chat: "+ e.getErrorString());
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(request.getChatHandle());
+				if (chatRoom != null && (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR
+						|| chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO)) {
+					log("Error joining to chat: I'm already a participant");
+					return;
+				}
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+			}
+		}
 	}
 
 	@Override
@@ -15389,7 +15666,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean loadMessages){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle){
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 
@@ -15404,13 +15681,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("open new chat: " + chatHandle);
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
-			if(loadMessages){
-				intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-			}
-			else{
-				intent.setAction(Constants.ACTION_NEW_CHAT);
-			}
-
+			intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 			intent.putExtra("CHAT_ID", chatHandle);
 			this.startActivity(intent);
 		}
@@ -16707,11 +16978,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(node == null){
 			return;
 		}
+		comesFromNotifications = true;
+		comesFromNotificationHandle = nodeHandle;
 		MegaNode parent = nC.getParent(node);
 		if (parent.getHandle() == megaApi.getRootNode().getHandle()){
 			//Cloud Drive
 			drawerItem = DrawerItem.CLOUD_DRIVE;
 			openFolderRefresh = true;
+			comesFromNotificationHandleSaved = parentHandleBrowser;
 			setParentHandleBrowser(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -16719,6 +16993,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Rubbish
 			drawerItem = DrawerItem.RUBBISH_BIN;
 			openFolderRefresh = true;
+			comesFromNotificationHandleSaved = parentHandleRubbish;
 			setParentHandleRubbish(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -16726,6 +17001,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Inbox
 			drawerItem = DrawerItem.INBOX;
 			openFolderRefresh = true;
+			comesFromNotificationHandleSaved = parentHandleInbox;
 			setParentHandleInbox(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -16733,8 +17009,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Incoming Shares
 			drawerItem = DrawerItem.SHARED_ITEMS;
 			indexShares = 0;
+			comesFromNotificationDeepBrowserTreeIncoming = deepBrowserTreeIncoming;
+			comesFromNotificationHandleSaved = parentHandleIncoming;
 			if (parent != null){
-				deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
+				comesFromNotificationsLevel = deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
 			}
 			openFolderRefresh = true;
 			setParentHandleIncoming(nodeHandle);
@@ -17322,7 +17600,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.TRANSFERS.getTag());
 				if (tFLol != null){
-					tFLol.transferFinish(index);
+					tFLol.transferFinish(transfer.getTag());
 				}
 				else{
 					log("tF is null!");
@@ -17700,9 +17978,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case CHAT:{
 				if(megaChatApi!=null){
-					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(Util.mutateIcon(this, R.drawable.ic_chat, R.color.white));
-					}
+					fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
 					fabButton.setVisibility(View.VISIBLE);
 				}
@@ -18218,21 +18494,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return parentHandleInbox;
 	}
 
+	@Override
+	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		if(call!=null){
+			if(call.getChatid() != -1){
+				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
+					int callStatus = call.getStatus();
+					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
 
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate() status: "+call.getStatus());
-        if(call.getChatid() != -1){
-            if((call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)||(call.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT)||(call.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-				setCallBadge();
-				rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-				if ((rChatFL != null) && (rChatFL.isVisible())){
-                    log("OnChatCallUpdate() status: "+call.getStatus()+" -> rChatFL visible: ");
-                    rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+					switch (callStatus) {
+						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
+						case MegaChatCall.CALL_STATUS_RING_IN:
+						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+						case MegaChatCall.CALL_STATUS_DESTROYED:
+						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+							setCallBadge();
+							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+							if ((rChatFL != null) && (rChatFL.isVisible())){
+								rChatFL.refreshNode(megaChatApi.getChatListItem(call.getChatid()));
+							}
+
+							fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+							if ((fbFLol != null) && (fbFLol.isVisible())){
+								fbFLol.showCallLayout();
+							}
+							break;
+						}
+
+						default:
+							break;
+					}
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 
 	public void setContactTitleSection(){
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
@@ -18342,10 +18637,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(numCalls == 0){
                 callBadge.setVisibility(View.GONE);
 			}else if(numCalls == 1){
-                if(this.participatingInACall()){
-					callBadge.setVisibility(View.GONE);
-				}else{
-					callBadge.setVisibility(View.VISIBLE);
+				if(megaChatApi!=null){
+					if(ChatUtil.participatingInACall(megaChatApi)){
+						callBadge.setVisibility(View.GONE);
+					}else{
+						callBadge.setVisibility(View.VISIBLE);
+					}
 				}
 			}else{
                 callBadge.setVisibility(View.VISIBLE);
@@ -18681,4 +18978,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        searchView.setQuery(searchQuery, true);
         }
     }
+
+    public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
+		this.accountFragmentPreUpgradeAccount = accountFragment;
+	}
 }
