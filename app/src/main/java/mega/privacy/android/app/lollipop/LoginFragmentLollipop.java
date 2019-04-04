@@ -2190,9 +2190,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivityLollipop.isFetchedNodes = true;
-            if(confirmLogoutDialog != null) {
-                confirmLogoutDialog.dismiss();
-            }
+//            if(confirmLogoutDialog != null) {
+//                confirmLogoutDialog.dismiss();
+//            }
             disableLoginButton();
         }
     }
@@ -2217,11 +2217,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
                 log("terminate login process when login");
-                megaApi.logout();
-                if(dbH != null) {
-                    dbH.clearCredentials();
-                    dbH.clearEphemeral();
-                }
+//                megaApi.logout();
+//                if(dbH != null) {
+//                    dbH.clearCredentials();
+//                    dbH.clearEphemeral();
+//                }
                 return;
             }
             if (error.getErrorCode() != MegaError.API_OK) {
@@ -2980,6 +2980,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         MegaApplication.setLoggingIn(false);
                         loginClicked = false;
                         megaChatApi.logout();
+                        megaApi.localLogout();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
