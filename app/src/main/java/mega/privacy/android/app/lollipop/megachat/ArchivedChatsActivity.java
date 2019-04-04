@@ -183,6 +183,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         }
         else{
             log("onChatListItemUpdate");
+            return;
         }
 
         if(archivedChatsFragment!=null){
