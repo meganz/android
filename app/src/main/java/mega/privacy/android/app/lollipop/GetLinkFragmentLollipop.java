@@ -311,8 +311,10 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 				linkWithKeyCheck.setChecked(false);
 				
 				//disable expiry/password options for decryption key option
-                switchButtonExpiry.setEnabled(true);
-                switchButtonProtection.setEnabled(true);
+                if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                    switchButtonExpiry.setEnabled(true);
+                    switchButtonProtection.setEnabled(true);
+                }
                 if(link!=null){
                     String urlString="";
                     String [] s = link.split("!");
@@ -356,8 +358,10 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 				linkDecryptionKeyCheck.setChecked(false);
 				linkWithKeyCheck.setChecked(true);
 				linkText.setText(link);
-                switchButtonExpiry.setEnabled(true);
-                switchButtonProtection.setEnabled(true);
+                if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                    switchButtonExpiry.setEnabled(true);
+                    switchButtonProtection.setEnabled(true);
+                }
                 break;
             }
             case R.id.copy_button:{
@@ -493,6 +497,9 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             linkText.setText(request.getText());
             copyButton.setEnabled(true);
             sendButton.setEnabled(true);
+            linkWithoutKeyCheck.setChecked(false);
+            linkDecryptionKeyCheck.setChecked(false);
+            linkWithKeyCheck.setChecked(true);
             passwordProtectionEditText.setText(request.getPassword());
             passwordProtectionEditText.setVisibility(View.VISIBLE);
             subtitleProOnlyProtection.setVisibility(View.GONE);
@@ -526,7 +533,18 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 }
                 else{
                     log("Remove pass protection");
-                    linkText.setText(link);
+                    if (linkWithKeyCheck.isChecked()) {
+                        linkText.setText(link);
+                    } else if (linkWithoutKeyCheck.isChecked()) {
+                        if(link!=null){
+                            String urlString="";
+                            String [] s = link.split("!");
+                            if (s.length == 3){
+                                urlString = s[0] + "!" + s[1];
+                            }
+                            linkText.setText(urlString);
+                        }
+                    }
                     copyButton.setEnabled(true);
                     sendButton.setEnabled(true);
                     isInPasswordProtectionMode = false;
