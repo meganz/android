@@ -8378,7 +8378,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (!holder.nameRequestedAction) {
                 log("3-Call for nonContactName: " + handle);
                 holder.nameRequestedAction = true;
-                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview());
+                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview(), pos);
                 megaChatApi.getUserFirstname(handle, chatRoom.getAuthorizationToken(), listener);
                 megaChatApi.getUserLastname(handle, chatRoom.getAuthorizationToken(), listener);
                 megaChatApi.getUserEmail(handle, listener);
@@ -8401,5 +8401,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         return false;
+    }
+
+    public ViewHolderMessageChat queryIfHolderNull(int pos) {
+        ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(pos);
+        if (holder == null) {
+            return null;
+        }
+
+        return holder;
     }
  }
