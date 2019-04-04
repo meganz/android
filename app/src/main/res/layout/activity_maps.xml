@@ -15,16 +15,17 @@
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        tools:context=".lollipop.megachat.ChatActivityLollipop" />
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:popupTheme="@style/Theme.Megaactionbar"
+        app:theme="@style/Theme.Megaactionbar"
+        tools:context=".lollipop.megachat" />
 
     <RelativeLayout
         android:id="@+id/map_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_maps">
+        android:layout_below="@id/toolbar_maps"
+        android:layout_marginBottom="72dp">
 
         <fragment
             android:id="@+id/map"
@@ -80,34 +81,49 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:visibility="gone"/>
-
-        <View
-            android:id="@+id/shadow_maps_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/list_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/send_current_location_layout"
         android:background="@color/white"
-        android:layout_below="@+id/map_layout">
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/address_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="multipleChoice"/>
-
-        <TextView
-            android:id="@+id/no_places_found_label"
+        <ImageView
+            android:id="@+id/address_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/no_places_found"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:alpha="0.56"
+            android:src="@drawable/ic_location"/>
+
+        <TextView
+            android:id="@+id/address_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/name_my_account"
-            android:layout_centerInParent="true"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_toRightOf="@id/address_icon"/>
+
+        <TextView
+            android:id="@+id/address_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/mail_my_account"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_below="@id/address_name_label"
+            android:layout_alignLeft="@+id/address_name_label"/>
 
     </RelativeLayout>
 

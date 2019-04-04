@@ -1,11 +1,9 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 
 public class MapAddress {
 
-    private Place place;
     LatLng latLng;
     private String name;
     private String address;
@@ -16,23 +14,12 @@ public class MapAddress {
         this.address = address;
     }
 
-    public MapAddress (Place place) {
-        this.place = place;
-        this.latLng = place.getLatLng();
-        this.name = place.getName().toString();
-        this.address = place.getAddress().toString();
-    }
-
     public String getAddress() {
         return address;
     }
 
     public String getName() {
         return name;
-    }
-
-    public Place getPlace() {
-        return place;
     }
 
     public void setName(String name) {
