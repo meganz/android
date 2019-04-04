@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="225"
-    android:versionName="3.5.2 (225)" >
+    android:versionCode="227"
+    android:versionName="3.6.0 (227)" >
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
@@ -320,7 +320,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.AddContactActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Add.Contacts"
+            android:theme="@style/Theme.Megaactionbar"
             android:windowSoftInputMode="adjustNothing">
         </activity>
 
@@ -480,7 +480,7 @@
         <!-- Used for Google Play Store Campaign Measurement-->
         <service
             android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-
+		<service android:name=".fcm.IncomingMessageService"/>
         <service
             android:name=".jobservices.CameraUploadsService"
             android:permission="android.permission.BIND_JOB_SERVICE"

@@ -60,7 +60,7 @@ public class HeaderItemDecoration extends RecyclerView.ItemDecoration {
 
             }else if(viewType == ShareContactsHeaderAdapter.ITEM_VIEW_TYPE_HEADER){
 
-                mDividerHeader.draw(c);
+//                mDividerHeader.draw(c);
 
             }
         }

@@ -92,9 +92,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 	RelativeLayout transfersOverViewLayout;
 
-	TextView contentText;	
-	RelativeLayout contentTextLayout;
-
 	Stack<Integer> lastPositionStack;
 	
 	float density;
@@ -592,13 +589,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_text);
-
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, contentTextLayout.getId());
-			recyclerView.setLayoutParams(params);
-
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersOverViewLayout.setVisibility(View.GONE);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
@@ -636,8 +626,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyLinearLayout.setVisibility(View.VISIBLE);
 
@@ -689,18 +677,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyLinearLayout.setVisibility(View.GONE);
 				}			
-			}
-
-			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}else{
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 			}
 
 			return v;
@@ -730,8 +709,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyLinearLayout = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 			addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			if (adapter == null){
 				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleOutgoing, recyclerView, null, Constants.OUTGOING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
@@ -757,12 +734,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			if (((ManagerActivityLollipop) context).deepBrowserTreeOutgoing == 0){
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-			}else{
-				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
-			}
+
 			adapter.setMultipleSelect(false);
 			
 			recyclerView.setAdapter(adapter);
@@ -770,8 +742,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			visibilityFastScroller();
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyLinearLayout.setVisibility(View.VISIBLE);
 
@@ -826,8 +796,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyLinearLayout.setVisibility(View.GONE);
 			}	
@@ -853,8 +821,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
                 if (adapter.getItemCount() == 0){
                     log("adapter.getItemCount() = 0");
                     recyclerView.setVisibility(View.GONE);
-                    contentTextLayout.setVisibility(View.GONE);
-                    contentText.setVisibility(View.GONE);
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyLinearLayout.setVisibility(View.VISIBLE);
 
@@ -911,12 +877,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 					log("adapter.getItemCount() != 0");
                     recyclerView.setVisibility(View.VISIBLE);
-                    contentTextLayout.setVisibility(View.GONE);
-                    contentText.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
                     emptyLinearLayout.setVisibility(View.GONE);
                 }
-                contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
 			}
         }
         else{
@@ -924,8 +887,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
            	((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			((ManagerActivityLollipop)context).setToolbarTitle();
-
-            contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
 			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 			addSectionTitle(nodes,adapter.getAdapterType());
@@ -936,8 +897,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             //If folder has no files
             if (adapter.getItemCount() == 0){
                 recyclerView.setVisibility(View.GONE);
-                contentTextLayout.setVisibility(View.GONE);
-                contentText.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyLinearLayout.setVisibility(View.VISIBLE);
 
@@ -991,8 +950,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             }
             else{
                 recyclerView.setVisibility(View.VISIBLE);
-                contentTextLayout.setVisibility(View.GONE);
-                contentText.setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);
                 emptyLinearLayout.setVisibility(View.GONE);
             }
@@ -1014,27 +971,19 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				if (adapter.getItemCount() == 0){
 					log("adapter.getItemCount() = 0");
 					recyclerView.setVisibility(View.GONE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyLinearLayout.setVisibility(View.VISIBLE);
 				}
 				else{
 					log("adapter.getItemCount() != 0");
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
-				contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-
 			}
 		}
 		else{
 			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
-			contentText.setText(MegaApiUtils.getInfoFolder(n, context));
-
 			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 			addSectionTitle(nodes,adapter.getAdapterType());
 
@@ -1044,8 +993,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyLinearLayout.setVisibility(View.VISIBLE);
 
@@ -1096,11 +1043,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}
 					emptyTextViewFirst.setText(result);
 				}
-			}
-			else{
+			}else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
-				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyLinearLayout.setVisibility(View.GONE);
 			}
@@ -1180,9 +1124,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setToolbarTitle();
-				
-				MegaNode infoNode = megaApi.getNodeByHandle(n.getHandle());
-				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				addSectionTitle(nodes,adapter.getAdapterType());
@@ -1194,8 +1135,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				//If folder has no files
 				if (adapter.getItemCount() == 0){
 					recyclerView.setVisibility(View.GONE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyLinearLayout.setVisibility(View.VISIBLE);
 
@@ -1251,8 +1190,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.GONE);
-					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyLinearLayout.setVisibility(View.GONE);
 				}
@@ -1799,10 +1736,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}
 			}
 
-			contentText.setText(MegaApiUtils.getInfoNodeOnlyFolders(nodes, context));
-
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyLinearLayout.setVisibility(View.GONE);
 			((ManagerActivityLollipop) context).showFabButton();
@@ -1812,11 +1746,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			log("Keep navigation");
 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing));
-			contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyLinearLayout.setVisibility(View.GONE);
 
@@ -1855,7 +1787,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 		else{
 			log("Back to Cloud");
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyLinearLayout.setVisibility(View.GONE);
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());

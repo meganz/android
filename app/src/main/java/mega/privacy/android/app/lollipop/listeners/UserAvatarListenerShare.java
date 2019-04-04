@@ -34,32 +34,27 @@ public class UserAvatarListenerShare implements MegaRequestListenerInterface {
 
         if (e.getErrorCode() == MegaError.API_OK){
 
-            if(context instanceof ChatCallActivity){
-                ((ChatCallActivity)context).setProfileContactAvatar();
-            }
-            else{
-                if (holder.mail.compareTo(request.getEmail()) == 0){
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.mail + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), holder.mail + ".jpg");
-                    }
-                    Bitmap bitmap = null;
-                    if (avatar.exists()){
-                        if (avatar.length() > 0){
-                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                            bOpts.inPurgeable = true;
-                            bOpts.inInputShareable = true;
-                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                            if (bitmap == null) {
-                                avatar.delete();
-                            }
-                            else{
-                                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
-                                holder.avatar.setImageBitmap(bitmap);
-                            }
+            if (holder.mail.compareTo(request.getEmail()) == 0){
+                File avatar = null;
+                if (context.getExternalCacheDir() != null){
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.mail + ".jpg");
+                }
+                else{
+                    avatar = new File(context.getCacheDir().getAbsolutePath(), holder.mail + ".jpg");
+                }
+                Bitmap bitmap = null;
+                if (avatar.exists()){
+                    if (avatar.length() > 0){
+                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                        bOpts.inPurgeable = true;
+                        bOpts.inInputShareable = true;
+                        bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                        if (bitmap == null) {
+                            avatar.delete();
+                        }
+                        else{
+                            bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+                            holder.avatar.setImageBitmap(bitmap);
                         }
                     }
                 }

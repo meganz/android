@@ -7,24 +7,11 @@
 
 	<include layout="@layout/item_transfers_overview"/>
 
-	<RelativeLayout
-		android:id="@+id/content_text_layout"
+	<include layout="@layout/item_call_in_progress_layout"
 		android:layout_width="match_parent"
-		android:layout_height="36dp"
-		android:layout_alignParentTop="true"
-		android:background="@color/new_background_fragment"
-		android:visibility="gone">
-
-		<TextView
-			android:id="@+id/content_text"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:textColor="@color/mail_my_account"
-			android:layout_centerVertical="true"
-			android:layout_marginLeft="72dp"
-			android:textSize="14sp" />
-
-	</RelativeLayout>
+		android:layout_height="48dp"
+		android:visibility="gone"
+		android:layout_alignParentTop="true" />
 
 	<RelativeLayout
 		android:id="@+id/relative_layout_file_list_browser_camera_upload_on_off"
@@ -41,8 +28,7 @@
 			android:layout_height="wrap_content"
 			android:layout_centerInParent="true"
 			android:fontFamily="sans-serif-medium"
-			android:textColor="@color/accentColor"
-			 />
+			android:textColor="@color/accentColor" />
 
 	</RelativeLayout>
 
@@ -80,7 +66,7 @@
 		android:id="@+id/linear_layout_recycler"
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
-		android:layout_below="@id/content_text_layout"
+		android:layout_below="@id/call_in_progress_layout"
 		android:layout_above="@id/relative_layout_file_list_browser_camera_upload_on_off">
 
 		<RelativeLayout
