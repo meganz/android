@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -62,6 +61,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -229,6 +229,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	private ImageView toggleButton;
 	private boolean passwdVisibility;
+
+	FileProviderActivity fileProviderActivity;
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -245,6 +247,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		super.onCreate(savedInstanceState);
+
+		fileProviderActivity = this;
 
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -355,13 +359,15 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 						int ret = megaChatApi.getInitState();
 
-						if(ret==0||ret==MegaChatApi.INIT_ERROR){
+						if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 							ret = megaChatApi.init(gSession);
 							log("onCreate: result of init ---> "+ret);
 							chatSettings = dbH.getChatSettings();
 							if (ret == MegaChatApi.INIT_NO_CACHE)
 							{
 								log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+								megaChatApi.enableGroupChatCalls(true);
+
 							}
 							else if (ret == MegaChatApi.INIT_ERROR)
 							{
@@ -865,7 +871,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					hideKeyboard();
+					Util.hideKeyboard(fileProviderActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -970,7 +976,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	void permitVerify(){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard();
+			Util.hideKeyboard(this, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -987,14 +993,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				log("lastEmail: "+lastEmail+" lastPasswd: "+lastPassword);
 				megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
 			}
-		}
-	}
-
-	void hideKeyboard(){
-
-		View v = getCurrentFocus();
-		if (v != null){
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
 	}
 
@@ -1873,12 +1871,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 
-	public void showSnackbar(String message) {
+	public void showSnackbar(String s) {
 		if(scrollView!=null){
-			Snackbar snackbar = Snackbar.make(scrollView, message, Snackbar.LENGTH_LONG);
-			TextView snackbarTextView = (TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-			snackbarTextView.setMaxLines(5);
-			snackbar.show();
+			BaseActivity.showSimpleSnackbar(this, outMetrics, scrollView, s);
 		}
 	}
 

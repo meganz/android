@@ -454,8 +454,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
-        log("setNodes");
         this.nodes = insertPlaceHolderNode(nodes);
+        log("setNodes size: "+this.nodes.size());
 //		contentTextFragment.setText(getInfoFolder(node));
         notifyDataSetChanged();
     }
@@ -489,6 +489,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderList.versionsIcon = (ImageView) v.findViewById(R.id.file_list_versions_icon);
 
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
+
+            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(275,outMetrics));
+            } else {
+                holderList.textViewFileName.setMaxWidth(Util.scaleWidthPx(210,outMetrics));
+            }
 
             holderList.textViewFileSize = (TextView)v.findViewById(R.id.file_list_filesize);
 
@@ -1219,7 +1225,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public int getItemCount() {
         if (nodes != null) {
-            return nodes.size() - placeholderCount;
+            return nodes.size();
         } else {
             return 0;
         }
@@ -1325,11 +1331,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         log("onClick: file_list_three_dots: " + currentPosition);
         if (!Util.isOnline(context)) {
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             } else if (context instanceof FolderLinkActivityLollipop) {
-                ((FolderLinkActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((FolderLinkActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             } else if (context instanceof ContactFileListActivityLollipop) {
-                ((ContactFileListActivityLollipop)context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((ContactFileListActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
             }
             return;
         }

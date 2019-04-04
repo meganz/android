@@ -23,16 +23,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class TourImageAdapter extends PagerAdapter {
 
 	private int[] mImages = new int[] {
-	        R.drawable.storage_space,
-	        R.drawable.speed,
-	        R.drawable.privacy_security,
-	        R.drawable.access
-	    };	
-	
+			R.drawable.tour1,
+			R.drawable.tour2,
+			R.drawable.tour3,
+			R.drawable.tour4
+	};
+
+	int[] barTitles = new int[] {
+			R.string.title_tour_one,
+			R.string.title_tour_two,
+			R.string.title_tour_three,
+			R.string.title_tour_four
+	};
+
+	int[] barTexts = new int[] {
+			R.string.content_tour_one,
+			R.string.content_tour_two,
+			R.string.content_tour_three,
+			R.string.content_tour_four
+	};
+
 	private Activity activity;
 	private LayoutInflater inflater;
 	
@@ -53,42 +68,17 @@ public class TourImageAdapter extends PagerAdapter {
 		
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        ImageView imgDisplay;
- 
+
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.tour_image_layout, container,false);
  
-        imgDisplay = (ImageView) viewLayout.findViewById(R.id.imageTour);
-
+        ImageView imgDisplay = (ImageView) viewLayout.findViewById(R.id.imageTour);
         imgDisplay.setImageResource(mImages[position]);
 
-		/*Rounded corners of image*/
-
-		Bitmap bitmap = ((BitmapDrawable)imgDisplay.getDrawable()).getBitmap();
-		int w = bitmap.getWidth();
-		int h = bitmap.getHeight();
-		int radius =20;
-		Bitmap output = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(output);
-
-		final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		final RectF rectF = new RectF(0, 0, w, h);
-
-		canvas.drawRoundRect(rectF, radius, radius, paint);
-
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-		canvas.drawBitmap(bitmap, null, rectF, paint);
-
-		/*left top and right top corners*/
-
-		final Rect clipRect = new Rect(0, radius, w, h);
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-		canvas.drawRect(clipRect, paint);
-
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-		canvas.drawBitmap(bitmap, null, rectF, paint);
-
-		imgDisplay.setImageBitmap(output);
+		TextView text1 = (TextView) viewLayout.findViewById(R.id.tour_text_1);
+		text1.setText(barTitles[position]);
+		TextView text2 = (TextView) viewLayout.findViewById(R.id.tour_text_2);
+		text2.setText(barTexts[position]);
 
         ((ViewPager) container).addView(viewLayout);
  

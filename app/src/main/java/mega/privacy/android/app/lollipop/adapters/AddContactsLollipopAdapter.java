@@ -79,15 +79,15 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
 
         holder = new ViewHolderChips(v);
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
+        holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = (TextView) v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(Util.scaleWidthPx(60, outMetrics));
+        holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
-        holder.deleteIcon.setOnClickListener(this);
 
-        holder.deleteIcon.setTag(holder);
+        holder.itemLayout.setTag(holder);
 
         v.setTag(holder);
 
@@ -141,7 +141,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
                 return;
             }
             switch (view.getId()) {
-                case R.id.delete_icon_chip: {
+                case R.id.item_layout_chip: {
                     ((AddContactActivityLollipop) context).deleteContact(currentPosition);
                     break;
                 }
