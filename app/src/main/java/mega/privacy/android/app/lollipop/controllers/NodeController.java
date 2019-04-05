@@ -830,14 +830,9 @@ public class NodeController {
                     log("ISFILE");
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
-                    if(localPath != null){
+                    boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                    if(localPath != null && autoPlayEnabled){
                         log("localPath != null");
-                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
-                        if(!autoPlayEnabled){
-                            log("auto play disabled");
-                            Util.showSnackBar(context, context.getString(R.string.general_already_downloaded));
-                            return;
-                        }
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
                             Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
@@ -1080,12 +1075,13 @@ public class NodeController {
                 }
             }
             log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-            if (numberOfNodesAlreadyDownloaded > 0){
-                String msg = context.getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-                if (numberOfNodesPending > 0){
-                    msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
+            if (numberOfNodesAlreadyDownloaded > 0) {
+                String msg;
+                msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded,numberOfNodesAlreadyDownloaded,numberOfNodesAlreadyDownloaded);
+                if (numberOfNodesPending > 0) {
+                    msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
                 }
-                showSnackbar(Constants.SNACKBAR_TYPE, msg);
+                showSnackbar(Constants.SNACKBAR_TYPE,msg);
             }
         }
     }
