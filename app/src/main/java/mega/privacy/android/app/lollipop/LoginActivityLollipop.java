@@ -101,7 +101,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     String lastNameTemp = null;
 
     static boolean isBackFromLoginPage;
-    static boolean isFetchedNodes;
+    static boolean isFetchingNodes;
 
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
