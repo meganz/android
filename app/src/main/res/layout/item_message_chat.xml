@@ -250,6 +250,35 @@
                                 android:textSize="14sp"/>
                         </LinearLayout>
 
+                        <RelativeLayout
+                            android:id="@+id/url_chat_own_message_image"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginBottom="12dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_centerVertical="true">
+
+                            <mega.privacy.android.app.components.RoundedImageView
+                                android:id="@+id/content_url_chat_own_message_contact_thumb"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:layout_centerInParent="true"
+                                rounded:border_color="@color/white"
+                                rounded:border_width="2dp"
+                                rounded:corner_radius="20dp"/>
+
+                            <TextView
+                                android:id="@+id/content_url_chat_own_message_contact_initial_letter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:gravity="center_horizontal|center_vertical"
+                                android:paddingBottom="3dp"/>
+                        </RelativeLayout>
+
                         <LinearLayout
                             android:id="@+id/url_own_message_buttons_warning_layout"
                             android:layout_width="match_parent"
@@ -1233,6 +1262,89 @@
 
             </RelativeLayout>
 
+            <!--Management messages-->
+            <RelativeLayout
+                android:id="@+id/contact_management_message_layout_with_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:layout_marginBottom="6dp"
+                android:layout_marginTop="11dp"
+                android:layout_below="@+id/title_contact_message_layout"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:id="@+id/contact_text_layout_with_avatar"
+                    android:layout_width="match_parent"
+                    android:gravity="left"
+                    android:layout_height="wrap_content">
+
+                    <!--contact mini avatar-->
+                    <RelativeLayout
+                        android:id="@+id/management_layout_avatar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@android:color/transparent">
+
+                        <mega.privacy.android.app.components.RoundedImageView
+                            android:id="@+id/management_contact_thumbnail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:background="@android:color/transparent"
+                            android:scaleType="fitCenter"
+                            rounded:border_color="@color/border_file_properties"
+                            rounded:border_width="0dp"
+                            rounded:corner_radius="40dp" />
+
+                        <TextView
+                            android:id="@+id/management_contact_initial_letter"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:textSize="15sp"
+                            android:gravity="center_horizontal|center_vertical"/>
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/contact_management_message_text_with_avatar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/management_layout_avatar"
+                        android:textSize="14sp"
+                        android:layout_marginLeft="8dp"
+                        android:gravity="left|center_vertical"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/name_my_account"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/contact_subtext_layout_with_avatar"
+                    android:layout_width="match_parent"
+                    android:gravity="left"
+                    android:visibility="gone"
+                    android:layout_below="@id/contact_text_layout_with_avatar"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/contact_management_message_subtext_with_avatar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginRight="48dp"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/subtitle_chat_message_enabled_ERK"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/mail_my_account"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
             <!--Content contact message-->
             <RelativeLayout
                 android:id="@+id/content_contact_message_layout"
@@ -1322,6 +1434,35 @@
                                 android:textSize="14sp"
                                 android:layout_gravity="center_horizontal|center_vertical"/>/>
 
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/url_chat_contact_message_image"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginBottom="12dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_centerVertical="true">
+
+                            <mega.privacy.android.app.components.RoundedImageView
+                                android:id="@+id/content_url_chat_contact_message_contact_thumb"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:layout_centerInParent="true"
+                                rounded:border_color="@color/white"
+                                rounded:border_width="2dp"
+                                rounded:corner_radius="20dp"/>
+
+                            <TextView
+                                android:id="@+id/content_url_chat_contact_message_contact_initial_letter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:gravity="center_horizontal|center_vertical"
+                                android:paddingBottom="3dp"/>
                         </RelativeLayout>
 
                         <LinearLayout

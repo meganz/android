@@ -165,16 +165,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             return;
         }
 
-        if(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
-            if(messageMega.isDeletable()){
-                log("Message DELETABLE");
-                optionRemove.setVisibility(View.VISIBLE);
-            }
-            else{
-                log("Message NOT DELETABLE");
-                optionRemove.setVisibility(View.GONE);
-            }
-        }else{
+        if(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() && messageMega.isDeletable()){
+            log("Message DELETABLE");
+            optionRemove.setVisibility(View.VISIBLE);
+        }
+        else{
+            log("Message NOT DELETABLE");
             optionRemove.setVisibility(View.GONE);
         }
 
@@ -186,6 +182,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
         optionForwardLayout.setOnClickListener(this);
+
+        if (chatC.isInAnonymousMode()) {
+            optionSaveOffline.setVisibility(View.GONE);
+            optionImport.setVisibility(View.GONE);
+            optionForwardLayout.setVisibility(View.GONE);
+        }
 
         nodeIconLayout.setVisibility(View.GONE);
 
@@ -412,7 +414,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     if(message!=null){
                         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                         messages.add(message);
-                        chatC.saveForOfflineWithAndroidMessages(messages);
+                        chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
                     }
                     else{
                         log("Message is NULL");

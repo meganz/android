@@ -2,7 +2,9 @@ package mega.privacy.android.app.lollipop.controllers;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,6 +14,7 @@ import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -30,6 +33,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
@@ -49,6 +53,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
@@ -1080,15 +1085,9 @@ public class ChatController {
             String handleString = MegaApiJava.userHandleToBase64(userHandle);
             log("The user handle to find is: "+handleString);
             MegaUser contact = megaApi.getContact(handleString);
-            if(contact!=null){
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    log("Is contact!");
-                    return getContactFullName(userHandle);
-                }
-                else{
-                    log("Old contact");
-                    return getNonContactFullName(userHandle);
-                }
+            if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                log("Is contact!");
+                return getContactFullName(userHandle);
             }
             else{
                 log("Non contact");
@@ -1229,77 +1228,20 @@ public class ChatController {
 
     public String getNonContactFullName(long userHandle){
         NonContactInfo nonContact = dbH.findNonContactByHandle(userHandle+"");
-        if(nonContact!=null){
+        if(nonContact!=null) {
             String fullName = nonContact.getFullName();
 
-            if(fullName!=null){
-                if(fullName.isEmpty()){
-                    log("1-Put email as fullname");
-                    String email = nonContact.getEmail();
-                    if(email!=null){
-                        if(email.isEmpty()){
-                            return "";
-                        }
-                        else{
-                            if (email.trim().length() <= 0){
-                                return "";
-                            }
-                            else{
-                                return email;
-                            }
-                        }
-                    }
-                    else{
-                        return "";
-                    }
-                }
-                else{
-                    if (fullName.trim().length() <= 0){
-                        log("2-Put email as fullname");
-                        String email = nonContact.getEmail();
-                        if(email!=null){
-                            if(email.isEmpty()){
-                                return "";
-                            }
-                            else{
-                                if (email.trim().length() <= 0){
-                                    return "";
-                                }
-                                else{
-                                    return email;
-                                }
-                            }
-                        }
-                        else{
-                            return "";
-                        }
-                    }
-                    else{
-                        return fullName;
-                    }
-                }
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                return fullName;
             }
-            else{
-                log("3-Put email as fullname");
+            else {
                 String email = nonContact.getEmail();
-                if(email!=null){
-                    if(email.isEmpty()){
-                        return "";
-                    }
-                    else{
-                        if (email.trim().length() <= 0){
-                            return "";
-                        }
-                        else{
-                            return email;
-                        }
-                    }
-                }
-                else{
-                    return "";
+                if (email != null && !email.trim().isEmpty()) {
+                    return email;
                 }
             }
         }
+
         return "";
     }
 
@@ -1344,25 +1286,11 @@ public class ChatController {
         log("getParticipantFullName: "+userHandle);
         String fullName = chatRoom.getPeerFullnameByHandle(userHandle);
 
-        if(fullName!=null){
-            if(fullName.isEmpty()){
-                log("1-Put email as fullname");
-                String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
-                return participantEmail;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
-                    log("2-Put email as fullname");
-                    String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
-                    return participantEmail;
-                }
-                else{
-                    return fullName;
-                }
-            }
+        if(fullName!=null && !fullName.trim().isEmpty()) {
+            return fullName;
         }
-        else{
-            log("3-Put email as fullname");
+        else {
+            log("1-Put email as fullname");
             String participantEmail = chatRoom.getPeerEmailByHandle(userHandle);
             return participantEmail;
         }
@@ -1414,21 +1342,21 @@ public class ChatController {
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
-    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages){
+    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chatRoom){
         log("saveForOffline - multiple messages");
         for(int i=0; i<messages.size();i++){
-            saveForOffline(messages.get(i).getMegaNodeList());
+            saveForOffline(messages.get(i).getMegaNodeList(), chatRoom);
         }
     }
 
-    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages){
+    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chatRoom){
         log("saveForOffline - multiple messages");
         for(int i=0; i<messages.size();i++){
-            saveForOffline(messages.get(i).getMessage().getMegaNodeList());
+            saveForOffline(messages.get(i).getMessage().getMegaNodeList(), chatRoom);
         }
     }
 
-    public void saveForOffline(MegaNodeList nodeList){
+    public void saveForOffline(MegaNodeList nodeList, MegaChatRoom chatRoom){
 
         File destination = null;
 
@@ -1463,7 +1391,7 @@ public class ChatController {
 
             MegaNode document = nodeList.get(i);
             if (document != null) {
-
+                document = authorizeNodeIfPreview(document, chatRoom);
                 if (Environment.getExternalStorageDirectory() != null){
                     destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+MegaApiUtils.createStringTree(document, context));
                 }
@@ -1479,21 +1407,7 @@ public class ChatController {
                     File offlineFile = new File(destination, document.getName());
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())){ //This means that is already available offline
                         log("File already exists!");
-                        if (context instanceof ChatFullScreenImageViewer){
-                            ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
-                        }
-                        else if (context instanceof AudioVideoPlayerLollipop){
-                            ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists), -1);
-                        }
-                        else if (context instanceof PdfViewerActivityLollipop){
-                            ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists), -1);
-                        }
-                        else if (context instanceof ChatActivityLollipop){
-                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists), -1);
-                        }
-                        else if (context instanceof NodeAttachmentHistoryActivity){
-                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
-                        }
+                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.file_already_exists));
                     }
                     else{
                         dlFiles.put(document, destination.getAbsolutePath());
@@ -1522,6 +1436,7 @@ public class ChatController {
             }
 
             Intent service = new Intent(context, DownloadService.class);
+            document = authorizeNodeIfPreview(document, chatRoom);
             String serializeString = document.serialize();
             log("serializeString: "+serializeString);
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
@@ -1534,32 +1449,138 @@ public class ChatController {
 
     }
 
-    public void prepareForDownloadLollipop(ArrayList<MegaNode> nodeList){
+    void showSnackbar(int type, String s) {
+        if (context instanceof ChatFullScreenImageViewer){
+            ((ChatFullScreenImageViewer) context).showSnackbar(type, s);
+        }
+        else if (context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).showSnackbar(type, s, -1);
+        }
+        else if (context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).showSnackbar(type, s, -1);
+        }
+        else if (context instanceof ChatActivityLollipop){
+            ((ChatActivityLollipop) context).showSnackbar(type, s, -1);
+        }
+        else if (context instanceof NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).showSnackbar(type, s);
+        }
+    }
+
+    void requestLocalFolder (long size, long[] hashes) {
+        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+        intent.setClass(context, FileStorageActivityLollipop.class);
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
+
+        if(context instanceof ChatActivityLollipop){
+            ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof ChatFullScreenImageViewer){
+            ((ChatFullScreenImageViewer) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+        else if(context instanceof NodeAttachmentHistoryActivity){
+            ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+        }
+    }
+
+    public void prepareForDownloadLollipop(final ArrayList<MegaNode> nodeList){
         log("prepareForDownload: "+nodeList.size()+" files to download");
+        long size = 0;
+        long[] hashes = new long[nodeList.size()];
+        for (int i=0;i<nodeList.size();i++){
+            hashes[i] = nodeList.get(i).getHandle();
+            MegaNode nodeTemp = megaApi.getNodeByHandle(hashes[i]);
+            if (nodeTemp != null){
+                if (nodeTemp.isFile()){
+                    size += nodeTemp.getSize();
+                }
+            }
+            else{
+                log("Error - nodeTemp is NULL");
+            }
+
+        }
+        log("Number of files: "+hashes.length);
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        String downloadLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR;
-        prefs = dbH.getPreferences();
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageAskAlways() != null){
-                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-                    log("askMe==false");
-                    if (prefs.getStorageDownloadLocation() != null){
-                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                        }
+        boolean askMe = Util.askMe(context);
+        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
+
+        if (askMe){
+            log("askMe");
+            File[] fs = context.getExternalFilesDirs(null);
+            if (fs.length > 1){
+                if (fs[1] == null){
+                    requestLocalFolder(size, hashes);
+                }
+                else{
+                    Dialog downloadLocationDialog;
+                    String[] sdCardOptions = context.getResources().getStringArray(R.array.settings_storage_download_location_array);
+                    AlertDialog.Builder b=new AlertDialog.Builder(context);
+
+                    b.setTitle(context.getResources().getString(R.string.settings_storage_download_location));
+                    final long sizeFinal = size;
+                    final long[] hashesFinal = new long[hashes.length];
+                    for (int i=0; i< hashes.length; i++){
+                        hashesFinal[i] = hashes[i];
                     }
+
+                    b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch(which){
+                                case 0:{
+                                    requestLocalFolder(sizeFinal, hashesFinal);
+                                    break;
+                                }
+                                case 1:{
+                                    File[] fs = context.getExternalFilesDirs(null);
+                                    if (fs.length > 1){
+                                        String path = fs[1].getAbsolutePath();
+                                        File defaultPathF = new File(path);
+                                        defaultPathF.mkdirs();
+                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
+                                        checkSizeBeforeDownload(path, nodeList);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                    b.setNegativeButton(context.getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    downloadLocationDialog = b.create();
+                    downloadLocationDialog.show();
                 }
             }
+            else{
+                requestLocalFolder(size, hashes);
+            }
         }
-
-        File defaultPathF = new File(downloadLocationDefaultPath);
-        defaultPathF.mkdirs();
-        checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
+        else{
+            log("NOT askMe");
+            File defaultPathF = new File(downloadLocationDefaultPath);
+            defaultPathF.mkdirs();
+            checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
+        }
     }
 
     public void prepareForChatDownload(ArrayList<MegaNodeList> list){
@@ -1610,17 +1631,7 @@ public class ChatController {
         }
 
         boolean advancedDevices=false;
-        String downloadLocationDefaultPath = Util.downloadDIR;
-        prefs = dbH.getPreferences();
-
-        if (prefs != null){
-            log("prefs != null");
-            if (prefs.getStorageDownloadLocation() != null){
-                if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-                    downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-                }
-            }
-        }
+        String downloadLocationDefaultPath = Util.getDownloadLocation(context);
 
         File defaultPathF = new File(downloadLocationDefaultPath);
         defaultPathF.mkdirs();
@@ -1633,9 +1644,11 @@ public class ChatController {
 
         final String parentPathC = parentPath;
         long sizeTemp=0;
+        long[] hashes = new long[nodeList.size()];
 
         for (int i=0;i<nodeList.size();i++) {
             MegaNode node = nodeList.get(i);
+            hashes[i] = node.getHandle();
             if(node!=null){
                 sizeTemp = sizeTemp+node.getSize();
             }
@@ -1654,22 +1667,7 @@ public class ChatController {
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
         if(availableFreeSpace < sizeC) {
-
-            if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
-            }
-            else if(context instanceof ChatFullScreenImageViewer){
-                ((ChatFullScreenImageViewer) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
-            }
-            else if (context instanceof PdfViewerActivityLollipop){
-                ((PdfViewerActivityLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
-            }
-            else if (context instanceof AudioVideoPlayerLollipop){
-                ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null, -1);
-            }
-            else if (context instanceof NodeAttachmentHistoryActivity){
-                ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
-            }
+            showSnackbar(Constants.NOT_SPACE_SNACKBAR_TYPE, null);
             log("Not enough space");
             return;
         }
@@ -1680,36 +1678,36 @@ public class ChatController {
 
         String ask=dbH.getAttributes().getAskSizeDownload();
 
-        if(ask==null){
+        if (ask==null) {
             ask="true";
         }
 
-        if(ask.equals("false")){
+        if (ask.equals("false")) {
             log("SIZE: Do not ask before downloading");
             download(parentPathC, nodeList);
         }
         else{
             log("SIZE: Ask before downloading");
-            if(sizeC>104857600){
-                log("Show size confirmacion: "+sizeC);
+            if (sizeC>104857600) {
+                log("Show size confirmation: "+sizeC);
                 //Show alert
-                if(context instanceof  ChatActivityLollipop){
+                if (context instanceof ChatActivityLollipop) {
                     ((ChatActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if(context instanceof ChatFullScreenImageViewer){
+                else if (context instanceof ChatFullScreenImageViewer) {
                     ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                else if (context instanceof PdfViewerActivityLollipop) {
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof AudioVideoPlayerLollipop){
-                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                else if (context instanceof AudioVideoPlayerLollipop) {
+                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof NodeAttachmentHistoryActivity){
-                    ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPath, nodeList, sizeC);
+                else if (context instanceof NodeAttachmentHistoryActivity) {
+                    ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
             }
-            else{
+            else {
                 download(parentPathC, nodeList);
             }
         }
@@ -1748,7 +1746,12 @@ public class ChatController {
             if(nodeList.size() == 1){
                 log("hashes.length == 1");
                 MegaNode tempNode = nodeList.get(0);
-
+                if (context instanceof ChatActivityLollipop) {
+                    tempNode = authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
+                }
+                else if (context instanceof NodeAttachmentHistoryActivity) {
+                    tempNode = authorizeNodeIfPreview(tempNode, ((NodeAttachmentHistoryActivity) context).getChatRoom());
+                }
                 if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
                     log("ISFILE");
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
@@ -1833,12 +1836,7 @@ public class ChatController {
                                         context.startActivity(mediaIntent);
                                     }
                                     else {
-                                        if(context instanceof  ChatActivityLollipop){
-                                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available), -1);
-                                        }
-                                        else if(context instanceof  NodeAttachmentHistoryActivity){
-                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
-                                        }
+                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.intent_not_available));
                                         Intent intentShare = new Intent(Intent.ACTION_SEND);
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                             intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -1907,21 +1905,11 @@ public class ChatController {
                                             log("call to startActivity(intentShare)");
                                             context.startActivity(intentShare);
                                         }
-                                        if(context instanceof  ChatActivityLollipop){
-                                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
-                                        }
-                                        else if(context instanceof  NodeAttachmentHistoryActivity){
-                                            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
-                                        }
+                                        showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                     }
                                 }
                                 catch (Exception e){
-                                    if(context instanceof  ChatActivityLollipop){
-                                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded), -1);
-                                    }
-                                    else if(context instanceof  NodeAttachmentHistoryActivity){
-                                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
-                                    }
+                                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                                 }
                             }
 
@@ -1947,6 +1935,12 @@ public class ChatController {
                         log("path of the file: "+path);
                         log("start service");
                         Intent service = new Intent(context, DownloadService.class);
+                        if (context instanceof ChatActivityLollipop) {
+                            nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());
+                        }
+                        else if (context instanceof NodeAttachmentHistoryActivity) {
+                            nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((NodeAttachmentHistoryActivity) context).getChatRoom());
+                        }
                         String serializeString = nodeToDownload.serialize();
                         log("serializeString: "+serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
@@ -2075,7 +2069,7 @@ public class ChatController {
                         MegaNode document = nodeList.get(i);
                         if (document != null) {
                             log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
-
+                            document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
                             megaApi.copyNode(document, target, listener);
                         }
                         else{
@@ -2085,12 +2079,7 @@ public class ChatController {
                 }
                 else{
                     log("MESSAGE is null");
-                    if(context instanceof  ChatActivityLollipop){
-                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error), -1);
-                    }
-                    else if(context instanceof  NodeAttachmentHistoryActivity){
-                        ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
-                    }
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.messages_forwarded_error));
                 }
             }
         }
@@ -2114,6 +2103,34 @@ public class ChatController {
         else if(context instanceof  NodeAttachmentHistoryActivity){
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+    }
+
+    public MegaNode authorizeNodeIfPreview (MegaNode node, MegaChatRoom chatRoom) {
+        if (chatRoom != null && chatRoom.isPreview()) {
+            MegaNode nodeAuthorized = megaApi.authorizeChatNode(node, chatRoom.getAuthorizationToken());
+            if (nodeAuthorized != null) {
+                log("authorizeNodeIfPreview authorized");
+                return nodeAuthorized;
+            }
+        }
+        log("authorizeNodeIfPreview NOT authorized");
+        return node;
+    }
+
+    public boolean isInAnonymousMode () {
+        if (megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isPreview (MegaChatRoom chatRoom) {
+        if (chatRoom != null) {
+            return chatRoom.isPreview();
+        }
+
+        return false;
     }
 
     public static void log(String message) {

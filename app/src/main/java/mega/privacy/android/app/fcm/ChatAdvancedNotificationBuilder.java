@@ -853,7 +853,9 @@ public final class ChatAdvancedNotificationBuilder {
 
     public void showSimpleNotification(){
         log("showSimpleNotification");
-
+    
+        Intent myService = new Intent(context, IncomingMessageService.class);
+        context.stopService(myService);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSimple, notificationChannelNameChatSimple, NotificationManager.IMPORTANCE_LOW);
             channel.enableVibration(false);
@@ -944,10 +946,9 @@ public final class ChatAdvancedNotificationBuilder {
             int requestCodeAnswer = notificationId + 2;
             PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
 
-            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_started,
-                    context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
-            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_call_rejected,
-                    context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
+            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(R.drawable.ic_call_filled, context.getString(R.string.answer_call_incoming).toUpperCase(), pendingIntentAnswer).build();
+            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(R.drawable.ic_remove_not, context.getString(R.string.ignore_call_incoming).toUpperCase(), pendingIntentIgnore).build();
+
 
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
@@ -1230,6 +1231,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             log("generateChatNotification:POST Android O");
+            Intent myService = new Intent(context, IncomingMessageService.class);
+            context.stopService(myService);
             newGenerateChatNotification(request);
         }
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -5,6 +5,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -18,6 +19,7 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -35,6 +37,8 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    ChatController cC;
+
     public MultipleForwardChatProcessor(Context context, long[] chatHandles, long[] idMessages, long idChat) {
 
         super();
@@ -51,6 +55,8 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
+
+        cC = new ChatController(context);
     }
 
     int counter = 0;
@@ -62,7 +68,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         Util.log("MultipleForwardChatProcessor", log);
     }
 
-    public void forward(){
+    public void forward(MegaChatRoom chatRoom){
         if(chatHandles.length==1){
             log("Forward to one chat");
             for(int i=0;i<idMessages.length;i++){
@@ -108,6 +114,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         }
                                         MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
                                         if(nodeToAttach!=null){
+                                            nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                             if(chatHandles[0]==idChat){
                                                 megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), this);
                                             }
@@ -262,6 +269,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                             }
                                             MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
                                             if(nodeToAttach!=null){
+                                                nodeToAttach = cC.authorizeNodeIfPreview(nodeToAttach, chatRoom);
                                                 if(chatHandles[k]==idChat){
                                                     megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
                                                 }

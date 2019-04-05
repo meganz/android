@@ -18,10 +18,12 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -77,7 +79,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		catch (UnsupportedEncodingException e) {}
 		url.replace(' ', '+');
 		if(url.startsWith("mega://")){
-			url = url.replace("mega://", "https://mega.co.nz/");
+			url = url.replace("mega://", "https://mega.nz/");
 		}
 
 		if (url.startsWith("https://www.mega.co.nz")){
@@ -87,10 +89,14 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		if (url.startsWith("https://www.mega.nz")){
 			url = url.replace("https://www.mega.nz", "https://mega.nz");
 		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length()-1);
+		}
 		
 		log("url " + url);
 		
-		// Download file link
+		// File link
 		if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
 			log("open link url");
 
@@ -129,6 +135,45 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			startActivity(openFolderIntent);
 			finish();
 
+			return;
+		}
+
+		// Chat link
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/chat/.+$") || url.matches("^https://mega\\.nz/chat/.+$"))) {
+			log("open chat url");
+
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			}
+			if (dbH != null) {
+				if (dbH.getCredentials() != null) {
+					log("Logged IN");
+					Intent openChatLinkIntent = new Intent(this, ManagerActivityLollipop.class);
+					openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+					openChatLinkIntent.setData(Uri.parse(url));
+					startActivity(openChatLinkIntent);
+					finish();
+				}
+				else{
+					log("Not logged");
+					int initResult = megaChatApi.getInitState();
+					if(initResult<MegaChatApi.INIT_WAITING_NEW_SESSION){
+						initResult = megaChatApi.initAnonymous();
+					}
+
+					if(initResult!= MegaChatApi.INIT_ERROR){
+						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						openChatLinkIntent.setData(Uri.parse(url));
+						startActivity(openChatLinkIntent);
+						finish();
+					}
+					else{
+						log("open chat url:initAnonymous:INIT_ERROR");
+						setError(getString(R.string.error_chat_link_init_error));
+					}
+				}
+			}
 			return;
 		}
 

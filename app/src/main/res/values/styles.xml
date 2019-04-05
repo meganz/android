@@ -194,8 +194,8 @@
         <item name="android:textColorPrimary">@color/text_secondary</item>
         <item name="android:background">@color/white</item>
         <item name="colorControlNormal">@color/text_secondary</item>
-        <item name="android:windowMinWidthMajor">90%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
@@ -213,6 +213,10 @@
 
     <style name="ToolbarTitle.Secondary" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="ToolbarSubtitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="CollapsingToolbarContactInfo" parent="ThemeOverlay.AppCompat.Light">
@@ -246,14 +250,6 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-
-    <style name="Theme.Add.Contacts" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/status_bar_login</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_back</item>
-        <item name="homeAsUpIndicator">@drawable/ic_back</item>
-    </style>
-
     <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:background">@color/white</item>
         <item name="android:positiveButtonText">@color/accentColor</item>
@@ -261,8 +257,13 @@
         <item name="android:content">@color/mail_my_account</item>
         <item name="colorControlNormal">@color/mail_my_account</item>
         <item name="android:textColorPrimary">@color/mail_my_account</item>
-        <item name="android:windowMinWidthMajor">90%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
+    </style>
+
+    <style name="AppCompatAlertDialogStyleNormal" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
     <style name="ColorControlStyle" parent="Theme.Megaactionbar">
