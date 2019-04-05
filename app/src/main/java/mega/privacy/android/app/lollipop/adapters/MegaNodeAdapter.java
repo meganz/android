@@ -319,11 +319,16 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-        for (int i = 0;i < selectedItems.size();i++) {
-            items.add(selectedItems.keyAt(i));
+        if (selectedItems !=null) {
+            List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+            for (int i = 0;i < selectedItems.size();i++) {
+                items.add(selectedItems.keyAt(i));
+            }
+            return items;
         }
-        return items;
+        else {
+            return null;
+        }
     }
 
     /*
@@ -355,6 +360,19 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         }
         return nodes;
+    }
+
+    public int getFolderCount() {
+        int folderCount = 0;
+        for (MegaNode node : nodes) {
+            if (node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            }
+        }
+        return folderCount;
     }
 
     /**

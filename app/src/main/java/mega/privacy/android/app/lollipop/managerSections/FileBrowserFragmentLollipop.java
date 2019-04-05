@@ -144,6 +144,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RelativeLayout callInProgressLayout;
 	Chronometer callInProgressChrono;
 
+	//This attribute is to preserve how many folder place holder in folder grid view
+	private int lastPlaceHolderCount;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -555,6 +558,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		log("after onCreate called super");
 	}
 
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setRetainInstance(true);
+	}
+
 	public void checkScroll() {
 		if (recyclerView != null) {
 			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
@@ -565,6 +574,35 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 		}
 	}
+
+	private void reDoTheSelectionAfterRotation() {
+	    log("re select the items which are selected before rotation");
+	    if (adapter != null) {
+            ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
+            int folderCount = adapter.getFolderCount();
+            log("There are" + folderCount + "folders");
+            int currentPlaceHolderCount = adapter.getPlaceholderCount();
+            log("There are" + currentPlaceHolderCount + "folder place holder in current screen");
+            if (selectedItems != null && selectedItems.size() > 0) {
+                activateActionMode();
+                for (int selectedItem : selectedItems) {
+                    if (((ManagerActivityLollipop)context).isList) {
+                        log("Do the list selection. The selectedItem is " + selectedItem);
+                        itemClick(selectedItem, null, null);
+                    }
+                    else {
+                        if (selectedItem < folderCount) {
+                            log("Do the list folder selection. The selectedItem is " + selectedItem);
+                            itemClick((selectedItem), null, null);
+                        } else {
+                            log("Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
+                            itemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount), null, null);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
@@ -776,7 +814,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             return v;
         }
     }
-	
+
+    @Override
+    public void onResume() {
+	    super.onResume();
+	    reDoTheSelectionAfterRotation();
+    }
+
+    @Override
+    public void onStop() {
+	    super.onStop();
+	    this.lastPlaceHolderCount = adapter.getPlaceholderCount();
+    }
+
 	public void setOverviewLayout() {
 		log("setOverviewLayout");
 		//Check transfers in progress
@@ -815,9 +865,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			linearLayoutRecycler.setLayoutParams(params);
 		} else {
 			log("NO TRANSFERS in progress");
+
 			if (transfersOverViewLayout != null) {
 				transfersOverViewLayout.setVisibility(View.GONE);
 			}
+
 			dotsOptionsTransfersLayout.setOnClickListener(null);
 			actionLayout.setOnClickListener(null);
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
@@ -1627,11 +1679,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         }
 
 		if (headerItemDecoration == null) {
+		    log("There is no headerItemDecoration, create a new one");
 			headerItemDecoration = new NewHeaderItemDecoration(context);
-			recyclerView.addItemDecoration(headerItemDecoration);
-		}
+		} else {
+		    log("There is previous existing headerItemDecoration, remove the old one to hard refresh ");
+		    recyclerView.removeItemDecoration(headerItemDecoration);
+        }
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
+        recyclerView.addItemDecoration(headerItemDecoration);
     }
     
     public void setNodes(ArrayList<MegaNode> nodes) {
