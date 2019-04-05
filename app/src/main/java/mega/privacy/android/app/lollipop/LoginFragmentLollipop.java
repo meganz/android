@@ -998,7 +998,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             else{
                 MegaNode rootNode = megaApi.getRootNode();
-                if (rootNode != null && !((LoginActivityLollipop)context).isFetchedNodes){
+                if (rootNode != null && !((LoginActivityLollipop)context).isFetchingNodes){
 
                     log("rootNode != null");
                     Intent intent = new Intent(context, ManagerActivityLollipop.class);
@@ -2189,7 +2189,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
             loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
-            LoginActivityLollipop.isFetchedNodes = true;
+            LoginActivityLollipop.isFetchingNodes = true;
 //            if(confirmLogoutDialog != null) {
 //                confirmLogoutDialog.dismiss();
 //            }
@@ -2384,7 +2384,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("terminate login process when fetch nodes");
                 return;
             }
-            LoginActivityLollipop.isFetchedNodes = false;
+            LoginActivityLollipop.isFetchingNodes = false;
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
@@ -2995,10 +2995,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     public int onBackPressed() {
         log("onBackPressed");
-        if (MegaApplication.isLoggingIn()){
-            if(!LoginActivityLollipop.isFetchedNodes) {
-                showConfirmLogoutDialog();
-            }
+        if (MegaApplication.isLoggingIn() || LoginActivityLollipop.isFetchingNodes) {
+            showConfirmLogoutDialog();
             return 2;
         }
         else{
