@@ -22,7 +22,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -2981,6 +2980,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         loginClicked = false;
                         megaChatApi.logout();
                         megaApi.localLogout();
+                        enableLoginButton();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
