@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="222"
-    android:versionName="3.5.1 (222)" >
+    android:versionCode="227"
+    android:versionName="3.6.0 (227)" >
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
@@ -35,8 +35,8 @@
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
     <uses-permission android:name="android.permission.FLAG_SHOW_WHEN_LOCKED" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
-    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
-    <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
+    <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
+    <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 
     <application
         android:name="mega.privacy.android.app.MegaApplication"
@@ -54,7 +54,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.LoginActivityLollipop"
             android:label="@string/login_text"
-            android:screenOrientation="locked"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden">
         </activity>
 
@@ -149,7 +149,7 @@
             android:name="mega.privacy.android.app.lollipop.ContactFileListActivityLollipop"
             android:label="@string/contact_properties_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
 
         <activity
@@ -157,7 +157,7 @@
             android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
 
         <activity
@@ -186,7 +186,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar">
         </activity>
 
         <activity
@@ -326,7 +326,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.AddContactActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Add.Contacts"
+            android:theme="@style/Theme.Megaactionbar"
             android:windowSoftInputMode="adjustNothing">
         </activity>
 
@@ -340,31 +340,31 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileInfoActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
 
         <activity
@@ -493,7 +493,7 @@
         <!-- Used for Google Play Store Campaign Measurement-->
         <service
             android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-
+		<service android:name=".fcm.IncomingMessageService"/>
         <service
             android:name=".jobservices.CameraUploadsService"
             android:permission="android.permission.BIND_JOB_SERVICE"

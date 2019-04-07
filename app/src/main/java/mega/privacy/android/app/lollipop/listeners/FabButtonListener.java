@@ -7,6 +7,7 @@ import android.view.View;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
@@ -34,7 +35,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             log("Cloud Drive SECTION");
                             if(!Util.isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                                 }
                                 return;
                             }
@@ -45,7 +46,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             log("Add contacts");
                             if(!Util.isOnline(context)){
                                 if(context instanceof ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                                 }
                                 return;
                             }
@@ -64,7 +65,7 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
             case R.id.floating_button_contact_file_list:{
                 if(!Util.isOnline(context)){
                     if(context instanceof ContactFileListActivityLollipop){
-                        ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                        ((ContactFileListActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem));
                     }
                     return;
                 }

@@ -113,7 +113,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false);
+            localRenderer.DrawBitmap(false, true);
         }
     }
 
@@ -127,15 +127,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     @Override
     public void onDestroy(){
         log("onDestroy()");
-        if(localFullScreenSurfaceView.getParent()!=null){
-            if(localFullScreenSurfaceView.getParent().getParent()!=null){
-                log("onDestroy() removeView chatId: "+chatId);
-                ((ViewGroup)localFullScreenSurfaceView.getParent()).removeView(localFullScreenSurfaceView);
-            }
-        }
-        localFullScreenSurfaceView.setVisibility(View.GONE);
-        log("onDestroy() removeChatVideoListener (LOCAL) chatId: "+chatId);
-        megaChatApi.removeChatVideoListener(chatId, -1, this);
+        removeSurfaceView();
         super.onDestroy();
     }
     @Override
@@ -156,8 +148,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
             }
         }
         localFullScreenSurfaceView.setVisibility(View.GONE);
-        log("removeSurfaceView() removeChatVideoListener (LOCAL) chatId: "+chatId);
-        megaChatApi.removeChatVideoListener(chatId, -1, this);
+        megaChatApi.removeChatVideoListener(chatId, -1, -1,this);
     }
 
     private static void log(String log) {

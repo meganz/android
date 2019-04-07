@@ -32,7 +32,7 @@
 					android:background="?attr/colorPrimary"
 					android:minHeight="?attr/actionBarSize"
 					app:popupTheme="@style/Theme.Megaactionbar"
-					app:theme="@style/Theme.Megaactionbar"
+					app:subtitleTextAppearance="@style/ToolbarSubtitle"app:theme="@style/Theme.Megaactionbar"
 					app:titleTextAppearance="@style/ToolbarTitle"
 					tools:context=".ManagerActivityLollipop"/>
 				<android.support.design.widget.TabLayout

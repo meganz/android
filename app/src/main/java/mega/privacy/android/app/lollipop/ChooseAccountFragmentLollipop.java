@@ -338,7 +338,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }
 
 
-        String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.tab_my_account_storage)+" ";
+        String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.label_storage_upgrade_account)+" ";
         try{
             textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'#000000\'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
@@ -354,7 +354,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         storageSectionFree.setText(resultFreeStorage);
 
-        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.transfer_quota);
+        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
         try{
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'#000000\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
@@ -413,7 +413,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
                 monthSectionPro1.setText(resultPro1Month);
 
-                String textToShowPro1Storage = "[A] "+(account.getStorage() / 1024)+" TB [/A] "+getString(R.string.tab_my_account_storage);
+                String textToShowPro1Storage = "[A] "+(account.getStorage() / 1024)+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowPro1Storage = textToShowPro1Storage.replace("[A]", "<font color=\'#000000\'>");
                     textToShowPro1Storage = textToShowPro1Storage.replace("[/A]", "</font>");
@@ -428,7 +428,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 storageSectionPro1.setText(resultPro1Storage);
 
 
-                String textToShowPro1Bandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+                String textToShowPro1Bandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[A]", "<font color=\'#000000\'>");
                     textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[/A]", "</font>");
@@ -476,7 +476,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
                 monthSectionPro2.setText(resultPro2Month);
 
-                String textToShowPro2Storage = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.tab_my_account_storage);
+                String textToShowPro2Storage = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowPro2Storage = textToShowPro2Storage.replace("[A]", "<font color=\'#000000\'>");
                     textToShowPro2Storage = textToShowPro2Storage.replace("[/A]", "</font>");
@@ -491,7 +491,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 storageSectionPro2.setText(resultPro2Storage);
 
 
-                String textToShowPro2Bandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+                String textToShowPro2Bandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[A]", "<font color=\'#000000\'>");
                     textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[/A]", "</font>");
@@ -538,7 +538,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
                 monthSectionPro3.setText(resultPro3Month);
 
-                String textToShowPro3Storage = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.tab_my_account_storage);
+                String textToShowPro3Storage = "[A] "+(sizeTranslation(account.getStorage(), 0))+" TB [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowPro3Storage = textToShowPro3Storage.replace("[A]", "<font color=\'#000000\'>");
                     textToShowPro3Storage = textToShowPro3Storage.replace("[/A]", "</font>");
@@ -553,7 +553,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 storageSectionPro3.setText(resultPro3Storage);
 
 
-                String textToShowPro3Bandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+                String textToShowPro3Bandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[A]", "<font color=\'#000000\'>");
                     textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[/A]", "</font>");
@@ -599,7 +599,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
                 monthSectionProLite.setText(resultLiteMonth);
 
-                String textToShowLiteStorage = "[A] "+account.getStorage()+" GB [/A] "+getString(R.string.tab_my_account_storage);
+                String textToShowLiteStorage = "[A] "+account.getStorage()+" GB [/A] "+getString(R.string.label_storage_upgrade_account);
                 try{
                     textToShowLiteStorage = textToShowLiteStorage.replace("[A]", "<font color=\'#000000\'>");
                     textToShowLiteStorage = textToShowLiteStorage.replace("[/A]", "</font>");
@@ -614,7 +614,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 storageSectionProLite.setText(resultLiteStorage);
 
 
-                String textToShowLiteBandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.transfer_quota);
+                String textToShowLiteBandwidth = "[A] "+(account.getTransfer() / 1024)+" TB [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
                 try{
                     textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[A]", "<font color=\'#000000\'>");
                     textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[/A]", "</font>");
