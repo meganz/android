@@ -9127,7 +9127,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						});
 						break;
 					}
-                    case RUBBISH_BIN:
+					case RUBBISH_BIN:
 		        	case CLOUD_DRIVE:
 		        	case INBOX:{
 
