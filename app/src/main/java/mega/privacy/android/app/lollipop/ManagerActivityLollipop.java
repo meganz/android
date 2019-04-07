@@ -2073,12 +2073,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					resetNavigationViewLayout();
 				}
 				setContactStatus();
-                registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
-                if (registeredPhoneNumber != null) {
-                    navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
-                } else {
-                    navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
-                }
+				showAddPhoneNumberInMenu();
 			}
 
 			@Override
@@ -3078,10 +3073,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		updateAccountDetailsVisibleInfo();
 
 		setContactStatus();
-
-		if (firstTimeAfterInstallation) {
-			askForAccess();
-		}
+        showAddPhoneNumberInMenu();
+        
+        if (firstTimeAfterInstallation) {
+            askForAccess();
+        }
 
 		log("END onCreate");
 	}
@@ -19080,6 +19076,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
         if(maFLol != null){
             maFLol.updateAddPhoneNumberLabel();
+        }
+    }
+    
+    private void showAddPhoneNumberInMenu(){
+	    if(megaApi == null){
+	        return;
+        }
+        registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber();
+        if (registeredPhoneNumber != null) {
+            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        } else {
+            navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
         }
     }
 }
