@@ -178,6 +178,21 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         errorInvalidCountryCode = findViewById(R.id.verify_account_invalid_country_code);
         errorInvalidPhoneNumber = findViewById(R.id.verify_account_invalid_phone_number);
         errorInvalidPhoneNumberIcon = findViewById(R.id.verify_account_invalid_phone_number_icon);
+        
+        //set saved state
+        if(savedInstanceState != null){
+            selectedCountryCode = savedInstanceState.getString(COUNTRY_CODE);
+            selectedCountryName = savedInstanceState.getString(COUNTRY_NAME);
+            selectedDialCode = savedInstanceState.getString(DIAL_CODE);
+    
+            String label = selectedCountryName + " (" + selectedDialCode + ")";
+            selectedCountry.setText(label);
+            errorInvalidCountryCode.setVisibility(View.GONE);
+            titleCountryCode.setVisibility(View.VISIBLE);
+            titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
+            selectedCountry.setTextColor(Color.parseColor("#DE000000"));
+            divider1.setBackgroundColor(Color.parseColor("#8A000000"));
+        }
     }
     
     @Override
@@ -390,4 +405,27 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
     
     }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putCharSequence(COUNTRY_CODE, selectedCountryCode);
+        outState.putCharSequence(COUNTRY_NAME, selectedCountryName);
+        outState.putCharSequence(DIAL_CODE, selectedDialCode);
+        super.onSaveInstanceState(outState);
+    }
+    
+//    private void setContryDetails(){
+//        selectedCountryCode = data.getStringExtra(COUNTRY_CODE);
+//        selectedCountryName = data.getStringExtra(COUNTRY_NAME);
+//        selectedDialCode = data.getStringExtra(DIAL_CODE);
+//
+//        String label = selectedCountryName + " (" + selectedDialCode + ")";
+//        selectedCountry.setText(label);
+//        errorInvalidCountryCode.setVisibility(View.GONE);
+//        titleCountryCode.setVisibility(View.VISIBLE);
+//        titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
+//        selectedCountry.setTextColor(Color.parseColor("#DE000000"));
+//        divider1.setBackgroundColor(Color.parseColor("#8A000000"));
+//    }
+
 }
