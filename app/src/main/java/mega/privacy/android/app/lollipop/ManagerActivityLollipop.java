@@ -15042,7 +15042,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showSMSVerificationDialog() {
 	    log("showSMSVerificationDialog");
-        shouldShowSMSDialog = false;
+//        shouldShowSMSDialog = false;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout,null);
@@ -15073,6 +15073,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
         });
         alertDialogSMSVerification = dialogBuilder.create();
+        alertDialogSMSVerification.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                shouldShowSMSDialog = false;
+            }
+        });
         alertDialogSMSVerification.setCancelable(false);
         alertDialogSMSVerification.setCanceledOnTouchOutside(false);
         alertDialogSMSVerification.show();
