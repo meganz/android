@@ -8,10 +8,9 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="30dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="14dp">
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="14dp">
 
         <ImageView
             android:layout_width="80dp"
@@ -26,7 +25,9 @@
             android:textSize="20sp"
             android:textColor="@color/name_my_account"
             android:layout_gravity="center_horizontal"
+            android:gravity="center"
             android:layout_marginTop="23dp"
+            android:layout_marginLeft="24dp"
             android:layout_marginRight="16dp"/>
 
         <TextView
@@ -37,6 +38,7 @@
             android:textColor="@color/name_my_account"
             android:layout_marginTop="24dp"
             android:layout_marginRight="16dp"
+            android:layout_marginLeft="24dp"
             android:maxLines="1"
             android:ellipsize="end"/>
 
@@ -44,7 +46,8 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:background="@color/accentColor"
-            android:layout_marginRight="16dp"/>
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="24dp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -52,24 +55,8 @@
             android:textSize="14sp"
             android:textColor="@color/mail_my_account"
             android:text="@string/copy_link_explanation"
-            android:layout_marginTop="8dp"/>
-
-        <Button
-            android:id="@+id/copy_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:layout_gravity="right"
-            android:gravity="right|center_vertical"
-            android:layout_marginTop="24dp"
-            android:text="@string/context_copy"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="8dp"
-            android:paddingLeft="8dp"
-            style="@style/ButtonStyle"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="24dp"/>
 
         <Button
             android:id="@+id/share_button"
@@ -78,13 +65,30 @@
             android:background="@android:color/transparent"
             android:layout_gravity="right"
             android:gravity="right|center_vertical"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
             android:text="@string/general_share"
             android:textColor="@color/accentColor"
             android:textSize="14sp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:paddingRight="8dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="8dp"
+            style="@style/ButtonStyle"/>
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:layout_gravity="right"
+            android:gravity="right|center_vertical"
+            android:layout_marginTop="12dp"
+            android:text="@string/context_delete"
+            android:textColor="@color/dark_primary_color"
+            android:textSize="14sp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingRight="10dp"
             android:paddingLeft="8dp"
             style="@style/ButtonStyle"/>
 
@@ -101,7 +105,7 @@
             android:textSize="14sp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:paddingRight="8dp"
+            android:paddingRight="10dp"
             android:paddingLeft="8dp"
             style="@style/ButtonStyle"/>
 

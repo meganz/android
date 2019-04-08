@@ -59,8 +59,8 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -506,7 +506,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         if (chat.isPublic() && chat.getOwnPrivilege() >= MegaChatRoom.PRIV_RO) {
-            megaChatApi.queryChatLink(chatHandle, this);
             chatLinkLayout.setVisibility(View.VISIBLE);
             chatLinkLayout.setOnClickListener(this);
             chatLinkSeparator.setVisibility(View.VISIBLE);
@@ -527,67 +526,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         super.onDestroy();
-    }
-
-    void showShareChatLinkDialog () {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        LayoutInflater inflater = getLayoutInflater();
-        View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
-        builder.setView(v);
-        final android.support.v7.app.AlertDialog shareLinkDialog = builder.create();
-
-        TextView nameGroup = (TextView) v.findViewById(R.id.group_name_text);
-        nameGroup.setText(chat.getTitle());
-        TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
-        chatLinkText.setText(chatLink);
-
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.copy_button: {
-                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
-                            clipboard.setPrimaryClip(clip);
-                            showSnackbar(getString(R.string.chat_link_copied_clipboard));
-                            shareLinkDialog.dismiss();
-                            dismissShareChatLinkDialog(shareLinkDialog);
-                        break;
-                    }
-                    case R.id.share_button: {
-                            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                            sharingIntent.setType("text/plain");
-                            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, chatLink);
-                            startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)));
-                            dismissShareChatLinkDialog(shareLinkDialog);
-                        break;
-                    }
-                    case R.id.dismiss_button: {
-                        dismissShareChatLinkDialog(shareLinkDialog);
-                        break;
-                    }
-                }
-            }
-        };
-
-        Button cancelButton = (Button) v.findViewById(R.id.copy_button);
-        cancelButton.setOnClickListener(clickListener);
-        Button shareButton = (Button) v.findViewById(R.id.share_button);
-        shareButton.setOnClickListener(clickListener);
-        Button dismissButton = (Button) v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(clickListener);
-
-        shareLinkDialog.setCancelable(false);
-        shareLinkDialog.setCanceledOnTouchOutside(false);
-        try {
-            shareLinkDialog.show();
-        }catch (Exception e){}
-    }
-
-    void dismissShareChatLinkDialog(android.support.v7.app.AlertDialog shareLinkDialog) {
-        try {
-            shareLinkDialog.dismiss();
-        } catch (Exception e) {}
     }
 
     public void setParticipants(){
@@ -1082,23 +1020,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             }
             case R.id.chat_group_contact_properties_chat_link_layout:{
-                if (chatLink == null) {
-                    if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR){
-                        if (chat.hasCustomTitle()) {
-                            megaChatApi.createChatLink(chatHandle, groupChatInfoActivity);
-                        }
-                        else {
-                            showRenameGroupDialog(true);
-                        }
-                    }
-                    else {
-//                  Show user error, not able to create a chat link
-                        showSnackbar(getString(R.string.error_creating_chat_link));
-                    }
-                }
-                else {
-                    showShareChatLinkDialog();
-                }
+                megaChatApi.queryChatLink(chatHandle, groupChatInfoActivity);
                 break;
             }
             case R.id.chat_group_contact_properties_private_layout: {
@@ -1129,32 +1051,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         else {
             showSnackbar(getString(R.string.email_verification_text_error));
         }
-    }
-
-
-    public void showConfirmationRemoveChatLink (){
-        log("showConfirmationRemoveChatLink");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        removeChatLink();
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-		builder.setTitle(getResources().getString(R.string.action_delete_link));
-        String message= getResources().getString(R.string.context_remove_chat_link_warning_text);
-        builder.setMessage(message).setPositiveButton(R.string.delete_button, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void removeChatLink(){
@@ -1616,6 +1512,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                    Query chat link
                     if(e.getErrorCode()==MegaChatError.ERROR_OK){
                         chatLink = request.getText();
+                        ChatUtil.showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        return;
                     }
                     else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
                         log("The chatroom isn't grupal or public");
@@ -1629,12 +1527,23 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     else{
                         log("Error TYPE_CHAT_LINK_HANDLE "+e.getErrorCode());
                     }
+                    if (chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR){
+                        if (chat.hasCustomTitle()) {
+                            megaChatApi.createChatLink(chatHandle, groupChatInfoActivity);
+                        }
+                        else {
+                            showRenameGroupDialog(true);
+                        }
+                    }
+                    else {
+                        showSnackbar(getString(R.string.no_chat_link_available));
+                    }
                 }
                 else if(request.getNumRetry()==1){
 //                    Create chat link
                     if(e.getErrorCode()==MegaChatError.ERROR_OK){
                         chatLink = request.getText();
-                        showShareChatLinkDialog();
+                        ChatUtil.showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
                     }
                     else{
                         log("Error TYPE_CHAT_LINK_HANDLE "+e.getErrorCode());
@@ -1647,6 +1556,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     log("Removing chat link");
                     if(e.getErrorCode()==MegaChatError.ERROR_OK){
                         chatLink = null;
+                        showSnackbar(getString(R.string.chat_link_deleted));
                     }
                     else{
                         if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
