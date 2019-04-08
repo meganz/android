@@ -88,7 +88,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         stop();
     }
 
-    private void stop() {
+    protected void stop() {
         stopForeground(true);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if(manager != null) {
@@ -104,17 +104,10 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setSmallIcon(R.drawable.ic_call_started)
                 .setAutoCancel(false);
-//                .setContentText(message)
-//                .setContentTitle(title)
-//                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,"NOTIFICATION_CHANNEL_NAME",importance);
-//            notificationChannel.enableLights(true);
-//            notificationChannel.setLightColor(Color.RED);
-//            notificationChannel.enableVibration(true);
-//            notificationChannel.setVibrationPattern(new long[] {100,200,300,400,500,400,300,200,400});
             mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
             if (mNotificationManager != null) {
                 mNotificationManager.createNotificationChannel(notificationChannel);
@@ -311,7 +304,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     }
 
-    private static void log(String message) {
+    protected static void log(String message) {
         Util.log("IncomingCallService",message);
     }
 }

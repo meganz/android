@@ -1439,90 +1439,110 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
-			//In the beginning of the navigation
-			log("deepBrowserTree==0");
-			((ManagerActivityLollipop)context).parentHandleIncoming = -1;
-			((ManagerActivityLollipop)context).setToolbarTitle();
-			findNodes();
-			visibilityFastScroller();
-//				adapterList.setNodes(nodes);
-			recyclerView.setVisibility(View.VISIBLE);
-			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
-				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
-			}
-			log("Scroll to "+lastVisiblePosition+" position");
+        if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationsLevel == (((ManagerActivityLollipop) context).deepBrowserTreeIncoming)) {
+			((ManagerActivityLollipop) context).comesFromNotifications = false;
+			((ManagerActivityLollipop) context).comesFromNotificationsLevel = 0;
+			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
+            ((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+			((ManagerActivityLollipop) context).setDeepBrowserTreeIncoming(((ManagerActivityLollipop) context).comesFromNotificationDeepBrowserTreeIncoming);
+			((ManagerActivityLollipop) context).comesFromNotificationDeepBrowserTreeIncoming = -1;
+			((ManagerActivityLollipop) context).setParentHandleIncoming(((ManagerActivityLollipop) context).comesFromNotificationHandleSaved);
+			((ManagerActivityLollipop) context).comesFromNotificationHandleSaved = -1;
+			((ManagerActivityLollipop) context).refreshIncomingShares();
 
-			if(lastVisiblePosition>=0){
+			return 4;
+        }
+		else {
+			((ManagerActivityLollipop)context).decreaseDeepBrowserTreeIncoming();
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				if(((ManagerActivityLollipop)context).isList){
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-				else{
-					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-			}
+			if(((ManagerActivityLollipop)context).deepBrowserTreeIncoming==0){
+				//In the beginning of the navigation
 
-			((ManagerActivityLollipop) context).showFabButton();
-
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			return 3;
-		}
-		else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
-			log("deepTree>0");
-
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
-
-			if (parentNode != null){
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-
-				((ManagerActivityLollipop)context).parentHandleIncoming = parentNode.getHandle();
-
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				((ManagerActivityLollipop)context).setToolbarTitle();
-
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-				addSectionTitle(nodes,adapter.getAdapterType() );
-
-				adapter.setNodes(nodes);
+				log("deepBrowserTree==0");
+				((ManagerActivityLollipop) context).parentHandleIncoming = -1;
+				((ManagerActivityLollipop) context).setToolbarTitle();
+				findNodes();
 				visibilityFastScroller();
+				//				adapterList.setNodes(nodes);
+				recyclerView.setVisibility(View.VISIBLE);
 				int lastVisiblePosition = 0;
-				if(!lastPositionStack.empty()){
+				if (!lastPositionStack.empty()) {
 					lastVisiblePosition = lastPositionStack.pop();
-					log("Pop of the stack "+lastVisiblePosition+" position");
+					log("Pop of the stack " + lastVisiblePosition + " position");
 				}
-				log("Scroll to "+lastVisiblePosition+" position");
+				log("Scroll to " + lastVisiblePosition + " position");
 
-				if(lastVisiblePosition>=0){
 
-					if(((ManagerActivityLollipop)context).isList){
+				if (lastVisiblePosition >= 0) {
+
+					if (((ManagerActivityLollipop) context).isList) {
 						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
-					else{
+					else {
 						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
 				}
+
+				((ManagerActivityLollipop) context).showFabButton();
+
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+
+				return 3;
+			}
+			else if (((ManagerActivityLollipop)context).deepBrowserTreeIncoming>0){
+				log("deepTree>0");
+
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming));
+
+				if (parentNode != null){
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+
+					((ManagerActivityLollipop)context).parentHandleIncoming = parentNode.getHandle();
+
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+					((ManagerActivityLollipop)context).setToolbarTitle();
+
+					nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+					addSectionTitle(nodes,adapter.getAdapterType() );
+
+					adapter.setNodes(nodes);
+					visibilityFastScroller();
+					int lastVisiblePosition = 0;
+					if(!lastPositionStack.empty()){
+						lastVisiblePosition = lastPositionStack.pop();
+						log("Pop of the stack "+lastVisiblePosition+" position");
+					}
+					log("Scroll to "+lastVisiblePosition+" position");
+
+					if(lastVisiblePosition>=0){
+
+						if(((ManagerActivityLollipop)context).isList){
+							mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+						}
+						else{
+							gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+						}
+					}
+				}
+
+				((ManagerActivityLollipop) context).showFabButton();
+				return 2;
+			}
+			else{
+				log("ELSE deepTree");
+//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
+				return 0;
 			}
 
-			((ManagerActivityLollipop) context).showFabButton();
-			return 2;
-		}
-		else{
-			log("ELSE deepTree");
-//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
-			recyclerView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
-			return 0;
 		}
 	}
 
