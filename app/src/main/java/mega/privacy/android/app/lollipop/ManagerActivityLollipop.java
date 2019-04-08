@@ -2671,7 +2671,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						if (Util.isChatEnabled()) {
+							log("ACTION_OPEN_CHAT_LINK: "+getIntent().getDataString());
+							megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						}
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -2680,11 +2683,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending = false;
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
-						idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
-						joiningToChatLink = true;
-						if (idJoinToChatLink == -1) {
-							showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+						if (Util.isChatEnabled()) {
+							megaChatApi.checkChatLink(getIntent().getDataString(), this);
+							idJoinToChatLink = getIntent().getLongExtra("idChatToJoin", -1);
+							joiningToChatLink = true;
+							if (idJoinToChatLink == -1) {
+								showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
+							}
 						}
 
 						getIntent().setAction(null);
@@ -5881,12 +5886,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					bottomNavigationCurrentItem = CHAT_BNV;
 				}
 				setBottomNavigationMenuItemChecked(CHAT_BNV);
-				if (visibleContacts.size() == 0 || visibleContacts.isEmpty() || visibleContacts == null){
-					hideFabButton();
-				}
-				else {
-					showFabButton();
-				}
+				showFabButton();
 				break;
 			}
     	}
@@ -7338,6 +7338,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 					if (searchExpand) {
 						openSearchView();
@@ -7348,7 +7349,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else {
 						if (Util.isOnline(this)) {
 							newChatMenuItem.setVisible(true);
-							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 							if (rChatFL != null && rChatFL.getItemCount() > 0) {
 								selectMenuItem.setVisible(true);
 							} else {
@@ -7361,7 +7361,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setStatusMenuItem.setVisible(false);
 						}
 					}
-					searchMenuItem.setVisible(true);
+					ArrayList<MegaChatListItem> chats = megaChatApi.getChatListItems();
+					if (chats != null && !chats.isEmpty()) {
+						searchMenuItem.setVisible(true);
+					}
+					else {
+						searchMenuItem.setVisible(false);
+					}
 
 					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
 					importLinkMenuItem.setVisible(true);
@@ -12086,24 +12092,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void chooseAddContactDialog(boolean isMegaContact){
 		log("chooseAddContactDialog");
-
-		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		if(isMegaContact){
-
 			if(megaApi!=null && megaApi.getRootNode()!=null){
-				ArrayList<MegaUser> contacts = megaApi.getContacts();
-				if(contacts==null){
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-				}
-				else {
-					if(contacts.isEmpty()){
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-					}
-					else{
-						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
-					}
-				}
+				Intent in = new Intent(this, AddContactActivityLollipop.class);
+				in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+				startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 			}
 			else{
 				log("Online but not megaApi");
@@ -12116,24 +12109,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void addContactFromPhone(){
-
 		Intent in = new Intent(this, AddContactActivityLollipop.class);
 		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
-
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//			boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-//			if (!hasReadContactsPermission) {
-//				log("No read contacts permission");
-//				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-//						new String[]{Manifest.permission.READ_CONTACTS},
-//						Constants.REQUEST_READ_CONTACTS);
-//				return;
-//			}
-//		}
-//
-//		Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
-//		this.startActivity(phoneContactIntent);
 	}
 
 	public void showNewContactDialog(){
@@ -14819,10 +14797,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
-
-		switch (newStorageState) {
-			case MegaApiJava.STORAGE_STATE_GREEN:
-				log("STORAGE STATE GREEN");
+        Intent intent = new Intent(this,UploadService.class);
+        switch (newStorageState) {
+            case MegaApiJava.STORAGE_STATE_GREEN:
+                log("STORAGE STATE GREEN");
+                intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+                startService(intent);
 				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					log("ACCOUNT TYPE FREE");
@@ -14835,6 +14815,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			case MegaApiJava.STORAGE_STATE_ORANGE:
 				log("STORAGE STATE ORANGE");
+                intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
+                startService(intent);
 				if (onCreate && isStorageStatusDialogShown) {
 					isStorageStatusDialogShown = false;
 					showStorageAlmostFullDialog();
@@ -15406,7 +15388,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish");
-			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
 			log("remove from chat finish!!!");
@@ -15548,8 +15530,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode()==MegaChatError.ERROR_OK) {
 				showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, getString(R.string.message_joined_successfully), request.getChatHandle());
 			}
-			else {
+			else{
 				log("Error joining to chat: "+ e.getErrorString());
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(request.getChatHandle());
+				if (chatRoom != null && (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR
+						|| chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_STANDARD || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO)) {
+					log("Error joining to chat: I'm already a participant");
+					return;
+				}
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), -1);
 			}
 		}
@@ -15560,7 +15548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean publicLink){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle){
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 
@@ -15577,9 +15565,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 			intent.putExtra("CHAT_ID", chatHandle);
-			if(publicLink){
-				intent.putExtra("PUBLIC_LINK", errorCode);
-			}
 			this.startActivity(intent);
 		}
 		else{
@@ -17549,22 +17534,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else {
 				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-			}
-		}
+                //work around - SDK does not return over quota error for folder upload,
+                //so need to be notified from global listener
+                if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                    log("onTransferTemporaryError: over quota");
+                    Intent intent = new Intent(this,UploadService.class);
+                    intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                    startService(intent);
+                }
+            }
+        }
 	}
 
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
 		log("onTransferData");
-
-//		if(Util.isVideoFile(transfer.getPath())){
-//		log("Is video!!!");
-//		ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-//	}
-//	else{
-//		log("NOT video!");
-//	}
-
 		return true;
 	}
 
@@ -17872,9 +17856,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case CHAT:{
 				if(megaChatApi!=null){
-//					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
-//					}
+					fabButton.setImageDrawable(Util.mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 					lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
 					fabButton.setVisibility(View.VISIBLE);
 				}
