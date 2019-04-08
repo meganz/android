@@ -113,7 +113,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false);
+            localRenderer.DrawBitmap(false, true);
         }
     }
 
