@@ -198,6 +198,9 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     @Override
     public void onBackPressed() {
         log("onBackPressed");
+        if(isUserLocked){
+            return;
+        }
         finish();
     }
     
