@@ -101,7 +101,7 @@ public class ChatUtil {
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
         if (context instanceof GroupChatInfoActivityLollipop) {
             inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
@@ -124,6 +124,20 @@ public class ChatUtil {
             @Override
             public void onClick(View v) {
                 switch (v.getId()) {
+                    case R.id.copy_button: {
+                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
+                        clipboard.setPrimaryClip(clip);
+                        if (context instanceof GroupChatInfoActivityLollipop) {
+                            ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
+                        }
+                        else if (context instanceof ChatActivityLollipop) {
+                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
+
+                        }
+                        dismissShareChatLinkDialog(context, shareLinkDialog);
+                        break;
+                    }
                     case R.id.share_button: {
                         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
@@ -147,6 +161,8 @@ public class ChatUtil {
             }
         };
 
+        Button copyButton = (Button) v.findViewById(R.id.copy_button);
+        copyButton.setOnClickListener(clickListener);
         Button shareButton = (Button) v.findViewById(R.id.share_button);
         shareButton.setOnClickListener(clickListener);
         Button deleteButton = (Button) v.findViewById(R.id.delete_button);
