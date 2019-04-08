@@ -185,13 +185,15 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             selectedCountryName = savedInstanceState.getString(COUNTRY_NAME);
             selectedDialCode = savedInstanceState.getString(DIAL_CODE);
     
-            String label = selectedCountryName + " (" + selectedDialCode + ")";
-            selectedCountry.setText(label);
-            errorInvalidCountryCode.setVisibility(View.GONE);
-            titleCountryCode.setVisibility(View.VISIBLE);
-            titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
-            selectedCountry.setTextColor(Color.parseColor("#DE000000"));
-            divider1.setBackgroundColor(Color.parseColor("#8A000000"));
+            if(selectedCountryCode != null && selectedCountryName != null && selectedDialCode != null){
+                String label = selectedCountryName + " (" + selectedDialCode + ")";
+                selectedCountry.setText(label);
+                errorInvalidCountryCode.setVisibility(View.GONE);
+                titleCountryCode.setVisibility(View.VISIBLE);
+                titleCountryCode.setTextColor(Color.parseColor("#FF00BFA5"));
+                selectedCountry.setTextColor(Color.parseColor("#DE000000"));
+                divider1.setBackgroundColor(Color.parseColor("#8A000000"));
+            }
         }
     }
     
