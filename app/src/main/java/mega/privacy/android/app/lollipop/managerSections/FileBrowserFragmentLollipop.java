@@ -1511,49 +1511,60 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(adapter.getParentHandle());
             
             log("parentHandle is: " + ((ManagerActivityLollipop)context).parentHandleBrowser);
-            MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser));
-            if (parentNode != null) {
-                recyclerView.setVisibility(View.VISIBLE);
-                emptyImageView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.GONE);
-                
-                ((ManagerActivityLollipop)context).parentHandleBrowser = parentNode.getHandle();
-                ((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-                
-                ((ManagerActivityLollipop)context).setToolbarTitle();
-                
-                nodes = megaApi.getChildren(parentNode,((ManagerActivityLollipop)context).orderCloud);
-                addSectionTitle(nodes,adapter.getAdapterType());
-                adapter.setNodes(nodes);
-                
-                visibilityFastScroller();
-                
-                setOverviewLayout();
 
-                int lastVisiblePosition = 0;
-                if (!lastPositionStack.empty()) {
-                    lastVisiblePosition = lastPositionStack.pop();
-                    log("Pop of the stack " + lastVisiblePosition + " position");
-                }
-                log("Scroll to " + lastVisiblePosition + " position");
+			if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleBrowser)) {
+				((ManagerActivityLollipop) context).comesFromNotifications = false;
+				((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
+				((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+				((ManagerActivityLollipop)context).parentHandleBrowser = ((ManagerActivityLollipop)context).comesFromNotificationHandleSaved;
+				((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 
-                if (lastVisiblePosition >= 0) {
+				return 2;
+			}
+			else {
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser));
+				if (parentNode != null) {
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
 
-                    if (((ManagerActivityLollipop)context).isList) {
-                        mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition,0);
-                    } else {
-                        gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition,0);
-                    }
-                }
-                log("return 2");
-                return 2;
-            } else {
-                log("ParentNode is NULL");
-                return 0;
-            }
-            
+					((ManagerActivityLollipop)context).parentHandleBrowser = parentNode.getHandle();
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+					((ManagerActivityLollipop)context).setToolbarTitle();
+
+					nodes = megaApi.getChildren(parentNode,((ManagerActivityLollipop)context).orderCloud);
+					addSectionTitle(nodes,adapter.getAdapterType());
+					adapter.setNodes(nodes);
+
+					visibilityFastScroller();
+
+					setOverviewLayout();
+
+					int lastVisiblePosition = 0;
+					if (!lastPositionStack.empty()) {
+						lastVisiblePosition = lastPositionStack.pop();
+						log("Pop of the stack " + lastVisiblePosition + " position");
+					}
+					log("Scroll to " + lastVisiblePosition + " position");
+
+					if (lastVisiblePosition >= 0) {
+
+						if (((ManagerActivityLollipop)context).isList) {
+							mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition,0);
+						} else {
+							gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition,0);
+						}
+					}
+					log("return 2");
+					return 2;
+				} else {
+					log("ParentNode is NULL");
+					return 0;
+				}
+			}
         }
-        
+
         return 0;
     }
 
