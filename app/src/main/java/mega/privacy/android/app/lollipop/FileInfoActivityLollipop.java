@@ -1518,8 +1518,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			sharedLayout.setVisibility(View.GONE);
 			dividerSharedLayout.setVisibility(View.GONE);
 			sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
-
-			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
+			sizeTextView.setText(Util.getSizeString(node.getSize()));
 
 			contentLayout.setVisibility(View.GONE);
 
@@ -3227,7 +3226,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		}
 		else{
 
-			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
+			sizeTextView.setText(Util.getSizeString(node.getSize()));
 		}
 
 		if (node.getCreationTime() != 0){
