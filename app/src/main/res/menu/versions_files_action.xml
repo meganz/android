@@ -19,6 +19,13 @@
 	    android:title="@string/general_save_to_device"
 		android:icon="@drawable/ic_download_white"
 		MEGA:showAsAction="always" />
+
+	<item
+		android:id="@+id/action_revert_version"
+		android:orderInCategory="120"
+		android:title="@string/general_revert"
+		android:icon="@drawable/ic_restore_black_24dp"
+		MEGA:showAsAction="always" />
 	
 	<item
 	    android:id="@+id/action_delete_versions"

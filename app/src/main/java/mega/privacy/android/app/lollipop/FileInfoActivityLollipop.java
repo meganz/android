@@ -2612,8 +2612,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     }
                     else {
                         showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.version_history_deleted_erroneously)
-                                + getResources().getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved)
-                                + getResources().getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove), -1);
+                                + getResources().getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved, versionsRemoved)
+                                + getResources().getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove, errorVersionRemove), -1);
                     }
                     versionsToRemove = 0;
                     versionsRemoved = 0;
