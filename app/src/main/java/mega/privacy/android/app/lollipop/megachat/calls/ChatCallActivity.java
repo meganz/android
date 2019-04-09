@@ -1671,7 +1671,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_INITIAL) {
                             log("CHANGE_TYPE_SESSION_STATUS:INITIAL");
 
-
                         }else if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                             log("CHANGE_TYPE_SESSION_STATUS:IN_PROGRESS");
 
@@ -3341,28 +3340,35 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     private void updateSubtitleNumberOfVideos() {
         log("updateSubtitleNumberOfVideos");
-        if((megaChatApi!=null)&&(callChat==null)){
-            callChat = megaChatApi.getChatCall(chatId);
-        }
-        if(callChat!=null){
-
-            int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
-            log("updateSubtitleNumberOfVideos: usersWithVideo = "+usersWithVideo);
-
-            if(usersWithVideo > 0){
-                if((totalVideosAllowed == 0)&&(megaChatApi != null)){
-                    totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
+        if (chat != null) {
+            if (chat.isGroup()) {
+                if((megaChatApi!=null)&&(callChat==null)){
+                    callChat = megaChatApi.getChatCall(chatId);
                 }
-                if(totalVideosAllowed != 0){
-                    participantText.setText(usersWithVideo + "/" + totalVideosAllowed);
-                    linearParticipants.setVisibility(View.VISIBLE);
-                }else{
-                    linearParticipants.setVisibility(View.GONE);
+                if(callChat!=null){
+
+                    int usersWithVideo = callChat.getNumParticipants(MegaChatCall.VIDEO);
+                    log("updateSubtitleNumberOfVideos: usersWithVideo = "+usersWithVideo);
+
+                    if(usersWithVideo > 0){
+                        if((totalVideosAllowed == 0)&&(megaChatApi != null)){
+                            totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
+                        }
+                        if(totalVideosAllowed != 0){
+                            participantText.setText(usersWithVideo + "/" + totalVideosAllowed);
+                            linearParticipants.setVisibility(View.VISIBLE);
+                        }else{
+                            linearParticipants.setVisibility(View.GONE);
+                        }
+                    }else{
+                        linearParticipants.setVisibility(View.GONE);
+                    }
                 }
             }else{
-                linearParticipants.setVisibility(View.GONE);
+                linearParticipants.setVisibility(GONE);
             }
         }
+
     }
 
     public void updatePeers() {
