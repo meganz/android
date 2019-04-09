@@ -136,46 +136,36 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 				createDefaultAvatar(holder);
 			}
 		}
-
-//		holder.name=false;
-//		holder.firstName=false;
-//		megaApi.getUserAttribute(contact, 1, listener);
-//		megaApi.getUserAttribute(contact, 2, listener);
+        
+        int status = contact.getStatus();
+        String timeStamp = String.valueOf(DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000));
+        switch (status) {
+            case MegaContactRequest.STATUS_ACCEPTED: {
+                holder.textViewContent.setText(context.getString(R.string.contact_request_status_accepted,timeStamp));
+                break;
+            }
+            case MegaContactRequest.STATUS_DELETED: {
+                holder.textViewContent.setText(context.getString(R.string.contact_request_status_deleted,timeStamp));
+                break;
+            }
+            case MegaContactRequest.STATUS_DENIED: {
+                holder.textViewContent.setText(context.getString(R.string.contact_request_status_denied,timeStamp));
+                break;
+            }
+            case MegaContactRequest.STATUS_IGNORED: {
+                holder.textViewContent.setText(context.getString(R.string.contact_request_status_ignored,timeStamp));
+                break;
+            }
+            case MegaContactRequest.STATUS_REMINDED: {
+                holder.textViewContent.setText(context.getString(R.string.contact_request_status_reminded,timeStamp));
+                break;
+            }
+            case MegaContactRequest.STATUS_UNRESOLVED: {
+                holder.textViewContent.setText(context.getString(R.string.contact_request_status_pending,timeStamp));
+                break;
+            }
+        }
 		
-		int status = contact.getStatus();
-		switch(status)
-		{
-			case MegaContactRequest.STATUS_ACCEPTED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (ACCEPTED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_DELETED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (DELETED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_DENIED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (DENIED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_IGNORED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (IGNORED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_REMINDED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (REMINDED)");
-				break;
-			}
-			case MegaContactRequest.STATUS_UNRESOLVED:
-			{
-				holder.textViewContent.setText(""+DateUtils.getRelativeTimeSpanString(contact.getCreationTime() * 1000)+" (PENDING)");
-				break;
-			}
-		}		
 		holder.itemLayout.setOnLongClickListener(this);
 		holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);
