@@ -4,30 +4,43 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/call_in_progress_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="48dp"
     android:visibility="gone"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:gravity="center_vertical|center_horizontal"
     android:background="@color/accentColor">
-
-    <TextView
-        android:id="@+id/call_in_progress_text"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:text="@string/call_in_progress_layout"
-        android:layout_marginRight="8dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/call_in_progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textAlignment="gravity"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:singleLine="false"
+            android:textSize="14sp"
+            android:text="@string/call_in_progress_layout"/>
 
-    <Chronometer
-        android:id="@+id/call_in_progress_chrono"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:textColor="@color/white"
-        android:textSize="13sp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_toRightOf="@id/call_in_progress_text"/>
+        <Chronometer
+            android:id="@+id/call_in_progress_chrono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:textColor="@color/white"
+            android:layout_marginLeft="5dp"
+            android:textSize="13sp"/>
+
+    </LinearLayout>
+
 
 </RelativeLayout>
