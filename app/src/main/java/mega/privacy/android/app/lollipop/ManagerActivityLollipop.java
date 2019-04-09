@@ -18116,9 +18116,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 		if (item != null){
 			log("onChatListItemUpdate:" + item.getTitle());
+			if (item.isPreview()) {
+				return;
+			}
 		}
 		else{
 			log("onChatListItemUpdate");
+			return;
 		}
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
