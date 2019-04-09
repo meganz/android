@@ -1155,47 +1155,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("setChatSubtitle:isPreview");
             setPreviewGroupalSubtitle();
             tB.setOnClickListener(this);
-
             setBottomLayout(SHOW_JOIN_LAYOUT);
-        }
-        else if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED||megaChatApi.getChatConnectionState(idChat)!=MegaChatApi.CHAT_CONNECTION_ONLINE){
-            log("Chat not connected ConnectionState: "+megaChatApi.getConnectionState()+" ChatConnectionState: "+megaChatApi.getChatConnectionState(idChat));
 
+        }else if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED||megaChatApi.getChatConnectionState(idChat)!=MegaChatApi.CHAT_CONNECTION_ONLINE){
+            log("Chat not connected ConnectionState: "+megaChatApi.getConnectionState()+" ChatConnectionState: "+megaChatApi.getChatConnectionState(idChat));
+            tB.setOnClickListener(this);
             if(chatRoom.isPreview()){
                 log("Chat not connected:setChatSubtitle:isPreview");
                 setPreviewGroupalSubtitle();
-                tB.setOnClickListener(this);
-
                 setBottomLayout(SHOW_NOTHING_LAYOUT);
-                return;
-            }
-            if (chatRoom.isGroup()) {
-                groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
-            }
-            else {
-                individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+            }else{
+                log("Chat not connected:setChatSubtitle:isNOTPreview");
+                if (chatRoom.isGroup()) {
+                    groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                }else{
+                    individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                }
+
+                int permission = chatRoom.getOwnPrivilege();
+                log("Check permissions");
+                if ((permission == MegaChatRoom.PRIV_RO)|| (permission == MegaChatRoom.PRIV_RM)){
+                    setBottomLayout(SHOW_NOTHING_LAYOUT);
+                }else{
+                    setBottomLayout(SHOW_WRITING_LAYOUT);
+                }
             }
 
-            tB.setOnClickListener(null);
-
-        }
-        else{
+        }else{
             log("karere connection state: "+megaChatApi.getConnectionState());
             log("chat connection state: "+megaChatApi.getChatConnectionState(idChat));
 
             int permission = chatRoom.getOwnPrivilege();
-
             if (chatRoom.isGroup()) {
                 tB.setOnClickListener(this);
                 if(chatRoom.isPreview()){
                     log("setChatSubtitle:isPreview");
                     setPreviewGroupalSubtitle();
-                    tB.setOnClickListener(this);
-
                     if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
                         setBottomLayout(SHOW_NOTHING_LAYOUT);
-                    }
-                    else {
+                    }else {
                         setBottomLayout(SHOW_JOIN_LAYOUT);
                     }
 
@@ -1214,8 +1212,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         else {
                             groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
                         }
-                    }
-                    else if (permission == MegaChatRoom.PRIV_RM) {
+                    }else if (permission == MegaChatRoom.PRIV_RM) {
                         log("Permission RM");
                         setBottomLayout(SHOW_NOTHING_LAYOUT);
 
@@ -1233,6 +1230,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     else{
                         log("permission: "+permission);
+
                         setBottomLayout(SHOW_WRITING_LAYOUT);
 
                         if(chatRoom.isArchived()){
@@ -1273,7 +1271,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         tB.setOnClickListener(null);
                     }
-
                     setBottomLayout(SHOW_NOTHING_LAYOUT);
 
                     if(chatRoom.isArchived()){
@@ -1314,8 +1311,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void setBottomLayout(int show) {
-        log("setBottomLayout");
-
         if (show == SHOW_JOIN_LAYOUT) {
             writingContainerLayout.setVisibility(View.GONE);
             joinChatLinkLayout.setVisibility(View.VISIBLE);
