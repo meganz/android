@@ -285,30 +285,34 @@
             <RelativeLayout
                 android:id="@+id/mutate_own_call"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
+                android:minHeight="36dp"
                 android:layout_below="@id/call_toolbar"
-                android:gravity="center_horizontal"
                 android:background="@drawable/gradient_shape_callschat"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:gravity="center_vertical|center_horizontal"
                 android:visibility="gone">
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_centerInParent="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true">
+                    android:orientation="horizontal">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_mutate_layout"
                         android:layout_marginRight="8dp"
+                        android:gravity="center"
                         android:background="@null" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:textColor="@color/white"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="@string/muted_own_micro"
+                        android:gravity="center"
+                        android:textAlignment="gravity"
                         android:textSize="14sp"
                         android:textStyle="normal"
                         android:fontFamily="roboto"/>
@@ -319,30 +323,40 @@
             <RelativeLayout
                 android:id="@+id/mutate_contact_call"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
+                android:minHeight="36dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:layout_below="@id/call_toolbar"
-                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:gravity="center_vertical|center_horizontal"
                 android:background="@drawable/gradient_shape_callschat"
-                android:visibility="gone">
+                android:visibility="visible">
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_centerInParent="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true">
+                    android:gravity="center_horizontal">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_mutate_layout"
+                        android:gravity="center"
                         android:layout_marginRight="8dp"
                         android:background="@null" />
                     <TextView
                         android:id="@+id/text_mutate_contact_call"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@null"
+                        android:maxWidth="250dp"
                         android:textColor="@color/white"
+                        android:gravity="left"
+                        android:maxLines="3"
+                        android:ellipsize="end"
+                        android:singleLine="false"
+                        android:textAlignment="center"
                         android:textSize="14sp"
                         android:textStyle="normal"
                         android:fontFamily="roboto"/>
