@@ -8,7 +8,7 @@
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">/</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Evet</string>
-    <string name="general_no" context="Answer for confirmation dialog.">Hayır</string>
+    <string name="general_no" context="Answer for confirmation dialog.">hayır</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">İptal</string>
     <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Şuraya taşı</string>
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Şuraya kopyala</string>
@@ -45,7 +45,7 @@
     <string name="general_importing" context="state while importing the file">İçeri aktarılıyor</string>
     <string name="general_forwarding" context="state while importing the file">Yönlendiriliyor</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Aktar</string>
-    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Saklama alanı</string>
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Depolama</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Aktarım Kotası</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Abone ol</string>
     <!--
@@ -641,7 +641,7 @@
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Kamera yüklemeleri tamamlandı</string>
 
-    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Saklama alanı</string>
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Depolama</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Kilidi</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Gelişmiş</string>
@@ -791,8 +791,8 @@
     <string name="sortby_size_largest_first" context="sort files by size largest first">en büyük</string>
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">en ufak</string>
 
-    <string name="per_month" context="in payments, for example: 4.99€ per month">aylık</string>
-    <string name="per_year" context="in payments, for example: 49.99€ per year">yıllık</string>
+    <string name="per_month" context="in payments, for example: 4.99€ per month">Aylık</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">Yıllık</string>
 
     <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Fatura bilgilerinizi girin:</string>
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Adres 1</string>
@@ -1261,7 +1261,10 @@
 	<string name="label_more" context="button label more">Daha fazla</string>
 	<string name="label_close" context="button label Close">Kapat</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">Genel</string>
-    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Saklama alanı</string>
+    <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Depolama</string>
+	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">Depolama</string>
+	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">Aktarma kotası</string>
+	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">Aktarma kotası</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">Tarife</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">Depolama alanı</string>
@@ -1820,7 +1823,7 @@
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Kurtarma Anahtarı Çevrimdışı bölümüne MEGARecoveryKey.txt olarak dışa aktarıldı.\nNot: Oturumu kapatırsanız, lütfen güvenli bir yerde saklayın.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Çıkış yapmak üzeresiniz, lütfen hatırladığınızdan emin olmak için parolanızı test edin.\nParolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Panoya kopyala</string>
-    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Kurtarma Anahtarını Dışarı Aktar</string>
+    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Kurtarma Anahtarını Dışa Aktar</string>
     <string name="option_logout_anyway" context="Option that permits user logout">Yine de çıkış yap</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Kurtarma Anahtarı</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Dosya Sistemine Kaydet</string>
@@ -2114,9 +2117,46 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Çöp Kovası Temizleme Planlayıcısını devre dışı bırakmak veya daha uzun bir saklama süresi ayarlamak için bir PRO planına abone olmanız gerekir.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">gün</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Sohbet Bağlantısı Al</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Sohbet Bağlantısını Yönet</string>
 
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Şifrelenmiş Anahtar Döngüsü\'nü etkinleştir</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Anahtar döngüsü biraz daha güvenli, fakat sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar eski mesajları göremez.</string>
+
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] bir Sohbet Bağlantısı oluşturdu.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] Sohbet Bağlantısını sildi.[/B]</string>
+
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Sohbet Bağlantısını Sil</string>
+
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Sohbet Bağlantısı</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Bu eylem diğer aktif oturumlardan çıkış yapacaktır.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Tüm diğer oturumları kapatmak istiyor musunuz?</string>
+
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">%d katılımcı</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">Katıl</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">Gözlemciler</string>
+
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Sohbet Bağlantısı yüklenirken hata oluştu.</string>
+
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Sohbet Bağlantısını yüklerken sohbeti başlatma hatası.</string>
+
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Daha önce üye olduğunuz bir sohbeti önizlemeye çalışıyorsunuz. Sohbete tekrar katılmak ister misiniz?</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Bu sohbete zaten katıldınız.</string>
+
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Bu sohbet önizlemesi artık mevcut değil. Önizlemeyi terk ederseniz, tekrar açamayacaksınız.</string>
+
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] şifreli anahtar döndürmeyi etkinleştirdi.[/B]</string>
+
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Bu konuşma artık mevcut değil</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Geçersiz Sohbet Bağlantısı</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Şifrelenmiş Anahtar Döngüsü</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Anahtar döngüsü biraz daha güvenli, fakat sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar eski mesajları göremez.</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Anahtar döngüsü biraz daha güvenli, fakat sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar eski mesajları göremez.</string>
+    <string name="action_open_chat_link" context="Menu item">Sohbet Bağlantısını Aç</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">%s kişisine daha önceden davetiye gönderilmiş ve Gönderilen İstekler sekmesinden görüntülenebilir.</string>
 
@@ -2227,6 +2267,10 @@
         <item context="Plural of participant. 2 participants" quantity="other">%d katılımcı</item>
     </plurals>
 
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Bu sohbet için bir bağlantı oluşturmadan önce, açıklayıcı bir konu belirlemeniz gerekir:</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Sohbet Bağlantısı panoya kopyalandı</string>
+
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Aylık[/A] %s [A]\'dan başlayan fiyatlarla[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Tekrarlanan abonelik yenilenme tarihinden önce iptal edilebilir</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Çağrı Başladı</string>
@@ -2236,6 +2280,16 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B][/B][A]Bildirim[/A] [B]yok.[/B]</string>
 
+    <string name="general_setup_mega" context="Permissions screen title">MEGA\'yı kur</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA\'nın fotoğraflarınıza, medyanıza ve dosyalarınıza erişmesi gerekir; böylece onları arkadaşlarınızla paylaşabilirsiniz, şifreli mesajlar gönderip güvenli aramalar yapabilirsiniz.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Fotoğraflara, medyaya ve dosyalara erişime izin verin.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Fotoğrafları, medyaları ve dosyaları paylaşmak için MEGA\'nın izninize ihtiyacı var.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Kamerayı etkinleştir</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Belgeleri taramak, fotoğraf çekmek ve video görüşmeleri yapmak için kameranıza erişim izni verir.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Çağrıları etkinleştir</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Şifreli arama yapmak için mikrofonunuza erişim izni verin.</string>
+    <string name="general_enable_access" context="General enable access">Erişimi etkinleştir</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Paylaşılan Dosyalar</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Eklenti zaten gönderildi</string>
@@ -2263,8 +2317,8 @@
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B][/B][A]Paylaşılan Dosya[/A][B]yoktur.[/B]</string>
 
-    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
-    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s aramaya katıldı</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s aramadan ayrıldı</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Bu arama azami katılımcı sayısına eriştiği için katılmanıza izin verilmiyor.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Bu arama azami görüntülü katılımcı sayısına eriştiği için görüntünüzü açmanıza izin verilmiyor.</string>
@@ -2282,6 +2336,56 @@
         <item context="version items" quantity="other">Mesajlar yönlendirildi</item>
     </plurals>
 
+    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d dosya %d sohbete gönderilmedi</item>
+        <item context="Plural of file. 2 files" quantity="other">%d dosya %d sohbete gönderilmedi</item>
+    </plurals>
+
+    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d kişi %d sohbete gönderilmedi</item>
+        <item context="Plural of file. 2 files" quantity="other">%d kişi %d sohbete gönderilmedi</item>
+    </plurals>
+
+    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d ileti %d sohbete gönderilmedi</item>
+        <item context="Plural of file. 2 files" quantity="other">%d ileti %d sohbete gönderilmedi</item>
+    </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">İçerik %d sohbete gönderilmedi</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">Yeni grup sohbeti başarıyla oluşturuldu</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">Dosyalar hazırlanıyor</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">Mesaj olarak gönderildi.</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Hata. Dosya seçilen sohbetlerden hiçbirine gönderilmedi</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[B]Öğe[/B] [A]Yok[/A]</string>
+
+    <string name="delete_versions" context="Action delete all file versions">Eski sürümleri sil</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Eski sürümler silinsin mi?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Lütfen mevcut dosyanın silinmeyeceğini unutmayın.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Eski sürümler silindi.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Eski sürümler silinmedi.</string>
+
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d sürümü başarıyla silindi</item>
+        <item context="version items" quantity="other">%d sürümleri başarıyla silindi</item>
+    </plurals>
+
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">%d sürümü silinmedi</item>
+        <item context="version items" quantity="other">%d sürümleri silinmedi</item>
+    </plurals>
+
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">MEGA kişiniz yok. Lütfen Kişiler bölümünden arkadaşlarınızı davet edin.</string>
+
+    <string name="title_tour_one" context="Title of first tour screen">Anahtarlar sizdedir</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">Var olmamızın sebebi güvenliktir, dosyalarınız sadece sizin erişebileceğiniz güzelce yağlanmış bir şifreleme makinesinin arkasında bizle güvendedir.</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">Şifreli konuşma</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Bulut sürücünüzle ilişkilendirilmiş tümüyle şifrelenmiş sesli ve görüntülü aramalar, grup mesajlaşmaları ve dosya paylaşımı.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">Ağınızı Oluşturun</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">MEGA\'dan ayrılmadan kişiler ekleyin, ağ oluşturun, işbirliği yapın, sesli ve görüntülü aramalar yapın.</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">Buluttaki Fotoğraflarınız</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">MEGA Kamera Yüklemelerinin her mobil cihaz için vazgeçilmez olduğunu unutmadı. Hesabınızı şimdi oluşturun.</string>
+
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Parolanızı girin</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s parola korumalı bir PDF dokümanıdır. Lütfen PDF\'i açmak için parolayı giriniz.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Yanlış parola girdiniz, lütfen tekrar deneyin.</string>
@@ -2289,10 +2393,33 @@
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">Herhangi bir arama sürmekte iken medya dosyaları oynatılamaz.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Devam eden Çağrı</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s grup araması başlattı. Katılmak için dokunun.</string>
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">%s aramasına geri dönmek için dokunun</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Aramaya geri dönmek için dokunun</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Cevapla</string>
-    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Yok sayıldı</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s grup araması başlattı. Katılmak için dokunun.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">Aramaya geri dönmek için dokunun</string>
 
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] grup sohbetine katıldı.[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Bu sohbete artık silmek üzere olduğunuz Sohbet Bağlantısı yoluyla erişilemez.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Şifreli Anahtar Döndürme, yeni grup sohbeti oluşturmadan Sohbet Bağlantısı almanıza izin vermez.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Yeni bir grup sohbeti oluşturmak ve Sohbet Bağlantısı almak ister misiniz?</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Anahtar döngüsü biraz daha güvenli, fakat sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar eski mesajları göremez.</string>
+
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">Sohbete başarıyla katıldınız.</string>
+
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d / %2$d</string>
+
+    <string name="hint_action_search" context="Hint of the Search view">Ara&#8230;</string>
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">Cevapla</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Yoksay</string>
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Sesli arama başlatılıyor&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Video görüşmesi başlatılıyor&#8230;</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s bu aramayı susturdu</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Sessiz</string>
+
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Çağrıya katıl</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Bu aramaya katılmak için mevcut aramanızı sonlandırmanız gerekir.</string>
+
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
 </resources>

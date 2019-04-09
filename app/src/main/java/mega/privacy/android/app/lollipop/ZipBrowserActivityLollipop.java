@@ -60,7 +60,7 @@ import nz.mega.sdk.MegaApiJava;
 
 
 
-public class ZipBrowserActivityLollipop extends PinActivityLollipop implements OnItemClickListener, OnItemLongClickListener{
+public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 	public static ImageView imageDrag;
 	int[] screenPosition;
 
@@ -105,7 +105,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		String pathZipTask;
 		int position;
 		
-		UnZipTask(Context _context, String _pathZipTask, int _position){
+		UnZipTask(String _pathZipTask, int _position){
 			this.pathZipTask = _pathZipTask;
 			this.position = _position;
 		}
@@ -125,19 +125,15 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			if (temp.isShowing()){
 				try{
 					temp.dismiss();
-										
 					openFile(position);
 				}
-				catch(Exception e)
-				{
+				catch(Exception e) {
 					e.printStackTrace();					
 				}				
 			}			
 		}
 		
-		private boolean unpackZip()
-		{			
-			
+		private boolean unpackZip() {
 			//TODO:Comprobar el flag, de ahora en adelante si está unzip tener en cuenta que estará en la carpeta correspondiente
 			
 			String destination;		
@@ -156,8 +152,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				f.mkdirs();				
 			}								
 				
-			try 
-			{
+			try {
 				FileInputStream fin = new FileInputStream(pathZipTask);
 				ZipInputStream zin = new ZipInputStream(new BufferedInputStream(fin));
 				ZipEntry ze = null; 
@@ -177,10 +172,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 					}
 				}
 				zin.close();
-
 			} 
-			catch(IOException e)
-			{
+			catch(IOException e) {
 				e.printStackTrace();
 				return false;
 			}			
@@ -321,116 +314,75 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			
 		String[] parts = pathZip.split("/");
 		if(parts.length>0){
-
 			currentFolder= parts[parts.length-1];
-			parts = currentFolder.split("\\.");
-			
 			currentFolder= currentFolder.replace(".zip", "");
 			
-		}else{
+		}
+		else{
 			currentFolder= pathZip;
 		}
 		
 		folderzipped = false;
-		
+
+		aB.setTitle("ZIP "+currentFolder);
+
 		try {
-			myZipFile = new ZipFile(pathZip);			
-	
+			myZipFile = new ZipFile(pathZip);
+
 			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
 			while (zipEntries.hasMoreElements()) {
-				
-				ZipEntry element = zipEntries.nextElement();				
-				
-				if(element.getName().startsWith(currentFolder+"/")){
-					folderzipped=true;					
-				}
-				else{
-					folderzipped=false;	
-					
-				}				
-			}
-	
-		} catch (IOException e) {
+				try {
+					ZipEntry element = zipEntries.nextElement();
+					if (element.getName().startsWith(currentFolder+"/")) {
+						folderzipped = true;
+					}
+					else {
+						folderzipped = false;
+					}
 
-			e.printStackTrace();
-		} 	
-		
-		if(folderzipped){	
-			aB.setTitle("ZIP "+currentFolder);
-			
-			try {
-				myZipFile = new ZipFile(pathZip);			
-		
-				Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-				while (zipEntries.hasMoreElements()) {
-					
-					ZipEntry element = zipEntries.nextElement();	
-		
+					String[] pE = element.getName().split("/");
+
 					if(element.isDirectory()){
-
-						if(!element.getName().equals(currentFolder+"/")){
-
-							String[] pE = element.getName().split("/");
-							if(pE.length<depth){
+						if (folderzipped) {
+							if(!element.getName().equals(currentFolder+"/")){
+								if(pE.length<depth){
+									zipNodes.add(element);
+								}
+							}
+						}
+						else {
+							if(pE.length<3){
 								zipNodes.add(element);
 							}
-						}					
+						}
 					}
 					else{
-						
-						String[] pE = element.getName().split("/");
-						if(pE.length==depth-1){
-							zipNodes.add(element);
+						if (folderzipped) {
+							if(pE.length==depth-1){
+								zipNodes.add(element);
+							}
 						}
-					}					
-				}
-			} catch (IOException e) {
-
-				e.printStackTrace();
-			} 	
-			
-		}
-		else{
-			aB.setTitle("ZIP "+currentFolder);
-			//currentFolder="";
-			
-			try {
-				myZipFile = new ZipFile(pathZip);			
-		
-				Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-				while (zipEntries.hasMoreElements()) {
-					
-					ZipEntry element = zipEntries.nextElement();	
-										
-					if(element.isDirectory()){
-
-						String[] pE = element.getName().split("/");
-						if(pE.length<3){
-							zipNodes.add(element);
+						else {
+							if(pE.length==1){
+								zipNodes.add(element);
+							}
 						}
-											
 					}
-					else{
-						
-						String[] pE = element.getName().split("/");
-						if(pE.length==1){
-							zipNodes.add(element);
-						}
-					}					
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					log("zipEntries.nextElement() fails exploring zip");
+//					Add unknown element
+					zipNodes.add(new ZipEntry(getString(R.string.transfer_unknown)));
 				}
-			} catch (IOException e) {
-
-				e.printStackTrace();
-			} 	
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 		orderZips();
 		if (adapterList == null){
 			adapterList = new ZipListAdapterLollipop(this, recyclerView, aB, zipNodes, currentFolder);
 		}
-		else{
-//			adapterList.setParentHandle(parentHandle);
-//			adapterList.setNodes(nodes);
-		}		
 
 		recyclerView.setAdapter(adapterList);
 	}
@@ -648,60 +600,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		Util.log("ZipBrowserActivityLollipop", log);
 	}
 
-	@Override
-	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
-			long arg3) {
-
-		return false;
-	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		log("onItemClick");
-
-		ZipEntry currentNode = zipNodes.get(position);
-		
-		currentPath=currentNode.getName();
-		
-		log("onItemClick, currentPath: "+currentPath);
-		
-		if(currentNode.isDirectory()){		
-			depth=depth+1;	
-			listDirectory(currentPath);	
-			this.setFolder(currentPath);
-			adapterList.setNodes(zipNodes);				
-		}
-		else{	
-			
-			String checkFolder = null;
-			int index = pathZip.lastIndexOf(".");
-			checkFolder = pathZip.substring(0, index);
-
-			if(checkFolder!=null){
-				File check = new File(checkFolder);
-			
-				if(check.exists()){
-					log("Already unzipped");
-					openFile(position);
-
-				}
-				else{
-					UnZipTask unZipTask = new UnZipTask(this, pathZip, position);
-					unZipTask.execute();
-					try{
-						temp = new ProgressDialog(this);
-						temp.setMessage(getString(R.string.unzipping_process));
-						temp.show();
-					}
-					catch(Exception e){
-						return;
-					}
-				}				
-				
-			}									
-		}			
-	}
-
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: position: "+position);
 		this.screenPosition = screenPosition;
@@ -721,7 +619,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			adapterList.setNodes(zipNodes);
 		}
 		else{
-
 			String checkFolder = null;
 			int index = pathZip.lastIndexOf(".");
 			checkFolder = pathZip.substring(0, index);
@@ -732,10 +629,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				if(check.exists()){
 					log("Already unzipped");
 					openFile(position);
-
 				}
 				else{
-					UnZipTask unZipTask = new UnZipTask(this, pathZip, position);
+					UnZipTask unZipTask = new UnZipTask(pathZip, position);
 					unZipTask.execute();
 					try{
 						temp = new ProgressDialog(this);
@@ -756,63 +652,47 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		log("listDirectory: "+directory);
 		
 		zipNodes.clear();
-		
-		if(directory.isEmpty()){
-			
-			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-			while (zipEntries.hasMoreElements()) {
-				
-				ZipEntry element = zipEntries.nextElement();	
-				
-				if(element.getName().startsWith(directory)){
-					
-					if(element.isDirectory()){
 
-						String[] pE = element.getName().split("/");
-						if(pE.length<3){
-							zipNodes.add(element);
+		Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+		while (zipEntries.hasMoreElements()) {
+
+			try {
+				ZipEntry element = zipEntries.nextElement();
+				String[] pE = element.getName().split("/");
+				if(element.getName().startsWith(directory)){
+					if(element.isDirectory()){
+						if (directory.isEmpty()) {
+							if(pE.length<3){
+								zipNodes.add(element);
+							}
 						}
-											
+						else {
+							if(!element.getName().equals(directory)){
+								if(pE.length<depth){
+									zipNodes.add(element);
+								}
+							}
+						}
 					}
 					else{
-						
-						String[] pE = element.getName().split("/");
-						if(pE.length==1){
-							zipNodes.add(element);
+						if (directory.isEmpty()) {
+							if(pE.length==1){
+								zipNodes.add(element);
+							}
 						}
-					}
-				}
-			}
-		}
-		else{
-		
-			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-			while (zipEntries.hasMoreElements()) {
-				
-				ZipEntry element = zipEntries.nextElement();	
-				
-				if(element.getName().startsWith(directory)){
-					
-					if(element.isDirectory()){
-						log("Directory: "+element.getName());
-						
-						if(!element.getName().equals(directory)){
-							String[] pE = element.getName().split("/");						
-							if(pE.length<depth){							
+						else {
+							if(pE.length<depth){
 								zipNodes.add(element);
 							}
 						}
 					}
-					else{			
-						log("File: "+element.getName());
-						String[] pE = element.getName().split("/");					
-						if(pE.length<depth){
-							zipNodes.add(element);
-						}					
-					}
 				}
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				log("zipEntries.nextElement() fails listing directory");
+				zipNodes.add(new ZipEntry(getString(R.string.transfer_unknown)));
 			}
-		}	
+		}
 	}
 	
 	public void onBackPressed(){
@@ -825,41 +705,33 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		
 		if(depth<3){
 			super.onBackPressed();
-			
 		} 
 		else if (depth==3&&(!folderzipped)){
-			
 			currentPath="";
 			listDirectory(currentPath);	
 			this.setFolder(currentPath);
 			adapterList.setNodes(zipNodes);	
 		}
 		else{
-			
 			if(currentPath==null || currentPath.length()==0){
-
 				currentPath=pathZip;
 				int index = currentPath.lastIndexOf("/");		
 				currentPath = currentPath.substring(0, index);
 				index = currentPath.lastIndexOf("/");		
 				currentPath = currentPath.substring(0, index+1);
-				depth=3;	
-				
+				depth=3;
 			}
 			else{
-
 				if(currentPath.endsWith("/")){
 					currentPath=currentPath.substring(0, currentPath.length()-1);	
 					int index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index+1);
-					
 				}
 				else{
 					int index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index);
 					index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index+1);
-					
 				}	
 			}	
 			
@@ -874,7 +746,8 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		String[] parts = folder.split("/");
 		if(parts.length>0){
 			currentFolder= parts[parts.length-1];							
-		}else{
+		}
+		else{
 			currentFolder= pathZip;
 		}
 		
@@ -884,13 +757,10 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		else {
 			parts = pathZip.split("/");
 			if(parts.length>0){
-
 				currentFolder= parts[parts.length-1];
-				parts = currentFolder.split("\\.");
-				
-				currentFolder= currentFolder.replace(".zip", "");
-				
-			}else{
+				currentFolder = currentFolder.replace(".zip", "");
+			}
+			else{
 				currentFolder= pathZip;
 			}
 			
@@ -911,26 +781,29 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		currentPathCount= currentPathCount.replace(toEliminate, "");
 		
 		int numFolders=0;
-		int numFiles=0;	
+		int numFiles=0;
 
 		if(depth==3&&!folderzipped){
 
 			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
 			while (zipEntries.hasMoreElements()) {
+				try {
+					ZipEntry element = zipEntries.nextElement();
 
-				ZipEntry element = zipEntries.nextElement();
-
-				if(element.getName().startsWith(directory+"/")){
-
-					if(element.isDirectory()){
-						//log("Directory: "+element.getName());
-						if(!element.getName().equals(directory+"/")){
-							numFolders++;
+					if(element.getName().startsWith(directory+"/")){
+						if(element.isDirectory()){
+							//log("Directory: "+element.getName());
+							if(!element.getName().equals(directory+"/")){
+								numFolders++;
+							}
+						}
+						else{
+							numFiles++;
 						}
 					}
-					else{
-						numFiles++;			
-					}
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					log("zipEntries.nextElement() fails counting files");
 				}
 			}
 		}
@@ -944,23 +817,23 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 
 			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
 			while (zipEntries.hasMoreElements()) {
+				try {
+					ZipEntry element = zipEntries.nextElement();
 
-				ZipEntry element = zipEntries.nextElement();	
-
-				if(element.getName().startsWith(currentPathCount)){
-
-					if(element.isDirectory()){
-
-						//log("Directory: "+element.getName());
-						if(!element.getName().equals(currentPathCount)){
-
-							numFolders++;
+					if(element.getName().startsWith(currentPathCount)){
+						if(element.isDirectory()){
+							//log("Directory: "+element.getName());
+							if(!element.getName().equals(currentPathCount)){
+								numFolders++;
+							}
+						}
+						else{
+							numFiles++;
 						}
 					}
-					else{
-
-						numFiles++;			
-					}
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					log("zipEntries.nextElement() fails counting files");
 				}
 			}
 		}

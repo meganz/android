@@ -43,6 +43,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -280,7 +281,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					mk = getIntent().getStringExtra("MK");
 					if(mk==null){
 						log("MK is NULL - close activity");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 
 					title.setText(getString(R.string.title_enter_new_password));
@@ -291,7 +292,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
 						log("link is NULL - close activity");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
 
@@ -299,6 +300,17 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		log("onBackPressed");
+		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+			Intent intent = new Intent(this, TestPasswordActivity.class);
+			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
+			startActivity(intent);
+		}
+		super.onBackPressed();
 	}
 
 	@Override
@@ -820,7 +832,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					log("reset pass on click");
 					if (linkToReset == null) {
 						log("link is NULL");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					} else {
 						if (mk == null) {
 							log("proceed to park account");
@@ -1242,7 +1254,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 							}
 						}
 						else {
-							showSnackbar(getString(R.string.email_verification_text_error));
+							showSnackbar(getString(R.string.general_text_error));
 						}
 					}
 					else {
@@ -1260,12 +1272,18 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					progress.dismiss();
 				} catch(Exception ex) {};
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				//Intent to MyAccount
-				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-				resetPassIntent.putExtra("RESULT", 0);
-				startActivity(resetPassIntent);
-				finish();
+				if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+					AccountController ac = new AccountController(this);
+					ac.logout(this, megaApi);
+				}
+				else {
+					//Intent to MyAccount
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", 0);
+					startActivity(resetPassIntent);
+					finish();
+				}
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){

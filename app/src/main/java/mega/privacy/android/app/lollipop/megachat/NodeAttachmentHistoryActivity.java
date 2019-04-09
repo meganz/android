@@ -589,7 +589,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
 										mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -599,7 +599,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = Uri.fromFile(mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
 										mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -638,12 +638,12 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 										}
 										else{
 											log("itemClick:ERROR:httpServerGetLocalLink");
-											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 										}
 									}
 									else{
 										log("itemClick:ERROR:httpServerGetLocalLink");
-										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 								}
 								else {
@@ -709,7 +709,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
 										pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -719,7 +719,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 									Uri mediaFileUri = Uri.fromFile(mediaFile);
 									if(mediaFileUri==null){
 										log("itemClick:ERROR:NULLmediaFileUri");
-										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 									else{
 										pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -755,12 +755,12 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 										}
 										else{
 											log("itemClick:ERROR:httpServerGetLocalLink");
-											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+											showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 										}
 									}
 									else{
 										log("itemClick:ERROR:httpServerGetLocalLink");
-										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+										showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 									}
 								}
 								else {
