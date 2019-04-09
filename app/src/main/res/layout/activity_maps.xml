@@ -127,4 +127,37 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/send_current_location_layout_landscape"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/address_icon_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true"
+            android:alpha="0.56"
+            android:src="@drawable/ic_location"/>
+
+        <TextView
+            android:id="@+id/address_name_label_landscape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/name_my_account"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:layout_toRightOf="@id/address_icon_landscape"/>
+
+    </RelativeLayout>
+
+
 </RelativeLayout>

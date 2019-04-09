@@ -24,6 +24,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
@@ -79,7 +81,9 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     private MapView mapView;
     private RelativeLayout mapLayout;
     private RelativeLayout sendCurrentLocationLayout;
+    private RelativeLayout sendCurrentLocationLandscapeLayout;
     private TextView currentLocationName;
+    private TextView currentLocationLandscape;
     private TextView currentLocationAddres;
     private FloatingActionButton setFullScreenFab;
     private FloatingActionButton myLocationFab;
@@ -97,6 +101,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     private boolean isFullScreenEnabled = false;
     private Bitmap fullscreenIconMarker;
     private Marker fullScreenMarker;
+    MapAddress fullScreenAddress;
 
     boolean isGPSEnabled = false;
 
@@ -145,22 +150,23 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         myLocationFab.setOnClickListener(this);
         myLocationFab.setVisibility(View.GONE);
         sendCurrentLocationLayout = (RelativeLayout) findViewById(R.id.send_current_location_layout);
+        sendCurrentLocationLayout.setOnClickListener(this);
         currentLocationName = (TextView) findViewById(R.id.address_name_label);
         currentLocationAddres = (TextView) findViewById(R.id.address_label);
+        sendCurrentLocationLandscapeLayout = (RelativeLayout) findViewById(R.id.send_current_location_layout_landscape);
+        currentLocationLandscape = (TextView) findViewById(R.id.address_name_label_landscape);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            sendCurrentLocationLayout.setVisibility(View.VISIBLE);
-        }
-        else {
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             sendCurrentLocationLayout.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mapLayout.getLayoutParams();
-            params.bottomMargin = 0;
-            mapLayout.setLayoutParams(params);
+            sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
+            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) mapLayout.getLayoutParams();
+            params1.bottomMargin = Util.px2dp(45, outMetrics);
+            mapLayout.setLayoutParams(params1);
         }
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -307,10 +313,27 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                     log("getLastLocation() onSuccess");
                     addresses = getAddresses(location.getLatitude(), location.getLongitude(), 1);
                     if (addresses != null) {
-                        currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_label), addresses.get(0).getAddressLine(0));
-                        currentLocationName.setText(currentAddress.getName());
-                        currentLocationAddres.setText(currentAddress.getAddress());
-
+                        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_label), addresses.get(0).getAddressLine(0));
+                            currentLocationName.setText(currentAddress.getName());
+                            currentLocationAddres.setText(currentAddress.getAddress());
+                        }
+                        else {
+                            currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_landscape_label, addresses.get(0).getAddressLine(0)), addresses.get(0).getAddressLine(0));
+                            String textToShow = String.format(currentAddress.getName());
+                            try{
+                                textToShow = textToShow.replace("[A]", "<font color=\'#8c8c8c\'>");
+                                textToShow = textToShow.replace("[/A]", "</font>");
+                            }
+                            catch (Exception e){}
+                            Spanned result = null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                            } else {
+                                result = Html.fromHtml(textToShow);
+                            }
+                            currentLocationLandscape.setText(result);
+                        }
                         myLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     }
                     if (animateCamera) {
@@ -329,10 +352,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
         return bitmap;
-    }
-
-    public void itemClick (int position) {
-        setActivityResult(position, currentAddress);
     }
 
     void saveSnapshotAsImage (Bitmap bitmap, int quality) {
@@ -360,12 +379,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         }
     }
 
-    void setActivityResult (final int position, final MapAddress location) {
+    void setActivityResult (final MapAddress location) {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        final String name = location.getName();
-        final String address = location.getAddress();
         final Double latitude = location.getLatLng().latitude;
         final Double longitude = location.getLatLng().longitude;
 
@@ -386,8 +403,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         else {
             mapWidth = outMetrics.heightPixels;
         }
-
-//        final int mapHeight = (MAP_MESSAGE_HEIGHT * mapWidth) / MAP_MESSAGE_WIDTH;
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -426,26 +441,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                         log("The bitmaps has "+byteArray.length+" final size with quality: "+quality);
 
                         Intent intent = new Intent();
-//                        (Like Whatsapp, on desgins only latitude and longitude)
-//                        Fullscreen mode --> send only direction
-//                        Click on place --> send name and direction
-//                        Click on send current location --> send nothing
-//                        Click on search location --> send name and direction if available
                         intent.putExtra("snapshot", byteArray);
                         intent.putExtra("latitude", latitude);
                         intent.putExtra("longitude", longitude);
-                        if (position == 0) {
-                            if (isFullScreenEnabled) {
-                                intent.putExtra("name", address);
-                                intent.putExtra("address", address);
-                            } else {
-                                intent.putExtra("name", "");
-                                intent.putExtra("address", "");
-                            }
-                        } else {
-                            intent.putExtra("name", name);
-                            intent.putExtra("address", address);
-                        }
+
                         if (getIntent() !=  null) {
                             intent.putExtra("editingMessage", getIntent().getBooleanExtra("editingMessage", false));
                             intent.putExtra("msg_id", getIntent().getLongExtra("msg_id", -1));
@@ -529,6 +528,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             }
             if (addresses != null && addresses.size() > 0) {
                 String address = addresses.get(0).getAddressLine(0);
+                fullScreenAddress = new MapAddress(latLng, null, address);
                 if (fullScreenMarker == null) {
                     fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet(address).icon(BitmapDescriptorFactory.fromBitmap(fullscreenIconMarker)));
                     fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
@@ -556,6 +556,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                 fullScreenMarker.showInfoWindow();
             }
             else {
+                fullScreenAddress = new MapAddress(latLng, null, null);
                 if (fullScreenMarker == null) {
                     fullScreenMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(title).snippet("").icon(BitmapDescriptorFactory.fromBitmap(fullscreenIconMarker)));
                     fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
@@ -596,6 +597,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.send_current_location_layout: {
+                setActivityResult(currentAddress);
+                break;
+            }
             case R.id.my_location_fab: {
                 setMyLocation(true);
                 break;
@@ -611,7 +616,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (isFullScreenEnabled && marker.equals(fullScreenMarker)) {
-            itemClick(0);
+            setActivityResult(fullScreenAddress);
             return true;
         }
 
@@ -622,7 +627,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     public void onInfoWindowClick(Marker marker) {
         log("onInfoWindowClick");
         if (isFullScreenEnabled && marker.equals(fullScreenMarker)) {
-            itemClick(0);
+            setActivityResult(fullScreenAddress);
         }
     }
 

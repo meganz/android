@@ -2342,6 +2342,7 @@
 
     <string name="title_activity_maps" context="Title of the activity that sends a location">Send location</string>
     <string name="current_location_label" context="Label layout on maps activity that permits send current location">Send your current location</string>
+    <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Send your current location: [A]%1$s[/A]</string>
     <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Nearby places</string>
     <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
     <string name="title_marker_maps" context="Title of the location marker set by the user">Send this location</string>

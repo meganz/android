@@ -1504,31 +1504,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
             params.addRule(RelativeLayout.ABOVE, R.id.join_chat_layout_chat_layout);
             messagesContainerLayout.setLayoutParams(params);
-            writingContainerLayout.setVisibility(View.GONE);
             fragmentVoiceClip.setVisibility(View.GONE);
-            mediaButton.setVisibility(View.GONE);
-            pickFileStorageButton.setVisibility(View.GONE);
         }
         else if (show == SHOW_NOTHING_LAYOUT) {
             writingContainerLayout.setVisibility(View.GONE);
             joinChatLinkLayout.setVisibility(View.GONE);
-            writingContainerLayout.setVisibility(View.GONE);
             fragmentVoiceClip.setVisibility(View.GONE);
-            mediaButton.setVisibility(View.GONE);
-            pickFileStorageButton.setVisibility(View.GONE);
         }
         else {
             writingContainerLayout.setVisibility(View.VISIBLE);
             joinChatLinkLayout.setVisibility(View.GONE);
-
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messagesContainerLayout.getLayoutParams();
             params.addRule(RelativeLayout.ABOVE, R.id.writing_container_layout_chat_layout);
             messagesContainerLayout.setLayoutParams(params);
-
-            writingContainerLayout.setVisibility(View.VISIBLE);
             fragmentVoiceClip.setVisibility(View.VISIBLE);
-            mediaButton.setVisibility(View.VISIBLE);
-            pickFileStorageButton.setVisibility(View.VISIBLE);
         }
     }
 
