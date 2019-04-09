@@ -632,7 +632,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 							log("LINK is null");
 							log(e.getErrorString() + "___" + e.getErrorCode());
 //							Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-							setError(getString(R.string.email_verification_text_error));
+							setError(getString(R.string.general_text_error));
 						}
 					}
 					else{

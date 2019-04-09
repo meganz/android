@@ -1068,7 +1068,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             showSnackbar(getString(R.string.chat_link_copied_clipboard));
         }
         else {
-            showSnackbar(getString(R.string.email_verification_text_error));
+            showSnackbar(getString(R.string.general_text_error));
         }
     }
 
