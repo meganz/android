@@ -19007,23 +19007,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     @Override
     public void onTrimMemory(int level) {
         // Determine which lifecycle or system event was raised.
+        //we will stop creating thumbnails while the phone is running low on memory to prevent OOM
         log("onTrimMemory lvl " + level);
-        switch (level) {
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
-                log("low memory");
-                ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
-                break;
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
-            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
-                log("memory ok");
-                ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
-                break;
-            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
-            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
-            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
-            default:
-                break;
+        if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
+            log("low memory");
+            ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
+        }else{
+            log("memory ok");
+            ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
 }
