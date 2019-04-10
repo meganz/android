@@ -830,8 +830,7 @@ public class NodeController {
                     log("ISFILE");
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
-                    boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
-                    if(localPath != null && autoPlayEnabled){
+                    if(localPath != null){
                         log("localPath != null");
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
@@ -839,7 +838,6 @@ public class NodeController {
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
-//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
                                         log("The video has not thumb");
@@ -854,7 +852,13 @@ public class NodeController {
                         catch(Exception e) {
                             log("Exception!!");
                         }
-
+    
+                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                        if (!autoPlayEnabled) {
+                            log("auto play disabled");
+                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
+                            return;
+                        }
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             log("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
