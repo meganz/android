@@ -2189,9 +2189,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivityLollipop.isFetchingNodes = true;
-//            if(confirmLogoutDialog != null) {
-//                confirmLogoutDialog.dismiss();
-//            }
             disableLoginButton();
         }
     }
@@ -2199,7 +2196,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
         //when get response, enable, hide login info
-        enableLoginButton();
         try{
             if(timer!=null){
                 timer.cancel();
@@ -2216,11 +2212,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
                 log("terminate login process when login");
-//                megaApi.logout();
-//                if(dbH != null) {
-//                    dbH.clearCredentials();
-//                    dbH.clearEphemeral();
-//                }
                 return;
             }
             if (error.getErrorCode() != MegaError.API_OK) {
@@ -2360,6 +2351,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 megaApi.fetchNodes(this);
             }
+        } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
+            enableLoginButton();
+            //need to clear local credentials?
+//            if (dbH != null) {
+//                dbH.clearCredentials();
+//                dbH.clearEphemeral();
+//            }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
             log("TYPE_GET_RECOVERY_LINK");
@@ -2961,7 +2959,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaChatApi.removeChatListener(this);
             }
         }
-
+        if(confirmLogoutDialog != null) {
+            confirmLogoutDialog.dismiss();
+        }
         super.onDestroy();
     }
 
@@ -2979,8 +2979,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         MegaApplication.setLoggingIn(false);
                         loginClicked = false;
                         megaChatApi.logout();
-                        megaApi.localLogout();
-                        enableLoginButton();
+                        megaApi.localLogout(LoginFragmentLollipop.this);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         dialog.dismiss();
