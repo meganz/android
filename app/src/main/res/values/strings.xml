@@ -646,9 +646,14 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
 
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
+	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+
+
+
+	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating</string>
@@ -2451,4 +2456,14 @@
     <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+
+	<plurals name="file_already_downloaded">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+	</plurals>
+
+	<plurals name="file_pending_download">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
+	</plurals>
 </resources>
