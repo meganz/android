@@ -91,6 +91,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import mega.privacy.android.app.AndroidLogger;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
@@ -2222,25 +2223,45 @@ public class Util {
 		}
 		return true;
 	}
-	
-	public static void showSnackBar(Context context, String message){
-        if (context instanceof ChatFullScreenImageViewer){
-            ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE,message);
+    
+    public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
+        if (context instanceof ChatFullScreenImageViewer) {
+            ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof AudioVideoPlayerLollipop) {
+            ((AudioVideoPlayerLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof PdfViewerActivityLollipop) {
+            ((PdfViewerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof ChatActivityLollipop) {
+            ((ChatActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof NodeAttachmentHistoryActivity) {
+            ((NodeAttachmentHistoryActivity)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof BaseActivity) {
+            View rootView = getRootViewFromContext(context);
+            if (rootView == null) {
+                log("unable to show snack bar, view does not exist");
+            } else {
+                ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
+            }
         }
-        else if (context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
+    }
+    
+    private static View getRootViewFromContext(Context context) {
+        BaseActivity activity = (BaseActivity)context;
+        View rootView = null;
+        try {
+            rootView = activity.findViewById(android.R.id.content);
+            if (rootView == null) {
+                rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+            }
+            if (rootView == null) {
+                rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
+            }
+        } catch (Exception e) {
+            log("getRootViewFromContext " + e.getMessage());
         }
-        else if (context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
-        }
-        else if (context instanceof ChatActivityLollipop){
-            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
-        }
-        else if (context instanceof NodeAttachmentHistoryActivity){
-            ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE,message);
-        }else if (context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE,message,-1);
-        }
+        return rootView;
     }
 
 	public static void hideKeyboard(Activity activity, int flag){
