@@ -13700,11 +13700,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if(cFLol!=null){
-				if(cFLol.isMultipleselect()){
-					cFLol.hideMultipleSelect();
-					cFLol.clearSelectionsNoAnimations();
-				}
+			if(cFLol!=null && cFLol.isMultipleselect()){
+				cFLol.hideMultipleSelect();
+				cFLol.clearSelectionsNoAnimations();
 			}
 
 			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
