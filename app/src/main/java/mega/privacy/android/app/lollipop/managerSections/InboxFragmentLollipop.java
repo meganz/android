@@ -1034,38 +1034,49 @@ public class InboxFragmentLollipop extends Fragment{
 			return 0;
 		}
 
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
-		if (parentNode != null) {
-			log("ParentNode: "+parentNode.getName());
+		if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleInbox)) {
+			((ManagerActivityLollipop) context).comesFromNotifications = false;
+			((ManagerActivityLollipop) context).comesFromNotificationHandle = -1;
+			((ManagerActivityLollipop) context).selectDrawerItemLollipop(ManagerActivityLollipop.DrawerItem.NOTIFICATIONS);
+			((ManagerActivityLollipop)context).parentHandleInbox = ((ManagerActivityLollipop)context).comesFromNotificationHandleSaved;
+			((ManagerActivityLollipop)context).comesFromNotificationHandleSaved = -1;
 
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-
-			((ManagerActivityLollipop) context).parentHandleInbox = parentNode.getHandle();
-			((ManagerActivityLollipop) context).setToolbarTitle();
-
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
-			setNodes(nodes);
-
-			int lastVisiblePosition = 0;
-			if(!lastPositionStack.empty()){
-				lastVisiblePosition = lastPositionStack.pop();
-				log("Pop of the stack "+lastVisiblePosition+" position");
-			}
-			log("Scroll to "+lastVisiblePosition+" position");
-
-			if(lastVisiblePosition>=0){
-
-				if(((ManagerActivityLollipop) context).isList){
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-				else{
-					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
-				}
-			}
 			return 2;
 		}
-		else{
-			return 0;
+		else {
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(((ManagerActivityLollipop) context).parentHandleInbox));
+			if (parentNode != null) {
+				log("ParentNode: "+parentNode.getName());
+
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+				((ManagerActivityLollipop) context).parentHandleInbox = parentNode.getHandle();
+				((ManagerActivityLollipop) context).setToolbarTitle();
+
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				setNodes(nodes);
+
+				int lastVisiblePosition = 0;
+				if(!lastPositionStack.empty()){
+					lastVisiblePosition = lastPositionStack.pop();
+					log("Pop of the stack "+lastVisiblePosition+" position");
+				}
+				log("Scroll to "+lastVisiblePosition+" position");
+
+				if(lastVisiblePosition>=0){
+
+					if(((ManagerActivityLollipop) context).isList){
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else{
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+				}
+				return 2;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 
