@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -272,6 +273,18 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         }
 
         datePickerDialog = new DatePickerDialog(context, this, year, month, day);
+        datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == DialogInterface.BUTTON_NEGATIVE) {
+                    MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
+                    if(node != null && node.getExpirationTime() > 0){
+                        switchButtonExpiry.setChecked(true);
+                    }else{
+                        switchButtonExpiry.setChecked(false);
+                    }
+                }
+            }
+        });
         //disable past date
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
