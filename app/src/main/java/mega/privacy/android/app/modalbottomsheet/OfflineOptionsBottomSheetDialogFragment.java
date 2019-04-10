@@ -361,11 +361,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
         }
         else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
         }
     }
 
@@ -391,7 +391,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 canvas.drawText(key, x, height+15f, paint);
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
 
         }
