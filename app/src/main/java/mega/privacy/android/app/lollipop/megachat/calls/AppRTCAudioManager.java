@@ -113,26 +113,49 @@ public class AppRTCAudioManager {
    * This method is called when the proximity sensor reports a state change,
    * e.g. from "NEAR to FAR" or from "FAR to NEAR".
    */
-  private void onProximitySensorChangedState() {
-    if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
-      return;
-    }
+//  private void onProximitySensorChangedState() {
+//    if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
+//      return;
+//    }
+//
+//    // The proximity sensor should only be activated when there are exactly two
+//    // available audio devices.
+//    if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE)
+//        && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
+//      if (proximitySensor.sensorReportsNearState()) {
+//
+//        // Sensor reports that a "handset is being held up to a person's ear",
+//        // or "something is covering the light sensor".
+//        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
+//      } else {
+//        // Sensor reports that a "handset is removed from a person's ear", or
+//        // "the light sensor is no longer covered".
+//        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+//      }
+//    }
+//  }
 
-    // The proximity sensor should only be activated when there are exactly two
-    // available audio devices.
-    if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE)
-        && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
-      if (proximitySensor.sensorReportsNearState()) {
 
-        // Sensor reports that a "handset is being held up to a person's ear",
-        // or "something is covering the light sensor".
-        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
-      } else {
-        // Sensor reports that a "handset is removed from a person's ear", or
-        // "the light sensor is no longer covered".
-        setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
-      }
-    }
+  public void activateSpeaker(boolean activated) {
+      Log.d(TAG,"activate Speaker: "+activated);
+      if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
+          return;
+        }
+        if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
+            if(activated){
+                Log.d(TAG,"activate SPEAKER_PHONE");
+
+                // Sensor reports that a "handset is removed from a person's ear", or
+                // "the light sensor is no longer covered".
+                setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+            }else{
+                Log.d(TAG,"activate EARPIECE");
+
+                // Sensor reports that a "handset is being held up to a person's ear",
+                // or "something is covering the light sensor".
+                setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
+            }
+        }
   }
 
   /* Receiver which handles changes in wired headset availability. */
@@ -172,7 +195,6 @@ public class AppRTCAudioManager {
     amState = AudioManagerState.UNINITIALIZED;
 
     useSpeakerphone = SPEAKERPHONE_AUTO;
-    Log.d(TAG, "useSpeakerphone: " + useSpeakerphone);
     if (useSpeakerphone.equals(SPEAKERPHONE_FALSE)) {
       defaultAudioDevice = AudioDevice.EARPIECE;
     } else {
@@ -182,14 +204,14 @@ public class AppRTCAudioManager {
     // Create and initialize the proximity sensor.
     // Tablet devices (e.g. Nexus 7) does not support proximity sensors.
     // Note that, the sensor will not be active until start() has been called.
-    proximitySensor = AppRTCProximitySensor.create(context, new Runnable() {
+//    proximitySensor = AppRTCProximitySensor.create(context, new Runnable() {
       // This method will be called each time a state change is detected.
       // Example: user holds his hand over the device (closer than ~5 cm),
       // or removes his hand from the device.
-      public void run() {
-        onProximitySensorChangedState();
-      }
-    });
+//      public void run() {
+//        onProximitySensorChangedState();
+//      }
+//    });
 
     Log.d(TAG, "defaultAudioDevice: " + defaultAudioDevice);
     AppRTCUtils.logDeviceInfo(TAG);

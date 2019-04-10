@@ -82,12 +82,12 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                         if(error>0){
                             message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
                             if(context instanceof ChatActivityLollipop){
-                                ((ChatActivityLollipop) context).removeRequestDialog();
-                                ((ChatActivityLollipop) context).showSnackbar(message);
+                                ((ChatActivityLollipop) context).removeProgressDialog();
+                                ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
                             }
                             else if(context instanceof NodeAttachmentHistoryActivity){
                                 ((NodeAttachmentHistoryActivity) context).removeProgressDialog();
-                                ((NodeAttachmentHistoryActivity) context).showSnackbar(message);
+                                ((NodeAttachmentHistoryActivity) context).showSnackbar(Constants.SNACKBAR_TYPE, message);
                             }
                         }
                         else{

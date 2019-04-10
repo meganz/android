@@ -79,7 +79,8 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
         remoteFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_remote_video);
         remoteFullScreenSurfaceView.setOnClickListener(this);
-        remoteFullScreenSurfaceView.setZOrderMediaOverlay(true);
+        remoteFullScreenSurfaceView.setZOrderOnTop(false);
+        remoteFullScreenSurfaceView.setZOrderMediaOverlay(false);
         SurfaceHolder remoteSurfaceHolder = remoteFullScreenSurfaceView.getHolder();
         remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);
@@ -126,7 +127,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            remoteRenderer.DrawBitmap(false);
+            remoteRenderer.DrawBitmap(false, false);
         }
     }
 
