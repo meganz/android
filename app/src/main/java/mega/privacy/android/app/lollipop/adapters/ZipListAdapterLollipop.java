@@ -47,6 +47,8 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		public ImageView savedOffline;
 		long document;
 
+		boolean isUnknownFile;
+
 		public ViewHolderBrowserList(View itemView) {
 			super(itemView);
 		}
@@ -109,32 +111,37 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 
 		String nameFile = zipNode.getName();
 
-		if(zipNode.isDirectory()){
-
-			int index = nameFile.lastIndexOf("/");
-
-			nameFile=nameFile.substring(0, nameFile.length()-1);
-			index = nameFile.lastIndexOf("/");
-			nameFile = nameFile.substring(index+1, nameFile.length());
-
-			String info = ((ZipBrowserActivityLollipop)context).countFiles(nameFile);
-
-			holder.textViewFileSize.setText(info);
+		if (nameFile.equals(context.getString(R.string.transfer_unknown))) {
+			holder.isUnknownFile = true;
 			holder.textViewFileName.setText(nameFile);
-
-			holder.imageView.setImageResource(R.drawable.ic_folder_list);
-
-		}else{
-
-			int	index = nameFile.lastIndexOf("/");
-			nameFile = nameFile.substring(index+1, nameFile.length());
-
-			holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));
-			holder.textViewFileName.setText(nameFile);
-
+			holder.textViewFileSize.setText("");
 			holder.imageView.setImageResource(MimeTypeList.typeForName(zipNode.getName()).getIconResourceId());
 		}
+		else {
+			holder.isUnknownFile = false;
+			if(zipNode.isDirectory()){
+				nameFile=nameFile.substring(0, nameFile.length()-1);
+                int index = nameFile.lastIndexOf("/");
+				nameFile = nameFile.substring(index+1, nameFile.length());
 
+				String info = ((ZipBrowserActivityLollipop)context).countFiles(nameFile);
+
+				holder.textViewFileSize.setText(info);
+				holder.textViewFileName.setText(nameFile);
+
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+
+			}
+			else{
+                int index = nameFile.lastIndexOf("/");
+				nameFile = nameFile.substring(index+1, nameFile.length());
+
+				holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));
+				holder.textViewFileName.setText(nameFile);
+
+				holder.imageView.setImageResource(MimeTypeList.typeForName(zipNode.getName()).getIconResourceId());
+			}
+		}
 
 		if (positionClicked == -1){
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -159,17 +166,22 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		log("onClick");
 
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
-		int currentPosition = holder.getAdapterPosition();
-		int[] screenPosition = new int[2];
-		ImageView imageView;
-		imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
-		imageView.getLocationOnScreen(screenPosition);
-		int[] dimens = new int[4];
-		dimens[0] = screenPosition[0];
-		dimens[1] = screenPosition[1];
-		dimens[2] = imageView.getWidth();
-		dimens[3] = imageView.getHeight();
-		((ZipBrowserActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
+		if (holder.isUnknownFile) {
+			((ZipBrowserActivityLollipop) context).showSnackbar(context.getString(R.string.unknownn_file));
+		}
+		else {
+			int currentPosition = holder.getAdapterPosition();
+			int[] screenPosition = new int[2];
+			ImageView imageView;
+			imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			imageView.getLocationOnScreen(screenPosition);
+			int[] dimens = new int[4];
+			dimens[0] = screenPosition[0];
+			dimens[1] = screenPosition[1];
+			dimens[2] = imageView.getWidth();
+			dimens[3] = imageView.getHeight();
+			((ZipBrowserActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
+		}
 	}
 
 	private static void log(String log) {

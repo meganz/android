@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -34,6 +33,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -43,6 +43,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -280,7 +281,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					mk = getIntent().getStringExtra("MK");
 					if(mk==null){
 						log("MK is NULL - close activity");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 
 					title.setText(getString(R.string.title_enter_new_password));
@@ -291,7 +292,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					linkToReset = getIntent().getDataString();
 					if (linkToReset == null) {
 						log("link is NULL - close activity");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
 
@@ -304,6 +305,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
+		if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+			Intent intent = new Intent(this, TestPasswordActivity.class);
+			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
+			startActivity(intent);
+		}
 		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
@@ -599,7 +605,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			public void afterTextChanged(Editable s) {
 				if (sixthPin.length()!=0){
 					sixthPin.setCursorVisible(true);
-					hideKeyboard();
+					Util.hideKeyboard(changePasswordActivity, 0);
 
 					if (pinLongClick) {
 						pasteClipboard();
@@ -737,7 +743,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	void permitVerify(){
 		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			hideKeyboard();
+			Util.hideKeyboard(changePasswordActivity, 0);
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
 			}
@@ -792,14 +798,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		}
 	}
 
-	void hideKeyboard(){
-
-		View v = getCurrentFocus();
-		if (v != null){
-			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-		}
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -835,7 +833,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					log("reset pass on click");
 					if (linkToReset == null) {
 						log("link is NULL");
-						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+						Util.showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 					} else {
 						if (mk == null) {
 							log("proceed to park account");
@@ -1047,7 +1045,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		if(!Util.isOnline(this))
 		{
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
 
@@ -1257,7 +1255,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 							}
 						}
 						else {
-							showSnackbar(getString(R.string.email_verification_text_error));
+							showSnackbar(getString(R.string.general_text_error));
 						}
 					}
 					else {
@@ -1275,12 +1273,18 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					progress.dismiss();
 				} catch(Exception ex) {};
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-				//Intent to MyAccount
-				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-				resetPassIntent.putExtra("RESULT", 0);
-				startActivity(resetPassIntent);
-				finish();
+				if (getIntent() != null && getIntent().getBooleanExtra("logout", false)) {
+					AccountController ac = new AccountController(this);
+					ac.logout(this, megaApi);
+				}
+				else {
+					//Intent to MyAccount
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+					resetPassIntent.putExtra("RESULT", 0);
+					startActivity(resetPassIntent);
+					finish();
+				}
 			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_RECOVERY_LINK){
@@ -1468,11 +1472,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void showSnackbar(String s){
-		log("showSnackbar");
-		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
-		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
-		snackbarTextView.setMaxLines(5);
-		snackbar.show();
+		showSnackbar(fragmentContainer, s);
 	}
 
 	void hideAB(){

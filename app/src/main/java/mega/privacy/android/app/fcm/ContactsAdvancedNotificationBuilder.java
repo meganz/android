@@ -642,7 +642,9 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
     public void showSimpleNotificationAPC(){
         log("showSimpleNotificationAPC");
-
+    
+        Intent myService = new Intent(context, IncomingMessageService.class);
+        context.stopService(myService);
         String title = context.getString(R.string.title_acceptance_contact_request_notification);
         String fullName = "";
 

@@ -34,7 +34,15 @@
         android:orderInCategory="115"
         android:title="@string/context_send_file"
         android:showAsAction="never"
-        android:icon="@drawable/ic_w_send_to_contact"
+        android:icon="@drawable/ic_send_to_contact"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_send_to_chat"
+        android:orderInCategory="115"
+        android:title="@string/context_send_contact"
+        android:showAsAction="never"
+        android:icon="@drawable/ic_share_contact"
         MEGA:showAsAction="never" />
     
     <item
