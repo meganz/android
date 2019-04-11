@@ -263,26 +263,13 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             }
         }
         
-        if (chat != null) {
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM || chat.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
-                holder.avatarImage.setAlpha(.4f);
-                holder.itemLayout.setOnClickListener(null);
-                holder.itemLayout.setOnLongClickListener(null);
 
-                holder.titleText.setTextColor(context.getResources().getColor(R.color.text_secondary));
-                holder.lastSeenStateText.setTextColor(context.getResources().getColor(R.color.text_secondary));
-                holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-            }
-            else{
-                holder.avatarImage.setAlpha(1.0f);
-                holder.itemLayout.setOnClickListener(this);
-                holder.itemLayout.setOnLongClickListener(this);
+        holder.itemLayout.setOnClickListener(this);
+        holder.itemLayout.setOnLongClickListener(this);
 
-                holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
-                holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-                holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-            }
-        }
+        holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+        holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
     }
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){

@@ -738,6 +738,9 @@ public class ChatExplorerFragment extends Fragment {
                 getVisibleMEGAContacts();
 
                 for (MegaChatListItem chat : chats) {
+                    if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
+                        continue;
+                    }
                     if (chat.isGroup()) {
                         items.add(new ChatExplorerListItem(chat));
                     }
@@ -747,6 +750,9 @@ public class ChatExplorerFragment extends Fragment {
                 }
 
                 for (MegaChatListItem archieved : archievedChats) {
+                    if (archieved.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
+                        continue;
+                    }
                     if (archieved.isGroup()) {
                         items.add(new ChatExplorerListItem(archieved));
                     }
