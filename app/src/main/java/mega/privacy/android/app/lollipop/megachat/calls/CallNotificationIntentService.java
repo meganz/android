@@ -104,6 +104,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             log("onRequestFinish:TYPE_HANG_CHAT_CALL");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("onRequestFinish: TYPE_HANG_CHAT_CALL:OK: ");
+                ((MegaApplication) getApplication()).setSpeakerStatus(false);
                 megaChatApi.answerChatCall(chatHandleToAnswer, false, this);
             }else{
                 log("onRequestFinish:TYPE_HANG_CHAT_CALL:ERROR: "+e.getErrorCode());

@@ -138,9 +138,11 @@ public class AppRTCAudioManager {
 
   public void activateSpeaker(boolean activated) {
       Log.d(TAG,"activate Speaker: "+activated);
-      if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
-          return;
-        }
+//      useSpeakerphone = SPEAKERPHONE_AUTO;
+
+//    if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
+//          return;
+//        }
         if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
             if(activated){
                 Log.d(TAG,"activate SPEAKER_PHONE");
@@ -181,11 +183,11 @@ public class AppRTCAudioManager {
   };
 
   /** Construction. */
-  static AppRTCAudioManager create(Context context) {
-    return new AppRTCAudioManager(context);
+  static AppRTCAudioManager create(Context context, boolean isAudioCall) {
+    return new AppRTCAudioManager(context, isAudioCall);
   }
 
-  private AppRTCAudioManager(Context context) {
+  private AppRTCAudioManager(Context context, boolean isAudioCall) {
     Log.d(TAG, "ctor");
     ThreadUtils.checkIsOnMainThread();
     apprtcContext = context;
@@ -194,10 +196,17 @@ public class AppRTCAudioManager {
     wiredHeadsetReceiver = new WiredHeadsetReceiver();
     amState = AudioManagerState.UNINITIALIZED;
 
-    useSpeakerphone = SPEAKERPHONE_AUTO;
+    if(isAudioCall){
+      useSpeakerphone = SPEAKERPHONE_FALSE;
+    }else {
+      useSpeakerphone = SPEAKERPHONE_AUTO;
+    }
+
     if (useSpeakerphone.equals(SPEAKERPHONE_FALSE)) {
+      Log.d(TAG,"DefaultDevice-EARPIECE");
       defaultAudioDevice = AudioDevice.EARPIECE;
     } else {
+      Log.d(TAG,"DefaultDevice-SPEAKER_PHONE");
       defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
     }
 
@@ -616,6 +625,6 @@ public class AppRTCAudioManager {
         audioManagerEvents.onAudioDeviceChanged(selectedAudioDevice, audioDevices);
       }
     }
-    Log.d(TAG, "--- updateAudioDeviceState done");
+    Log.d(TAG, "updateAudioDeviceState done");
   }
 }

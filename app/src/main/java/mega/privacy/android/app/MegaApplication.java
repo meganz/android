@@ -407,9 +407,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
-
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
@@ -1329,10 +1327,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("OK:TYPE_PUSH_RECEIVED");
 				chatNotificationReceived = true;
-
 				ChatAdvancedNotificationBuilder notificationBuilder;
 				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-
 				notificationBuilder.generateChatNotification(request);
 			}
 			else{
@@ -1821,6 +1817,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
     public void checkQueuedCalls(){
 		log("checkQueuedCalls");
 		try{
+			stopService(new Intent(this, IncomingCallService.class));
 			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 			notificationBuilder.checkQueuedCalls();
 		}

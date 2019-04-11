@@ -1807,6 +1807,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }else{
                     if(callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
                         log("startCall:I'm not in a call, this call is ring in");
+                        ((MegaApplication) getApplication()).setSpeakerStatus(false);
                         MegaApplication.setShowPinScreen(false);
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1815,12 +1816,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     }else if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
                         log("startCall:I'm not in a call, this call is user no present");
+                        if(startVideo){
+                            ((MegaApplication) getApplication()).setSpeakerStatus(true);
+                        }else{
+                            ((MegaApplication) getApplication()).setSpeakerStatus(false);
+                        }
                         megaChatApi.startChatCall(idChat, startVideo, this);
                     }
                 }
             }else{
                 if((megaChatApi!=null)&&(!ChatUtil.participatingInACall(megaChatApi))){
                     log("startCall there is not a call in this chat and i'm not in other call");
+                    if(startVideo){
+                        ((MegaApplication) getApplication()).setSpeakerStatus(true);
+                    }else{
+                        ((MegaApplication) getApplication()).setSpeakerStatus(false);
+                    }
                     megaChatApi.startChatCall(idChat, startVideo, this);
                 }
             }
@@ -6093,8 +6104,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     MegaChatCall call = megaChatApi.getChatCall(idChat);
                     if(call!=null) {
                         if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
+                            ((MegaApplication) getApplication()).setSpeakerStatus(false);
                             megaChatApi.answerChatCall(idChat, false, this);
                         }else if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ){
+                            ((MegaApplication) getApplication()).setSpeakerStatus(false);
                             megaChatApi.startChatCall(idChat, false, this);
                         }
                     }

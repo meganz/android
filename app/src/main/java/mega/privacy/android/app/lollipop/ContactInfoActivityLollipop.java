@@ -914,12 +914,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			else{
 				if(startVideo){
 					log("Start video call");
-					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
-				}
-				else{
+					((MegaApplication) getApplication()).setSpeakerStatus(true);
+				}else{
 					log("Start audio call");
-					megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+					((MegaApplication) getApplication()).setSpeakerStatus(false);
+
 				}
+				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+
+
 			}
 		}
 		else{

@@ -102,8 +102,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
 
     public void createNotification() {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_call_started)
-                .setAutoCancel(false);
+        mBuilder.setSmallIcon(R.drawable.ic_call_started).setAutoCancel(true);
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -285,7 +284,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 log("Connected to chat!");
                 if (showMessageNotificationAfterPush) {
                     showMessageNotificationAfterPush = false;
-                    log("Call to pushReceived");
                     megaChatApi.pushReceived(beep);
                     beep = false;
                 } else {
