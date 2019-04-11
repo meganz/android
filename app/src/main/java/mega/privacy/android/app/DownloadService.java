@@ -628,7 +628,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		{
 			try {
                 boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
-                if (openFile && app.isActivityVisible() && autoPlayEnabled) {
+                if (openFile && autoPlayEnabled) {
                     log("both openFile and autoPlayEnabled are true");
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
@@ -745,6 +745,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.putExtra("isPlayList", false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
+                            mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
