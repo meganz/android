@@ -1731,15 +1731,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         Util.log("MegaPhotoSyncGridTitleAdapterLollipop", log);
     }
 
-    public void activateActionMode(){
-        log("activateActionMode");
-        if (!isMultipleSelect()){
-            setMultipleSelect(true);
-        }
-        actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
-    }
-
     public void refreshActionModeTitle() {
-        activateActionMode();
+        updateActionModeTitle();
+        notifyDataSetChanged();
     }
 }
