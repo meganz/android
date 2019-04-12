@@ -501,10 +501,8 @@
                     android:id="@+id/record_fab"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:minHeight="48dp"
-                    android:minWidth="48dp"
                     android:scaleType="centerInside"
-                    android:layout_gravity="top|right"
+                    android:layout_gravity="bottom|right"
                     android:layout_marginRight="8dp"
                     android:visibility="visible"
                     app:mic_icon="@drawable/ic_b_mic_on"/>

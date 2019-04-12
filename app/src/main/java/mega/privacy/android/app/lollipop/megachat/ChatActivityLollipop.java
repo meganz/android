@@ -643,7 +643,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setVisibility(View.GONE);
         record.setRecordView(voiceClipLayout);
 
-
         emojiKeyboard = (EmojiKeyboard)findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton, fragmentVoiceClip);
 
@@ -1036,6 +1035,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 finish();
             }
 
+            sendIcon.setVisibility(View.GONE);
+            record.setVisibility(View.VISIBLE);
             if(chatRoom.hasCustomTitle()){
                 textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
             }
@@ -7505,6 +7506,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 setAsRead=false;
             }
 
+            sendIcon.setVisibility(View.GONE);
+            record.setVisibility(View.VISIBLE);
             setChatSubtitle();
             if(chatRoom.hasCustomTitle()){
                 textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
