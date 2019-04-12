@@ -1334,11 +1334,6 @@ public class ChatController {
         log("pickFileToSend");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
-//        ArrayList<String> longArray = new ArrayList<String>();
-//        for (int i=0; i<users.size(); i++){
-//            longArray.add(users.get(i).getEmail());
-//        }
-//        intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 

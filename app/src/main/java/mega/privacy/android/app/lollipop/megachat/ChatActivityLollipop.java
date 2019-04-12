@@ -2076,17 +2076,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 return;
             }
 
-//            final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-//            final long fileHandle = intent.getLongExtra("NODE_HANDLES", 0);
-//            MegaNode node = megaApi.getNodeByHandle(fileHandle);
-//            if(node!=null){
-//                log("Node to send: "+node.getName());
-//                MegaNodeList nodeList = MegaNodeList.createInstance();
-//                nodeList.addNode(node);
-//                megaChatApi.attachNodes(idChat, nodeList, this);
-//
-//            }
-
             long handles[] = intent.getLongArrayExtra("NODE_HANDLES");
             log("Number of files to send: "+handles.length);
 

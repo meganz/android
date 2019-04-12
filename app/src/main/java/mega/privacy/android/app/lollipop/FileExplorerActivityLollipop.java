@@ -133,8 +133,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static int CHAT_TAB = 2;
 	boolean isChatFirst = false;
 
-	boolean sendOriginalAttachments = false;
-
 	DatabaseHandler dbH = null;
 
 	AppBarLayout abL;
@@ -167,9 +165,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private String gSession;
     UserCredentials credentials;
 	private String lastEmail;
-//	private ImageView windowBack;
-//	private boolean backVisible = false;
-//	private TextView windowTitle;
 	
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
@@ -213,7 +208,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
-	//	long gParentHandle;
 	long parentHandleIncoming;
 	long parentHandleCloud;
 	int deepBrowserTree = 0;
@@ -404,33 +398,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    float density  = getResources().getDisplayMetrics().density;
 		
 		if (credentials == null){
-
 			log("User credentials NULL");
-//			megaApi.localLogout();
-//			AccountController aC = new AccountController(this);
-//			aC.logout(this, megaApi, megaChatApi, false);
-			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
 			loginIntent.setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD);
-			/*if (intent != null){
-				if(intent.getExtras() != null)
-				{
-					Bundle bundle = intent.getExtras();
-					Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
-					log("URI in bundle: "+uri);
-					loginIntent.putExtras(intent.getExtras());
-				}
-				
-				if(intent.getData() != null)
-				{
-					log("URI: "+intent.getData());
-					loginIntent.setData(intent.getData());
-				}
-			}
-			else{
-				log("intent==null");
-			}*/	
 			startActivity(loginIntent);
 			return;
 		}
@@ -501,7 +472,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
-//			generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
@@ -647,8 +617,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				String title = getResources().getQuantityString(R.plurals.plural_select_file, 10);
 				aB.setTitle(title);
-
-				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
 				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 
@@ -1208,27 +1176,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         tv.setText(title);
         return view;
     }
-	
-//	public void setBackVisibility(boolean backVisible){
-////		this.backVisible = backVisible;
-////		if (windowBack != null){
-////			if (!backVisible){
-////				windowBack.setVisibility(View.INVISIBLE);
-////			}
-////			else{
-////				windowBack.setVisibility(View.VISIBLE);
-////			}
-////		}
-//		if(backVisible){
-//			aB.setDisplayHomeAsUpEnabled(true);
-//			aB.setDisplayShowHomeEnabled(true);
-//		}
-//		else{
-//			aB.setDisplayHomeAsUpEnabled(false);
-//			aB.setDisplayShowHomeEnabled(false);
-//		}
-//	}
-	
 
 	public void setRootTitle(){
 		log("setRootTitle");
