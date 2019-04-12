@@ -1285,7 +1285,24 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			return v;
 		}
 	}
-	
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setRetainInstance(true);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		reDoTheSelectionAfterRotation();
+	}
+
+	private void reDoTheSelectionAfterRotation() {
+		if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
+			adapterGrid.refreshActionModeTitle();
+		}
+	}
 	public void selectAll(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){

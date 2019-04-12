@@ -55,6 +55,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -1554,7 +1555,9 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             this.multipleSelect = true;
             checkedItems.append(positionInNodes, true);
 
-            actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
+            if (actionMode == null) {
+                actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
+            }
 
             startAnimation(holder, -1, false);
 
@@ -1726,5 +1729,17 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     
     private static void log(String log) {
         Util.log("MegaPhotoSyncGridTitleAdapterLollipop", log);
+    }
+
+    public void activateActionMode(){
+        log("activateActionMode");
+        if (!isMultipleSelect()){
+            setMultipleSelect(true);
+        }
+        actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
+    }
+
+    public void refreshActionModeTitle() {
+        activateActionMode();
     }
 }
