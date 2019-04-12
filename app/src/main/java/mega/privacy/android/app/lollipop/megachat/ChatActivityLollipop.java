@@ -2535,9 +2535,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         closeChat(true);
 

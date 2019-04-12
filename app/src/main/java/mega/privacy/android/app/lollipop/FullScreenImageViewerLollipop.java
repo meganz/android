@@ -3007,7 +3007,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onBackPressed() {
 		log("onBackPressed");
 		setImageDragVisibility(View.VISIBLE);
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
