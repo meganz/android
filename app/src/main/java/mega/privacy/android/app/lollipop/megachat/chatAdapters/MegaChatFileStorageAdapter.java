@@ -14,20 +14,15 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatFileStorageFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-
 
 public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFileStorageAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener{
 
@@ -39,18 +34,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     DisplayMetrics outMetrics;
     private SparseBooleanArray selectedItems;
     boolean multipleSelect;
-
     int padding = 6;
     private int dimPhotos;
-
     DatabaseHandler dbH;
-    private int count;
-    MegaPreferences prefs;
-    private SparseBooleanArray checkedItems = new SparseBooleanArray();
 
     /* public static view holder class */
     public static class ViewHolderBrowser extends ViewHolder {
-
         public ViewHolderBrowser(View v) {
             super(v);
         }
@@ -58,15 +47,13 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     }
 
     public static class ViewHolderBrowserGrid extends ViewHolderBrowser {
-
         public ViewHolderBrowserGrid(View v){
             super(v);
         }
         public ImageView photo;
         public RelativeLayout thumbLayout;
-        public ImageView photoSelected;
-
-//        public RelativeLayout photoUnselected;
+        public ImageView photoSelectedIcon;
+        public ImageView photoSelectedStroke;
     }
 
     public void toggleSelection(int pos) {
@@ -172,29 +159,24 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         ViewHolderBrowserGrid holderGrid = new ViewHolderBrowserGrid(v);
 
         holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_item_layout);
-
         holderGrid.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_storage_grid_thumbnail_layout);
-//        ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) holderGrid.thumbLayout.getLayoutParams();
-//        marginParams.setMargins(padding, padding, 0, 0);
-//        holderGrid.thumbLayout.setLayoutParams(marginParams);
-
         holderGrid.thumbLayout.setPadding(padding,padding,padding,padding);
 
         ViewGroup.LayoutParams params = holderGrid.thumbLayout.getLayoutParams();
         params.height = dimPhotos;
         params.width = dimPhotos;
         holderGrid.thumbLayout.setLayoutParams(params);
-
         holderGrid.thumbLayout.setVisibility(View.GONE);
 
         holderGrid.photo = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
-        holderGrid.photoSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
-        holderGrid.photoSelected.setVisibility(View.GONE);
-//        holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
-//        holderGrid.photoUnselected.setVisibility(View.GONE);
+        holderGrid.photoSelectedIcon = (ImageView) v.findViewById(R.id.thumbnail_selected_image);
+        holderGrid.photoSelectedStroke = (ImageView) v.findViewById(R.id.thumbnail_selected_stroke);
 
-        holderGrid.photoSelected.setMaxHeight(dimPhotos);
-        holderGrid.photoSelected.setMaxWidth(dimPhotos);
+        holderGrid.photoSelectedStroke.setVisibility(View.GONE);
+        holderGrid.photoSelectedIcon.setVisibility(View.GONE);
+
+        holderGrid.photoSelectedIcon.setMaxHeight(dimPhotos);
+        holderGrid.photoSelectedIcon.setMaxWidth(dimPhotos);
 
         holderGrid.itemLayout.setTag(holderGrid);
         holderGrid.itemLayout.setOnClickListener(this);
@@ -217,33 +199,30 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 //        if(image == null){
 //            return;
 //        }
-        holder.thumbLayout.setVisibility(View.VISIBLE);
 
+        holder.thumbLayout.setVisibility(View.VISIBLE);
         holder.photo.setVisibility(View.VISIBLE);
 
-        //holder.photo.setImageBitmap(image);
         Picasso.with(holder.photo.getContext())
                 .load(uriImages.get(position))
                 .fit()
                 .centerCrop()
                 .into(holder.photo);
 
+
+
         if (!multipleSelect) {
-            holder.photoSelected.setVisibility(View.GONE);
-//            holder.photoUnselected.setVisibility(View.GONE);
-
+            holder.photoSelectedIcon.setVisibility(View.GONE);
+            holder.photoSelectedStroke.setVisibility(View.GONE);
         }else {
-
             if(this.isItemChecked(position)){
-                holder.photoSelected.setVisibility(View.VISIBLE);
-//                holder.photoUnselected.setVisibility(View.GONE);
-
+                holder.photoSelectedIcon.setVisibility(View.VISIBLE);
+                holder.photoSelectedStroke.setVisibility(View.VISIBLE);
             }else{
-                holder.photoSelected.setVisibility(View.GONE);
-//                holder.photoUnselected.setVisibility(View.VISIBLE);
+                holder.photoSelectedIcon.setVisibility(View.GONE);
+                holder.photoSelectedStroke.setVisibility(View.GONE);
             }
         }
-
     }
 
     @Override
@@ -294,30 +273,19 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         }
         if (!isMultipleSelect()){
             setMultipleSelect(true);
-            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
-        }else{
-            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
-
         }
-        //((ChatFileStorageFragment) fragment).itemClick(currentPosition);
-
+        ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
     }
 
     @Override
     public boolean onLongClick(View view) {
-
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
         int currentPosition = holder.getAdapterPosition();
 
         if (!isMultipleSelect()){
             setMultipleSelect(true);
-            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
-
-        }else{
-            ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
-
         }
-
+        ((ChatFileStorageFragment) fragment).itemClick(currentPosition);
         return true;
     }
 
@@ -329,7 +297,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
             ((ChatFileStorageFragment) fragment).updateIconSend(this.multipleSelect);
-
         }
         if(this.multipleSelect){
             selectedItems = new SparseBooleanArray();

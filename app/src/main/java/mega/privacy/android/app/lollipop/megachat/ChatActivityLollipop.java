@@ -2087,6 +2087,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(adapter!=null){
             adapter.stopCurrentPlaying();
         }
+        hideKeyboard();
 
         if(megaChatApi != null){
             MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
@@ -2961,8 +2962,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             if(fileStorageLayout.isShown()){
                 hideFileStorageSection();
-            }
-            else{
+            }else{
                 if (handlerEmojiKeyboard != null){
                     handlerEmojiKeyboard.removeCallbacksAndMessages(null);
                 }
@@ -5067,12 +5067,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             log("**onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize: "+messages.size());
             if((bufferMessages.size()+messages.size())>=numberToLoad){
-                log("**onMessageLoaded:******");
                 fullHistoryReceivedOnLoad();
                 isLoadingHistory = false;
             }
             else if(((bufferMessages.size()+messages.size())<numberToLoad) && (stateHistory==MegaChatApi.SOURCE_ERROR)){
-                log("**onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
+                log("onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
                 retryHistory = true;
             }
             else{
@@ -7012,7 +7011,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onNewIntent(Intent intent){
         log("onNewIntent");
-
+        hideKeyboard();
         if (intent != null){
             if (intent.getAction() != null){
                 log("Intent is here!: "+intent.getAction());
@@ -7665,6 +7664,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onPause(){
         log("onPause");
         super.onPause();
+        hideKeyboard();
 //        if(mMediaPlayer != null){
 //            mMediaPlayer.release();
 //            mMediaPlayer = null;
@@ -8402,6 +8402,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else {
             marginBottomVoicleButton = Util.px2dp(48, outMetrics);
         }
+        log("paramsRecordButton: marginBottomVoicleButton = "+marginBottomVoicleButton);
 
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fragmentVoiceClip.getLayoutParams();
         lp.setMargins(0,0,0, marginBottomVoicleButton);

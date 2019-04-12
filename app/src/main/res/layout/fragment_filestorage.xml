@@ -48,18 +48,5 @@
             app:fabSize="normal"
             app:pressedTranslationZ="12dp" />
 
-        <!--<ImageButton-->
-            <!--android:id="@+id/send_file_icon_chat"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_marginRight="16dp"-->
-            <!--android:background="@color/white"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_marginBottom="16dp"-->
-            <!--android:tint="@color/accentColor"-->
-            <!--android:src="@drawable/ic_send_black"-->
-            <!--android:visibility="gone"/>-->
-
 </RelativeLayout>
 
