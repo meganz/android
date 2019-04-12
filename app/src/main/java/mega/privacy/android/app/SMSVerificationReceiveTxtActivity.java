@@ -36,6 +36,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -663,7 +664,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
     }
 
     @Override
-    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+    public void onRequestFinish(final MegaApiJava api,MegaRequest request,MegaError e) {
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
             log("send verification code,get " +  e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_EEXPIRED) {
@@ -682,6 +683,12 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        //haven't logged in, need to auto-login
+                        if(api.getRootNode() == null) {
+                            //auto login
+                            Intent intent = new Intent(LoginActivityLollipop.AUTO_LOGIN);
+                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                        }
                         setResult(RESULT_OK);
                         finish();
                     }

@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -60,6 +61,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
+    public static final String AUTO_LOGIN = "autoLogin";
     float scaleH, scaleW;
     float density;
     DisplayMetrics outMetrics;
@@ -124,10 +126,30 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     };
 
+    private BroadcastReceiver autoLoginReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && AUTO_LOGIN.equals(intent.getAction())){
+                if(loginFragment != null) {
+                    MegaChatApiAndroid megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+                    megaChatApi.logout();
+                    DatabaseHandler dbH = DatabaseHandler.getDbHandler(LoginActivityLollipop.this);
+                    if(dbH.getCredentials() != null) {
+                        loginFragment.startFastLogin();
+                    } else {
+                        loginFragment.performLogin();
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     protected void onDestroy() {
         log("onDestroy");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(autoLoginReceiver);
         if (megaApi != null) {
             megaApi.removeGlobalListener(this);
             megaApi.removeRequestListener(this);
@@ -198,6 +220,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+        LocalBroadcastManager.getInstance(this).registerReceiver(autoLoginReceiver, new IntentFilter(AUTO_LOGIN));
 
         showFragment(visibleFragment);
     }

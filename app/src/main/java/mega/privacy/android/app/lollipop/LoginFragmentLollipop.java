@@ -3084,7 +3084,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return false;
     }
 
-    private void performLogin(){
+    public void performLogin(){
         if (validateForm()) {
             Util.checkPendingTransfer(megaApi, getContext(), this);
         }
