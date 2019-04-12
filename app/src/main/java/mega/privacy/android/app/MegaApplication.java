@@ -92,6 +92,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
@@ -143,6 +144,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	private static boolean registeredChatListeners = false;
 
+	private static boolean isVerifySMSShowed = false;
+
 	MegaChatApiAndroid megaChatApi = null;
 
 	private NetworkStateReceiver networkStateReceiver;
@@ -162,6 +165,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		intent.putExtra("actionType", Constants.GO_OFFLINE);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
+
+    public static void smsVerifyShowed(boolean isShowed) {
+	    isVerifySMSShowed = isShowed;
+    }
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -1363,7 +1370,23 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				intent.putExtra("state", state);
 				LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 			}
-		}
+        } else if (event.getType() == MegaEvent.EVENT_ACCOUNT_BLOCKED) {
+            //need sms verification to unblock
+            long whyAmIBlocked = event.getNumber();
+            int state = api.smsAllowedState();
+            log("whyAmIBlocked: " + whyAmIBlocked);
+            log("state: " + state);
+            boolean b = state != 0;
+            if (event.getNumber() == 500 && b) {
+                if (!isVerifySMSShowed) {
+                    Intent intent = new Intent(this,SMSVerificationActivity.class);
+                    intent.putExtra(NAME_USER_LOCKED,true);
+                    startActivity(intent);
+                }
+            } else {
+                //go back to login page.
+            }
+        }
 	}
 
 

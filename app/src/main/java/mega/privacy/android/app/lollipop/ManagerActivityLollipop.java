@@ -672,7 +672,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 if(drawerLayout != null) {
                     drawerLayout.closeDrawer(Gravity.LEFT);
                 }
-                showSnackbar(Constants.SNACKBAR_TYPE,getString(R.string.verify_account_successfully),-1);
                 refreshAddPhoneNumberButton();
             }
         }

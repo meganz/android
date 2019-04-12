@@ -50,7 +50,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
@@ -79,7 +78,6 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SMS_VERIFICATION;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener, AbortPendingTransferCallback {
 
@@ -2188,7 +2186,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     verifyShowError();
                 }else if(error.getErrorCode() == MegaError.API_EBLOCKED){
-                    needSMSVerification(request);
+                    //do nothing here, MegaApplication will hanlde blocked.
+                    errorMessage = getString(R.string.error_account_suspended);
                 }
                 else{
                     if (error.getErrorCode() == MegaError.API_ENOENT) {
@@ -2340,7 +2339,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     errorMessage = getString(R.string.account_not_validated_login);
                 } else if (error.getErrorCode() == MegaError.API_EBLOCKED) {
                     errorMessage = getString(R.string.error_account_suspended);
-                    needSMSVerification(request);
                 }
                 else{
                     errorMessage = error.getErrorString();
@@ -2447,23 +2445,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 }
             }
-        }
-    }
-
-    /**
-     * Check the number, to see if need to verify phone number to unblock.
-     *
-     * @param request MegaRequest object, contains the 'whyAmIBlocked' reason code.
-     */
-    private void needSMSVerification(MegaRequest request) {
-        long whyAmIBlocked = request.getNumber();
-        log("whyAmIBlocked: " + whyAmIBlocked);
-        if (whyAmIBlocked == 500) {
-            Intent intent = new Intent(context,SMSVerificationActivity.class);
-            intent.putExtra(NAME_USER_LOCKED,true);
-            startActivityForResult(intent,REQUEST_CODE_SMS_VERIFICATION);
-        } else {
-            log("blocked, but no need to verify phone number");
         }
     }
 

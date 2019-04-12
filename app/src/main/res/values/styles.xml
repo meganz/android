@@ -289,7 +289,6 @@
 	<style name="SMSVerificationReceiveTxtActivityTheme" parent="Theme.Megaactionbar">
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="colorPrimary">#FFF9F9F9</item>
-		<item name="android:background">#ffffff</item>
 	</style>
     <style name="GetFreeXxGbWhen" parent="@style/TextAppearance.AppCompat">
         <item name="android:fontFamily">Roboto</item>

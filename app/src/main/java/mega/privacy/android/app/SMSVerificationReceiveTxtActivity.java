@@ -677,8 +677,15 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 log("verification successful");
                 Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                setResult(RESULT_OK);
-                finish();
+                showSnackbar(Constants.SNACKBAR_TYPE,inputContainer,getString(R.string.verify_account_successfully),-1);
+                //showing the successful text for 2 secs, then finish itself back to previous page.
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+                }, 2000);
             } else {
                 log("invalid code");
                 showError(getString(R.string.verify_account_error_invalid_code));

@@ -56,6 +56,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     protected void onCreate(Bundle savedInstanceState) {
         log("SMSVerificationActivity onCreate");
         super.onCreate(savedInstanceState);
+        MegaApplication.smsVerifyShowed(true);
         setContentView(R.layout.activity_sms_verification);
         Intent intent = getIntent();
         if (intent != null) {
@@ -209,6 +210,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        MegaApplication.smsVerifyShowed(false);
     }
     
     @Override
