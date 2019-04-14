@@ -1261,6 +1261,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				adapterGrid.setHasStableIds(true);
 			} else {
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
+
+				if (adapterGrid.getContext() != context) {
+					log("sometimes after rotation, the attached activity is not the same as previous activity, we need to update the context");
+					adapterGrid.setContext(context);
+				}
+
 				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
 				adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
 			}
@@ -1300,9 +1306,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	private void reDoTheSelectionAfterRotation() {
 		if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
+			log("There is previous selected items, we need to redo the selection");
 			adapterGrid.refreshActionModeTitle();
 		}
 	}
+
 	public void selectAll(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){

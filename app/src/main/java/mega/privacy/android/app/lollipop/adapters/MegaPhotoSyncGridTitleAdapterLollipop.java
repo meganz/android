@@ -1050,6 +1050,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         notifyDataSetChanged();
     }
 
+    public void setContext(Context context) {
+        log("context has been updated, the action mode needs to be cleaned");
+        this.context = context;
+        actionMode = null;
+    }
+
+    public Context getContext() {
+        return this.context;
+    }
+
     public void setPhotoSyncHandle(long photoSyncHandle){
         this.photosyncHandle = photoSyncHandle;
         notifyDataSetChanged();
@@ -1555,9 +1565,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             this.multipleSelect = true;
             checkedItems.append(positionInNodes, true);
 
-            if (actionMode == null) {
-                actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
-            }
+            actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
 
             startAnimation(holder, -1, false);
 
@@ -1566,6 +1574,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         else{
             onNodeClick(holder, positionInNodes);
         }
+    }
+
+    private void forceNewActionMode() {
+        log("force create new action mode");
+        actionMode = ((AppCompatActivity) context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
     }
 
     private void updateActionModeTitle() {
@@ -1732,6 +1745,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public void refreshActionModeTitle() {
+        forceNewActionMode();
         updateActionModeTitle();
         notifyDataSetChanged();
     }
