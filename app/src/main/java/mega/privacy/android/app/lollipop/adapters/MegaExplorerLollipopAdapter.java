@@ -521,18 +521,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		selectedItems.clear();
 	}
 
-	//	public void clearSelections() {
-//		if(selectedItems!=null){
-//			selectedItems.clear();
-//			for (int i= 0; i<this.getItemCount();i++) {
-//				if (isItemChecked(i)) {
-//					toggleAllSelection(i);
-//				}
-//			}
-//		}
-//		notifyDataSetChanged();
-//	}
-//
 	private boolean isItemChecked(int position) {
 		return selectedItems.get(position);
 	}
