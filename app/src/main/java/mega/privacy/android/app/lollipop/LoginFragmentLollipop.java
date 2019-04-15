@@ -18,7 +18,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -2354,8 +2353,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
             log("TYPE_LOGOUT");
-            if(error.getErrorCode() == MegaError.API_OK) {
-                //clear credentials, cache and offline content.
+            if (error.getErrorCode() == MegaError.API_OK){
                 AccountController.localLogoutApp(context.getApplicationContext());
                 AccountController.logoutConfirmed(context.getApplicationContext());
                 enableLoginButton();
