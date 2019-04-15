@@ -2016,8 +2016,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		if (fileLinkFolderLink){
 			fileLinkFragmentContainer.setVisibility(View.GONE);
@@ -2100,7 +2099,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
