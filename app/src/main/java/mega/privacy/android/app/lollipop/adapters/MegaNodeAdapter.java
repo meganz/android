@@ -325,8 +325,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 items.add(selectedItems.keyAt(i));
             }
             return items;
-        }
-        else {
+        } else {
             return null;
         }
     }
