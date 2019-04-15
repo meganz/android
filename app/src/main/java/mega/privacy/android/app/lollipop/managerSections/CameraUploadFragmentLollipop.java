@@ -978,6 +978,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (adapterList == null) {
 				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			} else {
+				if (context != adapterList.getContext()) {
+					log("sometimes after rotation, the attached activity is not the same as previous activity, we need to update the context, and hardfresh the action mode");
+					adapterList.setContext(context);
+					actionMode = null;
+				}
+				if (listView != adapterList.getListFragment()) {
+					log("sometimes after rotation, the attached listView is not the same as previous listView, we need to update the listView to enable the toggle");
+					adapterList.setListFragment(listView);
+				}
 				adapterList.setNodes(nodesArray, nodes);
 			}
 
@@ -1305,10 +1314,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	private void reDoTheSelectionAfterRotation() {
-		if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
-			log("There is previous selected items, we need to redo the selection");
-			adapterGrid.refreshActionModeTitle();
+		if (((ManagerActivityLollipop)context).isListCameraUploads()) {
+			if (adapterList != null && adapterList.getSelectedDocuments().size() > 0) {
+				log("There is previous selected items, we need to redo the selection");
+				activateActionMode();
+				updateActionModeTitle();
+			}
 		}
+		else {
+			if (adapterGrid != null && adapterGrid.getSelectedDocuments().size() > 0) {
+				log("There is previous selected items, we need to redo the selection");
+				adapterGrid.refreshActionModeTitle();
+			}
+		}
+
 	}
 
 	public void selectAll(){
@@ -1963,7 +1982,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 	}
-	
+
 	private void updateActionModeTitle() {
 
 		log("updateActionModeTitle");
