@@ -53,6 +53,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -2352,12 +2353,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaApi.fetchNodes(this);
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
-            enableLoginButton();
-            //need to clear local credentials?
-//            if (dbH != null) {
-//                dbH.clearCredentials();
-//                dbH.clearEphemeral();
-//            }
+            log("TYPE_LOGOUT");
+            if (error.getErrorCode() == MegaError.API_OK){
+                AccountController.localLogoutApp(context.getApplicationContext());
+                enableLoginButton();
+            }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
             log("TYPE_GET_RECOVERY_LINK");
