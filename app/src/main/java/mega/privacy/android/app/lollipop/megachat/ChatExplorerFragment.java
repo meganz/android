@@ -37,7 +37,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
@@ -69,6 +69,7 @@ public class ChatExplorerFragment extends Fragment {
 
     LinearLayoutManager mLayoutManager;
 
+    ArrayList<ChatExplorerListItem> recents;
     ArrayList<MegaChatListItem> chats;
     ArrayList<MegaChatListItem> archievedChats;
     ArrayList<MegaContactAdapter> contacts;
@@ -83,7 +84,6 @@ public class ChatExplorerFragment extends Fragment {
     LinearLayout emptyLayout;
     TextView emptyTextViewInvite;
     ImageView emptyImageView;
-    int chatStatus;
     Button inviteButton;
     RelativeLayout contentLayout;
     ProgressBar progressBar;
@@ -178,7 +178,6 @@ public class ChatExplorerFragment extends Fragment {
 
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
 
-        listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
@@ -734,6 +733,45 @@ public class ChatExplorerFragment extends Fragment {
                 }
 
                 chats = megaChatApi.getActiveChatListItems();
+
+                if (!chats.isEmpty()) {
+                    Collections.sort(chats, new Comparator<MegaChatListItem>() {
+
+                        public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                            long timestamp1 = c1.getLastTimestamp();
+                            long timestamp2 = c2.getLastTimestamp();
+
+                            long result = timestamp2 - timestamp1;
+                            return (int) result;
+                        }
+                    });
+
+                    recents = new ArrayList<>();
+                    recents.add(new ChatExplorerListItem(true, true));
+                    ArrayList<MegaChatListItem> removeChats = new ArrayList<>();
+                    for (MegaChatListItem chat : chats) {
+                        if (chat.getOwnPrivilege() < MegaChatRoom.PRIV_STANDARD) {
+                            continue;
+                        }
+                        ChatExplorerListItem item;
+                        if (chat.isGroup()) {
+                            item = new ChatExplorerListItem(chat);
+                        }
+                        else {
+                            item = new ChatExplorerListItem(chat, getContact(chat));
+                        }
+                        item.setRecent(true);
+                        recents.add(item);
+                        removeChats.add(chat);
+                        if (recents.size() == 6) {
+                            break;
+                        }
+                    }
+                    for (MegaChatListItem remove: removeChats) {
+                        chats.remove(remove);
+                    }
+                }
+
                 archievedChats = megaChatApi.getArchivedChatListItems();
                 getVisibleMEGAContacts();
 
@@ -789,6 +827,13 @@ public class ChatExplorerFragment extends Fragment {
 
                 //Order by title
                 sortByAlphabetical();
+                if (!items.isEmpty()) {
+                    items.add(0, new ChatExplorerListItem(true, false));
+                }
+
+                for (int i=0; i<recents.size(); i++) {
+                    items.add(i, recents.get(i));
+                }
 
                 if (adapterList == null){
                     log("adapterList is NULL");
@@ -801,7 +846,7 @@ public class ChatExplorerFragment extends Fragment {
                 if (addedItemsSaved != null && !addedItemsSaved.isEmpty()) {
                     for (String id : addedItemsSaved) {
                         for (ChatExplorerListItem item : items) {
-                            if (item.getId().equals(id)) {
+                            if (!item.isHeader() && item.getId().equals(id)) {
                                 addedItems.add(item);
                                 int position = adapterList.getPosition(item);
                                 if (position != -1) {
@@ -828,7 +873,14 @@ public class ChatExplorerFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
 
             addedList.setAdapter(adapterAdded);
-
+            int position;
+            if (recents != null && !recents.isEmpty()) {
+                position = recents.size();
+            }
+            else {
+                position = -1;
+            }
+            listView.addItemDecoration(new PositionDividerItemDecoration(context, outMetrics, position));
             listView.setAdapter(adapterList);
 
             if (adapterAdded.getItemCount() == 0) {

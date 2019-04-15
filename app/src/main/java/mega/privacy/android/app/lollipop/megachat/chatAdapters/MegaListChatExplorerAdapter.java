@@ -93,12 +93,15 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         }
 
         RelativeLayout itemLayout;
+        RelativeLayout itemContainer;
         RoundedImageView avatarImage;
         TextView initialLetter;
         EmojiTextView titleText;
         ImageView stateIcon;
         MarqueeTextView lastSeenStateText;
         EmojiTextView participantsText;
+        RelativeLayout headerLayout;
+        TextView headerText;
 
         String email;
 
@@ -124,6 +127,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_explorer_list, parent, false);
         holder = new ViewHolderChatExplorerList(v);
 
+        holder.headerLayout = (RelativeLayout) v.findViewById(R.id.header_layout);
+        holder.headerText = (TextView) v.findViewById(R.id.label_text);
+        holder.itemContainer =(RelativeLayout) v.findViewById(R.id.item_container);
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
         holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
         holder.initialLetter = (TextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
@@ -152,6 +158,20 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
 
+        if (item.isHeader()) {
+            holder.itemContainer.setVisibility(View.GONE);
+            holder.headerLayout.setVisibility(View.VISIBLE);
+            if (item.isRecent()) {
+                holder.headerText.setText(R.string.recents_label);
+            }
+            else {
+                holder.headerText.setText(R.string.chats_label);
+            }
+            return;
+        }
+
+        holder.headerLayout.setVisibility(View.GONE);
+        holder.itemContainer.setVisibility(View.VISIBLE);
         holder.titleText.setText(item.getTitle());
 
         if (chat != null && chat.isGroup()) {

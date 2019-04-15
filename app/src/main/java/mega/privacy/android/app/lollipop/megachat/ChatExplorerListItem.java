@@ -5,10 +5,12 @@ import nz.mega.sdk.MegaChatListItem;
 
 public class ChatExplorerListItem {
 
-    MegaContactAdapter contact;
-    MegaChatListItem chat;
-    String title;
-    String id;
+    private MegaContactAdapter contact;
+    private MegaChatListItem chat;
+    private String title;
+    private String id;
+    private boolean isRecent;
+    private boolean isHeader;
 
     public ChatExplorerListItem (MegaContactAdapter contact) {
         this.contact = contact;
@@ -30,6 +32,11 @@ public class ChatExplorerListItem {
         this.id = String.valueOf(chat.getChatId());
     }
 
+    public ChatExplorerListItem (boolean isHeader, boolean isRecent) {
+        this.isHeader = isHeader;
+        this.isRecent =  isRecent;
+    }
+
     public MegaChatListItem getChat() {
         return chat;
     }
@@ -44,5 +51,17 @@ public class ChatExplorerListItem {
 
     public String getId() {
         return id;
+    }
+
+    public void setRecent(boolean recent) {
+        isRecent = recent;
+    }
+
+    public boolean isRecent () {
+        return isRecent;
+    }
+
+    public boolean isHeader ()  {
+        return isHeader;
     }
 }
