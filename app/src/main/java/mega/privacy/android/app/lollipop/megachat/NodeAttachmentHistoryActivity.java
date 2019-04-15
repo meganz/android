@@ -832,13 +832,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		intent.putExtra("messageIds", array);
 		startActivity(intent);
 	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-		super.callToSuperBack = true;
-		super.onBackPressed();
-	}
 	
 	private void updateActionModeTitle() {
 		log("updateActionModeTitle");

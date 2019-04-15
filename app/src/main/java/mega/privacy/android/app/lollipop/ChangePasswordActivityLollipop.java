@@ -310,7 +310,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			intent.putExtra("logout", getIntent().getBooleanExtra("logout", false));
 			startActivity(intent);
 		}
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
