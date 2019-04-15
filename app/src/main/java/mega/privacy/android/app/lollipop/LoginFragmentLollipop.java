@@ -18,6 +18,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -53,6 +54,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -2195,7 +2197,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
-        //when get response, enable, hide login info
         try{
             if(timer!=null){
                 timer.cancel();
@@ -2352,12 +2353,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaApi.fetchNodes(this);
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
-            enableLoginButton();
-            //need to clear local credentials?
-//            if (dbH != null) {
-//                dbH.clearCredentials();
-//                dbH.clearEphemeral();
-//            }
+            log("TYPE_LOGOUT");
+            if(error.getErrorCode() == MegaError.API_OK) {
+                //clear credentials, cache and offline content.
+                AccountController.localLogoutApp(context.getApplicationContext());
+                AccountController.logoutConfirmed(context.getApplicationContext());
+                enableLoginButton();
+            }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
             log("TYPE_GET_RECOVERY_LINK");
@@ -2987,9 +2989,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }
         };
-        String message= "Cancel current login";
-        confirmLogoutDialog =  builder.setCancelable(true).setMessage(message).setPositiveButton("YES", dialogClickListener)
-                .setNegativeButton("NO", dialogClickListener).show();
+        String message= getString(R.string.confirm_cancel_login);
+        confirmLogoutDialog =  builder.setCancelable(true)
+                .setMessage(message)
+                .setPositiveButton(getString(R.string.general_positive_button), dialogClickListener)
+                .setNegativeButton(getString(R.string.general_negative_button), dialogClickListener)
+                .show();
     }
 
     public int onBackPressed() {
