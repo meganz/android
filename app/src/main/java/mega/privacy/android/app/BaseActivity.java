@@ -152,13 +152,10 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("BROADCAST TO SEND SIGNAL PRESENCE");
-                MegaChatPresenceConfig config = megaChatApi.getPresenceConfig();
-                if(config != null) {
-                    if(delaySignalPresence && !config.isPending()){
-                        delaySignalPresence = false;
-                        retryConnectionsAndSignalPresence();
-                    }
+                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
+                    delaySignalPresence = false;
+                    retryConnectionsAndSignalPresence();
                 }
             }
         }
@@ -244,7 +241,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 if(!(this instanceof ChatCallActivity)){
                     log("Send signal presence if needed");
-                    if(megaChatApi.isSignalActivityRequired()){
+                    if(megaChatApi != null && megaChatApi.isSignalActivityRequired()){
                         megaChatApi.signalPresenceActivity();
                     }
                 }

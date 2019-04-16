@@ -838,7 +838,6 @@ public class NodeController {
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
-//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
                                         log("The video has not thumb");
@@ -853,7 +852,13 @@ public class NodeController {
                         catch(Exception e) {
                             log("Exception!!");
                         }
-
+    
+                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                        if (!autoPlayEnabled) {
+                            log("auto play disabled");
+                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
+                            return;
+                        }
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             log("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
@@ -1074,12 +1079,13 @@ public class NodeController {
                 }
             }
             log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-            if (numberOfNodesAlreadyDownloaded > 0){
-                String msg = context.getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-                if (numberOfNodesPending > 0){
-                    msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
+            if (numberOfNodesAlreadyDownloaded > 0) {
+                String msg;
+                msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded,numberOfNodesAlreadyDownloaded,numberOfNodesAlreadyDownloaded);
+                if (numberOfNodesPending > 0) {
+                    msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
                 }
-                showSnackbar(Constants.SNACKBAR_TYPE, msg);
+                showSnackbar(Constants.SNACKBAR_TYPE,msg);
             }
         }
     }
@@ -2127,10 +2133,18 @@ public class NodeController {
             log("is file");
             String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
             if(localPath != null){
+                File file = new File(localPath);
                 try {
-                    Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                    Util.copyFile(file, new File(parentPath, tempNode.getName()));
                 }catch(Exception e) {}
-                showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+
+                if (file != null && file.getParent().equals(parentPath)) {
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
+                }
+                else {
+                    showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.copy_already_downloaded));
+                }
+
             }
             else{
                 log("LocalPath is NULL");

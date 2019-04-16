@@ -514,13 +514,15 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					int ret = megaChatApi.getInitState();
 
-					if(ret==0||ret==MegaChatApi.INIT_ERROR){
+					if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
 						ret = megaChatApi.init(gSession);
 						log("onCreate: result of init ---> "+ret);
 						chatSettings = dbH.getChatSettings();
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
+							megaChatApi.enableGroupChatCalls(true);
+
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
 						{
@@ -2085,7 +2087,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finishActivity();
 		}
 		else{
-			showSnackbar(getString(R.string.email_verification_text_error));
+			showSnackbar(getString(R.string.general_text_error));
 		}
 	}
 
