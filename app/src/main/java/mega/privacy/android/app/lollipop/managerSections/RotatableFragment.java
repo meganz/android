@@ -71,6 +71,4 @@ public abstract class RotatableFragment extends Fragment {
         super.onStop();
         this.lastPlaceHolderCount = getAdapter().getPlaceholderCount();
     }
-
-
 }
