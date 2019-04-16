@@ -2358,7 +2358,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("TYPE_LOGOUT");
             if (error.getErrorCode() == MegaError.API_OK){
                 AccountController.localLogoutApp(context.getApplicationContext());
-                AccountController.logoutConfirmed(context.getApplicationContext());
                 enableLoginButton();
             }
         }
