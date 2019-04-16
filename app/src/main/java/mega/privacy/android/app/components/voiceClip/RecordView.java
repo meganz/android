@@ -66,6 +66,8 @@ public class RecordView extends RelativeLayout {
     private ImageView imageLock, imageArrow;
     private boolean flagRB = false;
     private boolean isLockpadShown = false;
+    private boolean isRecordingNow = false;
+
     Handler handlerStartRecord = new Handler();
     Handler handlerShowPadLock = new Handler();
     float previewX = 0;
@@ -152,6 +154,10 @@ public class RecordView extends RelativeLayout {
         hideViews(true);
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
+    }
+
+    public void setRecordingNow(boolean recordingNow) {
+        isRecordingNow = recordingNow;
     }
 
     private void hideViews(boolean hideSmallMic) {
@@ -357,7 +363,8 @@ public class RecordView extends RelativeLayout {
                 direction = UserBehaviour.NONE;
             }
 
-            if ((direction == UserBehaviour.CANCELING) && ((userBehaviour!= UserBehaviour.CANCELING) || (motionEvent.getRawY() + recordBtnLayout.getWidth() / 2 > firstY)) ){
+
+            if ((direction == UserBehaviour.CANCELING) && ((userBehaviour!= UserBehaviour.CANCELING) || (motionEvent.getRawY() + recordBtnLayout.getWidth() / 2 > firstY)) && (isRecordingNow) ){
 
                 if (recordBtnLayout.getX() <= (counterTime.getRight() + cancelBounds)){
                     log("onActionMove() CANCELING");

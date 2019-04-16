@@ -838,9 +838,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("recordView.setOnRecordListener():onCancel() - myAudioRecorder.reset()");
                         myAudioRecorder.reset();
                         outputFileVoiceNotes = null;
-                        recordButtonStates(RECORD_BUTTON_DESACTIVATED);
                     }
                 }
+                recordButtonStates(RECORD_BUTTON_DESACTIVATED);
+
             }
 
             @Override
@@ -2132,6 +2133,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButtonLayout.setVisibility(View.VISIBLE);
 
         if(recordButtonState == RECORD_BUTTON_SEND){
+            log("recordButtonStates:SEND");
+
             setRecordingNow(true);
             recordView.showLock(false);
             sendIcon.setVisibility(View.GONE);
@@ -2149,6 +2152,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
 
         }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
+            log("recordButtonStates:ACTIVATED");
+
             setRecordingNow(true);
             sendIcon.setVisibility(View.GONE);
             textChat.setVisibility(View.GONE);
@@ -2164,6 +2169,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             recordButton.setColorFilter(null);
 
         }else if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
+            log("recordButtonStates:DESACTIVATED");
+
             setRecordingNow(false);
             recordView.showLock(false);
             sendIcon.setVisibility(View.GONE);
@@ -5063,7 +5070,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 retryHistory = true;
             }
             else{
-                log("**onMessageLoaded:lessNumberReceived");
+                log("onMessageLoaded:lessNumberReceived");
                 if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
                     log("But more history exists --> loadMessages");
                     log("G->loadMessages unread is 0");
@@ -8417,6 +8424,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if((recordButtonState == RECORD_BUTTON_SEND)||(recordButtonState == RECORD_BUTTON_DESACTIVATED)){
+            log("paramsRecordButton:SEND||DESACTIVATED");
+
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
             params.height = Util.px2dp(48, outMetrics);
             params.width = Util.px2dp(48, outMetrics);
@@ -8426,6 +8435,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             recordButtonLayout.setLayoutParams(params);
 
        }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
+            log("paramsRecordButton:SEND||ACTIVATED");
+
             int marginBottomRecordLayout = 0;
 
             if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
@@ -8462,6 +8473,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setRecordingNow(boolean recordingNow) {
         this.recordingNow = recordingNow;
+        recordView.setRecordingNow(recordingNow);
         if(recordingNow){
             if(textChat!=null){
                 textChat.setEnabled(false);

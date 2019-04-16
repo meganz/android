@@ -493,7 +493,7 @@
                     android:layout_height="wrap_content"
                     android:maxHeight ="150dp"
                     android:visibility="visible"
-                    android:background="@color/blue"/>
+                    android:background="@null"/>
                 <RelativeLayout
                     android:id="@+id/layout_button_layout"
                     android:layout_width="match_parent"
@@ -506,7 +506,7 @@
                         android:layout_height="48dp"
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentRight="true"
-                        android:background="@color/orange"
+                        android:background="@null"
                         android:visibility="visible">
                         <mega.privacy.android.app.components.voiceClip.RecordButton
                             android:id="@+id/record_button"
@@ -524,6 +524,7 @@
                         android:orientation="vertical"
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="10dp"
+                        android:layout_marginBottom="-10dp"
                         android:layout_above="@+id/record_button_layout"
                         android:visibility="visible">
                         <TextView
