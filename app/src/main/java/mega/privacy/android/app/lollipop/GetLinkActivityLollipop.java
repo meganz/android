@@ -384,9 +384,17 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					log("Check are equal");
 					if(value1.equals(value2)){
 						log("Proceed to set pass");
-						getLinkFragment.processingPass();
-						megaApi.encryptLinkWithPassword(link, value2, getLinkActivity);
-						passwordDialog.dismiss();
+                        int passwordMinLength = 8;  //to be consistent with web client
+                        if(value1.length() < passwordMinLength){
+                            input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            errorLayout2.setVisibility(View.VISIBLE);
+                            textError2.setText(R.string.error_password_too_weak);
+                            input2.requestFocus();
+                        }else{
+                            getLinkFragment.processingPass();
+                            megaApi.encryptLinkWithPassword(link, value2, getLinkActivity);
+                            passwordDialog.dismiss();
+                        }
 					}
 					else{
 						input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
