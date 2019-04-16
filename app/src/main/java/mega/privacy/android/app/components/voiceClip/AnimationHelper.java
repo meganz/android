@@ -199,14 +199,14 @@ public class AnimationHelper {
     }
 
 
-    public void moveRecordButtonAndSlideToCancelBack(final RecordButton recordBtn, FrameLayout slideToCancelLayout, float initialX, float difX) {
+    public void moveRecordButtonToCancelBack(final RelativeLayout recordBtn, float initialX, float difX) {
         log("moveRecordButtonAndSlideToCancelBack()");
         final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
         positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                log("moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
+                log("*moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
                 float x = (Float) animation.getAnimatedValue();
                 recordBtn.setX(x);
             }
@@ -225,7 +225,7 @@ public class AnimationHelper {
         // if the move event was not called ,then the difX will still 0 and there is no need to move it back
         if (difX != 0) {
             float x = initialX - difX;
-            slideToCancelLayout.animate().x(x).setDuration(0).start();
+            recordBtn.animate().x(x).setDuration(0).start();
         }
     }
 

@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -23,6 +24,8 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
+import mega.privacy.android.app.components.voiceClip.RecordButton;
+import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.utils.Util;
 
 public class EmojiKeyboard extends LinearLayout {
@@ -35,6 +38,8 @@ public class EmojiKeyboard extends LinearLayout {
     private View rootView;
     private ImageButton emojiIcon;
     private FrameLayout fragment;
+    private RelativeLayout recordButtonLayout;
+    private RecordView recordView;
     private int keyboardHeight;
     private int marginBottom;
     private OnEmojiClickListener onEmojiClickListener;
@@ -124,11 +129,13 @@ public class EmojiKeyboard extends LinearLayout {
         super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(keyboardHeight, MeasureSpec.EXACTLY));
     }
 
-    public void init(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon, FrameLayout fragment) {
+    public void init(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon, FrameLayout fragment, RelativeLayout recordButtonLayout, RecordView recordView) {
         this.editInterface = editText;
         this.emojiIcon = emojiIcon;
         this.activity = context;
         this.fragment = fragment;
+        this.recordButtonLayout = recordButtonLayout;
+        this.recordView = recordView;
 
         display = activity.getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -249,14 +256,22 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void paramsRecordButton(int marginBottomVoicleButton){
-        if(fragment!=null){
-            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fragment.getLayoutParams();
-            lp.setMargins(0,0,0, marginBottomVoicleButton);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            fragment.setLayoutParams(lp);
+        if((fragment!=null)&&(recordButtonLayout!=null)&&(recordView!=null)){
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
+            params.height = Util.px2dp(48, outMetrics);
+            params.width = Util.px2dp(48, outMetrics);
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.setMargins(Util.px2dp(0, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(0, outMetrics), marginBottomVoicleButton);
+            recordButtonLayout.setLayoutParams(params);
+
+            FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
+            paramsRecordView.setMargins(0,0,Util.px2dp(0, outMetrics), marginBottomVoicleButton);
+            paramsRecordView.gravity = Gravity.BOTTOM |Gravity.RIGHT ;
+            recordView.setLayoutParams(paramsRecordView);
         }
     }
+
 
     public void setListenerActivated(boolean listenerActivated) {
         isListenerActivated = listenerActivated;

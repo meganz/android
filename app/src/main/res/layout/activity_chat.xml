@@ -481,54 +481,68 @@
             <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/record_voice_clip_layout"
+                android:id="@+id/fragment_voice_clip"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
+                android:layout_height="match_parent"
+                android:background="@null"
                 android:visibility="visible">
 
                 <mega.privacy.android.app.components.voiceClip.RecordView
-                    android:id="@+id/rl_voice_clip"
+                    android:id="@+id/record_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxHeight ="150dp"
-                    android:background="@android:color/transparent"
                     android:visibility="visible"
-                    android:layout_marginRight="8dp"
-                    android:layout_gravity="bottom|right"/>
-
-                <mega.privacy.android.app.components.voiceClip.RecordButton
-                    android:id="@+id/record_fab"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:scaleType="centerInside"
-                    android:layout_gravity="bottom|right"
-                    android:layout_marginRight="8dp"
-                    android:visibility="visible"
-                    app:mic_icon="@drawable/ic_b_mic_on"/>
-
-                <LinearLayout
-                    android:id="@+id/bubble_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_gravity="bottom|right"
-                    android:layout_marginRight="17dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginBottom="40dp"
-                    android:visibility="visible">
-                    <TextView
-                        android:id="@+id/bubble_text"
+                    android:background="@color/blue"/>
+                <RelativeLayout
+                    android:id="@+id/layout_button_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:background="@android:color/transparent">
+                    <RelativeLayout
+                        android:id="@+id/record_button_layout"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:background="@color/orange"
+                        android:visibility="visible">
+                        <mega.privacy.android.app.components.voiceClip.RecordButton
+                            android:id="@+id/record_button"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:visibility="visible"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/ic_mic_vc_off"/>
+                    </RelativeLayout>
+                    <LinearLayout
+                        android:id="@+id/bubble_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/recording_less_than_second"
-                        android:textSize="12sp"
-                        android:gravity="center"
-                        android:layout_gravity="center"
-                        android:textColor="@color/white"
-                        android:textStyle="normal"
-                        android:fontFamily="Roboto"/>
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_above="@+id/record_button_layout"
+                        android:visibility="visible">
+                        <TextView
+                            android:id="@+id/bubble_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/recording_less_than_second"
+                            android:textSize="12sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/white"
+                            android:textStyle="normal"
+                            android:fontFamily="Roboto"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+
+
+
             </FrameLayout>
         </RelativeLayout>
     </RelativeLayout>
