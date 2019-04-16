@@ -89,12 +89,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 
-			if(modeCloud==FileExplorerActivityLollipop.SELECT){
-				if(selectFile) {
-					if (((FileExplorerActivityLollipop) context).multiselect) {
-						activateButton(true);
-					}
-				}
+			if(isMultiselect()) {
+				activateButton(true);
 			}
 		}
 	}
@@ -417,44 +413,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 		}
-//		else{
-//			if(selectFile)
-//			{
-//				separator.setVisibility(View.GONE);
-//				optionsBar.setVisibility(View.GONE);
-//			}
-//		}
+
 
 		if (adapter == null){
 			if(selectFile){
 				log("Mode SELECT FILE ON");
 			}
-
-//			if(((FileExplorerActivityLollipop)context).multiselect){
-				adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-				log("SetOnItemClickListener");
-				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-
-					@Override
-					public void onItemClick(View view, int position) {
-						log("item click listener trigger!!");
-						itemClick(view, position);
-					}
-				});
-//			}
-//			else{
-//
-//				adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, selectFile);
-//				log("SetOnItemClickListener");
-//				adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-//
-//					@Override
-//					public void onItemClick(View view, int position) {
-//						log("item click listener trigger!!");
-//						itemClick(view, position);
-//					}
-//				});
-//			}
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
@@ -639,12 +604,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		log("itemClick");
 
 		if (nodes.get(position).isFolder()){
-			if(selectFile) {
-				if(((FileExplorerActivityLollipop)context).multiselect){
-					if(adapter.isMultipleSelect()){
-						hideMultipleSelect();
-					}
-				}
+			if(selectFile && ((FileExplorerActivityLollipop)context).multiselect && adapter.isMultipleSelect()){
+					hideMultipleSelect();
 			}
 
 			MegaNode n = nodes.get(position);
@@ -945,14 +906,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (adapter == null){
 			log("Adapter is NULL");
 			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-
-			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-
-				@Override
-				public void onItemClick(View view, int position) {
-					itemClick(view, position);
-				}
-			});
 		}
 //		else{
 //			adapter.setParentHandle(parentHandle);
@@ -1123,12 +1076,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			actionMode.finish();
 		}
 
-		if(modeCloud==FileExplorerActivityLollipop.SELECT){
-			if(selectFile) {
-				if (((FileExplorerActivityLollipop) context).multiselect) {
-					activateButton(false);
-				}
-			}
+		if(isMultiselect()){
+			activateButton(false);
 		}
 
 	}
@@ -1146,4 +1095,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 	}
 
+	boolean isMultiselect() {
+		if (modeCloud==FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).multiselect) {
+			return true;
+		}
+		return false;
+	}
 }

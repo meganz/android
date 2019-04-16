@@ -750,6 +750,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						log("onTabChanged TabId :"+ position);
 						supportInvalidateOptionsMenu();
 						changeTitle();
+						if (!multiselect) {
+							return;
+						}
+						iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 1));
+						cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
+						if (position == 0 && iSharesExplorer != null) {
+							iSharesExplorer.hideMultipleSelect();
+						}
+						else if (position == 1 && cDriveExplorer != null) {
+							cDriveExplorer.hideMultipleSelect();
+						}
 					}
 				});
 			}
@@ -953,7 +964,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								case MegaShare.ACCESS_READWRITE:
 								case MegaShare.ACCESS_FULL:{
 									log("The node is: "+n.getName()+" permissions: "+accessLevel);
-									createFolderMenuItem.setVisible(true);
+									if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
+										createFolderMenuItem.setVisible(false);
+									}
+									else{
+										createFolderMenuItem.setVisible(true);
+									}
 									break;
 								}
 								case MegaShare.ACCESS_READ:{

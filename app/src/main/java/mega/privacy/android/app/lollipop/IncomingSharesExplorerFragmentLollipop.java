@@ -3,9 +3,13 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -13,6 +17,9 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -23,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -64,6 +72,100 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	Stack<Integer> lastPositionStack;
 
+	Handler handler;
+	public ActionMode actionMode;
+
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapter.isMultipleSelect()){
+			adapter.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+			if(isMultiselect()){
+				activateButton(true);
+			}
+		}
+	}
+
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			log("onActionItemClicked");
+			List<MegaNode> documents = adapter.getSelectedNodes();
+
+			switch(item.getItemId()){
+
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			log("onCreateActionMode");
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			log("onDestroyActionMode");
+			clearSelections();
+			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			log("onPrepareActionMode");
+			List<MegaNode> selected = adapter.getSelectedNodes();
+
+			if (selected.size() != 0) {
+				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
+				MegaNode nodeS = megaApi.getNodeByHandle(parentHandle);
+
+				if(selected.size() == megaApi.getNumChildFiles(nodeS)){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+
+				}else{
+					if(isMultiselect()){
+						MegaNode node = megaApi.getNodeByHandle(parentHandle);
+						if(selected.size() == megaApi.getNumChildFiles(node)){
+							menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+						}else{
+							menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+						}
+					}else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					}
+
+					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setVisible(true);
+
+				}
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+
+			return false;
+		}
+	}
+
 	public static IncomingSharesExplorerFragmentLollipop newInstance() {
 		log("newInstance");
 		IncomingSharesExplorerFragmentLollipop fragment = new IncomingSharesExplorerFragmentLollipop();
@@ -86,6 +188,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		parentHandle = -1;
 
 		lastPositionStack = new Stack<>();
+
+		handler = new Handler();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
 	}
 
 	@Override
@@ -110,18 +220,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		optionButton = (Button) v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
-		//Left and Right margin
-//		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionButton.getLayoutParams();
-//		optionTextParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
-//		optionButton.setLayoutParams(optionTextParams);
 
 		cancelButton = (Button) v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		//Left and Right margin
-//		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-//		cancelTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
-//		cancelButton.setLayoutParams(cancelTextParams);
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 
@@ -162,13 +264,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		if (adapter == null){
 			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-			adapter.SetOnItemClickListener(new MegaExplorerLollipopAdapter.OnItemClickListener() {
-				
-				@Override
-				public void onItemClick(View view, int position) {
-					itemClick(view, position);
-				}
-			});
 			listView.setAdapter(adapter);
 		}
 		else{
@@ -197,7 +292,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					}
 				}else{
 					activateButton(true);
-
 				}
 			}
 		}
@@ -207,6 +301,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
 			optionButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
 		}
+		else if (isMultiselect()) {
+			optionButton.setText(getString(R.string.context_send));
+			if (adapter != null && adapter.getSelectedItemCount() > 0){
+				activateButton(true);
+			}
+			else {
+				activateButton(false);
+			}
+		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 		}
@@ -215,20 +318,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 
 
+
 		log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
+		if ((((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile) && !((FileExplorerActivityLollipop)context).multiselect){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
 		else{
-			if(selectFile){
-				separator.setVisibility(View.GONE);
-				optionsBar.setVisibility(View.GONE);
-			}
-			else{
-				separator.setVisibility(View.VISIBLE);
-				optionsBar.setVisibility(View.VISIBLE);
-			}
+			separator.setVisibility(View.VISIBLE);
+			optionsBar.setVisibility(View.VISIBLE);
 		}
 
 		if (adapter.getItemCount() != 0){
@@ -347,7 +445,20 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		switch(v.getId()){
 			case R.id.action_text:{
-				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
+				if(((FileExplorerActivityLollipop)context).multiselect){
+					log("Send several files to chat");
+					if(adapter.getSelectedItemCount()>0){
+						long handles[] = adapter.getSelectedHandles();
+						((FileExplorerActivityLollipop) context).buttonClick(handles);
+					}
+					else{
+						((FileExplorerActivityLollipop) context).showSnackbar(getString(R.string.no_files_selected_warning));
+					}
+
+				}
+				else{
+					((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
+				}
 				break;
 			}
 			case R.id.cancel_text:{
@@ -362,19 +473,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
 		log("((FileExplorerActivityLollipop)context).deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
+		if ((((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile) && !((FileExplorerActivityLollipop)context).multiselect){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
 		else{
-			if(selectFile){
-				separator.setVisibility(View.GONE);
-				optionsBar.setVisibility(View.GONE);
-			}
-			else{
-				separator.setVisibility(View.VISIBLE);
-				optionsBar.setVisibility(View.VISIBLE);
-			}
+			separator.setVisibility(View.VISIBLE);
+			optionsBar.setVisibility(View.VISIBLE);
 		}
 
 		int lastFirstVisiblePosition = 0;
@@ -433,22 +538,18 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
     public void itemClick(View view, int position) {
 		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
 		if (nodes.get(position).isFolder()){
-
+			if(selectFile && ((FileExplorerActivityLollipop)context).multiselect && adapter.isMultipleSelect()){
+				hideMultipleSelect();
+			}
 			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
 			log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-			if (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0){
+			if ((((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile) && !((FileExplorerActivityLollipop)context).multiselect){
 				separator.setVisibility(View.GONE);
 				optionsBar.setVisibility(View.GONE);
 			}
 			else{
-				if(selectFile){
-					separator.setVisibility(View.GONE);
-					optionsBar.setVisibility(View.GONE);
-				}
-				else{
-					separator.setVisibility(View.VISIBLE);
-					optionsBar.setVisibility(View.VISIBLE);
-				}
+				separator.setVisibility(View.VISIBLE);
+				optionsBar.setVisibility(View.VISIBLE);
 			}
 
 			int lastFirstVisiblePosition = 0;
@@ -523,21 +624,42 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			//Is file
 			if(selectFile)
 			{
-				//Seleccionar el fichero para enviar...
-				MegaNode n = nodes.get(position);
-				log("Selected node to send: "+n.getName());
-				if(nodes.get(position).isFile()){
-					MegaNode nFile = nodes.get(position);
-					
-					MegaNode parentFile = megaApi.getParentNode(nFile);
-					if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
-					{
-						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
+				if(((FileExplorerActivityLollipop)context).multiselect){
+					log("select file and allow multiselection");
+
+					if (adapter.getSelectedItemCount() == 0) {
+						log("activate the actionMode");
+						activateActionMode();
+						adapter.toggleSelection(position);
+						updateActionModeTitle();
 					}
-					else{
-						Toast.makeText(context, getString(R.string.context_send_no_permission), Toast.LENGTH_LONG).show();
-					}					
-				}		
+					else {
+						log("add to selectedNodes");
+						adapter.toggleSelection(position);
+
+						List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+						if (selectedNodes.size() > 0){
+							updateActionModeTitle();
+						}
+					}
+				}
+				else{
+					//Seleccionar el fichero para enviar...
+					MegaNode n = nodes.get(position);
+					log("Selected node to send: "+n.getName());
+					if(nodes.get(position).isFile()){
+						MegaNode nFile = nodes.get(position);
+
+						MegaNode parentFile = megaApi.getParentNode(nFile);
+						if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
+						{
+							((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
+						}
+						else{
+							Toast.makeText(context, getString(R.string.context_send_no_permission), Toast.LENGTH_LONG).show();
+						}
+					}
+				}
 			}
 		}
 		((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
@@ -569,8 +691,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			}
 			adapter.setParentHandle(parentHandle);
 
-			separator.setVisibility(View.GONE);
-			optionsBar.setVisibility(View.GONE);
+			if (((FileExplorerActivityLollipop)context).multiselect) {
+				separator.setVisibility(View.VISIBLE);
+				optionsBar.setVisibility(View.VISIBLE);
+			}
+			else {
+				separator.setVisibility(View.GONE);
+				optionsBar.setVisibility(View.GONE);
+			}
 
 			if (adapter.getItemCount() != 0){
 				emptyImageView.setVisibility(View.GONE);
@@ -684,7 +812,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				return 2;
 			}
 
-			if(selectFile){
+			if(selectFile && !((FileExplorerActivityLollipop)context).multiselect){
 				separator.setVisibility(View.GONE);
 				optionsBar.setVisibility(View.GONE);
 			}
@@ -805,5 +933,94 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}else{
 			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 		}
+	}
+
+	public void selectAll(){
+		log("selectAll");
+		if (adapter != null){
+			adapter.selectAll();
+
+			updateActionModeTitle();
+		}
+	}
+
+	private void clearSelections() {
+		if(adapter.isMultipleSelect()){
+			adapter.clearSelections();
+		}
+	}
+
+	private void updateActionModeTitle() {
+		log("updateActionModeTitle");
+
+		List<MegaNode> documents = adapter.getSelectedNodes();
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
+
+
+		Resources res = getActivity().getResources();
+
+		String title;
+		int sum=files+folders;
+
+		if (files == 0 && folders == 0) {
+			title = Integer.toString(sum);
+		} else if (files == 0) {
+			title = Integer.toString(folders);
+		} else if (folders == 0) {
+			title = Integer.toString(files);
+		} else {
+			title = Integer.toString(sum);
+		}
+		actionMode.setTitle(title);
+
+
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+	}
+
+	/*
+	 * Disable selection
+	 */
+	public void hideMultipleSelect() {
+		log("hideMultipleSelect");
+		adapter.setMultipleSelect(false);
+		adapter.clearSelectedItems();
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+
+		if(isMultiselect()){
+			activateButton(false);
+		}
+
+	}
+
+	public boolean isFolder(int position){
+		MegaNode node = nodes.get(position);
+		if(node.isFolder()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	boolean isMultiselect() {
+		if (modeCloud==FileExplorerActivityLollipop.SELECT && selectFile && ((FileExplorerActivityLollipop) context).multiselect) {
+			return true;
+		}
+		return false;
 	}
 }

@@ -38,6 +38,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
+import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -2133,6 +2134,41 @@ public class ChatController {
         }
 
         return false;
+    }
+
+    public void checkIfNodesAreMineAndAttachNodes(long handles[], long idChat) {
+        log("checkIfNodesAreMineAndSelectChatsToSendNodes");
+
+        MegaNode currentNode;
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
+        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
+        NodeController nC = new NodeController(context);
+
+        if (handles == null) {
+            return;
+        }
+
+        for (int i=0; i<handles.length; i++) {
+            currentNode = megaApi.getNodeByHandle(handles[i]);
+            if (currentNode != null) {
+                nodes.add(currentNode);
+            }
+        }
+
+        nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
+
+        if (notOwnerNodes.size() == 0) {
+            for(MegaNode node : ownerNodes) {
+                if (context instanceof ChatActivityLollipop) {
+                    megaChatApi.attachNode(idChat, node.getHandle(), (ChatActivityLollipop)context);
+                }
+            }
+        }
+        else {
+            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChat);
+            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
+        }
     }
 
     public static void log(String message) {

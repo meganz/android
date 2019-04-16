@@ -31,6 +31,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -40,7 +41,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> {
+public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener {
 	
 	final public static int CLOUD_EXPLORER = 0;
 	final public static int INCOMING_SHARES_EXPLORER = 1;
@@ -69,13 +70,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	boolean multipleSelect;
 	private SparseBooleanArray selectedItems;
 
-	OnItemClickListener mItemClickListener;
 	RecyclerView listFragment;
 
-	private ArrayList<Long> disabledNodesCloudDrive;
-
 	/*public static view holder class*/
-    public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder{
     	public ImageView imageView;
 		public ImageView permissionsIcon;
     	public TextView textViewFileName;
@@ -87,24 +85,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
     	public ViewHolderExplorerLollipop(View itemView) {
 			super(itemView);
-//            itemView.setOnClickListener(this);
-		}
-    	
-		@Override
-		public void onClick(View v) {
-			if(mItemClickListener != null){
-				mItemClickListener.onItemClick(v, getPosition());
-			}			
 		}
     }
-    
-    public interface OnItemClickListener {
-		   public void onItemClick(View view , int position);
-	}
-	
-	public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
-		this.mItemClickListener = mItemClickListener;
-	}
 	
 	ViewHolderExplorerLollipop holder = null;    
 
@@ -124,7 +106,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-		disabledNodesCloudDrive = new ArrayList<Long>();
 
 	}
 	
@@ -189,7 +170,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 
 		holder.currentPosition = position;
 		
@@ -208,6 +188,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			holder.imageView.setLayoutParams(params);
 
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
+			holder.itemView.setOnLongClickListener(null);
 
 			if (disabledNodes != null){
 
@@ -222,14 +203,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					log("Full access");
 					holder.imageView.setAlpha(1.0f);
 					holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-					holder.itemView.setOnClickListener(holder);
+					holder.itemView.setOnClickListener(this);
 					holder.permissionsIcon.setAlpha(.35f);
 				}
 			}
 			else{
 				holder.imageView.setAlpha(1.0f);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-				holder.itemView.setOnClickListener(holder);
+				holder.itemView.setOnClickListener(this);
 			}
 
 			if(node.isInShare()){
@@ -305,10 +286,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			holder.imageView.setLayoutParams(params);
 
 			if(selectFile){
-
 				holder.imageView.setAlpha(1.0f);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-				holder.itemView.setOnClickListener(holder);
+				holder.itemView.setOnClickListener(this);
+				holder.itemView.setOnLongClickListener(this);
 
 				if (multipleSelect) {
 					if(this.isItemChecked(position)){
@@ -331,10 +312,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				holder.imageView.setAlpha(.4f);
 				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 				holder.itemView.setOnClickListener(null);
+				holder.itemView.setOnLongClickListener(null);
 			}
 
 			if (node.hasThumbnail()){
-
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
 				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -430,7 +411,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 					if (selectedItems.size() <= 0){
 						log("toggleAllSelection: hideMultipleSelect");
 
-						((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+						if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
+							((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+						}
+						else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+							((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
+						}
 
 					}
 					log("toggleAllSelection: notified item changed");
@@ -478,7 +464,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (selectedItems.size() <= 0){
+						if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
 							((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+						}
+						else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+							((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
+						}
 					}
 				}
 
@@ -500,9 +491,17 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
-                if(!((CloudDriveExplorerFragmentLollipop) fragment).isFolder(i)){
-                    toggleAllSelection(i);
-                }
+				if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
+					if(!((CloudDriveExplorerFragmentLollipop) fragment).isFolder(i)){
+						toggleAllSelection(i);
+					}
+				}
+				else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+					if(!((IncomingSharesExplorerFragmentLollipop) fragment).isFolder(i)){
+						toggleAllSelection(i);
+					}
+				}
+
 			}
 		}
 	}
@@ -518,6 +517,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	public void clearSelectedItems() {
 		log("clearSelectedItems");
+		if (selectedItems == null) {
+			return;
+		}
 		selectedItems.clear();
 	}
 
@@ -741,6 +743,33 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 		}
 		return false;
+	}
+
+
+
+	@Override
+	public void onClick(View v) {
+		clickItem(v);
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		clickItem(v);
+		return true;
+	}
+
+	void clickItem(View v) {
+		ViewHolderExplorerLollipop holder = (ViewHolderExplorerLollipop) v.getTag();
+		if (holder == null) {
+			return;
+		}
+
+		if (fragment instanceof CloudDriveExplorerFragmentLollipop)  {
+			((CloudDriveExplorerFragmentLollipop) fragment).itemClick(v, holder.getAdapterPosition());
+		}
+		else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+			((IncomingSharesExplorerFragmentLollipop) fragment).itemClick(v, holder.getAdapterPosition());
+		}
 	}
 
 }
