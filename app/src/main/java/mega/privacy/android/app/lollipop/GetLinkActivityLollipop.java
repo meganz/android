@@ -57,7 +57,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 	CoordinatorLayout fragmentContainer;
 
 	private android.support.v7.app.AlertDialog passwordDialog;
-
+    private final int PROTECTION_PASSWORD_MIN_LENGTH = 8;  //to be consistent with web client
 	//Fragments
 	GetLinkFragmentLollipop getLinkFragment;
 	CopyrightFragmentLollipop copyrightFragment;
@@ -384,8 +384,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 					log("Check are equal");
 					if(value1.equals(value2)){
 						log("Proceed to set pass");
-                        int passwordMinLength = 8;  //to be consistent with web client
-                        if(value1.length() < passwordMinLength){
+                        if(value1.length() < PROTECTION_PASSWORD_MIN_LENGTH){
                             input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                             errorLayout2.setVisibility(View.VISIBLE);
                             textError2.setText(R.string.error_password_too_weak);
