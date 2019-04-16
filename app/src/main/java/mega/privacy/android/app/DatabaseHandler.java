@@ -25,7 +25,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 43;
+	private static final int DATABASE_VERSION = 44;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -134,6 +134,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
 	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
+    private static final String KEY_AUTO_PLAY = "autoplay";
 
 	private static final String KEY_ID_CHAT = "idchat";
 	private static final String KEY_MSG_TIMESTAMP = "timestamp";
@@ -209,7 +210,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
-				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN" + ")";
+				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN, " + KEY_AUTO_PLAY + " BOOLEAN" + ")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -597,6 +598,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL(CREATE_NEW_PENDING_MSG_TABLE);
 		}
+        
+        if (oldVersion <= 43){
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_AUTO_PLAY + " BOOLEAN;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTO_PLAY + " = '" + encrypt("false") + "';");
+        }
 	}
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -865,11 +871,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredSortOthers = decrypt(cursor.getString(28));
 			String firstTimeChat = decrypt(cursor.getString(29));
 			String smallGridCamera = decrypt(cursor.getString(30));
+            String isAutoPlayEnabled = decrypt(cursor.getString(31));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera);
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera, isAutoPlayEnabled);
 		}
 		cursor.close();
 		
@@ -3093,8 +3100,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void removePendingMessageById(long idMsg){
 		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_ID + "="+idMsg, null);
 	}
-
-	////
+    
+    public String getAutoPlayEnabled(){
+        
+        String selectQuery = "SELECT " + KEY_AUTO_PLAY + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            
+            String enabled = decrypt(cursor.getString(0));
+            return enabled;
+        }
+        cursor.close();
+        
+        return "false";
+    }
+    
+    public void setAutoPlayEnabled(String enabled){
+        log("setAutoPlayEnabled");
+    
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTO_PLAY + "='" + encrypt(enabled + "") + "' WHERE " + KEY_ID + " ='1'";
+            db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+        }
+        else{
+            values.put(KEY_AUTO_PLAY, encrypt(enabled + ""));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+    
 
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);

@@ -54,36 +54,44 @@
                             android:layout_gravity="left"
                             android:textSize="20sp"
                             android:maxLines="1"
-                            android:layout_toLeftOf="@+id/state_icon_toolbar"
+                            android:layout_toLeftOf="@+id/icons_layout"
                             android:ellipsize="end"/>
-                        <ImageView
-                            android:id="@+id/state_icon_toolbar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:layout_marginTop="7dp"
-                            android:layout_marginRight="3dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginLeft="3dp"
-                            android:layout_alignParentTop="true"
-                            android:visibility="gone"/>
 
-                        <ImageView
-                            android:id="@+id/private_icon_toolbar"
+                        <LinearLayout
+                            android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:layout_marginTop="2dp"
-                            android:layout_marginRight="4dp"
+                            android:orientation="horizontal"
                             android:layout_alignParentRight="true"
-                            android:src="@drawable/ic_w_make_private_small"
-                            android:layout_marginLeft="3dp"
-                            android:layout_alignParentTop="true"
-                            android:visibility="gone"/>
+                            android:layout_alignParentTop="true">
+
+                            <ImageView
+                                android:id="@+id/state_icon_toolbar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:layout_marginTop="7dp"
+                                android:layout_marginRight="1.5dp"
+                                android:layout_marginLeft="3dp"
+                                android:visibility="gone"/>
+
+                            <ImageView
+                                android:id="@+id/private_icon_toolbar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:layout_marginTop="2dp"
+                                android:layout_marginRight="1.5dp"
+                                android:layout_marginLeft="1.5dp"
+                                android:tint="@color/white"
+                                android:src="@drawable/ic_private_chat"
+                                android:visibility="gone"/>
+                        </LinearLayout>
+
                     </RelativeLayout>
 
                     <mega.privacy.android.app.components.MarqueeTextView
-                        android:id="@+id/subtitle_toolbar"
+                        android:id="@+id/individual_subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
@@ -91,6 +99,21 @@
                         android:visibility="gone"
                         android:singleLine="true"
                         android:ellipsize="none"
+                        android:layout_marginRight="0dp"/>
+
+                    <TextView
+                        android:id="@+id/groupal_subtitle_toolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
                         android:layout_marginRight="0dp"/>
 
                     <LinearLayout
