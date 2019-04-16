@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
@@ -70,7 +69,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -83,9 +81,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 
-public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
-
-	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+public class FileBrowserFragmentLollipop extends RotatableFragment implements OnClickListener{
 
 	public static ImageView imageDrag;
 
@@ -100,7 +96,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	TextView emptyTextViewFirst;
 
     MegaNodeAdapter adapter;
-	FileBrowserFragmentLollipop fileBrowserFragment = this;
 
 	ProgressBar progressBar;
 
@@ -144,9 +139,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RelativeLayout callInProgressLayout;
 	Chronometer callInProgressChrono;
 
-	//This attribute is to preserve how many folder place holder in folder grid view
-	private int lastPlaceHolderCount;
+	@Override
+	protected MegaNodeAdapter getAdapter() {
+		return adapter;
+	}
 
+	@Override
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -402,10 +400,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
-						//showMove = false;
 						break;
 					}
-					//if(showShare){
 					if(selected.get(i).isFile()){
 						showShare = false;
 					}else{
@@ -413,7 +409,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							showShare=true;
 						}
 					}
-					//}
 				}
 
 				//showSendToChat
@@ -558,12 +553,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		log("after onCreate called super");
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		setRetainInstance(true);
-	}
-
 	public void checkScroll() {
 		if (recyclerView != null) {
 			if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
@@ -574,35 +563,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 		}
 	}
-
-	private void reDoTheSelectionAfterRotation() {
-	    log("re select the items which are selected before rotation");
-	    if (adapter != null) {
-            ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
-            int folderCount = adapter.getFolderCount();
-            log("There are" + folderCount + "folders");
-            int currentPlaceHolderCount = adapter.getPlaceholderCount();
-            log("There are" + currentPlaceHolderCount + "folder place holder in current screen");
-            if (selectedItems != null && selectedItems.size() > 0) {
-                activateActionMode();
-                for (int selectedItem : selectedItems) {
-                    if (((ManagerActivityLollipop)context).isList) {
-                        log("Do the list selection. The selectedItem is " + selectedItem);
-                        itemClick(selectedItem, null, null);
-                    }
-                    else {
-                        if (selectedItem < folderCount) {
-                            log("Do the list folder selection. The selectedItem is " + selectedItem);
-                            itemClick((selectedItem), null, null);
-                        } else {
-                            log("Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
-                            itemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount), null, null);
-                        }
-                    }
-                }
-            }
-        }
-    }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
@@ -696,7 +656,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-//				adapter.setNodes(nodes);
             }
 
             adapter.setMultipleSelect(false);
@@ -709,13 +668,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             if (adapter.getItemCount() == 0) {
                 log("itemCount is 0");
                 recyclerView.setVisibility(View.GONE);
-//                contentText.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
             } else {
                 log("itemCount is " + adapter.getItemCount());
                 recyclerView.setVisibility(View.VISIBLE);
-//                contentText.setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
@@ -739,12 +696,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             recyclerView.setHasFixedSize(true);
             
             gridLayoutManager = (CustomizedGridLayoutManager)recyclerView.getLayoutManager();
-//			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//				@Override
-//			      public int getSpanSize(int position) {
-//					return 1;
-//				}
-//			});
             recyclerView.setItemAnimator(new DefaultItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
@@ -768,10 +719,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 			
 			transfersOverViewLayout.setOnClickListener(this);
-
-//            contentTextLayout = (RelativeLayout)v.findViewById(R.id.content_grid_text_layout);
-//            contentTextLayout.setVisibility(View.GONE);
-//            contentText = (TextView)v.findViewById(R.id.content_grid_text);
             
             if (adapter == null) {
                 adapter = new MegaNodeAdapter(context,this,nodes,((ManagerActivityLollipop)context).parentHandleBrowser,recyclerView,aB,Constants.FILE_BROWSER_ADAPTER,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
@@ -779,18 +726,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
                 adapter.setListFragment(recyclerView);
                 adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-//				addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-//                adapter.setNodes(nodes);
             }
 
-//            if (((ManagerActivityLollipop)context).parentHandleBrowser == megaApi.getRootNode().getHandle()) {
-//                MegaNode infoNode = megaApi.getRootNode();
-//            contentText.setText(MegaApiUtils.getInfoFolder(infoNode,context));
-//            } else {
-//                MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-//                contentText.setText(MegaApiUtils.getInfoFolder(infoNode,context));
-//            }
-            
             adapter.setMultipleSelect(false);
             
             recyclerView.setAdapter(adapter);
@@ -799,12 +736,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             if (adapter.getItemCount() == 0) {
                 recyclerView.setVisibility(View.GONE);
-//                contentText.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
             } else {
                 recyclerView.setVisibility(View.VISIBLE);
-//                contentText.setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
@@ -813,18 +748,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             return v;
         }
-    }
-
-    @Override
-    public void onResume() {
-	    super.onResume();
-	    reDoTheSelectionAfterRotation();
-    }
-
-    @Override
-    public void onStop() {
-	    super.onStop();
-	    this.lastPlaceHolderCount = adapter.getPlaceholderCount();
     }
 
 	public void setOverviewLayout() {
@@ -850,7 +773,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			long delay = megaApi.getBandwidthOverquotaDelay();
 			if (delay == 0) {
-//				transfersTitleText.setText(getString(R.string.section_transfers));
 			} else {
 				log("Overquota delay activated until: " + delay);
 				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
@@ -944,20 +866,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             log("Transfer panel not visible");
         }
     }
-    
+
+    @Override
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         log("item click position: " + position);
         if (adapter.isMultipleSelect()) {
             log("itemClick:multiselectON");
             adapter.toggleSelection(position);
-            
+
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
             if (selectedNodes.size() > 0) {
                 updateActionModeTitle();
             }
-//			else{
-//				hideMultipleSelect();
-//			}
 		}
 		else{
 			log("itemClick:multiselectOFF");
@@ -1311,10 +1231,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void setFolderInfoNavigation(MegaNode n){
 		log("setFolderInfoNavigation");
 		String cameraSyncHandle = null;
-//					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
-//						((ManagerActivityLollipop)context).cameraUploadsClicked();
-//						return;
-//					}
         //Check if the item is the Camera Uploads folder
         if (dbH.getPreferences() != null) {
             prefs = dbH.getPreferences();
@@ -1393,10 +1309,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         ((ManagerActivityLollipop)context).parentHandleBrowser = n.getHandle();
         
         ((ManagerActivityLollipop)context).setToolbarTitle();
-
-//        MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-
-//        contentText.setText(MegaApiUtils.getInfoFolder(infoNode,context));
         
         adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
         nodes = megaApi.getChildren(n,((ManagerActivityLollipop)context).orderCloud);
@@ -1409,7 +1321,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         //If folder has no files
         if (adapter.getItemCount() == 0) {
             recyclerView.setVisibility(View.GONE);
-//            contentText.setVisibility(View.GONE);
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
             
@@ -1460,7 +1371,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         } else {
             recyclerView.setVisibility(View.VISIBLE);
-//            contentText.setVisibility(View.VISIBLE);
             emptyImageView.setVisibility(View.GONE);
             emptyTextView.setVisibility(View.GONE);
         }
@@ -1560,8 +1470,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         log("onBackPressed");
         
         if (adapter != null) {
-//			((ManagerActivityLollipop)context).setParentHandleBrowser(adapter.getParentHandle());
-            
             log("parentHandle is: " + ((ManagerActivityLollipop)context).parentHandleBrowser);
 
 			if (((ManagerActivityLollipop) context).comesFromNotifications && ((ManagerActivityLollipop) context).comesFromNotificationHandle == (((ManagerActivityLollipop)context).parentHandleBrowser)) {
@@ -1707,7 +1615,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			if (adapter.getItemCount() == 0) {
 				recyclerView.setVisibility(View.GONE);
-//                    contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1758,7 +1665,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 			} else {
 				recyclerView.setVisibility(View.VISIBLE);
-//                    contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -1769,17 +1675,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         setOverviewLayout();
     }
 
-//	public void notifyDataSetChanged(){
-//		log("notifyDataSetChanged");
-//		if (adapter != null){
-//			adapter.notifyDataSetChanged();
-//		}
-//	}
-
-//	public boolean getIsList(){
-//		return isList;
-//	}
-    
     private static void log(String log) {
         Util.log("FileBrowserFragmentLollipop",log);
     }

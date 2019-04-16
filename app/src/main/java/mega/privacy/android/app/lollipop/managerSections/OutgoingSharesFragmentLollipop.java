@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -71,7 +70,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 
-public class OutgoingSharesFragmentLollipop extends Fragment{
+public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 
@@ -89,7 +88,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	boolean allFiles = true;
 
 	MegaNodeAdapter adapter;
-	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 	RelativeLayout transfersOverViewLayout;
 
 	Stack<Integer> lastPositionStack;
@@ -112,9 +110,12 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	
 	private int placeholderCount;
 
-	//This attribute is to preserve how many folder place holder in folder grid view
-	private int lastPlaceHolderCount;
+	@Override
+	protected MegaNodeAdapter getAdapter() {
+		return adapter;
+	}
 
+	@Override
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -441,7 +442,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}
 				}
 				else if(selected.size()==1){
-					//showLink=true;
 					showRename=true;
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -581,7 +581,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -659,8 +658,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						}
 						emptyTextViewFirst.setText(result);
 					}else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 						}else{
@@ -777,9 +774,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyTextViewFirst.setText(result);
 
 				}else {
-
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 					}else{
@@ -806,25 +800,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyLinearLayout.setVisibility(View.GONE);
-			}	
-//			setNodes(nodes);	
+			}
 
 			return v;
 		}		
 	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		reDoTheSelectionAfterRotation();
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		this.lastPlaceHolderCount = adapter.getPlaceholderCount();
-	}
-
 
 	public void refresh (){
 		log("refresh with parentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
@@ -869,9 +849,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						emptyTextViewFirst.setText(result);
 
 					}else {
-
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 						}else{
@@ -944,9 +921,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//                    emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 					}else{
@@ -1041,8 +1015,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					emptyTextViewFirst.setText(result);
 
 				} else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 					}else{
@@ -1108,12 +1080,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
         context = activity;
     }
 
-    @Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		setRetainInstance(true);
-	}
-
+	@Override
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
     	if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1190,8 +1157,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 						emptyTextViewFirst.setText(result);
 
 					}else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 						}else{
@@ -1302,7 +1267,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
@@ -1816,7 +1780,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyLinearLayout.setVisibility(View.GONE);
-//			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 			((ManagerActivityLollipop) context).deepBrowserTreeOutgoing=0;
 			return 0;
 		}
@@ -1825,44 +1788,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
 	}
-	
-//	public void setNodes(ArrayList<MegaNode> nodes){
-//		this.nodes = nodes;
-//		if (isList){
-//			if (adapterList != null){
-//				adapterList.setNodes(nodes);
-//				if (adapterList.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyLinearLayout.setVisibility(View.VISIBLE);
-//					contentText.setVisibility(View.GONE);
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyLinearLayout.setVisibility(View.GONE);
-//					contentText.setText(getInfoNode());
-//					contentText.setVisibility(View.VISIBLE);
-//				}			
-//			}	
-//		}
-//		else{
-//			if (adapterGrid != null){
-//				adapterGrid.setNodes(nodes);
-//				if (adapterGrid.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyLinearLayout.setVisibility(View.VISIBLE);
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyLinearLayout.setVisibility(View.GONE);
-//
-//				}			
-//			}
-//		}
-//	}
 
 	public void notifyDataSetChanged(){
 		if (adapter != null){
@@ -1896,34 +1821,5 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}
 		}
 
-	}
-
-	private void reDoTheSelectionAfterRotation() {
-		log("re select the items which are selected before rotation");
-		if (adapter != null) {
-			ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
-			int folderCount = adapter.getFolderCount();
-			log("There are" + folderCount + "folders");
-			int currentPlaceHolderCount = adapter.getPlaceholderCount();
-			log("There are" + currentPlaceHolderCount + "folder place holder in current screen");
-			if (selectedItems != null && selectedItems.size() > 0) {
-				activateActionMode();
-				for (int selectedItem : selectedItems) {
-					if (((ManagerActivityLollipop)context).isList) {
-						log("Do the list selection. The selectedItem is " + selectedItem);
-						itemClick(selectedItem, null, null);
-					}
-					else {
-						if (selectedItem < folderCount) {
-							log("Do the list folder selection. The selectedItem is " + selectedItem);
-							itemClick((selectedItem), null, null);
-						} else {
-							log("Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
-							itemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount), null, null);
-						}
-					}
-				}
-			}
-		}
 	}
 }
