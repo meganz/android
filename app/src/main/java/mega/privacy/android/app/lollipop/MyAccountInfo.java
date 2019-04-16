@@ -16,6 +16,7 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
+import nz.mega.sdk.MegaUser;
 
 public class MyAccountInfo {
 
@@ -293,9 +294,13 @@ public class MyAccountInfo {
             fullName = firstNameText + " " + lastNameText;
         }
 
-        if (fullName.trim().length() <= 0){
+        if (fullName.trim().length() <= 0) {
             log("Put email as fullname");
-            String email = megaApi.getMyUser().getEmail();
+            String email = "";
+            MegaUser user = megaApi.getMyUser();
+            if (user != null) {
+                email = user.getEmail();
+            }
             String[] splitEmail = email.split("[@._]");
             fullName = splitEmail[0];
         }
