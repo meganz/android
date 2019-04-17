@@ -56,6 +56,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -835,14 +836,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("recordView.setOnRecordListener():onCancel()");
                 if(isRecordingNow()){
                     if(myAudioRecorder!=null){
-                        log("recordView.setOnRecordListener():onCancel() - myAudioRecorder.reset()");
                         myAudioRecorder.reset();
                         outputFileVoiceNotes = null;
                     }
                 }
                 recordButtonStates(RECORD_BUTTON_DESACTIVATED);
-
             }
+
+
 
             @Override
             public void onLock() {
@@ -863,6 +864,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onAnimationEnd() {
                 log("recordView.setOnBasketAnimationEndListener():onAnimationEnd -> cancelRecord");
                 cancelRecord();
+            }
+
+            @Override
+            public void desactivateRecordButton() {
+                log("recordView.setOnBasketAnimationEndListener():desactivateRecordButton");
+                recordLayout.setVisibility(View.VISIBLE);
+                recordButtonLayout.setVisibility(View.VISIBLE);
+                setRecordingNow(false);
+                recordView.showLock(false);
+                sendIcon.setVisibility(View.GONE);
+                textChat.setVisibility(View.GONE);
+                keyboardTwemojiButton.setVisibility(View.GONE);
+                mediaButton.setVisibility(View.GONE);
+                pickAttachButton.setVisibility(View.GONE);
+                pickFileStorageButton.setVisibility(View.GONE);
+                recordButtonLayout.setBackground(null);
+                recordButton.activateOnTouchListener(false);
+                recordButton.activateOnClickListener(false);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_vc_off));
+                recordButton.setColorFilter(null);
+                paramsRecordButton(RECORD_BUTTON_DESACTIVATED);
             }
         });
 
@@ -1979,7 +2001,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         myAudioRecorder.prepare();
                         myAudioRecorder.start();
                         recordButtonStates(RECORD_BUTTON_ACTIVATED);
-                        }
+                    }
                 }
             }catch(IllegalStateException ise){}catch (IOException ioe){}
         }
@@ -2126,9 +2148,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
 
-    private void recordButtonStates(int recordButtonState){
-        log("recordButtonStates");
 
+
+    private void recordButtonStates(int recordButtonState){
         recordLayout.setVisibility(View.VISIBLE);
         recordButtonLayout.setVisibility(View.VISIBLE);
 
@@ -2138,7 +2160,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setRecordingNow(true);
             recordView.showLock(false);
             sendIcon.setVisibility(View.GONE);
-            textChat.setVisibility(View.GONE);
+            textChat.setVisibility(View.INVISIBLE);
             keyboardTwemojiButton.setVisibility(View.INVISIBLE);
             mediaButton.setVisibility(View.INVISIBLE);
             pickAttachButton.setVisibility(View.INVISIBLE);
@@ -2153,10 +2175,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
             log("recordButtonStates:ACTIVATED");
-
             setRecordingNow(true);
             sendIcon.setVisibility(View.GONE);
-            textChat.setVisibility(View.GONE);
+            textChat.setVisibility(View.INVISIBLE);
             keyboardTwemojiButton.setVisibility(View.INVISIBLE);
             mediaButton.setVisibility(View.INVISIBLE);
             pickAttachButton.setVisibility(View.INVISIBLE);
@@ -2179,6 +2200,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             mediaButton.setVisibility(View.VISIBLE);
             pickAttachButton.setVisibility(View.VISIBLE);
             pickFileStorageButton.setVisibility(View.VISIBLE);
+
             recordView.setVisibility(View.GONE);
             recordButtonLayout.setBackground(null);
             recordButton.activateOnTouchListener(true);
@@ -8475,16 +8497,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.recordingNow = recordingNow;
         recordView.setRecordingNow(recordingNow);
         if(recordingNow){
-            if(textChat!=null){
-                textChat.setEnabled(false);
-            }
             if(emojiKeyboard!=null){
                 emojiKeyboard.setListenerActivated(false);
             }
         }else{
-            if(textChat!=null){
-                textChat.setEnabled(true);
-            }
             if(emojiKeyboard!=null){
                 emojiKeyboard.setListenerActivated(true);
             }

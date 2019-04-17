@@ -12,41 +12,6 @@
     android:paddingBottom="10dp"
     android:visibility="visible">
 
-    <io.supercharge.shimmerlayout.ShimmerLayout
-        android:id="@+id/shimmer_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="24dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="88dp"
-        android:layout_alignParentBottom="true"
-        android:background="@null"
-        app:shimmer_animation_duration="1500"
-        app:shimmer_color="@color/white"
-        app:shimmer_reverse_animation="true">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <ImageView
-                android:id="@+id/arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_slide_record_white"
-                android:tint="@color/transparent_black" />
-
-            <TextView
-                android:id="@+id/slide_to_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/slide_to_cancel"
-                android:textColor="@color/name_my_account"
-                android:textSize="13sp"
-                android:textStyle="normal" />
-        </LinearLayout>
-    </io.supercharge.shimmerlayout.ShimmerLayout>
-
     <RelativeLayout
         android:id="@+id/rl_cancel_record"
         android:layout_width="wrap_content"
@@ -129,8 +94,43 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/glowing_mic"
+        android:layout_marginRight="20dp"
         android:textColor="@color/accentColor"
         android:textSize="16sp"
         android:textStyle="bold" />
+
+    <io.supercharge.shimmerlayout.ShimmerLayout
+        android:id="@+id/shimmer_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_toRightOf="@+id/chrono_voice_clip"
+        android:layout_alignParentBottom="true"
+        android:background="@null"
+        app:shimmer_animation_duration="1500"
+        app:shimmer_color="@color/white"
+        app:shimmer_reverse_animation="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_slide_record_white"
+                android:tint="@color/transparent_black" />
+
+            <TextView
+                android:id="@+id/slide_to_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/slide_to_cancel"
+                android:textColor="@color/name_my_account"
+                android:textSize="13sp"
+                android:textStyle="normal" />
+        </LinearLayout>
+    </io.supercharge.shimmerlayout.ShimmerLayout>
 
 </RelativeLayout>

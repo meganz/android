@@ -93,6 +93,9 @@ public class AnimationHelper {
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                if (onBasketAnimationEndListener != null) {
+                    onBasketAnimationEndListener.desactivateRecordButton();
+                }
             }
             @Override
             public void onAnimationEnd(Animation animation) {
@@ -117,6 +120,7 @@ public class AnimationHelper {
         translateAnimation2.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+
             }
 
             @Override

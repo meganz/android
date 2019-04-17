@@ -160,12 +160,10 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void setKeyboardHeight(int keyboardHeight) {
-        log("setKeyboardHeight(): "+keyboardHeight);
         this.keyboardHeight = keyboardHeight;
     }
 
     private int getActionBarHeight() {
-        log("getActionBarHeight()");
         int actionBarHeight = 0;
         TypedValue tv = new TypedValue();
         if (activity != null && activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
@@ -185,6 +183,23 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void showLetterKeyboard(){
         if(!isLetterKeyboardShown){
+            if (editInterface instanceof View){
+                log("showLetterKeyboard()");
+                hideEmojiKeyboard();
+                final View view = (View) editInterface;
+                view.setFocusableInTouchMode(true);
+                view.requestFocus();
+
+                final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm == null) return;
+                imm.showSoftInput(view, 0, null);
+                isLetterKeyboardShown = true;
+                emojiIcon.setImageResource(R.drawable.ic_emojicon);
+                paramsRecordButton(marginBottom);
+            } else {
+                throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
+            }
+        }else {
             if (editInterface instanceof View){
                 log("showLetterKeyboard()");
                 hideEmojiKeyboard();
@@ -224,7 +239,6 @@ public class EmojiKeyboard extends LinearLayout {
     public void hideLetterKeyboard() {
         if(isLetterKeyboardShown){
             if (editInterface instanceof View) {
-                log("hideLetterKeyboard() ");
                 final View view = (View) editInterface;
                 view.clearFocus();
 
@@ -257,6 +271,8 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void paramsRecordButton(int marginBottomVoicleButton){
         if((fragment!=null)&&(recordButtonLayout!=null)&&(recordView!=null)){
+            log("paramsRecordButton() ");
+
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
             params.height = Util.px2dp(48, outMetrics);
             params.width = Util.px2dp(48, outMetrics);
