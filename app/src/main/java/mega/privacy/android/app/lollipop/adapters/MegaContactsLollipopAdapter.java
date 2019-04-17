@@ -193,18 +193,15 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderGrid.contactInitialLetter = (TextView) v.findViewById(R.id.contact_grid_initial_letter);
 		    holderGrid.contactNameLayout = (LinearLayout) v.findViewById(R.id.contact_grid_name_layout);
 		    holderGrid.textViewContactName = (TextView) v.findViewById(R.id.contact_grid_name);
-//		    holderGrid.textViewContent = (MarqueeTextView) v.findViewById(R.id.contact_grid_content);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
 			holderGrid.contactSelectedIcon = (ImageView) v.findViewById(R.id.contact_grid_selected_icon);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				holderGrid.textViewContactName.setMaxWidth(Util.scaleWidthPx(61, outMetrics));
-//				holderGrid.textViewContent.setMaxWidth(Util.scaleWidthPx(70, outMetrics));
 			}
 			else{
 				holderGrid.textViewContactName.setMaxWidth(Util.scaleWidthPx(116, outMetrics));
-//				holderGrid.textViewContent.setMaxWidth(Util.scaleWidthPx(120, outMetrics));
 			}
 
 		    holderGrid.itemLayout.setTag(holderGrid);
@@ -328,67 +325,35 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					log("This user is connected");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online_grid));
-//					holder.textViewContent.setText(context.getString(R.string.online_status));
-//					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_AWAY){
 					log("This user is away");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away_grid));
-//					holder.textViewContent.setText(context.getString(R.string.away_status));
-//					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_BUSY){
 					log("This user is busy");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy_grid));
-//					holder.textViewContent.setText(context.getString(R.string.busy_status));
-//					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 					log("This user is offline");
 					holder.contactStateIcon.setVisibility(View.VISIBLE);
 					holder.contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline_grid));
-//					holder.textViewContent.setText(context.getString(R.string.offline_status));
-//					holder.textViewContent.setVisibility(View.VISIBLE);
 				}
 				else if(userStatus == MegaChatApi.STATUS_INVALID){
 					log("INVALID status: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
-//					holder.textViewContent.setVisibility(View.GONE);
 				}
 				else{
 					log("This user status is: "+userStatus);
 					holder.contactStateIcon.setVisibility(View.GONE);
-//					holder.textViewContent.setVisibility(View.GONE);
 				}
-
-//				if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-//					if(!contact.getLastGreen().isEmpty()){
-//						holder.textViewContent.setText(contact.getLastGreen());
-//						holder.textViewContent.isMarqueeIsNecessary(context);
-//					}
-//				}
 			}
 		}
 		else{
 			holder.contactStateIcon.setVisibility(View.GONE);
-
-//			ArrayList<MegaNode> sharedNodes = megaApi.getInShares(contact.getMegaUser());
-//
-//			String sharedNodesDescription = Util.getSubtitleDescription(sharedNodes);
-//			holder.textViewContent.setVisibility(View.VISIBLE);
-//			holder.textViewContent.setText(sharedNodesDescription);
 		}
-
-//		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.contactNameLayout.getLayoutParams();
-//		if (holder.textViewContent.getVisibility() == View.VISIBLE) {
-//			params.setMargins(0, Util.px2dp(16, outMetrics), Util.px2dp(4, outMetrics), 0);
-//		}
-//		else if (holder.textViewContent.getVisibility() == View.GONE) {
-//			params.setMargins(0, Util.px2dp(24, outMetrics), Util.px2dp(4, outMetrics), Util.px2dp(24, outMetrics));
-//		}
-//		holder.contactNameLayout.setLayoutParams(params);
 		
 		if (multipleSelect && this.isItemChecked(position)) {
 				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_contact_grid_selected));
