@@ -1015,7 +1015,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public int getItemCount() {
 		log("getItemCount");
-		return mOffList.size() - placeholderCount;
+		return mOffList.size();
 	}
 
 	public int getItemCountWithoutRK(){
