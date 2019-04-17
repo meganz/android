@@ -58,10 +58,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	boolean multipleSelect;
 	DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
+	boolean isPreview;
 
-	public MegaParticipantsChatLollipopAdapter(Context _context, ArrayList<MegaChatParticipant> _participants, RecyclerView _listView) {
-		this.context = _context;
-		this.participants = _participants;
+	public MegaParticipantsChatLollipopAdapter(Context context, ArrayList<MegaChatParticipant> participants, RecyclerView listView, boolean isPreview) {
+		this.context = context;
+		this.participants = participants;
 		this.positionClicked = -1;
 		
 		if (megaApi == null){
@@ -72,7 +73,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
 		}
 
-		listFragment = _listView;
+		this.listFragment = listView;
+		this.isPreview = isPreview;
 	}
 	
 	/*private view holder class*/
@@ -248,16 +250,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 					((ViewHolderParticipantsList)holder).textViewContent.isMarqueeIsNecessary(context);
 				}
 			}
-
-			if (!multipleSelect) {
+			if (isMultipleSelect() && isItemChecked(position)) {
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
+			}
+			else {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-			} else {
-
-				if (this.isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
-				} else {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
 			}
 
 			holder.textViewContactName.setText(((ViewHolderParticipantsList)holder).fullName);
@@ -371,6 +368,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 				}
 			}
 
+			if(isPreview && megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS){
+				((ViewHolderParticipantsList) holder).imageButtonThreeDots.setColorFilter(ContextCompat.getColor(context, R.color.chat_sliding_panel_separator));
+				((ViewHolderParticipantsList)holder).threeDotsLayout.setOnClickListener(null);
+				((ViewHolderParticipantsList)holder).itemLayout.setOnClickListener(null);
+			}
+
 			int permission = participant.getPrivilege();
 
 			if (permission == MegaChatRoom.PRIV_STANDARD) {
@@ -464,51 +467,68 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
     public int getItemCount() {
 		log("getItemCount");
-		int size = participants.size();
 
-		int permission = participants.get(size-1).getPrivilege();
-
-		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			log("getItemCount: moderator type");
-			int participantNumber = participants.size()+1;
-			log("return value: "+participantNumber);
-			return participantNumber;
-		} else {
+		if (isPreview) {
 			return participants.size();
+		}
+		else {
+			int size = participants.size();
+			int permission = participants.get(size-1).getPrivilege();
+
+			if (permission == MegaChatRoom.PRIV_MODERATOR) {
+				log("getItemCount: moderator type");
+				int participantNumber = participants.size()+1;
+				log("return value: "+participantNumber);
+				return participantNumber;
+			} else {
+				return participants.size();
+			}
 		}
     }
 
 	@Override
 	public int getItemViewType(int position) {
 		log("getItemViewType: position"+position);
-		int size = participants.size();
 
-		int permission = participants.get(size-1).getPrivilege();
+		if (isPreview) {
+			return  ITEM_VIEW_TYPE_NORMAL;
+		}
+		else {
+			int size = participants.size();
 
-		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			log("getItemViewType: moderator type");
-			if (position>0) {
-				return ITEM_VIEW_TYPE_NORMAL;
+			int permission = participants.get(size-1).getPrivilege();
+
+			if (permission == MegaChatRoom.PRIV_MODERATOR) {
+				log("getItemViewType: moderator type");
+				if (position>0) {
+					return ITEM_VIEW_TYPE_NORMAL;
+				} else {
+					log("Type ADD_PARTICIPANT");
+					return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
+				}
 			} else {
-				log("Type ADD_PARTICIPANT");
-				return ITEM_VIEW_TYPE_ADD_PARTICIPANT;
+				return ITEM_VIEW_TYPE_NORMAL;
 			}
-		} else {
-			return ITEM_VIEW_TYPE_NORMAL;
 		}
 	}
 
 	public Object getItem(int position) {
 		log("getItem: "+position);
-		int size = participants.size();
-		log("participants size: "+size);
-		int permission = participants.get(size-1).getPrivilege();
-
-		if (permission == MegaChatRoom.PRIV_MODERATOR) {
-			log("getItemViewType: moderator type");
-			return participants.get(position-1);
-		} else {
+		if (isPreview) {
 			return participants.get(position);
+		}
+		else {
+			int size = participants.size();
+			log("participants size: "+size);
+			int permission = participants.get(size-1).getPrivilege();
+
+			if (permission == MegaChatRoom.PRIV_MODERATOR) {
+				log("getItemViewType: moderator type");
+				return participants.get(position-1);
+			}
+			else {
+				return participants.get(position);
+			}
 		}
 	}
 

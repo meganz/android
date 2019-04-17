@@ -602,6 +602,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		MegaContactAdapter contact = (MegaContactAdapter) getItem(position);
 		holder.contactMail = contact.getMegaUser().getEmail();
+		if (holder.contactMail.equals(megaApi.getMyEmail())) {
+			holder.declineLayout.setVisibility(View.GONE);
+		}
+		else {
+			holder.declineLayout.setVisibility(View.VISIBLE);
+		}
 		log("contact: "+contact.getMegaUser().getEmail()+" handle: "+contact.getMegaUser().getHandle());
 
 		if(Util.isChatEnabled()){
