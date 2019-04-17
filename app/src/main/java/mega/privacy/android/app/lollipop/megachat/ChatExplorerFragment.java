@@ -950,7 +950,7 @@ public class ChatExplorerFragment extends Fragment {
             }
 
             for (ChatExplorerListItem item : items) {
-                if (item.getTitle().toLowerCase().contains(s.toLowerCase())) {
+                if (!item.isHeader() && item.getTitle().toLowerCase().contains(s.toLowerCase())) {
                     searchItems.add(item);
                     if (areAddedItems && addedItems.contains(item)) {
                         searchSelectedItems.put(searchItems.indexOf(item), true);

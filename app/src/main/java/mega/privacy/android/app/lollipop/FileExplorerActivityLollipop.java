@@ -159,6 +159,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	MenuItem createFolderMenuItem;
 	MenuItem newChatMenuItem;
 	MenuItem searchMenuItem;
+	MenuItem gridListMenuItem;
+	MenuItem sortByMenuItem;
+	boolean isList = true;
 
 	FrameLayout cloudDriveFrameLayout;
 	private long fragmentHandle  = -1;
@@ -821,6 +824,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 	}
+
+	void setGridListAction () {
+		if (isList) {
+			gridListMenuItem.setTitle(R.string.action_grid);
+			gridListMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+		}
+		else {
+			gridListMenuItem.setTitle(R.string.action_list);
+			gridListMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+		}
+	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -834,10 +848,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    searchMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_menu_search, R.color.black));
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
+	    gridListMenuItem = menu.findItem(R.id.cab_menu_grid_list);
+	    sortByMenuItem = menu.findItem(R.id.cab_menu_sort);
+	   	setGridListAction();
+	   	sortByMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_undo_black));
 
 	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
+		gridListMenuItem.setVisible(false);
+		sortByMenuItem.setVisible(false);
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
@@ -909,7 +929,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 		log("onPrepareOptionsMenuLollipop");
-
 	    //Check the tab shown
 		if (viewPagerExplorer != null && tabShown != NO_TABS){
 
@@ -930,6 +949,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						createFolderMenuItem.setVisible(true);
 					}
 					newChatMenuItem.setVisible(false);
+					if (multiselect) {
+						gridListMenuItem.setVisible(true);
+						sortByMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
+					}
 				}
 
 			}
@@ -981,6 +1005,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					newChatMenuItem.setVisible(false);
+					if (multiselect) {
+						gridListMenuItem.setVisible(true);
+						sortByMenuItem.setVisible(true);
+						searchMenuItem.setVisible(true);
+					}
 				}
 			}
 			else if(index==2){
@@ -2469,6 +2498,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					log("Online but not megaApi");
 					Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
+				break;
+			}
+			case R.id.cab_menu_grid_list:{
+				break;
+			}
+			case R.id.cab_menu_sort:{
+				break;
 			}
 		}
 		return super.onOptionsItemSelected(item);
