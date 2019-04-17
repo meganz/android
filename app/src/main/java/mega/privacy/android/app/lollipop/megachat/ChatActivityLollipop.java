@@ -869,22 +869,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void desactivateRecordButton() {
                 log("recordView.setOnBasketAnimationEndListener():desactivateRecordButton");
-                recordLayout.setVisibility(View.VISIBLE);
-                recordButtonLayout.setVisibility(View.VISIBLE);
-                setRecordingNow(false);
-                recordView.showLock(false);
-                sendIcon.setVisibility(View.GONE);
                 textChat.setVisibility(View.GONE);
                 keyboardTwemojiButton.setVisibility(View.GONE);
                 mediaButton.setVisibility(View.GONE);
                 pickAttachButton.setVisibility(View.GONE);
                 pickFileStorageButton.setVisibility(View.GONE);
-                recordButtonLayout.setBackground(null);
                 recordButton.activateOnTouchListener(false);
-                recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_vc_off));
-                recordButton.setColorFilter(null);
-                paramsRecordButton(RECORD_BUTTON_DESACTIVATED);
+                desactivatedButton();
+
             }
         });
 
@@ -2147,68 +2139,63 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return true;
     }
 
+    private void desactivatedButton(){
+        recordLayout.setVisibility(View.VISIBLE);
+        recordButtonLayout.setVisibility(View.VISIBLE);
+        setRecordingNow(false);
+        recordView.showLock(false);
+        sendIcon.setVisibility(View.GONE);
+        recordButtonLayout.setBackground(null);
+        recordButton.activateOnClickListener(false);
+        recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
+        recordButton.setColorFilter(null);
+        paramsRecordButton(RECORD_BUTTON_DESACTIVATED);
 
+    }
 
 
     private void recordButtonStates(int recordButtonState){
-        recordLayout.setVisibility(View.VISIBLE);
-        recordButtonLayout.setVisibility(View.VISIBLE);
 
-        if(recordButtonState == RECORD_BUTTON_SEND){
-            log("recordButtonStates:SEND");
+        if((recordButtonState == RECORD_BUTTON_SEND) || (recordButtonState == RECORD_BUTTON_ACTIVATED)){
+            log("recordButtonStates:SEND||ACTIVATED");
 
+            recordLayout.setVisibility(View.VISIBLE);
+            recordButtonLayout.setVisibility(View.VISIBLE);
             setRecordingNow(true);
-            recordView.showLock(false);
-            sendIcon.setVisibility(View.GONE);
             textChat.setVisibility(View.INVISIBLE);
+            sendIcon.setVisibility(View.GONE);
+
             keyboardTwemojiButton.setVisibility(View.INVISIBLE);
             mediaButton.setVisibility(View.INVISIBLE);
             pickAttachButton.setVisibility(View.INVISIBLE);
             pickFileStorageButton.setVisibility(View.INVISIBLE);
             recordView.setVisibility(View.VISIBLE);
-
-            recordButtonLayout.setBackground(null);
-            recordButton.activateOnTouchListener(false);
-            recordButton.activateOnClickListener(true);
-            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-            recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
-
-        }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
-            log("recordButtonStates:ACTIVATED");
-            setRecordingNow(true);
-            sendIcon.setVisibility(View.GONE);
-            textChat.setVisibility(View.INVISIBLE);
-            keyboardTwemojiButton.setVisibility(View.INVISIBLE);
-            mediaButton.setVisibility(View.INVISIBLE);
-            pickAttachButton.setVisibility(View.INVISIBLE);
-            pickFileStorageButton.setVisibility(View.INVISIBLE);
-            recordView.setVisibility(View.VISIBLE);
-            recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
-            recordButton.activateOnTouchListener(true);
-            recordButton.activateOnClickListener(false);
-            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
-            recordButton.setColorFilter(null);
-
+            if(recordButtonState == RECORD_BUTTON_SEND){
+                recordView.showLock(false);
+                recordButtonLayout.setBackground(null);
+                recordButton.activateOnTouchListener(false);
+                recordButton.activateOnClickListener(true);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
+                recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
+            }else{
+                recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
+                recordButton.activateOnTouchListener(true);
+                recordButton.activateOnClickListener(false);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
+                recordButton.setColorFilter(null);
+            }
+            paramsRecordButton(recordButtonState);
         }else if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
             log("recordButtonStates:DESACTIVATED");
-
-            setRecordingNow(false);
-            recordView.showLock(false);
-            sendIcon.setVisibility(View.GONE);
             textChat.setVisibility(View.VISIBLE);
             keyboardTwemojiButton.setVisibility(View.VISIBLE);
             mediaButton.setVisibility(View.VISIBLE);
             pickAttachButton.setVisibility(View.VISIBLE);
             pickFileStorageButton.setVisibility(View.VISIBLE);
-
             recordView.setVisibility(View.GONE);
-            recordButtonLayout.setBackground(null);
             recordButton.activateOnTouchListener(true);
-            recordButton.activateOnClickListener(false);
-            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
-            recordButton.setColorFilter(null);
+            desactivatedButton();
         }
-        paramsRecordButton(recordButtonState);
     }
 
     @Override
