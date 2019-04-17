@@ -373,13 +373,25 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return selectedItems.size();
 	}
 
+	public int getFolderCount() {
+		return folderCount;
+	}
+
+	public int getPlaceholderCount() {
+    	return placeholderCount;
+	}
+
 	public List<Integer> getSelectedItems() {
-		log("getSelectedItems");
-		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-		for (int i = 0; i < selectedItems.size(); i++) {
-			items.add(selectedItems.keyAt(i));
+    	if (selectedItems != null) {
+			log("getSelectedItems");
+			List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+			for (int i = 0; i < selectedItems.size(); i++) {
+				items.add(selectedItems.keyAt(i));
+			}
+			return items;
+		} else {
+    		return null;
 		}
-		return items;
 	}	
 	
 	/*
