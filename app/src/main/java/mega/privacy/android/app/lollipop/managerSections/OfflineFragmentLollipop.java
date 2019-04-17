@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -65,6 +64,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -73,7 +73,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-public class OfflineFragmentLollipop extends Fragment{
+public class OfflineFragmentLollipop extends RotatableFragment{
 
 	public static ImageView imageDrag;
 	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
@@ -127,14 +127,17 @@ public class OfflineFragmentLollipop extends Fragment{
 		super.onResume();
 		IntentFilter filter = new IntentFilter(REFRESH_OFFLINE_FILE_LIST);
 		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
-
-		reDoTheSelectionAfterRotation();
 	}
 
 	@Override
 	public void onPause(){
 		super.onPause();
 		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+	}
+
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
 	}
 
 	public void activateActionMode(){
@@ -685,12 +688,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}		
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		setRetainInstance(true);
-	}
-
 	private void reDoTheSelectionAfterRotation() {
 //		String className = this.getClass().getName();
 //		log(className, "re select the items which are selected before rotation");
@@ -720,12 +717,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 			}
 		}
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		this.lastPlaceHolderCount = adapter.getPlaceholderCount();
 	}
 
 	public void findNodes(){

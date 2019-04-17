@@ -57,7 +57,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -135,6 +135,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView fileGridSelected;
     }
 
+    @Override
     public int getPlaceholderCount() {
         return placeholderCount;
     }
@@ -318,6 +319,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return selectedItems.size();
     }
 
+    @Override
     public List<Integer> getSelectedItems() {
         if (selectedItems !=null) {
             List<Integer> items = new ArrayList<Integer>(selectedItems.size());
@@ -361,6 +363,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         return nodes;
     }
 
+    @Override
     public int getFolderCount() {
         int folderCount = 0;
         for (MegaNode node : nodes) {

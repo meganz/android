@@ -48,7 +48,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
 
-public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
+public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener, RotatableAdapter {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -373,14 +373,17 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return selectedItems.size();
 	}
 
+	@Override
 	public int getFolderCount() {
 		return folderCount;
 	}
 
+	@Override
 	public int getPlaceholderCount() {
     	return placeholderCount;
 	}
 
+	@Override
 	public List<Integer> getSelectedItems() {
     	if (selectedItems != null) {
 			log("getSelectedItems");

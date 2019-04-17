@@ -7,27 +7,27 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.utils.Util;
 
 public abstract class RotatableFragment extends Fragment {
     //This attribute is to preserve how many folder place holder in folder grid view
     private int lastPlaceHolderCount;
 
-    protected abstract MegaNodeAdapter getAdapter();
+    protected abstract RotatableAdapter getAdapter();
 
     public abstract void activateActionMode();
 
     public abstract void itemClick(int position,int[] screenPosition, ImageView imageView);
 
-    private static void log(String className, String log) {
-        Util.log(className, log);
+    private static void log(String tag, String log) {
+        Util.log(tag, log);
     }
 
     private void reDoTheSelectionAfterRotation() {
         String className = this.getClass().getName();
         log(className, "re select the items which are selected before rotation");
-        MegaNodeAdapter adapter = getAdapter();
+        RotatableAdapter adapter = getAdapter();
         if (adapter != null) {
             ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
             int folderCount = adapter.getFolderCount();
