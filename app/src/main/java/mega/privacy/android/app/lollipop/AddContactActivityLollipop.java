@@ -1745,10 +1745,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     getContactsTask = new GetContactsTask();
                     getContactsTask.execute();
                 }
-//                else if (savedaddedContacts == null && contactType == Constants.CONTACT_TYPE_BOTH) {
-//                    setAddedAdapterContacts();
-//                    queryIfHasReadContactsPermissions();
-//                }
                 else {
                     recoverContactsTask = new RecoverContactsTask();
                     recoverContactsTask.execute();
