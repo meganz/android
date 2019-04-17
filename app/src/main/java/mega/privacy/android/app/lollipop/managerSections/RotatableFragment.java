@@ -20,32 +20,33 @@ public abstract class RotatableFragment extends Fragment {
 
     public abstract void itemClick(int position,int[] screenPosition, ImageView imageView);
 
-    private static void log(String log) {
-        Util.log("RotatableFragment", log);
+    private static void log(String className, String log) {
+        Util.log(className, log);
     }
 
     private void reDoTheSelectionAfterRotation() {
-        log("re select the items which are selected before rotation");
+        String className = this.getClass().getName();
+        log(className, "re select the items which are selected before rotation");
         MegaNodeAdapter adapter = getAdapter();
         if (adapter != null) {
             ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
             int folderCount = adapter.getFolderCount();
-            log("There are" + folderCount + "folders");
+            log(className, "There are" + folderCount + "folders");
             int currentPlaceHolderCount = adapter.getPlaceholderCount();
-            log("There are" + currentPlaceHolderCount + "folder place holder in current screen");
+            log(className, "There are" + currentPlaceHolderCount + "folder place holder in current screen");
             if (selectedItems != null && selectedItems.size() > 0) {
                 activateActionMode();
                 for (int selectedItem : selectedItems) {
                     if (((ManagerActivityLollipop)getActivity()).isList) {
-                        log("Do the list selection. The selectedItem is " + selectedItem);
+                        log(className, "Do the list selection. The selectedItem is " + selectedItem);
                         itemClick(selectedItem, null, null);
                     }
                     else {
                         if (selectedItem < folderCount) {
-                            log("Do the list folder selection. The selectedItem is " + selectedItem);
+                            log(className, "Do the list folder selection. The selectedItem is " + selectedItem);
                             itemClick((selectedItem), null, null);
                         } else {
-                            log("Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
+                            log(className, "Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
                             itemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount), null, null);
                         }
                     }
