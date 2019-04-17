@@ -89,7 +89,7 @@ public class MultipleGroupChatRequestListener implements MegaChatRequestListener
                 ((GroupChatInfoActivityLollipop) context).showSnackbar(message);
             }
             else if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).showSnackbar(message);
+                ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
             }
 
         }

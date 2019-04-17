@@ -26,15 +26,17 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     int height;
     Bitmap bitmap;
     TextureView myTexture = null;
+    boolean isLocal;
     MegaSurfaceRendererGroup localRenderer = null;
 
-    public GroupCallListener(Context context, TextureView myTexture, Long peerHandle) {
+    public GroupCallListener(Context context, TextureView myTexture, long peerid, long clientid, boolean isLocal) {
         log("GroupCallListener");
         this.context = context;
         this.width = 0;
         this.height = 0;
         this.myTexture = myTexture;
-        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerHandle);
+        this.isLocal = isLocal;
+        this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerid, clientid);
     }
 
 
@@ -72,7 +74,7 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false);
+            localRenderer.DrawBitmap(false, isLocal);
         }
     }
 

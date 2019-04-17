@@ -53,6 +53,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -90,17 +91,25 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import mega.privacy.android.app.AndroidLogger;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class Util {
@@ -114,7 +123,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -635,19 +644,19 @@ public class Util {
 		float TB = GB * 1024;
 		
 		if (size < KB){
-			sizeString = size + " B";
+			sizeString = size + " " + context.getString(R.string.label_file_size_byte);
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + " KB";
+			sizeString = decf.format(size/KB) + " " + context.getString(R.string.label_file_size_kilo_byte);
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + " MB";
+			sizeString = decf.format(size/MB) + " " + context.getString(R.string.label_file_size_mega_byte);
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + " GB";
+			sizeString = decf.format(size/GB) + " " + context.getString(R.string.label_file_size_giga_byte);
 		}
 		else{
-			sizeString = decf.format(size/TB) + " TB";
+			sizeString = decf.format(size/TB) + " " + context.getString(R.string.label_file_size_tera_byte);
 		}
 		
 		return sizeString;
@@ -2109,6 +2118,14 @@ public class Util {
 					}
 				}, 500);
 			}
+			else if (option == 3) {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(context, R.color.status_bar_search));
+					}
+				}, 500);
+			}
 			else {
 				handler.postDelayed(new Runnable() {
 					@Override
@@ -2205,6 +2222,63 @@ public class Util {
 			}
 		}
 		return true;
+	}
+    
+    public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
+        if (context instanceof ChatFullScreenImageViewer) {
+            ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof AudioVideoPlayerLollipop) {
+            ((AudioVideoPlayerLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof PdfViewerActivityLollipop) {
+            ((PdfViewerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof ChatActivityLollipop) {
+            ((ChatActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof NodeAttachmentHistoryActivity) {
+            ((NodeAttachmentHistoryActivity)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof BaseActivity) {
+            View rootView = getRootViewFromContext(context);
+            if (rootView == null) {
+                log("unable to show snack bar, view does not exist");
+            } else {
+                ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
+            }
+        }
+    }
+    
+    private static View getRootViewFromContext(Context context) {
+        BaseActivity activity = (BaseActivity)context;
+        View rootView = null;
+        try {
+            rootView = activity.findViewById(android.R.id.content);
+            if (rootView == null) {
+                rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+            }
+            if (rootView == null) {
+                rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
+            }
+        } catch (Exception e) {
+            log("getRootViewFromContext " + e.getMessage());
+        }
+        return rootView;
+    }
+
+	public static void hideKeyboard(Activity activity, int flag){
+
+		View v = activity.getCurrentFocus();
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
+	}
+
+	public static void hideKeyboardView(Context context, View v, int flag){
+
+		if (v != null){
+			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
 	}
 
 	private static void log(String message) {

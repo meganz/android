@@ -160,14 +160,25 @@ public class AccountController implements View.OnClickListener{
     public void exportMK(String path, boolean fromOffline){
         log("exportMK");
         if (!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+            }
+            else if (context instanceof TestPasswordActivity) {
+                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+            }
             return;
         }
 
         boolean pathNull = false;
 
         String key = megaApi.exportMasterKey();
-        megaApi.masterKeyExported((ManagerActivityLollipop) context);
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.masterKeyExported((ManagerActivityLollipop) context);
+        }
+        else if (context instanceof TestPasswordActivity) {
+            ((TestPasswordActivity) context).incrementRequests();
+            megaApi.masterKeyExported((TestPasswordActivity) context);
+        }
 
         BufferedWriter out;
         try {
@@ -183,9 +194,14 @@ public class AccountController implements View.OnClickListener{
             log("Export in: "+path);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    if (context instanceof ManagerActivityLollipop) {
+                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                    }
+                    else if (context instanceof TestPasswordActivity) {
+                        ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                    }
+                    return;
                 }
             }
 
@@ -198,7 +214,12 @@ public class AccountController implements View.OnClickListener{
 
             File file = new File(path);
             if(availableFreeSpace < file.length()) {
-                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                if (context instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_not_enough_free_space), -1);
+                }
+                else if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                }
                 return;
             }
 
@@ -206,29 +227,32 @@ public class AccountController implements View.OnClickListener{
             out = new BufferedWriter(fileWriter);
             out.write(key);
             out.close();
-//            String message = context.getString(R.string.toast_master_key, path);
-//            try{
-//                message = message.replace("[A]", "\n");
-//            }
-//            catch (Exception e){}
-            if (pathNull){
-                ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                if(mAF!=null){
-                    mAF.setMkButtonText();
-                }
 
-                showConfirmationExportedDialog();
-            }
-            else {
-                if(fromOffline){
-                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+            if (context instanceof ManagerActivityLollipop) {
+                if (pathNull){
+                    ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                    MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                    if (mAF != null) {
+                        mAF.setMkButtonText();
+                    }
+                    showConfirmationExportedDialog();
+                }
+                else if(fromOffline) {
+                    ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.save_MK_confirmation), -1);
                 }
                 else{
                     showConfirmDialogRecoveryKeySaved();
                 }
             }
-//            Util.showAlert(((ManagerActivityLollipop) context), message, null);
+            else if (context instanceof TestPasswordActivity) {
+                if (pathNull) {
+                    showConfirmationExportedDialog();
+                }
+                else {
+                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
+            }
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -241,7 +265,13 @@ public class AccountController implements View.OnClickListener{
 
     void showConfirmationExportedDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = ((ManagerActivityLollipop)context).getLayoutInflater();
+        LayoutInflater inflater = null;
+        if (context instanceof ManagerActivityLollipop) {
+            inflater = ((ManagerActivityLollipop) context).getLayoutInflater();
+        }
+        else if (context instanceof TestPasswordActivity) {
+            inflater = ((TestPasswordActivity) context).getLayoutInflater();
+        }
         View v = inflater.inflate(R.layout.dialog_recovery_key_exported, null);
         builder.setView(v);
 
@@ -249,6 +279,14 @@ public class AccountController implements View.OnClickListener{
         recoveryKeyExportedButton.setOnClickListener(this);
 
         recoveryKeyExportedDialog = builder.create();
+        recoveryKeyExportedDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
+            }
+        });
         recoveryKeyExportedDialog.show();
     }
 
@@ -292,20 +330,41 @@ public class AccountController implements View.OnClickListener{
     public void copyMK(boolean logout){
         log("copyMK");
         String key = megaApi.exportMasterKey();
-        if (key != null) {
-            megaApi.masterKeyExported((ManagerActivityLollipop) context);
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
-            clipboard.setPrimaryClip(clip);
-            if (logout){
-                showConfirmDialogRecoveryKeySaved();
+        if (context instanceof ManagerActivityLollipop) {
+            if (key != null) {
+                megaApi.masterKeyExported((ManagerActivityLollipop) context);
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
+                clipboard.setPrimaryClip(clip);
+                if (logout) {
+                    showConfirmDialogRecoveryKeySaved();
+                }
+                else {
+                    Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+                }
             }
             else {
-                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
             }
         }
-        else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+        else if (context instanceof TestPasswordActivity) {
+            if (key != null) {
+                ((TestPasswordActivity) context).incrementRequests();
+                megaApi.masterKeyExported((TestPasswordActivity) context);
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
+                clipboard.setPrimaryClip(clip);
+                if (logout) {
+                    showConfirmDialogRecoveryKeySaved();
+                }
+                else {
+                    ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.copy_MK_confirmation));
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
+            }
+            else {
+                ((TestPasswordActivity) context).showSnackbar(context.getString(R.string.general_text_error));
+            }
         }
     }
 
@@ -336,12 +395,7 @@ public class AccountController implements View.OnClickListener{
             copyMK(false);
         }
         else if (context instanceof TestPasswordActivity) {
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
-            intent.putExtra("logout", true);
-            context.startActivity(intent);
-            ((TestPasswordActivity) context).finish();
+            copyMK(((TestPasswordActivity) context).isLogout());
         }
         else if (context instanceof TwoFactorAuthenticationActivity) {
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
@@ -376,7 +430,7 @@ public class AccountController implements View.OnClickListener{
             }
         }
         else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.general_text_error), null);
         }
 
         return null;
@@ -388,7 +442,20 @@ public class AccountController implements View.OnClickListener{
         builder.setPositiveButton(context.getString(R.string.action_logout), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                logout(context, megaApi);
+                if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
+                else {
+                    logout(context, megaApi);
+                }
+            }
+        });
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
             }
         });
         builder.show();
@@ -623,6 +690,9 @@ public class AccountController implements View.OnClickListener{
         switch (v.getId()){
             case R.id.dialog_recovery_key_button:{
                 recoveryKeyExportedDialog.dismiss();
+                if (context instanceof TestPasswordActivity) {
+                    ((TestPasswordActivity) context).passwordReminderSucceeded();
+                }
                 break;
             }
         }
