@@ -688,37 +688,6 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 		}		
 	}
 
-	private void reDoTheSelectionAfterRotation() {
-//		String className = this.getClass().getName();
-//		log(className, "re select the items which are selected before rotation");
-//		MegaNodeAdapter adapter = getAdapter();
-		if (adapter != null) {
-			ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
-			int folderCount = adapter.getFolderCount();
-			//log(className, "There are" + folderCount + "folders");
-			int currentPlaceHolderCount = adapter.getPlaceholderCount();
-			//log(className, "There are" + currentPlaceHolderCount + "folder place holder in current screen");
-			if (selectedItems != null && selectedItems.size() > 0) {
-				activateActionMode();
-				for (int selectedItem : selectedItems) {
-					if (((ManagerActivityLollipop)getActivity()).isList) {
-						//log(className, "Do the list selection. The selectedItem is " + selectedItem);
-						itemClick(selectedItem, null, null);
-					}
-					else {
-						if (selectedItem < folderCount) {
-							//log(className, "Do the list folder selection. The selectedItem is " + selectedItem);
-							itemClick((selectedItem), null, null);
-						} else {
-							//log(className, "Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
-							itemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount), null, null);
-						}
-					}
-				}
-			}
-		}
-	}
-
 	public void findNodes(){
 		log("findNodes");
 
