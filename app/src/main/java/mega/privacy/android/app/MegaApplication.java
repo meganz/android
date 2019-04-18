@@ -1378,6 +1378,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
             if (event.getNumber() == 500 && b) {
                 if (!isVerifySMSShowed) {
                     Intent intent = new Intent(this,SMSVerificationActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     intent.putExtra(NAME_USER_LOCKED,true);
                     startActivity(intent);
                 }
