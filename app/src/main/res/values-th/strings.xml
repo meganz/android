@@ -165,7 +165,7 @@
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s จะถูกดาวน์โหลด</string>
     <string name="alert_no_app" context="Alert text before download">ไม่มีแอปพลิเคชันเพื่อเปิดไฟล์ %s คุณต้องการดาวน์โหลดต่อหรือไม่</string>
-    <string name="checkbox_not_show_again" context="Alert checkbox before download">ไม่ต้องแสดงอีก</string>
+    <string name="checkbox_not_show_again" context="Alert checkbox before download">ไม่ต้องแสดงในครั้งต่อไป</string>
 
     <string name="login_text" context="Login button">เข้าสู่ระบบ</string>
     <string name="email_text" context="email label">อีเมล</string>
@@ -229,7 +229,7 @@
     <string name="cancel_transfer_confirmation">ลบการถ่ายโอนนี้หรือไม่</string>
     <string name="cancel_all_transfer_confirmation">ลบการถ่ายโอนทั้งหมดหรือไม่</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดร์ฟ</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดรฟ์</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">การอัปโหลดมีเดีย</string>
     <string name="section_inbox" context="title of the screen that show the inbox">กล่องขาเข้า</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">บันทึกออฟไลน์</string>
@@ -260,11 +260,11 @@
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
 
-    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">ไม่มีไฟล์ใดๆ</string>
+    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">ไม่มีไฟล์ในคลาวด์ไดรฟ์ของคุณ</string>
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
-    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">โฟล์เดอร์ว่าง</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">โฟลเดอร์ว่างเปล่า</string>
 
     <string name="choose_account_fragment" context="Title of the fragment Choose Account">เลือกบัญชี</string>
 
@@ -742,7 +742,7 @@
     <string name="april">เมษายน</string>
     <string name="may">พฤษภาคม</string>
     <string name="june">มิถุนายน</string>
-    <string name="july">กรกฎาคม</string>
+    <string name="july">กรกฏาคม</string>
     <string name="august">สิงหาคม</string>
     <string name="september">กันยายน</string>
     <string name="october">ตุลาคม</string>
@@ -797,7 +797,7 @@
     <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">กรอกรายละเอียดการเรียกเก็บเงินของคุณ:</string>
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">ที่อยู่ 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">ที่อยู่ 2 (ตัวเลือก)</string>
-    <string name="city_cc" context="Hint text of the city edittext for billing purposes">นคร</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">เมือง/อำเภอ</string>
     <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">รัฐ / จังหวัด</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">ประเทศ</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">รหัสไปรษณีย์</string>
@@ -1127,7 +1127,7 @@
     <string name="text_cleared_history" context="Text shown when a user cleared the history of a chat"><![CDATA[<font color=\'#060000\'>%1$s</font> <font color=\'#868686\'> cleared the chat history</font>]]></string>
     -->
 
-    <string name="group_chat_label" context="Label for the sliding panel of a group chat">การแชทเป็นกลุ่ม</string>
+    <string name="group_chat_label" context="Label for the sliding panel of a group chat">แชทกลุ่ม</string>
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">ข้อมูลกลุ่ม</string>
     <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">เริ่มการสนทนา</string>
     <string name="group_chat_edit_profile_label" context="Label for the option of the sliding panel to edit the profile">แก้ไขโปรไฟล์</string>
@@ -1136,7 +1136,7 @@
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">ลบ %s ออกจากการสนทนานี้หรือไม่</string>
 
-    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">อ่านเท่านั้น</string>
+    <string name="observer_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">อ่านอย่างเดียว</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1262,6 +1262,9 @@
 	<string name="label_close" context="button label Close">ปิด</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">ทั่วไป</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">ที่เก็บข้อมูล</string>
+	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">ที่เก็บข้อมูล</string>
+	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">โควต้าการถ่ายโอน</string>
+	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">โควต้าการถ่ายโอน</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">แผน</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">พื้นที่เก็บข้อมูล</string>
@@ -1479,7 +1482,7 @@
     <string name="file_properties_shared_folder_public_link_name">ลิงก์</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">เข้าถึงแบบเต็มที่</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">อ่านเท่านั้น</string>
+    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">อ่านอย่างเดียว</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">อ่านและเขียน</string>
 
     <string name="attachment_uploading_state_uploading">กำลังอัปโหลด&#8230;</string>
@@ -1912,7 +1915,7 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">อย่าลืมสำรองรหัสนี้ไว้ในที่ปลอดภัย ในกรณีที่คุณทำอุปกรณ์ของคุณหาย</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">กรุณากรอกรหัส 6 หลักที่สร้างโดยแอปตัวรับรองความถูกต้องของคุณ</string>
     <string name="general_verify" context="Text button">ตรวจสอบ</string>
-    <string name="general_next" context="Text button">ถัดไป</string>
+    <string name="general_next" context="Text button">ต่อไป</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">เกิดข้อผิดพลาดในการสร้างรหัสหรือคิวอาร์โค้ด กรุณาลองอีกครั้ง</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">เปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัยแล้ว</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชีของคุณ ระบบจะขอให้คุณกรอกรหัส 6 หลักที่ได้รับจากแอปตัวรับรองความถูกต้องของคุณ</string>
@@ -2022,7 +2025,7 @@
     <string name="confirmation_delete_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">ลบ %s ออกจากการสนทนานี้หรือไม่</string>
 
     <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">ไฟล์เวอร์ชัน</string>
-    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d ไฟล์ รวมทั้งหมด %2$s</string>
+    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d เวอร์ชันไฟล์ รวมทั้งหมด %2$s</string>
 
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">การจัดการไฟล์</string>
 
@@ -2114,9 +2117,46 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">หากต้องการปิดใช้งานตัวกำหนดเวลาทำความสะอาดถังขยะหรือตั้งระยะเวลาเก็บรักษาที่นานขึ้น คุณต้องสมัครแผน PRO</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">วัน</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">รับลิงก์แชท</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">จัดการลิงก์แชท</string>
 
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">เปิดใช้งาน Encrypted Key Rotation</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] ได้สร้างลิงก์แชท[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ได้ลบลิงก์แชท[/B]</string>
+
+    <string name="action_delete_link" context="Title of the option to delete a chat link">ลบลิงก์แชท</string>
+
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">ลิงก์แชท</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">การดำเนินการนี้จะนำคุณออกจากเซสชันที่ใช้งานอยู่ทั้งหมดยกเว้นที่มีอยู่ในปัจจุบัน</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">คุณต้องการปิดเซสชันอื่นทั้งหมดหรือไม่</string>
+
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">ผู้เข้าร่วม %d คน</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">เข้าร่วม</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">ผู้สังเกตการณ์</string>
+
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">เกิดข้อผิดพลาดในการโหลดลิงก์แชท</string>
+
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">เกิดข้อผิดพลาดในการเริ่มต้นแชทเมื่อโหลดลิงก์แชท</string>
+
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">คุณกำลังพยายามดูตัวอย่างแชทที่คุณเคยเป็นสมาชิก คุณต้องการเข้าร่วมการแชทอีกครั้งหรือไม่</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">คุณได้เข้าร่วมแชทนี้แล้ว</string>
+
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">ตัวอย่างแชทนี้ไม่สามารถใช้งานได้อีกต่อไป หากคุณออกจากหน้าตัวอย่าง คุณจะไม่สามารถเปิดได้อีกครั้ง</string>
+
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ได้เปิดใช้งาน Encrypted Key Rotation[/B]</string>
+
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">ลิงก์แชทไม่ถูกต้อง</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+    <string name="action_open_chat_link" context="Menu item">เปิดลิงก์แชท</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">คำเชิญให้ติดต่อ %s มีการส่งไปแล้วและสามารถดูได้ในแท็บคำขอที่ส่งแล้ว</string>
 
@@ -2227,6 +2267,10 @@
         <item context="Plural of participant. 2 participants" quantity="other">ผู้เข้าร่วม %d คน</item>
     </plurals>
 
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">ก่อนที่คุณจะสามารถสร้างลิงก์สำหรับการแชทนี้คุณต้องตั้งคำอธิบาย:</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">คัดลอกลิงก์แชทไปยังคลิปบอร์ดแล้ว</string>
+
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]จาก[/A] %s / [A]เดือน[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* การสมัครสมาชิกแบบจ่ายเป็นประจำสามารถยกเลิกได้ทุกเมื่อก่อนวันที่ต่ออายุจะมาถึง</string>
     <string name="call_started_messages" context="Message shown when a call starts.">เริ่มการโทร</string>
@@ -2236,6 +2280,16 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]ไม่มี [/B][A]แจ้งเตือน[/A][B][/B]</string>
 
+    <string name="general_setup_mega" context="Permissions screen title">ตั้งค่า MEGA</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA ต้องการเข้าถึงรูปภาพ มีเดียและไฟล์ของคุณ เพื่อสามารถแชร์กับเพื่อนของคุณ รวมไปถึงมีการแลกเปลี่ยนข้อความที่มีการเข้ารหัสและโทรออกอย่างปลอดภัย</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">อนุญาตให้เข้าถึงรูปภาพ มีเดียและไฟล์</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">ในการแชร์รูปภาพ สื่อและไฟล์ MEGA ต้องได้รับอนุญาตจากคุณ</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">เปิดใช้งานกล้อง</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">สำหรับการสแกนเอกสาร ถ่ายภาพและวิดีโอคอล ต้องอนุญาตให้เข้าถึงกล้องของคุณ</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">เปิดใช้งานการโทร</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">สำหรับการโทรแบบเข้ารหัส ต้องอนุญาตให้เข้าถึงไมโครโฟนของคุณ</string>
+    <string name="general_enable_access" context="General enable access">เปิดใช้งานการเข้าถึง</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">ไฟล์ที่ใช้ร่วมกัน</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">เอกสารแนบที่ส่งไปแล้ว</string>
@@ -2263,8 +2317,8 @@
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]ไม่มี[/B][A]ไฟล์ที่แชร์[/A][B][/B]</string>
 
-    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
-    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s เข้าร่วมการโทร</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s ออกจากการโทร</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">คุณไม่ได้รับอนุญาตให้เข้าร่วมการโทรนี้เนื่องจากมีผู้เข้าร่วมถึงจำนวนสูงสุดแล้ว</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">คุณไม่ได้รับอนุญาตให้เปิดใช้งานวิดีโอเนื่องจากการโทรนี้มีผู้เข้าร่วมถึงจำนวนสูงสุดที่ใช้วิดีโอแล้ว</string>
@@ -2282,6 +2336,56 @@
         <item context="version items" quantity="other">ส่งข้อความแล้ว</item>
     </plurals>
 
+    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">ไฟล์ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
+        <item context="Plural of file. 2 files" quantity="other">ไฟล์ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
+    </plurals>
+
+    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">ผู้ติดต่อ %d คนไม่ได้ถูกส่งไปยังแชท %d</item>
+        <item context="Plural of file. 2 files" quantity="other">ผู้ติดต่อ %d คนไม่ได้ถูกส่งไปยังแชท %d</item>
+    </plurals>
+
+    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">ข้อความ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
+        <item context="Plural of file. 2 files" quantity="other">ข้อความ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
+    </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">เนื้อหาไม่ได้ถูกส่งไปยังแชท %d</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">สร้างกลุ่มแชทใหม่สำเร็จแล้ว</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">กำลังเตรียมการไฟล์</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">ส่งเป็นข้อความ</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">ผิดพลาด ไฟล์ยังไม่ได้ส่งไปยังแชทที่เลือกไว้</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]ไม่มี[/A][B]รายการใด ๆ[/B]</string>
+
+    <string name="delete_versions" context="Action delete all file versions">ลบเวอร์ชันเก่า</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">ลบเวอร์ชันเก่าหรือไม่</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">โปรดทราบว่าไฟล์ปัจจุบันจะไม่ถูกลบ</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">ลบเวอร์ชันเก่าแล้ว</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">เวอร์ชันเก่าไม่ถูกลบ</string>
+
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">ลบเวอร์ชัน %d สำเร็จแล้ว</item>
+        <item context="version items" quantity="other">ลบ %d เวอร์ชันสำเร็จแล้ว</item>
+    </plurals>
+
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">ไม่ลบเวอร์ชัน %d</item>
+        <item context="version items" quantity="other">ไม่ลบ %d เวอร์ชัน</item>
+    </plurals>
+
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">คุณไม่มีรายชื่อผู้ติดต่อ MEGA กรุณาเชิญเพื่อน ๆ จากส่วนผู้ติดต่อ</string>
+
+    <string name="title_tour_one" context="Title of first tour screen">คุณคือผู้ถือกุญแจ</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">ความปลอดภัยคือเหตุผลหลักที่เราดำเนินการอยู่ ไฟล์ของคุณจะมีความปลอดภัยมากยิ่งขึ้น เพราะใช้เครื่องมือเข้ารหัสที่ป้องกันไฟล์ของคุณ ซึ่งมีเพียงคุณเท่านั้นที่สามารถเข้าถึงไฟล์ได้</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">เข้ารหัสแชท</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">แชทที่มีการเข้ารหัสอย่างเต็มที่ไม่ว่าจะเป็นการโทรด้วยเสียงและวิดีโอ การส่งข้อความแบบกลุ่มและบูรณาการไฟล์ร่วมกันกับคลาวด์ไดรฟ์ของคุณ</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">สร้างเครือข่ายของคุณ</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">เพิ่มผู้ติดต่อ สร้างเครือข่าย การทำงานร่วมกัน โทรออกด้วยเสียงและวิดีโอได้โดยไม่ต้องออกจากแอป MEGA</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">รูปถ่ายของคุณในคลาวด์</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">การอัปโหลดจากกล้อง เป็นฟีเจอร์สำคัญสำหรับโทรศัพท์มือถือทุกเครื่องและเราได้ให้ความสำคัญกับคุณ สร้างบัญชีของคุณเลย</string>
+
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">กรอกรหัสผ่านของคุณ</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s เป็นเอกสาร PDF ที่มีการป้องกันด้วยรหัสผ่าน กรุณากรอกรหัสผ่านเพื่อเปิด PDF นี้</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">คุณกรอกรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง</string>
@@ -2289,10 +2393,33 @@
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">ไม่สามารถเล่นไฟล์มีเดียขณะกำลังโทรได้</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">สายที่กำลังโทร</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s เริ่มการโทรกลุ่ม แตะเพื่อเข้าร่วม</string>
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">แตะเพื่อกลับไปที่การโทร %s</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">แตะเพื่อกลับไปที่การโทร</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s เริ่มการโทรกลุ่ม แตะเพื่อเข้าร่วม</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">แตะเพื่อกลับไปที่การโทร</string>
+
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] ได้เข้าร่วมแชทกลุ่ม[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">การสนทนานี้จะไม่สามารถเข้าถึงได้ผ่านลิงก์แชทที่คุณกำลังจะลบอีกต่อไป</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">การเข้ารหัส Key Rotation ไม่อนุญาตให้คุณรับลิงก์แชทโดยไม่ต้องสร้างแชทกลุ่มใหม่</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">คุณต้องการสร้างแชทกลุ่มใหม่และรับลิงก์แชทหรือไม่</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">คุณเข้าร่วมแชทสำเร็จแล้ว</string>
+
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d จาก %2$d</string>
+
+    <string name="hint_action_search" context="Hint of the Search view">ค้นหา&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">ตอบกลับ</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">ละเว้น</string>
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">กำลังเริ่มต้นการโทรด้วยเสียง&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">กำลังเริ่มสนทนาทางวิดีโอ&#8230;</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s ปิดเสียงการโทรนี้</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">ปิดเสียง</string>
 
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">เข้าร่วมการโทร</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">ในการเข้าร่วมการโทรนี้คุณต้องวางสายปัจจุบันก่อน</string>
+
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
 </resources>

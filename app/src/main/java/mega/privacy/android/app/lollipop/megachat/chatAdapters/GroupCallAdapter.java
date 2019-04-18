@@ -393,7 +393,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 myTexture.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
                 myTexture.setAlpha(1.0f);
                 myTexture.setRotation(0);
-                GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getPeerId(), peer.getClientId());
+                boolean isLocal;
+                if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){
+                    isLocal = true;
+                }else{
+                    isLocal = false;
+                }
+
+                GroupCallListener listenerPeer = new GroupCallListener(context, myTexture, peer.getPeerId(), peer.getClientId(), isLocal);
                 peer.setListener(listenerPeer);
 
                 if((peer.getPeerId() == megaChatApi.getMyUserHandle()) && (peer.getClientId() == megaChatApi.getMyClientidHandle(chatId))){

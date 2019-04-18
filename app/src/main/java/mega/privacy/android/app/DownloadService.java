@@ -628,8 +628,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else
 		{
 			try {
-				if (openFile) {
-					log("openFile true");
+                boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                if (openFile && autoPlayEnabled) {
+                    log("both openFile and autoPlayEnabled are true");
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
