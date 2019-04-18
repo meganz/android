@@ -244,23 +244,10 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
                             android:textColor="@color/name_my_account"
+                            android:text="@string/get_chat_link_option"
                             android:layout_weight="5"
                             android:textSize="16dp" />
 
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginLeft="16dp">
-                        <ImageView
-                            android:id="@+id/chat_group_contact_properties_chat_link_points"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_gravity="right|center_vertical"
-                            android:src="@drawable/ic_dots_vertical_grey" />
                     </RelativeLayout>
                 </LinearLayout>
 

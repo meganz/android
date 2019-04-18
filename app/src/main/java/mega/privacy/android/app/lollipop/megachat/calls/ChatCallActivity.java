@@ -1392,8 +1392,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
+
         if(mSensorManager!=null){
             log("onBackPressed:unregisterListener");
             mSensorManager.unregisterListener(this);

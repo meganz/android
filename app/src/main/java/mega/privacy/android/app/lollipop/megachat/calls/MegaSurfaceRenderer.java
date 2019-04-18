@@ -228,17 +228,17 @@ public class MegaSurfaceRenderer implements Callback {
         }
     }
 
-    public void DrawByteBuffer() {
-        log("DrawByteBuffer(): ");
+//    public void DrawByteBuffer() {
+//        log("DrawByteBuffer(): ");
+//
+//        if(byteBuffer == null)
+//            return;
+//        byteBuffer.rewind();
+//        bitmap.copyPixelsFromBuffer(byteBuffer);
+//        DrawBitmap(false);
+//    }
 
-        if(byteBuffer == null)
-            return;
-        byteBuffer.rewind();
-        bitmap.copyPixelsFromBuffer(byteBuffer);
-        DrawBitmap(false);
-    }
-
-    public void DrawBitmap(boolean flag) {
+    public void DrawBitmap(boolean flag, boolean isLocal) {
 
         if(bitmap == null)
             return;
@@ -248,8 +248,10 @@ public class MegaSurfaceRenderer implements Callback {
         }
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
-            canvas.scale(-1, 1);
-            canvas.translate(-canvas.getWidth(), 0);
+            if(isLocal){
+                canvas.scale(-1, 1);
+                canvas.translate(-canvas.getWidth(), 0);
+            }
             if (flag) {
                 paint.reset();
                 paint.setXfermode(modesrcover);
