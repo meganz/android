@@ -38,7 +38,7 @@ import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
 import mega.privacy.android.app.utils.Util;
 
 public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
-
+    private final String SAVED_QUERY_STRING = "SAVED_QUERY_STRING";
     private static List<Country> countries;
 
     private List<Country> selectedCountries = new ArrayList<>();
@@ -54,6 +54,8 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     private DisplayMetrics outMetrics;
 
     private Toolbar toolbar;
+    private String searchInput;
+    private SearchView.SearchAutoComplete searchAutoComplete;
     public static final String COUNTRY_NAME = "name";
     public static final String DIAL_CODE = "dial_code";
     public static final String COUNTRY_CODE = "code";
@@ -98,6 +100,10 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(Util.mutateIcon(this,R.drawable.ic_arrow_back_white,R.color.black));
+    
+        if(savedInstanceState != null){
+            searchInput = savedInstanceState.getString(SAVED_QUERY_STRING);
+        }
     }
 
     private void changeStatusBarColor() {
@@ -140,11 +146,17 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         }
 
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
-        SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(ContextCompat.getColor(this,R.color.black));
         searchAutoComplete.setHintTextColor(ContextCompat.getColor(this,R.color.status_bar_login));
-        searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+        searchAutoComplete.setHint(getString(R.string.hint_action_search));
+        if (searchInput != null) {
+            searchMenuItem.expandActionView();
+            searchView.setQuery(searchInput,true);
+            search(searchInput);
+        }
         v.setBackgroundColor(ContextCompat.getColor(this,android.R.color.transparent));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -320,5 +332,14 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     public static void countrySelected() {
 
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        String query = searchAutoComplete.getText().toString();
+        if(searchAutoComplete.hasFocus() || (query != null && !query.isEmpty())){
+            outState.putString(SAVED_QUERY_STRING, query);
+        }
     }
 }
