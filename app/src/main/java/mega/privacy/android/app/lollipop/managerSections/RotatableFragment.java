@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.ImageView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -11,8 +12,6 @@ import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.utils.Util;
 
 public abstract class RotatableFragment extends Fragment {
-    //This attribute is to preserve how many folder place holder in folder grid view
-    private int lastPlaceHolderCount;
 
     protected abstract RotatableAdapter getAdapter();
 
@@ -24,12 +23,17 @@ public abstract class RotatableFragment extends Fragment {
         Util.log(tag, log);
     }
 
+    private ArrayList<Integer> selectedItems;
+
+    private int folderCount;
+
+    private int lastPlaceHolderCount;
+
     private void reDoTheSelectionAfterRotation() {
         String className = this.getClass().getName();
         log(className, "re select the items which are selected before rotation");
         RotatableAdapter adapter = getAdapter();
         if (adapter != null) {
-            ArrayList<Integer> selectedItems = (ArrayList<Integer>) (adapter.getSelectedItems());
             int folderCount = adapter.getFolderCount();
             log(className, "There are" + folderCount + "folders");
             int currentPlaceHolderCount = adapter.getPlaceholderCount();
@@ -56,20 +60,34 @@ public abstract class RotatableFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        RotatableAdapter currentAdapter = getAdapter();
+        ArrayList<Integer> selectedItems = (ArrayList<Integer>) (currentAdapter.getSelectedItems());
+        outState.putSerializable("selectedItems", selectedItems);
+        outState.putInt("folderCount", currentAdapter.getFolderCount());
+        outState.putInt("lastPlaceHolderCount", currentAdapter.getPlaceholderCount());
+        selectedItems = null;
+        folderCount = -1;
+        lastPlaceHolderCount = -1;
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setRetainInstance(true);
+        if (savedInstanceState != null ) {
+            selectedItems = (ArrayList<Integer>) savedInstanceState.getSerializable("selectedItems");
+            folderCount = savedInstanceState.getInt("folderCount");
+            lastPlaceHolderCount = savedInstanceState.getInt("lastPlaceHolderCount") ;
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        reDoTheSelectionAfterRotation();
+        if (selectedItems != null) {
+            reDoTheSelectionAfterRotation();
+        }
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        this.lastPlaceHolderCount = getAdapter().getPlaceholderCount();
-    }
 }
