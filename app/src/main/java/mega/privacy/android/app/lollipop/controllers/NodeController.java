@@ -188,46 +188,11 @@ public class NodeController {
         }
     }
 
-    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
-        log("selectChatsToSendNodes");
-
-        int size = nodes.size();
-        long[] longArray = new long[size];
-
-        for(int i=0;i<nodes.size();i++){
-            longArray[i] = nodes.get(i).getHandle();
-        }
-
-        selectChatsToSendNodes(longArray);
-    }
-
     public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
         log("checkIfNodeIsMineAndSelectChatsToSendNode");
-        if (node != null) {
-            if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
-                selectChatsToSendNode(node);
-            }
-            else {
-                String nodeFP = megaApi.getFingerprint(node);
-                ArrayList<MegaNode> nodes = megaApi.getNodesByFingerprint(nodeFP);
-                MegaNode nodeOwner = null;
-                if (nodes != null) {
-                    for (int i=0; i<nodes.size(); i++) {
-                        if (megaApi.getAccess(nodes.get(i)) == MegaShare.ACCESS_OWNER){
-                            nodeOwner = nodes.get(i);
-                            break;
-                        }
-                    }
-                }
-                if (nodeOwner != null) {
-                    selectChatsToSendNode(nodeOwner);
-                }
-                else {
-                    CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-                    copyAndSendToChatListener.copyNode(node);
-                }
-            }
-        }
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        nodes.add(node);
+        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
@@ -244,7 +209,7 @@ public class NodeController {
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
             if (currentNode != null) {
-                if (megaApi.getAccess(currentNode) == MegaShare.ACCESS_OWNER) {
+                if (currentNode.getOwner() == megaApi.getMyUserHandleBinary()) {
                     ownerNodes.add(currentNode);
                 }
                 else {
@@ -253,7 +218,7 @@ public class NodeController {
                     MegaNode nodeOwner = null;
                     if (fNodes != null) {
                         for (int j=0; j<fNodes.size(); j++) {
-                            if (megaApi.getAccess(fNodes.get(j)) == MegaShare.ACCESS_OWNER){
+                            if (fNodes.get(j).getOwner() == megaApi.getMyUserHandleBinary()){
                                 nodeOwner = fNodes.get(j);
                                 break;
                             }
@@ -278,17 +243,15 @@ public class NodeController {
         }
     }
 
-    public void selectChatsToSendNode(MegaNode node){
-        log("selectChatsToSendNode");
-
-        long[] longArray = new long[1];
-        longArray[0] = node.getHandle();
-
-        selectChatsToSendNodes(longArray);
-    }
-
-    public void selectChatsToSendNodes(long[] longArray){
+    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
         log("selectChatsToSendNodes");
+
+        int size = nodes.size();
+        long[] longArray = new long[size];
+
+        for(int i=0;i<nodes.size();i++){
+            longArray[i] = nodes.get(i).getHandle();
+        }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
         i.putExtra("NODE_HANDLES", longArray);
