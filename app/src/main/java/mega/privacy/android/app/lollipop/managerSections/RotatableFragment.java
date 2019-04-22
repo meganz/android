@@ -87,6 +87,7 @@ public abstract class RotatableFragment extends Fragment {
         super.onResume();
         if (selectedItems != null) {
             reDoTheSelectionAfterRotation();
+            selectedItems = null;
         }
     }
 
