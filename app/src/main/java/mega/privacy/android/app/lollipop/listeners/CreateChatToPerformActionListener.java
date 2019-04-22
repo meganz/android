@@ -16,6 +16,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -182,7 +183,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if(chat!=null){
-                            ((MegaApplication) ((Activity)context).getApplication()).setSpeakerStatus(false);
+                            ChatUtil.activateSpeaker(false,((MegaApplication) ((Activity)context).getApplication()));
                             megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         }
                         else{
@@ -200,8 +201,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if(chat!=null){
-                            ((MegaApplication) ((Activity)context).getApplication()).setSpeakerStatus(true);
-
+                            ChatUtil.activateSpeaker(true,((MegaApplication) ((Activity)context).getApplication()));
                             megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         }
                         else{

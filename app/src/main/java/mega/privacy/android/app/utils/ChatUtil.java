@@ -3,10 +3,12 @@ package mega.privacy.android.app.utils;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
@@ -19,6 +21,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
+
+import static android.view.View.GONE;
 
 public class ChatUtil {
 
@@ -219,6 +223,31 @@ public class ChatUtil {
         builder.setTitle(R.string.action_delete_link);
         builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    public static void activateSpeaker(boolean activateSpeaker, MegaApplication app){
+        if(activateSpeaker){
+            app.setSpeakerStatus(true);
+        }else{
+            app.setSpeakerStatus(false);
+        }
+    }
+
+    public static void activateChrono(boolean activateChrono, Chronometer chronometer, MegaChatCall callChat){
+        if(activateChrono){
+            if((callChat!=null)&&(chronometer!=null)&&(chronometer.getVisibility() == GONE)){
+                chronometer.setVisibility(View.VISIBLE);
+                chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
+                chronometer.start();
+                chronometer.setFormat(" %s");
+            }
+        }else{
+            if((chronometer!=null) && (chronometer.getVisibility()==View.VISIBLE)){
+                chronometer.stop();
+                chronometer.setVisibility(View.GONE);
+            }
+        }
+
     }
 
     private static void log(String message) {

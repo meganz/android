@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -104,7 +105,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             log("onRequestFinish:TYPE_HANG_CHAT_CALL");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("onRequestFinish: TYPE_HANG_CHAT_CALL:OK: ");
-                ((MegaApplication) getApplication()).setSpeakerStatus(false);
+                ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
                 megaChatApi.answerChatCall(chatHandleToAnswer, false, this);
             }else{
                 log("onRequestFinish:TYPE_HANG_CHAT_CALL:ERROR: "+e.getErrorCode());

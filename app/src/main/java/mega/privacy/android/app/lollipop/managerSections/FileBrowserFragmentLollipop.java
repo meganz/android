@@ -1810,24 +1810,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
                 callInProgressLayout.setVisibility(View.VISIBLE);
             }
-            if((callInProgressChrono!=null) && (callInProgressChrono.getVisibility() != View.VISIBLE)){
-                long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
-                if((megaChatApi!=null) && (chatId != -1)){
-                    MegaChatCall call = megaChatApi.getChatCall(chatId);
-                    if(call!=null){
-                        callInProgressChrono.setVisibility(View.VISIBLE);
-                        callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-                        callInProgressChrono.start();
-                        callInProgressChrono.setFormat("%s");
-                    }
-                }
-            }
+			long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
+			if((megaChatApi!=null) && (chatId != -1)){
+				MegaChatCall call = megaChatApi.getChatCall(chatId);
+				ChatUtil.activateChrono(true, callInProgressChrono, call);
+			}
 
         }else{
-            if(callInProgressChrono!=null){
-                callInProgressChrono.stop();
-                callInProgressChrono.setVisibility(View.GONE);
-            }
+			ChatUtil.activateChrono(false, callInProgressChrono, null);
             if(callInProgressLayout!=null){
                 callInProgressLayout.setVisibility(View.GONE);
             }

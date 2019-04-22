@@ -233,7 +233,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     MarqueeTextView individualSubtitleToobar;
     TextView groupalSubtitleToolbar;
     LinearLayout subtitleCall;
-    Chronometer chronoCall;
+    Chronometer subtitleChronoCall;
     LinearLayout participantsLayout;
     TextView participantsText;
     ImageView iconStateToolbar;
@@ -495,7 +495,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         individualSubtitleToobar = (MarqueeTextView) tB.findViewById(R.id.individual_subtitle_toolbar);
         groupalSubtitleToolbar = (TextView) tB.findViewById(R.id.groupal_subtitle_toolbar);
         subtitleCall = (LinearLayout) tB.findViewById(R.id.subtitle_call);
-        chronoCall = (Chronometer) tB.findViewById(R.id.chrono_call);
+        subtitleChronoCall = (Chronometer) tB.findViewById(R.id.chrono_call);
         participantsLayout = (LinearLayout) tB.findViewById(R.id.ll_participants);
         participantsText = (TextView) tB.findViewById(R.id.participants_text);
         iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
@@ -507,7 +507,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         groupalSubtitleToolbar.setText("");
         groupalSubtitleToolbar.setVisibility(View.GONE);
         subtitleCall.setVisibility(View.GONE);
-        chronoCall.setVisibility(View.GONE);
+        subtitleChronoCall.setVisibility(View.GONE);
         participantsLayout.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
@@ -1807,7 +1807,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }else{
                     if(callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
                         log("startCall:I'm not in a call, this call is ring in");
-                        ((MegaApplication) getApplication()).setSpeakerStatus(false);
+                        ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
                         MegaApplication.setShowPinScreen(false);
                         Intent intent = new Intent(this, ChatCallActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1816,22 +1816,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     }else if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
                         log("startCall:I'm not in a call, this call is user no present");
-                        if(startVideo){
-                            ((MegaApplication) getApplication()).setSpeakerStatus(true);
-                        }else{
-                            ((MegaApplication) getApplication()).setSpeakerStatus(false);
-                        }
+                        ChatUtil.activateSpeaker(startVideo,(MegaApplication) getApplication());
                         megaChatApi.startChatCall(idChat, startVideo, this);
                     }
                 }
             }else{
                 if((megaChatApi!=null)&&(!ChatUtil.participatingInACall(megaChatApi))){
                     log("startCall there is not a call in this chat and i'm not in other call");
-                    if(startVideo){
-                        ((MegaApplication) getApplication()).setSpeakerStatus(true);
-                    }else{
-                        ((MegaApplication) getApplication()).setSpeakerStatus(false);
-                    }
+                    ChatUtil.activateSpeaker(startVideo,(MegaApplication) getApplication());
                     megaChatApi.startChatCall(idChat, startVideo, this);
                 }
             }
@@ -6104,10 +6096,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     MegaChatCall call = megaChatApi.getChatCall(idChat);
                     if(call!=null) {
                         if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
-                            ((MegaApplication) getApplication()).setSpeakerStatus(false);
+                            ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
                             megaChatApi.answerChatCall(idChat, false, this);
                         }else if(call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ){
-                            ((MegaApplication) getApplication()).setSpeakerStatus(false);
+                            ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
                             megaChatApi.startChatCall(idChat, false, this);
                         }
                     }
@@ -6398,10 +6390,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
-        if(callInProgressChrono!=null){
-            callInProgressChrono.stop();
-            callInProgressChrono.setVisibility(View.GONE);
-        }
+        ChatUtil.activateChrono(false, callInProgressChrono, null);
+        ChatUtil.activateChrono(false, subtitleChronoCall, null);
         if(callInProgressLayout!=null){
             callInProgressLayout.setVisibility(View.GONE);
         }
@@ -7258,19 +7248,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     case MegaChatCall.CALL_STATUS_DESTROYED: {
                         log("onChatCallUpdate:STATUS: DESTROYED");
-
                         setSubtitleVisibility();
-                        if (chronoCall != null) {
-                            chronoCall.stop();
-                            chronoCall.setVisibility(View.GONE);
-                        }
+                        ChatUtil.activateChrono(false, subtitleChronoCall, call);
                         if (callInProgressLayout.getVisibility() != View.GONE) {
                             callInProgressLayout.setVisibility(View.GONE);
                             callInProgressLayout.setOnClickListener(null);
-                            if (callInProgressChrono != null) {
-                                callInProgressChrono.stop();
-                                callInProgressChrono.setVisibility(View.GONE);
-                            }
+                            ChatUtil.activateChrono(false, callInProgressChrono, call);
                         }
                         invalidateOptionsMenu();
                         break;
@@ -7304,10 +7287,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(isGroup()){
                 //Group:
                 log("showCallLayout: USER_NO_PRESENT || RING_IN - Group");
-                if(chronoCall!=null){
-                    chronoCall.stop();
-                    chronoCall.setVisibility(View.GONE);
-                }
+                ChatUtil.activateChrono(false, subtitleChronoCall, call);
                 usersWithVideo();
 
                 long callerHandle = call.getCaller();
@@ -7319,85 +7299,48 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 callInProgressLayout.setVisibility(View.VISIBLE);
                 callInProgressLayout.setOnClickListener(this);
-
-                if(callInProgressChrono!=null){
-                    callInProgressChrono.stop();
-                    callInProgressChrono.setVisibility(View.GONE);
-                }
+                ChatUtil.activateChrono(false, callInProgressChrono, call);
                 usersWithVideo();
 
             }else{
                 //Individual:
                 log("showCallLayout: USER_NO_PRESENT || RING_IN - Individual");
 
-                if(chronoCall!=null){
-                    chronoCall.stop();
-                    chronoCall.setVisibility(View.GONE);
-                }
-
+                ChatUtil.activateChrono(false, subtitleChronoCall, call);
                 callInProgressLayout.setVisibility(View.GONE);
                 callInProgressLayout.setOnClickListener(this);
                 callInProgressText.setText(getString(R.string.call_in_progress_layout));
-
-                if(callInProgressChrono!=null){
-                    callInProgressChrono.stop();
-                    callInProgressChrono.setVisibility(View.GONE);
-                }
+                ChatUtil.activateChrono(false, callInProgressChrono, call);
             }
 
         }else if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
             log("showCallLayout: REQUEST_SENT");
 
-            if(chronoCall!=null){
-                chronoCall.stop();
-                chronoCall.setVisibility(View.GONE);
-            }
 
             callInProgressLayout.setVisibility(View.VISIBLE);
             callInProgressLayout.setOnClickListener(this);
             callInProgressText.setText(getString(R.string.call_in_progress_layout));
-            if(callInProgressChrono!=null){
-                callInProgressChrono.stop();
-                callInProgressChrono.setVisibility(View.GONE);
-            }
-
-
+            ChatUtil.activateChrono(false, subtitleChronoCall, call);
+            ChatUtil.activateChrono(false, callInProgressChrono, call);
         }else if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
             log("showCallLayout: IN_PROGRESS");
 
             callInProgressLayout.setVisibility(View.VISIBLE);
             callInProgressLayout.setOnClickListener(this);
             callInProgressText.setText(getString(R.string.call_in_progress_layout));
-            if(callInProgressChrono!=null){
-                callInProgressChrono.setVisibility(View.VISIBLE);
-                callInProgressChrono.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-                callInProgressChrono.start();
-                callInProgressChrono.setFormat("%s");
-            }
-
+            ChatUtil.activateChrono(true, callInProgressChrono, call);
             if(isGroup()) {
                 log("showCallLayout: IN_PROGRESS - Group");
-
                 //Group:
                 subtitleCall.setVisibility(View.VISIBLE);
                 individualSubtitleToobar.setVisibility(View.GONE);
                 groupalSubtitleToolbar.setVisibility(View.GONE);
-                if(chronoCall!=null){
-                    chronoCall.setVisibility(View.VISIBLE);
-                    chronoCall.setBase(SystemClock.elapsedRealtime() - (call.getDuration()*1000));
-                    chronoCall.start();
-                    chronoCall.setFormat("%s");
-                }
+                ChatUtil.activateChrono(true, subtitleChronoCall, call);
                 usersWithVideo();
-
             }else{
                 log("showCallLayout: IN_PROGRESS - Individual");
-
                 //Individual:
-                if(chronoCall!=null){
-                    chronoCall.stop();
-                    chronoCall.setVisibility(View.GONE);
-                }
+                ChatUtil.activateChrono(false, subtitleChronoCall, call);
             }
             invalidateOptionsMenu();
         }

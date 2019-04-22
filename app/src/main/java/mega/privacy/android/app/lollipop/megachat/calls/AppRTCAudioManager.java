@@ -137,7 +137,7 @@ public class AppRTCAudioManager {
 
 
   public void activateSpeaker(boolean activated) {
-      Log.d(TAG,"activate Speaker: "+activated);
+      Log.d(TAG,"activateSpeaker() =  "+activated);
 //      useSpeakerphone = SPEAKERPHONE_AUTO;
 
 //    if (!useSpeakerphone.equals(SPEAKERPHONE_AUTO)) {
@@ -145,18 +145,17 @@ public class AppRTCAudioManager {
 //        }
         if (audioDevices.size() == 2 && audioDevices.contains(AppRTCAudioManager.AudioDevice.EARPIECE) && audioDevices.contains(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)) {
             if(activated){
-                Log.d(TAG,"activate SPEAKER_PHONE");
-
                 // Sensor reports that a "handset is removed from a person's ear", or
                 // "the light sensor is no longer covered".
-                setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE);
+              defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
             }else{
-                Log.d(TAG,"activate EARPIECE");
-
                 // Sensor reports that a "handset is being held up to a person's ear",
                 // or "something is covering the light sensor".
-                setAudioDeviceInternal(AppRTCAudioManager.AudioDevice.EARPIECE);
+              defaultAudioDevice = AudioDevice.EARPIECE;
+
             }
+          updateAudioDeviceState();
+
         }
   }
 
@@ -183,11 +182,11 @@ public class AppRTCAudioManager {
   };
 
   /** Construction. */
-  static AppRTCAudioManager create(Context context, boolean isAudioCall) {
-    return new AppRTCAudioManager(context, isAudioCall);
+  static AppRTCAudioManager create(Context context, boolean isSpeakerOn) {
+    return new AppRTCAudioManager(context, isSpeakerOn);
   }
 
-  private AppRTCAudioManager(Context context, boolean isAudioCall) {
+  private AppRTCAudioManager(Context context, boolean isSpeakerOn) {
     Log.d(TAG, "ctor");
     ThreadUtils.checkIsOnMainThread();
     apprtcContext = context;
@@ -195,19 +194,13 @@ public class AppRTCAudioManager {
     bluetoothManager = AppRTCBluetoothManager.create(context, this);
     wiredHeadsetReceiver = new WiredHeadsetReceiver();
     amState = AudioManagerState.UNINITIALIZED;
-
-    if(isAudioCall){
-      useSpeakerphone = SPEAKERPHONE_FALSE;
-    }else {
+    if(isSpeakerOn){
       useSpeakerphone = SPEAKERPHONE_AUTO;
-    }
-
-    if (useSpeakerphone.equals(SPEAKERPHONE_FALSE)) {
-      Log.d(TAG,"DefaultDevice-EARPIECE");
-      defaultAudioDevice = AudioDevice.EARPIECE;
-    } else {
-      Log.d(TAG,"DefaultDevice-SPEAKER_PHONE");
       defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
+    }else {
+      useSpeakerphone = SPEAKERPHONE_FALSE;
+      defaultAudioDevice = AudioDevice.EARPIECE;
+
     }
 
     // Create and initialize the proximity sensor.
@@ -495,6 +488,8 @@ public class AppRTCAudioManager {
    * TODO(henrika): add unit test to verify all state transitions.
    */
   public void updateAudioDeviceState() {
+    Log.d(TAG,"updateAudioDeviceState()");
+
     ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "--- updateAudioDeviceState: "
             + "wired headset=" + hasWiredHeadset + ", "
@@ -538,8 +533,7 @@ public class AppRTCAudioManager {
     // Update the existing audio device set.
     audioDevices = newAudioDevices;
     // Correct user selected audio devices if needed.
-    if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE
-        && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
+    if (bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
       // If BT is not available, it can't be the user selection.
       userSelectedAudioDevice = AudioDevice.NONE;
     }
@@ -552,7 +546,6 @@ public class AppRTCAudioManager {
     if (!hasWiredHeadset && userSelectedAudioDevice == AudioDevice.WIRED_HEADSET) {
       // If user selected wired headset, but then unplugged wired headset then make
       // speaker phone as user selected device.
-
       userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
     }
 
