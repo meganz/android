@@ -3320,7 +3320,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 hideMultipleSelect();
             }
         }
-        showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, message, -1);
+        showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
     }
 
 	public void showSnackbar(int type, String s, long idChat){
