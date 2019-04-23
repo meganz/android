@@ -996,7 +996,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 			Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             String notificationTitle;
-            if(n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)){
+            if(n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE) && !n.hasChanged(MegaNode.CHANGE_TYPE_NEW)){
                 notificationTitle = getString(R.string.context_permissions_changed);
             }else{
                 notificationTitle = getString(R.string.title_incoming_folder_notification);
