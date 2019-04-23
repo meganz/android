@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -432,13 +433,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mNotificationManager.cancel(notificationIdForFolderUpload);
         stopSelf();
         log("after stopSelf");
-        String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-        File f = new File(pathSelfie);
-        //Delete recursively all files and folder
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                if (f.list().length <= 0) {
-                    f.delete();
+        if (Util.isPermissionGranted(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+            File f = new File(pathSelfie);
+            //Delete recursively all files and folder
+            if (f.exists()) {
+                if (f.isDirectory()) {
+                    if (f.list().length <= 0) {
+                        f.delete();
+                    }
                 }
             }
         }
