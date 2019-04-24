@@ -948,8 +948,8 @@ public class ChatExplorerFragment extends Fragment {
             if (addedItems != null && !addedItems.isEmpty()) {
                 areAddedItems = true;
             }
-
-            for (ChatExplorerListItem item : items) {
+            ArrayList<ChatExplorerListItem> copiedItems = items;
+            for (ChatExplorerListItem item : copiedItems) {
                 if (!item.isHeader() && item.getTitle().toLowerCase().contains(s.toLowerCase())) {
                     searchItems.add(item);
                     if (areAddedItems && addedItems.contains(item)) {
@@ -959,7 +959,6 @@ public class ChatExplorerFragment extends Fragment {
             }
 
             adapterList.setSearchSelectedItems(searchSelectedItems);
-
             return null;
         }
 
@@ -979,6 +978,7 @@ public class ChatExplorerFragment extends Fragment {
     }
 
     public void enableSearch(boolean enable) {
+        log("enableSearch");
         if (enable) {
             search("");
             if (addLayout.getVisibility() == View.VISIBLE) {
@@ -1001,6 +1001,9 @@ public class ChatExplorerFragment extends Fragment {
 
             if (adapterList != null && adapterList.isSearchEnabled()) {
                 adapterList.setSearchEnabled(enable);
+                if (!adapterList.getItems().equals(items)) {
+                    adapterList.setItems(items);
+                }
             }
 
             if (adapterAdded != null && adapterAdded.getItemCount() == 0) {
