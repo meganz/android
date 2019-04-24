@@ -831,7 +831,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else if (result == MegaError.API_EARGS) {
                         log("Incorrect arguments!");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                         return v;
                     } else if (result == MegaError.API_EKEY) {
                         log("Incorrect MK when changing pass");
@@ -840,7 +840,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else {
                         log("Error when changing pass - show error message");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                         return v;
                     }
                 } else if (action.equals(Constants.ACTION_PARK_ACCOUNT)) {
@@ -851,7 +851,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else {
                         log("Error when parking account - show error message");
-                        Util.showAlert(context, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                        Util.showAlert(context, getString(R.string.general_text_error), getString(R.string.general_error_word));
                         return v;
                     }
                 }
@@ -1270,13 +1270,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 int ret = megaChatApi.getInitState();
 
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     ret = megaChatApi.init(gSession);
                     log("enableChat: result of init ---> "+ret);
                     chatSettings = dbH.getChatSettings();
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1348,7 +1349,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
 
                 int ret = megaChatApi.getInitState();
-                if(ret==0||ret==MegaChatApi.INIT_ERROR){
+                if(ret==MegaChatApi.INIT_NOT_DONE||ret==MegaChatApi.INIT_ERROR){
                     log("initial: INIT STATE: "+ret);
 
                     ret = megaChatApi.init(gSession);
@@ -1358,6 +1359,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
+                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1389,6 +1391,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("startFastLogin: Chat is NOT ENABLED");
             }
             megaApi.fastLogin(gSession, this);
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING))  {
+                log("megaChatApi.refreshUrl()");
+                megaChatApi.refreshUrl();
+            }
         }
         else{
             log("Another login is proccessing");
@@ -2289,7 +2295,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 log("Error when asking for recovery pass link");
                 log(error.getErrorString() + "___" + error.getErrorCode());
-                Util.showAlert(context,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                Util.showAlert(context,getString(R.string.general_text_error), getString(R.string.general_error_word));
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){

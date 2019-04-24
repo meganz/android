@@ -194,8 +194,8 @@
         <item name="android:textColorPrimary">@color/text_secondary</item>
         <item name="android:background">@color/white</item>
         <item name="colorControlNormal">@color/text_secondary</item>
-        <item name="android:windowMinWidthMajor">90%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
@@ -257,8 +257,13 @@
         <item name="android:content">@color/mail_my_account</item>
         <item name="colorControlNormal">@color/mail_my_account</item>
         <item name="android:textColorPrimary">@color/mail_my_account</item>
-        <item name="android:windowMinWidthMajor">90%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
+    </style>
+
+    <style name="AppCompatAlertDialogStyleNormal" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
     <style name="ColorControlStyle" parent="Theme.Megaactionbar">

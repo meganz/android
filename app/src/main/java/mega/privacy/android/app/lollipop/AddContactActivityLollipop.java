@@ -135,6 +135,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     StickyLayoutManager stickyLayoutManager;
     ImageView emptyImageView;
     TextView emptyTextView;
+    TextView emptySubTextView;
+    Button emptyInviteButton;
     ProgressBar progressBar;
     RecyclerView addedContactsRecyclerView;
     RelativeLayout containerAddedContactsRecyclerView;
@@ -188,6 +190,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private MenuItem sendInvitationMenuItem;
     private MenuItem scanQrMenuItem;
+    private MenuItem inviteContactMenuItem;
 
     private boolean comesFromChat;
 
@@ -220,14 +223,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private RelativeLayout typeContactLayout;
     private EditText typeContactEditText;
     private RelativeLayout scanQRButton;
-    private Button scanQRButton2;
     private RelativeLayout inviteContactButton;
-    private Button inviteContactButton2;
     private RelativeLayout newGroupChatButton;
-    private Button newGroupChatButton2;
+    private RelativeLayout newChatLinkButton;
     private boolean isConfirmAddShown = false;
     private String confirmAddMail;
     private boolean createNewGroup = false;
+    private boolean createNewChatLink = false;
     private String title = "";
 
     private LinearLayout addContactsLayout;
@@ -1004,24 +1006,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 if (contactType == Constants.CONTACT_TYPE_BOTH) {
                     if (adapterMEGA != null) {
                         if (adapterMEGA.getItemCount() == 0) {
-                            emptyImageView.setVisibility(View.VISIBLE);
-                            emptyTextView.setVisibility(View.VISIBLE);
+                            setEmptyStateVisibility(true);
                         }
                         else {
-                            emptyImageView.setVisibility(View.GONE);
-                            emptyTextView.setVisibility(View.GONE);
+                            setEmptyStateVisibility(false);
                         }
                     }
                 }
                 else {
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.VISIBLE);
+                    setEmptyStateVisibility(true);
                 }
             }
             else{
                 headerContacts.setVisibility(View.VISIBLE);
-                emptyImageView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.GONE);
+                setEmptyStateVisibility(false);
             }
         }
     }
@@ -1062,14 +1060,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 emptyTextView.setText(result);
                 headerContacts.setVisibility(View.GONE);
                 recyclerViewList.setVisibility(View.GONE);
-                emptyImageView.setVisibility(View.VISIBLE);
-                emptyTextView.setVisibility(View.VISIBLE);
+                setEmptyStateVisibility(true);
             }
             else {
                 headerContacts.setVisibility(View.VISIBLE);
                 recyclerViewList.setVisibility(View.VISIBLE);
-                emptyImageView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.GONE);
+                setEmptyStateVisibility(false);
             }
         }
     }
@@ -1108,8 +1104,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             emptyTextView.setText(result);
         }
         else {
-            emptyImageView.setVisibility(View.GONE);
-            emptyTextView.setVisibility(View.GONE);
+            setEmptyStateVisibility(false);
         }
     }
 
@@ -1124,7 +1119,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     public void setSendInvitationVisibility() {
         if (fabButton != null) {
-            if (contactType == Constants.CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup || (comesFromChat && adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0))){
+            if (contactType == Constants.CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup || createNewChatLink
+                    || (comesFromChat && adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0))){
                 fabButton.setVisibility(View.VISIBLE);
             }
             else if (contactType == Constants.CONTACT_TYPE_DEVICE && adapterContacts != null && adapterContacts.getItemCount() > 0) {
@@ -1241,6 +1237,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             scanQrMenuItem.setVisible(false);
         }
 
+        inviteContactMenuItem = menu.findItem(R.id.action_invite_contact);
+        inviteContactMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_add_contact, R.color.black));
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                && contactType == Constants.CONTACT_TYPE_MEGA && !createNewGroup && !comesFromChat && !onNewGroup) {
+            inviteContactMenuItem.setVisible(true);
+        }
+        else {
+            inviteContactMenuItem.setVisible(false);
+        }
+
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
         sendInvitationMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_send_white, R.color.accentColor));
         setSendInvitationVisibility();
@@ -1256,8 +1262,30 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+        setSearchVisibility();
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    void setSearchVisibility() {
+        if (searchMenuItem == null) {
+            return;
+        }
+
+        boolean visible;
+
+        if ((contactType == Constants.CONTACT_TYPE_MEGA && filteredContactMEGA.isEmpty())
+                || (contactType ==  Constants.CONTACT_TYPE_DEVICE && filteredContactsPhone.isEmpty())
+                || (contactType == Constants.CONTACT_TYPE_BOTH && filteredContactsShare.isEmpty())){
+            visible = false;
+        }
+        else {
+            visible = true;
+        }
+
+        if (searchMenuItem.isVisible() != visible) {
+            searchMenuItem.setVisible(visible);
+        }
     }
 
     @Override
@@ -1350,6 +1378,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("isConfirmAddShown", isConfirmAddShown);
         outState.putString("confirmAddMail", confirmAddMail);
         outState.putBoolean("createNewGroup", createNewGroup);
+        outState.putBoolean("createNewChatLink", createNewChatLink);
         outState.putBoolean("isEKREnabled", isEKREnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
@@ -1563,19 +1592,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         });
         scanQRButton = (RelativeLayout) findViewById(R.id.layout_scan_qr);
         scanQRButton.setOnClickListener(this);
-        scanQRButton2 = (Button) findViewById(R.id.scan_qr_button);
-        scanQRButton2.setOnClickListener(this);
         scanQRButton.setVisibility(View.GONE);
         inviteContactButton = (RelativeLayout) findViewById(R.id.layout_invite_contact);
         inviteContactButton.setOnClickListener(this);
-        inviteContactButton2 = (Button) findViewById(R.id.invite_contact_button);
-        inviteContactButton2.setOnClickListener(this);
         inviteContactButton.setVisibility(View.GONE);
         newGroupChatButton = (RelativeLayout) findViewById(R.id.layout_group_chat);
         newGroupChatButton.setOnClickListener(this);
-        newGroupChatButton2 = (Button) findViewById(R.id.group_chat_button);
-        newGroupChatButton2.setOnClickListener(this);
         newGroupChatButton.setVisibility(View.GONE);
+        newChatLinkButton = (RelativeLayout) findViewById(R.id.layout_chat_link);
+        newChatLinkButton.setOnClickListener(this);
+        newChatLinkButton.setVisibility(View.GONE);
         addContactsLayout = (LinearLayout) findViewById(R.id.add_contacts_container);
         addedContactsRecyclerView = (RecyclerView) findViewById(R.id.contact_adds_recycler_view);
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
@@ -1613,8 +1639,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             if (!comesFromChat && !newGroup) {
-                inviteContactButton.setVisibility(View.VISIBLE);
+                if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    inviteContactButton.setVisibility(View.VISIBLE);
+                }
                 newGroupChatButton.setVisibility(View.VISIBLE);
+                newChatLinkButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(linearLayoutManager);
             headerContacts.setVisibility(View.VISIBLE);
@@ -1652,6 +1681,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
         }
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
+        emptySubTextView = (TextView) findViewById(R.id.add_contact_list_empty_subtext);
+        emptyInviteButton = (Button) findViewById(R.id.add_contact_list_empty_invite_button);
+        emptyInviteButton.setText(R.string.contact_invite);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) emptySubTextView.getLayoutParams();
+            params1.setMargins(Util.px2dp(34, outMetrics), 0, Util.px2dp(34, outMetrics), 0);
+            emptyTextView.setLayoutParams(params1);
+            LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) emptyInviteButton.getLayoutParams();
+            params2.setMargins(0, Util.px2dp(5, outMetrics), 0, Util.px2dp(32, outMetrics));
+            emptyInviteButton.setLayoutParams(params2);
+        }
+
+        emptyInviteButton.setOnClickListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.add_contact_progress_bar);
 
@@ -1681,6 +1724,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             isConfirmAddShown = savedInstanceState.getBoolean("isConfirmAddShown", false);
             confirmAddMail = savedInstanceState.getString("confirmAddMail");
             createNewGroup = savedInstanceState.getBoolean("createNewGroup", false);
+            createNewChatLink = savedInstanceState.getBoolean("createNewChatLink", false);
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
@@ -1692,6 +1736,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     setTitleAB();
                     inviteContactButton.setVisibility(View.GONE);
                     newGroupChatButton.setVisibility(View.GONE);
+                    newChatLinkButton.setVisibility(View.GONE);
                 }
 
                 if (savedaddedContacts == null && contactType == Constants.CONTACT_TYPE_MEGA) {
@@ -1736,12 +1781,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         setPhoneAdapterContacts(filteredContactsPhone);
                     }
                     else if (addedContactsPhone != null && !addedContactsPhone.isEmpty()) {
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        emptyTextView.setVisibility(View.VISIBLE);
+                        setEmptyStateVisibility(true);
                     }
                     else {
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        emptyTextView.setVisibility(View.VISIBLE);
+                        setEmptyStateVisibility(true);
 
                         progressBar.setVisibility(View.VISIBLE);
                         getContactsTask = new GetContactsTask();
@@ -1777,10 +1820,32 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             setTitleAB();
             inviteContactButton.setVisibility(View.GONE);
             newGroupChatButton.setVisibility(View.GONE);
+            newChatLinkButton.setVisibility(View.GONE);
 
         }
 
         setGetChatLinkVisibility();
+    }
+
+    void setEmptyStateVisibility (boolean visible) {
+        if (visible) {
+            emptyImageView.setVisibility(View.VISIBLE);
+            emptyTextView.setVisibility(View.VISIBLE);
+            if (contactType == Constants.CONTACT_TYPE_MEGA && (addedContactsMEGA == null || addedContactsMEGA.isEmpty())) {
+                emptySubTextView.setVisibility(View.VISIBLE);
+                emptyInviteButton.setVisibility(View.VISIBLE);
+            }
+            else {
+                emptySubTextView.setVisibility(View.GONE);
+                emptyInviteButton.setVisibility(View.GONE);
+            }
+        }
+        else {
+            emptyImageView.setVisibility(View.GONE);
+            emptyTextView.setVisibility(View.GONE);
+            emptySubTextView.setVisibility(View.GONE);
+            emptyInviteButton.setVisibility(View.GONE);
+        }
     }
 
     void setGetChatLinkVisibility () {
@@ -1801,8 +1866,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         Constants.REQUEST_READ_CONTACTS);
             }
             else {
-                emptyImageView.setVisibility(View.VISIBLE);
-                emptyTextView.setVisibility(View.VISIBLE);
+                setEmptyStateVisibility(true);
 
                 progressBar.setVisibility(View.VISIBLE);
                 getContactsTask = new GetContactsTask();
@@ -1810,9 +1874,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
         else{
-            emptyImageView.setVisibility(View.VISIBLE);
-            emptyTextView.setVisibility(View.VISIBLE);
-
+            setEmptyStateVisibility(true);
             progressBar.setVisibility(View.VISIBLE);
             getContactsTask = new GetContactsTask();
             getContactsTask.execute();
@@ -1832,10 +1894,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         aB.setSubtitle(null);
                     }
                 }
-                else if (!createNewGroup) {
+                else if (!createNewGroup && !createNewChatLink) {
                     aB.setTitle(getString(R.string.group_chat_start_conversation_label).toUpperCase());
                 }
-                else if (createNewGroup && !onNewGroup) {
+                else if ((createNewGroup || createNewChatLink) && !onNewGroup) {
                     if (onlyCreateGroup) {
                         aB.setTitle(getString(R.string.title_new_group));
                     }
@@ -1934,8 +1996,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (adapterShareHeader != null){
             if (adapterShareHeader.getItemCount() == 0){
-                emptyImageView.setVisibility(View.VISIBLE);
-                emptyTextView.setVisibility(View.VISIBLE);
+                setEmptyStateVisibility(true);
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
@@ -1954,8 +2015,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 emptyTextView.setText(result);
             }
             else {
-                emptyImageView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.GONE);
+                setEmptyStateVisibility(false);
             }
         }
         setRecyclersVisibility();
@@ -1986,8 +2046,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (adapterMEGA != null){
             if (adapterMEGA.getItemCount() == 1){
                 headerContacts.setVisibility(View.GONE);
-                emptyImageView.setVisibility(View.VISIBLE);
-                emptyTextView.setVisibility(View.VISIBLE);
+                setEmptyStateVisibility(true);
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
@@ -2048,8 +2107,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if(adapterPhone!=null){
             if (adapterPhone.getItemCount() == 0){
                 headerContacts.setVisibility(View.GONE);
-                emptyImageView.setVisibility(View.VISIBLE);
-                emptyTextView.setVisibility(View.VISIBLE);
+                setEmptyStateVisibility(true);
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
@@ -2130,6 +2188,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setTitleAB();
         setRecyclersVisibility();
         refreshKeyboard();
+        setSearchVisibility();
     }
 
     public void showSnackbar(String message) {
@@ -2184,8 +2243,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             if (adapterShareHeader.getItemCount() != 0) {
-                emptyImageView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.GONE);
+                setEmptyStateVisibility(false);
             }
         }
         else {
@@ -2201,8 +2259,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                     if (adapterMEGA.getItemCount() != 0) {
                         headerContacts.setVisibility(View.VISIBLE);
-                        emptyImageView.setVisibility(View.GONE);
-                        emptyTextView.setVisibility(View.GONE);
+                        setEmptyStateVisibility(false);
                     }
                 }
             }
@@ -2250,8 +2307,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             if (adapterShareHeader.getItemCount() != 0) {
-                emptyImageView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.GONE);
+                setEmptyStateVisibility(false);
             }
         }
         else {
@@ -2267,8 +2323,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 if(adapterPhone!=null){
                     if (adapterPhone.getItemCount() != 0){
                         headerContacts.setVisibility(View.VISIBLE);
-                        emptyImageView.setVisibility(View.GONE);
-                        emptyTextView.setVisibility(View.GONE);
+                        setEmptyStateVisibility(false);
                     }
                 }
             }
@@ -2658,7 +2713,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("itemClick");
 
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
-            if (createNewGroup || comesFromChat) {
+            if (createNewGroup || createNewChatLink || comesFromChat) {
                 if (adapter == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT) {
                     if (searchExpand) {
                         if (searchAutoComplete != null) {
@@ -2709,6 +2764,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 startConversation(contacts, true, null);
             }
         }
+        setSearchVisibility();
     }
 
     void showConfirmationDeleteFromChat (final MegaContactAdapter contact) {
@@ -2825,6 +2881,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
             addShareContact(contact);
         }
+        setSearchVisibility();
     }
 
     public String getShareContactMail(ShareContactInfo contact) {
@@ -2876,13 +2933,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.scan_qr_button:
             case R.id.layout_scan_qr: {
                 log("Scan QR code pressed");
                 initScanQR();
                 break;
             }
-            case R.id.invite_contact_button:
+            case R.id.add_contact_list_empty_invite_button:
             case R.id.layout_invite_contact: {
                 log("Invite contact pressed");
                 Intent in = new Intent(this, AddContactActivityLollipop.class);
@@ -2890,19 +2946,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
             }
-            case R.id.group_chat_button:
             case R.id.layout_group_chat: {
                 log("New group chat pressed");
                 createNewGroup = true;
-                setSendInvitationVisibility();
-                setTitleAB();
-                inviteContactButton.setVisibility(View.GONE);
-                newGroupChatButton.setVisibility(View.GONE);
+                setNextLayout();
                 break;
             }
             case R.id.ekr_switch: {
                 isEKREnabled = ekrSwitch.isChecked();
                 setGetChatLinkVisibility();
+                break;
+            }
+            case R.id.layout_chat_link: {
+                createNewChatLink = true;
+                newGroup();
                 break;
             }
             case R.id.fab_button_next: {
@@ -2918,6 +2975,19 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 Util.hideKeyboard(this, 0);
                 break;
             }
+        }
+    }
+
+    void setNextLayout() {
+        if (visibleContactsMEGA != null && !visibleContactsMEGA.isEmpty()) {
+            setSendInvitationVisibility();
+            setTitleAB();
+            inviteContactButton.setVisibility(View.GONE);
+            newGroupChatButton.setVisibility(View.GONE);
+            newChatLinkButton.setVisibility(View.GONE);
+        }
+        else {
+            setResultContacts(addedContactsMEGA, true);
         }
     }
 
@@ -2959,31 +3029,22 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     @Override
     public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if (onNewGroup) {
-            returnToAddContacts();
-            createMyContact();
             if (addedContactsMEGA.contains(myContact)) {
                 addedContactsMEGA.remove(myContact);
             }
+            returnToAddContacts();
+            createMyContact();
         }
-        else if (createNewGroup && (!newGroup || !onlyCreateGroup)) {
-            createNewGroup = false;
-            aB.setSubtitle(null);
-            inviteContactButton.setVisibility(View.VISIBLE);
-            newGroupChatButton.setVisibility(View.VISIBLE);
-            filteredContactMEGA.clear();
-            filteredContactMEGA.addAll(visibleContactsMEGA);
-            setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-            addedContactsMEGA.clear();
-            setRecyclersVisibility();
-            setSendInvitationVisibility();
-            containerAddedContactsRecyclerView.setVisibility(View.GONE);
+        else if (createNewGroup && newGroup) {
+            finish();
+        }
+        else if ((createNewGroup || createNewChatLink) && (!newGroup || !onlyCreateGroup)) {
+            returnToStartConversation();
         }
         else {
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }
@@ -3036,11 +3097,27 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         finish();
     }
 
+    void returnToStartConversation() {
+        createNewGroup = false;
+        createNewChatLink = false;
+        aB.setSubtitle(null);
+        inviteContactButton.setVisibility(View.VISIBLE);
+        newGroupChatButton.setVisibility(View.VISIBLE);
+        newChatLinkButton.setVisibility(View.VISIBLE);
+        filteredContactMEGA.clear();
+        filteredContactMEGA.addAll(visibleContactsMEGA);
+        setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
+        addedContactsMEGA.clear();
+        setRecyclersVisibility();
+        setSendInvitationVisibility();
+        setSearchVisibility();
+        containerAddedContactsRecyclerView.setVisibility(View.GONE);
+    }
+
     private void returnToAddContacts() {
         onNewGroup = false;
         setTitleAB();
         textHeader.setText(getString(R.string.contacts_mega));
-        searchMenuItem.setVisible(true);
         setRecyclersVisibility();
         addContactsLayout.setVisibility(View.VISIBLE);
         if (addedContactsMEGA.size() == 0) {
@@ -3048,8 +3125,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
         newGroupLayout.setVisibility(View.GONE);
+        if (createNewChatLink) {
+            findViewById(R.id.ekr_layout).setVisibility(View.VISIBLE);
+        }
         visibilityFastScroller();
         setSendInvitationVisibility();
+        setSearchVisibility();
+        if (createNewChatLink || visibleContactsMEGA == null || visibleContactsMEGA.isEmpty()) {
+            onBackPressed();
+        }
     }
 
     void createMyContact () {
@@ -3079,7 +3163,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         onNewGroup = true;
         searchExpand = false;
         if (aB != null) {
-            aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+            if (createNewChatLink) {
+                aB.setTitle(getString(R.string.new_chat_link_label).toUpperCase());
+            }
+            else {
+                aB.setTitle(getString(R.string.title_new_group).toUpperCase());
+            }
             aB.setSubtitle(getString(R.string.subtitle_new_group));
         }
 
@@ -3093,6 +3182,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         addContactsLayout.setVisibility(View.GONE);
         newGroupLayout.setVisibility(View.VISIBLE);
+        if (createNewChatLink) {
+            findViewById(R.id.ekr_layout).setVisibility(View.GONE);
+        }
         setSendInvitationVisibility();
         setMegaAdapterContacts(addedContactsMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT);
         visibilityFastScroller();
@@ -3114,25 +3206,24 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 
-        if(getChatLinkBox.isChecked()){
-            if(chatTitle!=null && !chatTitle.isEmpty()){
-                String trimChatTitle = chatTitle.trim();
-                if(trimChatTitle.isEmpty()){
-                    Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
-                    return;
-                }
-            }
-            else if(chatTitle==null || chatTitle.isEmpty()){
-                Util.showAlert(this, getString(R.string.message_error_set_title_get_link), null);
-                return;
-            }
+        if((getChatLinkBox.isChecked() || createNewChatLink) && (chatTitle == null || chatTitle.trim().isEmpty())){
+            new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal)
+                    .setTitle(getString(R.string.enter_group_name))
+                    .setMessage(getString(R.string.alert_enter_group_name))
+                    .setPositiveButton("OK",null)
+                    .show();
+            return;
         }
 
         if(chatTitle!=null){
             intent.putExtra(EXTRA_CHAT_TITLE, chatTitle);
         }
 
-        if(onNewGroup){
+        if (createNewChatLink) {
+            intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
+            intent.putExtra(EXTRA_CHAT_LINK, true);
+        }
+        else if(onNewGroup){
             intent.putExtra(EXTRA_EKR, isEKREnabled);
             intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
             intent.putExtra(EXTRA_CHAT_LINK, getChatLinkBox.isChecked());
@@ -3214,8 +3305,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
                     if (hasReadContactsPermissions && contactType == Constants.CONTACT_TYPE_DEVICE) {
                         filteredContactsPhone.clear();
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        emptyTextView.setVisibility(View.VISIBLE);
+                        setEmptyStateVisibility(true);
 
                         progressBar.setVisibility(View.VISIBLE);
                         new GetContactsTask().execute();
@@ -3233,8 +3323,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     if (hasReadContactsPermissions && contactType == Constants.CONTACT_TYPE_DEVICE) {
                         log("Permission denied");
                         filteredContactsPhone.clear();
-                        emptyImageView.setVisibility(View.VISIBLE);
-                        emptyTextView.setVisibility(View.VISIBLE);
+                        setEmptyStateVisibility(true);
                         emptyTextView.setText(R.string.no_contacts_permissions);
 
                         progressBar.setVisibility(View.GONE);

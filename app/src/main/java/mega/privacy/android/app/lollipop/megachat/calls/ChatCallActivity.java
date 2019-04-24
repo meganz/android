@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -43,7 +42,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +77,6 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CallNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -98,7 +95,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import android.provider.CallLog;
-import static mega.privacy.android.app.utils.Util.context;
 
 import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
@@ -1395,8 +1391,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
+
         if(mSensorManager!=null){
             log("onBackPressed:unregisterListener");
             mSensorManager.unregisterListener(this);

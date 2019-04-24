@@ -1747,37 +1747,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
-                }
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_LAND,outMetrics),0,0,0);
@@ -2020,27 +1990,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             int privilege = message.getPrivilege();
             log("Privilege of me: " + privilege);
             String textToShow = "";
-            String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
-
-            if (fullNameAction == null) {
-                fullNameAction = "";
-            }
-
-            if (fullNameAction.trim().length() <= 0) {
-
-                log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                fullNameAction = "Unknown name";
-                if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                    log("3-Call for nonContactName: " + message.getUserHandle());
-                    ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getUserHandle());
-                    megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                    megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                    megaChatApi.getUserEmail(message.getUserHandle(), listener);
-                } else {
-                    log("4-Name already asked and no name received: " + message.getUserHandle());
-                }
-            }
+            String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
             if (privilege != MegaChatRoom.PRIV_RM) {
                 log("I was added");
@@ -2199,30 +2149,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(message.getHandleOfAction(), chatRoom);
-
-
-            if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                ((ViewHolderMessageChat) holder).fullNameTitle = "";
-            }
-
-            if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                    log("3-Call for nonContactName: " + message.getUserHandle());
-
-                    ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getHandleOfAction());
-
-                    megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
-                    megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
-                    megaChatApi.getUserEmail(message.getHandleOfAction(), listener);
-                } else {
-                    log("4-Name already asked and no name received: " + message.getUserHandle());
-                }
-            }
+            setContactMessageName(position, holder, message.getHandleOfAction(), false);
 
             String textToShow = "";
             if (privilege != MegaChatRoom.PRIV_RM) {
@@ -2231,7 +2158,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("By me");
 
                     if(message.getUserHandle() == message.getHandleOfAction()){
-                        textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
+                        textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(holder.fullNameTitle));
                     }
                     else{
                         textToShow = String.format(context.getString(R.string.message_add_participant), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(megaChatApi.getMyFullname()));
@@ -2249,27 +2176,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
 //                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
                     log("By other");
-                    String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
-
-                    if (fullNameAction == null) {
-                        fullNameAction = "";
-                    }
-
-                    if (fullNameAction.trim().length() <= 0) {
-
-                        log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                        fullNameAction = "Unknown name";
-                        if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                            log("3-Call for nonContactName: " + message.getUserHandle());
-                            ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getUserHandle());
-                            megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                            megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                            megaChatApi.getUserEmail(message.getUserHandle(), listener);
-                        } else {
-                            log("4-Name already asked and no name received: " + message.getUserHandle());
-                        }
-                    }
+                    String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
                     if(message.getUserHandle() == message.getHandleOfAction()){
                         textToShow = String.format(context.getString(R.string.message_joined_public_chat_autoinvitation), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
@@ -2319,27 +2226,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     } else {
                         log("The participant was removed");
-                        String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
-
-                        if (fullNameAction == null) {
-                            fullNameAction = "";
-                        }
-
-                        if (fullNameAction.trim().length() <= 0) {
-
-                            log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                            fullNameAction = "Unknown name";
-                            if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                                log("3-Call for nonContactName: " + message.getUserHandle());
-                                ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getUserHandle());
-                                megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                                megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                                megaChatApi.getUserEmail(message.getUserHandle(), listener);
-                            } else {
-                                log("4-Name already asked and no name received: " + message.getUserHandle());
-                            }
-                        }
+                        String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
                         textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(fullNameAction));
                         try {
@@ -2447,27 +2334,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             } else {
                 log("I was change by someone");
-                String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
+                String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
-                if (fullNameAction == null) {
-                    fullNameAction = "";
-                }
-
-                if (fullNameAction.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    fullNameAction = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getUserHandle());
-                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        megaChatApi.getUserEmail(message.getUserHandle(), listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
                 textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(fullNameAction));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
@@ -2598,30 +2466,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(message.getHandleOfAction(), chatRoom);
-
-
-            if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                ((ViewHolderMessageChat) holder).fullNameTitle = "";
-            }
-
-            if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                    log("3-Call for nonContactName: " + message.getUserHandle());
-
-                    ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getHandleOfAction());
-
-                    megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
-                    megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
-                    megaChatApi.getUserEmail(message.getHandleOfAction(), listener);
-                } else {
-                    log("4-Name already asked and no name received: " + message.getUserHandle());
-                }
-            }
+            setContactMessageName(position, holder, message.getHandleOfAction(), false);
 
             int privilege = message.getPrivilege();
             String privilegeString = "";
@@ -2639,7 +2484,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String textToShow = "";
             if (message.getUserHandle() == myUserHandle) {
                 log("The privilege was change by me");
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
+                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -2656,29 +2501,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             } else {
                 log("By other");
-                String fullNameAction = cC.getFullName(message.getUserHandle(), chatRoom);
+                String fullNameAction = getContactMessageName(position, holder, message.getUserHandle());
 
-                if (fullNameAction == null) {
-                    fullNameAction = "";
-                }
-
-                if (fullNameAction.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    fullNameAction = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, message.getUserHandle());
-                        megaChatApi.getUserFirstname(message.getUserHandle(), listener);
-                        megaChatApi.getUserLastname(message.getUserHandle(), listener);
-                        megaChatApi.getUserEmail(message.getUserHandle(), listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
+                textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
                 try {
                     textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
@@ -2966,34 +2791,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 long userHandle = message.getUserHandle();
                 log("Contact message!!: " + userHandle);
-                if (((ChatActivityLollipop) context).isGroup()) {
-
-                    holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-                    if (holder.fullNameTitle == null) {
-                        holder.fullNameTitle = "";
-                    }
-
-                    if (holder.fullNameTitle.trim().length() <= 0) {
-                        log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                        holder.fullNameTitle = "Unknown name";
-                        if (!(holder.nameRequestedAction)) {
-                            log("3-Call for nonContactName: " + message.getUserHandle());
-                            holder.nameRequestedAction = true;
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                            megaChatApi.getUserFirstname(userHandle, listener);
-                            megaChatApi.getUserLastname(userHandle, listener);
-                            megaChatApi.getUserEmail(userHandle, listener);
-                        } else {
-                            log("4-Name already asked and no name received: " + message.getUserHandle());
-                        }
-                    }
-                    holder.nameContactText.setVisibility(View.VISIBLE);
-                    holder.nameContactText.setText(holder.fullNameTitle);
-
-                }else{
-                    holder.fullNameTitle = chatRoom.getTitle();
-                    holder.nameContactText.setVisibility(View.GONE);
-                }
+                setContactMessageName(position, holder, userHandle, true);
 
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                     holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -3332,36 +3130,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 long userHandle = message.getUserHandle();
                 log("Contact message!!: " + userHandle);
 
-                if (((ChatActivityLollipop) context).isGroup()) {
-
-                    holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                    if (holder.fullNameTitle == null) {
-                        holder.fullNameTitle = "";
-                    }
-
-                    if (holder.fullNameTitle.trim().length() <= 0) {
-
-                        log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                        holder.fullNameTitle = "Unknown name";
-                        if (!(holder.nameRequestedAction)) {
-                            log("3-Call for nonContactName: " + message.getUserHandle());
-                            holder.nameRequestedAction = true;
-                            ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle);
-                            megaChatApi.getUserFirstname(userHandle, listener);
-                            megaChatApi.getUserLastname(userHandle, listener);
-                            megaChatApi.getUserEmail(userHandle, listener);
-                        } else {
-                            log("4-Name already asked and no name received: " + message.getUserHandle());
-                        }
-                    }
-
-                    holder.nameContactText.setVisibility(View.VISIBLE);
-                    holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-                } else {
-                    holder.fullNameTitle = chatRoom.getTitle();
-                    holder.nameContactText.setVisibility(View.GONE);
-                }
+                setContactMessageName(position, holder, userHandle, true);
 
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                     holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -3847,37 +3616,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
-                }
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-
-            } else {
-                holder.fullNameTitle = chatRoom.getTitle();
-                holder.nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -4679,36 +4418,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
 
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (holder.fullNameTitle == null) {
-                    holder.fullNameTitle = "";
-                }
-
-                if (holder.fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
-                    if (!(holder.nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        holder.nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                holder.nameContactText.setVisibility(View.VISIBLE);
-                holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-                holder.fullNameTitle = chatRoom.getTitle();
-                holder.nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -5404,36 +5114,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
 
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (holder.fullNameTitle == null) {
-                    holder.fullNameTitle = "";
-                }
-
-                if (holder.fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                holder.nameContactText.setVisibility(View.VISIBLE);
-                holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-                holder.fullNameTitle = chatRoom.getTitle();
-                holder.nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -5963,34 +5644,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
 
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (holder.fullNameTitle == null) {
-                    holder.fullNameTitle = "";
-                }
-
-                if (holder.fullNameTitle.trim().length() <= 0) {
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    holder.fullNameTitle = "Unknown name";
-                    if (!(holder.nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        holder.nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-                holder.nameContactText.setVisibility(View.VISIBLE);
-                holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-                holder.fullNameTitle = chatRoom.getTitle();
-                holder.nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -6236,37 +5890,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
-                }
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -6377,27 +6001,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).fullNameTitle = megaChatApi.getMyFullname();
         }
         else{
-            ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-            if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                ((ViewHolderMessageChat) holder).fullNameTitle = "";
-            }
-
-            if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                    log("3-Call for nonContactName: " + message.getUserHandle());
-                    ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                    ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                    megaChatApi.getUserFirstname(userHandle, listener);
-                    megaChatApi.getUserLastname(userHandle, listener);
-                    megaChatApi.getUserEmail(userHandle, listener);
-                } else {
-                    log("4-Name already asked and no name received: " + message.getUserHandle());
-                }
-            }
+            setContactMessageName(position, holder, userHandle, false);
         }
 
         ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
@@ -6610,37 +6214,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
 
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
-                }
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -6825,37 +6399,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
-                }
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -7048,38 +6592,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             long userHandle = message.getUserHandle();
             log("Contact message!!: " + userHandle);
-
-            if (((ChatActivityLollipop) context).isGroup()) {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
-                }
-
-                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
-
-                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
-                        log("3-Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
-                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
-                        megaChatApi.getUserFirstname(userHandle, listener);
-                        megaChatApi.getUserLastname(userHandle, listener);
-                        megaChatApi.getUserEmail(userHandle, listener);
-                    } else {
-                        log("4-Name already asked and no name received: " + message.getUserHandle());
-                    }
-                }
-
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-            } else {
-
-                ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
-                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
-            }
+            setContactMessageName(position, holder, userHandle, true);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -8826,6 +8339,75 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return true;
     }
 
+    void setContactMessageName(int pos, ViewHolderMessageChat holder, long handle, boolean visibility) {
+        if (isHolderNull(pos, holder)) {
+            return;
+        }
 
+        if (!visibility) {
+            holder.fullNameTitle = getContactMessageName(pos, holder, handle);
+            return;
+        }
 
-}
+        if (chatRoom.isGroup()) {
+            holder.fullNameTitle = getContactMessageName(pos, holder, handle);
+            holder.nameContactText.setVisibility(View.VISIBLE);
+            holder.nameContactText.setText(holder.fullNameTitle);
+        }
+        else {
+            holder.fullNameTitle = chatRoom.getTitle();
+            holder.nameContactText.setVisibility(View.GONE);
+        }
+    }
+
+    String getContactMessageName(int pos, ViewHolderMessageChat holder, long handle) {
+        if (isHolderNull(pos, holder)) {
+            return null;
+        }
+
+        String name = cC.getFullName(handle, chatRoom);
+
+        if (name == null) {
+            name = "";
+        }
+
+        if (name.trim().length() <= 0) {
+            log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+            name = "Unknown name";
+            if (!holder.nameRequestedAction) {
+                log("3-Call for nonContactName: " + handle);
+                holder.nameRequestedAction = true;
+                ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, handle, chatRoom.isPreview(), pos);
+                megaChatApi.getUserFirstname(handle, chatRoom.getAuthorizationToken(), listener);
+                megaChatApi.getUserLastname(handle, chatRoom.getAuthorizationToken(), listener);
+                megaChatApi.getUserEmail(handle, listener);
+            }
+            else {
+                log("4-Name already asked and no name received: " + handle);
+            }
+        }
+
+        return name;
+    }
+
+    boolean isHolderNull(int pos, ViewHolderMessageChat holder) {
+        if (holder ==  null) {
+            holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(pos);
+            if (holder == null) {
+                notifyItemChanged(pos);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public ViewHolderMessageChat queryIfHolderNull(int pos) {
+        ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(pos);
+        if (holder == null) {
+            return null;
+        }
+
+        return holder;
+    }
+ }

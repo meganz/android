@@ -2,11 +2,14 @@ package mega.privacy.android.app.lollipop.listeners;
 
 
 import android.content.Context;
+import android.content.Intent;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -44,7 +47,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
             }
             else{
                 if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                    ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
                 }
                 else if(context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
@@ -63,21 +66,13 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                if (request.getNumRetry() == 1) {
                    log("Chat link exported!");
 
-                   if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                       if(request.getText()!=null){
-                           if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                               android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                               clipboard.setText(request.getText());
-                           } else {
-                               android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                               android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", request.getText());
-                               clipboard.setPrimaryClip(clip);
-                           }
-                       }
-                   }
-
                    if(context instanceof ManagerActivityLollipop){
-                       ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+                       Intent intent = new Intent(context, ChatActivityLollipop.class);
+                       intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+                       intent.putExtra("CHAT_ID", request.getChatHandle());
+                       intent.putExtra("PUBLIC_LINK", e.getErrorCode());
+                       intent.putExtra("CHAT_LINK", request.getText());
+                       context.startActivity(intent);
                    }
                    else if(context instanceof FileExplorerActivityLollipop){
                        ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
