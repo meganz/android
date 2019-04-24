@@ -268,7 +268,6 @@ public class ChatController {
     }
 
     public void deleteMessageById(long messageId, long chatId) {
-        log("deleteMessage");
         MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
         if(message!=null){
             deleteMessage(message, chatId);
@@ -290,6 +289,12 @@ public class ChatController {
                 if(messageToDelete==null){
                     log("The message cannot be deleted");
                 }
+//
+//                else{
+//                    log("The message has been deleted");
+//
+//                    ((ChatActivityLollipop) context).removeMsgNotSent(message);
+//                }
             }
         }
     }

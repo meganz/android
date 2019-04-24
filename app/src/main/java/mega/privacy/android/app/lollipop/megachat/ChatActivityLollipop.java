@@ -4599,18 +4599,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 bufferSending.clear();
             }
 
-            log("**onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize: "+messages.size());
+            log("onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize: "+messages.size());
             if((bufferMessages.size()+messages.size())>=numberToLoad){
-                log("**onMessageLoaded:******");
+                log("onMessageLoaded:");
                 fullHistoryReceivedOnLoad();
                 isLoadingHistory = false;
             }
             else if(((bufferMessages.size()+messages.size())<numberToLoad) && (stateHistory==MegaChatApi.SOURCE_ERROR)){
-                log("**onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
+                log("onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
                 retryHistory = true;
             }
             else{
-                log("**onMessageLoaded:lessNumberReceived");
+                log("onMessageLoaded:lessNumberReceived");
                 if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
                     log("But more history exists --> loadMessages");
                     log("G->loadMessages unread is 0");
@@ -5919,8 +5919,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showMsgNotSentPanel(AndroidMegaChatMessage message, int position){
-        log("showMsgNotSentPanel: "+position);
-
         this.selectedPosition = position;
         this.selectedMessageId = message.getMessage().getRowId();
         log("Temporal id of MS message: "+message.getMessage().getTempId());
@@ -5971,6 +5969,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         messages.remove(selectedPosition);
         adapter.removeMessage(selectedPosition, messages);
     }
+//    public void removeMsgNotSent(MegaChatMessage message){
+//        messages.remove(message);
+//        adapter.removeMessage(selectedPosition, messages);
+//    }
 
     public void removePendingMsg(long id){
         log("removePendingMsg: "+selectedMessageId);

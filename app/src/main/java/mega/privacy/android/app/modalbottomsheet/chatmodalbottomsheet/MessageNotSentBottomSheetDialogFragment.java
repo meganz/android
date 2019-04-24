@@ -59,7 +59,6 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         if (megaChatApi == null){
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
-
         if(savedInstanceState!=null) {
             log("Bundle is NOT NULL");
             chatId = savedInstanceState.getLong("chatId", -1);
@@ -97,7 +96,6 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
     }
     @Override
     public void setupDialog(final Dialog dialog, int style) {
-
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
