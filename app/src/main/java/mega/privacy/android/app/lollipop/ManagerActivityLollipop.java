@@ -9053,7 +9053,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 		        	case CLOUD_DRIVE:
-		        	case INBOX:{
+		        	case INBOX:
+                    case RUBBISH_BIN:{
 
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 
