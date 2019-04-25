@@ -3154,6 +3154,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (selected.size() !=0) {
 //                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if((chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()){
+                    log("Chat without permissions || without preview");
 
                     boolean showCopy = true;
                     for(int i=0; i<selected.size();i++) {
@@ -3188,8 +3189,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                             importIcon.setVisible(false);
-                        }
-                        else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+
+                        }else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             log("TYPE_NODE_ATTACHMENT selected");
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -3197,8 +3198,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             if(selected.get(0).getMessage().getUserHandle()==myUserHandle && selected.get(0).getMessage().isDeletable()){
                                 log("one message Message DELETABLE");
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                            }
-                            else{
+                            }else{
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             }
 
@@ -3220,6 +3220,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+                            log("TYPE_CONTACT_ATTACHMENT selected");
+
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
 
@@ -3237,10 +3239,26 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             importIcon.setVisible(false);
                         }
                         else{
-                            MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
+                            log(selected.get(0).getMessage().getType()+" selected");
+
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(true);
+                            MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
+                            if(messageSelected == null){
+                                messageSelected = megaChatApi.getMessage(idChat, selected.get(0).getMessage().getTempId());
+                                if(messageSelected == null){
+                                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
+                                    menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
+                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                                    menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                                    menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                                    importIcon.setVisible(false);
+                                    return false;
+                                }
+                            }
 
                             if(messageSelected.getUserHandle()==myUserHandle){
+
                                 if(messageSelected.isEditable()){
                                     log("Message EDITABLE");
                                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(true);
@@ -3266,21 +3284,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 importIcon.setVisible(false);
 
                                 int type = selected.get(0).getMessage().getType();
-                                if (chatC.isInAnonymousMode() || !Util.isOnline(chatActivity)
-                                        || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
+                                if (chatC.isInAnonymousMode() || !Util.isOnline(chatActivity) || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 }
                                 else{
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
                                 }
                             }
-
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                             importIcon.setVisible(false);
                         }
                     }
                     else{
+                        log("onPrepareActionMode: Many items selected");
+
                         log("Many items selected");
                         boolean isUploading = false;
                         boolean showDelete = true;
