@@ -3073,6 +3073,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     break;
                 }
                 case R.id.chat_cab_menu_delete:{
+                    log("chat_cab_menu_delete ");
                     clearSelections();
                     hideMultipleSelect();
                     //Delete
@@ -4832,7 +4833,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         int resultModify = -1;
         if(msg.isDeleted()){
-            log("The message has been deleted");
+            log("onMessageUpdate: The message has been deleted");
             deleteMessage(msg, false);
             return;
         }
@@ -4899,14 +4900,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                 log("TRUNCATE MESSAGE");
                 clearHistory(androidMsg);
-            }
-            else{
+            }else{
                 if(msg.isDeleted()){
                     log("Message deleted!!");
                 }
-
                 checkMegaLink(msg);
-
                 resultModify = modifyMessageReceived(androidMsg, false);
                 log("onMessageUpdate: resultModify: "+resultModify);
             }
@@ -5009,6 +5007,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Index: " + itr.nextIndex());
 
             if(!messageToCheck.isUploading()){
+
                 if(rejected){
                     if (messageToCheck.getMessage().getTempId() == msg.getTempId()) {
                         indexToChange = itr.nextIndex();
@@ -5016,7 +5015,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
                 else{
-                    if (messageToCheck.getMessage().getMsgId() == msg.getMsgId()) {
+
+                    if ((messageToCheck.getMessage().getMsgId() == msg.getMsgId()) || (messageToCheck.getMessage().getTempId() == msg.getTempId())){
                         indexToChange = itr.nextIndex();
                         break;
                     }
@@ -5051,8 +5051,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         adjustInfoToShow(indexToChange+1);
                         setShowAvatar(indexToChange+1);
                     }
-                }
-                else{
+                }else{
                     //Not first element
                     if(indexToChange==messages.size()){
                         log("The last message removed, do not check more messages");
@@ -5065,11 +5064,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     setShowAvatar(indexToChange-1);
                 }
             }
-
             adapter.removeMessage(indexToChange+1, messages);
         }
         else{
-            log("index to change not found");
+            log("index not found");
+
         }
     }
 
@@ -5969,10 +5968,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         messages.remove(selectedPosition);
         adapter.removeMessage(selectedPosition, messages);
     }
-//    public void removeMsgNotSent(MegaChatMessage message){
-//        messages.remove(message);
-//        adapter.removeMessage(selectedPosition, messages);
-//    }
+    public void updatingRemovedMessage(MegaChatMessage message){
+        adapter.changeBackground(message);
+    }
 
     public void removePendingMsg(long id){
         log("removePendingMsg: "+selectedMessageId);

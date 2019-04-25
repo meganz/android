@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.RTFFormatter;
@@ -129,6 +130,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private SparseBooleanArray selectedItems;
 
     private MegaChatLollipopAdapter megaChatAdapter;
+    ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
 
     ChatController cC;
 
@@ -3952,6 +3954,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
+            log("MY MESSAGE: position: "+position);
+
             log("MY message handle!!: " + message.getMsgId());
             holder.layoutAvatarMessages.setVisibility(View.GONE);
              holder.titleOwnMessage.setGravity(Gravity.RIGHT);
@@ -4132,6 +4136,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.retryAlert.setVisibility(View.GONE);
                 }else{
                     log("Status: "+message.getStatus());
+                    boolean isRemoved = false;
+                    if((removedMessages!=null)&&(removedMessages.size()>0)){
+                        for(RemovedMessage removeMsg:removedMessages){
+                            if(removeMsg.getMsgId() == message.getMsgId()){
+                                if(removeMsg.getMsgTempId() == message.getTempId()){
+                                    isRemoved = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if(isRemoved){
+                        holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
+                    }else{
+                        holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
+                    }
+
                     holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
                     holder.triangleIcon.setVisibility(View.GONE);
                     holder.retryAlert.setVisibility(View.GONE);
@@ -4318,9 +4339,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 } else {
                     log("Status: " + message.getStatus());
+                    boolean isRemoved = false;
+                    if((removedMessages!=null)&&(removedMessages.size()>0)){
+                        for(RemovedMessage removeMsg:removedMessages){
+                            if(removeMsg.getMsgId() == message.getMsgId()){
+                                if(removeMsg.getMsgTempId() == message.getTempId()){
+                                    isRemoved = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if(isRemoved){
+                        holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
+                    }else{
+                        holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
+                    }
 
                     holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
-                    holder.contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
                     holder.triangleIcon.setVisibility(View.GONE);
                     holder.retryAlert.setVisibility(View.GONE);
                 }
@@ -7244,6 +7281,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             int itemCount = messages.size() - position;
             log("itemCount: " + itemCount);
             notifyItemRangeChanged(position, itemCount);
+        }
+    }
+
+    public void changeBackground(MegaChatMessage message){
+        log("changeBackground");
+        for(int i=0;i<messages.size();i++){
+            if((messages.get(i).getMessage().getTempId() == message.getTempId()) && (messages.get(i).getMessage().getMsgId() == message.getMsgId())){
+                RemovedMessage msg = new RemovedMessage(messages.get(i).getMessage().getTempId(), messages.get(i).getMessage().getMsgId());
+                removedMessages.add(msg);
+                notifyItemChanged(i+1);
+            }
         }
     }
 

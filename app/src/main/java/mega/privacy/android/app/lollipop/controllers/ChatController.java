@@ -282,19 +282,19 @@ public class ChatController {
             if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                 log("Delete node attachment message");
                 megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
-            }
-            else{
-                log("Delete normal message");
-                messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+            }else{
+                log("Delete normal message- STATUS = "+message.getStatus());
+                if(message.getStatus() == MegaChatMessage.STATUS_SENDING){
+                    messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
+                }else{
+                    messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+                }
                 if(messageToDelete==null){
                     log("The message cannot be deleted");
+                }else{
+                    log("The message has been deleted");
+                    ((ChatActivityLollipop) context).updatingRemovedMessage(message);
                 }
-//
-//                else{
-//                    log("The message has been deleted");
-//
-//                    ((ChatActivityLollipop) context).removeMsgNotSent(message);
-//                }
             }
         }
     }
