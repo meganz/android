@@ -263,11 +263,15 @@ public class Constants {
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 	public static int NOTIFICATION_CHAT_UPLOAD = 15;
+    public static int NOTIFICATION_UPLOAD_FOLDER = 16;
+    public static int NOTIFICATION_UPLOAD_FINAL_FOLDER = 17;
 
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
 	public static String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
-	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA Upload";
+    public static String NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER = "FolderUploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA File Upload";
+    public static String NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER = "MEGA Folder Upload";
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
 	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
@@ -288,8 +292,10 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
-    
-    public static String CHAT_FOLDER = "My chat files";
+    public static String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
+
+
+	public static String CHAT_FOLDER = "My chat files";
 
 	public static int RICH_WARNING_TRUE = 1;
 	public static int RICH_WARNING_FALSE= 0;

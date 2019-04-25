@@ -227,7 +227,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	ArrayList<File> zipFiles = new ArrayList<>();
 
-	boolean sendToChat = false;
 	private String downloadLocationDefaultPath = "";
 
 	@Override
@@ -678,15 +677,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if(nC ==null){
 					nC = new NodeController(this, isFolderLink);
 				}
-				if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-					MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-					if (attachNode != null) {
-						nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-					}
+
+				MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+				if (attachNode != null) {
+					nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
 				}
-				else {
-					nC.selectChatsToSendNodes(longArray);
-				}
+
 				break;
 			}
 
@@ -2570,17 +2566,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-						&& adapterType == Constants.INCOMING_SHARES_ADAPTER) {
-					log("Incoming node copied to Send to chat");
-					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-					if (attachNode != null) {
-						nC.selectChatsToSendNode(attachNode);
-					}
-				}
-				else {
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
-				}
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2600,7 +2586,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else{
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 			}
-			sendToChat = false;
 			log("copy nodes request finished");
 		}
 	}
@@ -3007,7 +2992,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onBackPressed() {
 		log("onBackPressed");
 		setImageDragVisibility(View.VISIBLE);
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
@@ -3213,9 +3197,4 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public MegaNode getCurrentDocument() {
 		return currentDocument;
 	}
-
-	public void setSendToChat (boolean sendToChat) {
-		this.sendToChat = sendToChat;
-	}
-
 }
