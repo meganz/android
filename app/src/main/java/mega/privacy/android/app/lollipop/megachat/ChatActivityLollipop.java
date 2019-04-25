@@ -985,9 +985,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 removedMessages = new ArrayList<RemovedMessage>();
 
                 if (adapter == null) {
-                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-                    adapter.setHasStableIds(true);
-                    listView.setAdapter(adapter);
+                    createAdapter();
                 }
 
                 setPreviewersView();
@@ -2947,13 +2945,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if (adapter == null){
                 log("adapter NULL");
-                adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-                adapter.setHasStableIds(true);
-                listView.setLayoutManager(mLayoutManager);
-                listView.setAdapter(adapter);
-                adapter.setMessages(messages);
-            }
-            else{
+                createAdapter();
+            }else{
                 log("adapter is NOT null");
                 adapter.addMessage(messages, index);
                 if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
@@ -5207,9 +5200,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     //Create adapter
                     if (adapter == null) {
-                        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-                        adapter.setHasStableIds(true);
-                        listView.setAdapter(adapter);
+                        createAdapter();
                     } else {
                         adapter.modifyMessage(messages, indexToChange+1);
                     }
@@ -5251,11 +5242,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Create adapter
         if(adapter==null){
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-            adapter.setHasStableIds(true);
-            listView.setLayoutManager(mLayoutManager);
-            listView.setAdapter(adapter);
-            adapter.setMessages(messages);
+           createAdapter();
         }
         else{
             adapter.loadPreviousMessages(messages, bufferMessages.size());
@@ -5438,13 +5425,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             log("Create adapter");
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-            adapter.setHasStableIds(true);
-            listView.setLayoutManager(mLayoutManager);
-            listView.setAdapter(adapter);
-            adapter.setMessages(messages);
-        }
-        else{
+            createAdapter();
+        }else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex==0){
                 log("Arrives the first message of the chat");
@@ -5492,13 +5474,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             log("Create adapter");
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-            adapter.setHasStableIds(true);
-            listView.setLayoutManager(mLayoutManager);
-            listView.setAdapter(adapter);
-            adapter.setMessages(messages);
-        }
-        else{
+            createAdapter();
+        }else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex<0){
                 log("Arrives the first message of the chat");
@@ -5583,18 +5560,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             log("Create adapter");
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-            adapter.setHasStableIds(true);
-            listView.setLayoutManager(mLayoutManager);
-            listView.setAdapter(adapter);
-            adapter.setMessages(messages);
+            createAdapter();
         }else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex<0){
                 log("Arrives the first message of the chat");
                 adapter.setMessages(messages);
-            }
-            else{
+            }else{
                 adapter.addMessage(messages, lastIndex+1);
                 adapter.notifyItemChanged(lastIndex);
             }
@@ -6064,13 +6036,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.messages = messages;
         //Create adapter
         if (adapter == null) {
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
-            adapter.setHasStableIds(true);
-            listView.setAdapter(adapter);
-            adapter.setMessages(messages);
+            createAdapter();
         } else {
             adapter.setMessages(messages);
         }
+    }
+
+
+    private void createAdapter(){
+        //Create adapter
+        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, removedMessages, listView);
+        adapter.setHasStableIds(true);
+        listView.setLayoutManager(mLayoutManager);
+        listView.setAdapter(adapter);
+        adapter.setMessages(messages);
+
     }
 
     @Override
