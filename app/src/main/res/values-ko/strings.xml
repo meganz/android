@@ -1262,6 +1262,9 @@
 	<string name="label_close" context="button label Close">닫기</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">일반</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">저장소</string>
+	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">저장소</string>
+	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">전송 할당량</string>
+	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">전송 할당량</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">요금제</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">저장소 공간</string>
@@ -2026,7 +2029,7 @@
 
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">파일 관리</string>
 
-    <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">모든 오래된 파일 기록을 삭제</string>
+    <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">모든 오래된 파일 버전 기록을 삭제</string>
     <string name="settings_file_management_subtitle_delete_versions" context="subtitle of the option in Settings to delete all the versions of the account">소유하고 계신 모든 현재 버전의 파일들은 남습니다. 오직 오래된 구 버전의 파일 기록만이 제거됩니다.</string>
 
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">당신은 모든 파일의 버전 기록을 삭제하려고 합니다. 연락처로부터 공유받은 파일 버전은 그들에 의해 삭제되어야 합니다.\n\n현재 파일은 삭제되지 않는다는 점을 참고하세요.</string>
@@ -2114,9 +2117,46 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, PRO 요금제를 구독하여야 합니다.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">일</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">대화 링크 얻기</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">대화 링크 관리</string>
 
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">암호화 키 순환 활성화</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A]님이[B] 대화 링크를 만들었습니다.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 삭제하였습니다.[/B]</string>
+
+    <string name="action_delete_link" context="Title of the option to delete a chat link">대회 링크 삭제</string>
+
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">대화 링크</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">이것은 현재 세션을 제외한 모든 활성 세션을 로그아웃시킵니다.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">모든 다른 세션을 닫으시겠습니까?</string>
+
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">참가자 %d명</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">참여</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">참관인</string>
+
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">대화 링크를 불러오던 중 오류 발생</string>
+
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">대화 링크를 불러오던 중 대화 초기화 오류 발생</string>
+
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">이전에 참여했었던 대화를 미리 보려고 합니다. 대화에 참여하시겠습니까?</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">이미 이 대화에 참여하고 있습니다.</string>
+
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">이 대화 미리 보기는 더 이상 유효하지 않습니다. 미리 보기를 떠나면, 다시 열 수 없습니다.</string>
+
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A]님이[B] 암호화 키 순환을 활성화하였습니다.[/B]</string>
+
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">이 대화는 더 이상 유효하지 않습니다</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">잘못된 대화 링크</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">암호화 키 순환</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+    <string name="action_open_chat_link" context="Menu item">대화 링크 열기</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">연락처 %s에 대한 초대장이 이전에 발송되었으며, 발송된 요청 탭에서 찾아볼 수 있습니다.</string>
 
@@ -2227,6 +2267,10 @@
         <item context="Plural of participant. 2 participants" quantity="other">참가자 %d명</item>
     </plurals>
 
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">이 대화의 링크를 생성하기 전, 설명을 입력해야합니다:</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">클립보드에 대화 링크를 복사하였습니다</string>
+
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">%s / [A]월[/A]* [A]부터[/A]</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 정기 구독은 갱신일 이전에 언제든지 취소할 수 있습니다.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">통화 시작</string>
@@ -2236,6 +2280,16 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[A]알림[/A] [B]없음[/B][B].[/B]</string>
 
+    <string name="general_setup_mega" context="Permissions screen title">MEGA 설정</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA가 당신이 친구와 사진, 미디어와 파일을 공유하고, 암호화된 메시지를 교환하며 안전한 통화를 할 수 있도록 접근 권한이 필요합니다.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">사진, 미디어 그리고 파일에 대한 접근 허용</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">사진, 미디어와 파일을 공유하려면 MEGA는 당신의 허가가 필요합니다.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">카메라 활성화</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근이 허용되어야 합니다.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">통화 활성화</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">암호화된 통화를 하려면 당신의 마이크에 접근이 허용되어야 합니다.</string>
+    <string name="general_enable_access" context="General enable access">접근 허용</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">공유된 파일</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">첨부물이 이미 발송됨</string>
@@ -2263,8 +2317,8 @@
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]공유된 파일[/A] [B]없음[/B][B].[/B]</string>
 
-    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s joined the call</string>
-    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s left the call</string>
+    <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s님이 통화에 참여하셨습니다</string>
+    <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s님이 통화에서 떠났습니다</string>
 
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">이 통화가 최대 참가자 수에 도달했기 때문에 참여할 수 없습니다.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">이 통화의 최대 영상 사용 참가자 수에 도달했기 때문에 영상을 활성화할 수 없습니다.</string>
@@ -2282,6 +2336,56 @@
         <item context="version items" quantity="other">전달된 메시지</item>
     </plurals>
 
+    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
+        <item context="Plural of file. 2 files" quantity="other">%d개의 파일이 %d개의 대화에 전송되지 않았습니다</item>
+    </plurals>
+
+    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
+        <item context="Plural of file. 2 files" quantity="other">%d개의 연락처가 %d개의 대화에 전송되지 않았습니다</item>
+    </plurals>
+
+    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
+        <item context="Plural of file. 2 files" quantity="other">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
+    </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">항목이 %d개의 대화에 전송되지 않았습니다</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">새 단체 대화가 성공적으로 생성되었습니다</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">파일 준비중</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">메시지로 전송</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">오류. 파일이 선택한 대화에 전송되지 않았습니다.</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[B]항목[/B] [A]없음[/A]</string>
+
+    <string name="delete_versions" context="Action delete all file versions">피일 기록 삭제</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">오래된 버전을 삭제할까요?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">현재 파일은 삭제되지 않습니다.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">오래된 버전이 삭제되었습니다.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">오래된 버전이 삭제되지 않았습니다.</string>
+
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d개의 버전이 성공적으로 삭제되었습니다</item>
+        <item context="version items" quantity="other">%d개의 버전이 성공적으로 삭제되었습니다</item>
+    </plurals>
+
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">%d개의 버전이 삭제되지 않았습니다</item>
+        <item context="version items" quantity="other">%d개의 버전이 삭제되지 않았습니다</item>
+    </plurals>
+
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">MEGA 연락처가 없습니다. 연락처 부문에서 친구들을 초대하세요.</string>
+
+    <string name="title_tour_one" context="Title of first tour screen">당신이 열쇠를 갖습니다</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">보안은 우리의 존재 이유이며, 당신의 파일들은 당신만이 접근 할수 있도록 우리 서버에 마치 잘 관리된 암호화 기계 뒤에 있는 것처럼 매우 안전합니다.</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">암호화된 대화</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">완전히 암호화된 대화와 음성과 영상 통화, 그룹 대화 그리고 클라우드 드라이브와 통합된 파일 공유</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">네트워크 생성</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">MEGA를 떠나지 않고 연락처를 추가하고, 네트워크를 형성하고, 협업하고, 음성과 영상 통화를 하세요</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">클라우드 속 당신의 사진</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 계정을 만드세요.</string>
+
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">비밀번호를 입력하세요</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s은/는 비밀번호로 보호된 PDF 문서입니다. PDF를 열려면 비밀번호를 입력하세요.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">잘못된 비밀번호입니다, 다시 시도하세요.</string>
@@ -2289,10 +2393,33 @@
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">통화가 진행중일 때에는 미디어 파일을 재생할 수 없습니다.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">진행중인 통화</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s님이 그룹 통화를 시작하였습니다. 참여하려면 탭하세요.</string>
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">통화로 돌아가려면 탭하세요</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">응답</string>
-    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시됨</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s님이 그룹 통화를 시작하였습니다. 참여하려면 탭하세요.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">통화로 돌아가려면 탭하세요</string>
 
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A]님이[B] 단체 대화에 참여하였습니다.[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">이 대화는 당신이 삭제하려고 하는 대화 링크를 통해서 접근할 수 없게 됩니다.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">암호화 키 순환은 새 단체 대화를 만드는 것 없이 대화 링크를 만드는 것을 허용하지 않습니다.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">새 단체 대화를 만들고 대화 링크를 생성할까요?</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">성공적으로 대화에 참여하였습니다.</string>
+
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%2$d 중 %1$d</string>
+
+    <string name="hint_action_search" context="Hint of the Search view">검색&#8230;</string>
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">응답</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시</string>
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">음성 통화 시작중&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">영상 통화 시작중&#8230;</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s님이 이 통화를 음소거 하였습니다</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">음소거됨</string>
+
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">통화 참여</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">이 통화에 참여하려면 현재 통화를 마쳐야합니다</string>
+
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
 </resources>
