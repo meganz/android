@@ -4481,9 +4481,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(!noMoreNoSentMessages){
                         log("onMessageLoaded: NOT noMoreNoSentMessages");
-                        bufferSending.add(0,androidMsg);
-                    }
-                    else{
+                        addInbufferSending(androidMsg);
+                    }else{
                         log("Try to recover the initial msg");
                         if(msg.getMsgId()!=-1){
                             MegaChatMessage notEdited = megaChatApi.getMessage(idChat, msg.getMsgId());
@@ -4528,9 +4527,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("onMessageLoaded: Message " + returnValue + " modified!");
                         return;
                     }
-
-                    bufferSending.add(0,androidMsg);
-
+                    addInbufferSending(androidMsg);
                     if(!noMoreNoSentMessages){
                         log("onMessageLoaded: NOT noMoreNoSentMessages");
                     }
@@ -4544,9 +4541,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("onMessageLoaded: Message " + returnValue + " modified!");
                     return;
                 }
-
-                bufferSending.add(0,androidMsg);
-
+                addInbufferSending(androidMsg);
                 if(!noMoreNoSentMessages){
                     log("onMessageLoaded: NOT noMoreNoSentMessages");
                 }
@@ -4583,7 +4578,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     positionToScroll++;
                     log("positionToScroll:increase: "+positionToScroll);
                 }
-
                 bufferMessages.add(androidMsg);
                 log("onMessageLoaded: Size of buffer: "+bufferMessages.size());
                 log("onMessageLoaded: Size of messages: "+messages.size());
@@ -4599,18 +4593,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 bufferSending.clear();
             }
 
-            log("**onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize: "+messages.size());
+            log("onMessageLoaded:numberToLoad: "+numberToLoad+" bufferSize: "+bufferMessages.size()+" messagesSize: "+messages.size());
             if((bufferMessages.size()+messages.size())>=numberToLoad){
-                log("**onMessageLoaded:******");
                 fullHistoryReceivedOnLoad();
                 isLoadingHistory = false;
             }
             else if(((bufferMessages.size()+messages.size())<numberToLoad) && (stateHistory==MegaChatApi.SOURCE_ERROR)){
-                log("**onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
+                log("onMessageLoaded:noMessagesLoaded&SOURCE_ERROR: wait to CHAT ONLINE connection");
                 retryHistory = true;
             }
             else{
-                log("**onMessageLoaded:lessNumberReceived");
+                log("onMessageLoaded:lessNumberReceived");
                 if((stateHistory!=MegaChatApi.SOURCE_NONE)&&(stateHistory!=MegaChatApi.SOURCE_ERROR)){
                     log("But more history exists --> loadMessages");
                     log("G->loadMessages unread is 0");
@@ -5292,6 +5285,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
             messages.clear();
             messages.add(androidMsg);
+
             for(int i = indexToChange+1; i<messagesCopy.size();i++){
                 messages.add(messagesCopy.get(i));
             }
@@ -5456,7 +5450,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         int lastIndex = messages.size()-1;
         log("1lastIndex: "+lastIndex);
         if(messages.size()==-1){
-            log("2lastIndex: "+lastIndex);
+            log("lastIndex: "+lastIndex);
             msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
             messages.add(msg);
         }
@@ -7640,6 +7634,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             adapter.setNodeAttachmentVisibility(true, holder_imageDrag, position_imageDrag);
             holder_imageDrag = null;
             position_imageDrag = -1;
+        }
+    }
+
+    private void addInbufferSending(AndroidMegaChatMessage androidMsg){
+        if(bufferSending.isEmpty()){
+            bufferSending.add(0,androidMsg);
+        }else{
+            boolean isContained = false;
+            for(int i=0; i<bufferSending.size(); i++){
+                if((bufferSending.get(i).getMessage().getMsgId() == androidMsg.getMessage().getMsgId())&&(bufferSending.get(i).getMessage().getTempId() == androidMsg.getMessage().getTempId())){
+                    isContained = true;
+                    break;
+                }
+            }
+            if(!isContained){
+                bufferSending.add(0,androidMsg);
+            }
         }
     }
 
