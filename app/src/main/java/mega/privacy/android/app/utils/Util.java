@@ -2186,6 +2186,11 @@ public class Util {
 		return defaultAvatar;
 	}
 
+	public static MegaPreferences getPreferences (Context context) {
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		return dbH.getPreferences();
+	}
+
 	public static String getDownloadLocation (Context context) {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         MegaPreferences prefs = dbH.getPreferences();

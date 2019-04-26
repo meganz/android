@@ -59,6 +59,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
@@ -99,7 +100,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-public class FileExplorerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
+public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
 
 	public final static int CLOUD_FRAGMENT = 0;
 	public final static int INCOMING_FRAGMENT = 1;
@@ -2504,6 +2505,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				break;
 			}
 			case R.id.cab_menu_sort:{
+				showShortOptions(fileExplorerActivityLollipop, outMetrics);
 				break;
 			}
 		}
@@ -3372,6 +3374,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 	}
 
+	public void refreshOrderNodes (int order) {
+
+	}
+
 	public void collapseSearchView () {
 		if (searchMenuItem != null) {
 			searchMenuItem.collapseActionView();
@@ -3445,5 +3451,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	public HashMap<String, String> getNameFiles () {
 		return nameFiles;
+	}
+
+	public ManagerActivityLollipop.DrawerItem getCurrentItem() {
+
+		return ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
 	}
 }
