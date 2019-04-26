@@ -13,7 +13,7 @@
 		android:id="@+id/action_grid_view_large_small"
 		android:orderInCategory="90"
 		android:title="@string/action_grid"
-		android:icon="@drawable/ic_menu_gridview"
+		android:icon="@drawable/ic_thumbnail_view"
 		MEGA:showAsAction="ifRoom"
 		android:visible="false"/>
 

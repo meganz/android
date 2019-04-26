@@ -828,11 +828,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	void setGridListAction () {
 		if (isList) {
 			gridListMenuItem.setTitle(R.string.action_grid);
-			gridListMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
+			gridListMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
 		}
 		else {
 			gridListMenuItem.setTitle(R.string.action_list);
-			gridListMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
+			gridListMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
 		}
 	}
 	
@@ -851,7 +851,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    gridListMenuItem = menu.findItem(R.id.cab_menu_grid_list);
 	    sortByMenuItem = menu.findItem(R.id.cab_menu_sort);
 	   	setGridListAction();
-	   	sortByMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_undo_black));
+	   	sortByMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_sort));
 
 	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
