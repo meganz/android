@@ -561,13 +561,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 			showOptionsPanel(n, position);
 		}
 	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-		super.callToSuperBack = true;
-		super.onBackPressed();
-	}
 	
 	private void updateActionModeTitle() {
 		log("updateActionModeTitle");

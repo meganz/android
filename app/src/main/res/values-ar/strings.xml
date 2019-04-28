@@ -99,7 +99,7 @@
     -->
 
     <string name="action_settings" context="Menu item">الاعدادات</string>
-    <string name="action_search" context="Search button">بحث</string>
+    <string name="action_search" context="Search button">البحث</string>
     <string name="action_play" context="Search button">تشغيل</string>
     <string name="action_pause" context="Search button">ايقاف</string>
     <string name="action_refresh" context="Menu item">إعادة تحميل</string>
@@ -204,7 +204,7 @@
     <string name="tour_access_text">احصل على التشفير بشكل كامل مع امكانية الوصول في أي مكان وفي أي وقت</string>
 
     <string name="create_account_text" context="button that allows the user to create an account">إنشاء حساب</string>
-    <string name="name_text" context="Name of the user">الاسم</string>
+    <string name="name_text" context="Name of the user">الإسم</string>
     <string name="lastname_text" context="Last name of the user">اسم العائلة</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">أنا أوافق على  [A]شروط الخدمة[/A] الخاص بMEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">هل لديك حساب؟</string>
@@ -238,7 +238,7 @@
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
     <string name="section_shared_items" context="title of the screen that shows all the shared items">المجلدات المشاركة</string>
-    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">سلة المهملات</string>
+    <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">سلة المحذوفات</string>
     <string name="section_contacts" context="Title of the contact list">جهات الاتصال</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">جهات اتصال  [A](%1$d)[/A]</string>
@@ -287,7 +287,7 @@
     -->
     <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">رابط عام</string>
 
-    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">صلاحيات</string>
+    <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">الرّخص</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">أذونات المشاركة</string>
     <string name="file_properties_shared_folder_change_permissions" context="menu item">تغيير الصلاحيات</string>
     <string name="file_properties_shared_folder_select_contact" context="when listing all the contacts that shares a folder">مشاركة مع</string>
@@ -337,7 +337,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">مشاركة الصورة باستخدام</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">مشاركة الرابط</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">الحصول على الرابط</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">الحصول على الرّابط</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
 
@@ -375,7 +375,7 @@
     -->
     <string name="context_move_to_trash" context="menu item">نقل إلى سلة المهملات</string>
     <string name="context_delete_from_mega" context="menu item">إزالة من MEGA</string>
-    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">اسم المجلد</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">إسم المجلد</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">عنوان البريد الإلكتروني</string>
     <string name="context_creating_folder" context="status dialog when performing the action">إنشاء مجلد</string>
     <!--
@@ -502,7 +502,7 @@
     -->
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">مجلد جديد</string>
-    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">إضافة جهة اتصال</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">إضافة متصّل</string>
     <string name="menu_add_contact_and_share" context="Menu option to add a contact to your contact list.">أضف جهة اتصال وشارك</string>
     <!--
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
@@ -736,14 +736,14 @@
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">نسخة حزمة أدوات تطوير البرمجيات لMEGAchat</string>
     <string name="settings_about_code_link_title" context="Link to the public code of the app">عرض مصدر الكود</string>
 
-    <string name="january">يناير</string>
-    <string name="february">فبراير</string>
+    <string name="january">جانفي</string>
+    <string name="february">فيفري</string>
     <string name="march">مارس</string>
-    <string name="april">أبريل</string>
-    <string name="may">مايو</string>
-    <string name="june">يونيو</string>
-    <string name="july">يوليو</string>
-    <string name="august">أغسطس</string>
+    <string name="april">أفريل</string>
+    <string name="may">ماي</string>
+    <string name="june">جوان</string>
+    <string name="july">جويلية</string>
+    <string name="august">أوت</string>
     <string name="september">سبتمبر</string>
     <string name="october">أكتوبر</string>
     <string name="november">نوفمبر</string>
@@ -777,7 +777,7 @@
     -->
 
     <string name="sortby_owner_mail" context="category in sort by action">رسائل بريد المالك</string>
-    <string name="sortby_name" context="category in sort by action">الاسم</string>
+    <string name="sortby_name" context="category in sort by action">الإسم</string>
     <string name="sortby_name_ascending" context="sort files alphabetically ascending">ترتيب تصاعدي</string>
     <string name="sortby_name_descending" context="sort files alphabetically descending">تنازلي</string>
 
@@ -1262,6 +1262,9 @@
 	<string name="label_close" context="button label Close">إغلاق</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">عام</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">التخزين</string>
+	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">التخزين</string>
+	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">نقل البيانات</string>
+	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">نقل البيانات</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">الباقة</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">مساحة التخزين</string>
@@ -1478,7 +1481,7 @@
     <string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">المحتويات</string>
     <string name="file_properties_shared_folder_public_link_name">رابط</string>
 
-    <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">الوصول الكامل</string>
+    <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">وصول كامل</string>
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">للقراءة فقط</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">قراءة وكتابة</string>
 
@@ -1937,7 +1940,7 @@
     <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">Authenticator App</string>
     <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">هل تريد فتح متجر غوغل لتثبيت تطبيق مصادقة؟</string>
     <string name="play_store_label" context="Label Play Store">Play Store</string>
-    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">You need an authenticator app to enable 2FA on MEGA. You can download and install the Google Authenticator, Duo Mobile, Authy or Microsoft Authenticator app for your phone or tablet.</string>
+    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">تحتاج الى تطبيق مصادقة لتفعيل المصادقة المزدوجة 2FA على MEGA. يمكنك تنزيل وتثبيت أحد التطبيقات Google Authenticator، Duo Mobile أو Microsoft Authenticator app على موبايلك أو جهازك اللوحي.</string>
 
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">تمت مشاركة %d ملف بنجاح</string>
@@ -2022,7 +2025,7 @@
     <string name="confirmation_delete_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">هل تود إزالة %s من هذه المحادثة؟</string>
 
     <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">النسخ المعدلة للملف</string>
-    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d file versions, taking a total of %2$s</string>
+    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d نسخ معدلة للملفات، تستهلك اجمالي %2$s</string>
 
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">إدارة الملف</string>
 
@@ -2111,12 +2114,49 @@
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">أزل الملفات الأكبر من</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
 
-    <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">لتعطيل الافراغ التلقائي لسلة المحذوفات أو لتحديد زمن أطول للاحتفاظ، يجب ان تشترك باشتراك PRO.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">أيام</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
 
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable Encrypted Key Rotation</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
+
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
+
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
+
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">%d participants</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">Join</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">Observers</string>
+
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
+
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
+
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were previously a member of. Do you want to join the chat again?</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat.</string>
+
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
+
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
+
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">The invitation to contact %s has been sent before and can be consulted in the Sent Requests tab.</string>
 
@@ -2227,6 +2267,10 @@
         <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Before you can generate a link for this chat, you need to set a description:</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
+
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]From[/A] %s / [A]month[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* الاشتراكات المجددة تلقائيا يمكن إلغاؤها في أي وقت قبل وقت التجديد.</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
@@ -2236,6 +2280,16 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No [/B][A]Notifications[/A][B].[/B]</string>
 
+    <string name="general_setup_mega" context="Permissions screen title">اعداد MEGA</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow access to photos, media and files.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, media and files MEGA needs your permission.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">Attachment already sent</string>
@@ -2282,6 +2336,56 @@
         <item context="version items" quantity="other">تمت إعادة توجيه الرسائل بنجاح</item>
     </plurals>
 
+    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files were not sent to %d chats</item>
+    </plurals>
+
+    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d contacts were not sent to %d chats</item>
+    </plurals>
+
+    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+    </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">إعداد الملفات</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as a message.</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">خطأ. الملف لم يرسل لأي من المحادثات المحددة</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
+
+    <string name="delete_versions" context="Action delete all file versions">حذف جميع النسخ القديمة</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
+
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d version deleted successfully</item>
+        <item context="version items" quantity="other">%d versions deleted successfully</item>
+    </plurals>
+
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">%d version not deleted</item>
+        <item context="version items" quantity="other">%d versions not deleted</item>
+    </plurals>
+
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+
+    <string name="title_tour_one" context="Title of first tour screen">انت تحتفظ بالمفتاح</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">نحن موجودون لتوفير الأمان، ملفاتك بأمان أكثر معنا محمية خلف آلية تشفير متينة بحيث تكون أنت فقط القادر على الولوج الى ملفاتك.</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">دردشة مشفرة</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">دردشة مشفرة بشكل كامل مع اتصال صوتي وفيديو، وتراسل مجموعات ومشاركة ملفات بشكل متكامل مع سواقتك السحابية.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">انشئ شبكتك</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">اضف جهات اتصال، وانشئ شبكات ومجموعات، تعاون، اجري اتصالات صوتية وفيديوهية دون مغادرة MEGA.</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">صورك على السحابة</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">تحميل صور الكاميرا هو ميزة اساسية لأي جهاز موبايل ونحن نقدم لك ذلك. انشئ حسابك الآن.</string>
+
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">You have entered the wrong password, please try again.</string>
@@ -2289,10 +2393,33 @@
 
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Tap to return to call</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
+
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully.</string>
+
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
+
+    <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
     <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">إجابة</string>
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">تجاهل</string>
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Starting audio call&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Starting video call&#8230;</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
 
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
+
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
 </resources>

@@ -29,9 +29,9 @@ import nz.mega.sdk.MegaChatApi;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-
-	private static final int DATABASE_VERSION = 44;
-    private static final String DATABASE_NAME = "megapreferences";
+	
+	private static final int DATABASE_VERSION = 45;
+    private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
     private static final String TABLE_ATTRIBUTES = "attributes";
@@ -146,6 +146,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
 	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
+    private static final String KEY_AUTO_PLAY = "autoplay";
 
 	private static final String KEY_ID_CHAT = "idchat";
 	private static final String KEY_MSG_TIMESTAMP = "timestamp";
@@ -253,7 +254,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
 				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
                 KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT," + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT," +  KEY_CAM_VIDEO_SYNC_TIMESTAMP + " TEXT," +
-                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT" +")";
+                KEY_SEC_VIDEO_SYNC_TIMESTAMP + " TEXT,"  + KEY_AUTO_PLAY + " BOOLEAN" + ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -643,8 +644,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL(CREATE_NEW_PENDING_MSG_TABLE);
 		}
-		
-		if(oldVersion <= 43) {
+
+        if (oldVersion <= 43){
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_AUTO_PLAY + " BOOLEAN;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTO_PLAY + " = '" + encrypt("false") + "';");
+        }
+
+		if(oldVersion <= 44) {
 		    db.execSQL(CREATE_SYNC_RECORDS_TABLE);
 
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_UPLOAD_VIDEO_QUALITY + " TEXT;");
@@ -771,7 +777,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return cursor != null && cursor.getCount() == 1;
         }
     }
-    
+
     public SyncRecord recordExists(String originalFingerprint,boolean isSecondary,boolean isCopyOnly) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FP_ORI + " ='" + encrypt(originalFingerprint) + "' AND "
@@ -825,7 +831,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         db.execSQL(sql);
     }
-    
+
     public void deleteAllSecondarySyncRecords(int type){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS +" WHERE " + KEY_SYNC_SECONDARY + " ='" + encrypt("true") + "'";
         if(type != SyncRecord.TYPE_ANY) {
@@ -833,7 +839,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         db.execSQL(sql);
     }
-    
+
     public void deleteVideoRecordsByState(int state){
         String sql = "DELETE FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
@@ -938,7 +944,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return null;
     }
-    
+
     public boolean shouldClearCamsyncRecords() {
         String selectQuery = "SELECT " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " FROM " + TABLE_PREFERENCES;
         Cursor cursor = db.rawQuery(selectQuery,null);
@@ -953,7 +959,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return false;
     }
-    
+
     public void saveShouldClearCamsyncRecords(boolean should) {
         String sql = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS +" = '" + encrypt(String.valueOf(should)) + "'";
         db.execSQL(sql);
@@ -1264,12 +1270,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String shouldClearCameraSyncRecords = decrypt(cursor.getString(34));
 			String camVideoSyncTimeStamp = decrypt(cursor.getString(35));
 			String secVideoSyncTimeStamp = decrypt(cursor.getString(36));
+            String isAutoPlayEnabled = decrypt(cursor.getString(37));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled);
 		}
 		cursor.close();
 
@@ -3526,7 +3533,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		int rows = db.delete(TABLE_PENDING_MSG_SINGLE, KEY_ID + "="+idMsg, null);
 	}
 
-	////
+    public String getAutoPlayEnabled(){
+
+        String selectQuery = "SELECT " + KEY_AUTO_PLAY + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+
+            String enabled = decrypt(cursor.getString(0));
+            return enabled;
+        }
+        cursor.close();
+
+        return "false";
+    }
+
+    public void setAutoPlayEnabled(String enabled){
+        log("setAutoPlayEnabled");
+
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTO_PLAY + "='" + encrypt(enabled + "") + "' WHERE " + KEY_ID + " ='1'";
+            db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+        }
+        else{
+            values.put(KEY_AUTO_PLAY, encrypt(enabled + ""));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
 
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);

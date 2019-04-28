@@ -41,6 +41,8 @@ public class MegaPreferences{
 	String chargingOnSize = "";
 	String shouldClearCameraSyncRecords;
 
+	String isAutoPlayEnabled = "";
+
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
@@ -49,11 +51,11 @@ public class MegaPreferences{
 	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
 
-	
+
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp){
+			String preferredSortOthers, String firstTimeChat, String smallGridCamera,String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,String secVideoSyncTimeStamp, String isAutoPlayEnabled){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -90,6 +92,7 @@ public class MegaPreferences{
 		this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
 		this.camVideoSyncTimeStamp = camVideoSyncTimeStamp;
 		this.secVideoSyncTimeStamp = secVideoSyncTimeStamp;
+		this.isAutoPlayEnabled = isAutoPlayEnabled;
 	}
 
 	public String getFirstTime (){
@@ -399,123 +402,9 @@ public class MegaPreferences{
                 ", secVideoSyncTimeStamp='" + secVideoSyncTimeStamp + '\'' +
                 '}';
     }
+
+    public boolean isAutoPlayEnabled(){
+        return Boolean.parseBoolean(isAutoPlayEnabled);
+    }
 }
 
-//import java.util.Arrays;
-//
-//import android.content.Context;
-//import android.content.SharedPreferences;
-//import android.content.SharedPreferences.Editor;
-//import android.os.Bundle;
-//import android.preference.PreferenceActivity;
-//import android.provider.Settings;
-//import android.util.Base64;
-//
-//public class Preferences extends PreferenceActivity{
-//	
-//	public static String FILE = "prefs_main.xml";
-//	// Preferences keys
-//	public static String KEY_EMAIL = "email";
-//	public static String KEY_PASSWORD2 = "password";
-//	public static String KEY_PUBLIC_KEY = "public_key";
-//	public static String KEY_PRIVATE_KEY = "private_key";
-//	
-//	@Override
-//	public void onCreate(Bundle savedInstanceState){
-//		super.onCreate(savedInstanceState);
-//		
-//	}
-//	
-//	/*
-//	 * Get static preference object
-//	 */
-//	public static SharedPreferences getPreferences(Context context) {
-//		SharedPreferences prefs = context.getSharedPreferences(FILE, 0);
-//		return prefs;
-//	}
-//	
-//	/*
-//	 * Get user credentials or null if not available
-//	 */
-//	synchronized public static UserCredentials getCredentials(Context context){
-//		if (context == null){
-//			return null;
-//		}
-//		
-//		SharedPreferences prefs = getPreferences(context);
-//		
-//		String email = decrypt(prefs.getString(KEY_EMAIL, null));
-//		if(email == null) return null;
-//		
-//		String publicKey = decrypt(prefs.getString(KEY_PUBLIC_KEY, null));
-//		if(publicKey == null) return null;
-//		
-//		String privateKey = decrypt(prefs.getString(KEY_PRIVATE_KEY, null));
-//		if (privateKey == null) return null;
-//		
-//		return new UserCredentials(email, privateKey, publicKey);
-//	}
-//	
-//	public static String encrypt(String original) {
-//		if (original == null) {
-//			return null;
-//		}
-//		try {
-//			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
-//			return Base64.encodeToString(encrypted, Base64.DEFAULT);
-//		} catch (Exception e) {
-//			log("ee");
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
-//	
-//	public static String decrypt(String encodedString) {
-//		if (encodedString == null) {
-//			return null;
-//		}
-//		try {
-//			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
-//			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
-//			return new String(original);
-//		} catch (Exception e) {
-//			log("de");
-//			return null;
-//		}
-//	}
-//	
-//	/*
-//	 * Save user credentials
-//	 */
-//	public static void saveCredentials(Context context,
-//			UserCredentials credentials) {
-//		if(context == null) return;
-//		SharedPreferences prefs = getPreferences(context);
-//		Editor editor = prefs.edit();
-//		editor.putString(Preferences.KEY_EMAIL, encrypt(credentials.getEmail()));
-//		editor.putString(Preferences.KEY_PUBLIC_KEY,
-//				encrypt(credentials.getPublicKey()));
-//		editor.putString(Preferences.KEY_PRIVATE_KEY,
-//				encrypt(credentials.getPrivateKey()));
-//		editor.commit();
-//	}
-//	
-//	/*
-//	 * Remove user credentials
-//	 */
-//	public static void clearCredentials(Context context) {
-//		SharedPreferences prefs = getPreferences(context);
-//		Editor editor = prefs.edit();
-//		editor.clear();
-//		editor.commit();
-//	}
-//	
-//	private static byte[] getAesKey() {
-//		String key = Settings.Secure.ANDROID_ID
-//				+ "fkvn8 w4y*(NC$G*(G($*GR*(#)*huio4h389$G";
-//		return Arrays.copyOfRange(key.getBytes(), 0, 32);
-//	}
-//	
-
-//
-//}

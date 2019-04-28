@@ -127,7 +127,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            remoteRenderer.DrawBitmap(false);
+            remoteRenderer.DrawBitmap(false, false);
         }
     }
 

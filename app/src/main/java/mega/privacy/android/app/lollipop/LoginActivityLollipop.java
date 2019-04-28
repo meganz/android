@@ -552,8 +552,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         int valueReturn = -1;
 
@@ -585,7 +584,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         if (valueReturn == 0) {
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }

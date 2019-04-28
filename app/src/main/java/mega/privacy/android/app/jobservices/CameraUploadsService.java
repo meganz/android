@@ -777,18 +777,18 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             }
                         }
                     }
-                    if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
-                        //Change the file names as device
-                        log("Call Look for Rename Task");
-                        final MegaNode existingNode = nodeExists;
-                        final MegaNode parentNode = uploadNode;
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                new LookForRenameTask(media,parentNode).rename(existingNode);
-                            }
-                        });
-                    }
+//                    if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
+//                        //Change the file names as device
+//                        log("Call Look for Rename Task");
+//                        final MegaNode existingNode = nodeExists;
+//                        final MegaNode parentNode = uploadNode;
+//                        handler.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                new LookForRenameTask(media,parentNode).rename(existingNode);
+//                            }
+//                        });
+//                    }
                 }
             }
         }
