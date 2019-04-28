@@ -598,48 +598,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private long getLastModifiedTime(SyncRecord file) {
         return file.getTimestamp();
-//        String originalPath = file.getLocalPath();
-//        long lastModified;
-//        try {
-//            ExifInterface exif = new ExifInterface(originalPath);
-//            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
-//            lastModified = sFormatter.parse(s).getTime();
-//            if (lastModified == 0) {
-//                lastModified = new File(originalPath).lastModified();
-//                if (lastModified == 0) {
-//                    lastModified = file.getTimestamp();
-//                }
-//            }
-//        } catch (Exception e) {
-//            lastModified = new File(originalPath).lastModified();
-//            if (lastModified == 0) {
-//                lastModified = file.getTimestamp();
-//            }
-//        }
-//        return lastModified;
     }
 
     private long getLastModifiedTime(Media media) {
         return media.timestamp;
-//        String originalPath = media.filePath;
-//        long lastModified;
-//        try {
-//            ExifInterface exif = new ExifInterface(originalPath);
-//            String s = exif.getAttribute(ExifInterface.TAG_DATETIME);
-//            lastModified = sFormatter.parse(s).getTime();
-//            if (lastModified == 0) {
-//                lastModified = new File(originalPath).lastModified();
-//                if (lastModified == 0) {
-//                    lastModified = media.timestamp;
-//                }
-//            }
-//        } catch (Exception e) {
-//            lastModified = new File(originalPath).lastModified();
-//            if (lastModified == 0) {
-//                lastModified = media.timestamp;
-//            }
-//        }
-//        return lastModified;
     }
     
     private void saveDataToDB(ArrayList<SyncRecord> list) {
@@ -767,139 +729,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } catch (Exception e) {
                 log("Exception, can not get possible nodes from cloud");
             }
-            
-//            if (nodeExists == null) {
-//                log("if(nodeExists == null)");
-//                //Check if the file is already uploaded in the correct folder but without a fingerprint
-//                int photoIndex = 0;
-//                MegaNode possibleNode = null;
-//                String photoFinalName;
-//                do {
-//                    //Iterate between all files with the correct target name
-//                    //Create the final name taking into account the
-//                    if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
-//                        //Keep the file names as device
-//
-//                        photoFinalName = media.filePath;
-//                        log("Keep the camera file name: " + photoFinalName);
-//                    } else {
-//                        photoFinalName = Util.getPhotoSyncNameWithIndex(getLastModifiedTime(media),media.filePath,photoIndex);
-//                        log("CHANGE the camera file name: " + photoFinalName);
-//                    }
-//
-//                    possibleNode = megaApi.getChildNode(uploadNode,photoFinalName);
-//
-//                    // If the file matches name, mtime and size, and doesn't have a fingerprint,
-//                    // => we consider that it's the correct one
-//                    if (possibleNode != null && megaApi.getFingerprint(possibleNode) == null) {
-//                        nodeExists = possibleNode;
-//                        log("nodeExists = possibleNode;");
-//                        break;
-//                    }
-//                    //Continue iterating
-//                    photoIndex++;
-//                } while (possibleNode != null);
-//
-//                if (nodeExists == null) {
-//                    log("if(nodeExists == null)");
-//                    // If the file wasn't found by fingerprint nor in the destination folder,
-//                    // take a look in the folder from v1
-//                    SharedPreferences prefs = this.getSharedPreferences("prefs_main.xml",0);
-//                    if (prefs != null) {
-//                        String handle = prefs.getString("camera_sync_folder_hash",null);
-//                        if (handle != null) {
-//                            MegaNode prevFolder = megaApi.getNodeByHandle(MegaApiAndroid.base64ToHandle(handle));
-//                            if (prevFolder != null) {
-//                                // If we reach this code, the app is an updated v1 and the previously selected
-//                                // folder still exists
-//
-//                                // If the file matches name, mtime and size, and doesn't have a fingerprint,
-//                                // => we consider that it's the correct one
-//                                possibleNode = megaApi.getChildNode(prevFolder,sourceFile.getName());
-//                                if (possibleNode != null && megaApi.getFingerprint(possibleNode) == null) {
-//                                    nodeExists = possibleNode;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-            
-//            if (nodeExists == null) {
-//                log("UPLOAD THE FILE: " + media.filePath);
-//                Calendar cal = Calendar.getInstance();
-//                cal.setTimeInMillis(getLastModifiedTime(media));
-//                log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
-//                boolean photoAlreadyExists = false;
-//                ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode,MegaApiJava.ORDER_ALPHABETICAL_ASC);
-//                for (int i = 0;i < nL.size();i++) {
-//                    if ((nL.get(i).getName().compareTo(Util.getPhotoSyncName(getLastModifiedTime(media),media.filePath)) == 0)) {
-//                        photoAlreadyExists = true;
-//                    }
-//                }
-//
-//                if (!photoAlreadyExists) {
-//                    log("if (!photoAlreadyExists)");
-//                    SyncRecord record = new SyncRecord(sourceFile.getAbsolutePath(),sourceFile.getName(),media.timestamp,isSecondary,type);
-//                    if (shouldCompressVideo() && type == SyncRecord.TYPE_VIDEO) {
-//                        record.setStatus(STATUS_TO_COMPRESS);
-//                    }
-//                    float gpsData[] = getGPSCoordinates(sourceFile.getAbsolutePath(),isVideo);
-//                    record.setLatitude(gpsData[0]);
-//                    record.setLongitude(gpsData[1]);
-//                    record.setOriginFingerprint(localFingerPrint);
-//
-//                    pendingList.add(record);
-//                    log("MediaFinalName: " + sourceFile.getName());
-//                }
-//            } else {
-//                log("NODE EXISTS: " + megaApi.getParentNode(nodeExists).getName() + " : " + nodeExists.getName());
-//                if (megaApi.getParentNode(nodeExists).getHandle() != uploadNodeHandle) {
-//                    SyncRecord record = new SyncRecord(nodeExists.getHandle(),sourceFile.getName(),true,media.filePath,media.timestamp,isSecondary,type);
-//                    record.setOriginFingerprint(nodeExists.getOriginalFingerprint());
-//                    record.setNewFingerprint(nodeExists.getFingerprint());
-//                    pendingList.add(record);
-//                    log("MediaFinalName: " + sourceFile.getName());
-//                } else {
-//                    if (!isSecondary) {
-//                        if (isVideo) {
-//                            if (media.timestamp > currentVideoTimeStamp) {
-//                                currentVideoTimeStamp = media.timestamp;
-//                                dbH.setCamVideoSyncTimeStamp(media.timestamp);
-//                            }
-//                        } else {
-//                            if (media.timestamp > currentTimeStamp) {
-//                                currentTimeStamp = media.timestamp;
-//                                dbH.setCamSyncTimeStamp(media.timestamp);
-//                            }
-//                        }
-//                    } else {
-//                        if (isVideo) {
-//                            if (media.timestamp > secondaryVideoTimeStamp) {
-//                                secondaryVideoTimeStamp = media.timestamp;
-//                                dbH.setSecVideoSyncTimeStamp(media.timestamp);
-//                            }
-//                        } else {
-//                            if (media.timestamp > secondaryTimeStamp) {
-//                                secondaryTimeStamp = media.timestamp;
-//                                dbH.setSecSyncTimeStamp(media.timestamp);
-//                            }
-//                        }
-//                    }
-//                    if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
-//                        //Change the file names as device
-//                        log("Call Look for Rename Task");
-//                        final MegaNode existingNode = nodeExists;
-//                        final MegaNode parentNode = uploadNode;
-//                        handler.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                new LookForRenameTask(media,parentNode).rename(existingNode);
-//                            }
-//                        });
-//                    }
-//                }
-//            }
+
             if (nodeExists == null) {
                 log("UPLOAD THE FILE: " + media.filePath);
                 SyncRecord record = new SyncRecord(sourceFile.getAbsolutePath(),sourceFile.getName(),media.timestamp,isSecondary,type);
