@@ -38,7 +38,7 @@
         android:id="@+id/full_video_viewer_chat"
         android:orderInCategory="110"
         android:title="@string/general_share"
-        android:icon="@drawable/ic_w_send_to_contact"
+        android:icon="@drawable/ic_send_to_contact"
         MEGA:showAsAction="always"
         android:visible="true"/>
 

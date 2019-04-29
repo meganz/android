@@ -161,7 +161,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="14dp"
-                                android:text="@string/transfer_quota"
+                                android:text="@string/label_transfer_quota_achievements"
                                 android:textColor="@color/grey_achievements_title"
                                 android:layout_column="0"/>
                         </LinearLayout>
@@ -290,7 +290,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="11dp"
-                                        android:text="@string/transfer_quota"
+                                        android:text="@string/label_transfer_quota_achievements"
                                         android:textColor="@color/grey_achievements_title"
                                         android:layout_below="@id/figure_unlocked_transfer_text_referral"
                                         android:layout_column="0"/>
@@ -413,7 +413,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="11dp"
-                                        android:text="@string/transfer_quota"
+                                        android:text="@string/label_transfer_quota_achievements"
                                         android:textColor="@color/grey_achievements_title"
                                         android:layout_below="@id/figure_unlocked_transfer_text_base_quota"
                                         android:layout_column="0"/>
@@ -553,7 +553,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="11dp"
-                                        android:text="@string/transfer_quota"
+                                        android:text="@string/label_transfer_quota_achievements"
                                         android:textColor="@color/grey_achievements_title"
                                         android:layout_below="@id/figure_unlocked_transfer_text_install_app"
                                         android:layout_column="0"/>
@@ -688,7 +688,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="11dp"
-                                        android:text="@string/transfer_quota"
+                                        android:text="@string/label_transfer_quota_achievements"
                                         android:textColor="@color/grey_achievements_title"
                                         android:layout_below="@id/figure_unlocked_transfer_text_registration"
                                         android:layout_column="0"/>
@@ -831,7 +831,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textSize="11dp"
-                                        android:text="@string/transfer_quota"
+                                        android:text="@string/label_transfer_quota_achievements"
                                         android:textColor="@color/grey_achievements_title"
                                         android:layout_below="@id/figure_unlocked_transfer_text_install_desktop"
                                         android:layout_column="0"/>
