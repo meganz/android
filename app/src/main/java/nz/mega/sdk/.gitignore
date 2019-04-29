@@ -84,3 +84,6 @@
 /MegaTimeZoneDetails.java
 /MegaUserAlert.java
 /MegaUserAlertList.java
+
+/MegaRecentActionBucket.java
+/MegaRecentActionBucketList.java

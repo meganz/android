@@ -646,9 +646,14 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
 
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
+	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+
+
+
+	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating</string>
@@ -875,7 +880,7 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Email verification</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Please check your email to proceed.</string>
-    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">An error occurred, please try again.</string>
+    <string name="general_text_error" context="Text to inform the user when an error occurs">An error occurred, please try again.</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">You must be logged in to perform this action.</string>
@@ -1823,18 +1828,19 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog 'Do you remember your password?'">Do you remember your password?</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog 'Do you remember your password?' when logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog 'Do you remember your password?'">Please test your password to ensure you remember it. If you lose your password, you will lose access to your MEGA data.</string>
     <string name="remember_pwd_dialog_do_not_show" context="'Do you remember your password?' dialog option that permits user do not show it again">Don’t show me again</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Test password</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test your password</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password accepted</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password!\nBackup your Recovery Key as soon as possible!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Recovery Key exported</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">The Recovery Key has been exported into the Offline section as MEGARecoveryKey.txt.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copy to clipboard</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export Recovery Key</string>
-    <string name="option_logout_anyway" context="Option that permits user logout">Logout anyway</string>
+    <string name="proceed_to_logout" context="Option that permits user logout">Proceed to logout</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Recovery Key</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Save on File System</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copied to clipboard</string>
@@ -2450,4 +2456,14 @@
     <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
     <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
     <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+
+	<plurals name="file_already_downloaded">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+	</plurals>
+
+	<plurals name="file_pending_download">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
+	</plurals>
 </resources>
