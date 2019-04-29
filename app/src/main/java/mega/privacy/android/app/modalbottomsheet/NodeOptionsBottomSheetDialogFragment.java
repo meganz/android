@@ -1211,21 +1211,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                if(drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
-                    if(((ManagerActivityLollipop) context).getTabItemShares()==0) {
-                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
-                    }
-                    else {
-                        nC.selectChatsToSendNode(node);
-                    }
-                }
-                else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH) {
-                    nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
-                }
-                else {
-                    nC.selectChatsToSendNode(node);
-                }
+                nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
                 dismissAllowingStateLoss();
                 break;
             }

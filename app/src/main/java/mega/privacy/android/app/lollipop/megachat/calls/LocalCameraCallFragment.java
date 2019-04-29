@@ -117,7 +117,7 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
 
         if (bitmap != null){
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-            localRenderer.DrawBitmap(true);
+            localRenderer.DrawBitmap(true, true);
         }
     }
 

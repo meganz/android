@@ -165,7 +165,7 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         return bitmap;
     }
 
-    public void DrawBitmap(boolean flag) {
+    public void DrawBitmap(boolean flag, boolean isLocal) {
         if(bitmap == null){
             return;
         }
@@ -174,8 +174,11 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         }
         Canvas canvas = myTexture.lockCanvas();
         if (canvas != null) {
-            canvas.scale(-1, 1);
-            canvas.translate(-canvas.getWidth(), 0);
+            if(isLocal){
+                canvas.scale(-1, 1);
+                canvas.translate(-canvas.getWidth(), 0);
+            }
+
             if (flag) {
                 paint.reset();
                 paint.setXfermode(modesrcover);
@@ -271,13 +274,13 @@ public class MegaSurfaceRendererGroup implements TextureView.SurfaceTextureListe
         }
     }
 
-    public void DrawByteBuffer() {
-        if(byteBuffer == null)
-            return;
-        byteBuffer.rewind();
-        bitmap.copyPixelsFromBuffer(byteBuffer);
-        DrawBitmap(false);
-    }
+//    public void DrawByteBuffer() {
+//        if(byteBuffer == null)
+//            return;
+//        byteBuffer.rewind();
+//        bitmap.copyPixelsFromBuffer(byteBuffer);
+//        DrawBitmap(false);
+//    }
 
     private static void log(String log) {
         Util.log("MegaSurfaceRendererGroup", log);

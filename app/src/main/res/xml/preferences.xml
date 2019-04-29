@@ -207,6 +207,11 @@
 			android:layout="@layout/delete_versions_preferences"
 			android:title="@string/settings_file_management_delete_versions"/>
 
+		<android.support.v7.preference.SwitchPreferenceCompat
+			android:key="auto_play_switch"
+			android:title="@string/settings_auto_play_label"
+			android:defaultValue="false"/>
+
 	</android.support.v7.preference.PreferenceCategory>
 
 	<android.support.v7.preference.PreferenceCategory

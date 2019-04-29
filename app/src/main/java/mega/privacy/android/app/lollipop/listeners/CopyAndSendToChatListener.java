@@ -29,7 +29,6 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
-    boolean oneNode = true;
     int counter = 0;
     MegaNode parentNode;
     ArrayList<MegaNode> nodesCopied = new ArrayList<>();
@@ -45,7 +44,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
-        oneNode = true;
+
         counter = 0;
         parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
     }
@@ -55,8 +54,6 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
     }
 
     public void copyNodes (ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes) {
-
-        oneNode = false;
         nodesCopied.addAll(ownerNodes);
         counter = nodes.size();
         for (int i=0; i<nodes.size(); i++) {
@@ -80,20 +77,11 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         if (request.getType() == MegaRequest.TYPE_COPY){
             counter --;
             if (e.getErrorCode() == MegaError.API_OK){
-                if (oneNode) {
-                    MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-                    if (node != null) {
+                nodesCopied.add(megaApi.getNodeByHandle(request.getNodeHandle()));
+                if (counter == 0){
+                    if (nodesCopied != null) {
                         NodeController nC = new NodeController(context);
-                        nC.selectChatsToSendNode(node);
-                    }
-                }
-                else if (counter >= 0){
-                    nodesCopied.add(megaApi.getNodeByHandle(request.getNodeHandle()));
-                    if (counter == 0){
-                        if (nodesCopied != null) {
-                            NodeController nC = new NodeController(context);
-                            nC.selectChatsToSendNodes(nodesCopied);
-                        }
+                        nC.selectChatsToSendNodes(nodesCopied);
                     }
                 }
             }
