@@ -11948,6 +11948,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void selectSortByContacts(int _orderContacts){
 		log("selectSortByContacts");
 
+		if (getOrderContacts() == _orderContacts) {
+			return;
+		}
+
 		this.setOrderContacts(_orderContacts);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 		if (cFLol != null){
@@ -11958,6 +11962,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void selectSortByOffline(int _orderOthers){
 		log("selectSortByOffline");
+
+		if (orderOthers == orderOthers) {
+			return;
+		}
 
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
@@ -12016,6 +12024,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void refreshOthersOrder(int newOrderOthers){
 		log("refreshOthersOrder: "+newOrderOthers);
+		if (getOrderOthers() == newOrderOthers) {
+			return;
+		}
+
 		this.setOrderOthers(newOrderOthers);
 
 		if(sharesPageAdapter!=null){
@@ -12025,6 +12037,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void selectSortUploads(int orderCamera){
 		log("selectSortUploads");
+
+		if (this.orderCamera == orderCamera) {
+			return;
+		}
 
 		this.orderCamera = orderCamera;
 
