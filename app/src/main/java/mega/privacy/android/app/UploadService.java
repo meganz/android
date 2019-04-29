@@ -144,7 +144,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        megaApi.addTransferListener(this);
+        megaApi.addTransferListener(this);
 	}
 
 	@Override
@@ -189,6 +189,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private synchronized void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
+
         MegaTransferListenerInterface placeHolderListener = null;
 		String action = intent.getAction();
 		log("action is " + action);
@@ -222,9 +223,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if(lastModified <= 0){
 		    lastModified = file.lastModified();
         }
-        if(file.exists()) {
-            megaApi.addTransferListener(this);
-        }
 		if (file.isDirectory()) {
             acquireLock();
             totalFolderUploads++;
@@ -235,7 +233,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), placeHolderListener);
 			}
 		}
-		else if(file.isFile()) {
+		else {
 			if (nameInMEGAEdited != null){
 				switch (checkFileToUploadRenamed(file, parentHandle, nameInMEGAEdited)) {
 					case CHECK_FILE_TO_UPLOAD_UPLOAD: {
