@@ -3325,15 +3325,14 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if(isRemoveOffline){
             Intent intent = new Intent();
             intent.putExtra(NODE_HANDLE, handle);
             setResult(RESULT_OK, intent);
         }
-        super.callToSuperBack = true;
+
         super.onBackPressed();
 	}
 

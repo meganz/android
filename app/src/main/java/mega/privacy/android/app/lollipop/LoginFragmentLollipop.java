@@ -831,7 +831,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else if (result == MegaError.API_EARGS) {
                         log("Incorrect arguments!");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                         return v;
                     } else if (result == MegaError.API_EKEY) {
                         log("Incorrect MK when changing pass");
@@ -840,7 +840,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else {
                         log("Error when changing pass - show error message");
-                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+                        ((LoginActivityLollipop)context).showSnackbar(getString(R.string.general_text_error));
                         return v;
                     }
                 } else if (action.equals(Constants.ACTION_PARK_ACCOUNT)) {
@@ -851,7 +851,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         return v;
                     } else {
                         log("Error when parking account - show error message");
-                        Util.showAlert(context, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                        Util.showAlert(context, getString(R.string.general_text_error), getString(R.string.general_error_word));
                         return v;
                     }
                 }
@@ -2295,7 +2295,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             else{
                 log("Error when asking for recovery pass link");
                 log(error.getErrorString() + "___" + error.getErrorCode());
-                Util.showAlert(context,getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+                Util.showAlert(context,getString(R.string.general_text_error), getString(R.string.general_error_word));
             }
         }
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
