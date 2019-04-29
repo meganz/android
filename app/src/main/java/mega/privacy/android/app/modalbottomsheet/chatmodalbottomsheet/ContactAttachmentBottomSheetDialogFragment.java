@@ -566,7 +566,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 log("Info option");
 
                 if (!Util.isOnline(context)){
-                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     return;
                 }
 
@@ -600,7 +600,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                 log("Invite option");
 
                 if (!Util.isOnline(context)){
-                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                 }
                 else{
                     ContactController cC = new ContactController(context);

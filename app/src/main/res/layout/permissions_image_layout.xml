@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="428dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/image_permissions_layout"
+        android:layout_width="match_parent"
+        android:layout_height="218dp"
+        android:layout_margin="8dp"
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/image_permissions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/title_permissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:paddingBottom="16dp"
+            android:layout_above="@+id/subtitle_permissions"
+            android:textSize="22sp"
+            android:textColor="@color/name_my_account"
+            android:gravity="center"/>
+
+        <View
+            android:id="@+id/invisible_view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="92dp"/>
+
+        <TextView
+            android:id="@+id/subtitle_permissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_alignTop="@+id/invisible_view"
+            android:textSize="16sp"
+            android:textColor="@color/mail_my_account"
+            android:gravity="center"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

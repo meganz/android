@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
                 android:fontFamily="sans-serif"
-                android:textSize="18sp"/>
+                android:textSize="14sp"/>
         </LinearLayout>
     </RelativeLayout>
     
