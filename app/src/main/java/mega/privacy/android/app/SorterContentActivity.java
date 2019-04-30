@@ -1,6 +1,8 @@
 package mega.privacy.android.app;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -10,12 +12,13 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 
 public class SorterContentActivity extends BaseActivity {
 
-    public static void showShortOptions(final Context context, DisplayMetrics outMetrics) {
+    public void showShortOptions(final Context context, DisplayMetrics outMetrics) {
 
         ManagerActivityLollipop.DrawerItem drawerItem = null;
 
@@ -161,19 +164,23 @@ public class SorterContentActivity extends BaseActivity {
             MegaPreferences prefs = Util.getPreferences(context);
             drawerItem = ((FileExplorerActivityLollipop) context).getCurrentItem();
 
+            if (drawerItem == null) {
+                return;
+            }
+
             switch (drawerItem) {
                 case CLOUD_DRIVE: {
-                    if (prefs != null){
+                    if (prefs != null && prefs.getPreferredSortCloud() !=  null){
                         order = Integer.parseInt(prefs.getPreferredSortCloud());
                     }
 
                     break;
                 }
                 case SHARED_ITEMS: {
-                    if (((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1 && prefs != null){
+                    if (((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1 && prefs != null && prefs.getPreferredSortOthers() != null){
                         order = Integer.parseInt(prefs.getPreferredSortOthers());
                     }
-                    else if (prefs != null){
+                    else if (prefs != null && prefs.getPreferredSortCloud() != null){
                         order = Integer.parseInt(prefs.getPreferredSortCloud());
                     }
 
@@ -315,7 +322,13 @@ public class SorterContentActivity extends BaseActivity {
                             }
                         }
                         else if (context instanceof FileExplorerActivityLollipop) {
-                            ((FileExplorerActivityLollipop) context).refreshOrderNodes(order);
+                            setFileExplorerOrder(finalDrawerItem, context, order);
+                            if (((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
+                                updateManagerOrder(false, order);
+                            }
+                            else {
+                                updateManagerOrder(true, order);
+                            }
                         }
                         break;
                     }
@@ -329,7 +342,8 @@ public class SorterContentActivity extends BaseActivity {
                             ((ManagerActivityLollipop) context).refreshCloudOrder(order);
                         }
                         else if (context instanceof FileExplorerActivityLollipop) {
-                            ((FileExplorerActivityLollipop) context).refreshOrderNodes(order);
+                            setFileExplorerOrder(finalDrawerItem, context, order);
+                            updateManagerOrder(true, order);
                         }
                         break;
                     }
@@ -349,6 +363,31 @@ public class SorterContentActivity extends BaseActivity {
         oldestCheck.setOnClickListener(clickListener);
         largestCheck.setOnClickListener(clickListener);
         smallestCheck.setOnClickListener(clickListener);
+    }
+
+    void updateManagerOrder (boolean cloudOrder, int order) {
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER);
+        intent.putExtra("cloudOrder", cloudOrder);
+        intent.putExtra("order", order);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void setFileExplorerOrder (ManagerActivityLollipop.DrawerItem drawerItem, Context context, int order) {
+        ((FileExplorerActivityLollipop) context).refreshOrderNodes(order);
+        MegaPreferences prefs = Util.getPreferences(context);
+        DatabaseHandler dbH = Util.getDbH(context);
+        if (drawerItem == ManagerActivityLollipop.DrawerItem.SHARED_ITEMS && ((FileExplorerActivityLollipop) context).getParentHandleIncoming() == -1) {
+            if (prefs != null) {
+                prefs.setPreferredSortOthers(String.valueOf(order));
+            }
+            dbH.setPreferredSortOthers(String.valueOf(order));
+        }
+        else {
+            if (prefs != null) {
+                prefs.setPreferredSortCloud(String.valueOf(order));
+            }
+            dbH.setPreferredSortCloud(String.valueOf(order));
+        }
     }
 
     public static void log(String message) {

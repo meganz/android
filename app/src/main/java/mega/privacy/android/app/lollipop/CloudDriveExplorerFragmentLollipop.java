@@ -83,6 +83,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	Handler handler;
 
+	int order;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -293,25 +295,33 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //				}
 				parentHandle = megaApi.getRootNode().getHandle();
 			}
-		}		
-		
+		}
+
+		MegaPreferences prefs = Util.getPreferences(context);
+		if(prefs.getPreferredSortCloud()!=null){
+			order = Integer.parseInt(prefs.getPreferredSortCloud());
+		}
+		else{
+			order = megaApi.ORDER_DEFAULT_ASC;
+		}
+
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		if(chosenNode == null) {
 			log("chosenNode is NULL");
-		
+
 			if(megaApi.getRootNode()!=null){
 				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode());
+				nodes = megaApi.getChildren(megaApi.getRootNode(), order);
 			}
 
 		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
 			log("chosenNode is ROOT");
 			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(chosenNode);
+			nodes = megaApi.getChildren(chosenNode, order);
 
 		}else {
 			log("ChosenNode not null and not ROOT");
-			
+
 			MegaNode parentNode = megaApi.getParentNode(chosenNode);
 			if(parentNode!=null){
 				log("ParentNode NOT NULL");
@@ -321,22 +331,22 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 					grandParentNode = megaApi.getParentNode(parentNode);
 				}
 				if(parentNode.getType() == MegaNode.TYPE_ROOT){
-					nodes = megaApi.getChildren(chosenNode);
+					nodes = megaApi.getChildren(chosenNode, order);
 					log("chosenNode is: "+chosenNode.getName());
 				}
 				else{
 					log("Parent node exists but is not Cloud!");
 					parentHandle = megaApi.getRootNode().getHandle();
-					nodes = megaApi.getChildren(megaApi.getRootNode());
+					nodes = megaApi.getChildren(megaApi.getRootNode(), order);
 				}
-				
+
 			}
 			else{
 				log("parentNode is NULL");
 				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode());
-			}		
-			
+				nodes = megaApi.getChildren(megaApi.getRootNode(), order);
+			}
+
 		}
 		
 		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
@@ -658,7 +668,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
 			adapter.setParentHandle(parentHandle);
-			nodes = megaApi.getChildren(nodes.get(position));
+			nodes = megaApi.getChildren(nodes.get(position), order);
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
 
@@ -828,10 +838,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				((FileExplorerActivityLollipop) context).changeTitle();
 			}
 			else{
-//				String path=parentNode.getName();
-//				String[] temp;
-//				temp = path.split("/");
-//				name = temp[temp.length-1];
 
 				if(modeCloud==FileExplorerActivityLollipop.SELECT){
 					if(!selectFile)
@@ -875,7 +881,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 
-			nodes = megaApi.getChildren(parentNode);
+			nodes = megaApi.getChildren(parentNode, order);
 			adapter.setNodes(nodes);
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -1093,6 +1099,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}else{
 			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 		}
+	}
+
+	public void orderNodes (int order) {
+		this.order = order;
+		if (parentHandle == -1) {
+			nodes = megaApi.getChildren(megaApi.getRootNode(), order);
+		}
+		else {
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
+		}
+
+		adapter.setNodes(nodes);
 	}
 
 	boolean isMultiselect() {

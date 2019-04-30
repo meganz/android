@@ -745,6 +745,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	};
 
+	private BroadcastReceiver receiverUpdateOrder = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				boolean cloudOrder = intent.getBooleanExtra("cloudOrder", true);
+				int order = intent.getIntExtra("order", MegaApiJava.ORDER_DEFAULT_ASC);
+				log("****** cloudOrder: "+cloudOrder+" order: "+order);
+				if (cloudOrder) {
+					refreshCloudOrder(order);
+				}
+				else {
+					refreshOthersOrder(order);
+				}
+			}
+		}
+	};
+
 	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1804,6 +1821,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			localBroadcastManager.registerReceiver(networkReceiver,
 					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
+			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER));
 		}
 
 		nC = new NodeController(this);
@@ -4316,6 +4335,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
 
     	super.onDestroy();
 	}

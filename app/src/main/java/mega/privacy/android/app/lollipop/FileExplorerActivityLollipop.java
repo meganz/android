@@ -739,10 +739,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
 					if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
+						mTabsAdapterExplorer.setTabRemoved(true);
 						tabLayoutExplorer.removeTabAt(2);
+						mTabsAdapterExplorer.notifyDataSetChanged();
 					}
 					else if (!Util.isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
+						mTabsAdapterExplorer.setTabRemoved(true);
 						tabLayoutExplorer.removeTabAt(2);
+						mTabsAdapterExplorer.notifyDataSetChanged();
 					}
 				}
 
@@ -1324,7 +1328,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		supportInvalidateOptionsMenu();
 	}
 	
-	private String getFragmentTag(int viewPagerId, int fragmentPosition)
+	public String getFragmentTag(int viewPagerId, int fragmentPosition)
 	{
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
@@ -3375,7 +3379,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void refreshOrderNodes (int order) {
+		cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
+		if (cDriveExplorer != null) {
+			cDriveExplorer.orderNodes(order);
+		}
 
+		iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 1));
+		if (iSharesExplorer != null) {
+			iSharesExplorer.orderNodes(order);
+		}
 	}
 
 	public void collapseSearchView () {
@@ -3393,6 +3405,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public long getParentHandleIncoming() {
+		if (iSharesExplorer != null) {
+			parentHandleIncoming = iSharesExplorer.getParentHandle();
+		}
 		return parentHandleIncoming;
 	}
 
@@ -3454,7 +3469,20 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public ManagerActivityLollipop.DrawerItem getCurrentItem() {
-
-		return ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+		if (viewPagerExplorer != null) {
+			if (viewPagerExplorer.getCurrentItem() == 0) {
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
+				if (cDriveExplorer != null) {
+					return ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+				}
+			}
+			else {
+				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 1));
+				if (iSharesExplorer != null) {
+					return ManagerActivityLollipop.DrawerItem.SHARED_ITEMS;
+				}
+			}
+		}
+		return null;
 	}
 }

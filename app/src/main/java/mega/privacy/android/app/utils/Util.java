@@ -123,7 +123,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -2186,9 +2186,12 @@ public class Util {
 		return defaultAvatar;
 	}
 
+	public static DatabaseHandler getDbH (Context context) {
+		return DatabaseHandler.getDbHandler(context);
+	}
+
 	public static MegaPreferences getPreferences (Context context) {
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-		return dbH.getPreferences();
+		return getDbH(context).getPreferences();
 	}
 
 	public static String getDownloadLocation (Context context) {

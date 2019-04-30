@@ -30,16 +30,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -74,6 +77,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	Handler handler;
 	public ActionMode actionMode;
+
+	int orderParent;
+	int order;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -206,11 +212,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
-		
-		float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
 
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		
@@ -254,12 +255,26 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 
+		MegaPreferences prefs = Util.getPreferences(context);
+
 		if (parentHandle == -1){
+			if(prefs.getPreferredSortOthers()!=null){
+				orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
+			}
+			else{
+				orderParent = megaApi.ORDER_DEFAULT_ASC;
+			}
 			findNodes();
 		}
 		else{
+			if(prefs.getPreferredSortCloud()!=null){
+				order = Integer.parseInt(prefs.getPreferredSortCloud());
+			}
+			else{
+				order = megaApi.ORDER_DEFAULT_ASC;
+			}
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
+			nodes = megaApi.getChildren(parentNode, order);
 		}
 		
 		if (adapter == null){
@@ -405,9 +420,37 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			if(nodeContact!=null){
 				if(nodeContact.size()>0){
 					nodes.addAll(nodeContact);
+					if (orderParent  == MegaApiJava.ORDER_DEFAULT_DESC){
+						sortByMailDescending();
+					}
 				}
 			}			
 		}
+	}
+
+	public void sortByMailDescending(){
+		log("sortByNameDescending");
+		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+
+		for (int i=0;i<nodes.size();i++){
+			if(nodes.get(i) == null) {
+				continue;
+			}
+			if (nodes.get(i).isFolder()){
+				folderNodes.add(nodes.get(i));
+			}
+			else{
+				fileNodes.add(nodes.get(i));
+			}
+		}
+
+		Collections.reverse(folderNodes);
+		Collections.reverse(fileNodes);
+
+		nodes.clear();
+		nodes.addAll(folderNodes);
+		nodes.addAll(fileNodes);
 	}
 
 	public void findDisabledNodes (){
@@ -560,7 +603,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
-			nodes = megaApi.getChildren(nodes.get(position));
+			nodes = megaApi.getChildren(nodes.get(position), order);
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
 
@@ -743,7 +786,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			if (parentNode != null){
 				
 				parentHandle = parentNode.getHandle();
-				nodes = megaApi.getChildren(parentNode);
+				nodes = megaApi.getChildren(parentNode, order);
 
 				if (modeCloud == FileExplorerActivityLollipop.COPY){
 					if (((FileExplorerActivityLollipop)context).deepBrowserTree > 0){
@@ -1005,6 +1048,19 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			activateButton(false);
 		}
 
+	}
+
+	public void orderNodes (int order) {
+		if (parentHandle == -1) {
+			this.orderParent = order;
+			findNodes();
+		}
+		else {
+			this.order = order;
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
+		}
+
+		adapter.setNodes(nodes);
 	}
 
 	public boolean isFolder(int position){
