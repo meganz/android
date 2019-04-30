@@ -2160,6 +2160,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						handleList.add(documents.get(i).getHandle());
 					}
 					onFileClick(handleList);
+					clearSelections();
 
 				}else{
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
