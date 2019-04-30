@@ -4384,7 +4384,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     boolean isFile = AndroidMegaRichLinkMessage.isFileLink(link);
 
                     if(link!=null){
-                        log("The is link founded");
+                        log("The link was found");
                         if(megaApi!=null && megaApi.getRootNode()!=null){
                             ChatLinkInfoListener listener = null;
                             if(isFile){
