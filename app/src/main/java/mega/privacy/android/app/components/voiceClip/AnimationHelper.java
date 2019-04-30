@@ -207,14 +207,6 @@ public class AnimationHelper {
         log("moveRecordButtonAndSlideToCancelBack()");
         final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
         positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                log("*moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
-                float x = (Float) animation.getAnimatedValue();
-                recordBtn.setX(x);
-            }
-        });
         positionAnimator.addListener(new AnimatorListenerAdapter(){
             @Override
             public void onAnimationEnd(Animator animation) {

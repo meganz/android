@@ -9224,230 +9224,121 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        this.notifyItemChanged(currentPosition);
     }
 
+    private void pausePlayRecord(ViewHolderMessageChat holder, boolean isOwn,boolean isPaused, String VoiceClipPath) {
+            if(isPaused){
+                //Pause -> play
+                stopCurrentPlaying();
+                try {
+                    holder.mediaPlayerVoiceNotes.reset();
+                    holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
+                    holder.mediaPlayerVoiceNotes.setLooping(false);
+                    holder.mediaPlayerVoiceNotes.prepare();
+                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
+                    holder.mediaPlayerVoiceNotes.start();
 
-    public void playRecord(final int positionInAdapter, ViewHolderMessageChat holder){
-        log("playRecord() positionInAdapter = "+positionInAdapter+", positionInMessages = "+(positionInAdapter-1)+", messages.size: "+messages.size());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if(isOwn){
+                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                    updateOwnSeekBar(holder);
+                }else{
+                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                    updateContactSeekBar(holder);
+                }
+            }else{
+                //Play -> pause
+                holder.mediaPlayerVoiceNotes.pause();
+                holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
+                holder.mediaPlayerVoiceNotes.stop();
+                if(isOwn){
+                    holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
+                    holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                }else{
+                    holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
+                    holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
+                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                }
+                removeCallBacks();
+
+            }
+
+    }
+
+    private void checkIfIsUpload(boolean isMyMessage, AndroidMegaChatMessage message){
+        MegaNodeList nodeList = message.getMessage().getMegaNodeList();
+        if(nodeList.size()==1){
+            MegaNode node = nodeList.get(0);
+            if (MimeTypeList.typeForName(node.getName()).isAudio()){
+                String voiceNotesLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
+                String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
+                File f = new File(voiceNotesLocationDefaultPath, node.getName());
+                boolean isOnMegaVoiceNotes = false;
+                if(f.exists() && (f.length() == node.getSize())){
+                    isOnMegaVoiceNotes = true;
+                }
+
+                if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                    log("playRecord:localPath != null");
+                    pausePlayRecord(holder, isMyMessage, true, localPath);
+
+                }else{
+                    log("playRecord:localPath == null");
+                    if (Util.isOnline(context)) {
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            log("megaApi.httpServerIsRunning() == 0");
+                            megaApi.httpServerStart();
+                        }
+
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
+
+                        if (mi.totalMem > Constants.BUFFER_COMP) {
+                            log("total mem: " + mi.totalMem + " allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        } else {
+                            log("total mem: " + mi.totalMem + " allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+
+                        String url = megaApi.httpServerGetLocalLink(node);
+                        if ((url != null) && (Uri.parse(url) != null)) {
+                            Uri parsedUri = Uri.parse(url);
+                            pausePlayRecord(holder, isMyMessage, true, parsedUri.toString());
+                            return;
+                        }
+                    }
+                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
+                }
+            }
+        }
+    }
+
+    private void playRecord(final int positionInAdapter, ViewHolderMessageChat holder){
+        log("************+playRecord() positionInAdapter = "+positionInAdapter+", positionInMessages = "+(positionInAdapter-1)+", messages.size: "+messages.size());
         AndroidMegaChatMessage currentMessage = getMessageAt(positionInAdapter);
         if(currentMessage!=null){
             if((currentMessage.getMessage()!=null)&&(currentMessage.getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
-                if(currentMessage.getMessage().getUserHandle() == myUserHandle){
-                    log("playRecord: MY message");
-                    if(holder == null){
-                        holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
-                    }
-                    if(holder!=null) {
-                        if(holder.mediaPlayerVoiceNotes!=null){
-                            if(holder.mediaPlayerVoiceNotes.isPlaying()) {
-                                //PLAY -> PAUSE
-                                log("playRecord:myMessage:isPlaying -> pause");
-                                holder.mediaPlayerVoiceNotes.pause();
-                                holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
-                                holder.mediaPlayerVoiceNotes.stop();
-                                holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
-                                holder.contentOwnMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                                removeCallBacks();
-
-                            }else {
-                                //PAUSE -> PLAY
-                                log("playRecord:myMessage:is NOT Playing   -> upload my voice clip");
-                                //upload voice clip:
-                                MegaNodeList nodeListOwn = currentMessage.getMessage().getMegaNodeList();
-                                if(nodeListOwn.size()==1){
-                                    MegaNode node = nodeListOwn.get(0);
-                                    if (MimeTypeList.typeForName(node.getName()).isAudio()){
-                                        log("isAudio");
-                                        try {
-                                            String voiceNotesLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
-                                            String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
-                                            File f = new File(voiceNotesLocationDefaultPath, node.getName());
-                                            boolean isOnMegaVoiceNotes = false;
-                                            if(f.exists() && (f.length() == node.getSize())){
-                                                isOnMegaVoiceNotes = true;
-                                            }
-
-                                            if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
-                                                log("playRecord:localPath != null");
-                                                if(holder.mediaPlayerVoiceNotes!=null){
-                                                    stopCurrentPlaying();
-                                                    log("playRecord:myMessage:localPath: -> play");
-                                                    holder.mediaPlayerVoiceNotes.reset();
-                                                    holder.mediaPlayerVoiceNotes.setDataSource(localPath);
-                                                    holder.mediaPlayerVoiceNotes.setLooping(false);
-                                                    holder.mediaPlayerVoiceNotes.prepare();
-                                                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                                    holder.mediaPlayerVoiceNotes.start();
-                                                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                                                    updateOwnSeekBar(holder);
-                                                }
-                                            }else{
-                                                log("playRecord:localPath == null");
-                                                if (Util.isOnline(context)){
-                                                    if (megaApi.httpServerIsRunning() == 0) {
-                                                        log("megaApi.httpServerIsRunning() == 0");
-                                                        megaApi.httpServerStart();
-                                                    }else{
-                                                        log("ERROR:httpServerAlreadyRunning");
-                                                    }
-
-                                                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                                    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                                                    activityManager.getMemoryInfo(mi);
-
-                                                    if(mi.totalMem>Constants.BUFFER_COMP){
-                                                        log("total mem: "+mi.totalMem+" allocate 32 MB");
-                                                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                                                    }else{
-                                                        log("total mem: "+mi.totalMem+" allocate 16 MB");
-                                                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                                                    }
-
-                                                    String url = megaApi.httpServerGetLocalLink(node);
-                                                    if(url!=null){
-                                                        Uri parsedUri = Uri.parse(url);
-                                                        if(parsedUri!=null){
-                                                            String VoiceClipPath = parsedUri.toString();
-                                                            if(holder.mediaPlayerVoiceNotes!=null){
-                                                                stopCurrentPlaying();
-                                                                log("playRecord:myMessage:uri -> play");
-                                                                holder.mediaPlayerVoiceNotes.reset();
-                                                                holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
-                                                                holder.mediaPlayerVoiceNotes.setLooping(false);
-                                                                holder.mediaPlayerVoiceNotes.prepare();
-                                                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                                                holder.mediaPlayerVoiceNotes.start();
-                                                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                                                                updateOwnSeekBar(holder);
-                                                            }
-                                                        }else{
-                                                            log("ERROR:httpServerGetLocalLink");
-                                                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                                                        }
-                                                    }else{
-                                                        log("ERROR:httpServerGetLocalLink");
-                                                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                                                    }
-                                                }else{
-                                                    log("ERROR:isOnline");
-                                                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                                                }
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }else{
-                    log("playRecord: CONTACT message");
-
-                    if(holder == null){
-                        holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
-                    }
-                    if(holder!=null) {
-                        if(holder.mediaPlayerVoiceNotes!=null){
-
-                            if(holder.mediaPlayerVoiceNotes.isPlaying()) {
-                                //PLAY -> PAUSE
-                                log("playRecord:contactMessage:isPlaying -> pause");
-                                holder.mediaPlayerVoiceNotes.pause();
-                                holder.lastProgress = holder.mediaPlayerVoiceNotes.getCurrentPosition();
-                                holder.mediaPlayerVoiceNotes.stop();
-                                holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.lastProgress));
-                                holder.contentContactMessageVoiceClipSeekBar.setProgress(holder.lastProgress);
-                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
-                                removeCallBacks();
-                            }else {
-                                //PAUSE -> PLAY
-                                log("playRecord:contactMessage:is NOT Playing   -> upload my voice clip");
-                                MegaNodeList nodeListContact = currentMessage.getMessage().getMegaNodeList();
-                                if(nodeListContact.size()==1){
-                                    MegaNode node = nodeListContact.get(0);
-                                    if (MimeTypeList.typeForName(node.getName()).isAudio()){
-                                        log("isAudio. node.getName : "+node.getName());
-                                        try {
-                                            String voiceNotesLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
-                                            log("voiceNotesLocationDefaultPath: "+voiceNotesLocationDefaultPath);
-                                            String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
-                                            File f = new File(voiceNotesLocationDefaultPath, node.getName());
-                                            boolean isOnMegaVoiceNotes = false;
-                                            if(f.exists() && (f.length() == node.getSize())){
-                                                isOnMegaVoiceNotes = true;
-                                            }
-                                            if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
-                                                log("playRecord:localPath !=null ");
-                                                if(holder.mediaPlayerVoiceNotes!=null){
-                                                    stopCurrentPlaying();
-                                                    log("playRecord:contactMessage:localPath -> start");
-                                                    holder.mediaPlayerVoiceNotes.reset();
-                                                    holder.mediaPlayerVoiceNotes.setDataSource(localPath);
-                                                    holder.mediaPlayerVoiceNotes.setLooping(false);
-                                                    holder.mediaPlayerVoiceNotes.prepare();
-                                                    holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                                    holder.mediaPlayerVoiceNotes.start();
-                                                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                                                    updateContactSeekBar(holder);
-                                                }
-                                            }else{
-                                                log("playRecord:localPath == null");
-                                                if (Util.isOnline(context)){
-                                                    if (megaApi.httpServerIsRunning() == 0) {
-                                                        log("megaApi.httpServerIsRunning() == 0");
-                                                        megaApi.httpServerStart();
-                                                    }else{
-                                                        log("ERROR:httpServerAlreadyRunning");
-                                                    }
-
-                                                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                                    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                                                    activityManager.getMemoryInfo(mi);
-
-                                                    if(mi.totalMem>Constants.BUFFER_COMP){
-                                                        log("total mem: "+mi.totalMem+" allocate 32 MB");
-                                                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                                                    }else{
-                                                        log("total mem: "+mi.totalMem+" allocate 16 MB");
-                                                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                                                    }
-
-                                                    String url = megaApi.httpServerGetLocalLink(node);
-                                                    if(url!=null){
-                                                        Uri parsedUri = Uri.parse(url);
-                                                        if(parsedUri!=null){
-                                                            String VoiceClipPath = parsedUri.toString();
-                                                            if(holder.mediaPlayerVoiceNotes!=null){
-                                                                stopCurrentPlaying();
-                                                                log("playRecord:contactMessage:uri -> play");
-                                                                holder.mediaPlayerVoiceNotes.reset();
-                                                                holder.mediaPlayerVoiceNotes.setDataSource(VoiceClipPath);
-                                                                holder.mediaPlayerVoiceNotes.setLooping(false);
-                                                                holder.mediaPlayerVoiceNotes.prepare();
-                                                                holder.mediaPlayerVoiceNotes.seekTo(holder.lastProgress);
-                                                                holder.mediaPlayerVoiceNotes.start();
-                                                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
-                                                                updateContactSeekBar(holder);
-                                                            }
-                                                        }else{
-                                                            log("ERROR:httpServerGetLocalLink");
-                                                            ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                                                        }
-                                                    }else{
-                                                        log("ERROR:httpServerGetLocalLink");
-                                                        ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                                                    }
-                                                }else{
-                                                    log("ERROR:isOnline");
-                                                    ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                                                }
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            }
+                boolean isMyMessage = false;
+                if (currentMessage.getMessage().getUserHandle() == myUserHandle){
+                    isMyMessage = true;
+                }
+                if(holder == null){
+                    holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
+                }
+                if(holder!=null) {
+                    if(holder.mediaPlayerVoiceNotes!=null){
+                        if(holder.mediaPlayerVoiceNotes.isPlaying()) {
+                            //PLAY -> PAUSE
+                            log("playRecord:myMessage:isPlaying -> pause");
+                            pausePlayRecord(holder, isMyMessage, false, null);
+                        }else {
+                            //PAUSE -> PLAY
+                            log("playRecord:myMessage:is NOT Playing   -> upload my voice clip");
+                            checkIfIsUpload(isMyMessage, currentMessage);
                         }
                     }
                 }

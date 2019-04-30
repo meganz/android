@@ -352,7 +352,7 @@ public class RecordView extends RelativeLayout {
 
         long time = System.currentTimeMillis() - startTime;
         if (!isSwiped) {
-            UserBehaviour direction = UserBehaviour.NONE;
+            UserBehaviour direction;
             float motionX = Math.abs(firstX - motionEvent.getRawX());
             float motionY = Math.abs(firstY - motionEvent.getRawY());
 
@@ -405,7 +405,6 @@ public class RecordView extends RelativeLayout {
                         showLock(false);
                     }
                 }
-
                 recordBtnLayout.setTranslationX(-(firstX - motionEvent.getRawX()));
                 recordBtnLayout.setTranslationY(0);
 

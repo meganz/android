@@ -339,9 +339,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	void initUpload (ArrayList<PendingMessageSingle> pendingMsgs) {
 
 		PendingMessageSingle pendingMsg = pendingMsgs.get(0);
-
-		log("Chat file uploading: "+pendingMsg.getFilePath());
-
 		File file = new File(pendingMsg.getFilePath());
 
 		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -440,6 +437,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 		else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
+			log("DATA connection is Mp4Video");
+
 			try {
 				totalVideos++;
 				numberVideosPending++;
@@ -508,6 +507,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 		else{
+			log("DATA connection is OTHER");
+
 			for (PendingMessageSingle pendMsg : pendingMsgs) {
 				pendingMessages.add(pendMsg);
 			}
@@ -1132,6 +1133,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	public void attach (PendingMessageSingle pendMsg, MegaTransfer transfer) {
 		if (megaChatApi != null) {
+			log("attach");
+
 			requestSent++;
 			pendMsg.setNodeHandle(transfer.getNodeHandle());
 			pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
@@ -1166,17 +1169,18 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		int id = Integer.parseInt(idFound);
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
+		if(pendingMessages!=null && pendingMessages.size()>0){
+			for(int i=0; i<pendingMessages.size();i++) {
+				PendingMessageSingle pendMsg = pendingMessages.get(i);
+				if (pendMsg.getId() == id) {
+					if (megaChatApi != null) {
+						requestSent++;
+						pendMsg.setNodeHandle(transfer.getNodeHandle());
+						pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
+						log("attachVoiceClips() - attachVoiceMessage");
+						megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
-		for(int i=0; i<pendingMessages.size();i++) {
-			PendingMessageSingle pendMsg = pendingMessages.get(i);
-			if (pendMsg.getId() == id) {
-				if (megaChatApi != null) {
-					requestSent++;
-					pendMsg.setNodeHandle(transfer.getNodeHandle());
-					pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
-					log("attachVoiceClips() - attachVoiceMessage");
-					megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
-
+					}
 				}
 			}
 		}
@@ -1237,6 +1241,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			log("onTransferUpdate -  TYPE_UPLOAD");
 
 			String appData = transfer.getAppData();
 
