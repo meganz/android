@@ -198,6 +198,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             }
         }
 
+        if (isAllowingAccessShown) {
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+        }
+
         if (numItems == 1){
             itemsLayout.setVisibility(View.GONE);
         }
