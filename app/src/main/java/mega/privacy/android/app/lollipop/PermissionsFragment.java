@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -65,6 +66,15 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (!Util.isTablet(getActivity())) {
+            log("allow all screens after this permission fragment");
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        }
     }
 
     @Override
@@ -352,6 +362,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        if (!Util.isTablet(getActivity())) {
+            log("only allow portrait when the device is mobile");
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     }
 
     private static void log(String log) {
