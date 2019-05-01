@@ -8,6 +8,7 @@ import android.view.View;
 
 import java.io.File;
 
+import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -63,6 +64,8 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
                             } else if (holder instanceof LastContactsAdapter.ViewHolder) {
                                 ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
+                            } else if(holder instanceof ContactsHorizontalAdapter.ContactViewHolder) {
+                                ((ContactsHorizontalAdapter.ContactViewHolder)holder).avatar.setImageBitmap(bitmap);
                             }
                             holder.contactInitialLetter.setVisibility(View.GONE);
                         }
