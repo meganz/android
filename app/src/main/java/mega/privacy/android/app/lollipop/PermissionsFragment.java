@@ -206,7 +206,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             itemsLayout.setVisibility(View.GONE);
         }
         else {
-            itemsText.setText(getString(R.string.wizard_steps_indicator, 1, numItems));
+            itemsText.setText(getString(R.string.wizard_steps_indicator, currentPermission + 1, numItems));
         }
     }
 
