@@ -19,6 +19,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -50,7 +51,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
-import mega.privacy.android.app.components.HorizontalRecyclerView;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
@@ -63,15 +63,11 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
@@ -111,7 +107,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     private Button dismissBtn;
     private Button allowBtn;
     private RelativeLayout contactsListLayout;
-    private HorizontalRecyclerView contactsList;
+    private RecyclerView contactsList;
     private ImageView moreContacts;
 
     private static boolean isExpand;
@@ -324,6 +320,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         invitationContainer = v.findViewById(R.id.contacts_list_container);
         contactsListLayout = v.findViewById(R.id.contacts_list_layout);
         contactsList = v.findViewById(R.id.contacts_list);
+        contactsList.setLayoutManager(new GridLayoutManager(getContext(),4,GridLayoutManager.VERTICAL,false));
         contactsList.setAdapter(new ContactsHorizontalAdapter((Activity)context, getMegaContacts()));
         moreContacts = v.findViewById(R.id.more_contacts);
         moreContacts.setOnClickListener(this);

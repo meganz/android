@@ -94,7 +94,7 @@
                     android:id="@+id/contacts_list_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <mega.privacy.android.app.components.HorizontalRecyclerView
+                    <android.support.v7.widget.RecyclerView
                         android:id="@+id/contacts_list"
                         android:layout_width="match_parent"
                         android:layout_marginLeft="16dp"
