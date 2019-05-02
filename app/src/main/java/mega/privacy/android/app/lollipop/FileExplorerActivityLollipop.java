@@ -432,6 +432,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				log("intent==null");
 			}*/	
 			startActivity(loginIntent);
+			finish();
 			return;
 		}
 		else{
@@ -2607,7 +2608,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void setToolbarSubtitle(String s) {
-		aB.setSubtitle(s);
+	    if(aB != null) {
+            aB.setSubtitle(s);
+        }
 	}
 	
 	@Override
