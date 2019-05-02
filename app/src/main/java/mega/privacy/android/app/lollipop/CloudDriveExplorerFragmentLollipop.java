@@ -49,6 +49,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	Context context;
 	MegaApiAndroid megaApi;
 	ArrayList<MegaNode> nodes;
+	ArrayList<MegaNode> searchNodes = null;
 
 	public long parentHandle = -1;
 	
@@ -273,28 +274,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			parentHandle = -1;
 		}
-		else{
-			if (parentHandle == -1)
-			{
-				//QA Report #6608 - do not remember last folder
-				//Find in the database the last parentHandle
-//				if (dbH == null){
-//					dbH = DatabaseHandler.getDbHandler(context);
-//				}
-//				if (dbH != null){
-//					prefs = dbH.getPreferences();
-//					if (prefs != null) {
-//
-//						String lastFolder = prefs.getLastFolderCloud();
-//						if(lastFolder != null) {
-//							if (lastFolder.compareTo("") != 0){
-//								parentHandle = Long.parseLong(lastFolder);
-//							}
-//						}
-//					}
-//				}
-				parentHandle = megaApi.getRootNode().getHandle();
-			}
+		else if (parentHandle == -1) {
+			parentHandle = megaApi.getRootNode().getHandle();
 		}
 
 		MegaPreferences prefs = Util.getPreferences(context);
@@ -442,6 +423,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		listView.setAdapter(adapter);
 
 		//If folder has no files
+		showEmptyScreen();
+
+		return v;
+	}
+
+	private void showEmptyScreen() {
+		if (adapter == null) {
+			return;
+		}
 		if (adapter.getItemCount() == 0){
 			listView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
@@ -499,25 +489,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-
-
-
 		}
-
-		return v;
 	}
-	
-//	public void setMode(int mode){
-//		log("setMode: "+mode);
-//		modeCloud=mode;
-//		log("setMode: "+modeCloud);
-//	}	
 
-
-//	public void setBackVisibility(boolean backVisibility){
-//		((LauncherFileExplorerActivity) context).setBackVisibility(backVisibility);
-//	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -613,12 +587,22 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
     public void itemClick(View view, int position) {
 		log("itemClick");
 
-		if (nodes.get(position).isFolder()){
+		ArrayList<MegaNode> clickNodes;
+
+		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
+			clickNodes = searchNodes;
+			((FileExplorerActivityLollipop) context).collapseSearchView();
+		}
+		else {
+			clickNodes = nodes;
+		}
+
+		if (clickNodes.get(position).isFolder()){
 			if(selectFile && ((FileExplorerActivityLollipop)context).multiselect && adapter.isMultipleSelect()){
 					hideMultipleSelect();
 			}
 
-			MegaNode n = nodes.get(position);
+			MegaNode n = clickNodes.get(position);
 
 			int lastFirstVisiblePosition = 0;
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
@@ -663,12 +647,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 			
-			parentHandle = nodes.get(position).getHandle();
+			parentHandle = clickNodes.get(position).getHandle();
 
 			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
 			adapter.setParentHandle(parentHandle);
-			nodes = megaApi.getChildren(nodes.get(position), order);
+			nodes = megaApi.getChildren(clickNodes.get(position), order);
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
 
@@ -778,10 +762,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				else{
 					//Send file
-					MegaNode n = nodes.get(position);
+					MegaNode n = clickNodes.get(position);
 					log("Selected node to send: "+n.getName());
-					if(nodes.get(position).isFile()){
-						MegaNode nFile = nodes.get(position);
+					if(clickNodes.get(position).isFile()){
+						MegaNode nFile = clickNodes.get(position);
 						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
 					}
 				}
@@ -1118,5 +1102,32 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			return true;
 		}
 		return false;
+	}
+
+	public void search (String s) {
+		if (megaApi == null || s == null) {
+			return;
+		}
+		if (getParentHandle() == -1) {
+			setParentHandle(megaApi.getRootNode().getHandle());
+		}
+		MegaNode parent = megaApi.getNodeByHandle(getParentHandle());
+		if (parent == null) {
+			return;
+		}
+		searchNodes = megaApi.search(parent, s, false, order);
+		if (searchNodes != null && adapter != null) {
+			adapter.setNodes(searchNodes);
+		}
+		showEmptyScreen();
+	}
+
+	public void closeSearch() {
+		searchNodes = null;
+		if (adapter == null) {
+			return;
+		}
+		adapter.setNodes(nodes);
+		showEmptyScreen();
 	}
 }

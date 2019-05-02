@@ -53,6 +53,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	Context context;
 	MegaApiAndroid megaApi;
 	ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+	ArrayList<MegaNode> searchNodes = null;
+
 	long parentHandle = -1;
 	
 	MegaExplorerLollipopAdapter adapter;
@@ -78,8 +80,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	Handler handler;
 	public ActionMode actionMode;
 
-	int orderParent;
-	int order;
+	int orderParent = megaApi.ORDER_DEFAULT_ASC;
+	int order = megaApi.ORDER_DEFAULT_ASC;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -257,13 +259,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		MegaPreferences prefs = Util.getPreferences(context);
 
-		if(prefs.getPreferredSortOthers()!=null){
-			orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
-			order = Integer.parseInt(prefs.getPreferredSortCloud());
-		}
-		else{
-			orderParent = megaApi.ORDER_DEFAULT_ASC;
-			order = megaApi.ORDER_DEFAULT_ASC;
+		if(prefs != null) {
+			if (prefs.getPreferredSortOthers()!=null) {
+				orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
+			}
+			if (prefs.getPreferredSortCloud() != null) {
+				order = Integer.parseInt(prefs.getPreferredSortCloud());
+			}
 		}
 
 		if (parentHandle == -1){
@@ -341,6 +343,16 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionsBar.setVisibility(View.VISIBLE);
 		}
 
+		showEmptyScreen();
+
+		return v;
+	}
+
+	private void showEmptyScreen() {
+		if (adapter == null) {
+			return;
+		}
+
 		if (adapter.getItemCount() != 0){
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -372,10 +384,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 				emptyTextViewFirst.setText(result);
 
-			}else{
-
-//				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+			}
+			else{
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
 				}else{
@@ -399,8 +409,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			}
 
 		}
-
-		return v;
 	}
 	
 	public void findNodes(){
@@ -414,18 +422,16 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		nodes.clear();
 		for (int i=0;i<contacts.size();i++){			
 			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
-			if(nodeContact!=null){
-				if(nodeContact.size()>0){
-					nodes.addAll(nodeContact);
-					if (orderParent  == MegaApiJava.ORDER_DEFAULT_DESC){
-						sortByMailDescending();
-					}
+			if(nodeContact!=null && !nodeContact.isEmpty()){
+				nodes.addAll(nodeContact);
+				if (orderParent  == MegaApiJava.ORDER_DEFAULT_DESC){
+					sortByMailDescending(nodes);
 				}
-			}			
+			}
 		}
 	}
 
-	public void sortByMailDescending(){
+	public void sortByMailDescending(ArrayList<MegaNode> nodes){
 		log("sortByNameDescending");
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
@@ -577,7 +583,17 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
     public void itemClick(View view, int position) {
 		log("------------------itemClick: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		if (nodes.get(position).isFolder()){
+		ArrayList<MegaNode> clickNodes;
+
+		if (((FileExplorerActivityLollipop) context).isSearchExpanded() && searchNodes != null) {
+			clickNodes = searchNodes;
+			((FileExplorerActivityLollipop) context).collapseSearchView();
+		}
+		else {
+			clickNodes = nodes;
+		}
+
+		if (clickNodes.get(position).isFolder()){
 			if(selectFile && ((FileExplorerActivityLollipop)context).multiselect && adapter.isMultipleSelect()){
 				hideMultipleSelect();
 			}
@@ -598,7 +614,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
-			parentHandle = nodes.get(position).getHandle();
+			parentHandle = clickNodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position), order);
 			adapter.setNodes(nodes);
@@ -685,10 +701,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 				else{
 					//Seleccionar el fichero para enviar...
-					MegaNode n = nodes.get(position);
+					MegaNode n = clickNodes.get(position);
 					log("Selected node to send: "+n.getName());
-					if(nodes.get(position).isFile()){
-						MegaNode nFile = nodes.get(position);
+					if(clickNodes.get(position).isFile()){
+						MegaNode nFile = clickNodes.get(position);
 
 						MegaNode parentFile = megaApi.getParentNode(nFile);
 						if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
@@ -1075,5 +1091,41 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			return true;
 		}
 		return false;
+	}
+
+	public void search (String s) {
+		if (megaApi == null || s == null) {
+			return;
+		}
+		log("search getparentHandle: "+getParentHandle());
+		if (getParentHandle() == -1) {
+			searchNodes = new ArrayList<>();
+			for (MegaNode node : nodes) {
+				if (node.getName().toLowerCase().contains(s.toLowerCase())){
+					searchNodes.add(node);
+				}
+			}
+		}
+		else {
+			MegaNode parent = megaApi.getNodeByHandle(getParentHandle());
+			if (parent == null) {
+				return;
+			}
+			searchNodes = megaApi.search(parent, s, false, order);
+		}
+		if (searchNodes != null && adapter != null) {
+			adapter.setNodes(searchNodes);
+		}
+
+		showEmptyScreen();
+	}
+
+	public void closeSearch() {
+		searchNodes = null;
+		if (adapter == null) {
+			return;
+		}
+		adapter.setNodes(nodes);
+		showEmptyScreen();
 	}
 }
