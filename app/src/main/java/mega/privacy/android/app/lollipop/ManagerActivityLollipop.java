@@ -250,7 +250,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public int accountFragment;
 
-	public long handleInviteContact = 0;
+	private long handleInviteContact = -1;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -2418,10 +2418,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						log("Login loin");
-						handleInviteContact = getIntent().getLongExtra("handle", 0);
-
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("handle", handleInviteContact);
+						intent.putExtra("contactHandle", getIntent().getLongExtra("contactHandle", -1));
 						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
@@ -2799,7 +2797,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						markNotificationsSeen(true);
-						openContactLink(getIntent().getLongExtra("handle", 0));
+						openContactLink(getIntent().getLongExtra("contactHandle", -1));
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
 						update2FASetting();
@@ -3015,9 +3013,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("END onCreate");
 	}
 
-	public void openContactLink (long handle) {
-    	dismissOpenLinkDialog();
+	private void openContactLink (long handle) {
+    	if (handle == -1) {
+    		log("Not valid contact handle");
+    		return;
+		}
 		handleInviteContact = handle;
+    	dismissOpenLinkDialog();
 		log("openContactLink Handle to invite a contact: "+handle);
 		drawerItem = DrawerItem.CONTACTS;
 		indexContacts = 0;
@@ -3542,7 +3544,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
 					markNotificationsSeen(true);
-					openContactLink(getIntent().getLongExtra("handle", 0));
+					openContactLink(getIntent().getLongExtra("contactHandle", -1));
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
@@ -5193,6 +5195,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		});
 
+		supportInvalidateOptionsMenu();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -6969,11 +6972,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectMenuItem.setVisible(false);
 						sortByMenuItem.setVisible(false);
 					}
-					if (handleInviteContact != 0) {
-						if (cFLol != null) {
-							cFLol.invite(handleInviteContact);
-						}
-						handleInviteContact = 0;
+
+					if (handleInviteContact != -1 && cFLol != null) {
+						cFLol.invite(handleInviteContact);
 					}
 
 					//Hide
@@ -10903,7 +10904,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	void showOpenLinkError(boolean show, int error) {
+	private void showOpenLinkError(boolean show, int error) {
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
@@ -10944,13 +10945,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	void dismissOpenLinkDialog() {
+	private void dismissOpenLinkDialog() {
 		try {
 			openLinkDialog.dismiss();
 		} catch (Exception e) {}
 	}
 
-	void openLink (String link) {
+	private void openLink (String link) {
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 			int error = nC.importLink(link);
 			if (openLinkError.getVisibility() == View.VISIBLE) {
@@ -10975,28 +10976,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
             else {
                 switch (error) {
-                    case Constants.FILE_LINK: {
-                        log("Do nothing: correct file link");
-                        dismissOpenLinkDialog();
-                        break;
-                    }
+                    case Constants.FILE_LINK:
                     case Constants.FOLDER_LINK: {
-                        log("Do nothing: correct folder link");
+                        log("Do nothing: correct file or folder link");
                         dismissOpenLinkDialog();
                         break;
                     }
-                    case Constants.CHAT_LINK: {
-                        log("Show error: correct chat link");
-                        showOpenLinkError(true, error);
-                        break;
-                    }
-                    case Constants.CONTACT_LINK: {
-                        log("Show error: correct contact link");
-                        showOpenLinkError(true, error);
-                        break;
-                    }
+                    case Constants.CHAT_LINK:
+                    case Constants.CONTACT_LINK:
                     case Constants.ERROR_LINK: {
-                        log("Show error: invalid link");
+                        log("Show error: invalid link or correct chat or contact link");
                         showOpenLinkError(true, error);
                         break;
                     }
@@ -11008,7 +10997,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void showOpenLinkDialog() {
+	private void showOpenLinkDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_open_link, null);
@@ -18777,5 +18766,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
+	}
+
+	public void deleteInviteContactHandle () {
+		handleInviteContact = -1;
 	}
 }
