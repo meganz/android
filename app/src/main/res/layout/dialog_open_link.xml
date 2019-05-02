@@ -25,7 +25,8 @@
         android:textColor="@color/emoji_icons"
         android:layout_marginTop="30dp"
         android:layout_below="@+id/link_title"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:autoLink="none"/>
 
     <RelativeLayout
         android:id="@+id/link_error"

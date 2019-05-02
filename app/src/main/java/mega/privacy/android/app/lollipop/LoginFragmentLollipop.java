@@ -960,8 +960,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             else  if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 action = Constants.ACTION_OPEN_CONTACTS_SECTION;
-                                if(intentReceived.getLongExtra("handle", 0) != 0){
-                                    intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
+                                if(intentReceived.getLongExtra("contactHandle", -1) != -1){
+                                    intent.putExtra("contactHandle", intentReceived.getLongExtra("contactHandle", -1));
                                 }
                             }
 
@@ -1020,8 +1020,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                         else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            if(intentReceived.getLongExtra("handle", 0) != 0){
-                                intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
+                            if(intentReceived.getLongExtra("contactHandle", -1) != -1){
+                                intent.putExtra("contactHandle", intentReceived.getLongExtra("contactHandle", -1));
                             }
                         }
                         intent.setAction(action);
@@ -2072,7 +2072,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                     intent.setData(uriData);
                                 }
                                 else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
-                                    intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
+                                    intent.putExtra("contactHandle", intentReceived.getLongExtra("contactHandle", -1));
                                 }
                                 else if (action.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)) {
                                     if (idChatToJoin != -1) {
