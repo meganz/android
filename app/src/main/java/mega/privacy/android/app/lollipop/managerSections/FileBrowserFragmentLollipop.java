@@ -867,7 +867,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
         }
     }
 
-    @Override
     public void itemClick(int position,int[] screenPosition,ImageView imageView) {
         log("item click position: " + position);
         if (adapter.isMultipleSelect()) {
@@ -1228,6 +1227,11 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
 		}
 	}
 
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
+	}
+
 	public void setFolderInfoNavigation(MegaNode n){
 		log("setFolderInfoNavigation");
 		String cameraSyncHandle = null;
@@ -1411,8 +1415,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment implements On
             adapter.clearSelections();
         }
     }
-    
-    private void updateActionModeTitle() {
+
+    @Override
+    protected void updateActionModeTitle() {
         log("updateActionModeTitle");
         if (actionMode == null || getActivity() == null) {
             log("RETURN");

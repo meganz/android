@@ -2,9 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.widget.ImageView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -17,15 +15,15 @@ public abstract class RotatableFragment extends Fragment {
 
     public abstract void activateActionMode();
 
-    public abstract void itemClick(int position,int[] screenPosition, ImageView imageView);
+    public abstract void multipleItemClick(int position);
+
+    protected abstract void updateActionModeTitle();
 
     private static void log(String tag, String log) {
         Util.log(tag, log);
     }
 
     private ArrayList<Integer> selectedItems;
-
-    private int folderCount;
 
     private int lastPlaceHolderCount;
 
@@ -43,19 +41,20 @@ public abstract class RotatableFragment extends Fragment {
                 for (int selectedItem : selectedItems) {
                     if (((ManagerActivityLollipop)getActivity()).isList) {
                         log(className, "Do the list selection. The selectedItem is " + selectedItem);
-                        itemClick(selectedItem, null, null);
+                        multipleItemClick(selectedItem);
                     }
                     else {
                         if (selectedItem < folderCount) {
                             log(className, "Do the list folder selection. The selectedItem is " + selectedItem);
-                            itemClick((selectedItem), null, null);
+                            multipleItemClick(selectedItem);
                         } else {
                             log(className, "Do the list file selection. The selectedItem is " + selectedItem + "the lastPlaceHolderCount is " + lastPlaceHolderCount + ". The currentPlaceHolderCount is " + currentPlaceHolderCount);
-                            itemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount), null, null);
+                            multipleItemClick((selectedItem - lastPlaceHolderCount + currentPlaceHolderCount));
                         }
                     }
                 }
             }
+            updateActionModeTitle();
         }
     }
 
@@ -68,7 +67,6 @@ public abstract class RotatableFragment extends Fragment {
         outState.putInt("folderCount", currentAdapter.getFolderCount());
         outState.putInt("lastPlaceHolderCount", currentAdapter.getPlaceholderCount());
         selectedItems = null;
-        folderCount = -1;
         lastPlaceHolderCount = -1;
     }
 
@@ -77,7 +75,6 @@ public abstract class RotatableFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null ) {
             selectedItems = (ArrayList<Integer>) savedInstanceState.getSerializable("selectedItems");
-            folderCount = savedInstanceState.getInt("folderCount");
             lastPlaceHolderCount = savedInstanceState.getInt("lastPlaceHolderCount") ;
         }
     }

@@ -1390,7 +1390,15 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 			}
 		}
     }
-    
+
+	@Override
+	public void multipleItemClick(int position) {
+		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+			position -= placeholderCount;
+		}
+		adapter.toggleSelection(position);
+	}
+
     public void openFile (File currentFile){
 		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
@@ -1444,8 +1452,9 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 //			}
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		log("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;

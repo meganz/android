@@ -833,7 +833,6 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
         context = activity;
     }
 
-    @Override
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
     	log("itemClick");
 
@@ -1231,6 +1230,11 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 		}
 	}
 
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
+	}
+
 	public void findNodes(){
 		log("findNodes");
 		nodes=megaApi.getInShares();
@@ -1357,8 +1361,9 @@ public class IncomingSharesFragmentLollipop extends RotatableFragment{
 			adapter.clearSelections();
 		}
 	}
-		
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}

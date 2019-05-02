@@ -1080,7 +1080,6 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
         context = activity;
     }
 
-	@Override
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
     	if (adapter.isMultipleSelect()){
 			log("multiselect ON");
@@ -1477,7 +1476,12 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			}
 		}
 	}
-	
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
+	}
+
 	public void selectAll(){
 		if (adapter != null){
 			if(adapter.isMultipleSelect()){
@@ -1639,8 +1643,9 @@ public class OutgoingSharesFragmentLollipop extends RotatableFragment{
 			adapter.clearSelections();
 		}
 	}
-	
-	private void updateActionModeTitle() {
+
+	@Override
+	protected void updateActionModeTitle() {
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
