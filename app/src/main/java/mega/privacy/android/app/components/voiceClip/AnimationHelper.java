@@ -1,8 +1,5 @@
 package mega.privacy.android.app.components.voiceClip;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -15,12 +12,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 import static android.view.View.INVISIBLE;
@@ -40,6 +34,9 @@ public class AnimationHelper {
     private AlphaAnimation alphaAnimation1;
     private AlphaAnimation alphaAnimation2;
     private Handler handler1, handler2;
+    private static int durationAlpha = 350;
+    private static int durationTraslate = 250;
+    private static int durationBasket = 450;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
         this.context = context;
@@ -50,7 +47,7 @@ public class AnimationHelper {
 
     @SuppressLint("RestrictedApi")
     public void animateBasket(float basketInitialX) {
-        log("animateBasket()");
+        log("animateBasket");
         isBasketAnimating = true;
 
         clearAlphaAnimation(false);
@@ -65,18 +62,18 @@ public class AnimationHelper {
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
         alphaAnimation1 = new AlphaAnimation(0.2f, 1.0f);
-        alphaAnimation1.setDuration(350);
+        alphaAnimation1.setDuration(durationAlpha);
         alphaAnimation1.setFillAfter(true);
 
         alphaAnimation2 = new AlphaAnimation(1.0f, 0.0f);
-        alphaAnimation2.setDuration(350);
+        alphaAnimation2.setDuration(durationAlpha);
         alphaAnimation2.setFillAfter(true);
 
         translateAnimation1 = new TranslateAnimation(basketInitialX, basketInitialX + 90, 0, 0);
-        translateAnimation1.setDuration(250);
+        translateAnimation1.setDuration(durationTraslate);
 
-        translateAnimation2 = new TranslateAnimation(basketInitialX+90, basketInitialX, 0, 0);
-        translateAnimation2.setDuration(350);
+        translateAnimation2 = new TranslateAnimation(basketInitialX + 90, basketInitialX, 0, 0);
+        translateAnimation2.setDuration(durationAlpha);
 
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);
@@ -88,7 +85,7 @@ public class AnimationHelper {
                 basketImg.setVisibility(VISIBLE);
                 basketImg.startAnimation(translateAnimation1);
             }
-        }, 350);
+        }, durationAlpha);
 
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -107,29 +104,23 @@ public class AnimationHelper {
                     public void run() {
                         basketImg.startAnimation(translateAnimation2);
                         smallBlinkingMic.setVisibility(INVISIBLE);
-//                        basketImg.setVisibility(INVISIBLE);
                     }
-                }, 450);
+                }, durationBasket);
             }
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
         });
-//        alphaAnimation2.setAnimationListener(new Animation.AnimationListener() {
 
         translateAnimation2.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
 
             }
-
             @Override
             public void onAnimationEnd(Animation animation) {
                 basketImg.setVisibility(INVISIBLE);
                 isBasketAnimating = false;
-
-                //if the user pressed the record button while the animation is running
-                // then do NOT call on Animation end
                 if (onBasketAnimationEndListener != null && !isStartRecorded) {
                     onBasketAnimationEndListener.onAnimationEnd();
                 }
@@ -196,7 +187,7 @@ public class AnimationHelper {
     public void animateSmallMicAlpha() {
         log("animateSmallMicAlpha()");
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alphaAnimation.setDuration(500);
+        alphaAnimation.setDuration(durationBasket);
         alphaAnimation.setRepeatMode(Animation.REVERSE);
         alphaAnimation.setRepeatCount(Animation.INFINITE);
         smallBlinkingMic.startAnimation(alphaAnimation);
@@ -207,18 +198,8 @@ public class AnimationHelper {
         log("moveRecordButtonAndSlideToCancelBack()");
         final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
         positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        positionAnimator.addListener(new AnimatorListenerAdapter(){
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                log("moveRecordButtonAndSlideToCancelBack() ---- DONE");
-
-            }
-        });
-
         positionAnimator.setDuration(0);
         positionAnimator.start();
-
-        // if the move event was not called ,then the difX will still 0 and there is no need to move it back
         if (difX != 0) {
             float x = initialX - difX;
             recordBtn.animate().x(x).setDuration(0).start();

@@ -46,8 +46,7 @@ public class RecordView extends RelativeLayout {
     private ShimmerLayout slideToCancelLayout;
     private RelativeLayout cancelRecordLayout;
     private TextView textCancelRecord;
-    private ImageView arrow;
-    private float initialX,initialY, basketInitialY, difX = 0;
+    private float initialX, difX = 0;
     private float basketInitialX = 0;
 
     private float cancelBounds = DEFAULT_CANCEL_BOUNDS;
@@ -81,9 +80,7 @@ public class RecordView extends RelativeLayout {
     private float lastX, lastY;
     private float firstX, firstY;
 
-    private float directionOffset = 0;
     private UserBehaviour userBehaviour = UserBehaviour.NONE;
-
 
     public RecordView(Context context) {
         super(context);
@@ -115,14 +112,17 @@ public class RecordView extends RelativeLayout {
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        arrow = view.findViewById(R.id.arrow);
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
         slideToCancel.setText(context.getString(R.string.slide_to_cancel).toUpperCase(Locale.getDefault()));
         smallBlinkingMic = view.findViewById(R.id.glowing_mic);
+        smallBlinkingMic.setVisibility(GONE);
         counterTime = view.findViewById(R.id.chrono_voice_clip);
+        counterTime.setVisibility(GONE);
         basketImg = view.findViewById(R.id.basket_img);
         slideToCancelLayout = view.findViewById(R.id.shimmer_layout);
+        slideToCancelLayout.setVisibility(GONE);
         cancelRecordLayout = view.findViewById(R.id.rl_cancel_record);
+        cancelRecordLayout.setVisibility(GONE);
         textCancelRecord = view.findViewById(R.id.text_cancel_record);
         textCancelRecord.setText(context.getString(R.string.button_cancel).toUpperCase(Locale.getDefault()));
         layoutLock = view.findViewById(R.id.layout_lock);
@@ -139,23 +139,9 @@ public class RecordView extends RelativeLayout {
             public void onClick(View view) {
                 log("cancelRecordLayout. onClick()");
                 hideViews(false);
-                if(counterTime != null){
-                    counterTime.stop();
-                }
-                if(animationHelper!=null){
-                    animationHelper.animateBasket(basketInitialX);
-                    animationHelper.setStartRecorded(false);
-                }else{
-                    if (recordListener != null) {
-                        recordListener.onCancel();
-                    }
-                }
-
-
             }
         });
 
-        hideViews(true);
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         animationHelper = new AnimationHelper(context, basketImg, smallBlinkingMic);
     }
@@ -167,21 +153,27 @@ public class RecordView extends RelativeLayout {
     private void hideViews(boolean hideSmallMic) {
         slideToCancelLayout.setVisibility(GONE);
         cancelRecordLayout.setVisibility(GONE);
-        if(counterTime != null){
-            counterTime.stop();
-            counterTime.setVisibility(GONE);
-        }
+        startStopCounterTime(false);
+
         if (hideSmallMic){
             smallBlinkingMic.setVisibility(GONE);
+            if(animationHelper!=null){
+                animationHelper.clearAlphaAnimation(false);
+                animationHelper.onAnimationEnd();
+                animationHelper.setStartRecorded(false);
+            }
+        }else{
+            if(animationHelper!=null){
+                animationHelper.animateBasket(basketInitialX);
+                animationHelper.setStartRecorded(false);
+                return;
+            }
+        }
+        if (recordListener != null) {
+            recordListener.onCancel();
         }
     }
 
-    private void showViews() {
-        slideToCancelLayout.setVisibility(VISIBLE);
-        cancelRecordLayout.setVisibility(GONE);
-        smallBlinkingMic.setVisibility(VISIBLE);
-        counterTime.setVisibility(VISIBLE);
-    }
 
     public void showLock(boolean flag){
         if(flag){
@@ -190,31 +182,7 @@ public class RecordView extends RelativeLayout {
                 layoutLock.setVisibility(View.VISIBLE);
                 imageArrow.setVisibility(VISIBLE);
                 imageLock.setVisibility(VISIBLE);
-                int prevHeight  = layoutLock.getHeight();
-                ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, Util.px2dp(175, outMetrics));
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        layoutLock.getLayoutParams().height = (int) animation.getAnimatedValue();
-                        layoutLock.requestLayout();
-                    }
-                });
-                valueAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-
-                        if((imageArrow!=null)&& (imageLock!=null)){
-                            imageArrow.clearAnimation();
-                            imageLock.clearAnimation();
-                            imageArrow.startAnimation(animJumpFast);
-                            imageLock.startAnimation(animJump);
-                            isLockpadShown = true;
-                        }
-                    }
-                });
-                valueAnimator.setInterpolator(new DecelerateInterpolator());
-                valueAnimator.setDuration(500);
-                valueAnimator.start();
+                createAnimation(flag,Util.px2dp(175, outMetrics), 500);
             }
         }else{
             flagRB = false;
@@ -223,36 +191,47 @@ public class RecordView extends RelativeLayout {
                 if (layoutLock.getVisibility() == View.VISIBLE) {
                     layoutLock.setVisibility(View.GONE);
                     isLockpadShown = false;
-                    int prevHeight = layoutLock.getHeight();
-                    ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, 10);
-                    valueAnimator.setInterpolator(new DecelerateInterpolator());
-                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            layoutLock.getLayoutParams().height = (int) animation.getAnimatedValue();
-                            layoutLock.requestLayout();
-                        }
-                    });
-                    valueAnimator.addListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            if ((imageArrow != null) && (imageLock != null)) {
-                                imageArrow.clearAnimation();
-                                imageLock.clearAnimation();
-                                imageArrow.startAnimation(animJumpFast);
-                                imageLock.startAnimation(animJump);
-                            }
-                            imageArrow.setVisibility(GONE);
-                            imageLock.setVisibility(GONE);
-                            layoutLock.setVisibility(View.GONE);
-                        }
-                    });
-                    valueAnimator.setInterpolator(new DecelerateInterpolator());
-                    valueAnimator.setDuration(100);
-                    valueAnimator.start();
+                    createAnimation(flag, 10, 100);
                 }
             }
         }
+    }
+
+    private void createAnimation(final boolean showPL, int value, int duration){
+        int prevHeight  = layoutLock.getHeight();
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, value);
+        if(!showPL){
+            valueAnimator.setInterpolator(new DecelerateInterpolator());
+        }
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                layoutLock.getLayoutParams().height = (int) animation.getAnimatedValue();
+                layoutLock.requestLayout();
+            }
+        });
+        valueAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+                if((imageArrow!=null)&& (imageLock!=null)){
+                    imageArrow.clearAnimation();
+                    imageLock.clearAnimation();
+                    imageArrow.startAnimation(animJumpFast);
+                    imageLock.startAnimation(animJump);
+                    if(showPL) {
+                        isLockpadShown = true;
+                    }else{
+                        imageArrow.setVisibility(GONE);
+                        imageLock.setVisibility(GONE);
+                        layoutLock.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.setDuration(duration);
+        valueAnimator.start();
     }
 
     private boolean isLessThanOneSecond(long time) {
@@ -301,8 +280,7 @@ public class RecordView extends RelativeLayout {
         @Override
         public void run() {
             if(flagRB){
-                counterTime.setBase(SystemClock.elapsedRealtime());
-                counterTime.start();
+                startStopCounterTime(true);
                 handlerShowPadLock.postDelayed(runPadLock, 3000);
                 if (recordListener != null) {
                     recordListener.onStart();
@@ -327,25 +305,24 @@ public class RecordView extends RelativeLayout {
         animationHelper.resetSmallMic();
         slideToCancelLayout.startShimmerAnimation();
         initialX = recordBtnLayout.getX();
-        initialY = recordBtnLayout.getY();
         firstX = motionEvent.getRawX();
         firstY = motionEvent.getRawY();
         lastX = motionEvent.getRawX();
         lastY = motionEvent.getRawY();
         playSound(RECORD_START);
-
         userBehaviour = UserBehaviour.NONE;
-
-        basketInitialY = basketImg.getY() + 90;
         basketInitialX = basketImg.getX() - 90;
 
-        showViews();
+        slideToCancelLayout.setVisibility(VISIBLE);
+        cancelRecordLayout.setVisibility(GONE);
+        smallBlinkingMic.setVisibility(VISIBLE);
         startTime = System.currentTimeMillis();
         isSwiped = false;
         animationHelper.animateSmallMicAlpha();
         handlerStartRecord.postDelayed(runStartRecord, 500); //500 milliseconds delay to record
         flagRB = true;
     }
+
 
     protected void onActionMove(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
         log("onActionMove()");
@@ -364,37 +341,13 @@ public class RecordView extends RelativeLayout {
                 direction = UserBehaviour.NONE;
             }
 
-
             if ((direction == UserBehaviour.CANCELING) && ((userBehaviour!= UserBehaviour.CANCELING) || (motionEvent.getRawY() + recordBtnLayout.getWidth() / 2 > firstY)) && (isRecordingNow) ){
-
                 if (recordBtnLayout.getX() <= (counterTime.getRight() + cancelBounds)){
-                    if (isLessThanOneSecond(time)) {
-                        log("onActionMove() CANCELING-> isLessThanOneSecond");
-                        hideViews(true);
-                        animationHelper.clearAlphaAnimation(false);
-                        animationHelper.onAnimationEnd();
-                        if (recordListener != null) {
-                            recordListener.onCancel();
-                            animationHelper.moveRecordButtonToCancelBack(recordBtnLayout, initialX, difX);
-                            counterTime.stop();
-                            slideToCancelLayout.stopShimmerAnimation();
-                            isSwiped = true;
-                            animationHelper.setStartRecorded(false);
-                            userBehaviour = UserBehaviour.CANCELING;
-                        }
-                    } else {
-                        log("onActionMove() CANCELING more than one second ");
-                        hideViews(false);
-                        animationHelper.animateBasket(basketInitialX);
-                        if (recordListener != null) {
-                            animationHelper.moveRecordButtonToCancelBack(recordBtnLayout, initialX, difX);
-                            counterTime.stop();
-                            slideToCancelLayout.stopShimmerAnimation();
-                            isSwiped = true;
-                            animationHelper.setStartRecorded(false);
-                            userBehaviour = UserBehaviour.CANCELING;
-                        }
-                    }
+                    hideViews(isLessThanOneSecond(time));
+                    animationHelper.moveRecordButtonToCancelBack(recordBtnLayout, initialX, difX);
+                    slideToCancelLayout.stopShimmerAnimation();
+                    isSwiped = true;
+                    userBehaviour = UserBehaviour.CANCELING;
                     return;
                 }
 
@@ -410,7 +363,7 @@ public class RecordView extends RelativeLayout {
 
             } else if((direction == UserBehaviour.LOCKING) && ((userBehaviour != UserBehaviour.CANCELING) || (motionEvent.getRawX() + recordBtnLayout.getWidth() / 2 > firstX)) && ((layoutLock.getVisibility() == VISIBLE) && (isLockpadShown))) {
                 if(((firstY - motionEvent.getRawY()) >= (layoutLock.getHeight()- recordBtnLayout.getHeight())) && (recordListener != null)){
-                    log("onActionMove() LOCKING");
+                    log("LOCKING");
                     recordListener.onLock();
                     recordBtnLayout.setTranslationY(0);
                     recordBtnLayout.setTranslationX(0);
@@ -460,6 +413,7 @@ public class RecordView extends RelativeLayout {
                 animationHelper.clearAlphaAnimation(false);
                 animationHelper.onAnimationEnd();
                 animationHelper.setStartRecorded(false);
+
             }
             playSound(RECORD_ERROR);
 
@@ -468,17 +422,32 @@ public class RecordView extends RelativeLayout {
             if (recordListener != null && !isSwiped) {
                 recordListener.onFinish(elapsedTime);
             }
-            animationHelper.setStartRecorded(false);
             if (!isSwiped) {
                 playSound(RECORD_FINISHED);
             }
-            hideViews(!isSwiped);
             if (!isSwiped) {
                 animationHelper.clearAlphaAnimation(true);
+                animationHelper.setStartRecorded(false);
             }
             showLock(false);
-            counterTime.stop();
+            startStopCounterTime(false);
         }
+    }
+
+    private void startStopCounterTime(boolean start){
+        if(counterTime!=null){
+            if(start){
+                if(counterTime.getVisibility() == GONE){
+                    counterTime.setVisibility(VISIBLE);
+                    counterTime.setBase(SystemClock.elapsedRealtime());
+                    counterTime.start();
+                }
+            }else{
+                counterTime.stop();
+                counterTime.setVisibility(GONE);
+            }
+        }
+
     }
 
     public void setOnRecordListener(OnRecordListener recrodListener) {
@@ -497,9 +466,7 @@ public class RecordView extends RelativeLayout {
         RECORD_FINISHED = finishedSound;
         RECORD_ERROR = errorSound;
     }
-    public float getCancelBounds() {
-        return cancelBounds;
-    }
+
     public void setCancelBounds(float cancelBounds) {
         setCancelBounds(cancelBounds, true);
     }

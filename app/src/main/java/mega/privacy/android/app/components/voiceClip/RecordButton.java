@@ -2,9 +2,6 @@ package mega.privacy.android.app.components.voiceClip;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -18,44 +15,43 @@ import mega.privacy.android.app.utils.Util;
 
 public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
     private RecordView recordView;
-//    private RelativeLayout recordButtonLayout;
     private OnRecordClickListener onRecordClickListener;
 
-    public void setRecordView(RecordView recordView) {
-        this.recordView = recordView;
-    }
-
-//    public void setRecordButtonLayout(RelativeLayout recordButtonLayout) {
-//        this.recordButtonLayout = recordButtonLayout;
-//    }
     public RecordButton(Context context) {
         super(context);
         init(context, null);
     }
+
     public RecordButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
+
     public RecordButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
     }
+
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
             typedArray.recycle();
         }
     }
+
+    public void setRecordView(RecordView recordView) {
+        this.recordView = recordView;
+    }
+
     public void activateOnClickListener(boolean flag){
-        log("activateOnClickListener -> "+flag);
         if(flag){
             this.setOnClickListener(this);
         }else{
             this.setOnClickListener(null);
         }
     }
+
     public void activateOnTouchListener(boolean flag){
-        log("activateOnTouchListener -> "+flag);
         if(flag){
             this.setOnTouchListener(this);
         }else{
@@ -111,7 +107,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     @Override
     public void onClick(View v) {
         if (onRecordClickListener != null){
-            log("onClick()");
             onRecordClickListener.onClick(v);
         }
     }
