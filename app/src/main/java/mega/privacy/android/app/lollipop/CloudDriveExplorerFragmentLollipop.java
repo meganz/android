@@ -1077,7 +1077,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		adapter.clearSelectedItems();
+		adapter.clearSelections();
 		if (actionMode != null) {
 			actionMode.finish();
 		}

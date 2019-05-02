@@ -524,6 +524,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	}
 
 	private boolean isItemChecked(int position) {
+	    if (selectedItems == null) {
+	        return false;
+        }
 		return selectedItems.get(position);
 	}
 

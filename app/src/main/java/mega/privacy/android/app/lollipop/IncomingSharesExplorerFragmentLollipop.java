@@ -257,22 +257,19 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		MegaPreferences prefs = Util.getPreferences(context);
 
+		if(prefs.getPreferredSortOthers()!=null){
+			orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
+			order = Integer.parseInt(prefs.getPreferredSortCloud());
+		}
+		else{
+			orderParent = megaApi.ORDER_DEFAULT_ASC;
+			order = megaApi.ORDER_DEFAULT_ASC;
+		}
+
 		if (parentHandle == -1){
-			if(prefs.getPreferredSortOthers()!=null){
-				orderParent = Integer.parseInt(prefs.getPreferredSortOthers());
-			}
-			else{
-				orderParent = megaApi.ORDER_DEFAULT_ASC;
-			}
 			findNodes();
 		}
 		else{
-			if(prefs.getPreferredSortCloud()!=null){
-				order = Integer.parseInt(prefs.getPreferredSortCloud());
-			}
-			else{
-				order = megaApi.ORDER_DEFAULT_ASC;
-			}
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode, order);
 		}
@@ -1039,7 +1036,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		adapter.clearSelectedItems();
+		adapter.clearSelections();
 		if (actionMode != null) {
 			actionMode.finish();
 		}

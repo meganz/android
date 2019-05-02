@@ -763,10 +763,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						}
 						iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 1));
 						cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
-						if (position == 0 && iSharesExplorer != null) {
+						if (iSharesExplorer != null && position == 0) {
 							iSharesExplorer.hideMultipleSelect();
 						}
-						else if (position == 1 && cDriveExplorer != null) {
+
+						if (cDriveExplorer != null && position == 1) {
 							cDriveExplorer.hideMultipleSelect();
 						}
 					}
