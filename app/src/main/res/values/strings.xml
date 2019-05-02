@@ -1429,7 +1429,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">View files</string>
-    <string name="add_to_cloud" context="Menu option">Add to Cloud Drive</string>
+    <string name="add_to_cloud" context="Menu option">Import</string>
     <string name="save_for_offline" context="Menu option">Save for offline</string>
 
     <string name="general_view_contacts" context="Menu option">View contacts</string>
@@ -1986,7 +1986,7 @@
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid message format</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid message signature</string>
 
-    <string name="add_to_cloud_import" context="Menu option">Add to Cloud Drive</string>
+    <string name="add_to_cloud_import" context="Menu option">Import</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error occurred trying to create the stream</string>
 
