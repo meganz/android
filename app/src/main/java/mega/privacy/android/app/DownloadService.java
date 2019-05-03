@@ -83,6 +83,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
+	public static String EXTRA_SHOW_NOTIFICATION = "SHOW_NOTIFICATION";
 
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -94,7 +95,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean canceled;
 
 	private String pathFileToOpen;
-
+	private boolean showNotification = true;
 	private boolean openFile = true;
 
 	private boolean isOverquota = false;
@@ -222,13 +223,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+        showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, true);
+
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
 
         boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
-
         boolean fromMV = intent.getBooleanExtra("fromMV", false);
         log("fromMV: "+fromMV);
 
@@ -280,7 +282,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					pendingIntents.add(intent);
-					updateProgressNotification();
+					if(showNotification){
+						updateProgressNotification();
+					}
 					megaApi.fastLogin(gSession, this);
 					return;
 				}
@@ -514,7 +518,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private File getDir(MegaNode document, Intent intent) {
-		log("getDir");
 		boolean toDownloads = (intent.hasExtra(EXTRA_PATH) == false);
 		File destDir;
 		if (toDownloads) {
@@ -522,7 +525,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		} else {
 			destDir = new File(intent.getStringExtra(EXTRA_PATH));
 		}
-		log("save to: " + destDir.getAbsolutePath());
+		log("getDir:save to: " + destDir.getAbsolutePath());
 		return destDir;
 	}
 
@@ -1447,11 +1450,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads() + "_" + megaApiFolder.getTotalDownloads());
+		log("onTransferStart:Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads() + "_" + megaApiFolder.getTotalDownloads());
 
-		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
+		if((transfer.getType()==MegaTransfer.TYPE_DOWNLOAD)&&(showNotification)){
 			transfersCount++;
-
 			updateProgressNotification();
 		}
 	}
@@ -1463,13 +1465,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			transfersCount--;
 
-			if(!transfer.isFolderTransfer()){
+			if((!transfer.isFolderTransfer())&&(showNotification)){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
 					String size = Util.getSizeString(transfer.getTotalBytes());
 					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 					dbH.setCompletedTransfer(completedTransfer);
 				}
-
 				updateProgressNotification();
 			}
 
@@ -2187,7 +2188,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if(!transfer.isFolderTransfer()){
+			if((!transfer.isFolderTransfer())&&(showNotification)){
 				updateProgressNotification();
 			}
 		}
@@ -2211,7 +2212,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					isOverquota = true;
 					log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
 
-					showTransferOverquotaNotification();
+					if(showNotification){
+						showTransferOverquotaNotification();
+					}
 				}
 			}
 		}

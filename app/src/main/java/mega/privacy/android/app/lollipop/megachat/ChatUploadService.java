@@ -75,6 +75,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public static String EXTRA_ATTACH_CHAT_IDS = "ATTACH_CHAT_IDS";
 	public static String EXTRA_UPLOAD_FILES_FINGERPRINTS = "UPLOAD_FILES_FINGERPRINTS";
 	public static String EXTRA_PEND_MSG_IDS = "PEND_MSG_IDS";
+	public static String EXTRA_SHOW_NOTIFICATION = "SHOW_NOTIFICATION";
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -104,6 +105,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	int totalVideos = 0;
 	int totalUploadsCompleted = 0;
 	int totalUploads = 0;
+	private boolean showNotification = true;
 
 	MegaNode parentNode;
 
@@ -293,6 +295,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 			else {
 				long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
+				showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, true);
+
 
 				long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
 				PendingMessageSingle pendingMsg = null;
@@ -620,7 +624,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void updateProgressDownsampling(int percentage, String key){
 
 		mapVideoDownsampling.put(key, percentage);
-		updateProgressNotification();
+		if(showNotification){
+			updateProgressNotification();
+		}
 	}
 
 	public void finishDownsampling(String returnedFile, boolean success, long idPendingMessage){
@@ -898,7 +904,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 				mapProgressTransfers.put(transfer.getTag(), transfer);
 
-				if (!transfer.isFolderTransfer()){
+				if ((!transfer.isFolderTransfer())&&(showNotification)){
 					updateProgressNotification();
 				}
 			}
@@ -1093,7 +1099,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					onQueueComplete();
 				}
 				else{
-					updateProgressNotification();
+					if(showNotification){
+						updateProgressNotification();
+					}
 				}
 			}
 		}
@@ -1177,7 +1185,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						requestSent++;
 						pendMsg.setNodeHandle(transfer.getNodeHandle());
 						pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
-						log("attachVoiceClips() - attachVoiceMessage");
+						log("attachVoiceClips() - STATE_ATTACHING");
 						megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 
 					}
@@ -1240,7 +1248,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
-		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+		if((transfer.getType()==MegaTransfer.TYPE_UPLOAD)&&(showNotification)) {
 			log("onTransferUpdate -  TYPE_UPLOAD");
 
 			String appData = transfer.getAppData();
@@ -1269,10 +1277,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						log("After overquota error");
 						isOverquota = 0;
 					}
-
 					mapProgressTransfers.put(transfer.getTag(), transfer);
 
-					updateProgressNotification();
+					if(showNotification){
+						updateProgressNotification();
+					}
 				}
 			}
 		}
@@ -1299,7 +1308,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					else {
 						log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-						updateProgressNotification();
+						if(showNotification){
+							updateProgressNotification();
+						}
 					}
 					break;
 			}

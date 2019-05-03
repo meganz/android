@@ -6240,7 +6240,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         } else {
             long userHandle = message.getUserHandle();
-            log("Contact message!!: " + userHandle);
+            log("Contact message: " + userHandle);
 
             if (((ChatActivityLollipop) context).isGroup()) {
                 holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
@@ -9270,19 +9270,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(nodeList.size()==1){
             MegaNode node = nodeList.get(0);
             if (MimeTypeList.typeForName(node.getName()).isAudio()){
-                log("checkVCDownload");
                 String voiceNotesLocationDefaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
                 String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
                 File f = new File(voiceNotesLocationDefaultPath, node.getName());
                 boolean isOnMegaVoiceNotes = false;
                 if(f.exists() && (f.length() == node.getSize())){
                     isOnMegaVoiceNotes = true;
+                    log("checkVCDownload:  isOnMegaVoiceNotes");
+
                 }
 
                 if (localPath != null && (isOnMegaVoiceNotes || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
-                    log("checkVCDownload:localPath != null");
+                    log("checkVCDownload:found it. LocalPath != null");
                     pauseAndPlayVC(holder, isMyMessage, true, localPath);
-
                 }else{
                     log("checkVCDownload:localPath == null");
                     if (Util.isOnline(context)) {

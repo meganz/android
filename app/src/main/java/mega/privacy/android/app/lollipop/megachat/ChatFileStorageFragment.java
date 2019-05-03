@@ -313,7 +313,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             for(Integer element:posSelected){
                 //filePath = mPhotoUris.get(element);
                 filePath = imagesPath.get(element);
-                ((ChatActivityLollipop) getActivity()).uploadPictureOrVoiceClip(filePath);
+                ((ChatActivityLollipop) getActivity()).uploadPictureOrVoiceClip(filePath, false);
             }
             clearSelections();
             hideMultipleSelect();
