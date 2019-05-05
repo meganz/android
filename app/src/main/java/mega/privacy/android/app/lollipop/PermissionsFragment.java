@@ -30,6 +30,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     final int READ_WRITE = 0;
     final int CAMERA = 1;
     final int CALLS = 2;
+    final int CONTACTS = 3;
 
     Context context;
 
@@ -55,6 +56,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     boolean readGranted = false;
     boolean cameraGranted = false;
     boolean microphoneGranted = false;
+    boolean contactsGranted = false;
 //    boolean writeCallsGranted = false;
 
     int[] mImages;
@@ -95,18 +97,21 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 R.drawable.photos,
                 R.drawable.enable_camera,
                 R.drawable.calls,
+                R.drawable.calls
         };
 
         mTitles = new String[] {
                 context.getString(R.string.allow_acces_media_title),
                 context.getString(R.string.allow_acces_camera_title),
-                context.getString(R.string.allow_acces_calls_title)
+                context.getString(R.string.allow_acces_calls_title),
+                context.getString(R.string.allow_acces_contact_title)
         };
 
         mSubtitles =  new String[] {
                 context.getString(R.string.allow_acces_media_subtitle),
                 context.getString(R.string.allow_acces_camera_subtitle),
-                context.getString(R.string.allow_acces_calls_subtitle_microphone)
+                context.getString(R.string.allow_acces_calls_subtitle_microphone),
+                context.getString(R.string.allow_acces_contact_subtitle)
         };
 
 
