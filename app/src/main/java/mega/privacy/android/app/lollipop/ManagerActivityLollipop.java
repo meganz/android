@@ -7338,7 +7338,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 
 					if (searchExpand) {
 						openSearchView();
@@ -7361,7 +7361,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setStatusMenuItem.setVisible(false);
 						}
 					}
-					ArrayList<MegaChatListItem> chats = megaChatApi.getChatListItems();
+
+					ArrayList<MegaChatListItem> chats = null;
+					if (megaChatApi != null) {
+						chats = megaChatApi.getChatListItems();
+					}
 					if (chats != null && !chats.isEmpty()) {
 						searchMenuItem.setVisible(true);
 					}
@@ -9437,8 +9441,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onBackPressed() {
 		log("onBackPressed");
 
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		if (drawerLayout.isDrawerOpen(nV)){
     		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -9469,17 +9472,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
 			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-			if (fbFLol != null) {
-				if (fbFLol.onBackPressed() == 0) {
-					super.callToSuperBack = true;
-					super.onBackPressed();
-				}
+			if (fbFLol != null && fbFLol.onBackPressed() != 0) {
 				return;
 			}
-			else{
-				super.callToSuperBack = true;
-				super.onBackPressed();
-			}
+			super.onBackPressed();
 		}
 		else if (drawerItem == DrawerItem.RUBBISH_BIN){
 			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
@@ -9490,7 +9486,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 return;
 			}
 			else{
-				super.callToSuperBack = true;
 				super.onBackPressed();
 			}
 		}
@@ -9501,11 +9496,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	}
 		else if (drawerItem == DrawerItem.INBOX){
 			iFLol = (InboxFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.INBOX.getTag());
-			if (iFLol != null){
-				if (iFLol.onBackPressed() == 0){
-					backToDrawerItem(bottomNavigationCurrentItem);
-					return;
-				}
+			if (iFLol != null && iFLol.onBackPressed() == 0){
+				backToDrawerItem(bottomNavigationCurrentItem);
+				return;
 			}
 		}
 		else if (drawerItem == DrawerItem.NOTIFICATIONS){
@@ -9529,49 +9522,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (index == 1) {
 					//OUTGOING
 					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-					if (outSFLol != null && outSFLol.isAdded()) {
-						if (outSFLol.onBackPressed() == 0) {
-							drawerItem = DrawerItem.CLOUD_DRIVE;
-							selectDrawerItemLollipop(drawerItem);
-							return;
-						}
+					if (outSFLol != null && outSFLol.isAdded() && outSFLol.onBackPressed() == 0) {
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItemLollipop(drawerItem);
+						return;
 					}
 				}
 				else {
 					//InCOMING
 					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-					if (inSFLol != null && inSFLol.isAdded()) {
-						if (inSFLol.onBackPressed() == 0) {
-							drawerItem = DrawerItem.CLOUD_DRIVE;
-							selectDrawerItemLollipop(drawerItem);
-							return;
-						}
+					if (inSFLol != null && inSFLol.isAdded() && inSFLol.onBackPressed() == 0) {
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItemLollipop(drawerItem);
+						return;
 					}
 				}
 			}
 		}
 		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 			oFLol = (OfflineFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.OFFLINE.getTag());
-			if (oFLol != null){
-				if (oFLol.onBackPressed() == 0){
-
-					if (!Util.isOnline(this)){
-						super.callToSuperBack = true;
-						super.onBackPressed();
-						return;
-					}
-
-					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-					if (fbFLol != null){
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						selectDrawerItemLollipop(drawerItem);
-					}
-					else{
-						super.callToSuperBack = true;
-						super.onBackPressed();
-					}
+			if (oFLol != null && oFLol.onBackPressed() == 0){
+				if (!Util.isOnline(this)){
+					super.onBackPressed();
 					return;
 				}
+
+				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
+				if (fbFLol != null){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItemLollipop(drawerItem);
+				}
+				else{
+					super.onBackPressed();
+				}
+				return;
 			}
 		}
 		else if (drawerItem == DrawerItem.CHAT){
@@ -9596,11 +9580,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case 0:{
 					//CONTACTS FRAGMENT
 		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		    		if (cFLol != null){
-		    			if (cFLol.onBackPressed() == 0){
-							backToDrawerItem(bottomNavigationCurrentItem);
-		    				return;
-		    			}
+		    		if (cFLol != null && cFLol.onBackPressed() == 0){
+						backToDrawerItem(bottomNavigationCurrentItem);
+						return;
 		    		}
 					break;
 				}
@@ -9629,16 +9611,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	    		case Constants.MY_ACCOUNT_FRAGMENT:{
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-	    			if (maFLol != null){
-	    				if (maFLol.onBackPressed() == 0){
-	    					if (comesFromNotifications) {
-	    						comesFromNotifications = false;
-	    						selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
-							}
-							else {
-								backToDrawerItem(bottomNavigationCurrentItem);
-							}
-	    				}
+	    			if (maFLol != null && maFLol.onBackPressed() == 0){
+						if (comesFromNotifications) {
+							comesFromNotifications = false;
+							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+						}
+						else {
+							backToDrawerItem(bottomNavigationCurrentItem);
+						}
 	    			}
 	    			return;
 	    		}
@@ -9691,36 +9671,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	}
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 			cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-			if (cuFL != null){
-    			if (cuFL.onBackPressed() == 0){
-					visibilitySearch(false);
-					backToDrawerItem(-1);
-    				return;
-    			}
-    		}
+			if (cuFL != null && cuFL.onBackPressed() == 0){
+				visibilitySearch(false);
+				backToDrawerItem(-1);
+				return;
+			}
     	}
 		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
 			muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MEDIA_UPLOADS.getTag());
-			if (muFLol != null){
-    			if (muFLol.onBackPressed() == 0){
-					visibilitySearch(false);
-					backToDrawerItem(CLOUD_DRIVE_BNV);
-    				return;
-    			}
+			if (muFLol != null && muFLol.onBackPressed() == 0){
+				visibilitySearch(false);
+				backToDrawerItem(CLOUD_DRIVE_BNV);
+				return;
     		}
     	}
 		else if (drawerItem == DrawerItem.SEARCH){
 			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
-    		if (sFLol != null){
-    			if (sFLol.onBackPressed() == 0){
-					backToDrawerItem(bottomNavigationCurrentItem);
-					changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
-    				return;
-    			}
+    		if (sFLol != null && sFLol.onBackPressed() == 0){
+				backToDrawerItem(bottomNavigationCurrentItem);
+				changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
+				return;
     		}
     	}
 		else{
-			super.callToSuperBack = true;
 			super.onBackPressed();
 			return;
 		}

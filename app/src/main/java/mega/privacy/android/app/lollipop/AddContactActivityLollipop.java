@@ -3014,8 +3014,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     @Override
     public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if (onNewGroup) {
             if (addedContactsMEGA.contains(myContact)) {
@@ -3031,7 +3030,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             returnToStartConversation();
         }
         else {
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }
