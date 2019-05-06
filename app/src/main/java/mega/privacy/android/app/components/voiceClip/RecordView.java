@@ -191,16 +191,18 @@ public class RecordView extends RelativeLayout {
                 if (layoutLock.getVisibility() == View.VISIBLE) {
                     layoutLock.setVisibility(View.GONE);
                     isLockpadShown = false;
-                    createAnimation(flag, 10, 100);
+                    createAnimation(flag, 10, 250);
                 }
             }
         }
     }
 
-    private void createAnimation(final boolean showPL, int value, int duration){
+    private void createAnimation(final boolean toOpen, int value, int duration){
+        log("createAnimation");
+
         int prevHeight  = layoutLock.getHeight();
         ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, value);
-        if(!showPL){
+        if(!toOpen){
             valueAnimator.setInterpolator(new DecelerateInterpolator());
         }
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -210,21 +212,24 @@ public class RecordView extends RelativeLayout {
                 layoutLock.requestLayout();
             }
         });
+
         valueAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-
                 if((imageArrow!=null)&& (imageLock!=null)){
-                    imageArrow.clearAnimation();
-                    imageLock.clearAnimation();
-                    imageArrow.startAnimation(animJumpFast);
-                    imageLock.startAnimation(animJump);
-                    if(showPL) {
+                    if(toOpen){
+                        //It is expanded
                         isLockpadShown = true;
+                        imageArrow.startAnimation(animJumpFast);
+                        imageLock.startAnimation(animJump);
                     }else{
+                        //It is compressed
+                        imageLock.clearAnimation();
+                        imageArrow.clearAnimation();
                         imageArrow.setVisibility(GONE);
                         imageLock.setVisibility(GONE);
                         layoutLock.setVisibility(View.GONE);
+
                     }
                 }
             }
