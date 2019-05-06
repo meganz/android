@@ -762,6 +762,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	};
 
+    private BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                updateView(intent.getBooleanExtra("isList", true));
+				supportInvalidateOptionsMenu();
+            }
+        }
+    };
+
 	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1823,6 +1833,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
 			localBroadcastManager.registerReceiver(receiverUpdateOrder, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER));
+
+            localBroadcastManager.registerReceiver(receiverUpdateView, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_VIEW));
 		}
 
 		nC = new NodeController(this);
@@ -7738,21 +7750,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								return true;
 							}
 						}
-
-//						if (tFLol != null){
-//							if (tFLol.onBackPressed() == 0){
-//								drawerItem = DrawerItem.CLOUD_DRIVE;
-//								if (nV != null){
-//									Menu nVMenu = nV.getMenu();
-//									MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-//									resetNavigationViewMenu(nVMenu);
-//									cloudDrive.setChecked(true);
-//									cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
-//								}
-//								selectDrawerItemLollipop(drawerItem);
-//								return true;
-//							}
-//						}
 					}
 				}
 		    	return true;
@@ -7869,22 +7866,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (drawerItem == DrawerItem.CHAT){
 					log("Action set status");
 					showPresenceStatusDialog();
-//					drawerItem = DrawerItem.SETTINGS;
-//					if (nV != null){
-//						Menu nVMenu = nV.getMenu();
-////						MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-////						chat.setTitle(getString(R.string.section_chat));
-//						MenuItem mi = nVMenu.findItem(R.id.navigation_item_chat);
-//						if (mi != null){
-//							mi.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat));
-//							mi.setChecked(false);
-//						}
-//						MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
-//						settings.setChecked(true);
-//						settings.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
-//					}
-//					scrollToChat = true;
-//					selectDrawerItemLollipop(drawerItem);
 				}
 
 				return true;
@@ -8237,49 +8218,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
         		}
 	        	else{
-		        	isList = !isList;
-	    			dbH.setPreferredViewList(isList);
-
-	    			if (isList){
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-
-					//Refresh Cloud Fragment
-					refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-
-					//Refresh Rubbish Fragment
-					refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
-
-
-					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-					refreshFragment(FragmentTag.OFFLINE.getTag());
-
-					//Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
-					refreshFragment(FragmentTag.CONTACTS.getTag());
-
-					if (contactsPageAdapter != null) {
-	    				contactsPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh shares section
-					refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-
-					//Refresh shares section
-					refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
-
-					if(sharesPageAdapter!=null){
-						sharesPageAdapter.notifyDataSetChanged();
-					}
-
-					//Refresh search section
-					refreshFragment(FragmentTag.SEARCH.getTag());
-
-					//Refresh inbox section
-					refreshFragment(FragmentTag.INBOX.getTag());
-
+	    			updateView(!isList);
 	        	}
 	        	supportInvalidateOptionsMenu();
 
@@ -8390,6 +8329,46 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
 		}
 	}
+
+	private void updateView (boolean isList) {
+        if (this.isList != isList) {
+            this.isList = isList;
+            dbH.setPreferredViewList(isList);
+        }
+
+        //Refresh Cloud Fragment
+        refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+
+        //Refresh Rubbish Fragment
+        refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
+
+
+        //Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
+        refreshFragment(FragmentTag.OFFLINE.getTag());
+
+        //Refresh ContactsFragmentLollipop layout even current fragment isn't ContactsFragmentLollipop.
+        refreshFragment(FragmentTag.CONTACTS.getTag());
+
+        if (contactsPageAdapter != null) {
+            contactsPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh shares section
+        refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+
+        //Refresh shares section
+        refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+
+        if(sharesPageAdapter!=null){
+            sharesPageAdapter.notifyDataSetChanged();
+        }
+
+        //Refresh search section
+        refreshFragment(FragmentTag.SEARCH.getTag());
+
+        //Refresh inbox section
+        refreshFragment(FragmentTag.INBOX.getTag());
+    }
 
 	public void hideMKLayout(){
 		log("hideMKLayout");

@@ -298,18 +298,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-    //	public void clearSelections() {
-//		if(selectedItems!=null){
-//			selectedItems.clear();
-//			for (int i= 0; i<this.getItemCount();i++) {
-//				if (isItemChecked(i)) {
-//					toggleAllSelection(i);
-//				}
-//			}
-//		}
-//		notifyDataSetChanged();
-//	}
-//
     private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
@@ -456,7 +444,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = insertPlaceHolderNode(nodes);
         log("setNodes size: "+this.nodes.size());
-//		contentTextFragment.setText(getInfoFolder(node));
         notifyDataSetChanged();
     }
 
@@ -714,22 +701,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.videoInfoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setVisibility(View.GONE);
                 log(node.getName() + " DURATION: " + node.getDuration());
-                int duration = node.getDuration();
-                if (duration > 0) {
-                    int hours = duration / 3600;
-                    int minutes = (duration % 3600) / 60;
-                    int seconds = duration % 60;
-
-                    String timeString;
-                    if (hours > 0) {
-                        timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
-                    } else {
-                        timeString = String.format("%d:%02d",minutes,seconds);
-                    }
-
-                    log("The duration is: " + hours + " " + minutes + " " + seconds);
-
-                    holder.videoDuration.setText(timeString);
+                String duration = Util.getVideoDuration(node.getDuration());
+                if (duration != null && !duration.isEmpty()) {
+                    holder.videoDuration.setText(duration);
                     holder.videoDuration.setVisibility(View.VISIBLE);
                 }
             }
@@ -1203,17 +1177,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-//	public boolean isEnabled(int position) {
-//		// if (position == 0){
-//		// return false;
-//		// }
-//		// else{
-//		// return true;
-//		// }
-//		return super.isEnabled(position);
-//	}
-
-
     private String getItemNode(int position) {
         if (nodes.get(position) != null) {
             return nodes.get(position).getName();
@@ -1459,9 +1422,5 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private static void log(String log) {
         Util.log("MegaNodeAdapter",log);
-    }
-
-    public void allowMultiselect() {
-
     }
 }

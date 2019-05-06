@@ -127,7 +127,7 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        if(Util.isChatEnabled() && ! tabRemoved){
+        if(Util.isChatEnabled() && !tabRemoved){
             return PAGE_COUNT;
         }
         else{

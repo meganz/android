@@ -86,14 +86,38 @@
 	 android:layout_height="1dip"
 	 android:layout_above="@id/options_explorer_layout"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/file_list_view_browser"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:clipToPadding="false"
-        android:choiceMode="multipleChoice"
-        android:layout_below="@id/content_text"
-        android:layout_above="@id/separator" />
-    
-    
+	<RelativeLayout
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_below="@id/content_text"
+		android:layout_above="@id/separator">
+
+		<android.support.v7.widget.RecyclerView
+			android:id="@+id/file_list_view_browser"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:clipToPadding="false"
+			android:choiceMode="multipleChoice" />
+
+		<mega.privacy.android.app.components.NewGridRecyclerView
+			android:id="@+id/file_grid_view_browser"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_centerHorizontal="true"
+			android:layout_centerInParent="true"
+			android:choiceMode="multipleChoice"
+			android:columnWidth ="172dp"
+			android:paddingRight="4dp"
+			android:paddingLeft="4dp"/>
+
+		<mega.privacy.android.app.components.scrollBar.FastScroller
+			android:id="@+id/fastscroll"
+			android:orientation="vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_alignParentRight="true"
+			android:gravity="right"/>
+
+	</RelativeLayout>
+
 </RelativeLayout>

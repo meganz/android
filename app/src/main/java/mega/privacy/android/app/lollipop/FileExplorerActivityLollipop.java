@@ -16,6 +16,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -57,6 +58,7 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
@@ -64,6 +66,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
@@ -136,6 +139,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	boolean isChatFirst = false;
 
 	DatabaseHandler dbH = null;
+	MegaPreferences prefs;
 
 	AppBarLayout abL;
 	Toolbar tB;
@@ -395,6 +399,13 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		fileExplorerActivityLollipop = this;
 				
 		dbH = DatabaseHandler.getDbHandler(this);
+		prefs = dbH.getPreferences();
+		if (prefs == null || prefs.getPreferredViewList() == null) {
+			isList = true;
+		}
+		else {
+			isList = Boolean.parseBoolean(prefs.getPreferredViewList());
+		}
 		credentials = dbH.getCredentials();
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -758,17 +769,28 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						log("onTabChanged TabId :"+ position);
 						supportInvalidateOptionsMenu();
 						changeTitle();
+
 						if (!multiselect) {
 							return;
 						}
 						collapseSearchView();
-						iSharesExplorer = getIncomingExplorerFragment();
-						if (iSharesExplorer != null && position == 0) {
-							iSharesExplorer.hideMultipleSelect();
-						}
 						cDriveExplorer = getCloudExplorerFragment();
-						if (cDriveExplorer != null && position == 1) {
-							cDriveExplorer.hideMultipleSelect();
+						iSharesExplorer = getIncomingExplorerFragment();
+						if (position == 0) {
+							if (iSharesExplorer != null ) {
+								iSharesExplorer.hideMultipleSelect();
+							}
+							if (cDriveExplorer != null) {
+								cDriveExplorer.checkScroll();
+							}
+						}
+						else if (position == 1) {
+							if (cDriveExplorer != null) {
+								cDriveExplorer.hideMultipleSelect();
+							}
+							if (iSharesExplorer != null) {
+								iSharesExplorer.checkScroll();
+							}
 						}
 					}
 				});
@@ -2282,14 +2304,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 				cDriveExplorer.setNodes(nodes);
-				cDriveExplorer.getListView().invalidate();
+				cDriveExplorer.getRecyclerView().invalidate();
 			}
 			else{
 				if (megaApi.getRootNode() != null){
 					cDriveExplorer.setParentHandle(megaApi.getRootNode().getHandle());
 					nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 					cDriveExplorer.setNodes(nodes);
-					cDriveExplorer.getListView().invalidate();
+					cDriveExplorer.getRecyclerView().invalidate();
 				}
 			}
 		}
@@ -2395,6 +2417,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case R.id.cab_menu_grid_list:{
+				refreshViewNodes();
 				break;
 			}
 			case R.id.cab_menu_sort:{
@@ -3309,6 +3332,42 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
+	private void refreshViewNodes () {
+		isList = !isList;
+		dbH.setPreferredViewList(isList);
+		updateManagerView();
+		supportInvalidateOptionsMenu();
+		refreshView();
+	}
+
+	private void refreshView () {
+		cDriveExplorer = getCloudExplorerFragment();
+		if (cDriveExplorer != null) {
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.detach(cDriveExplorer);
+			cDriveExplorer.headerItemDecoration = null;
+			ft.attach(cDriveExplorer);
+			ft.commitAllowingStateLoss();
+		}
+
+		iSharesExplorer = getIncomingExplorerFragment();
+		if (iSharesExplorer != null) {
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.detach(iSharesExplorer);
+			iSharesExplorer.headerItemDecoration = null;
+			ft.attach(iSharesExplorer);
+			ft.commitAllowingStateLoss();
+		}
+
+//		mTabsAdapterExplorer.notifyDataSetChanged();
+	}
+
+	private void updateManagerView () {
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_VIEW);
+		intent.putExtra("isList", isList);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+	}
+
 	public void collapseSearchView () {
 		if (searchMenuItem != null) {
 			searchMenuItem.collapseActionView();
@@ -3407,5 +3466,18 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	public boolean isSearchExpanded () {
 		return isSearchExpanded;
+	}
+
+	public boolean isList () {
+		return isList;
+	}
+
+	public int getItemType() {
+		if (isList) {
+			return MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
+		}
+		else {
+			return MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
+		}
 	}
 }

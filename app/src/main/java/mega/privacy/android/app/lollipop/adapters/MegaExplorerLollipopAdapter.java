@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -30,7 +31,9 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -71,22 +74,52 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private SparseBooleanArray selectedItems;
 
 	RecyclerView listFragment;
+    private int placeholderCount;
 
 	/*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder{
-    	public ImageView imageView;
-		public ImageView permissionsIcon;
-    	public TextView textViewFileName;
-    	public TextView textViewFileSize;
-    	public RelativeLayout itemLayout;
-    	public int currentPosition;
-    	public long document;
+		public RelativeLayout itemLayout;
+		public int currentPosition;
+		public long document;
 
 
     	public ViewHolderExplorerLollipop(View itemView) {
 			super(itemView);
 		}
     }
+
+	public class ViewHolderListExplorerLollipop extends ViewHolderExplorerLollipop{
+		public ImageView imageView;
+		public ImageView permissionsIcon;
+        public TextView textViewFileName;
+		public TextView textViewFileSize;
+
+
+		public ViewHolderListExplorerLollipop(View itemView) {
+			super(itemView);
+		}
+	}
+
+	public class ViewHolderGridExplorerLollipop extends ViewHolderExplorerLollipop{
+		public RelativeLayout folderLayout;
+		public RelativeLayout thumbnailFolderLayout;
+		public ImageView folderIcon;
+		public TextView folderName;
+		public RelativeLayout fileLayout;
+        public RelativeLayout thumbnailFileLayout;
+        public ImageView fileThumbnail;
+        public ImageView fileSelectedIcon;
+        public ImageView fileIcon;
+        public TextView fileName;
+        public RelativeLayout videoLayout;
+        public TextView videoDuration;
+        public ImageView videoIcon;
+
+
+		public ViewHolderGridExplorerLollipop(View itemView) {
+			super(itemView);
+		}
+	}
 	
 	ViewHolderExplorerLollipop holder = null;    
 
@@ -129,258 +162,336 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	
 	@Override
 	public ViewHolderExplorerLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
-		
-		listFragment = (RecyclerView) parent;
-		//		final int _position = position;
-				
-		
+
+	    listFragment = (RecyclerView) parent;
+
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-		
-	    View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
 
-		holder = new ViewHolderExplorerLollipop(v);
-		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_item_layout);
-		holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
-		holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
+		View v;
+	    if (((FileExplorerActivityLollipop) context).isList()) {
+	        log("onCreateViewHolder list");
+			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
+			ViewHolderListExplorerLollipop holder = new ViewHolderListExplorerLollipop(v);
 
-		holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
-		holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
+			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_item_layout);
+			holder.imageView = (ImageView) v.findViewById(R.id.file_explorer_thumbnail);
+			holder.textViewFileName = (TextView) v.findViewById(R.id.file_explorer_filename);
+			holder.textViewFileSize = (TextView) v.findViewById(R.id.file_explorer_filesize);
+			holder.permissionsIcon = (ImageView) v.findViewById(R.id.file_explorer_permissions);
 
-		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
-			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
-
+			v.setTag(holder);
+			return holder;
 		}
-		else{
-			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-			holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+		else {
+		    log("onCreateViewHolder grid");
+			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer_grid, parent, false);
+			ViewHolderGridExplorerLollipop holder =  new ViewHolderGridExplorerLollipop(v);
 
+			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_layout);
+            holder.folderLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_folder_layout);
+            holder.thumbnailFolderLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_folder_thumbnail_layout);
+            holder.folderIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_folder_icon);
+            holder.folderName= (TextView) v.findViewById(R.id.file_explorer_grid_folder_filename);
+            holder.fileLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_file_layout);
+            holder.thumbnailFileLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_file_thumbnail_layout);
+            holder.fileThumbnail = (ImageView) v.findViewById(R.id.file_explorer_grid_file_thumbnail);
+            holder.fileSelectedIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_file_selected);
+            holder.fileIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_file_icon);
+            holder.fileName= (TextView) v.findViewById(R.id.file_grid_filename_for_file);
+            holder.videoLayout = (RelativeLayout) v.findViewById(R.id.file_explorer_grid_file_videoinfo_layout);
+            holder.videoDuration= (TextView) v.findViewById(R.id.file_explorer_grid_file_title_video_duration);
+            holder.videoIcon = (ImageView) v.findViewById(R.id.file_explorer_grid_file_video_icon);
+
+			v.setTag(holder);
+			return holder;
 		}
-
-		v.setTag(holder);
-		return holder;
 	}
 
 	@Override
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-
-		holder.currentPosition = position;
-		
-		MegaNode node = (MegaNode) getItem(position);
-		holder.document = node.getHandle();
-		Bitmap thumb = null;
-		
-		holder.textViewFileName.setText(node.getName());
-			
-		if (node.isFolder()){
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
-
-			holder.imageView.setLayoutParams(params);
-
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.itemView.setOnLongClickListener(null);
-
-			if (disabledNodes != null){
-
-				if (disabledNodes.contains(node.getHandle())){
-					log("Disabled!");
-					holder.imageView.setAlpha(.4f);
-					holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-					holder.permissionsIcon.setAlpha(.2f);
-					holder.itemView.setOnClickListener(null);
-				}
-				else{
-					log("Full access");
-					holder.imageView.setAlpha(1.0f);
-					holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-					holder.itemView.setOnClickListener(this);
-					holder.permissionsIcon.setAlpha(.35f);
-				}
-			}
-			else{
-				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-				holder.itemView.setOnClickListener(this);
-			}
-
-			if(node.isInShare()){
-				holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
-				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-				for(int j=0; j<sharesIncoming.size();j++){
-					MegaShare mS = sharesIncoming.get(j);
-					if(mS.getNodeHandle()==node.getHandle()){
-						MegaUser user= megaApi.getContact(mS.getUser());
-						if(user!=null){
-							MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-							if(contactDB!=null){
-								if(!contactDB.getName().equals("")){
-									holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
-								}
-								else{
-									holder.textViewFileSize.setText(user.getEmail());
-								}
-							}
-							else{
-								log("The contactDB is null: ");
-								holder.textViewFileSize.setText(user.getEmail());
-							}
-						}
-						else{
-							holder.textViewFileSize.setText(mS.getUser());
-						}
-					}
-				}
-
-				//Check permissions
-				holder.permissionsIcon.setVisibility(View.VISIBLE);
-				int accessLevel = megaApi.getAccess(node);
-
-				if(accessLevel== MegaShare.ACCESS_FULL){
-					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
-				}
-				else if(accessLevel== MegaShare.ACCESS_READ){
-					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
-				}
-				else{
-					holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
-				}
-			}
-			else if(node.isOutShare()||megaApi.isPendingShare(node)) {
-				holder.permissionsIcon.setVisibility(View.GONE);
-				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
-				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
-
-			}else{
-				holder.permissionsIcon.setVisibility(View.GONE);
-				boolean isCU = isCameraUploads(node);
-				if(isCU){
-					holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
-				}else{
-					holder.imageView.setImageResource(R.drawable.ic_folder_list);
-				}
-				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
-			}
-		}
-		else{
-
-			holder.permissionsIcon.setVisibility(View.GONE);
-			
-			long nodeSize = node.getSize();
-			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-			params.setMargins(0, 0, 0, 0);
-
-			holder.imageView.setLayoutParams(params);
-
-			if(selectFile){
-				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-				holder.itemView.setOnClickListener(this);
-				holder.itemView.setOnLongClickListener(this);
-
-				if (multipleSelect) {
-					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
-						holder.imageView.setImageResource(R.drawable.ic_select_folder);
-						log("Do not show thumb");
-						return;
-					}
-					else{
-						holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-						holder.itemLayout.setBackgroundColor(Color.WHITE);
-					}
-				}
-				else{
-					holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
-				}
-			}
-			else{
-				holder.imageView.setAlpha(.4f);
-				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-				holder.itemView.setOnClickListener(null);
-				holder.itemView.setOnLongClickListener(null);
-			}
-
-			if (node.hasThumbnail()){
-				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-				params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-				int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-				params1.setMargins(left, 0, 0, 0);
-
-				holder.imageView.setLayoutParams(params1);
-
-				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-				if (thumb != null){
-					holder.imageView.setImageBitmap(thumb);
-				}
-				else{
-					thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-					if (thumb != null){
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						try{
-							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaExplorerLollipop(node, context, holder, megaApi, this);
-						}
-						catch(Exception e){} //Too many AsyncTasks
-
-						if (thumb != null){
-							holder.imageView.setImageBitmap(thumb);
-						}
-					}
-				}
-			}
-			else{
-				thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-				if (thumb != null){
-					RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-					params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-					int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-					params1.setMargins(left, 0, 0, 0);
-
-					holder.imageView.setLayoutParams(params1);
-					holder.imageView.setImageBitmap(thumb);
-				}
-				else{
-					thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-					if (thumb != null){
-						RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-						params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-						int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-						params1.setMargins(left, 0, 0, 0);
-
-						holder.imageView.setLayoutParams(params1);
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						try{
-							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, node, holder, megaApi, this);
-						}
-						catch(Exception e){} //Too many AsyncTasks
-					}
-				}
-			}
-
-
-		}		
+        if (((FileExplorerActivityLollipop) context).isList()) {
+            ViewHolderListExplorerLollipop holderList = (ViewHolderListExplorerLollipop) holder;
+            onBindViewHolderList(holderList, position);
+        }
+        else  {
+            ViewHolderGridExplorerLollipop holderGrid = (ViewHolderGridExplorerLollipop) holder;
+            onBindViewHolderGrid(holderGrid, position);
+        }
 	}
+
+	private void setImageParams (ImageView image, int size, int sizeLeft) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) image.getLayoutParams();
+        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, context.getResources().getDisplayMetrics());
+        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, size, context.getResources().getDisplayMetrics());
+        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, sizeLeft, context.getResources().getDisplayMetrics());
+        params.setMargins(left, 0, 0, 0);
+
+        image.setLayoutParams(params);
+    }
+
+    public void onBindViewHolderList(ViewHolderListExplorerLollipop holder, int position) {
+	    log("onBindViewHolderList");
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        holder.currentPosition = position;
+
+        MegaNode node = (MegaNode) getItem(position);
+        if (node == null) {
+            return;
+        }
+        holder.document = node.getHandle();
+
+        holder.textViewFileName.setText(node.getName());
+
+        if (node.isFolder()){
+            setImageParams(holder.imageView, 48, 0);
+            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemView.setOnLongClickListener(null);
+
+            if (disabledNodes != null){
+
+                if (disabledNodes.contains(node.getHandle())){
+                    log("Disabled!");
+                    holder.imageView.setAlpha(.4f);
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                    holder.permissionsIcon.setAlpha(.2f);
+                    holder.itemView.setOnClickListener(null);
+                }
+                else{
+                    log("Full access");
+                    holder.imageView.setAlpha(1.0f);
+                    holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                    holder.itemView.setOnClickListener(this);
+                    holder.permissionsIcon.setAlpha(.35f);
+                }
+            }
+            else{
+                holder.imageView.setAlpha(1.0f);
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                holder.itemView.setOnClickListener(this);
+            }
+
+            if(node.isInShare()){
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+                    holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+
+                }
+                else{
+                    holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+                    holder.textViewFileSize.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+
+                }
+                holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+                ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+                for(int j=0; j<sharesIncoming.size();j++){
+                    MegaShare mS = sharesIncoming.get(j);
+                    if(mS.getNodeHandle()==node.getHandle()){
+                        MegaUser user= megaApi.getContact(mS.getUser());
+                        if(user!=null){
+                            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+                            if(contactDB!=null){
+                                if(!contactDB.getName().equals("")){
+                                    holder.textViewFileSize.setText(contactDB.getName()+" "+contactDB.getLastName());
+                                }
+                                else{
+                                    holder.textViewFileSize.setText(user.getEmail());
+                                }
+                            }
+                            else{
+                                log("The contactDB is null: ");
+                                holder.textViewFileSize.setText(user.getEmail());
+                            }
+                        }
+                        else{
+                            holder.textViewFileSize.setText(mS.getUser());
+                        }
+                    }
+                }
+
+                //Check permissions
+                holder.permissionsIcon.setVisibility(View.VISIBLE);
+                int accessLevel = megaApi.getAccess(node);
+
+                if(accessLevel== MegaShare.ACCESS_FULL){
+                    holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
+                }
+                else if(accessLevel== MegaShare.ACCESS_READ){
+                    holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
+                }
+                else{
+                    holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read_write);
+                }
+            }
+            else if(node.isOutShare()||megaApi.isPendingShare(node)) {
+                holder.permissionsIcon.setVisibility(View.GONE);
+                holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+                holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+
+            }else{
+                holder.permissionsIcon.setVisibility(View.GONE);
+                boolean isCU = isCameraUploads(node);
+                if(isCU){
+                    holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
+                }else{
+                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                }
+                holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
+            }
+        }
+        else{
+            holder.permissionsIcon.setVisibility(View.GONE);
+
+            long nodeSize = node.getSize();
+            holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+            holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+            setImageParams(holder.imageView, 48, 0);
+
+            if(selectFile){
+                holder.imageView.setAlpha(1.0f);
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+                holder.itemView.setOnClickListener(this);
+                holder.itemView.setOnLongClickListener(this);
+
+                if (multipleSelect) {
+                    if(this.isItemChecked(position)){
+                        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                        holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                        log("Do not show thumb");
+                        return;
+                    }
+                    else{
+                        holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                        holder.itemLayout.setBackgroundColor(Color.WHITE);
+                    }
+                }
+                else{
+                    holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                    holder.itemLayout.setBackgroundColor(Color.WHITE);
+                }
+            }
+            else{
+                holder.imageView.setAlpha(.4f);
+                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.itemView.setOnClickListener(null);
+                holder.itemView.setOnLongClickListener(null);
+            }
+
+
+            Bitmap thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
+            if (thumb == null) {
+                thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
+                if (thumb == null) {
+                    try {
+                        if (node.hasThumbnail()) {
+                            thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaExplorerLollipop(node, context, holder, megaApi, this);
+                        }
+                        else {
+                            ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, node, holder, megaApi, this);
+                        }
+                    } catch (Exception e) {}
+                }
+            }
+
+            if (thumb != null) {
+                setImageParams(holder.imageView, 36, 6);
+                holder.imageView.setImageBitmap(thumb);
+            }
+        }
+    }
+
+    public void onBindViewHolderGrid(ViewHolderGridExplorerLollipop holder, int position) {
+	    log("onBindViewHolderGrid");
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        holder.currentPosition = position;
+
+        MegaNode node = (MegaNode) getItem(position);
+
+        if (node == null) {
+            holder.fileLayout.setVisibility(View.GONE);
+            holder.folderLayout.setVisibility(View.INVISIBLE);
+            holder.itemLayout.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        holder.document = node.getHandle();
+
+        if (node.isFolder()){
+            holder.folderLayout.setVisibility(View.VISIBLE);
+            holder.fileLayout.setVisibility(View.GONE);
+            holder.folderName.setText(node.getName());
+
+            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemView.setOnLongClickListener(null);
+
+            holder.folderName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+            holder.itemView.setOnClickListener(this);
+
+            if(node.isInShare()){
+                holder.folderIcon.setImageResource(R.drawable.ic_folder_incoming_list);
+            }
+            else if(node.isOutShare()||megaApi.isPendingShare(node)) {
+                holder.folderIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
+            }
+            else if(isCameraUploads(node)){
+                holder.folderIcon.setImageResource(R.drawable.ic_folder_image_list);
+            }
+            else{
+                holder.folderIcon.setImageResource(R.drawable.ic_folder_list);
+            }
+        }
+        else{
+            holder.itemView.setOnClickListener(this);
+            holder.itemView.setOnLongClickListener(this);
+            holder.folderLayout.setVisibility(View.GONE);
+            holder.fileLayout.setVisibility(View.VISIBLE);
+            holder.fileName.setText(node.getName());
+
+            if (Util.isVideoFile(node.getName())) {
+                holder.videoLayout.setVisibility(View.VISIBLE);
+                log(node.getName() + " DURATION: " + node.getDuration());
+                String duration = Util.getVideoDuration(node.getDuration());
+                if (duration != null && !duration.isEmpty())  {
+                    holder.videoDuration.setText(duration);
+                    holder.videoDuration.setVisibility(View.VISIBLE);
+                }
+            }
+
+            Bitmap thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
+            if (thumb == null) {
+                thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
+                if (thumb == null) {
+                    try {
+                        if (node.hasThumbnail()) {
+                            thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaExplorerLollipop(node, context, holder, megaApi, this);
+                        }
+                        else {
+                            ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context, node, holder, megaApi, this);
+                        }
+                    } catch (Exception e) {}
+                }
+            }
+            if (thumb != null) {
+                holder.fileThumbnail.setImageBitmap(thumb);
+            }
+
+            if (isMultipleSelect() && isItemChecked(position)) {
+                holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
+                holder.fileSelectedIcon.setImageResource(R.drawable.ic_select_folder);
+
+            } else {
+                holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
+                holder.fileSelectedIcon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        }
+    }
 
 	public void toggleAllSelection(int pos) {
 		log("toggleAllSelection: "+pos);
@@ -395,46 +506,48 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			selectedItems.put(pos, true);
 		}
 
-		MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop view = (MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
-		if(view!=null){
-			log("Start animation: "+pos);
-			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-				@Override
-				public void onAnimationStart(Animation animation) {
+        if (((FileExplorerActivityLollipop) context).isList()) {
+            ViewHolderListExplorerLollipop view = (ViewHolderListExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
+            if (view != null) {
+                log("Start animation: " + pos);
+                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-				}
+                    }
 
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					log("onAnimationEnd");
-					if (selectedItems.size() <= 0){
-						log("toggleAllSelection: hideMultipleSelect");
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        log("onAnimationEnd");
+                        if (selectedItems.size() <= 0) {
+                            log("toggleAllSelection: hideMultipleSelect");
 
-						if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
-							((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
-						}
-						else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
-							((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
-						}
+                            if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
+                                ((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+                            } else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+                                ((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
+                            }
 
-					}
-					log("toggleAllSelection: notified item changed");
-					notifyItemChanged(positionToflip);
-				}
+                        }
+                        log("toggleAllSelection: notified item changed");
+                        notifyItemChanged(positionToflip);
+                    }
 
-				@Override
-				public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-				}
-			});
-			view.imageView.startAnimation(flipAnimation);
-		}
-		else{
-			log("NULL view pos: "+positionToflip);
-			notifyItemChanged(pos);
-		}
+                    }
+                });
+                view.imageView.startAnimation(flipAnimation);
+            } else {
+                log("NULL view pos: " + positionToflip);
+                notifyItemChanged(pos);
+            }
+        }
+        else {
 
+        }
 	}
 
 	public void toggleSelection(int pos) {
@@ -451,41 +564,43 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		notifyItemChanged(pos);
 
 
-		MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop view = (MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
-		if(view!=null){
-			log("Start animation: "+pos);
-			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-				@Override
-				public void onAnimationStart(Animation animation) {
+		if (((FileExplorerActivityLollipop) context).isList()) {
+            ViewHolderListExplorerLollipop view = (ViewHolderListExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
+            if (view != null) {
+                log("Start animation: " + pos);
+                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-				}
+                    }
 
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
-							((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
-						}
-						else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
-							((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
-						}
-					}
-				}
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        if (selectedItems.size() <= 0) {
+                            if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
+                                ((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+                            } else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+                                ((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
+                            }
+                        }
+                    }
 
-				@Override
-				public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
 
-				}
-			});
+                    }
+                });
 
-			view.imageView.startAnimation(flipAnimation);
+                view.imageView.startAnimation(flipAnimation);
 
-		}
-		else{
-			log("view is null - not animation");
-		}
+            } else {
+                log("view is null - not animation");
+            }
+        }
+        else {
 
+        }
 	}
 
 	public void selectAll(){
@@ -640,7 +755,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
     }
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
-		this.nodes = nodes;
+		this.nodes = insertPlaceHolderNode(nodes);
 		positionClicked = -1;
 		notifyDataSetChanged();
 	}
@@ -774,5 +889,34 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			((IncomingSharesExplorerFragmentLollipop) fragment).itemClick(v, holder.getAdapterPosition());
 		}
 	}
+
+    private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
+	    if (nodes == null) {
+	        return null;
+        }
+        int folderCount = 0;
+        for (MegaNode node : nodes) {
+            if (node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            }
+        }
+        int spanCount = 2;
+        if (listFragment instanceof NewGridRecyclerView) {
+            log("listFragment instanceof NewGridRecyclerView");
+            spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
+        }
+        placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+
+        if (folderCount > 0 && placeholderCount != 0 && !((FileExplorerActivityLollipop) context).isList()) {
+            //Add placeholder at folders' end.
+            for (int i = 0;i < placeholderCount;i++) {
+                nodes.add(folderCount + i,null);
+            }
+        }
+        return nodes;
+    }
 
 }

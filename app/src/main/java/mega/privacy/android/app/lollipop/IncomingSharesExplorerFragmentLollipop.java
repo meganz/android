@@ -31,15 +31,21 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -50,6 +56,7 @@ import nz.mega.sdk.MegaUser;
 
 public class IncomingSharesExplorerFragmentLollipop extends Fragment implements OnClickListener{
 
+	private DisplayMetrics outMetrics;
 	Context context;
 	MegaApiAndroid megaApi;
 	ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
@@ -62,8 +69,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	int modeCloud;
 	boolean selectFile;
 
-	RecyclerView listView;
+	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -82,6 +90,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	int orderParent = megaApi.ORDER_DEFAULT_ASC;
 	int order = megaApi.ORDER_DEFAULT_ASC;
+
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -206,13 +216,25 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		handler.removeCallbacksAndMessages(null);
 	}
 
+	public void checkScroll() {
+		if (recyclerView == null) {
+			return;
+		}
+		if (recyclerView.canScrollVertically(-1)){
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+		}
+		else {
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
 
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
-		DisplayMetrics outMetrics = new DisplayMetrics();
+		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
@@ -227,25 +249,28 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		cancelButton = (Button) v.findViewById(R.id.cancel_text);
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		
-		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-		mLayoutManager = new LinearLayoutManager(context);
-		listView.setLayoutManager(mLayoutManager);
-		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+		if (((FileExplorerActivityLollipop) context).isList) {
+			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			mLayoutManager = new LinearLayoutManager(context);
+			recyclerView.setLayoutManager(mLayoutManager);
+		}
+		else {
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
+		}
+
+		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-				if (listView.canScrollVertically(-1)){
-					((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-				}
-				else {
-					((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-				}
+
 			}
 		});
-		
+
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
 
@@ -275,16 +300,17 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode, order);
 		}
-		
+
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		if (adapter == null){
-			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
-			listView.setAdapter(adapter);
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
+			recyclerView.setAdapter(adapter);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
-			adapter.setNodes(nodes);
 			adapter.setSelectFile(selectFile);
 		}
+		adapter.setNodes(nodes);
 
 		findDisabledNodes();
 
@@ -356,12 +382,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (adapter.getItemCount() != 0){
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 
 		}else{
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 			if (parentHandle==-1) {
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
@@ -458,7 +484,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 	public void findDisabledNodes (){
 		log("findDisabledNodes");
-
+		if (((FileExplorerActivityLollipop) context).multiselect) {
+			return;
+		}
 		ArrayList<Long> disabledNodes = new ArrayList<Long>();
 
 		for (int i=0;i<nodes.size();i++){
@@ -529,7 +557,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 
 		int lastFirstVisiblePosition = 0;
-		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		if (((FileExplorerActivityLollipop) context).isList()) {
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		}
+		else {
+			lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+		}
 
 		log("Push to stack "+lastFirstVisiblePosition+" position");
 		lastPositionStack.push(lastFirstVisiblePosition);
@@ -538,13 +571,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		adapter.setParentHandle(parentHandle);
 		nodes.clear();
 		adapter.setNodes(nodes);
-		listView.scrollToPosition(0);
+		recyclerView.scrollToPosition(0);
 
 		((FileExplorerActivityLollipop) context).changeTitle();
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 //			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 //			emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -571,7 +604,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			emptyTextView.setVisibility(View.VISIBLE);
 		}
 		else{
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
@@ -609,7 +642,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			}
 
 			int lastFirstVisiblePosition = 0;
-			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			if (((FileExplorerActivityLollipop) context).isList) {
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			}
+			else {
+				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+			}
 
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
@@ -617,14 +655,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			parentHandle = clickNodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position), order);
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
-			listView.scrollToPosition(0);
+			recyclerView.scrollToPosition(0);
 
 			((FileExplorerActivityLollipop) context).changeTitle();
 			
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 //				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 //				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -654,7 +693,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -731,7 +770,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
 			findDisabledNodes();
-			
+
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
 			((FileExplorerActivityLollipop) context).changeTitle();
 
@@ -743,7 +783,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			log("Scroll to "+lastVisiblePosition+" position");
 
 			if(lastVisiblePosition>=0){
-				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				if (((FileExplorerActivityLollipop) context).isList()) {
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else {
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
 			}
 			adapter.setParentHandle(parentHandle);
 
@@ -759,12 +804,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			if (adapter.getItemCount() != 0){
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 			}
 			else{
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 
 				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
@@ -817,6 +862,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					}
 				}
 
+				addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 				adapter.setNodes(nodes);
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
@@ -826,7 +872,12 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				log("Scroll to "+lastVisiblePosition+" position");
 
 				if(lastVisiblePosition>=0){
-					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					if (((FileExplorerActivityLollipop) context).isList()) {
+						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
+					else {
+						gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+					}
 				}
 				adapter.setParentHandle(parentHandle);
 
@@ -835,7 +886,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				if (adapter.getItemCount() != 0){
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					listView.setVisibility(View.VISIBLE);
+					recyclerView.setVisibility(View.VISIBLE);
 				}
 				else{
 //					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
@@ -862,7 +913,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					emptyTextViewFirst.setText(result);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					listView.setVisibility(View.GONE);
+					recyclerView.setVisibility(View.GONE);
 				}
 				((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 				return 2;
@@ -880,7 +931,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			return 2;
 		}
 		else{
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			separator.setVisibility(View.GONE);
@@ -916,9 +967,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		if (adapter != null){
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
 			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -971,15 +1023,15 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
 	}
 	
-	public RecyclerView getListView(){
-		return listView;
+	public RecyclerView getRecyclerView(){
+		return recyclerView;
 	}
 
 	public void activateButton(boolean show){
@@ -1073,6 +1125,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
 		}
 
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(nodes);
 	}
 
@@ -1114,6 +1167,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			searchNodes = megaApi.search(parent, s, false, order);
 		}
 		if (searchNodes != null && adapter != null) {
+			addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(searchNodes);
 		}
 
@@ -1125,7 +1179,61 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (adapter == null) {
 			return;
 		}
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(nodes);
 		showEmptyScreen();
+	}
+
+	private void addSectionTitle(List<MegaNode> nodes,int type) {
+		Map<Integer, String> sections = new HashMap<>();
+		int placeholderCount;
+		int folderCount = 0;
+		int fileCount = 0;
+		for (MegaNode node : nodes) {
+			if(node == null) {
+				continue;
+			}
+			if (node.isFolder()) {
+				folderCount++;
+			}
+			if (node.isFile()) {
+				fileCount++;
+			}
+		}
+
+		if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
+			int spanCount = 2;
+			if (recyclerView instanceof NewGridRecyclerView) {
+				spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+			}
+			if(folderCount > 0) {
+				for (int i = 0;i < spanCount;i++) {
+					sections.put(i,getString(R.string.general_folders));
+				}
+			}
+
+			if(fileCount > 0 ) {
+				placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+				if (placeholderCount == 0) {
+					for (int i = 0;i < spanCount;i++) {
+						sections.put(folderCount + i,getString(R.string.general_files));
+					}
+				} else {
+					for (int i = 0;i < spanCount;i++) {
+						sections.put(folderCount + placeholderCount + i,getString(R.string.general_files));
+					}
+				}
+			}
+		} else {
+			sections.put(0,getString(R.string.general_folders));
+			sections.put(folderCount,getString(R.string.general_files));
+		}
+
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+			recyclerView.addItemDecoration(headerItemDecoration);
+		}
+		headerItemDecoration.setType(type);
+		headerItemDecoration.setKeys(sections);
 	}
 }

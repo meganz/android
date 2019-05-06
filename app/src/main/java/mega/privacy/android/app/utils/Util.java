@@ -2289,6 +2289,25 @@ public class Util {
 		}
 	}
 
+	public static String getVideoDuration (int duration) {
+		if (duration > 0) {
+			int hours = duration / 3600;
+			int minutes = (duration % 3600) / 60;
+			int seconds = duration % 60;
+
+			String timeString;
+			if (hours > 0) {
+				timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
+			} else {
+				timeString = String.format("%d:%02d",minutes,seconds);
+			}
+
+			log("The duration is: " + hours + " " + minutes + " " + seconds);
+			return timeString;
+		}
+		return null;
+	}
+
 	private static void log(String message) {
 		log("Util", message);
 	}

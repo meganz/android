@@ -29,16 +29,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
+import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -50,6 +56,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	MegaApiAndroid megaApi;
 	ArrayList<MegaNode> nodes;
 	ArrayList<MegaNode> searchNodes = null;
+	DisplayMetrics metrics;
 
 	public long parentHandle = -1;
 	
@@ -66,8 +73,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //	boolean first = false;
 //	private boolean folderSelected = false;
 	LinearLayout optionsBar;
-	RecyclerView listView;
+	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -85,6 +93,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	Handler handler;
 
 	int order;
+
+	public NewHeaderItemDecoration headerItemDecoration;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -216,6 +226,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		handler.removeCallbacksAndMessages(null);
 	}
 
+	public void checkScroll () {
+		if (recyclerView == null) {
+			return;
+		}
+		if (recyclerView.canScrollVertically(-1)){
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+		}
+		else {
+			((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
@@ -223,7 +245,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
-		DisplayMetrics metrics = new DisplayMetrics();
+		metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
 		
 		float density  = getResources().getDisplayMetrics().density;
@@ -241,21 +263,25 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
-		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+		if (((FileExplorerActivityLollipop) context).isList) {
+			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
+			mLayoutManager = new LinearLayoutManager(context);
+			recyclerView.setLayoutManager(mLayoutManager);
+		}
+		else {
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
+			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
-		mLayoutManager = new LinearLayoutManager(context);
-		listView.setLayoutManager(mLayoutManager);
-		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+		}
+
+		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-				if (listView.canScrollVertically(-1)){
-					((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
-				}
-				else {
-					((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
-				}
+				checkScroll();
 			}
 		});
 		
@@ -405,22 +431,22 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			}
 		}
 
-
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		if (adapter == null){
 			if(selectFile){
 				log("Mode SELECT FILE ON");
 			}
-			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
-			adapter.setNodes(nodes);
 			adapter.setSelectFile(selectFile);
 		}
+		adapter.setNodes(nodes);
 
 		adapter.setPositionClicked(-1);		
 		
-		listView.setAdapter(adapter);
+		recyclerView.setAdapter(adapter);
 
 		//If folder has no files
 		showEmptyScreen();
@@ -433,7 +459,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			return;
 		}
 		if (adapter.getItemCount() == 0){
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			if (megaApi.getRootNode().getHandle()==parentHandle) {
@@ -486,7 +512,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		}
 		else{
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}
@@ -532,7 +558,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		log("navigateToFolder");
 
 		int lastFirstVisiblePosition = 0;
-		lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		if (((FileExplorerActivityLollipop) context).isList()) {
+			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+		}
+		else {
+			lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+		}
 
 		log("Push to stack "+lastFirstVisiblePosition+" position");
 		lastPositionStack.push(lastFirstVisiblePosition);
@@ -542,13 +573,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		adapter.setParentHandle(parentHandle);
 		nodes.clear();
 		adapter.setNodes(nodes);
-		listView.scrollToPosition(0);
+		recyclerView.scrollToPosition(0);
 
 		((FileExplorerActivityLollipop) context).changeTitle();
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 //			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
@@ -575,7 +606,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			emptyTextViewFirst.setText(result);
 		}
 		else{
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.GONE);
 		}
 
@@ -605,7 +636,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			MegaNode n = clickNodes.get(position);
 
 			int lastFirstVisiblePosition = 0;
-			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			if (((FileExplorerActivityLollipop)context).isList) {
+				lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+			}
+			else {
+				lastFirstVisiblePosition = gridLayoutManager.findFirstCompletelyVisibleItemPosition();
+			}
 
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
@@ -653,14 +689,15 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(clickNodes.get(position), order);
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
-			listView.scrollToPosition(0);
+			recyclerView.scrollToPosition(0);
 
 			((FileExplorerActivityLollipop) context).changeTitle();
 			
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
@@ -716,7 +753,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -861,11 +898,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 
 			nodes = megaApi.getChildren(parentNode, order);
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
@@ -875,7 +913,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			log("Scroll to "+lastVisiblePosition+" position");
 
 			if(lastVisiblePosition>=0){
-				mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				if (((FileExplorerActivityLollipop) context).isList()) {
+					mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
+				else {
+					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
+				}
 			}
 			adapter.setParentHandle(parentHandle);
 			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
@@ -895,13 +938,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		log("setDisableNodes");
 		if (adapter == null){
 			log("Adapter is NULL");
-			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, listView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
 		}
-//		else{
-//			adapter.setParentHandle(parentHandle);
-//			adapter.setNodes(nodes);
-//			adapter.setSelectFile(selectFile);
-//		}
 		adapter.setDisableNodes(disabledNodes);
 		adapter.setSelectFile(selectFile);
 	}
@@ -928,9 +966,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		log("setNodes");
 		this.nodes = nodes;
 		if (adapter != null){
+			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
 			if (adapter.getItemCount() == 0){
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
@@ -980,7 +1019,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -1072,8 +1111,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	}
 
-	public RecyclerView getListView(){
-		return listView;
+	public RecyclerView getRecyclerView(){
+		return recyclerView;
 	}
 
 	public void activateButton(boolean show){
@@ -1094,6 +1133,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), order);
 		}
 
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(nodes);
 	}
 
@@ -1117,6 +1157,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		searchNodes = megaApi.search(parent, s, false, order);
 		if (searchNodes != null && adapter != null) {
+			addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(searchNodes);
 		}
 		showEmptyScreen();
@@ -1127,7 +1168,61 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (adapter == null) {
 			return;
 		}
+		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(nodes);
 		showEmptyScreen();
+	}
+
+	private void addSectionTitle(List<MegaNode> nodes,int type) {
+		Map<Integer, String> sections = new HashMap<>();
+		int placeholderCount;
+		int folderCount = 0;
+		int fileCount = 0;
+		for (MegaNode node : nodes) {
+			if(node == null) {
+				continue;
+			}
+			if (node.isFolder()) {
+				folderCount++;
+			}
+			if (node.isFile()) {
+				fileCount++;
+			}
+		}
+
+		if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
+			int spanCount = 2;
+			if (recyclerView instanceof NewGridRecyclerView) {
+				spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+			}
+			if(folderCount > 0) {
+				for (int i = 0;i < spanCount;i++) {
+					sections.put(i,getString(R.string.general_folders));
+				}
+			}
+
+			if(fileCount > 0 ) {
+				placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+				if (placeholderCount == 0) {
+					for (int i = 0;i < spanCount;i++) {
+						sections.put(folderCount + i,getString(R.string.general_files));
+					}
+				} else {
+					for (int i = 0;i < spanCount;i++) {
+						sections.put(folderCount + placeholderCount + i,getString(R.string.general_files));
+					}
+				}
+			}
+		} else {
+			sections.put(0,getString(R.string.general_folders));
+			sections.put(folderCount,getString(R.string.general_files));
+		}
+
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+			recyclerView.addItemDecoration(headerItemDecoration);
+		}
+		headerItemDecoration.setType(type);
+		headerItemDecoration.setKeys(sections);
 	}
 }

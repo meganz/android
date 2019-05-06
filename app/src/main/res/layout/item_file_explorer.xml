@@ -43,6 +43,7 @@
         android:layout_below="@+id/file_explorer_filename"
         android:textColor="@color/file_list_second_row"
         android:layout_marginLeft="13dp"
+        android:layout_marginRight="12dp"
         android:textSize="14sp"
         android:ellipsize="end"
         android:singleLine="true"
