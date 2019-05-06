@@ -150,6 +150,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
 
+    private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Void>{
+        MegaChatLollipopAdapter.ViewHolderMessageChat holder;
+        MegaNodeList nodelist;
+        public ChatVoiceClipAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
+            this.holder = holder;
+        }
+        @Override
+        protected Void doInBackground(MegaNodeList... params) {
+            log("ChatVoiceClipAsyncTask-doInBackground");
+            nodelist = params[0];
+            ((ChatActivityLollipop)context).sendToDownload(nodelist);
+            return null;
+        }
+    }
+
     private class ChatPreviewAsyncTask extends AsyncTask<MegaNode, Void, Integer> {
 
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
@@ -490,6 +505,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         myUserHandle = megaChatApi.getMyUserHandle();
         log("MegaChatLollipopAdapter: MyUserHandle: " + myUserHandle);
+        //Download voice clips:
+        ArrayList<MegaNodeList> nodeVCtoDownload = new ArrayList<>();
+        log("*****Create adapter: messages.size = "+messages.size());
+        for(AndroidMegaChatMessage msg:messages){
+            if(msg.getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP){
+                if(msg.getMessage().getUserHandle() != megaChatApi.getMyUserHandle()){
+                    nodeVCtoDownload.add(msg.getMessage().getMegaNodeList());
+                }
+            }
+        }
+
     }
 
     public static class ViewHolderMessageChat extends RecyclerView.ViewHolder{
@@ -6243,7 +6269,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Contact message: " + userHandle);
 
             //Download voice clips:
-            ((ChatActivityLollipop)context).isDowloaded(nodeListOwn);
+            boolean isDownload = ((ChatActivityLollipop)context).isDowloaded(nodeListOwn);
+            if(!isDownload){
+                try {
+                    new MegaChatLollipopAdapter.ChatVoiceClipAsyncTask(holder).execute(nodeListOwn);
+                } catch (Exception ex) {
+                    //Too many AsyncTasks
+                    log("Too many AsyncTasks");
+                }
+            }
 
             if (((ChatActivityLollipop) context).isGroup()) {
                 holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);

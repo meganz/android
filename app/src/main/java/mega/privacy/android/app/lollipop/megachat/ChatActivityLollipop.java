@@ -5181,7 +5181,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         emptyLayout.setVisibility(View.GONE);
     }
 
-    public void isDowloaded(MegaNodeList nodeList){
+    public boolean isDowloaded(MegaNodeList nodeList){
         String parentPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
         if (nodeList != null) {
             if (nodeList.size() == 1) {
@@ -5195,13 +5195,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(localPath != null){
                         log("this voice clip is downloaded");
-                        return;
+                        return true;
                     }
                 }
             }
         }
         log("this voice clip is not downloaded");
-        chatC.prepareForChatDownload(nodeList, true);
+        return false;
     }
 
     @Override
@@ -5241,7 +5241,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP){
                 log("onMessageReceived -> type voice clip");
                 MegaNodeList megaNodeList = msg.getMegaNodeList();
-                chatC.prepareForChatDownload(megaNodeList, true);
+                sendToDownload(megaNodeList);
             }
         }
         else {
@@ -5319,7 +5319,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //        mLayoutManager.setStackFromEnd(true);
 //        mLayoutManager.scrollToPosition(0);
     }
+    public void sendToDownload(MegaNodeList nodelist){
+        chatC.prepareForChatDownload(nodelist, true);
 
+    }
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageUpdate!: "+ msg.getMsgId());
@@ -6021,7 +6024,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void loadMessage(AndroidMegaChatMessage messageToShow){
         log("loadMessage");
-
         messageToShow.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL);
         messages.add(0,messageToShow);
 
@@ -6070,7 +6072,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int reinsertNodeAttachmentNoRevoked(AndroidMegaChatMessage msg){
-        log("reinsertNodeAttachmentNoRevoked");
+        log("*reinsertNodeAttachmentNoRevoked");
         int lastIndex = messages.size()-1;
         log("1lastIndex: "+lastIndex);
         if(messages.size()==-1){
