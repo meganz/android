@@ -1493,6 +1493,7 @@ public class ChatController {
     }
 
     private void filePathDefault(String path, final ArrayList<MegaNode> nodeList, final boolean isVoiceClip){
+        log("filePathDefault");
         File defaultPathF = new File(path);
         defaultPathF.mkdirs();
         checkSizeBeforeDownload(path, nodeList, isVoiceClip);
@@ -1523,7 +1524,6 @@ public class ChatController {
         String downloadLocationDefaultPath = getDefaultLocationPath(isVoiceClip);
 
         if(isVoiceClip){
-            log("NOT askMe");
             filePathDefault(downloadLocationDefaultPath,nodeList,isVoiceClip);
             return;
         }
@@ -1703,7 +1703,7 @@ public class ChatController {
         }
 
         if(isVoiceClip){
-            downloadVC(parentPath, nodeList);
+            download(parentPath, nodeList, isVoiceClip);
             return;
         }
 
@@ -1745,80 +1745,12 @@ public class ChatController {
         }
     }
 
-
-    public void downloadVC(String parentPath, ArrayList<MegaNode> nodeList){
-        log("downloadVC");
-        if(context instanceof  ChatActivityLollipop){
-            ActivityCompat.requestPermissions(((ChatActivityLollipop) context),
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    Constants.REQUEST_WRITE_STORAGE);
-        }
-
-        if (nodeList != null){
-            if(nodeList.size() == 1){
-                log("hashes.length == 1");
-                MegaNode tempNode = nodeList.get(0);
-                if (context instanceof ChatActivityLollipop) {
-                    tempNode = authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
-                }
-
-                if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-                    log("tempNode is TYPE_FILE");
-                    String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
-                    //Check if the file is already downloaded
-                    if(localPath != null){
-                        log("it was already downloaded: localPath != null");
-                        try {
-                            log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getHandle());
-                            Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-                        }
-                        catch(Exception e) {
-                            log("Exception!!");
-                        }
-                        return;
-                    }//localPath found
-                    else{
-                        log("It is not already downloaded: localPath == null");
-
-                    }
-                }
-            }
-
-            for (int i=0; i<nodeList.size();i++) {
-                log("hashes.length more than 1 = "+nodeList.size());
-                MegaNode nodeToDownload = nodeList.get(i);
-                if(nodeToDownload != null){
-                    log("node NOT null");
-                    Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-                    dlFiles.put(nodeToDownload, parentPath);
-
-                    for (MegaNode document : dlFiles.keySet()) {
-                        String path = dlFiles.get(document);
-                        log("path of the file: "+path);
-                        log("start service");
-                        Intent service = new Intent(context, DownloadService.class);
-                        if (context instanceof ChatActivityLollipop) {
-                            nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());
-                        }
-                        String serializeString = nodeToDownload.serialize();
-                        log("serializeString: "+serializeString);
-                        service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
-                        service.putExtra(DownloadService.EXTRA_PATH, path);
-                        service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                        service.putExtra(DownloadService.EXTRA_SHOW_NOTIFICATION, false);
-                        service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                        context.startService(service);
-                    }
-                }
-                else {
-                    log("node NOT fOUND!!!!!");
-                }
-            }
-        }
+    public void download(String parentPath, ArrayList<MegaNode> nodeList){
+        download(parentPath,nodeList,false);
     }
 
-    public void download(String parentPath, ArrayList<MegaNode> nodeList){
-        log("download-----------");
+    public void download(String parentPath, ArrayList<MegaNode> nodeList, boolean isVoiceClip){
+        log("download----------- ");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1865,7 +1797,7 @@ public class ChatController {
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     if(localPath != null){
-                        log("Not already download: localPath != null");
+                        log("localPath != null");
                         try {
                             log("Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
                             Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
@@ -1886,6 +1818,10 @@ public class ChatController {
                         }
                         catch(Exception e) {
                             log("Exception!!");
+                        }
+
+                        if(isVoiceClip){
+                            return;
                         }
 
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
@@ -1985,6 +1921,7 @@ public class ChatController {
                         }
                         else {
                             log("MimeTypeList other file");
+
                             if(context instanceof ChatFullScreenImageViewer){
                                 ((ChatFullScreenImageViewer) context).showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded));
                             }
@@ -2050,13 +1987,19 @@ public class ChatController {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((NodeAttachmentHistoryActivity) context).getChatRoom());
                         }
                         String serializeString = nodeToDownload.serialize();
+
+                        if(isVoiceClip){
+                            service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
+                            service.putExtra(DownloadService.EXTRA_SHOW_NOTIFICATION, false);
+                        }else{
+                            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                                service.putExtra("fromMV", true);
+                            }
+                        }
                         log("serializeString: "+serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                         service.putExtra(DownloadService.EXTRA_PATH, path);
                         service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
-                        if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
-                            service.putExtra("fromMV", true);
-                        }
                         context.startService(service);
                     }
                 }

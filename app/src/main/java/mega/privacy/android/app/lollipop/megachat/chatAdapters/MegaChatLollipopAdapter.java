@@ -6242,6 +6242,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             long userHandle = message.getUserHandle();
             log("Contact message: " + userHandle);
 
+            //Download voice clips:
+            ((ChatActivityLollipop)context).isDowloaded(nodeListOwn);
+
             if (((ChatActivityLollipop) context).isGroup()) {
                 holder.fullNameTitle = cC.getFullName(userHandle, chatRoom);
 
@@ -6250,10 +6253,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 if (holder.fullNameTitle.trim().length() <= 0) {
                     log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
-                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
-                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
+                    holder.fullNameTitle = "Unknown name";
+                    if (!(holder.nameRequestedAction)) {
                         log("Call for nonContactName: " + message.getUserHandle());
-                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
+                        holder.nameRequestedAction = true;
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle, chatRoom.isPreview());
                         megaChatApi.getUserFirstname(userHandle, chatRoom.getAuthorizationToken(), listener);
                         megaChatApi.getUserLastname(userHandle, chatRoom.getAuthorizationToken(), listener);
@@ -6263,7 +6266,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
                 holder.nameContactText.setVisibility(View.VISIBLE);
-                holder.nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
+                holder.nameContactText.setText(holder.fullNameTitle);
             } else {
                 holder.fullNameTitle = chatRoom.getTitle();
                 holder.nameContactText.setVisibility(View.GONE);
@@ -6311,7 +6314,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (messages.get(position - 1).isShowAvatar()) {
                 holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
-                setContactAvatar(holder, userHandle, ((ViewHolderMessageChat) holder).fullNameTitle, false);
+                setContactAvatar(holder, userHandle, holder.fullNameTitle, false);
             } else {
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
             }
@@ -6414,7 +6417,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
     }
-
 
     public void bindContactAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("bindContactAttachmentMessage");

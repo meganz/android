@@ -3472,6 +3472,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     break;
                 }
                 case R.id.chat_cab_menu_download:{
+                    log("###### chat_cab_menu_download ");
                     clearSelections();
                     hideMultipleSelect();
                     ArrayList<MegaNodeList> list = new ArrayList<>();
@@ -5178,6 +5179,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         chatRelativeLayout.setVisibility(View.VISIBLE);
         emptyLayout.setVisibility(View.GONE);
+    }
+
+    public void isDowloaded(MegaNodeList nodeList){
+        String parentPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
+        if (nodeList != null) {
+            if (nodeList.size() == 1) {
+                MegaNode tempNode = nodeList.get(0);
+                if (context instanceof ChatActivityLollipop) {
+                    tempNode = chatC.authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
+                }
+
+                if ((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE) {
+                    String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
+
+                    if(localPath != null){
+                        log("this voice clip is downloaded");
+                        return;
+                    }
+                }
+            }
+        }
+        log("this voice clip is not downloaded");
+        chatC.prepareForChatDownload(nodeList, true);
     }
 
     @Override
