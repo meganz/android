@@ -720,8 +720,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
@@ -729,7 +728,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 		else{
 			if (parentHandleStack.isEmpty()){
-				super.callToSuperBack = true;
 				super.onBackPressed();
 			}
 			else{

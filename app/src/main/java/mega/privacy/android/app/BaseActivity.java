@@ -43,7 +43,6 @@ public class BaseActivity extends AppCompatActivity {
 
     private AlertDialog sslErrorDialog;
 
-    protected boolean callToSuperBack = false;
     boolean delaySignalPresence = false;
 
     @Override
@@ -150,8 +149,8 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("BROADCAST TO SEND SIGNAL PRESENCE");
-                if(delaySignalPresence && megaChatApi.getPresenceConfig().isPending()==false){
+                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
                 }
@@ -239,7 +238,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 if(!(this instanceof ChatCallActivity)){
                     log("Send signal presence if needed");
-                    if(megaChatApi.isSignalActivityRequired()){
+                    if(megaChatApi != null && megaChatApi.isSignalActivityRequired()){
                         megaChatApi.signalPresenceActivity();
                     }
                 }
@@ -255,9 +254,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         retryConnectionsAndSignalPresence();
-        if(callToSuperBack){
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override

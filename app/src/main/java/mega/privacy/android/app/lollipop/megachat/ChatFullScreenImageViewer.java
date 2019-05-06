@@ -1006,6 +1006,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, fragmentContainer, s);
 	}
+    
+    public void showSnackbar(int type, String s, int chatId){
+        showSnackbar(type, fragmentContainer, s, chatId);
+    }
 
 	public void touchImage() {
 		log("touchImage");
@@ -1042,13 +1046,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		}
 	}
-
-	@Override
-	public void onBackPressed() {
-		super.callToSuperBack = true;
-		super.onBackPressed();
-	}
-
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {}
 

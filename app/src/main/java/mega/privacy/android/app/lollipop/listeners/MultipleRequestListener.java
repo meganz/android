@@ -292,7 +292,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 ((ManagerActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
             }
             else if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).removeRequestDialog();
+                ((ChatActivityLollipop) context).removeProgressDialog();
                 ((ChatActivityLollipop) context).showSnackbar(Constants.SNACKBAR_TYPE, message, -1);
             }
             else if(context instanceof ContactAttachmentActivityLollipop){

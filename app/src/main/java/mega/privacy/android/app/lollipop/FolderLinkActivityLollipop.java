@@ -899,20 +899,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 		
 		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
+		String downloadLocationDefaultPath = Util.getDownloadLocation(this);
 			
 		if (askMe){
 
@@ -2029,8 +2016,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		if (fileLinkFolderLink){
 			fileLinkFragmentContainer.setVisibility(View.GONE);
@@ -2113,7 +2099,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 		}
 
-		super.callToSuperBack = true;
 		super.onBackPressed();
 	}
 
