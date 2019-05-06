@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -2280,6 +2279,12 @@ public class Util {
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
 		}
+	}
+
+	public static boolean isTablet(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
 	}
 
 	public static boolean checkPermissionGranted (String permission, Context context) {
