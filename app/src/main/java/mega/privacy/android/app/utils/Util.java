@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -2278,6 +2279,15 @@ public class Util {
 		if (v != null){
 			InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(v.getWindowToken(), flag);
+		}
+	}
+
+	public static boolean checkPermissionGranted (String permission, Context context) {
+		try {
+			return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+		} catch (IllegalArgumentException ex) {
+			log("IllegalArgument Exception is thrown");
+			return false;
 		}
 	}
 
