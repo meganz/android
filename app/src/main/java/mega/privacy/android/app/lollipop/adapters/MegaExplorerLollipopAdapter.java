@@ -422,6 +422,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
 
         holder.document = node.getHandle();
+        holder.itemLayout.setVisibility(View.VISIBLE);
 
         if (node.isFolder()){
             holder.folderLayout.setVisibility(View.VISIBLE);

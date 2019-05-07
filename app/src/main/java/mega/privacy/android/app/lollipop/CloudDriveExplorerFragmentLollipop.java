@@ -433,9 +433,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		if (adapter == null){
-			if(selectFile){
-				log("Mode SELECT FILE ON");
-			}
 			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
 		}
 		else{
@@ -523,7 +520,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
         super.onAttach(activity);
         context = activity;
     }
-	
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");

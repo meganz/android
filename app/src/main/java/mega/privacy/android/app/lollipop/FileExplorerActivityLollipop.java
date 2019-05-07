@@ -3359,7 +3359,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			ft.commitAllowingStateLoss();
 		}
 
-//		mTabsAdapterExplorer.notifyDataSetChanged();
+		mTabsAdapterExplorer.notifyDataSetChanged();
 	}
 
 	private void updateManagerView () {
