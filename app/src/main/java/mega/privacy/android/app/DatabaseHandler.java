@@ -2350,8 +2350,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setAccountDetailsTimeStamp (){
+		setAccountDetailsTimeStamp(System.currentTimeMillis()/1000);
+	}
+
+	public void resetAccountDetailsTimeStamp (){
+		setAccountDetailsTimeStamp(-1);
+	}
+
+	private void setAccountDetailsTimeStamp (long accountDetailsTimeStamp){
 		log("setAccountDetailsTimeStamp");
-		long accountDetailsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
