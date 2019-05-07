@@ -47,6 +47,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -281,7 +282,10 @@ public class ChatController {
         if(message!=null){
 
             if((message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (message.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                log("Delete node attachment message");
+                log("Delete node attachment message ------");
+                if((message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) && (message.getMegaNodeList()!=null) && (message.getMegaNodeList().size()>0) && (message.getMegaNodeList().get(0)!=null)){
+                    ((ChatActivityLollipop) context).deleteOwnVoiceClip(message.getMegaNodeList().get(0).getName());
+                }
                 megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
             }
             else{
@@ -1500,7 +1504,7 @@ public class ChatController {
     }
 
     public void prepareForDownloadLollipop(final ArrayList<MegaNode> nodeList, final boolean isVoiceClip){
-        log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, to path = "+getDefaultLocationPath(isVoiceClip));
+        log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
         long size = 0;
         long[] hashes = new long[nodeList.size()];
         for (int i=0;i<nodeList.size();i++){
@@ -1521,7 +1525,7 @@ public class ChatController {
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
-        String downloadLocationDefaultPath = getDefaultLocationPath(isVoiceClip);
+        String downloadLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, isVoiceClip);
 
         if(isVoiceClip){
             filePathDefault(downloadLocationDefaultPath,nodeList,isVoiceClip);
@@ -1593,16 +1597,6 @@ public class ChatController {
         }
     }
 
-    private String getDefaultLocationPath(boolean isVoiceNote){
-        String locationPath;
-        if(isVoiceNote){
-            locationPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
-        }else{
-            locationPath = Util.getDownloadLocation(context);
-        }
-        return locationPath;
-    }
-
     public void prepareForChatDownload(ArrayList<MegaNodeList> list){
         prepareForChatDownload(list, false);
     }
@@ -1653,7 +1647,7 @@ public class ChatController {
         }
 
         boolean advancedDevices=false;
-        String downloadLocationDefaultPath = getDefaultLocationPath(isVoiceClip);
+        String downloadLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, isVoiceClip);
 
         File defaultPathF = new File(downloadLocationDefaultPath);
         defaultPathF.mkdirs();

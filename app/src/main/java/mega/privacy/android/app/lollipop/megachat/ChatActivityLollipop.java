@@ -4049,7 +4049,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
 
-                                        String downloadLocationDefaultPath = Util.getDownloadLocation(this);
+                                        String downloadLocationDefaultPath = ChatUtil.getDefaultLocationPath(this,false);
                                         String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
                                         log("localPath: "+localPath);
 
@@ -5323,13 +5323,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         chatC.prepareForChatDownload(nodelist, true);
 
     }
+    public void deleteOwnVoiceClip(String nameFile){
+        String path = ChatUtil.getDefaultLocationPath(context, true);
+        File f = new File(path, nameFile);
+        if(f.exists()){
+            f.delete();
+        }
+
+    }
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageUpdate!: "+ msg.getMsgId());
 
         int resultModify = -1;
         if(msg.isDeleted()){
-            log("The message has been deleted");
             deleteMessage(msg, false);
             return;
         }
@@ -5338,7 +5345,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(msg.hasChanged(MegaChatMessage.CHANGE_TYPE_ACCESS)){
             log("onMessageUpdate() Change access of the message");
-
             MegaNodeList nodeList = msg.getMegaNodeList();
             int revokedCount = 0;
 
@@ -8281,7 +8287,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void hideKeyboard() {
         log("hideKeyboard");
-        if (fileStorageLayout.isShown()) {
+        if((fileStorageLayout!=null)&&(fileStorageLayout.isShown())) {
             hideFileStorageSection();
         }
         if(emojiKeyboard!=null) {

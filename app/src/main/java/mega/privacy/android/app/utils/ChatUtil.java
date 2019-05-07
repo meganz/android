@@ -2,6 +2,8 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -85,6 +87,17 @@ public class ChatUtil {
         }
         return false;
     }
+
+    public static String getDefaultLocationPath(Context context, boolean isVoiceNote){
+        String locationPath;
+        if(isVoiceNote){
+            locationPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
+        }else{
+            locationPath = Util.getDownloadLocation(context);
+        }
+        return locationPath;
+    }
+
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);
     }

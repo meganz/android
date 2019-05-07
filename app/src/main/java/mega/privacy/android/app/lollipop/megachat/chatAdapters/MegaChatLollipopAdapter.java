@@ -505,17 +505,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         myUserHandle = megaChatApi.getMyUserHandle();
         log("MegaChatLollipopAdapter: MyUserHandle: " + myUserHandle);
-        //Download voice clips:
-        ArrayList<MegaNodeList> nodeVCtoDownload = new ArrayList<>();
-        log("*****Create adapter: messages.size = "+messages.size());
-        for(AndroidMegaChatMessage msg:messages){
-            if(msg.getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP){
-                if(msg.getMessage().getUserHandle() != megaChatApi.getMyUserHandle()){
-                    nodeVCtoDownload.add(msg.getMessage().getMegaNodeList());
-                }
-            }
-        }
-
     }
 
     public static class ViewHolderMessageChat extends RecyclerView.ViewHolder{
