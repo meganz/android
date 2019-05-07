@@ -1980,19 +1980,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 myAudioRecorder.reset();
                 myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
                 myAudioRecorder.setOutputFile(outputFileVoiceNotes);
-            }
-            try {
-                if(!isRecordingNow()){
-                    if(myAudioRecorder!=null){
-                        log("startRecord: myAudioRecorder.prepare() && myAudioRecorder.start()");
-                        myAudioRecorder.prepare();
-                        myAudioRecorder.start();
-                        setRecordingNow(true);
-                    }
+                myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                try {
+                    myAudioRecorder.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }catch(IllegalStateException ise){}catch (IOException ioe){}
+                myAudioRecorder.start();
+                setRecordingNow(true);
+            }
         }
     }
 
