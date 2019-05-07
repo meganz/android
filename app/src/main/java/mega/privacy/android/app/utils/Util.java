@@ -241,6 +241,21 @@ public class Util {
 		}
 	}
 
+    public static String getSDCardRoot(File sd) {
+        String s = sd.getPath();
+        int i = 0,x = 0;
+        for(; x < s.toCharArray().length;x++) {
+            char c = s.toCharArray()[x];
+            if(c == '/') {
+                i++;
+            }
+            if(i == 3) {
+                break;
+            }
+        }
+        return s.substring(0,x);
+    }
+
 	public static void showErrorAlertDialogGroupCall(String message, final boolean finish, final Activity activity){
 		if(activity == null){
 			return;

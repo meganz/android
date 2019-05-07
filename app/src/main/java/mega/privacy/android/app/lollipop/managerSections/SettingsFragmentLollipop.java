@@ -1538,14 +1538,12 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 								log("more than one");
 								if (fs[1] != null){
 									log("external not NULL");
-									String path = fs[1].getAbsolutePath();
-									dbH.setStorageDownloadLocation(path);
-									if (downloadLocation != null){
-										downloadLocation.setSummary(path);
-									}
-									if (downloadLocationPreference != null){
-										downloadLocationPreference.setSummary(path);
-									}
+									String sdRoot = Util.getSDCardRoot(fs[1]);
+                                    Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+                                    intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
+                                    startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 								}
 								else{
 									log("external NULL -- intent to FileStorageActivityLollipop");

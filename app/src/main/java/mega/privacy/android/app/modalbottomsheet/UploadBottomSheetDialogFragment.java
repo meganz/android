@@ -217,7 +217,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         intent.setClass(context,FileStorageActivityLollipop.class);
         if (fromSDCard) {
             File[] fs = context.getExternalFilesDirs(null);
-            String sdRoot = getSDCardRoot(fs[1]);
+            String sdRoot = Util.getSDCardRoot(fs[1]);
             intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
         }
 
@@ -226,21 +226,6 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         } else if (context instanceof ContactFileListActivityLollipop) {
             ((ContactFileListActivityLollipop)context).startActivityForResult(intent,Constants.REQUEST_CODE_GET_LOCAL);
         }
-    }
-
-    private String getSDCardRoot(File sd) {
-        String s = sd.getPath();
-        int i = 0,x = 0;
-        for(; x < s.toCharArray().length;x++) {
-            char c = s.toCharArray()[x];
-            if(c == '/') {
-                i++;
-            }
-            if(i == 3) {
-                break;
-            }
-        }
-        return s.substring(0,x);
     }
 
     @Override
