@@ -354,6 +354,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
 		chatAttachmentsChatListPreference.setOnPreferenceChangeListener(this);
+		// Handle the char sequence until the French terms are properly handled.
+		CharSequence[] sequences = chatAttachmentsChatListPreference.getEntries();
+		CharSequence[] changedCharSequences = new CharSequence[sequences.length];
+		for (int i = 0; i<sequences.length; i++) {
+			CharSequence changedSequence = sequences[i].toString().replace(" %s", "");
+			changedCharSequences[i] = changedSequence;
+		}
+		chatAttachmentsChatListPreference.setEntries(changedCharSequences);
 
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
 		statusChatListPreference.setOnPreferenceChangeListener(this);
