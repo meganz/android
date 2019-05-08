@@ -1383,6 +1383,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		log("onSaveInstanceState");
 		super.onSaveInstanceState(bundle);
 		bundle.putBoolean("folderSelected", folderSelected);
+		cDriveExplorer = getCloudExplorerFragment();
 		if(cDriveExplorer!=null){
 			parentHandleCloud = cDriveExplorer.getParentHandle();
 		}
@@ -2052,10 +2053,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			}
 		}
 		
-	}
-	
-	public void setParentHandle (long parentHandle){
-		this.parentHandleCloud = parentHandle;
 	}
 
 	/*
@@ -3250,42 +3247,63 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		if (!Util.isChatEnabled()) {
 			return null;
 		}
+		ChatExplorerFragment c;
 
 		if (importFileF) {
 			return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorer");
 		}
 		else if(isChatFirst){
-			return  (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
+			c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
 		else{
-			return  (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
+			c = (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
+
+		if (c != null && c.isAdded()) {
+			return c;
+		}
+
+		return null;
 	}
 
 	private IncomingSharesExplorerFragmentLollipop getIncomingExplorerFragment () {
+		IncomingSharesExplorerFragmentLollipop iS;
+
 		if (importFileF) {
 			return (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 		}
 		else if (isChatFirst) {
-			return  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
+			iS =  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
 		else {
-			return  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
+			iS = (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 
+		if (iS != null && iS.isAdded()) {
+			return iS;
+		}
 
+		return null;
 	}
 
 	private CloudDriveExplorerFragmentLollipop getCloudExplorerFragment () {
+		CloudDriveExplorerFragmentLollipop cD;
+
 		if (importFileF || tabShown == NO_TABS) {
 			return (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 		}
 		else if (isChatFirst) {
-			return  (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
+			cD = (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 		else {
-			return  (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
+			cD = (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
+
+		if (cD != null && cD.isAdded()) {
+			return cD;
+		}
+
+		return null;
 	}
 
 	public void refreshOrderNodes (int order) {

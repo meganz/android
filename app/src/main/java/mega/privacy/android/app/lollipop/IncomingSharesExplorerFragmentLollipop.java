@@ -358,7 +358,14 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 
 		log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		if ((((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile) && !((FileExplorerActivityLollipop)context).multiselect){
+		setOptionsBarVisibility();
+		showEmptyScreen();
+
+		return v;
+	}
+
+	private void setOptionsBarVisibility() {
+		if (!isMultiselect() && (((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile)){
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
@@ -366,10 +373,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			separator.setVisibility(View.VISIBLE);
 			optionsBar.setVisibility(View.VISIBLE);
 		}
-
-		showEmptyScreen();
-
-		return v;
 	}
 
 	private void getNodes() {
@@ -449,8 +452,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		log("findNodes");
 		((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);
 
-		separator.setVisibility(View.GONE);
-		optionsBar.setVisibility(View.GONE);
+		setOptionsBarVisibility();
 
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		nodes.clear();
@@ -555,14 +557,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
 		log("((FileExplorerActivityLollipop)context).deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-		if ((((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile) && !((FileExplorerActivityLollipop)context).multiselect){
-			separator.setVisibility(View.GONE);
-			optionsBar.setVisibility(View.GONE);
-		}
-		else{
-			separator.setVisibility(View.VISIBLE);
-			optionsBar.setVisibility(View.VISIBLE);
-		}
+		setOptionsBarVisibility();
 
 		int lastFirstVisiblePosition = 0;
 		if (((FileExplorerActivityLollipop) context).isList()) {
@@ -640,14 +635,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			}
 			((FileExplorerActivityLollipop)context).increaseDeepBrowserTree();
 			log("deepBrowserTree value: "+((FileExplorerActivityLollipop)context).deepBrowserTree);
-			if ((((FileExplorerActivityLollipop)context).deepBrowserTree <= 0 || selectFile) && !((FileExplorerActivityLollipop)context).multiselect){
-				separator.setVisibility(View.GONE);
-				optionsBar.setVisibility(View.GONE);
-			}
-			else{
-				separator.setVisibility(View.VISIBLE);
-				optionsBar.setVisibility(View.VISIBLE);
-			}
+			setOptionsBarVisibility();
 
 			int lastFirstVisiblePosition = 0;
 			if (((FileExplorerActivityLollipop) context).isList) {
@@ -798,15 +786,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 			}
 			adapter.setParentHandle(parentHandle);
-
-			if (((FileExplorerActivityLollipop)context).multiselect) {
-				separator.setVisibility(View.VISIBLE);
-				optionsBar.setVisibility(View.VISIBLE);
-			}
-			else {
-				separator.setVisibility(View.GONE);
-				optionsBar.setVisibility(View.GONE);
-			}
+			setOptionsBarVisibility();
 
 			if (adapter.getItemCount() != 0){
 				emptyImageView.setVisibility(View.GONE);
@@ -926,14 +906,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				return 2;
 			}
 
-			if(selectFile && !((FileExplorerActivityLollipop)context).multiselect){
-				separator.setVisibility(View.GONE);
-				optionsBar.setVisibility(View.GONE);
-			}
-			else{
-				separator.setVisibility(View.VISIBLE);
-				optionsBar.setVisibility(View.VISIBLE);
-			}
+			setOptionsBarVisibility();
 
 			return 2;
 		}

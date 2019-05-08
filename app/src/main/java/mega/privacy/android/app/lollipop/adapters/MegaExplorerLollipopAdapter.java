@@ -69,7 +69,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private ArrayList<Long> disabledNodes;
 
 	Object fragment;
-	
+
 	long parentHandle = -1;
 	boolean selectFile = false;
 
@@ -762,11 +762,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		notifyDataSetChanged();
 		visibilityFastScroller();
 	}
-	
+
 	public long getParentHandle(){
 		return parentHandle;
 	}
-	
+
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
 	}
