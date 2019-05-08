@@ -48,14 +48,14 @@
                     <RelativeLayout
                         android:id="@+id/chat_group_properties_avatar_container_layout"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="1dp">
 
                         <RelativeLayout
                             android:id="@+id/chat_group_properties_avatar_layout"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:layout_gravity="right"
-                            android:layout_marginTop="16dp"
                             android:layout_marginLeft="16dp">
 
                             <mega.privacy.android.app.components.RoundedImageView
@@ -81,9 +81,8 @@
                         android:id="@+id/chat_group_contact_properties_info_text_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/chat_group_properties_avatar_container_layout"
                         android:layout_marginTop="16dp"
-                        android:layout_marginBottom="13dp">
+                        android:layout_marginBottom="16dp">
 
                         <TextView
                             android:id="@+id/chat_group_contact_properties_info_title"
@@ -245,23 +244,10 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="left|center_vertical"
                             android:textColor="@color/name_my_account"
+                            android:text="@string/get_chat_link_option"
                             android:layout_weight="5"
                             android:textSize="16dp" />
 
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginLeft="16dp">
-                        <ImageView
-                            android:id="@+id/chat_group_contact_properties_chat_link_points"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_gravity="right|center_vertical"
-                            android:src="@drawable/ic_dots_vertical_grey" />
                     </RelativeLayout>
                 </LinearLayout>
 

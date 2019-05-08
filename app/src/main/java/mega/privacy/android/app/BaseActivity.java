@@ -30,6 +30,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -45,7 +46,6 @@ public class BaseActivity extends AppCompatActivity {
 
     private AlertDialog sslErrorDialog;
 
-    protected boolean callToSuperBack = false;
     boolean delaySignalPresence = false;
 
     @Override
@@ -152,13 +152,10 @@ public class BaseActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
-                log("BROADCAST TO SEND SIGNAL PRESENCE");
-                MegaChatPresenceConfig config = megaChatApi.getPresenceConfig();
-                if(config != null) {
-                    if(delaySignalPresence && !config.isPending()){
-                        delaySignalPresence = false;
-                        retryConnectionsAndSignalPresence();
-                    }
+                log("****BROADCAST TO SEND SIGNAL PRESENCE");
+                if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && megaChatApi.getPresenceConfig().isPending()==false){
+                    delaySignalPresence = false;
+                    retryConnectionsAndSignalPresence();
                 }
             }
         }
@@ -244,7 +241,7 @@ public class BaseActivity extends AppCompatActivity {
 
                 if(!(this instanceof ChatCallActivity)){
                     log("Send signal presence if needed");
-                    if(megaChatApi.isSignalActivityRequired()){
+                    if(megaChatApi != null && megaChatApi.isSignalActivityRequired()){
                         megaChatApi.signalPresenceActivity();
                     }
                 }
@@ -260,9 +257,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         retryConnectionsAndSignalPresence();
-        if(callToSuperBack){
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -400,6 +395,20 @@ public class BaseActivity extends AppCompatActivity {
             for(int i=0;i<chats.size();i++){
                 megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
             }
+        }
+    }
+
+    /**
+     * Method to refresh the account details info if necessary.
+     */
+    protected void refreshAccountInfo(){
+        log("refreshAccountInfo");
+
+        //Check if the call is recently
+        log("Check the last call to getAccountDetails");
+        if(DBUtil.callToAccountDetails(getApplicationContext())){
+            log("megaApi.getAccountDetails SEND");
+            ((MegaApplication) getApplication()).askForAccountDetails();
         }
     }
 
