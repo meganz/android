@@ -130,7 +130,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				else{
 					//Document is FILE
 					holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-					//
 					ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
 				}
 			}	
@@ -170,14 +169,12 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 						else{
 							holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 							holder.itemLayout.setBackgroundColor(Color.WHITE);
-							//
 							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
 						}
 					}
 					else{
 						holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						//
 						ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
 					}
 				}

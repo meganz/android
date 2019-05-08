@@ -966,6 +966,11 @@ public class ThumbnailUtilsLollipop {
 		MegaNode document;
 	}
 
+
+	/*
+	* This async task is to patch thumb nail picture to video or image files
+	* in device folder when select device file to upload
+	*/
 	static class AttachThumbnailToFileStorageExplorerTask extends AsyncTask<FileDocument, Void, Boolean> {
 
 		Context context;
@@ -1095,8 +1100,6 @@ public class ThumbnailUtilsLollipop {
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 		holder.imageView.setImageBitmap(bitmap);
-		//adapter.notifyDataSetChanged();
-
 		log("AttachThumbnailTask end");
 	}
 
@@ -1366,7 +1369,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != nullString localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
 		if(localPath != null) //Si la tengo en el sistema de ficheros
 		{
 			log("localPath no es nulo: " + localPath);
