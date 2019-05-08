@@ -2202,6 +2202,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
+        enableLoginButton();
         try{
             if(timer!=null){
                 timer.cancel();
@@ -2361,7 +2362,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("TYPE_LOGOUT");
             if (error.getErrorCode() == MegaError.API_OK){
                 AccountController.localLogoutApp(context.getApplicationContext());
-                enableLoginButton();
             }
         }
         else if(request.getType() == MegaRequest.TYPE_GET_RECOVERY_LINK){
@@ -2406,6 +2406,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.saveCredentials(credentials);
 
                 log("readyToManager");
+                if(confirmLogoutDialog != null) {
+                    confirmLogoutDialog.dismiss();
+                }
                 readyToManager();
 
             }else{
@@ -2983,7 +2986,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         backWhileLogin = true;
                         MegaApplication.setLoggingIn(false);
                         loginClicked = false;
-                        megaChatApi.logout();
+                        megaChatApi.logout(LoginFragmentLollipop.this);
                         megaApi.localLogout(LoginFragmentLollipop.this);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -3002,7 +3005,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     public int onBackPressed() {
         log("onBackPressed");
-        if (MegaApplication.isLoggingIn() || LoginActivityLollipop.isFetchingNodes) {
+        //login is in process
+        if ((MegaApplication.isLoggingIn() || LoginActivityLollipop.isFetchingNodes) && loginLogin.getVisibility() == View.GONE) {
             showConfirmLogoutDialog();
             return 2;
         }
