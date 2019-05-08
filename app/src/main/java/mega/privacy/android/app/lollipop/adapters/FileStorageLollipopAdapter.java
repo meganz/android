@@ -23,10 +23,11 @@ import java.util.List;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.FileDocument;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.FileDocument;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter.OnItemClickListener;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
 /*
@@ -50,7 +51,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}	
 	
 	/*private view holder class*/
-    class ViewHolderFileStorage extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolderFileStorage extends RecyclerView.ViewHolder implements View.OnClickListener{
     	
     	public ImageView imageView;
     	public TextView textViewFileName;
@@ -129,6 +130,8 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				else{
 					//Document is FILE
 					holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+					//
+					ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
 				}
 			}	
 			else{
@@ -167,11 +170,15 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 						else{
 							holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 							holder.itemLayout.setBackgroundColor(Color.WHITE);
+							//
+							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
 						}
 					}
 					else{
 						holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
+						//
+						ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
 					}
 				}
 			}
