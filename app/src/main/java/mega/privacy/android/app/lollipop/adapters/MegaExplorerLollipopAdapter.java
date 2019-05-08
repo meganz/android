@@ -30,11 +30,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -44,7 +47,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener {
+public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 	
 	final public static int CLOUD_EXPLORER = 0;
 	final public static int INCOMING_SHARES_EXPLORER = 1;
@@ -74,9 +77,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private SparseBooleanArray selectedItems;
 
 	RecyclerView listFragment;
-    private int placeholderCount;
 
-	/*public static view holder class*/
+    /*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder{
 		public RelativeLayout itemLayout;
 		public int currentPosition;
@@ -454,6 +456,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.folderLayout.setVisibility(View.GONE);
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.fileName.setText(node.getName());
+            holder.fileThumbnail.setVisibility(View.GONE);
+            holder.fileIcon.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
             if (Util.isVideoFile(node.getName())) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
@@ -463,6 +467,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     holder.videoDuration.setText(duration);
                     holder.videoDuration.setVisibility(View.VISIBLE);
                 }
+                else {
+                    holder.videoDuration.setVisibility(View.GONE);
+                }
+            }
+            else {
+                holder.videoLayout.setVisibility(View.GONE);
             }
 
             Bitmap thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
@@ -480,7 +490,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 }
             }
             if (thumb != null) {
-                holder.fileThumbnail.setImageBitmap(thumb);
+                holder.fileThumbnail.setImageBitmap(ThumbnailUtilsLollipop.getRoundedRectBitmap(context,thumb,2));
+                holder.fileThumbnail.setVisibility(View.VISIBLE);
+                holder.fileIcon.setVisibility(View.GONE);
             }
 
             if (isMultipleSelect() && isItemChecked(position)) {
@@ -494,45 +506,60 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
     }
 
-	public void toggleAllSelection(int pos) {
-		log("toggleAllSelection: "+pos);
-		final int positionToflip = pos;
+    public void toggleAllSelection(int pos) {
+        log("toggleAllSelection: " + pos);
+        startAnimation(pos, putOrDeletePostion(pos));
+    }
 
-		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
-			selectedItems.delete(pos);
-		}
-		else {
-			log("PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
+    public void toggleSelection(int pos) {
+        log("toggleSelection: " + pos);
+        startAnimation(pos, putOrDeletePostion(pos));
+    }
+
+	boolean putOrDeletePostion(int pos) {
+        if (selectedItems.get(pos,false)) {
+            log("delete pos: " + pos);
+            selectedItems.delete(pos);
+            return true;
+        } else {
+            log("PUT pos: " + pos);
+            selectedItems.put(pos,true);
+            return false;
+        }
+    }
+
+    private void hideMultipleSelect() {
+        if (selectedItems.size() <= 0) {
+            if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
+                ((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
+            } else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+                ((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
+            }
+        }
+    }
+
+    void startAnimation (final int pos, final boolean delete) {
 
         if (((FileExplorerActivityLollipop) context).isList()) {
+            log("adapter type is LIST");
             ViewHolderListExplorerLollipop view = (ViewHolderListExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
                 log("Start animation: " + pos);
-                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+                Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-
+                        if (!delete) {
+                            notifyItemChanged(pos);
+                        }
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        log("onAnimationEnd");
-                        if (selectedItems.size() <= 0) {
-                            log("toggleAllSelection: hideMultipleSelect");
-
-                            if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
-                                ((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
-                            } else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
-                                ((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
-                            }
-
+                        hideMultipleSelect();
+                        if (delete) {
+                            notifyItemChanged(pos);
                         }
-                        log("toggleAllSelection: notified item changed");
-                        notifyItemChanged(positionToflip);
                     }
 
                     @Override
@@ -541,68 +568,50 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     }
                 });
                 view.imageView.startAnimation(flipAnimation);
-            } else {
-                log("NULL view pos: " + positionToflip);
+            }
+            else {
+                log("view is null - not animation");
+                hideMultipleSelect();
+                notifyItemChanged(pos);
+            }
+        } else {
+            log("adapter type is GRID");
+            ViewHolderGridExplorerLollipop view = (ViewHolderGridExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
+            if (view != null) {
+                log("Start animation: " + pos);
+                Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
+                if (!delete) {
+                    notifyItemChanged(pos);
+                    flipAnimation.setDuration(250);
+                }
+                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        if (!delete) {
+                            notifyItemChanged(pos);
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        hideMultipleSelect();
+                        notifyItemChanged(pos);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                view.fileSelectedIcon.startAnimation(flipAnimation);
+            }
+            else {
+                log("view is null - not animation");
+                hideMultipleSelect();
                 notifyItemChanged(pos);
             }
         }
-        else {
-
-        }
-	}
-
-	public void toggleSelection(int pos) {
-		log("toggleSelection: "+pos);
-
-		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
-			selectedItems.delete(pos);
-		}
-		else {
-			log("PUT pos: "+pos);
-			selectedItems.put(pos, true);
-		}
-		notifyItemChanged(pos);
-
-
-		if (((FileExplorerActivityLollipop) context).isList()) {
-            ViewHolderListExplorerLollipop view = (ViewHolderListExplorerLollipop) listFragment.findViewHolderForLayoutPosition(pos);
-            if (view != null) {
-                log("Start animation: " + pos);
-                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        if (selectedItems.size() <= 0) {
-                            if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
-                                ((CloudDriveExplorerFragmentLollipop) fragment).hideMultipleSelect();
-                            } else if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
-                                ((IncomingSharesExplorerFragmentLollipop) fragment).hideMultipleSelect();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-
-                view.imageView.startAnimation(flipAnimation);
-
-            } else {
-                log("view is null - not animation");
-            }
-        }
-        else {
-
-        }
-	}
+    }
 
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
@@ -629,14 +638,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				toggleAllSelection(i);
 			}
 		}
-	}
-
-	public void clearSelectedItems() {
-		log("clearSelectedItems");
-		if (selectedItems == null) {
-			return;
-		}
-		selectedItems.clear();
 	}
 
 	private boolean isItemChecked(int position) {
@@ -759,6 +760,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		this.nodes = insertPlaceHolderNode(nodes);
 		positionClicked = -1;
 		notifyDataSetChanged();
+		visibilityFastScroller();
 	}
 	
 	public long getParentHandle(){
@@ -906,10 +908,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         }
         int spanCount = 2;
         if (listFragment instanceof NewGridRecyclerView) {
-            log("listFragment instanceof NewGridRecyclerView");
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
-        placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+        int placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && !((FileExplorerActivityLollipop) context).isList()) {
             //Add placeholder at folders' end.
@@ -920,4 +921,30 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         return nodes;
     }
 
+    private void visibilityFastScroller() {
+	    int visibility;
+        if (getItemCount() < Constants.MIN_ITEMS_SCROLLBAR) {
+            visibility = View.GONE;
+        }
+        else {
+            visibility = View.VISIBLE;
+        }
+
+        if (fragment instanceof IncomingSharesExplorerFragmentLollipop) {
+            ((IncomingSharesExplorerFragmentLollipop) fragment).getFastScroller().setVisibility(visibility);
+        }
+        else if (fragment instanceof CloudDriveExplorerFragmentLollipop) {
+            ((CloudDriveExplorerFragmentLollipop) fragment).getFastScroller().setVisibility(visibility);
+        }
+    }
+
+    @Override
+    public String getSectionTitle(int position) {
+	    MegaNode node = (MegaNode) getItem(position);
+
+        if (node != null && node.getName() != null && !node.getName().isEmpty()) {
+            return node.getName().substring(0,1);
+        }
+        return null;
+    }
 }

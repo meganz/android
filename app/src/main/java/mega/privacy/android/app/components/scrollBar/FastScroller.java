@@ -177,7 +177,7 @@ public class FastScroller extends LinearLayout{
     }
 
     private void invalidateVisibility() {
-        if (recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0 || recyclerView.getChildAt(0) == null || isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
+        if (recyclerView == null || recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0 || recyclerView.getChildAt(0) == null || isRecyclerViewNotScrollable() || maxVisibility != View.VISIBLE) {
             super.setVisibility(INVISIBLE);
         } else {
             super.setVisibility(VISIBLE);

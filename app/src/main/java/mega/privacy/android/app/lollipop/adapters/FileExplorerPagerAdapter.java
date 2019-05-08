@@ -3,7 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
@@ -12,7 +12,7 @@ import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.utils.Util;
 
-public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
+public class FileExplorerPagerAdapter extends FragmentStatePagerAdapter {
 
     final int PAGE_COUNT = 3;
     private Context context;
@@ -133,6 +133,11 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
         else{
             return PAGE_COUNT-1;
         }
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
     private static void log(String log) {

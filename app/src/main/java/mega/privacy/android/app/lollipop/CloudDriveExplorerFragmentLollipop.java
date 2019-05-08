@@ -43,6 +43,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -61,6 +62,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public long parentHandle = -1;
 	
 	MegaExplorerLollipopAdapter adapter;
+    private FastScroller fastScroller;
 	
 	int modeCloud;
 	boolean selectFile=false;
@@ -263,6 +265,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		cancelButton.setOnClickListener(this);
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 
+        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 		if (((FileExplorerActivityLollipop) context).isList) {
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
@@ -274,7 +277,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
-
 		}
 
 		recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -313,48 +315,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
-		if(chosenNode == null) {
-			log("chosenNode is NULL");
-
-			if(megaApi.getRootNode()!=null){
-				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode(), order);
-			}
-
-		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
-			log("chosenNode is ROOT");
-			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(chosenNode, order);
-
-		}else {
-			log("ChosenNode not null and not ROOT");
-
-			MegaNode parentNode = megaApi.getParentNode(chosenNode);
-			if(parentNode!=null){
-				log("ParentNode NOT NULL");
-				MegaNode grandParentNode = megaApi.getParentNode(parentNode);
-				while(grandParentNode!=null){
-					parentNode=grandParentNode;
-					grandParentNode = megaApi.getParentNode(parentNode);
-				}
-				if(parentNode.getType() == MegaNode.TYPE_ROOT){
-					nodes = megaApi.getChildren(chosenNode, order);
-					log("chosenNode is: "+chosenNode.getName());
-				}
-				else{
-					log("Parent node exists but is not Cloud!");
-					parentHandle = megaApi.getRootNode().getHandle();
-					nodes = megaApi.getChildren(megaApi.getRootNode(), order);
-				}
-
-			}
-			else{
-				log("parentNode is NULL");
-				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode(), order);
-			}
-
-		}
+		getNodes();
 		
 		((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
 
@@ -441,14 +402,60 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}
 		adapter.setNodes(nodes);
 
-		adapter.setPositionClicked(-1);		
+		adapter.setPositionClicked(-1);
 		
 		recyclerView.setAdapter(adapter);
-
+		fastScroller.setRecyclerView(recyclerView);
 		//If folder has no files
 		showEmptyScreen();
 
 		return v;
+	}
+
+	private void getNodes() {
+		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
+		if(chosenNode == null) {
+			log("chosenNode is NULL");
+
+			if(megaApi.getRootNode()!=null){
+				parentHandle = megaApi.getRootNode().getHandle();
+				nodes = megaApi.getChildren(megaApi.getRootNode(), order);
+			}
+
+		}else if(chosenNode.getType() == MegaNode.TYPE_ROOT) {
+			log("chosenNode is ROOT");
+			parentHandle = megaApi.getRootNode().getHandle();
+			nodes = megaApi.getChildren(chosenNode, order);
+
+		}else {
+			log("ChosenNode not null and not ROOT");
+
+			MegaNode parentNode = megaApi.getParentNode(chosenNode);
+			if(parentNode!=null){
+				log("ParentNode NOT NULL");
+				MegaNode grandParentNode = megaApi.getParentNode(parentNode);
+				while(grandParentNode!=null){
+					parentNode=grandParentNode;
+					grandParentNode = megaApi.getParentNode(parentNode);
+				}
+				if(parentNode.getType() == MegaNode.TYPE_ROOT){
+					nodes = megaApi.getChildren(chosenNode, order);
+					log("chosenNode is: "+chosenNode.getName());
+				}
+				else{
+					log("Parent node exists but is not Cloud!");
+					parentHandle = megaApi.getRootNode().getHandle();
+					nodes = megaApi.getChildren(megaApi.getRootNode(), order);
+				}
+
+			}
+			else{
+				log("parentNode is NULL");
+				parentHandle = megaApi.getRootNode().getHandle();
+				nodes = megaApi.getChildren(megaApi.getRootNode(), order);
+			}
+
+		}
 	}
 
 	private void showEmptyScreen() {
@@ -774,18 +781,28 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			//Is file
 			if(selectFile)
 			{
+				MegaNode n = clickNodes.get(position);
 				if(((FileExplorerActivityLollipop)context).multiselect){
 					log("select file and allow multiselection");
-
+					int togglePosition = position;
+					if (!clickNodes.equals(nodes)) {
+						MegaNode node;
+						for (int i=0; i<nodes.size(); i++) {
+							node = nodes.get(i);
+							if (node != null && node.getHandle() == n.getHandle()) {
+								togglePosition = i;
+							}
+						}
+					}
 					if (adapter.getSelectedItemCount() == 0) {
 						log("activate the actionMode");
 						activateActionMode();
-						adapter.toggleSelection(position);
+						adapter.toggleSelection(togglePosition);
 						updateActionModeTitle();
 					}
 					else {
 						log("add to selectedNodes");
-						adapter.toggleSelection(position);
+						adapter.toggleSelection(togglePosition);
 
 						List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 						if (selectedNodes.size() > 0){
@@ -796,12 +813,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				}
 				else{
 					//Send file
-					MegaNode n = clickNodes.get(position);
 					log("Selected node to send: "+n.getName());
-					if(clickNodes.get(position).isFile()){
-						MegaNode nFile = clickNodes.get(position);
-						((FileExplorerActivityLollipop) context).buttonClick(nFile.getHandle());
-					}
+					((FileExplorerActivityLollipop) context).buttonClick(n.getHandle());
 				}
 
 			}
@@ -1034,7 +1047,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	public boolean isFolder(int position){
 		MegaNode node = nodes.get(position);
-		if(node.isFolder()){
+		if(node == null || node.isFolder()){
 			return true;
 		}
 		else{
@@ -1165,6 +1178,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (adapter == null) {
 			return;
 		}
+		getNodes();
 		addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(nodes);
 		showEmptyScreen();
@@ -1222,4 +1236,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		headerItemDecoration.setType(type);
 		headerItemDecoration.setKeys(sections);
 	}
+
+	public FastScroller getFastScroller() {
+	    return fastScroller;
+    }
 }

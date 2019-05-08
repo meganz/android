@@ -65,7 +65,8 @@
                 android:scaleType="fitXY"
                 android:paddingTop="1dp"
                 android:paddingRight="1dp"
-                android:paddingLeft="1dp"/>
+                android:paddingLeft="1dp"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/file_explorer_grid_file_selected"

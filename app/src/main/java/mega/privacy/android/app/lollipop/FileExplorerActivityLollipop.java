@@ -1283,105 +1283,81 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		else{
 			int position = viewPagerExplorer.getCurrentItem();
+			Fragment f = (Fragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, position);
+			if (f == null) {
+				return;
+			}
 			if(position == 0){
-
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-
-				Fragment f = (Fragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(f!=null){
-					if(f instanceof ChatExplorerFragment){
-
-						if(tabShown!=NO_TABS){
-							tabShown=CHAT_TAB;
-						}
-
-						if(((ChatExplorerFragment)f)!=null){
-							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
-						}
+				if(f instanceof ChatExplorerFragment){
+					if(tabShown!=NO_TABS){
+						tabShown=CHAT_TAB;
 					}
-					else if(f instanceof CloudDriveExplorerFragmentLollipop){
 
-						if(tabShown!=NO_TABS){
-							tabShown=CLOUD_TAB;
-						}
-
-						if(((CloudDriveExplorerFragmentLollipop)f).parentHandle==-1|| ((CloudDriveExplorerFragmentLollipop)f).parentHandle==megaApi.getRootNode().getHandle()){
-							setRootTitle();
-						}
-						else{
-							aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).parentHandle).getName());
-						}
-
-						showFabButton(false);
+					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+				}
+				else if(f instanceof CloudDriveExplorerFragmentLollipop){
+					if(tabShown!=NO_TABS){
+						tabShown=CLOUD_TAB;
 					}
+
+					if(((CloudDriveExplorerFragmentLollipop)f).parentHandle==-1|| ((CloudDriveExplorerFragmentLollipop)f).parentHandle==megaApi.getRootNode().getHandle()){
+						setRootTitle();
+					}
+					else{
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).parentHandle).getName());
+					}
+
+					showFabButton(false);
 				}
 			}
 			else if(position == 1){
-
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-
-				Fragment f = (Fragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(f!=null){
-					if(f instanceof IncomingSharesExplorerFragmentLollipop){
-
-						if(tabShown!=NO_TABS){
-							tabShown=INCOMING_TAB;
-						}
-
-						if(deepBrowserTree==0){
-							setRootTitle();
-						}
-						else{
-							aB.setTitle(megaApi.getNodeByHandle(((IncomingSharesExplorerFragmentLollipop)f).parentHandle).getName());
-						}
+				if(f instanceof IncomingSharesExplorerFragmentLollipop){
+					if(tabShown!=NO_TABS){
+						tabShown=INCOMING_TAB;
 					}
-					else if(f instanceof CloudDriveExplorerFragmentLollipop){
 
-						if(tabShown!=NO_TABS){
-							tabShown=CLOUD_TAB;
-						}
+					if(deepBrowserTree==0){
+						setRootTitle();
+					}
+					else{
+						aB.setTitle(megaApi.getNodeByHandle(((IncomingSharesExplorerFragmentLollipop)f).parentHandle).getName());
+					}
+				}
+				else if(f instanceof CloudDriveExplorerFragmentLollipop){
+					if(tabShown!=NO_TABS){
+						tabShown=CLOUD_TAB;
+					}
 
-						if(((CloudDriveExplorerFragmentLollipop)f).parentHandle==-1|| ((CloudDriveExplorerFragmentLollipop)f).parentHandle==megaApi.getRootNode().getHandle()){
-							setRootTitle();
-						}
-						else{
-							aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).parentHandle).getName());
-						}
+					if(((CloudDriveExplorerFragmentLollipop)f).parentHandle==-1|| ((CloudDriveExplorerFragmentLollipop)f).parentHandle==megaApi.getRootNode().getHandle()){
+						setRootTitle();
+					}
+					else{
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).parentHandle).getName());
 					}
 				}
 				showFabButton(false);
 			}
 			else if(position == 2){
-
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
-
-				Fragment f = (Fragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(f!=null){
-					if(f instanceof ChatExplorerFragment){
-
-						if(tabShown!=NO_TABS){
-							tabShown=CHAT_TAB;
-						}
-
-						if(((ChatExplorerFragment)f)!=null){
-							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
-						}
+				if(f instanceof ChatExplorerFragment){
+					if(tabShown!=NO_TABS){
+						tabShown=CHAT_TAB;
 					}
-					else if(f instanceof IncomingSharesExplorerFragmentLollipop){
 
-						if(tabShown!=NO_TABS){
-							tabShown=INCOMING_TAB;
-						}
-
-						if(deepBrowserTree==0){
-							setRootTitle();
-						}
-						else{
-							aB.setTitle(megaApi.getNodeByHandle(((IncomingSharesExplorerFragmentLollipop)f).parentHandle).getName());
-						}
-
-						showFabButton(false);
+					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+				}
+				else if(f instanceof IncomingSharesExplorerFragmentLollipop){
+					if(tabShown!=NO_TABS){
+						tabShown=INCOMING_TAB;
 					}
+
+					if(deepBrowserTree==0){
+						setRootTitle();
+					}
+					else{
+						aB.setTitle(megaApi.getNodeByHandle(((IncomingSharesExplorerFragmentLollipop)f).parentHandle).getName());
+					}
+
+					showFabButton(false);
 				}
 			}
 		}
@@ -3275,49 +3251,41 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			return null;
 		}
 
-		String chatTag1;
 		if (importFileF) {
-			chatTag1  ="chatExplorer";
+			return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag("chatExplorer");
 		}
 		else if(isChatFirst){
-			chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			return  (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
 		else{
-			chatTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			return  (ChatExplorerFragment) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
-		return (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(chatTag1);
 	}
 
 	private IncomingSharesExplorerFragmentLollipop getIncomingExplorerFragment () {
-		String incomingTag;
-
 		if (importFileF) {
-			incomingTag = "iSharesExplorer";
+			return (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 		}
 		else if (isChatFirst) {
-			incomingTag = getFragmentTag(R.id.explorer_tabs_pager, 2);
+			return  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
 		}
 		else {
-			incomingTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			return  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 
-		return (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(incomingTag);
+
 	}
 
 	private CloudDriveExplorerFragmentLollipop getCloudExplorerFragment () {
-		String cloudTag;
-
 		if (importFileF || tabShown == NO_TABS) {
-			cloudTag = "cDriveExplorer";
+			return (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
 		}
 		else if (isChatFirst) {
-			cloudTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			return  (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 		}
 		else {
-			cloudTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			return  (CloudDriveExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 0);
 		}
-
-		return (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cloudTag);
 	}
 
 	public void refreshOrderNodes (int order) {
@@ -3369,9 +3337,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void collapseSearchView () {
-		if (searchMenuItem != null) {
-			searchMenuItem.collapseActionView();
+		if (searchMenuItem == null) {
+			return;
 		}
+		searchMenuItem.collapseActionView();
 	}
 
 	public long getParentHandleCloud() {

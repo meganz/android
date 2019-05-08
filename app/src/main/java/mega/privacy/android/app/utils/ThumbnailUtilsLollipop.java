@@ -576,7 +576,9 @@ public class ThumbnailUtilsLollipop {
 									}
 									else if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) {
 										MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop holderGrid = (MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) holder;
-										holderGrid.fileThumbnail.setImageBitmap(bitmap);
+										holderGrid.fileThumbnail.setImageBitmap(ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,2));
+										holderGrid.fileThumbnail.setVisibility(View.VISIBLE);
+										holderGrid.fileIcon.setVisibility(View.GONE);
 										holderGrid.fileThumbnail.startAnimation(fadeInAnimation);
 										adapter.notifyItemChanged(holderGrid.getAdapterPosition());
 									}
@@ -1089,7 +1091,7 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
 			if (shouldContinueObject){
-				onThumbnailGeneratedExplorerLollipop(megaApi, thumbFile, param.document, holder, adapter);
+				onThumbnailGeneratedExplorerLollipop(context, thumbFile, param.document, holder, adapter);
 			}
 		}
 	}
@@ -1133,7 +1135,7 @@ public class ThumbnailUtilsLollipop {
 		}
 	}	
 	
-	private static void onThumbnailGeneratedExplorerLollipop(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderExplorerLollipop holder, MegaExplorerLollipopAdapter adapter){
+	private static void onThumbnailGeneratedExplorerLollipop(Context context, File thumbFile, MegaNode document, ViewHolderExplorerLollipop holder, MegaExplorerLollipopAdapter adapter){
 		log("onPreviewGenerated");
 		//Tengo que mostrarla
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1146,7 +1148,9 @@ public class ThumbnailUtilsLollipop {
 		}
 		else if (holder instanceof MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) {
 			MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop holderGrid = (MegaExplorerLollipopAdapter.ViewHolderGridExplorerLollipop) holder;
-			holderGrid.fileThumbnail.setImageBitmap(bitmap);
+			holderGrid.fileThumbnail.setImageBitmap(ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,2));
+			holderGrid.fileThumbnail.setVisibility(View.VISIBLE);
+			holderGrid.fileIcon.setVisibility(View.GONE);
 			adapter.notifyItemChanged(holderGrid.getAdapterPosition());
 		}
 		thumbnailCache.put(document.getHandle(), bitmap);
