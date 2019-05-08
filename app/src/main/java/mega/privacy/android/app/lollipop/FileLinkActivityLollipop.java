@@ -759,11 +759,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					mediaIntent.setDataAndType(parsedUri, mimeType);
 				} else {
 					log("showFile:ERROR:httpServerGetLocalLink");
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 				}
 			} else {
 				log("showFile:ERROR:httpServerGetLocalLink");
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 			}
 
 			mediaIntent.putExtra("HANDLE", document.getHandle());
@@ -819,12 +819,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					}
 					else{
 						log("showFile:ERROR:httpServerGetLocalLink");
-						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 					}
 				}
 				else{
 					log("showFile:ERROR:httpServerGetLocalLink");
-					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error));
+					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error));
 				}
 			}
 			else {
@@ -843,7 +843,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("none");
 		}
 	}
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
@@ -860,7 +859,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("URL: " + url + "___SIZE: " + size);
 
 			NodeController nC = new NodeController(this);
-			nC.downloadFileLink(document, url);
+			nC.downloadTo(document, parentPath, url);
 		}
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {

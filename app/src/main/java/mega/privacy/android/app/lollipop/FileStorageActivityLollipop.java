@@ -80,6 +80,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static String EXTRA_FROM_SETTINGS = "from_settings";
 	public static String EXTRA_CAMERA_FOLDER = "camera_folder";
 	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
+	public static String EXTRA_SD_ROOT = "sd_root";
 	public static String EXTRA_PATH = "filepath";
 	public static String EXTRA_FILES = "fileslist";	
 	
@@ -131,6 +132,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private Boolean fromSettings;
 	private Boolean cameraFolderSettings;
+	private String sdRoot;
+	private boolean hasSDCard;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -379,6 +382,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		Intent intent = getIntent();
 		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
 		cameraFolderSettings = intent.getBooleanExtra(EXTRA_CAMERA_FOLDER, false);
+		sdRoot = intent.getStringExtra(EXTRA_SD_ROOT);
+		hasSDCard = (sdRoot != null);
 		
 		mode = Mode.getFromIntent(intent);
 		if (mode == Mode.PICK_FOLDER) {
@@ -469,34 +474,42 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		else{
 			root = new File("/");
 		}
+		//pick file from SD card
+		if(hasSDCard) {
+		    root = new File(sdRoot);
+        }
 
 		lastPositionStack = new Stack<>();
 
-		prefs = dbH.getPreferences();
-		if (prefs == null){
-			path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
-		}
-		else{
-			String lastFolder = prefs.getLastFolderUpload();
-			if(lastFolder!=null){
-				path = new File(prefs.getLastFolderUpload());
-				if(!path.exists())
-				{
-					path = null;
-				}
-			}
-			else{
-				path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
-			}
-			if (cameraFolderSettings){
-				camSyncLocalPath = prefs.getCamSyncLocalPath();
-			}
-			
-		}		
-		if (path == null) {
-			path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
-		}
-		
+		if(!hasSDCard) {
+            prefs = dbH.getPreferences();
+            if (prefs == null){
+                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+            }
+            else{
+                String lastFolder = prefs.getLastFolderUpload();
+                if(lastFolder!=null){
+                    path = new File(prefs.getLastFolderUpload());
+                    if(!path.exists())
+                    {
+                        path = null;
+                    }
+                }
+                else{
+                    path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+                }
+                if (cameraFolderSettings){
+                    camSyncLocalPath = prefs.getCamSyncLocalPath();
+                }
+            }
+            if (path == null) {
+                path = new File(Environment.getExternalStorageDirectory().toString() + "/" + Util.downloadDIR);
+            }
+        } else {
+		    //always pick from SD card root
+		    path = new File(sdRoot);
+        }
+
 		if (cameraFolderSettings){
 //			if (camSyncLocalPath != null){
 //				if (camSyncLocalPath.compareTo("") == 0){
@@ -721,7 +734,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
 //				log("onClick: "+path.getAbsolutePath());
-				dbH.setLastUploadFolder(path.getAbsolutePath());
+                //don't record last upload folder for SD card upload
+                if(!hasSDCard) {
+                    dbH.setLastUploadFolder(path.getAbsolutePath());
+                }
 				if (mode == Mode.PICK_FOLDER) {
 					log("Mode.PICK_FOLDER");
 					Intent intent = new Intent();
@@ -934,12 +950,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		// Finish activity if at the root
 		if (path.equals(root)) {
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		// Go one level higher otherwise
 		} else {
