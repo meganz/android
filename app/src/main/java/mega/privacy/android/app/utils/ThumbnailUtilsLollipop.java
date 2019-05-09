@@ -975,6 +975,7 @@ public class ThumbnailUtilsLollipop {
 
 		Context context;
 		File thumbFile;
+		File originalFile;
 		ViewHolderFileStorage holder;
 		FileStorageLollipopAdapter adapter;
 		MegaApiAndroid megaApi;
@@ -991,16 +992,16 @@ public class ThumbnailUtilsLollipop {
 		protected Boolean doInBackground(FileDocument... params) {
 			log("Attach Thumb nails to file storage explorer Start");
 			File thumbDir = getThumbFolder(context);
-			File originalFile = params[0].getFile();
-			thumbFile = new File(thumbDir, megaApi.getFingerprint(originalFile.getAbsolutePath()) + ".jpg" );
-			boolean thumbCreated = MegaUtilsAndroidApp.createThumbnail(originalFile, context, thumbFile);
+			this.originalFile = params[0].getFile();
+			thumbFile = new File(thumbDir, megaApi.getFingerprint(this.originalFile.getAbsolutePath()) + ".jpg" );
+			boolean thumbCreated = MegaUtilsAndroidApp.createThumbnail(this.originalFile, context, thumbFile);
 			return thumbCreated;
 		}
 
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
 			if (shouldContinueObject){
-				onThumbnailGeneratedExplorerLollipop(thumbFile, holder, adapter);
+				onThumbnailGeneratedExplorerLollipop(megaApi, this.thumbFile, this.originalFile, holder);
 			}
 		}
 	}
@@ -1096,12 +1097,13 @@ public class ThumbnailUtilsLollipop {
 		log("AttachThumbnailTask end");		
 	}
 
-	private static void onThumbnailGeneratedExplorerLollipop(File thumbFile, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter){
+	private static void onThumbnailGeneratedExplorerLollipop(MegaApiAndroid megaApi,File thumbFile, File originalFile, ViewHolderFileStorage holder){
 		log("onPreviewGenerated");
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 		holder.imageView.setImageBitmap(bitmap);
+		thumbnailCache.put(megaApi.getFingerprint(originalFile.getAbsolutePath()), bitmap);
 		log("AttachThumbnailTask end");
 	}
 
@@ -1389,6 +1391,24 @@ public class ThumbnailUtilsLollipop {
 			log("no image or video");
 			return;
 		}
+		// if the thumbnail bitmap is cached in memory cache
+		Bitmap bitmap = getThumbnailFromCache(megaApi.getFingerprint(document.getFile().getAbsolutePath()));
+		if (bitmap != null) {
+			holder.imageView.setImageBitmap(bitmap);
+			return;
+		}
+
+		// if the thumbnail bitmap is cached in device file directory
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		File directoryCachedFile = new File(getThumbFolder(context), megaApi.getFingerprint(document.getFile().getAbsolutePath()) + ".jpg" );
+		bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
+		if (bitmap != null) {
+			holder.imageView.setImageBitmap(bitmap);
+			return;
+		}
+
+		// There is no cache before, we have to start an async task to have the thumb nail bitmap
 		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, holder, adapter).execute(document);
 
 	}

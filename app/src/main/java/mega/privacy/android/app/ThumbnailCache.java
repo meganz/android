@@ -17,6 +17,7 @@ public class ThumbnailCache {
 	
 	public ThumbnailCache() {
 		cache = new LruThumbnailCache(70);
+		cachePath = new LruThumbnailCachePath(70);
 		nulls = new ArrayList<Long>();
 	}
 	

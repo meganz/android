@@ -450,7 +450,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				break;
 			}
 		}
-	}	
+	}
 
 	private static void log(String message) {
 		Util.log("FileStorageLollipopAdapter", message);
