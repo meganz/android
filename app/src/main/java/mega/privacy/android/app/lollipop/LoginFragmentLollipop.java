@@ -1104,6 +1104,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginLoggingIn.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
+        closeCancelDialog();
         scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
         loginCreateAccount.setVisibility(View.VISIBLE);
         queryingSignupLinkText.setVisibility(View.GONE);
@@ -1172,6 +1173,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         isFirstTime = false;
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
+        closeCancelDialog();
         firstPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
         secondPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
         thirdPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
@@ -1425,6 +1427,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
+            closeCancelDialog();
             scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
@@ -1464,6 +1467,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
+            closeCancelDialog();
             scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
@@ -1534,6 +1538,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void backToLoginForm() {
         //return to login form page
         loginLogin.setVisibility(View.VISIBLE);
+        closeCancelDialog();
         loginCreateAccount.setVisibility(View.VISIBLE);
         loginLoggingIn.setVisibility(View.GONE);
         generatingKeysText.setVisibility(View.GONE);
@@ -1567,6 +1572,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if(!Util.isOnline(context)){
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
+            closeCancelDialog();
             scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
@@ -1879,6 +1885,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
+        closeCancelDialog();
         scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
     }
 
@@ -1897,6 +1904,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
+        closeCancelDialog();
         scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
     }
 
@@ -2008,6 +2016,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void readyToManager(){
+        closeCancelDialog();
         if(confirmLink==null && !accountConfirmed){
             log("confirmLink==null");
 
@@ -2247,6 +2256,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     prepareNodesText.setVisibility(View.GONE);
                     serversBusyText.setVisibility(View.GONE);
                     loginVerificationLayout.setVisibility(View.VISIBLE);
+                    closeCancelDialog();
                     firstPin.requestFocus();
                     firstPin.setCursorVisible(true);
                 }
@@ -2305,6 +2315,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (!is2FAEnabled) {
                     loginLoggingIn.setVisibility(View.GONE);
                     loginLogin.setVisibility(View.VISIBLE);
+                    closeCancelDialog();
                     scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                     loginCreateAccount.setVisibility(View.VISIBLE);
                     queryingSignupLinkText.setVisibility(View.GONE);
@@ -2406,9 +2417,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.saveCredentials(credentials);
 
                 log("readyToManager");
-                if(confirmLogoutDialog != null) {
-                    confirmLogoutDialog.dismiss();
-                }
                 readyToManager();
 
             }else{
@@ -2431,6 +2439,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
+                closeCancelDialog();
                 scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 generatingKeysText.setVisibility(View.GONE);
@@ -2472,6 +2481,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
             String s = "";
             loginLogin.setVisibility(View.VISIBLE);
+            closeCancelDialog();
             scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             bForgotPass.setVisibility(View.INVISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
@@ -2516,6 +2526,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             else{
                 loginLogin.setVisibility(View.VISIBLE);
+                closeCancelDialog();
                 scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 loginLoggingIn.setVisibility(View.GONE);
@@ -2533,6 +2544,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 }
             }
+        }
+    }
+
+    private void closeCancelDialog() {
+        if (confirmLogoutDialog != null) {
+            confirmLogoutDialog.dismiss();
         }
     }
 
@@ -2967,9 +2984,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 megaChatApi.removeChatListener(this);
             }
         }
-        if(confirmLogoutDialog != null) {
-            confirmLogoutDialog.dismiss();
-        }
+        closeCancelDialog();
         super.onDestroy();
     }
 
@@ -3006,7 +3021,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public int onBackPressed() {
         log("onBackPressed");
         //login is in process
-        if ((MegaApplication.isLoggingIn() || LoginActivityLollipop.isFetchingNodes) && loginLogin.getVisibility() == View.GONE) {
+        boolean onLoginPage = loginLogin.getVisibility() == View.VISIBLE;
+        boolean on2faPage = loginVerificationLayout.getVisibility() == View.VISIBLE;
+        if ((MegaApplication.isLoggingIn() || LoginActivityLollipop.isFetchingNodes) && !onLoginPage && !on2faPage) {
             showConfirmLogoutDialog();
             return 2;
         }
@@ -3016,6 +3033,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("Forgot Pass layout is VISIBLE");
                 hideForgotPassLayout();
                 return 1;
+            }
+            if(on2faPage) {
+                log("back from 2fa page");
+                showConfirmLogoutDialog();
+                return 2;
             }
 
             if(parkAccountLayout.getVisibility()==View.VISIBLE){
