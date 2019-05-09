@@ -1117,7 +1117,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		if (parent == null) {
 			return;
 		}
-		searchNodes = megaApi.search(parent, s, false, order);
+		searchNodes = megaApi.search(parent, s, true, order);
 		if (searchNodes != null && adapter != null) {
 			addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(searchNodes);

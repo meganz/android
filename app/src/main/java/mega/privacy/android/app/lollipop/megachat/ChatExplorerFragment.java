@@ -38,6 +38,7 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
@@ -100,6 +101,9 @@ public class ChatExplorerFragment extends Fragment {
     LinearLayoutManager addedLayoutManager;
 
     SearchTask searchTask;
+
+    PositionDividerItemDecoration positionDividerItemDecoration;
+    SimpleDividerItemDecoration simpleDividerItemDecoration;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -380,42 +384,46 @@ public class ChatExplorerFragment extends Fragment {
             megaChatApi.signalPresenceActivity();
         }
 
-        if (adapterList != null && adapterList.getItemCount() > 0) {
-            ChatExplorerListItem item = adapterList.getItem(position);
+        if (adapterList == null || adapterList.getItemCount() <= 0) {
+            return;
+        }
 
-            if (adapterList.isSearchEnabled()) {
-                if (context instanceof ChatExplorerActivity) {
-                    ((ChatExplorerActivity) context).collapseSearchView();
-                }
-                else {
-                    ((FileExplorerActivityLollipop) context).collapseSearchView();
-                }
-                adapterList.setItems(items);
-                int togglePossition = adapterList.getPosition(item);
-                adapterList.toggleSelection(togglePossition);
+        ChatExplorerListItem item = adapterList.getItem(position);
+
+        if (adapterList.isSearchEnabled()) {
+            if (context instanceof ChatExplorerActivity) {
+                ((ChatExplorerActivity) context).collapseSearchView();
             }
             else {
-                adapterList.toggleSelection(position);
+                ((FileExplorerActivityLollipop) context).collapseSearchView();
             }
+            if (!adapterList.getItems().equals(items)) {
+                adapterList.setItems(items);
+            }
+            int togglePossition = adapterList.getPosition(item);
+            adapterList.toggleSelection(togglePossition);
+        }
+        else {
+            adapterList.toggleSelection(position);
+        }
 
 
-            if (item != null && !addedItems.contains(item)) {
-                addedItems.add(item);
-                adapterAdded.setItems(addedItems);
-                setFirstLayoutVisibility(View.GONE);
+        if (item != null && !addedItems.contains(item)) {
+            addedItems.add(item);
+            adapterAdded.setItems(addedItems);
+            setFirstLayoutVisibility(View.GONE);
 
-                if(context instanceof  ChatExplorerActivity){
-                    ((ChatExplorerActivity)context).showFabButton(true);
-                    ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
-                else if (context instanceof FileExplorerActivityLollipop){
-                    ((FileExplorerActivityLollipop)context).showFabButton(true);
-                    ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
-                }
+            if(context instanceof  ChatExplorerActivity){
+                ((ChatExplorerActivity)context).showFabButton(true);
+                ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
-            else if (addedItems.contains(item)) {
-                deleteItem(item);
+            else if (context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop)context).showFabButton(true);
+                ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
+        }
+        else if (addedItems.contains(item)) {
+            deleteItem(item);
         }
     }
 
@@ -454,77 +462,6 @@ public class ChatExplorerFragment extends Fragment {
             return participantFirstName + " " + participantLastName;
         }
     }
-
-//    @Override
-//    public void onChatRoomUpdate(MegaChatApiJava api, MegaChatRoom item) {
-//        log("onChatRoomUpdate");
-//
-////        MegaChatRoom chatUpdated = megaChatApi.getChatRoom(chat.getChatId());
-////        if(chatUpdated!=null){
-////            log("chat updated: "+chat.getTitle());
-////            log("unread count: "+chat.getUnreadCount());
-////            log("change type: "+chat.getChanges());
-////        }
-//
-//        if(item.hasChanged(MegaChatRoom.CHANGE_TYPE_UNREAD_COUNT)){
-//            log("CHANGE_TYPE_UNREAD_COUNT for the chat: "+item.getChatId());
-//            if(item!=null){
-//
-//                if (adapterList == null || adapterList.getItemCount()==0){
-//                    setChats();
-//                }
-//                else{
-//                    long chatHandleToUpdate = item.getChatId();
-//                    int indexToReplace = -1;
-//                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-//                    while (itrReplace.hasNext()) {
-//                        MegaChatListItem chat = itrReplace.next();
-//                        if(chat!=null){
-//                            if(chat.getChatId()==chatHandleToUpdate){
-//                                indexToReplace = itrReplace.nextIndex()-1;
-//                                break;
-//                            }
-//                        }
-//                        else{
-//                            break;
-//                        }
-//                    }
-//                    if(indexToReplace!=-1){
-//                        log("Index to replace: "+indexToReplace);
-//                        MegaChatListItem chatToReplace = megaChatApi.getChatListItem(item.getChatId());
-//                        log("Unread count: "+chatToReplace.getUnreadCount());
-//                        chats.set(indexToReplace, chatToReplace);
-//
-//                        adapterList.modifyChat(chats, indexToReplace);
-//                        adapterList.setPositionClicked(-1);
-//
-//                        if (adapterList.getItemCount() == 0){
-//                            log("adapterList.getItemCount() == 0");
-//                            listView.setVisibility(View.GONE);
-//                            emptyLayout.setVisibility(View.VISIBLE);
-//                        }
-//                        else{
-//                            log("adapterList.getItemCount() NOT = 0");
-//                            listView.setVisibility(View.VISIBLE);
-//                            emptyLayout.setVisibility(View.GONE);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    @Override
-//    public void onViewStateRestored(Bundle savedInstanceState) {
-//        log("onViewStateRestored");
-//        super.onViewStateRestored(savedInstanceState);
-//
-//        if(savedInstanceState != null)
-//        {
-//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-//            listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-//        }
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -880,7 +817,9 @@ public class ChatExplorerFragment extends Fragment {
             else {
                 position = -1;
             }
-            listView.addItemDecoration(new PositionDividerItemDecoration(context, outMetrics, position));
+            positionDividerItemDecoration = new PositionDividerItemDecoration(context, outMetrics, position);
+            simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
+            listView.addItemDecoration(positionDividerItemDecoration);
             listView.setAdapter(adapterList);
 
             if (adapterAdded.getItemCount() == 0) {
@@ -964,6 +903,9 @@ public class ChatExplorerFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (!adapterList.isSearchEnabled()) {
+                return;
+            }
             adapterList.setItems(searchItems);
             setListVisibility();
         }
@@ -980,6 +922,9 @@ public class ChatExplorerFragment extends Fragment {
     public void enableSearch(boolean enable) {
         log("enableSearch");
         if (enable) {
+            listView.removeItemDecoration(positionDividerItemDecoration);
+            listView.addItemDecoration(simpleDividerItemDecoration);
+            listView.invalidateItemDecorations();
             search("");
             if (addLayout.getVisibility() == View.VISIBLE) {
                 addLayout.setVisibility(View.GONE);
@@ -995,6 +940,10 @@ public class ChatExplorerFragment extends Fragment {
             }
         }
         else{
+            listView.removeItemDecoration(simpleDividerItemDecoration);
+            listView.addItemDecoration(positionDividerItemDecoration);
+            listView.invalidateItemDecorations();
+
             if (addLayout.getVisibility() == View.GONE) {
                 addLayout.setVisibility(View.VISIBLE);
             }

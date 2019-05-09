@@ -440,9 +440,11 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void collapseSearchView () {
-        if (searchMenuItem != null) {
-            searchMenuItem.collapseActionView();
+        if (searchMenuItem == null) {
+            return;
         }
+
+        searchMenuItem.collapseActionView();
     }
 
     public static void log(String log) {

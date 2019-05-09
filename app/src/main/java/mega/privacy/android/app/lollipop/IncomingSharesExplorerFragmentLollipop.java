@@ -1145,7 +1145,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			if (parent == null) {
 				return;
 			}
-			searchNodes = megaApi.search(parent, s, false, order);
+			searchNodes = megaApi.search(parent, s, true, order);
 		}
 		if (searchNodes != null && adapter != null) {
 			addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());

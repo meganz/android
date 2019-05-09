@@ -3327,7 +3327,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	private void refreshView () {
-		cDriveExplorer = getCloudExplorerFragment();
+		cDriveExplorer =  (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
 		if (cDriveExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(cDriveExplorer);
@@ -3336,7 +3336,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			ft.commitAllowingStateLoss();
 		}
 
-		iSharesExplorer = getIncomingExplorerFragment();
+		iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
 		if (iSharesExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(iSharesExplorer);
