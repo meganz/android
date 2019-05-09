@@ -218,7 +218,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 switch (visibleFragment) {
                     case Constants.LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
-                            loginFragment.returnToLogin();
+//                            loginFragment.returnToLogin();
+                            onBackPressed();
                         }
                         break;
                     }
