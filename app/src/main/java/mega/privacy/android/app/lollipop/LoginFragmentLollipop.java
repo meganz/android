@@ -3001,6 +3001,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         backWhileLogin = true;
                         MegaApplication.setLoggingIn(false);
                         loginClicked = false;
+                        if (megaChatApi == null){
+                            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                        }
                         megaChatApi.logout(LoginFragmentLollipop.this);
                         megaApi.localLogout(LoginFragmentLollipop.this);
                         break;
