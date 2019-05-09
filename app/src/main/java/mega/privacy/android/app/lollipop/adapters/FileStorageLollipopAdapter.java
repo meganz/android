@@ -21,6 +21,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileDocument;
@@ -29,6 +30,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaSharedFolderLollipopAdapter.OnItemClickListener;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
 
 /*
  * Adapter for FilestorageActivity list
@@ -36,6 +38,7 @@ import mega.privacy.android.app.utils.Util;
 public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorageLollipopAdapter.ViewHolderFileStorage> implements OnClickListener {
 		
 	private Context context;
+	MegaApiAndroid megaApi;
 	private List<FileDocument> currentFiles;
 	private Mode mode;
 	OnItemClickListener mItemClickListener;
@@ -48,6 +51,9 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		this.mode = mode2;
 		this.listFragment = listView;
 		this.context = context;
+		if (this.megaApi == null){
+			this.megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 	}	
 	
 	/*private view holder class*/
@@ -130,7 +136,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 				else{
 					//Document is FILE
 					holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-					ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
+					ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this.megaApi ,this);
 				}
 			}	
 			else{
@@ -169,13 +175,13 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 						else{
 							holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 							holder.itemLayout.setBackgroundColor(Color.WHITE);
-							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
+							ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this.megaApi, this);
 						}
 					}
 					else{
 						holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-						ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this);
+						ThumbnailUtilsLollipop.createThumbnailExplorerLollipop(context,document, holder, this.megaApi, this);
 					}
 				}
 			}

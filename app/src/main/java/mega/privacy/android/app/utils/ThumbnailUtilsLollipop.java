@@ -977,12 +977,14 @@ public class ThumbnailUtilsLollipop {
 		File thumbFile;
 		ViewHolderFileStorage holder;
 		FileStorageLollipopAdapter adapter;
+		MegaApiAndroid megaApi;
 
-		AttachThumbnailToFileStorageExplorerTask(Context context, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter) {
+		AttachThumbnailToFileStorageExplorerTask(Context context, MegaApiAndroid megaApi, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter) {
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
 			this.thumbFile = null;
+			this.megaApi = megaApi;
 		}
 
 		@Override
@@ -990,8 +992,8 @@ public class ThumbnailUtilsLollipop {
 			log("Attach Thumb nails to file storage explorer Start");
 			File thumbDir = getThumbFolder(context);
 			File originalFile = params[0].getFile();
-			thumbFile = new File(thumbDir, originalFile.getName() + ".jpg" );
-			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(originalFile, thumbFile);
+			thumbFile = new File(thumbDir, megaApi.getFingerprint(originalFile.getAbsolutePath()) + ".jpg" );
+			boolean thumbCreated = MegaUtilsAndroidApp.createThumbnail(originalFile, context, thumbFile);
 			return thumbCreated;
 		}
 
@@ -1381,13 +1383,13 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 
-	public static void createThumbnailExplorerLollipop(Context context, FileDocument document, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter) {
+	public static void createThumbnailExplorerLollipop(Context context, FileDocument document, ViewHolderFileStorage holder, MegaApiAndroid megaApi, FileStorageLollipopAdapter adapter) {
 		if (!MimeTypeList.typeForName(document.getName()).isImage() &&
 				!MimeTypeList.typeForName(document.getName()).isVideo()) {
 			log("no image or video");
 			return;
 		}
-		new AttachThumbnailToFileStorageExplorerTask(context, holder, adapter).execute(document);
+		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, holder, adapter).execute(document);
 
 	}
 	
