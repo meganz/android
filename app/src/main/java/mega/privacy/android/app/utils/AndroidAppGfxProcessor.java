@@ -21,13 +21,11 @@ public class AndroidAppGfxProcessor extends AndroidGfxProcessor {
         int width;
         int height;
 
-        if(isVideoFile(path)){
-
+        if (isVideoFile(path)) {
             Bitmap bmThumbnail = null;
-
-            try{
+            try {
                 bmThumbnail = android.media.ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-                if(context != null && bmThumbnail == null) {
+                if (context != null && bmThumbnail == null) {
 
                     String SELECTION = MediaStore.MediaColumns.DATA + "=?";
                     String[] PROJECTION = {BaseColumns._ID};
@@ -42,29 +40,28 @@ public class AndroidAppGfxProcessor extends AndroidGfxProcessor {
                     }
                     cursor.close();
                 }
+            } catch (Exception e) {
             }
-            catch(Exception e){}
 
-            if(bmThumbnail==null){
+            if (bmThumbnail == null) {
 
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                try{
+                try {
                     retriever.setDataSource(path);
                     bmThumbnail = retriever.getFrameAtTime();
-                }
-                catch(Exception e1){
-                }
-                finally {
+                } catch (Exception e1) {
+                } finally {
                     try {
                         retriever.release();
-                    } catch (Exception ex) {}
+                    } catch (Exception ex) {
+                    }
                 }
             }
 
-            if(bmThumbnail==null){
-                try{
+            if (bmThumbnail == null) {
+                try {
                     bmThumbnail = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MINI_KIND);
-                    if(context != null && bmThumbnail == null) {
+                    if (context != null && bmThumbnail == null) {
 
                         String SELECTION = MediaStore.MediaColumns.DATA + "=?";
                         String[] PROJECTION = {BaseColumns._ID};
@@ -79,18 +76,17 @@ public class AndroidAppGfxProcessor extends AndroidGfxProcessor {
                         }
                         cursor.close();
                     }
+                } catch (Exception e2) {
                 }
-                catch (Exception e2){}
             }
 
             try {
                 if (bmThumbnail != null) {
                     return Bitmap.createScaledBitmap(bmThumbnail, w, h, true);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
             }
-        }
-        else{
+        } else {
             if ((orientation < 5) || (orientation > 8)) {
                 width = rect.right;
                 height = rect.bottom;
@@ -101,8 +97,9 @@ public class AndroidAppGfxProcessor extends AndroidGfxProcessor {
 
             try {
                 int scale = 1;
-                while (width / scale / 2 >= w && height / scale / 2 >= h)
+                while (width / scale / 2 >= w && height / scale / 2 >= h) {
                     scale *= 2;
+                }
 
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = false;

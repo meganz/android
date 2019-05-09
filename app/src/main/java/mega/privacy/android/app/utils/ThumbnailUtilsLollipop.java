@@ -1392,11 +1392,13 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
+		// if the document is gone or deleted
 		String key = megaApi.getFingerprint(document.getFile().getAbsolutePath());
 		if (key == null) {
 			log("no key");
 			return;
 		}
+
 		// if the thumbnail bitmap is cached in memory cache
 		Bitmap bitmap = getThumbnailFromCache(key);
 		if (bitmap != null) {
