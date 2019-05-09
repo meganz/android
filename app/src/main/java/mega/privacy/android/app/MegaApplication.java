@@ -462,7 +462,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				staging = false;
 			}
 		}
-
+        
+        Util.setFileLoggerSDK(fileLoggerSDK);
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
@@ -477,7 +478,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 		}
 		else {
-			Util.setFileLoggerSDK(fileLoggerSDK);
 			if (fileLoggerSDK) {
 				MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 			} else {
@@ -502,7 +502,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				fileLoggerKarere = false;
 			}
 		}
-
+        
+        Util.setFileLoggerKarere(fileLoggerKarere);
 		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
 		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
@@ -510,7 +511,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		}
 		else {
-			Util.setFileLoggerKarere(fileLoggerKarere);
 			if (fileLoggerKarere) {
 				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 			} else {
