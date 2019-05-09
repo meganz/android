@@ -4348,6 +4348,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateOrder);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdateView);
 
     	super.onDestroy();
 	}

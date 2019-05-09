@@ -414,14 +414,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 
 		if (chosenNode != null && chosenNode.getType() != MegaNode.TYPE_ROOT) {
-			MegaNode parentNode = megaApi.getParentNode(chosenNode);
-
-			if(parentNode!=null && parentNode.getType() == MegaNode.TYPE_ROOT) {
-				log("ParentNode NOT NULL");
-				nodes = megaApi.getChildren(chosenNode, order);
-				log("chosenNode is: " + chosenNode.getName());
-				return;
-			}
+			nodes = megaApi.getChildren(chosenNode, order);
+			log("chosenNode is: " + chosenNode.getName());
+			return;
 		}
 
 		MegaNode rootNode = megaApi.getRootNode();
