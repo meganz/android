@@ -1391,8 +1391,14 @@ public class ThumbnailUtilsLollipop {
 			log("no image or video");
 			return;
 		}
+
+		String key = megaApi.getFingerprint(document.getFile().getAbsolutePath());
+		if (key == null) {
+			log("no key");
+			return;
+		}
 		// if the thumbnail bitmap is cached in memory cache
-		Bitmap bitmap = getThumbnailFromCache(megaApi.getFingerprint(document.getFile().getAbsolutePath()));
+		Bitmap bitmap = getThumbnailFromCache(key);
 		if (bitmap != null) {
 			holder.imageView.setImageBitmap(bitmap);
 			return;
@@ -1401,7 +1407,7 @@ public class ThumbnailUtilsLollipop {
 		// if the thumbnail bitmap is cached in device file directory
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-		File directoryCachedFile = new File(getThumbFolder(context), megaApi.getFingerprint(document.getFile().getAbsolutePath()) + ".jpg" );
+		File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg" );
 		bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
 		if (bitmap != null) {
 			holder.imageView.setImageBitmap(bitmap);
