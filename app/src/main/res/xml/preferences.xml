@@ -97,7 +97,7 @@
 		<android.support.v7.preference.ListPreference
 			android:key="settings_chat_send_originals"
 			android:title="@string/settings_chat_upload_quality"
-			android:entries="@array/settings_chat_multimedia_file_upload_quality_entries"
+			android:entries="@array/settings_chat_upload_quality_entries"
 			android:entryValues="@array/settings_chat_upload_quality_values" />
 
 		<android.support.v7.preference.SwitchPreferenceCompat
