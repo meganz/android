@@ -1785,8 +1785,13 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualitätsreduktion bei Versand via Chat</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload. The place holder is to differentiate the quality of uploaded video">Original %s</item>
-        <item context="the options of what to upload. The place holder is to differentiate the quality of uploaded video">Medium %s</item>
+        <item context="the options of what to upload.">Original</item>
+        <item context="the options of what to upload.">Mittel</item>
+    </string-array>
+
+    <string-array name="settings_chat_multimedia_file_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of origin quality multimedia file to upload.">Original</item>
+        <item context="the options of medium quality multimedia file to  upload.">Mittel</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Verpasster Anruf</string>
@@ -2137,7 +2142,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Schlüsselrotation aktivieren</string>
-    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chat-Links exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
@@ -2169,9 +2174,9 @@
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Schlüsselrotation</string>
-    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chat-Links exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chat-Links exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
     <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Die Einladung an %s wurde bereits verschickt und kann unter "Gesendete Anfragen" verwaltet werden.</string>
@@ -2249,7 +2254,7 @@
     <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Ungültiger Zeitraum, er sollte größer 0 sein</string>
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Letzte Online-Zeit verfügbar machen</string>
-    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Erlauben Sie es Ihren Kontakten, Ihre letzte Online-Zeit zu sehen</string>
+    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Erlauben Sie Ihren Kontakten, den Zeitpunkt zu sehen, an dem Sie zuletzt online waren</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
         <item context="Singular of file. 1 file" quantity="one">%d Datei</item>
@@ -2296,7 +2301,7 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]Keine [/B][A]Benachrichtigungen[/A][B].[/B]</string>
 
-    <string name="general_setup_mega" context="Permissions screen title">Setup MEGA</string>
+    <string name="general_setup_mega" context="Permissions screen title">MEGA konfigurieren</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow access to photos, media and files.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, media and files MEGA needs your permission.</string>
@@ -2393,14 +2398,14 @@
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
 
-    <string name="title_tour_one" context="Title of first tour screen">You hold the keys</string>
-    <string name="content_tour_one" cotext="Content of first tour screen">Security is why we exist, your files are safe with us behind a well oiled encryption machine where only you can access your files.</string>
-    <string name="title_tour_two" cotext="Title of second tour screen">Encrypted chat</string>
-    <string name="content_tour_two" cotext="Content of second tour screen">Fully encrypted chat with voice and video calls, group messaging and file sharing integration with your Cloud Drive.</string>
-    <string name="title_tour_three" cotext="Title of third tour screen">Create your Network</string>
-    <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, colaborate, make voice and video calls without ever leaving MEGA</string>
-    <string name="title_tour_four" cotext="Title of fourth tour screen">Your Photos in the Cloud</string>
-    <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
+    <string name="title_tour_one" context="Title of first tour screen">Sie sind der alleinige Inhaber Ihrer Schlüsel</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">Die Sicherheit Ihrer Daten ist unsere Existenzgrundlage. Dank Ende-zu-Ende-Verschlüsselung kontrollieren Sie alleine, wer Zugang zu ihnen erhält.</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">Verschlüsselte Kommunikation</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">Vollverschlüsselter Textchat, Audio- und Videoanrufe, Gruppengespräche und Integration mit Ihrem Cloud Drive.</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">Kontaktnetzwerk erstellen</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">Fügen Sie Kontakte hinzu, tauschen Sie Dokumente aus, führen Sie Audio- und Video-Gespräche, ohne MEGA zu verlassen</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">Ihre Fotos in der Cloud</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">Kamera-Uploads ist essentiell für alle Mobilgeräte, und MEGA unterstützt dies selbstverständlich. Erstellen Sie jetzt Ihren Account.</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Passwort</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s ist ein passwortgeschütztes PDF-Dokument. Zur Darstellung geben Sie bitte das Passwort ein.</string>
@@ -2420,7 +2425,7 @@
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
     <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chat-Links exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Schlüsselrotation ist etwas sicherer, jedoch können Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzugänglich.</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully.</string>
 
@@ -2444,7 +2449,7 @@
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">Über diesen Link können Dritte der Unterhaltung beitreten</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Neuer Chatlink</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Benennen Sie den Gruppenchat</string>
-    <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
+    <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Link-Export ist nur für Chats mit gesetztem Titel erlaubt.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">Kein Chatlink verfügbar.</string>
