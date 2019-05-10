@@ -89,9 +89,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
-//import com.vdurmont.emoji.EmojiManager;
-//import com.vdurmont.emoji.EmojiParser;
-
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
     public static int MAX_WIDTH_NAME_SENDER_GROUP_THUMB_LAND_PICTURE = 194;
@@ -520,6 +517,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         Button neverRichLinkButton;
         Button alwaysAllowRichLinkButton;
         Button notNowRichLinkButton;
+        RelativeLayout urlOwnMessageTitleLayout;
         TextView urlOwnMessageTitle;
         TextView urlOwnMessageDescription;
 
@@ -544,6 +542,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
         EmojiTextView urlContactMessageText;
+        RelativeLayout urlContactMessageTitleLayout;
         TextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
         RelativeLayout forwardContactRichLinks;
@@ -788,7 +787,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageDisableButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_disable_layout);
             holder.yesDisableButton = (Button) v.findViewById(R.id.url_yes_disable_button);
             holder.noDisableButton = (Button) v.findViewById(R.id.url_no_disable_button);
-
+            holder.urlOwnMessageTitleLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_enable_layout_inside);
             holder.urlOwnMessageTitle = (TextView) v.findViewById(R.id.url_own_message_title);
             holder.urlOwnMessageDescription = (TextView) v.findViewById(R.id.url_own_message_description);
 
@@ -996,6 +995,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageText = (EmojiTextView) v.findViewById(R.id.url_contact_message_text);
             holder.urlContactMessageText.setTag(holder);
 
+            holder.urlContactMessageTitleLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_enable_layout_inside);
             holder.urlContactMessageTitle = (TextView) v.findViewById(R.id.url_contact_message_title);
             holder.urlContactMessageDescription = (TextView) v.findViewById(R.id.url_contact_message_description);
 
@@ -2559,13 +2559,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             Bitmap bitmapIcon = null;
 
             if (image != null) {
-                byte[] decodedBytes = Base64.decode(image, 0);
-                bitmapImage = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                try {
+                    byte[] decodedBytes = Base64.decode(image, 0);
+                    bitmapImage = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                } catch (Exception e) {
+                    log("error getting image "+e);
+                }
             }
 
             if (icon != null) {
-                byte[] decodedBytes2 = Base64.decode(icon, 0);
-                bitmapIcon = BitmapFactory.decodeByteArray(decodedBytes2, 0, decodedBytes2.length);
+                try {
+                    byte[] decodedBytes2 = Base64.decode(icon, 0);
+                    bitmapIcon = BitmapFactory.decodeByteArray(decodedBytes2, 0, decodedBytes2.length);
+                } catch (Exception e) {
+                    log("error getting icon  "+e);
+                }
             }
 
             if (message.getUserHandle() == myUserHandle) {
@@ -2741,9 +2749,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.urlOwnMessageImage.setImageBitmap(bitmapImage);
                     holder.urlOwnMessageImage.setVisibility(View.VISIBLE);
                     holder.urlOwnMessageGroupAvatarLayout.setVisibility(View.GONE);
-
+                    holder.urlOwnMessageTitleLayout.setGravity(Gravity.RIGHT);
                 } else {
+                    holder.urlOwnMessageGroupAvatarLayout.setVisibility(View.GONE);
                     holder.urlOwnMessageImage.setVisibility(View.GONE);
+                    holder.urlOwnMessageTitleLayout.setGravity(Gravity.LEFT);
                 }
 
                 if (bitmapIcon != null) {
@@ -2969,15 +2979,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setText(text);
-                }
 
-                if(bitmapImage!=null){
-                    ((ViewHolderMessageChat)holder).urlContactMessageImage.setImageBitmap(bitmapImage);
-                    ((ViewHolderMessageChat)holder).urlContactMessageImage.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).urlContactMessageGroupAvatarLayout.setVisibility(View.GONE);
-                }
-                else{
-                    ((ViewHolderMessageChat)holder).urlContactMessageImage.setVisibility(View.GONE);
+                    if (bitmapImage != null) {
+                        holder.urlContactMessageImage.setImageBitmap(bitmapImage);
+                        holder.urlContactMessageImage.setVisibility(View.VISIBLE);
+                        holder.urlContactMessageGroupAvatarLayout.setVisibility(View.GONE);
+                        holder.urlContactMessageTitleLayout.setGravity(Gravity.RIGHT);
+                    } else {
+                        holder.urlContactMessageGroupAvatarLayout.setVisibility(View.GONE);
+                        holder.urlContactMessageImage.setVisibility(View.GONE);
+                        holder.urlContactMessageTitleLayout.setGravity(Gravity.LEFT);
+                    }
                 }
 
                 if (bitmapIcon != null) {
