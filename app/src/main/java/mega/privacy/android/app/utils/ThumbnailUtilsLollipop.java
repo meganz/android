@@ -1410,11 +1410,13 @@ public class ThumbnailUtilsLollipop {
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg" );
-		bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
-		if (bitmap != null) {
-			holder.imageView.setImageBitmap(bitmap);
-			return;
-		}
+		if (directoryCachedFile.exists()) {
+            bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
+            if (bitmap != null) {
+                holder.imageView.setImageBitmap(bitmap);
+                return;
+            }
+        }
 
 		// There is no cache before, we have to start an async task to have the thumb nail bitmap
 		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, holder, adapter).execute(document);
