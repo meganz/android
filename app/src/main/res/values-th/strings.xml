@@ -1785,13 +1785,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">คุณภาพไฟล์มีเดีย</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">ต้นฉบับ</item>
-        <item context="the options of what to upload.">ปานกลาง</item>
-    </string-array>
-
-    <string-array name="settings_chat_multimedia_file_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of origin quality multimedia file to upload.">ต้นฉบับ</item>
-        <item context="the options of medium quality multimedia file to  upload.">ปานกลาง</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">สายที่ไม่ได้รับ</string>
