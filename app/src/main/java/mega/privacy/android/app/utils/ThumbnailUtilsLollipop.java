@@ -65,6 +65,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnail;
+
 
 /*
  * Service to create thumbnails
@@ -994,7 +996,7 @@ public class ThumbnailUtilsLollipop {
 			File thumbDir = getThumbFolder(context);
 			this.originalFile = params[0].getFile();
 			thumbFile = new File(thumbDir, megaApi.getFingerprint(this.originalFile.getAbsolutePath()) + ".jpg" );
-			boolean thumbCreated = MegaUtilsAndroidApp.createThumbnail(this.originalFile, context, thumbFile);
+			boolean thumbCreated = createThumbnail(this.originalFile, context, thumbFile);
 			return thumbCreated;
 		}
 
