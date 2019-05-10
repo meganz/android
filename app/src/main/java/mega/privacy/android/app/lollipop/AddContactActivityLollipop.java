@@ -282,15 +282,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             else if (contactType == Constants.CONTACT_TYPE_DEVICE) {
                 if (queryPermissions) {
-                    phoneContacts.clear();
-                    filteredContactsPhone.clear();
-                    phoneContacts = getPhoneContacts();
-                    addedContactsPhone.clear();
-                    for (int i = 0; i < phoneContacts.size(); i++) {
-                        filteredContactsPhone.add(phoneContacts.get(i));
-                    }
-                    getVisibleMEGAContacts();
-
+                    getBothContacts();
                     boolean found;
                     PhoneContactInfo contactPhone;
                     MegaContactAdapter contactMEGA;
@@ -315,17 +307,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             else {
-                if (queryPermissions) {
-                    phoneContacts.clear();
-                    filteredContactsPhone.clear();
-                    addedContactsPhone.clear();
-                    phoneContacts = getPhoneContacts();
-                    for (int i = 0; i < phoneContacts.size(); i++) {
-                        filteredContactsPhone.add(phoneContacts.get(i));
-                    }
-                }
-                getVisibleMEGAContacts();
-
+                getBothContacts();
+                addedContactsPhone.clear();
                 MegaContactAdapter contactMEGA;
                 PhoneContactInfo contactPhone;
                 ShareContactInfo contact;
@@ -555,16 +538,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
             else {
-                if (queryPermissions) {
-                    phoneContacts.clear();
-                    filteredContactsPhone.clear();
-                    phoneContacts = getPhoneContacts();
-                    for (int i = 0; i < phoneContacts.size(); i++) {
-                        filteredContactsPhone.add(phoneContacts.get(i));
-                    }
-                }
-                getVisibleMEGAContacts();
-
+                getBothContacts();
                 MegaContactAdapter contactMEGA;
                 PhoneContactInfo contactPhone;
                 ShareContactInfo contact = null;
@@ -642,13 +616,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         }
                     }
                 }
-
-                if (filteredContactMEGA.size() == 0 && filteredContactsShare.size() > 0) {
-                    filteredContactsShare.remove(0);
-                }
-                if (filteredContactsPhone.size() == 0 && (filteredContactsShare.size()-1 >= 0)) {
-                    filteredContactsShare.remove(filteredContactsShare.size()-1);
-                }
             }
             return null;
         }
@@ -690,6 +657,22 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+    }
+
+    private void getBothContacts() {
+        if (queryPermissions) {
+            if (phoneContacts != null) {
+                phoneContacts.clear();
+            }
+            filteredContactsPhone.clear();
+            phoneContacts = getPhoneContacts();
+            if (phoneContacts != null) {
+                for (int i = 0; i < phoneContacts.size(); i++) {
+                    filteredContactsPhone.add(phoneContacts.get(i));
+                }
+            }
+        }
+        getVisibleMEGAContacts();
     }
 
     private class QueryIfContactSouldBeAddedTask extends AsyncTask<Boolean, Void, Integer> {
@@ -954,7 +937,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     void setPhoneAdapterContacts (ArrayList<PhoneContactInfo> contacts) {
-        if(queryPermissions &&filteredContactsPhone!=null){
+        if(queryPermissions && filteredContactsPhone!=null){
             if (filteredContactsPhone.size() == 0){
                 headerContacts.setVisibility(View.GONE);
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
@@ -1861,21 +1844,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 ActivityCompat.requestPermissions((AddContactActivityLollipop) this,
                         new String[]{Manifest.permission.READ_CONTACTS},
                         Constants.REQUEST_READ_CONTACTS);
+                if (contactType == Constants.CONTACT_TYPE_DEVICE) {
+                    return;
+                }
             }
-            else {
-                setEmptyStateVisibility(true);
+        }
+        setEmptyStateVisibility(true);
+        progressBar.setVisibility(View.VISIBLE);
+        getContactsTask = new GetContactsTask();
+        getContactsTask.execute();
 
-                progressBar.setVisibility(View.VISIBLE);
-                getContactsTask = new GetContactsTask();
-                getContactsTask.execute();
-            }
-        }
-        else{
-            setEmptyStateVisibility(true);
-            progressBar.setVisibility(View.VISIBLE);
-            getContactsTask = new GetContactsTask();
-            getContactsTask.execute();
-        }
     }
 
     private void setTitleAB() {
@@ -2527,16 +2505,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 log("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
 
                 if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
-                    if (inputString == ""){
-                        log("VALID Contact: "+ name + " ---> "+ emailAddress);
-                        PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
-                        contactList.add(contactPhone);
-                    }
-                    else if (!inputString.isEmpty() && (name.toUpperCase().contains(inputString.toUpperCase()) || emailAddress.toUpperCase().contains(inputString.toUpperCase()))){
-                        log("VALID Contact: "+ name + " ---> "+ emailAddress + " inputString: " + inputString);
-                        PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
-                        contactList.add(contactPhone);
-                    }
+                    PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
+                    contactList.add(contactPhone);
                 }
             }
             c.close();
@@ -3327,13 +3297,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         emptyTextView.setText(R.string.no_contacts_permissions);
 
                         progressBar.setVisibility(View.GONE);
-                    }
-                    else{
-                        progressBar.setVisibility(View.VISIBLE);
-                        emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
-
-                        getContactsTask = new GetContactsTask();
-                        getContactsTask.execute();
                     }
                 }
                 break;
