@@ -1785,8 +1785,13 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calitatea media a chatului</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload. The place holder is to differentiate the quality of uploaded video">Original %s</item>
-        <item context="the options of what to upload. The place holder is to differentiate the quality of uploaded video">Medium %s</item>
+        <item context="the options of what to upload.">Original</item>
+        <item context="the options of what to upload.">Medie</item>
+    </string-array>
+
+    <string-array name="settings_chat_multimedia_file_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of origin quality multimedia file to upload.">Original</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medie</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Apel ratat</string>

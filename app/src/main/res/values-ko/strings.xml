@@ -517,7 +517,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">파일 시스템에서 선택</string>
-    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">다음에서 고르기</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -649,7 +649,7 @@
 	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">오프라인 파일 삭제</string>
 
 	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
-	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">다운로드 완료 후 파일 열기</string>
 
 
 
@@ -1367,8 +1367,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
-		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
-		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">%2$d개의 폴더 중 %1$d번째 업로드중</item>
+		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">%2$d개의 폴더 중 %1$d번째 업로드중</item>
 	</plurals>
 
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
@@ -1377,8 +1377,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
-		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
-		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">폴더 %1$d개 업로드 완료</item>
+		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">폴더 %1$d개 업로드 완료</item>
 	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">전체 크기: %1$s</string>
@@ -1785,8 +1785,13 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">대화 미디어 품질</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload. The place holder is to differentiate the quality of uploaded video">Original %s</item>
-        <item context="the options of what to upload. The place holder is to differentiate the quality of uploaded video">Medium %s</item>
+        <item context="the options of what to upload.">원본</item>
+        <item context="the options of what to upload.">보통</item>
+    </string-array>
+
+    <string-array name="settings_chat_multimedia_file_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of origin quality multimedia file to upload.">원본</item>
+        <item context="the options of medium quality multimedia file to  upload.">보통</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">부재중 전화</string>
@@ -2120,7 +2125,7 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">대화 활동</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">새 메시지가 있을 수 있습니다</string>
-	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
+	<string name="retrieving_message_title" context="When app is retrieving push message">메시지 수신중</string>
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">휴지통 비우기 일정</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">휴지통이 자동으로 비워집니다.</string>
 
@@ -2445,25 +2450,25 @@
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">새 대화 링크</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">그룹 이름을 입력하세요</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">대화 링크를 생성하려면 그룹 이름을 지어야합니다.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">사용 가능한 대화 링크 없음</string>
-    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">대화 링크를 성공적으로 삭제하였습니다.</string>
 
-    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ACCEPTED)</string>
-    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (DELETED)</string>
-    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (DENIED)</string>
-    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
-    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
-    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (승낙함)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (삭제함)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (거절함)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (무시함)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (상기함)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (보류중)</string>
 
 	<plurals name="file_already_downloaded">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d개의 파일은 이미 다운로드 되었습니다.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d개의 파일은 이미 다운로드 되었습니다.&#160;</item>
 	</plurals>
 
 	<plurals name="file_pending_download">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d개의 파일 대기중.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">파일 %d개 보류중.</item>
 	</plurals>
 </resources>
