@@ -83,8 +83,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.TimeUnit;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -182,6 +180,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private static int RECORD_BUTTON_SEND = 1;
     private static int RECORD_BUTTON_ACTIVATED = 2;
     private static int RECORD_BUTTON_DESACTIVATED = 3;
+    private static int VOICE_CLIP_TYPE = 4;
+
     private int currentRecordButtonState = 0;
     String mOutputFilePath;
     int keyboardHeight;
@@ -394,6 +394,37 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private BroadcastReceiver voiceclipDownloadedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                long nodeHandle = intent.getLongExtra("nodeHandle", 0);
+                boolean successfully = intent.getBooleanExtra("successfully",false);
+                findPosInAdapter(nodeHandle, successfully);
+            }
+        }
+    };
+
+    private void findPosInAdapter(long nodeHandle, boolean successfully){
+        int positionInMessages = -1;
+        long userHandle = -1;
+        if((messages!=null)&&(!messages.isEmpty())){
+            for(int i=0; i<messages.size();i++){
+                if((messages.get(i).getMessage()!=null)
+                        &&(messages.get(i).getMessage().getMegaNodeList()!=null)
+                        &&(messages.get(i).getMessage().getMegaNodeList().size()>0)
+                        &&(messages.get(i).getMessage().getMegaNodeList().get(0).getHandle() == nodeHandle)){
+                    positionInMessages = i;
+                    userHandle = messages.get(i).getMessage().getUserHandle();
+                    break;
+                }
+            }
+        }
+        if((adapter!=null)&&(positionInMessages != -1)&&(userHandle != -1)){
+            adapter.updateVoiceClip(positionInMessages+1, successfully, userHandle);
+        }
+    }
+
     private BroadcastReceiver dialogConnectReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -503,6 +534,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         chatC = new ChatController(chatActivity);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
+        LocalBroadcastManager.getInstance(this).registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
@@ -1970,7 +2002,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
             File newFolder = new File(path);
             newFolder.mkdirs();
-            outputFileVoiceNotes = path + "/note_voice.opus";
+            outputFileVoiceNotes = path + "/note_voice.m4a";
             long timeStamp = System.currentTimeMillis()/1000;
             File voiceFile = new File(outputFileVoiceNotes);
             String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
@@ -3469,7 +3501,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     break;
                 }
                 case R.id.chat_cab_menu_download:{
-                    log("###### chat_cab_menu_download ");
+                    log("chat_cab_menu_download ");
                     clearSelections();
                     hideMultipleSelect();
                     ArrayList<MegaNodeList> list = new ArrayList<>();
@@ -3931,6 +3963,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             actionMode.finish();
         }
     }
+
+
 
     public void selectAll() {
         if (adapter != null) {
@@ -5179,11 +5213,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean isDowloaded(MegaNodeList nodeList){
-        String parentPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
+        String parentPath = ChatUtil.getDefaultLocationPath(this, true);
         if (nodeList != null) {
             if (nodeList.size() == 1) {
                 MegaNode tempNode = nodeList.get(0);
-                if (context instanceof ChatActivityLollipop) {
+                if (this instanceof ChatActivityLollipop) {
                     tempNode = chatC.authorizeNodeIfPreview(tempNode, ((ChatActivityLollipop) context).getChatRoom());
                 }
 
@@ -5318,7 +5352,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
     public void sendToDownload(MegaNodeList nodelist){
         chatC.prepareForChatDownload(nodelist, true);
-
     }
     public void deleteOwnVoiceClip(String nameFile){
         String path = ChatUtil.getDefaultLocationPath(context, true);
@@ -7018,6 +7051,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             callInProgressLayout.setVisibility(View.GONE);
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
 
         super.onDestroy();
     }
@@ -7869,6 +7903,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Intent intent = new Intent(this, ChatUploadService.class);
             PendingMessageSingle pMsgSingle = new PendingMessageSingle();
             pMsgSingle.setChatId(idChat);
+            if(isVoiceClip){
+                pMsgSingle.setType(Constants.TYPE_VOICE_CLIP);
+            }
             long timestamp = System.currentTimeMillis()/1000;
             pMsgSingle.setUploadTimestamp(timestamp);
 
@@ -8405,9 +8442,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         int value = 0;
         int margins = marginBottomVoicleLayout;
+        int marginRight = 0;
         if((recordButtonState == RECORD_BUTTON_SEND)||(recordButtonState == RECORD_BUTTON_DESACTIVATED)){
             log("paramsRecordButton:SEND||DESACTIVATED");
             value = 48;
+            if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
+                marginRight = Util.px2dp(12, outMetrics);
+            }
        }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
             log("paramsRecordButton:ACTIVATED");
             value = 80;
@@ -8423,11 +8464,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         params.width = Util.px2dp(value, outMetrics);
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params.setMargins(Util.px2dp(0, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(0, outMetrics), margins);
+        params.setMargins(0, 0, marginRight, margins);
         recordButtonLayout.setLayoutParams(params);
 
         FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
-        paramsRecordView.setMargins(0,0,Util.px2dp(0, outMetrics), marginBottomVoicleLayout);
+        paramsRecordView.setMargins(0,0,0, marginBottomVoicleLayout);
         paramsRecordView.gravity = Gravity.BOTTOM |Gravity.RIGHT ;
         recordView.setLayoutParams(paramsRecordView);
     }

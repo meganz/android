@@ -26,7 +26,6 @@ import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.FontRequestEmojiCompatConfig;
 import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -573,6 +572,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		
 //		new MegaTest(getMegaApi()).start();
 	}
+
 
 	public void askForFullAccountInfo(){
 		log("askForFullAccountInfo");

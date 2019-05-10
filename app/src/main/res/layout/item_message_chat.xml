@@ -457,9 +457,20 @@
                                 android:background="@null"
                                 android:visibility="gone"/>
 
+                            <ImageView
+                                android:id="@+id/content_own_message_voice_clip_not_available"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="16dp"
+                                android:src="@drawable/ic_clear_white"
+                                android:tint="@color/grey_achievements_invite_friends"
+                                android:background="@null"
+                                android:visibility="gone"/>
+
                             <!-- Progress bar-->
                             <RelativeLayout
-                                android:id="@+id/uploadingProgressBarVoiceClip"
+                                android:id="@+id/uploading_own_progressbar_voiceclip"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
@@ -467,7 +478,6 @@
                                 android:visibility="gone"
                                 android:background="@android:color/transparent">
                                 <ProgressBar
-                                    android:id="@+id/uploadingProgressBarVoiceClip_im"
                                     android:indeterminate="true"
                                     android:indeterminateTintMode="src_atop"
                                     android:indeterminateTint="@color/small_letter_upgrade_account"
@@ -475,16 +485,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
                             </RelativeLayout>
-
-                            <!--&lt;!&ndash; error icon&ndash;&gt;-->
-                            <!--<ImageView-->
-                            <!--android:id="@+id/content_own_message_voice_clip_error"-->
-                            <!--android:layout_width="24dp"-->
-                            <!--android:layout_height="24dp"-->
-                            <!--android:layout_gravity="center_vertical"-->
-                            <!--android:layout_marginLeft="16dp"-->
-                            <!--android:background="@null"-->
-                            <!--android:visibility="gone"/>-->
 
                             <SeekBar
                                 android:id="@+id/content_own_message_voice_clip_seekBar"
@@ -1596,6 +1596,36 @@
                             android:layout_marginLeft="16dp"
                             android:background="@null"
                             android:visibility="gone"/>
+
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_voice_clip_not_available"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:src="@drawable/ic_clear_white"
+                            android:tint="@color/grey_achievements_invite_friends"
+                            android:background="@null"
+                            android:visibility="gone"/>
+
+                        <!-- Progress bar-->
+                        <RelativeLayout
+                            android:id="@+id/uploading_contact_progressbar_voiceclip"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="16dp"
+                            android:visibility="gone"
+                            android:background="@android:color/transparent">
+                            <ProgressBar
+                                android:indeterminate="true"
+                                android:indeterminateTintMode="src_atop"
+                                android:indeterminateTint="@color/small_letter_upgrade_account"
+                                android:layout_centerInParent="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        </RelativeLayout>
                         <SeekBar
                             android:id="@+id/content_contact_message_voice_clip_seekBar"
                             android:layout_width="145dp"

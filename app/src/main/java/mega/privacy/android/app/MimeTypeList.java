@@ -211,12 +211,12 @@ public class MimeTypeList {
 	 * Check is MimeType of audio type
 	 */
 	public boolean isAudio() {
-		return type.startsWith("audio/") || extension.equals("opus");
+		return type.startsWith("audio/") || extension.equals("m4a");
 	}
 
 	public boolean isAudioNotSupported() {
 		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
-				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")
+				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
 				|| extension.equals("3ga");
 	}
 

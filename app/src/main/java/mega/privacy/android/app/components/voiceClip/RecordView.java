@@ -455,8 +455,8 @@ public class RecordView extends RelativeLayout {
 
     }
 
-    public void setOnRecordListener(OnRecordListener recrodListener) {
-        this.recordListener = recrodListener;
+    public void setOnRecordListener(OnRecordListener recordListener) {
+        this.recordListener = recordListener;
     }
     public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
         animationHelper.setOnBasketAnimationEndListener(onBasketAnimationEndListener);

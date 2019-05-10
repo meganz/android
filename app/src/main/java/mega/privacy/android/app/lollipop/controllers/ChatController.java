@@ -1798,7 +1798,6 @@ public class ChatController {
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
-//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
                                         log("The video has not thumb");
@@ -1965,7 +1964,7 @@ public class ChatController {
                 log("hashes.length more than 1 = "+nodeList.size());
                 MegaNode nodeToDownload = nodeList.get(i);
                 if(nodeToDownload != null){
-                    log("node NOT null");
+                    log("node NOT null is going to donwload");
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
                     dlFiles.put(nodeToDownload, parentPath);
 
@@ -1995,6 +1994,8 @@ public class ChatController {
                         service.putExtra(DownloadService.EXTRA_PATH, path);
                         service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, true);
                         context.startService(service);
+
+
                     }
                 }
                 else {

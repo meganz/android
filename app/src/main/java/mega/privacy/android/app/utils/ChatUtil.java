@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 
+import java.io.File;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
+import nz.mega.sdk.MegaNode;
 
 public class ChatUtil {
 
@@ -97,6 +100,20 @@ public class ChatUtil {
         }
         return locationPath;
     }
+
+    public static boolean isInMegaVoiceNotes(Context context, MegaNode node){
+            String voiceNotesLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, true);
+            File f = new File(voiceNotesLocationDefaultPath, node.getName());
+            boolean result = false;
+            if((f.exists())&&(f.length() == node.getSize())){
+                result = true;
+            }
+            return result;
+
+
+
+    }
+
 
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);

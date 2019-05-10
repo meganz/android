@@ -37,7 +37,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -45,6 +44,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -167,8 +167,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			mBuilder = new Notification.Builder(DownloadService.this);
 		}
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
-
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
 	}
 
 	@Override
@@ -1480,14 +1480,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if((wl != null) && (wl.isHeld()))
 					try{ wl.release(); } catch(Exception ex) {}
 
-				log("Download cancelled: " + transfer.getFileName());
+				log("Download cancelled: " + transfer.getNodeHandle());
+
+				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
+				intent.putExtra("nodeHandle", transfer.getNodeHandle());
+				intent.putExtra("successfully", true);
+				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
 				File file = new File(transfer.getPath());
 				file.delete();
 				DownloadService.this.cancel();
+
+
 			}
 			else{
 				if (error.getErrorCode() == MegaError.API_OK) {
-					log("Download OK: " + transfer.getFileName());
+					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
+					intent.putExtra("nodeHandle", transfer.getNodeHandle());
+					intent.putExtra("successfully", true);
+					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+
 					log("DOWNLOADFILE: " + transfer.getPath());
 
 					//To update thumbnails for videos
@@ -1572,6 +1585,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else
 				{
+
+					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
+					intent.putExtra("nodeHandle", transfer.getNodeHandle());
+					intent.putExtra("successfully", true);
+					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
 					log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
 					if(!transfer.isFolderTransfer()){
@@ -2025,6 +2044,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 //			}
 //		}
 	}
+
 
 	private void insertParentDB (MegaNode parentNode, boolean fromInbox){
 		log("insertParentDB: Check SaveOffline: "+parentNode.getName());

@@ -212,6 +212,7 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
 	public static String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
 	public static String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
+	public static String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -245,6 +246,8 @@ public class Constants {
 	final public static int CONTACT_TYPE_MEGA = 0;
 	final public static int CONTACT_TYPE_DEVICE = 1;
 	final public static int CONTACT_TYPE_BOTH = 2;
+
+	public static int TYPE_VOICE_CLIP = 3;
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
