@@ -223,8 +223,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					AccountController.localLogoutApp(getApplicationContext());
 				}
 			}
-			else if(request.getType() == MegaRequest.TYPE_LOGIN){
-				log("BackgroundRequestListener:onRequestFinish:TYPE_LOGIN");
+			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
+				log("BackgroundRequestListener:onRequestFinish:TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
 				}
@@ -591,7 +591,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	public void askForAccountDetails(){
-
+		log("askForAccountDetails");
+		if (dbH != null) {
+			dbH.resetAccountDetailsTimeStamp();
+		}
 		megaApi.getAccountDetails(null);
 	}
 
