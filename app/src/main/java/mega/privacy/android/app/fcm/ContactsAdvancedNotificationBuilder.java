@@ -38,6 +38,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public final class ContactsAdvancedNotificationBuilder implements MegaRequestListenerInterface {
 
     private static final String GROUP_KEY_IPC = "IPCNotificationBuilder";
@@ -509,15 +512,9 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public Bitmap setUserAvatar(String contactMail){
         log("setUserAvatar");
 
-        File avatar = null;
-        if (context.getExternalCacheDir() != null){
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
-        else{
-            avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, contactMail + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()){
+        if (isFileAvailable(avatar)){
             if (avatar.length() > 0){
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;

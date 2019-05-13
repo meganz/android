@@ -35,7 +35,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -49,6 +48,9 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
+
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public final class ChatAdvancedNotificationBuilder {
 
@@ -581,15 +583,9 @@ public final class ChatAdvancedNotificationBuilder {
 
             String contactMail = chat.getPeerEmail(0);
 
-            File avatar = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-            }
+            File avatar = buildAvatarFile(context, contactMail + ".jpg");
             Bitmap bitmap = null;
-            if (avatar.exists()){
+            if (isFileAvailable(avatar)){
                 if (avatar.length() > 0){
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
