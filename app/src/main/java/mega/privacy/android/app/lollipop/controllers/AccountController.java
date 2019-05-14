@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+
+import static mega.privacy.android.app.utils.Constants.ACTION_LOG_OUT;
 
 public class AccountController implements View.OnClickListener{
 
@@ -616,6 +619,10 @@ public class AccountController implements View.OnClickListener{
         }
 
         localLogoutApp(context);
+        
+        Intent intent = new Intent();
+        intent.setAction(ACTION_LOG_OUT);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     static public void logoutConfirmed(Context context){
