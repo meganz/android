@@ -83,6 +83,13 @@ public class MyStorageFragmentLollipop extends Fragment {
 		super.onCreate(savedInstanceState);
 	}
 
+	@Override
+	public void onResume () {
+		super.onResume();
+
+		refreshAccountInfo();
+	}
+
 	public void checkScroll () {
 		if (scrollView != null) {
 			if (scrollView.canScrollVertically(-1)) {
@@ -169,8 +176,6 @@ public class MyStorageFragmentLollipop extends Fragment {
 		}
 
 		setAccountDetails();
-//
-		refreshAccountInfo();
 
 		return v;
 	}
