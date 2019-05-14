@@ -321,7 +321,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
 						myAccountInfo.setAccountDetails(request.getNumDetails());
 
-						boolean sessions = (request.getNumDetails() & 0x020) != 0;
+						boolean sessions = (request.getNumDetails() & myAccountInfo.hasSessionsDetails) != 0;
 						if (sessions) {
 							MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
 

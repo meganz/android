@@ -73,6 +73,11 @@ public class MyAccountInfo {
     int numVersions = -1;
     long previousVersionsSize = -1;
 
+    public final int hasStorageDetails = 0x01;
+    public final int hasTransferDetails = 0x02;
+    public final int hasProDetails = 0x04;
+    public final int hasSessionsDetails = 0x020;
+
     public MyAccountInfo(Context context){
         log("MyAccountInfo created");
 
@@ -95,9 +100,9 @@ public class MyAccountInfo {
             return;
         }
 
-        boolean storage = (numDetails & 0x01) != 0;
-        boolean transfer = (numDetails & 0x02) != 0;
-        boolean pro = (numDetails & 0x04) != 0;
+        boolean storage = (numDetails & hasStorageDetails) != 0;
+        boolean transfer = (numDetails & hasTransferDetails) != 0;
+        boolean pro = (numDetails & hasProDetails) != 0;
 
         if (storage) {
             long totalStorage = accountInfo.getStorageMax();
