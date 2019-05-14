@@ -322,14 +322,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
 		}
 		else{
-			if(myAccountInfo.getAccountInfo().getTransferOwnUsed()<0){
+			if(myAccountInfo.getUsedTransferFormatted().trim().length()<=0){
 				transferQuotaUsedText.setText(getString(R.string.recovering_info));
 			}
 			else{
-				long transferQuotaUsed = myAccountInfo.getAccountInfo().getTransferOwnUsed();
-				long transferQuotaMax = myAccountInfo.getAccountInfo().getTransferMax();
-
-				String textToShow = String.format(context.getString(R.string.my_account_of_string), Util.getSizeString(transferQuotaUsed), Util.getSizeString(transferQuotaMax));
+				String textToShow = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedTransferFormatted(), myAccountInfo.getTotalTansferFormatted());
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#777777\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -367,14 +364,14 @@ public class MyStorageFragmentLollipop extends Fragment {
 		typeAccountIcon.setVisibility(View.VISIBLE);
 		typeAccountIcon.setBackground(drawable);
 
-		if(myAccountInfo.getAccountInfo().getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
-				&& myAccountInfo.getAccountInfo().getSubscriptionRenewTime() > 0){
+		if(myAccountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+				&& myAccountInfo.getSubscriptionRenewTime() > 0){
 			expirationAccountTitle.setText(getString(R.string.renews_on));
-			expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
+			expirationAccountText.setText(Util.getDateString(myAccountInfo.getSubscriptionRenewTime()));
 		}
-		else if (myAccountInfo.getAccountInfo().getProExpiration() > 0){
+		else if (myAccountInfo.getProExpirationTime() > 0){
 			expirationAccountTitle.setText(getString(R.string.expires_on));
-			expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
+			expirationAccountText.setText(Util.getDateString(myAccountInfo.getProExpirationTime()));
 		}
 		else {
 			log("Error. Renew date and expiration date invalids");
