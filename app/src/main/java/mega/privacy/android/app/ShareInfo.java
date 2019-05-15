@@ -3,7 +3,6 @@ package mega.privacy.android.app;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,9 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -309,44 +306,23 @@ public class ShareInfo {
 				return;
 			}
 
-			if (context.getExternalCacheDir() != null){
-				if (title != null){
-					if (title.contains("../") || title.contains(("..%2F"))){
-						log("External path traversal: " + title);
-						return;
-					}
-					log("External No path traversal: " + title);
-					if (context instanceof PdfViewerActivityLollipop){
-						log("context of PdfViewerActivityLollipop");
-						if (!title.endsWith(".pdf")){
-							title += ".pdf";
-						}
-					}
-					file = new File(context.getExternalCacheDir(), title);
-				}
-				else{
-					return;
-				}
-			}
-			else{
-				if (title != null){
-					if (title.contains("../") || title.contains(("..%2F"))){
-						log("Internal path traversal: " + title);
-						return;
-					}
-					log("Internal No path traversal: " + title);
-					if (context instanceof PdfViewerActivityLollipop){
-						log("context of PdfViewerActivityLollipop");
-						if (!title.endsWith(".pdf")){
-							title += ".pdf";
-						}
-					}
-					file = new File(context.getCacheDir(), title);
-				}
-				else{
-					return;
-				}
-			}
+            if (title != null) {
+                if (title.contains("../") || title.contains(("..%2F"))) {
+                    log("Internal path traversal: " + title);
+                    return;
+                }
+                log("Internal No path traversal: " + title);
+                if (context instanceof PdfViewerActivityLollipop) {
+                    log("context of PdfViewerActivityLollipop");
+                    if (!title.endsWith(".pdf")) {
+                        title += ".pdf";
+                    }
+                }
+                file = new File(context.getCacheDir(),title);
+            } else {
+                return;
+            }
+
 			log("Start copy to: "+file.getAbsolutePath());
 
 			try {
