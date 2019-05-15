@@ -14079,7 +14079,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					qrFile.delete();
 				}
 
-                if (isFileAvailable(newFile)) {
+                if (newFile != null) {
                     log("NEW - the destination of the avatar is: " + newFile.getAbsolutePath());
                     MegaUtilsAndroid.createAvatar(imgFile,newFile);
                     megaApi.setAvatar(newFile.getAbsolutePath(),this);
