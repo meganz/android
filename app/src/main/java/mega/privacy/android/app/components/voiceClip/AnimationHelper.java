@@ -12,6 +12,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import mega.privacy.android.app.R;
@@ -193,17 +194,22 @@ public class AnimationHelper {
         smallBlinkingMic.startAnimation(alphaAnimation);
     }
 
-
-    public void moveRecordButtonToCancelBack(final RelativeLayout recordBtn, float initialX, float difX) {
+    public void moveRecordButtonAndSlideToCancelBack(final RelativeLayout recordBtn, float initialX) {
         log("moveRecordButtonAndSlideToCancelBack()");
         final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
         positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        positionAnimator.setDuration(0);
+        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                log("moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
+                float x = (Float) animation.getAnimatedValue();
+                recordBtn.setX(x);
+
+            }
+        });
+        positionAnimator.setDuration(1000);
         positionAnimator.start();
-        if (difX != 0) {
-            float x = initialX - difX;
-            recordBtn.animate().x(x).setDuration(0).start();
-        }
+
     }
 
     public void resetSmallMic() {

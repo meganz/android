@@ -99,12 +99,16 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_marginRight="147dp"-->
+
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_toRightOf="@+id/chrono_voice_clip"
         android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/chrono_voice_clip"
+        android:layout_marginLeft="20dp"
         android:background="@null"
         app:shimmer_animation_duration="1500"
         app:shimmer_color="@color/white"

@@ -180,7 +180,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private static int RECORD_BUTTON_SEND = 1;
     private static int RECORD_BUTTON_ACTIVATED = 2;
     private static int RECORD_BUTTON_DESACTIVATED = 3;
-    private static int VOICE_CLIP_TYPE = 4;
 
     private int currentRecordButtonState = 0;
     String mOutputFilePath;
@@ -399,31 +398,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 long nodeHandle = intent.getLongExtra("nodeHandle", 0);
-                boolean successfully = intent.getBooleanExtra("successfully",false);
-                findPosInAdapter(nodeHandle, successfully);
-            }
-        }
-    };
-
-    private void findPosInAdapter(long nodeHandle, boolean successfully){
-        int positionInMessages = -1;
-        long userHandle = -1;
-        if((messages!=null)&&(!messages.isEmpty())){
-            for(int i=0; i<messages.size();i++){
-                if((messages.get(i).getMessage()!=null)
-                        &&(messages.get(i).getMessage().getMegaNodeList()!=null)
-                        &&(messages.get(i).getMessage().getMegaNodeList().size()>0)
-                        &&(messages.get(i).getMessage().getMegaNodeList().get(0).getHandle() == nodeHandle)){
-                    positionInMessages = i;
-                    userHandle = messages.get(i).getMessage().getUserHandle();
-                    break;
+                int resultTransfer = intent.getIntExtra("resultTransfer",0);
+                if(adapter!=null){
+                    adapter.finishedVoiceClipDownload(nodeHandle, resultTransfer);
                 }
             }
         }
-        if((adapter!=null)&&(positionInMessages != -1)&&(userHandle != -1)){
-            adapter.updateVoiceClip(positionInMessages+1, successfully, userHandle);
-        }
-    }
+    };
 
     private BroadcastReceiver dialogConnectReceiver = new BroadcastReceiver() {
         @Override
@@ -850,7 +831,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("recordView.setOnRecordListener():onStart() -> startRecord");
-                adapter.stopCurrentPlaying();
+                if(adapter!=null) {
+                    adapter.stopAllReproductionsInProgress();
+                }
                 startRecord();
             }
 
@@ -926,6 +909,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         listView.setLayoutManager(mLayoutManager);
 
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                log("############# onScrollStateChanged");
+//                adapter.pauseCurrentPlaying(mLayoutManager.findFirstVisibleItemPosition(), mLayoutManager.findLastVisibleItemPosition());
+//            }
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 // Get the first visible item
@@ -956,6 +945,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                     }
+
+
                 }
 
                 if(stateHistory!=MegaChatApi.SOURCE_NONE){
@@ -2056,7 +2047,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("startCall ");
 
         if(adapter!=null){
-            adapter.stopCurrentPlaying();
+            adapter.stopAllReproductionsInProgress();
         }
         hideKeyboard();
 
@@ -2376,7 +2367,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         log("forwardMessages");
         if(adapter!=null){
-            adapter.stopCurrentPlaying();
+            adapter.stopAllReproductionsInProgress();
         }
         chatC.prepareAndroidMessagesToForward(messagesSelected, idChat);
     }
@@ -2849,7 +2840,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     case DialogInterface.BUTTON_POSITIVE: {
                         log("Open camera and lost the camera in the call");
                         if (adapter != null) {
-                            adapter.stopCurrentPlaying();
+                            adapter.stopAllReproductionsInProgress();
                         }
                         //Find the call in progress:
                         if(megaChatApi!=null){
@@ -2888,7 +2879,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     case DialogInterface.BUTTON_POSITIVE:
                         log("Clear chat!");
                         if(adapter!=null){
-                            adapter.stopCurrentPlaying();
+                            adapter.stopAllReproductionsInProgress();
                         }
 //						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
                         log("Clear history selected!");
@@ -2924,7 +2915,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE: {
                         if(adapter!=null){
-                            adapter.stopCurrentPlaying();
+                            adapter.stopAllReproductionsInProgress();
                         }
                         ChatController chatC = new ChatController(chatActivity);
                         chatC.leaveChat(c);
@@ -3873,7 +3864,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         if(adapter!=null){
-                            adapter.stopCurrentPlaying();
+                            adapter.stopAllReproductionsInProgress();
                         }
                         ChatController cC = new ChatController(chatActivity);
                         cC.deleteAndroidMessages(messages, chat);
@@ -5269,11 +5260,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     adapter.notifyItemChanged(positionNewMessagesLayout);
                 }
             }
-            if(msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP){
-                log("onMessageReceived -> type voice clip");
-                MegaNodeList megaNodeList = msg.getMegaNodeList();
-                sendToDownload(megaNodeList);
-            }
         }
         else {
             int messageType = msg.getType();
@@ -5351,6 +5337,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //        mLayoutManager.scrollToPosition(0);
     }
     public void sendToDownload(MegaNodeList nodelist){
+        log("sendToDownload ");
         chatC.prepareForChatDownload(nodelist, true);
     }
     public void deleteOwnVoiceClip(String nameFile){
@@ -7042,7 +7029,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(adapter!=null) {
             adapter.destroyVoiceElemnts();
         }
-
         if(callInProgressChrono!=null){
             callInProgressChrono.stop();
             callInProgressChrono.setVisibility(View.GONE);
@@ -8447,7 +8433,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("paramsRecordButton:SEND||DESACTIVATED");
             value = 48;
             if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
-                marginRight = Util.px2dp(12, outMetrics);
+                marginRight = Util.px2dp(14, outMetrics);
             }
        }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
             log("paramsRecordButton:ACTIVATED");
@@ -8469,7 +8455,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
         paramsRecordView.setMargins(0,0,0, marginBottomVoicleLayout);
-        paramsRecordView.gravity = Gravity.BOTTOM |Gravity.RIGHT ;
         recordView.setLayoutParams(paramsRecordView);
     }
 

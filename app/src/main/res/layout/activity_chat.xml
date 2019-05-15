@@ -494,12 +494,13 @@
                     android:maxHeight ="150dp"
                     android:visibility="visible"
                     android:background="@null"/>
+
                 <RelativeLayout
                     android:id="@+id/layout_button_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="gone"
-                    android:background="@android:color/transparent">
+                    android:background="@null">
                     <RelativeLayout
                         android:id="@+id/record_button_layout"
                         android:layout_width="48dp"
@@ -523,7 +524,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:layout_alignParentRight="true"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginRight="25dp"
                         android:layout_marginBottom="-10dp"
                         android:layout_above="@+id/record_button_layout"
                         android:visibility="visible">
@@ -540,10 +541,6 @@
                             android:fontFamily="Roboto"/>
                     </LinearLayout>
                 </RelativeLayout>
-
-
-
-
             </FrameLayout>
         </RelativeLayout>
     </RelativeLayout>

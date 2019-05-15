@@ -1450,7 +1450,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferStart:Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads() + "_" + megaApiFolder.getTotalDownloads());
+		log("*onTransferStart:Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
 		if((transfer.getType()==MegaTransfer.TYPE_DOWNLOAD)&&(showNotification)){
 			transfersCount++;
@@ -1460,7 +1460,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		log("onTransferFinish: " + transfer.getFileName());
+		log("onTransferFinish: " + transfer.getNodeHandle());
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			transfersCount--;
@@ -1481,10 +1481,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					try{ wl.release(); } catch(Exception ex) {}
 
 				log("Download cancelled: " + transfer.getNodeHandle());
-
 				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
 				intent.putExtra("nodeHandle", transfer.getNodeHandle());
-				intent.putExtra("successfully", true);
+				intent.putExtra("resultTransfer", Constants.ERROR_VOICE_CLIP_TRANSFER);
 				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
 				File file = new File(transfer.getPath());
@@ -1497,7 +1496,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if (error.getErrorCode() == MegaError.API_OK) {
 					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
 					intent.putExtra("nodeHandle", transfer.getNodeHandle());
-					intent.putExtra("successfully", true);
+					intent.putExtra("resultTransfer", Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
 					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
 
@@ -1585,10 +1584,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else
 				{
-
 					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
 					intent.putExtra("nodeHandle", transfer.getNodeHandle());
-					intent.putExtra("successfully", true);
+					if(error.getErrorCode() == MegaError.API_EEXIST){
+						intent.putExtra("resultTransfer", Constants.INPROGRESS_VOICE_CLIP_TRANSFER);
+					}else{
+						intent.putExtra("resultTransfer", Constants.ERROR_VOICE_CLIP_TRANSFER);
+					}
 					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
 					log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
