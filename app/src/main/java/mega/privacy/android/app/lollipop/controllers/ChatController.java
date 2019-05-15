@@ -282,7 +282,7 @@ public class ChatController {
         if(message!=null){
 
             if((message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (message.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                log("Delete node attachment message ------");
+                log("deleteMessage:Delete node attachment message or voice clip message");
                 if((message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) && (message.getMegaNodeList()!=null) && (message.getMegaNodeList().size()>0) && (message.getMegaNodeList().get(0)!=null)){
                     ((ChatActivityLollipop) context).deleteOwnVoiceClip(message.getMegaNodeList().get(0).getName());
                 }
@@ -1744,7 +1744,7 @@ public class ChatController {
     }
 
     public void download(String parentPath, ArrayList<MegaNode> nodeList, boolean isVoiceClip){
-        log("******download() ");
+        log("download() ");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -1778,8 +1778,6 @@ public class ChatController {
 
         if (nodeList != null){
             if(nodeList.size() == 1){
-                log("******download:  nodeList.size() == 1");
-
                 log("hashes.length == 1");
                 MegaNode tempNode = nodeList.get(0);
                 if (context instanceof ChatActivityLollipop) {
@@ -1793,9 +1791,9 @@ public class ChatController {
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     if(localPath != null){
-                        log("*******download:localPath != null");
+                        log("download:localPath != null");
                         try {
-                            log("*********+download:Call to copyFile: localPath: "+localPath+" node name: "+tempNode.getName());
+                            log("download:Call to copyFile: localPath: ");
                             Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
@@ -1957,23 +1955,21 @@ public class ChatController {
                         return;
                     }//localPath found
                     else{
-                        log("*********download:localPath is NULL");
+                        log("download:localPath is NULL");
                     }
                 }
             }
 
             for (int i=0; i<nodeList.size();i++) {
-                log("*************download:hashes.length more than 1 = "+nodeList.size());
                 MegaNode nodeToDownload = nodeList.get(i);
                 if(nodeToDownload != null){
-                    log("*********download:node NOT null is going to donwload");
+                    log("download:node NOT null is going to donwload");
                     Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
                     dlFiles.put(nodeToDownload, parentPath);
 
                     for (MegaNode document : dlFiles.keySet()) {
                         String path = dlFiles.get(document);
                         log("path of the file: "+path);
-                        log("************download: start service");
                         Intent service = new Intent(context, DownloadService.class);
                         if (context instanceof ChatActivityLollipop) {
                             nodeToDownload = authorizeNodeIfPreview(nodeToDownload, ((ChatActivityLollipop) context).getChatRoom());

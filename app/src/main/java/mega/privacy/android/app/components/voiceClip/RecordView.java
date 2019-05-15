@@ -321,6 +321,8 @@ public class RecordView extends RelativeLayout {
         slideToCancelLayout.startShimmerAnimation();
         slideToCancelLayout.setVisibility(VISIBLE);
 
+        startStopCounterTime(false);
+
         initialX = recordBtnLayout.getX();
 
         firstX = motionEvent.getRawX();
@@ -467,8 +469,9 @@ public class RecordView extends RelativeLayout {
                 animationHelper.setStartRecorded(false);
             }
             showLock(false);
-            startStopCounterTime(false);
         }
+        startStopCounterTime(false);
+
     }
 
     private void startStopCounterTime(boolean start){

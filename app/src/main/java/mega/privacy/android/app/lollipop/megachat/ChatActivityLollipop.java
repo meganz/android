@@ -2035,9 +2035,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("stopRecord(): myAudioRecorder.stop()");
                 try{
                     myAudioRecorder.stop();
+                    uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
+                    outputFileVoiceNotes = null;
                 }catch(RuntimeException ex){ }
-                uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
-                outputFileVoiceNotes = null;
             }
             setRecordingNow(false);
         }
@@ -3305,14 +3305,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         int index = messages.size()-1;
         if(androidMsgSent!=null){
-            if(androidMsgSent.isUploading()){
-                log("sendMessageToUI:Name of the file uploading: "+androidMsgSent.getPendingMessage().getName());
-            }
-            else{
-                log("sendMessageToUI:Sent message with id temp: "+androidMsgSent.getMessage().getTempId());
-                log("State of the message: "+androidMsgSent.getMessage().getStatus());
-            }
-
             if(index==-1){
                 //First element
                 log("sendMessageToUI:First element!");
@@ -3356,7 +3348,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 listView.setAdapter(adapter);
                 adapter.setMessages(messages);
             }else{
-                log("sendMessageToUI:adapter is NOT null");
+                log("sendMessageToUI:adapter is NOT null  A addMEssage()");
                 adapter.addMessage(messages, index);
                 if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
                     mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
@@ -5340,7 +5332,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("sendToDownload ");
         chatC.prepareForChatDownload(nodelist, true);
     }
+
+    /*
+    * Delete a voice note from local storage
+     */
     public void deleteOwnVoiceClip(String nameFile){
+        log("deleteOwnVoiceClip");
         String path = ChatUtil.getDefaultLocationPath(context, true);
         File f = new File(path, nameFile);
         if(f.exists()){
@@ -7881,8 +7878,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("uploadPictureOrVoiceClip: path "+path);
             File selfie = new File(path);
 
-            if(!(MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudio())&& !(MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage())){
-                log("it is not an audio or image");
+            if(!(MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudio()) && !(MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage())){
+                log("uploadPictureOrVoiceClip:it is not an audio or image");
                 return;
             }
 
@@ -7890,6 +7887,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             PendingMessageSingle pMsgSingle = new PendingMessageSingle();
             pMsgSingle.setChatId(idChat);
             if(isVoiceClip){
+                log("uploadPictureOrVoiceClip: TYPE_VOICE_CLIP");
                 pMsgSingle.setType(Constants.TYPE_VOICE_CLIP);
             }
             long timestamp = System.currentTimeMillis()/1000;
@@ -7903,10 +7901,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             pMsgSingle.setId(idMessage);
 
             if(idMessage!=-1){
-                log("idMessage = "+idMessage);
+                log("uploadPictureOrVoiceClip:idMessage = "+idMessage);
                 intent.putExtra(ChatUploadService.EXTRA_ID_PEND_MSG, idMessage);
                 if(!isLoadingHistory){
-                    log("sendMessageToUI");
+                    log("uploadPictureOrVoiceClip:sendMessageToUI");
                     AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(pMsgSingle, true);
                     sendMessageToUI(newNodeAttachmentMsg);
                 }

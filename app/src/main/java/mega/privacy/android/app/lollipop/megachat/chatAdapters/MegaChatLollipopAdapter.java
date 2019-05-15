@@ -1311,7 +1311,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ViewHolderHeaderChat) {
-            log(" onBindViewHolder ViewHolderHeaderChat: " + position);
+            log("onBindViewHolder ViewHolderHeaderChat: " + position);
         } else {
             log("onBindViewHolder ViewHolderMessageChat: " + position);
             AndroidMegaChatMessage androidMessage = messages.get(position - 1);
@@ -1439,14 +1439,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).previewContactLocation.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).pinnedContactLocationLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).pinnedContactLocationInfoText.setVisibility(View.GONE);
-            int initialDuration = 0;
 
             String path = message.getPendingMessage().getFilePath();
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
             if (path != null) {
                 if((MimeTypeList.typeForName(path).isAudio()) && (type==Constants.TYPE_VOICE_CLIP)){
-                    log("is an audio");
+                    log("onBindViewHolderUploading:TYPE_VOICE_CLIP");
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
@@ -1472,7 +1471,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
                     if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
-                        ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
                         ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
 
@@ -8314,9 +8312,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.messages = messages;
         notifyItemInserted(position);
         if (position == messages.size()) {
-            log("No need to update more");
+            log("addMessage:No need to update more");
         } else {
-            log("Update until end");
+            log("addMessage:Update until end-------- itemCount");
             int itemCount = messages.size() - position;
             log("itemCount: " + itemCount);
             notifyItemRangeChanged(position, itemCount + 1);
