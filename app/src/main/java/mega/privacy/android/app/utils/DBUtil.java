@@ -126,6 +126,13 @@ public class DBUtil {
         }
     }
 
+    public static void resetAccountDetailsTimeStamp(Context context) {
+        log("resetAccountDetailsTimeStamp");
+        dbH = DatabaseHandler.getDbHandler(context);
+        if(dbH == null) return;
+        dbH.resetAccountDetailsTimeStamp();
+    }
+
     public static boolean callToExtendedAccountDetails (Context context) {
         log("callToExtendedAccountDetails");
         dbH = DatabaseHandler.getDbHandler(context);

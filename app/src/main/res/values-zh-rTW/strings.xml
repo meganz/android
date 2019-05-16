@@ -870,7 +870,6 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">電子郵件驗證</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">請確認您的電子信箱以繼續</string>
-    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">發生錯誤，請再試一次。</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">您必須登入才能執行此操作。</string>
