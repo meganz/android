@@ -2555,26 +2555,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String image = meta.getRichPreview().getImage();
             String icon = meta.getRichPreview().getIcon();
 
-            Bitmap bitmapImage = null;
-            Bitmap bitmapIcon = null;
-
-            if (image != null) {
-                try {
-                    byte[] decodedBytes = Base64.decode(image, 0);
-                    bitmapImage = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-                } catch (Exception e) {
-                    log("error getting image "+e);
-                }
-            }
-
-            if (icon != null) {
-                try {
-                    byte[] decodedBytes2 = Base64.decode(icon, 0);
-                    bitmapIcon = BitmapFactory.decodeByteArray(decodedBytes2, 0, decodedBytes2.length);
-                } catch (Exception e) {
-                    log("error getting icon  "+e);
-                }
-            }
+            Bitmap bitmapImage = getBitmapFromString(image);
+            Bitmap bitmapIcon = getBitmapFromString(icon);
 
             if (message.getUserHandle() == myUserHandle) {
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
@@ -3222,6 +3204,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Link to bind as a no type message");
             bindNoTypeMessage(holder, androidMessage, position);
         }
+    }
+
+    private Bitmap getBitmapFromString(String imageString){
+
+        if (imageString != null) {
+            try {
+                byte[] decodedBytes = Base64.decode(imageString, 0);
+                return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            } catch (Exception e) {
+                log("error getting image "+e);
+            }
+        }
+        return null;
     }
 
 
