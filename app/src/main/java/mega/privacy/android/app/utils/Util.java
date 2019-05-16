@@ -701,7 +701,7 @@ public class Util {
         }
     }
     
-    private static void cleanDir(File dir) {
+    public static void cleanDir(File dir) {
         File[] files = dir.listFiles();
 
 		if(files !=null){
