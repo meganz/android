@@ -1308,16 +1308,28 @@ public class Util {
 		  try {
 			  for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				  NetworkInterface intf = en.nextElement();
+				  String interfaceName = intf.getName();
 
 				  // Ensure get the IP from the current active network interface
-				  if ((isOnWifi(context) && !intf.getName().contains("wlan")) || (isOnMobileData(context) && !intf.getName().contains("data"))) {
-				  	continue;
+				  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					  ConnectivityManager cm =
+							  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+					  String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
+					  if (interfaceName.compareTo(activeInterfaceName) != 0) {
+					  	continue;
+					  }
+				  }
+				  else {
+					  if ((isOnWifi(context) && !interfaceName.contains("wlan") && !interfaceName.contains("ath")) ||
+							  (isOnMobileData(context) && !interfaceName.contains("data") && !interfaceName.contains("rmnet"))) {
+					  	continue;
+					  }
 				  }
 
 				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					  InetAddress inetAddress = enumIpAddr.nextElement();
 					  if (inetAddress != null && !inetAddress.isLoopbackAddress()) {
-						  return inetAddress.getHostAddress();
+					  	return inetAddress.getHostAddress();
 					  }
 				  }
 			  }
