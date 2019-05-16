@@ -195,6 +195,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
@@ -2014,24 +2015,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
 			@Override
 			public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-				if (!Util.isOnline(managerActivity) || megaApi==null || megaApi.getRootNode()==null) {
-					disableNavigationViewLayout();
-				}
-				else {
-					resetNavigationViewLayout();
-				}
-				setContactStatus();
+				refreshDrawerInfo(false);
 			}
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
-				if (!Util.isOnline(managerActivity) || megaApi==null || megaApi.getRootNode()==null) {
-					disableNavigationViewLayout();
-				}
-				else {
-					resetNavigationViewLayout();
-				}
-				setContactStatus();
+				refreshDrawerInfo(true);
 			}
 
 			@Override
@@ -2042,6 +2031,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public void onDrawerStateChanged(int newState) {
 
+			}
+
+			/**
+			 * Method to refresh the info displayed in the drawer menu.
+			 *
+			 * @param refreshStorageInfo Parameter to indicate if refresh the storage info.
+			 */
+			private void refreshDrawerInfo(boolean refreshStorageInfo) {
+				if (!Util.isOnline(managerActivity) || megaApi==null || megaApi.getRootNode()==null) {
+					disableNavigationViewLayout();
+				}
+				else {
+					resetNavigationViewLayout();
+				}
+
+				setContactStatus();
+
+				if (!refreshStorageInfo) return;
+				refreshAccountInfo();
 			}
 		});
         nV = (NavigationView) findViewById(R.id.navigation_view);
@@ -7337,7 +7345,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
+					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 
 					if (searchExpand) {
 						openSearchView();
@@ -16169,14 +16177,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setInboxNavigationDrawer();
 						}
 						moveToRubbish = false;
-						((MegaApplication) getApplication()).askForAccountDetails();
+						DBUtil.resetAccountDetailsTimeStamp(getApplicationContext());
 					}
 					else if(restoreFromRubbish){
-						log("Not moved to rubbish");
+						log("Restore from rubbish");
 						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
 						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_node_restored, destination.getName()), -1);
 						restoreFromRubbish = false;
-						((MegaApplication) getApplication()).askForAccountDetails();
+						DBUtil.resetAccountDetailsTimeStamp(getApplicationContext());
 					}
 					else{
 						log("Not moved to rubbish");
@@ -16309,7 +16317,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				refreshAfterRemoving();
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
-				((MegaApplication) getApplication()).askForAccountDetails();
+				DBUtil.resetAccountDetailsTimeStamp(getApplicationContext());
 			}
 			else{
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
@@ -16376,6 +16384,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else if (drawerItem == DrawerItem.INBOX){
 					refreshInboxList();
 				}
+
+				DBUtil.resetAccountDetailsTimeStamp(getApplicationContext());
 			}
 			else{
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
@@ -16457,8 +16467,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
-				//Get storage figures again
-				((MegaApplication) getApplication()).askForAccountDetails();
+				DBUtil.resetAccountDetailsTimeStamp(getApplicationContext());
 			}
 			else{
 				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
