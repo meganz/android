@@ -41,10 +41,11 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = manager.getActiveNetworkInfo();
 
+        MegaApplication mApplication = ((MegaApplication)context.getApplicationContext());
+
         if(ni != null && ni.getState() == NetworkInfo.State.CONNECTED) {
 
             log("getState = "+ni.getState());
-            MegaApplication mApplication = ((MegaApplication)context.getApplicationContext());
             megaApi = mApplication.getMegaApi();
 
             if(Util.isChatEnabled()){
@@ -55,33 +56,28 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             }
 
             String previousIP = mApplication.getLocalIpAddress();
-            String currentIP = Util.getLocalIpAddress();
-            if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0))
+            String currentIP = Util.getLocalIpAddress(context);
+
+            mApplication.setLocalIpAddress(currentIP);
+
+            if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0))
             {
-                mApplication.setLocalIpAddress(currentIP);
-            }
-            else if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0) && (currentIP.compareTo(previousIP) != 0))
-            {
-                mApplication.setLocalIpAddress(currentIP);
-                log("reconnect and retryPendingConnections");
-                megaApi.reconnect();
+                if ((previousIP == null) || (currentIP.compareTo(previousIP) != 0)) {
+                    log("reconnect and retryPendingConnections");
+                    megaApi.reconnect();
 
-//                if (megaChatApi != null){
-//                    megaChatApi.retryPendingConnections(true, null);
-//                }
-            }
-            else{
+                    if (megaChatApi != null){
+                        megaChatApi.retryPendingConnections(true, null);
+                    }
+                }
+                else{
+                    log("retryPendingConnections");
+                    megaApi.retryPendingConnections();
 
-                log("retryPendingConnections");
-                megaApi.retryPendingConnections();
-
-//                if (megaChatApi != null){
-//                    megaChatApi.retryPendingConnections(false, null);
-//                }
-            }
-
-            if (megaChatApi != null){
-                megaChatApi.retryPendingConnections(true, null);
+                    if (megaChatApi != null){
+                        megaChatApi.retryPendingConnections(false, null);
+                    }
+                }
             }
 
             connected = true;
@@ -97,6 +93,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 }
             }, 2 * 1000);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
+            mApplication.setLocalIpAddress(null);
             connected = false;
         }
 
