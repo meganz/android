@@ -203,6 +203,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 
 					onFileClick(handleList);
+					clearSelections();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -2161,8 +2162,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					onFileClick(handleList);
 					clearSelections();
-
-				}else{
+				} else {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 						if (!hasStoragePermission) {
