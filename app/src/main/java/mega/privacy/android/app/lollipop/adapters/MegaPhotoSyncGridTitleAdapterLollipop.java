@@ -488,7 +488,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         private ImageView videoIcon;
         private RelativeLayout gradient_effect;
         private ImageView click_icon;
-        private RelativeLayout click_unselected;
         private RelativeLayout content_layout;
         private long document;
         private MegaMonthPicLollipop megaMonthPicLollipop;
@@ -523,8 +522,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 paramsI.setMargins(Util.px2dp(7, outMetrics), Util.px2dp(7, outMetrics), 0, 0);
             }
             click_icon.setLayoutParams(paramsI);
-            click_unselected = (RelativeLayout) itemView.findViewById(R.id.cell_photosync_title_menu_long_click_unselected);
-            click_unselected.setVisibility(View.GONE);
             videoIcon = (ImageView) itemView.findViewById(R.id.cell_photosync_grid_title_video_icon);
             content_layout = (RelativeLayout) itemView.findViewById(R.id.cell_item_grid_title_layout);
 
@@ -610,20 +607,17 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     click_icon.setImageResource(R.drawable.ic_select_folder);
                     photo.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                     photo.setPadding(Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics));
-                    click_unselected.setVisibility(View.GONE);
                 }
                 else{
                     click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                     photo.setBackground(null);
                     photo.setPadding(0, 0, 0, 0);
-                    click_unselected.setVisibility(View.GONE);
                 }
             }
             else{
                 click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                 photo.setBackground(null);
                 photo.setPadding(0, 0, 0, 0);
-                click_unselected.setVisibility(View.GONE);
             }
 
             if(n == null){
@@ -714,14 +708,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     photo.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                     photo.setPadding(Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics));
                     gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads_rounded));
-                    click_unselected.setVisibility(View.GONE);
                 }
                 else{
                     click_icon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
                     photo.setBackground(null);
                     photo.setPadding(0, 0, 0, 0);
                     gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
-                    click_unselected.setVisibility(View.GONE);
                 }
             }
             else{
@@ -729,7 +721,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 photo.setBackground(null);
                 photo.setPadding(0, 0, 0, 0);
                 gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
-                click_unselected.setVisibility(View.GONE);
             }
 
             if(n == null){

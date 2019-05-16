@@ -27,13 +27,7 @@ public class CameraUploadImageProcessor {
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
             Bitmap thumbnail = getImageThumbnailFromDB(context,localPath);
-            if (thumbnail == null) {
-                log("create thumbnail use api");
-                api.createThumbnail(localPath,dst.getAbsolutePath());
-            } else {
-                log("get from db is not null");
-                nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
-            }
+            processThumbnail(thumbnail, api, localPath, dst);
         }
     }
 
@@ -42,13 +36,17 @@ public class CameraUploadImageProcessor {
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
             Bitmap thumbnail = getVideoThumbnailFromDB(context,localPath);
-            if (thumbnail == null) {
-                log("create thumbnail use api");
-                api.createThumbnail(localPath,dst.getAbsolutePath());
-            } else {
-                log("get from db is not null");
-                nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
-            }
+            processThumbnail(thumbnail, api, localPath, dst);
+        }
+    }
+
+    private static void processThumbnail(Bitmap thumbnail,MegaApiJava api,String localPath,File dst) {
+        if (thumbnail == null) {
+            log("create thumbnail use api");
+            api.createThumbnail(localPath,dst.getAbsolutePath());
+        } else {
+            log("get from db is not null");
+            nz.mega.sdk.AndroidGfxProcessor.saveBitmap(thumbnail,dst);
         }
     }
 
@@ -90,7 +88,7 @@ public class CameraUploadImageProcessor {
         return nz.mega.sdk.AndroidGfxProcessor.saveBitmap(bitmap,preview);
     }
 
-    public static Bitmap getVideoBitmap(Context context,String path,int w,int h) {
+    private static Bitmap getVideoBitmap(Context context,String path,int w,int h) {
         Bitmap bmThumbnail = null;
         try {
             bmThumbnail = ThumbnailUtils.createVideoThumbnail(path,MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
