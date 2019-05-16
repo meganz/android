@@ -621,6 +621,20 @@ public class Util {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
+
+	/*
+	 * Check is device on Mobile Data
+	 */
+	public static boolean isOnMobileData(Context context) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = null;
+		if (connectivityManager != null) {
+			networkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		}
+		return networkInfo == null ? false : networkInfo.isConnected();
+	}
 	
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
@@ -1289,15 +1303,21 @@ public class Util {
 		return numberOfNodes;
 	}
 	
-	public static String getLocalIpAddress()
+	public static String getLocalIpAddress(Context context)
   {
 		  try {
 			  for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				  NetworkInterface intf = en.nextElement();
+
+				  // Ensure get the IP from the current active network interface
+				  if ((isOnWifi(context) && !intf.getName().contains("wlan")) || (isOnMobileData(context) && !intf.getName().contains("data"))) {
+				  	continue;
+				  }
+
 				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					  InetAddress inetAddress = enumIpAddr.nextElement();
-					  if (!inetAddress.isLoopbackAddress()) {
-						  return inetAddress.getHostAddress().toString();
+					  if (inetAddress != null && !inetAddress.isLoopbackAddress()) {
+						  return inetAddress.getHostAddress();
 					  }
 				  }
 			  }

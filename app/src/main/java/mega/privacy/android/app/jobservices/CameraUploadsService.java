@@ -1465,7 +1465,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         String previousIP = app.getLocalIpAddress();
-        String currentIP = Util.getLocalIpAddress();
+        String currentIP = Util.getLocalIpAddress(getApplicationContext());
         if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
             app.setLocalIpAddress(currentIP);
         }
