@@ -12,7 +12,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import mega.privacy.android.app.R;
@@ -50,7 +49,6 @@ public class AnimationHelper {
     public void animateBasket(float basketInitialX) {
         log("animateBasket");
         isBasketAnimating = true;
-
         clearAlphaAnimation(false);
 
         //save initial x,y values for mic icon
@@ -65,14 +63,12 @@ public class AnimationHelper {
         alphaAnimation1 = new AlphaAnimation(0.2f, 1.0f);
         alphaAnimation1.setDuration(durationAlpha);
         alphaAnimation1.setFillAfter(true);
-
         alphaAnimation2 = new AlphaAnimation(1.0f, 0.0f);
         alphaAnimation2.setDuration(durationAlpha);
         alphaAnimation2.setFillAfter(true);
 
         translateAnimation1 = new TranslateAnimation(basketInitialX, basketInitialX + 90, 0, 0);
         translateAnimation1.setDuration(durationTraslate);
-
         translateAnimation2 = new TranslateAnimation(basketInitialX + 90, basketInitialX, 0, 0);
         translateAnimation2.setDuration(durationAlpha);
 
@@ -92,7 +88,7 @@ public class AnimationHelper {
             @Override
             public void onAnimationStart(Animation animation) {
                 if (onBasketAnimationEndListener != null) {
-                    onBasketAnimationEndListener.desactivateRecordButton();
+                    onBasketAnimationEndListener.deactivateRecordButton();
                 }
             }
             @Override
@@ -134,8 +130,9 @@ public class AnimationHelper {
     }
 
 
-    //if the user started a new Record while the Animation is running
-    // then we want to stop the current animation and revert views back to default state
+    /*
+    * Stop the current animation and revert views back to default state
+    */
     public void resetBasketAnimation() {
         log("resetBasketAnimation()");
         if (isBasketAnimating) {
@@ -201,7 +198,6 @@ public class AnimationHelper {
         positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                log("moveRecordButtonAndSlideToCancelBack() ---- IN PROGRESS");
                 float x = (Float) animation.getAnimatedValue();
                 recordBtn.setX(x);
 
@@ -228,11 +224,14 @@ public class AnimationHelper {
         }
     }
 
-    //check if the user started a new Record by pressing the RecordButton
+    /*
+    *Check if a new recording has started when the record button was pressed
+    */
     public void setStartRecorded(boolean startRecorded) {
         log("setStartRecorded()  -> "+startRecorded);
         isStartRecorded = startRecorded;
     }
+
     public static void log(String message) {
         Util.log("AnimationHelper",message);
     }

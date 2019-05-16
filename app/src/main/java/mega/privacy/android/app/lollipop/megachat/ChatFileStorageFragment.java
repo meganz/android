@@ -34,6 +34,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatFileStorageAdapter;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -117,17 +118,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-//        int heightFrag;
-//        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-//            heightFrag = Util.scaleWidthPx(80, outMetrics);
-//        }else{
-//            heightFrag = Util.scaleWidthPx(240, outMetrics);
-//
-//        }
-
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int heightFrag = displayMetrics.heightPixels / 2 - getActionBarHeight();
+        int heightFrag = displayMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(((Activity)context), getResources());
 
         View v = inflater.inflate(R.layout.fragment_filestorage, container, false);
         rlfragment = (RelativeLayout) v.findViewById(R.id.relative_layout_frag);
@@ -394,15 +387,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         }
     }
 
-    private int getActionBarHeight() {
-        log("getActionBarHeight()");
-        int actionBarHeight = 0;
-        TypedValue tv = new TypedValue();
-        if (context != null && context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        }
-        return actionBarHeight;
-    }
+
 
     public void createImagesPath(String path){
         imagesPath.add(path);

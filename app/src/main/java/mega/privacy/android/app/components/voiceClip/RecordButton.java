@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
@@ -64,6 +63,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         super.onAttachedToWindow();
         setClip(this);
     }
+
     public void setClip(View v) {
         if (v.getParent() == null) {
             return;
@@ -76,6 +76,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             setClip((View) v.getParent());
         }
     }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
             log("onTouch");
@@ -100,7 +101,7 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
 
     public void setOnRecordClickListener(OnRecordClickListener onRecordClickListener) {
-        log("setOnRecordClickListener()");
+        log("setOnRecordClickListener");
         this.onRecordClickListener = onRecordClickListener;
     }
 

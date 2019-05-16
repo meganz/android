@@ -1,8 +1,14 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Environment;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import java.io.File;
 
@@ -91,6 +97,7 @@ public class ChatUtil {
         return false;
     }
 
+    /* Get the corresponding path, Mega Downloads or Mega Voice Notes*/
     public static String getDefaultLocationPath(Context context, boolean isVoiceNote){
         String locationPath;
         if(isVoiceNote){
@@ -101,6 +108,7 @@ public class ChatUtil {
         return locationPath;
     }
 
+    /* Know if a voice note is downloaded in the Mega Voice Notes folder*/
     public static boolean isInMegaVoiceNotes(Context context, MegaNode node){
             String voiceNotesLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, true);
             File f = new File(voiceNotesLocationDefaultPath, node.getName());
@@ -109,11 +117,17 @@ public class ChatUtil {
                 result = true;
             }
             return result;
-
-
-
     }
 
+    /* Get the height of the action bar */
+    public static int getActionBarHeight(Activity activity, Resources resources) {
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (activity != null && activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.getDisplayMetrics());
+        }
+        return actionBarHeight;
+    }
 
     public static void log(String origin, String message) {
         MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_WARNING, "[clientApp] "+ origin + ": " + message, origin);

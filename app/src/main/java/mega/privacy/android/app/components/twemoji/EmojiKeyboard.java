@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -18,14 +17,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
-import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 
 public class EmojiKeyboard extends LinearLayout {
@@ -44,6 +42,8 @@ public class EmojiKeyboard extends LinearLayout {
     private int marginBottom;
     private OnEmojiClickListener onEmojiClickListener;
     private OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
+    private OnPlaceButtonListener buttonListener;
+
 
     boolean isListenerActivated  = true;
     float density;
@@ -102,6 +102,9 @@ public class EmojiKeyboard extends LinearLayout {
         init(attrs, defStyleAttr);
     }
 
+    public void setOnPlaceButtonListener(OnPlaceButtonListener buttonListener) {
+        this.buttonListener = buttonListener;
+    }
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiKeyboard, defStyle, 0);
@@ -143,7 +146,7 @@ public class EmojiKeyboard extends LinearLayout {
         density  = getResources().getDisplayMetrics().density;
 
         activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-        keyboardHeight = outMetrics.heightPixels / 2 - getActionBarHeight();
+        keyboardHeight = outMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(activity, getResources());
         marginBottom = Util.px2dp(48, outMetrics);
         requestLayout();
     }
@@ -153,23 +156,6 @@ public class EmojiKeyboard extends LinearLayout {
     }
     public void setOnEmojiBackspaceClickListener(OnEmojiBackspaceClickListener onEmojiBackspaceClickListener) {
         this.onEmojiBackspaceClickListener = onEmojiBackspaceClickListener;
-    }
-
-    public int getKeyboardHeight() {
-        return keyboardHeight;
-    }
-
-    public void setKeyboardHeight(int keyboardHeight) {
-        this.keyboardHeight = keyboardHeight;
-    }
-
-    private int getActionBarHeight() {
-        int actionBarHeight = 0;
-        TypedValue tv = new TypedValue();
-        if (activity != null && activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        }
-        return actionBarHeight;
     }
 
     //KEYBOARDS:
@@ -182,49 +168,28 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void showLetterKeyboard(){
-        if(!isLetterKeyboardShown){
-            if (editInterface instanceof View){
-                log("showLetterKeyboard()");
-                hideEmojiKeyboard();
-                final View view = (View) editInterface;
-                view.setFocusableInTouchMode(true);
-                view.requestFocus();
-
-                final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm == null) return;
-                imm.showSoftInput(view, 0, null);
-                isLetterKeyboardShown = true;
-                emojiIcon.setImageResource(R.drawable.ic_emojicon);
-                paramsRecordButton(marginBottom);
-            } else {
-                throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
-            }
-        }else {
-            if (editInterface instanceof View){
-                log("showLetterKeyboard()");
-                hideEmojiKeyboard();
-                final View view = (View) editInterface;
-                view.setFocusableInTouchMode(true);
-                view.requestFocus();
-
-                final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm == null) return;
-                imm.showSoftInput(view, 0, null);
-                isLetterKeyboardShown = true;
-                emojiIcon.setImageResource(R.drawable.ic_emojicon);
-                paramsRecordButton(marginBottom);
-            } else {
-                throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
+        if((!isLetterKeyboardShown) && (editInterface instanceof View)){
+            log("showLetterKeyboard()");
+            hideEmojiKeyboard();
+            final View view = (View) editInterface;
+            view.setFocusableInTouchMode(true);
+            view.requestFocus();
+            final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm == null) return;
+            imm.showSoftInput(view, 0, null);
+            isLetterKeyboardShown = true;
+            emojiIcon.setImageResource(R.drawable.ic_emojicon);
+            if (buttonListener != null) {
+                buttonListener.needToPlace();
             }
         }
+
     }
 
     public void showEmojiKeyboard(){
         if(!isEmojiKeyboardShown){
-            log("showEmojiKeyboard()");
             hideLetterKeyboard();
             setVisibility(VISIBLE);
-            paramsRecordButton(keyboardHeight+marginBottom);
 
             isEmojiKeyboardShown = true;
             emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
@@ -233,24 +198,25 @@ public class EmojiKeyboard extends LinearLayout {
                 view.setFocusableInTouchMode(true);
                 view.requestFocus();
             }
+            if (buttonListener != null) {
+                log("showEmojiKeyboard:needToPlace");
+                buttonListener.needToPlace();
+            }
         }
     }
 
     public void hideLetterKeyboard() {
-        if(isLetterKeyboardShown){
-            if (editInterface instanceof View) {
-                final View view = (View) editInterface;
-                view.clearFocus();
-
-                final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm == null) return;
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
-                isLetterKeyboardShown = false;
-                paramsRecordButton(marginBottom);
-
-            } else {
-                throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
+        if((isLetterKeyboardShown) && (editInterface instanceof View)){
+            final View view = (View) editInterface;
+            view.clearFocus();
+            final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm == null) return;
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
+            isLetterKeyboardShown = false;
+            if (buttonListener != null) {
+                buttonListener.needToPlace();
             }
+
         }
     }
 
@@ -260,7 +226,9 @@ public class EmojiKeyboard extends LinearLayout {
             recentEmoji.persist();
             variantEmoji.persist();
             setVisibility(GONE);
-            paramsRecordButton(marginBottom);
+            if (buttonListener != null) {
+                buttonListener.needToPlace();
+            }
             isEmojiKeyboardShown = false;
             if (editInterface instanceof View) {
                 final View view = (View) editInterface;
@@ -268,26 +236,6 @@ public class EmojiKeyboard extends LinearLayout {
             }
         }
     }
-
-    public void paramsRecordButton(int marginBottomVoicleButton){
-        if((fragment!=null)&&(recordButtonLayout!=null)&&(recordView!=null)){
-            log("paramsRecordButton() ");
-
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
-            params.height = Util.px2dp(48, outMetrics);
-            params.width = Util.px2dp(48, outMetrics);
-            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            params.setMargins(Util.px2dp(0, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(0, outMetrics), marginBottomVoicleButton);
-            recordButtonLayout.setLayoutParams(params);
-
-            FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
-            paramsRecordView.setMargins(0,0,Util.px2dp(0, outMetrics), marginBottomVoicleButton);
-            paramsRecordView.gravity = Gravity.BOTTOM |Gravity.RIGHT ;
-            recordView.setLayoutParams(paramsRecordView);
-        }
-    }
-
 
     public void setListenerActivated(boolean listenerActivated) {
         isListenerActivated = listenerActivated;

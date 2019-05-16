@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -50,13 +49,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -67,9 +62,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.firebase.iid.FirebaseInstanceId;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -93,6 +86,7 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
+import mega.privacy.android.app.components.twemoji.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordClickListener;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
@@ -189,8 +183,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     boolean newVisibility = false;
     boolean getMoreHistory=false;
     private int RECORD_FINISHED = R.raw.record_finished;
-
-    Chronometer myChrono;
 
     int minutesLastGreen = -1;
     boolean isLoadingHistory = false;
@@ -358,7 +350,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout recordButtonLayout;
     RecordButton recordButton;
     MediaRecorder myAudioRecorder;
-    boolean recordingNow = false;
     LinearLayout bubbleLayout;
     TextView bubbleText;
     RecordView recordView;
@@ -599,6 +590,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
         }
 
+        keyboardHeight = outMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(this, getResources());
+        marginBottomDesactivated = Util.px2dp(48, outMetrics);
+        marginBottomActivated = Util.px2dp(24, outMetrics);
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
@@ -606,18 +600,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         callInProgressChrono = (Chronometer) findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
 
-        rLKeyboardTwemojiButton.setOnClickListener(this);
-        keyboardTwemojiButton.setVisibility(View.VISIBLE);
-        keyboardTwemojiButton.setOnClickListener(this);
-        rLMediaButton.setOnClickListener(this);
-        mediaButton.setVisibility(View.VISIBLE);
-        mediaButton.setOnClickListener(this);
-        rLPickAttachButton.setOnClickListener(this);
-        pickAttachButton.setVisibility(View.VISIBLE);
-        pickAttachButton.setOnClickListener(this);
-        rLPickFileStorageButton.setOnClickListener(this);
-        pickFileStorageButton.setVisibility(View.VISIBLE);
-        pickFileStorageButton.setOnClickListener(this);
+        enableButton(rLKeyboardTwemojiButton,keyboardTwemojiButton);
+        enableButton(rLMediaButton,mediaButton);
+        enableButton(rLPickAttachButton,pickAttachButton);
+        enableButton(rLPickFileStorageButton,pickFileStorageButton);
 
         messageJumpLayout.setOnClickListener(this);
 
@@ -632,6 +618,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setOnClickListener(this);
         sendIcon.setEnabled(true);
 
+        //Voice clip elements
         fragmentVoiceClip = (FrameLayout) findViewById(R.id.fragment_voice_clip);
         recordLayout = (RelativeLayout) findViewById(R.id.layout_button_layout);
         recordButtonLayout = (RelativeLayout) findViewById(R.id.record_button_layout);
@@ -639,6 +626,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButton.setEnabled(true);
 
         recordView = (RecordView) findViewById(R.id.record_view);
+        recordView.setCancelBounds(1);
+        recordView.setLessThanSecondAllowed(false);
+        recordView.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
         recordView.setVisibility(View.GONE);
 
         bubbleLayout = (LinearLayout) findViewById(R.id.bubble_layout);
@@ -657,6 +647,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         recordButton.setRecordView(recordView);
+        myAudioRecorder = new MediaRecorder();
+
 
         emojiKeyboard = (EmojiKeyboard)findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton, fragmentVoiceClip, recordButtonLayout, recordView);
@@ -667,14 +659,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setEnabled(true);
         emojiKeyboard.setListenerActivated(true);
 
-        myAudioRecorder = new MediaRecorder();
-
         observersLayout = (RelativeLayout) findViewById(R.id.observers_layout);
         observersNumberText = (TextView) findViewById(R.id.observers_text);
-
-        keyboardHeight = outMetrics.heightPixels / 2 - getActionBarHeight();
-        marginBottomDesactivated = Util.px2dp(48, outMetrics);
-        marginBottomActivated = Util.px2dp(24, outMetrics);
 
         textChat.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) { }
@@ -813,84 +799,85 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
-        //ListenForRecord must be false ,otherwise onClick will not be called
+
+        /*
+        *If the recording button (an arrow) is clicked, the recording will be sent to the chat
+        */
         recordButton.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
-                log("recordButton.setOnRecordClickListener():onClick -> stopRecord");
-                recordView.playSound(RECORD_FINISHED);
-                stopRecord();
+                log("recordButton.setOnRecordClickListener:onClick");
+                sendRecording();
             }
         });
 
-        recordView.setCancelBounds(1);
-        recordView.setLessThanSecondAllowed(false);
-        recordView.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
 
+        /*
+         *Events of the recording
+         */
         recordView.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
-                log("recordView.setOnRecordListener():onStart() -> startRecord");
-                if(adapter!=null) {
-                    adapter.stopAllReproductionsInProgress();
-                }
-                startRecord();
+                log("recordView.setOnRecordListener:onStart");
+                startRecording();
             }
-
             @Override
             public void onLessThanSecond() {
-                log("recordView.setOnRecordListener():onLessThanSecond() -> showBubble");
+                log("recordView.setOnRecordListener:onLessThanSecond");
                 showBubble();
             }
-
             @Override
             public void onCancel() {
-                log("recordView.setOnRecordListener():onCancel()");
-                if(isRecordingNow()){
-                    if(myAudioRecorder!=null){
-                        myAudioRecorder.reset();
-                        outputFileVoiceNotes = null;
-                    }
-                }
-                recordButtonStates(RECORD_BUTTON_DESACTIVATED);
+                log("recordView.setOnRecordListener:onCancel");
+                cancelRecording();
             }
-
-
-
             @Override
             public void onLock() {
-                log("recordView.setOnRecordListener():onLock()");
+                log("recordView.setOnRecordListener:onLock");
                 recordButtonStates(RECORD_BUTTON_SEND);
             }
-
             @Override
             public void onFinish(long recordTime) {
-                log("recordView.setOnRecordListener():onFinish -> stopRecord");
-                stopRecord();
+                log("recordView.setOnRecordListener:onFinish");
+                sendRecording();
             }
-
         });
+
         recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
             @Override
             public void onAnimationEnd() {
-                log("recordView.setOnBasketAnimationEndListener():onAnimationEnd -> cancelRecord");
-                cancelRecord();
+                log("recordView.setOnBasketAnimationEndListener:onAnimationEnd");
+                cancelRecording();
             }
 
             @Override
-            public void desactivateRecordButton() {
-                log("recordView.setOnBasketAnimationEndListener():desactivateRecordButton");
-                textChat.setVisibility(View.GONE);
-
-                keyboardTwemojiButton.setVisibility(View.GONE);
-                mediaButton.setVisibility(View.GONE);
-                pickAttachButton.setVisibility(View.GONE);
-                pickFileStorageButton.setVisibility(View.GONE);
+            public void deactivateRecordButton() {
+                log("recordView.setOnBasketAnimationEndListener:desactivateRecordButton");
+                hideChatOptions();
+                recordView.setVisibility(View.VISIBLE);
+                recordLayout.setVisibility(View.VISIBLE);
+                recordButtonLayout.setVisibility(View.VISIBLE);
                 recordButton.activateOnTouchListener(false);
-                desactivatedButton();
-
+                recordButtonDeactivated(true);
+                placeRecordButton(RECORD_BUTTON_DESACTIVATED);
             }
         });
+
+        emojiKeyboard.setOnPlaceButtonListener(new OnPlaceButtonListener() {
+            @Override
+            public void needToPlace() {
+
+                if(sendIcon.getVisibility() != View.VISIBLE){
+                    recordLayout.setVisibility(View.VISIBLE);
+                    recordButtonLayout.setVisibility(View.VISIBLE);
+                }
+                recordView.setVisibility(View.INVISIBLE);
+                recordButton.activateOnTouchListener(true);
+                placeRecordButton(RECORD_BUTTON_DESACTIVATED);
+            }
+        });
+
+
 
         messageJumpLayout.setOnClickListener(this);
 
@@ -982,6 +969,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         log("FINISH on Create");
     }
+
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
         log("initAfterIntent");
@@ -1931,7 +1919,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_call_chat:{
-                if(!isRecordingNow()){
+                if(!recordView.isRecordingNow()){
                     startVideo = false;
                     if(checkPermissionsCall()){
                         startCall();
@@ -1941,7 +1929,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.cab_menu_video_chat:{
                 log("cab_menu_video_chat");
-                if(!isRecordingNow()){
+                if(!recordView.isRecordingNow()){
                     startVideo = true;
                     if(checkPermissionsCall()){
                         startCall();
@@ -1986,10 +1974,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return super.onOptionsItemSelected(item);
     }
 
-    public void startRecord(){
-        log("startRecord() ");
+    /*
+     * Start recording
+     */
+    public void startRecording(){
+        log("startRecording() ");
+        if(adapter!=null) {
+            adapter.stopAllReproductionsInProgress();
+        }
+
         if(checkPermissionsVoiceClip()){
-            log("startRecord() with Permissions");
+            log("startRecording() with Permissions");
             String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
             File newFolder = new File(path);
             newFolder.mkdirs();
@@ -1999,7 +1994,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
             outputFileVoiceNotes = path + "/note_voice"+name;
             if((myAudioRecorder!=null)&&(outputFileVoiceNotes != null)) {
-                log("startRecord: myAudioRecorder initialized and dataSourceConfigure ");
+                log("startRecording: myAudioRecorder initialized and dataSourceConfigure ");
                 myAudioRecorder.reset();
                 myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -2016,11 +2011,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void cancelRecord(){
-        log("cancelRecord()");
-        if(isRecordingNow()){
+    /*
+     * Cancel recording and reset the audio recorder
+     */
+    private void cancelRecording(){
+        log("cancelRecording");
+        if(recordView.isRecordingNow()){
             if(myAudioRecorder!=null){
-                log("cancelRecord(): myAudioRecorder.reset()");
                 myAudioRecorder.reset();
                 outputFileVoiceNotes = null;
             }
@@ -2028,20 +2025,202 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void stopRecord(){
-        log("stopRecord()");
-        if(isRecordingNow()){
+    /*
+    * Stop the Record and send it to the chat
+    */
+    private void sendRecording(){
+        log("sendRecording");
+        if(recordView.isRecordingNow()){
+            setRecordingNow(false);
             if(myAudioRecorder!=null) {
-                log("stopRecord(): myAudioRecorder.stop()");
                 try{
+                    recordView.playSound(RECORD_FINISHED);
                     myAudioRecorder.stop();
                     uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
                     outputFileVoiceNotes = null;
                 }catch(RuntimeException ex){ }
             }
-            setRecordingNow(false);
         }
     }
+
+    /*
+     *Hide chat options while recording
+     */
+    private void hideChatOptions(){
+        log("hideChatOptions");
+        textChat.setVisibility(View.INVISIBLE);
+        sendIcon.setVisibility(View.GONE);
+        disableButton(rLKeyboardTwemojiButton,keyboardTwemojiButton);
+        disableButton(rLMediaButton,mediaButton);
+        disableButton(rLPickAttachButton,pickAttachButton);
+        disableButton(rLPickFileStorageButton,pickFileStorageButton);
+    }
+
+    private void disableButton(final  RelativeLayout layout, final  ImageButton button){
+        log("disableButton");
+        layout.setOnClickListener(null);
+        button.setOnClickListener(null);
+        button.setVisibility(View.INVISIBLE);
+    }
+
+    /*
+     *Show chat options when not being recorded
+     */
+    private void showChatOptions(){
+        log("showChatOptions");
+        textChat.setVisibility(View.VISIBLE);
+        enableButton(rLKeyboardTwemojiButton,keyboardTwemojiButton);
+        enableButton(rLMediaButton,mediaButton);
+        enableButton(rLPickAttachButton,pickAttachButton);
+        enableButton(rLPickFileStorageButton,pickFileStorageButton);
+    }
+
+    private void enableButton(RelativeLayout layout, ImageButton button){
+        log("enableButton");
+        layout.setOnClickListener(this);
+        button.setOnClickListener(this);
+        button.setVisibility(View.VISIBLE);
+    }
+
+    /*
+     *Record button activated
+     */
+    private void recordButtonActivated(){
+        log("recordButtonActivated");
+        recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
+        recordButton.activateOnTouchListener(true);
+        recordButton.activateOnClickListener(false);
+        recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
+        recordButton.setColorFilter(null);
+    }
+
+    /*
+     *Record button deactivated or ready to send
+     */
+    private void recordButtonDeactivated(boolean isDesactivated){
+        log("recordButtonDeactivated");
+        recordView.showLock(false);
+        recordButtonLayout.setBackground(null);
+        sendIcon.setVisibility(View.GONE);
+        recordButton.setVisibility(View.VISIBLE);
+
+        if(isDesactivated){
+            recordButton.activateOnClickListener(false);
+            recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
+            recordButton.setColorFilter(null);
+            return;
+        }
+        recordButton.activateOnTouchListener(false);
+        recordButton.activateOnClickListener(true);
+        recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
+        recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
+    }
+
+    /*
+     *Update the record button view depending on the state the recording is in
+     */
+    private void recordButtonStates(int recordButtonState){
+        log("recordButtonStates");
+
+        if(currentRecordButtonState != recordButtonState){
+            currentRecordButtonState = recordButtonState;
+            recordLayout.setVisibility(View.VISIBLE);
+            recordButtonLayout.setVisibility(View.VISIBLE);
+            if((currentRecordButtonState == RECORD_BUTTON_SEND) || (currentRecordButtonState == RECORD_BUTTON_ACTIVATED)){
+                log("recordButtonStates:SEND||ACTIVATED");
+                recordView.setVisibility(View.VISIBLE);
+                hideChatOptions();
+                if(recordButtonState == RECORD_BUTTON_SEND){
+                    recordButtonDeactivated(false);
+                }else{
+                    recordButtonActivated();
+                }
+
+            }else if(currentRecordButtonState == RECORD_BUTTON_DESACTIVATED){
+                log("recordButtonStates:DESACTIVATED");
+                showChatOptions();
+                recordView.setVisibility(View.GONE);
+                recordButton.activateOnTouchListener(true);
+                recordButtonDeactivated(true);
+            }
+            placeRecordButton(currentRecordButtonState);
+        }
+    }
+
+    public void showBubble(){
+        log("showBubble");
+        bubbleLayout.setAlpha(1);
+        bubbleLayout.setVisibility(View.VISIBLE);
+        bubbleLayout.animate().alpha(0).setDuration(4000);
+        cancelRecording();
+    }
+
+    /*
+    *Place the record button with the corresponding margins
+    */
+    public void placeRecordButton(int recordButtonState){
+        log("placeRecordButton");
+        int marginBottomVoicleLayout;
+        recordView.recordButtonTranslation(recordButtonLayout,0,0);
+        if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
+            marginBottomVoicleLayout = keyboardHeight+marginBottomDesactivated;
+        }else {
+            marginBottomVoicleLayout = marginBottomDesactivated;
+        }
+
+        int value = 0;
+        int marginBottom = marginBottomVoicleLayout;
+        int marginRight = 0;
+        if((recordButtonState == RECORD_BUTTON_SEND)||(recordButtonState == RECORD_BUTTON_DESACTIVATED)){
+            log("placeRecordButton:SEND||DESACTIVATED");
+            value = 48;
+            if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
+                marginRight = Util.px2dp(14, outMetrics);
+            }
+        }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
+            log("placeRecordButton:ACTIVATED");
+            value = 80;
+            if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
+                marginBottom = keyboardHeight+marginBottomActivated;
+            }else {
+                marginBottom = marginBottomActivated;
+            }
+        }
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
+        params.height = Util.px2dp(value, outMetrics);
+        params.width = Util.px2dp(value, outMetrics);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params.setMargins(0, 0, marginRight, marginBottom);
+        recordButtonLayout.setLayoutParams(params);
+
+        FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
+        paramsRecordView.setMargins(0,0,0, marginBottomVoicleLayout);
+        recordView.setLayoutParams(paramsRecordView);
+    }
+
+    public boolean isRecordingNow(){
+        return recordView.isRecordingNow();
+    }
+
+    /*
+     * Know if you're recording right now
+     */
+    public void setRecordingNow(boolean recordingNow) {
+        recordView.setRecordingNow(recordingNow);
+        if(recordView.isRecordingNow()){
+            recordButtonStates(RECORD_BUTTON_ACTIVATED);
+            if(emojiKeyboard!=null){
+                emojiKeyboard.setListenerActivated(false);
+            }
+        }else{
+            recordButtonStates(RECORD_BUTTON_DESACTIVATED);
+            if(emojiKeyboard!=null){
+                emojiKeyboard.setListenerActivated(true);
+            }
+        }
+    }
+
 
     private void startCall(){
         log("startCall ");
@@ -2156,87 +2335,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return true;
     }
 
-    private void desactivatedButton(){
-        log("desactivatedButton");
-        recordLayout.setVisibility(View.VISIBLE);
-        recordButtonLayout.setVisibility(View.VISIBLE);
-        recordView.showLock(false);
-        sendIcon.setVisibility(View.GONE);
-        recordButtonLayout.setBackground(null);
-        recordButton.activateOnClickListener(false);
-        recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
-        recordButton.setColorFilter(null);
-        recordButton.setVisibility(View.VISIBLE);
-        paramsRecordButton(RECORD_BUTTON_DESACTIVATED);
-
-    }
-
-
-    private void recordButtonStates(int recordButtonState){
-        if(currentRecordButtonState != recordButtonState){
-            currentRecordButtonState = recordButtonState;
-            if((currentRecordButtonState == RECORD_BUTTON_SEND) || (currentRecordButtonState == RECORD_BUTTON_ACTIVATED)){
-                log("recordButtonStates(): currentRecordButtonState:SEND||ACTIVATED");
-                recordLayout.setVisibility(View.VISIBLE);
-                recordButtonLayout.setVisibility(View.VISIBLE);
-                textChat.setVisibility(View.INVISIBLE);
-                sendIcon.setVisibility(View.GONE);
-
-                rLKeyboardTwemojiButton.setOnClickListener(null);
-                keyboardTwemojiButton.setVisibility(View.INVISIBLE);
-                keyboardTwemojiButton.setOnClickListener(null);
-                rLMediaButton.setOnClickListener(null);
-                mediaButton.setVisibility(View.INVISIBLE);
-                mediaButton.setOnClickListener(null);
-                rLPickAttachButton.setOnClickListener(null);
-                pickAttachButton.setVisibility(View.INVISIBLE);
-                pickAttachButton.setOnClickListener(null);
-                rLPickFileStorageButton.setOnClickListener(null);
-                pickFileStorageButton.setVisibility(View.INVISIBLE);
-                pickFileStorageButton.setOnClickListener(null);
-
-                recordView.setVisibility(View.VISIBLE);
-                if(recordButtonState == RECORD_BUTTON_SEND){
-                    recordView.showLock(false);
-                    recordButtonLayout.setBackground(null);
-                    recordButton.activateOnTouchListener(false);
-                    recordButton.activateOnClickListener(true);
-                    recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-                    recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
-                }else{
-                    recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
-                    recordButton.activateOnTouchListener(true);
-                    recordButton.activateOnClickListener(false);
-                    recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
-                    recordButton.setColorFilter(null);
-                }
-                paramsRecordButton(currentRecordButtonState);
-
-            }else if(currentRecordButtonState == RECORD_BUTTON_DESACTIVATED){
-                log("recordButtonStates(): currentRecordButtonState:DESACTIVATED");
-                textChat.setVisibility(View.VISIBLE);
-
-                rLKeyboardTwemojiButton.setOnClickListener(this);
-                keyboardTwemojiButton.setVisibility(View.VISIBLE);
-                keyboardTwemojiButton.setOnClickListener(this);
-                rLMediaButton.setOnClickListener(this);
-                mediaButton.setVisibility(View.VISIBLE);
-                mediaButton.setOnClickListener(this);
-                rLPickAttachButton.setOnClickListener(this);
-                pickAttachButton.setVisibility(View.VISIBLE);
-                pickAttachButton.setOnClickListener(this);
-                rLPickFileStorageButton.setOnClickListener(this);
-                pickFileStorageButton.setVisibility(View.VISIBLE);
-                pickFileStorageButton.setOnClickListener(this);
-
-                recordView.setVisibility(View.GONE);
-                recordButton.activateOnTouchListener(true);
-                desactivatedButton();
-            }
-        }
-
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         log("onRequestPermissionsResult");
@@ -2267,8 +2365,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("RECORD_VOICE_CLIP || REQUEST_STORAGE_VOICE_CLIP");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                    if(checkPermissionsVoiceClip()){
-                        cancelRecord();
-                    }
+                       cancelRecording();
+
+                   }
                 }
                 break;
             }
@@ -3037,7 +3136,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.keyboard_twemoji_chat:
             case R.id.rl_keyboard_twemoji_chat:{
                 log("onClick:keyboard_icon_chat:  ");
-//                if(!isRecordingNow()){
                     if(fileStorageLayout.isShown()){
                         hideFileStorageSection();
                     }
@@ -3057,14 +3155,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             emojiKeyboard.showEmojiKeyboard();
                         }
                     }
-//                }
                 break;
             }
 
             case R.id.media_icon_chat:
             case R.id.rl_media_icon_chat: {
                 log("onClick:media_icon_chat");
-                if (!isRecordingNow()) {
+                if (!recordView.isRecordingNow()) {
                     hideKeyboard();
                     if (ChatUtil.participatingInACall(megaChatApi)) {
                         showConfirmationOpenCamera(chatRoom);
@@ -3077,9 +3174,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_file_storage_icon_chat:
             case R.id.rl_pick_file_storage_icon_chat:{
                 log("file storage icon ");
-
-//                if(!isRecordingNow()){
-                    if(fileStorageLayout.isShown()){
+                 if(fileStorageLayout.isShown()){
                         hideFileStorageSection();
                     }else{
                         if((emojiKeyboard!=null)&&(emojiKeyboard.getLetterKeyboardShown())){
@@ -3120,8 +3215,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                     }
-//                }
-
                 break;
             }
             case R.id.toolbar_maps:{
@@ -3219,7 +3312,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
         fileStorageLayout.setVisibility(View.VISIBLE);
         pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
-        paramsRecordButton(RECORD_BUTTON_DESACTIVATED);
+        placeRecordButton(RECORD_BUTTON_DESACTIVATED);
     }
 
     public void attachFromCloud(){
@@ -7015,7 +7108,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         if(myAudioRecorder!=null){
-            log("onDestroy(): myAudioRecorder.reset() && myAudioRecorder.release()");
             myAudioRecorder.reset();
             myAudioRecorder.release();
             myAudioRecorder = null;
@@ -8382,13 +8474,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             position_imageDrag = -1;
         }
     }
-    public void showBubble(){
-        log("showBubble()");
-        bubbleLayout.setAlpha(1);
-        bubbleLayout.setVisibility(View.VISIBLE);
-        bubbleLayout.animate().alpha(0).setDuration(4000);
-        cancelRecord();
-    }
+
+
+
 
     public void hideFileStorageSection(){
         log("hideFileStorageSection");
@@ -8398,83 +8486,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
-        paramsRecordButton(RECORD_BUTTON_DESACTIVATED);
+        placeRecordButton(RECORD_BUTTON_DESACTIVATED);
 
-    }
-
-    private int getActionBarHeight() {
-        log("getActionBarHeight()");
-        int actionBarHeight = 0;
-        TypedValue tv = new TypedValue();
-        if (this != null && this.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
-        }
-        return actionBarHeight;
-    }
-
-    public void paramsRecordButton(int recordButtonState){
-        log("paramsRecordButton");
-        int marginBottomVoicleLayout = 0;
-        recordButtonLayout.setTranslationX(0);
-        recordButtonLayout.setTranslationY(0);
-
-        if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
-            marginBottomVoicleLayout = keyboardHeight+marginBottomDesactivated;
-        }else {
-            marginBottomVoicleLayout = marginBottomDesactivated;
-        }
-
-        int value = 0;
-        int margins = marginBottomVoicleLayout;
-        int marginRight = 0;
-        if((recordButtonState == RECORD_BUTTON_SEND)||(recordButtonState == RECORD_BUTTON_DESACTIVATED)){
-            log("paramsRecordButton:SEND||DESACTIVATED");
-            value = 48;
-            if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
-                marginRight = Util.px2dp(14, outMetrics);
-            }
-       }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
-            log("paramsRecordButton:ACTIVATED");
-            value = 80;
-            if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
-                margins = keyboardHeight+marginBottomActivated;
-            }else {
-                margins = marginBottomActivated;
-            }
-        }
-
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
-        params.height = Util.px2dp(value, outMetrics);
-        params.width = Util.px2dp(value, outMetrics);
-        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params.setMargins(0, 0, marginRight, margins);
-        recordButtonLayout.setLayoutParams(params);
-
-        FrameLayout.LayoutParams paramsRecordView = (FrameLayout.LayoutParams) recordView.getLayoutParams();
-        paramsRecordView.setMargins(0,0,0, marginBottomVoicleLayout);
-        recordView.setLayoutParams(paramsRecordView);
-    }
-
-
-    public boolean isRecordingNow() {
-        return recordingNow;
-    }
-
-    public void setRecordingNow(boolean recordingNow) {
-        this.recordingNow = recordingNow;
-        recordView.setRecordingNow(recordingNow);
-        if(recordingNow){
-            recordButtonStates(RECORD_BUTTON_ACTIVATED);
-            if(emojiKeyboard!=null){
-                emojiKeyboard.setListenerActivated(false);
-            }
-        }else{
-            recordButtonStates(RECORD_BUTTON_DESACTIVATED);
-            if(emojiKeyboard!=null){
-                emojiKeyboard.setListenerActivated(true);
-            }
-        }
     }
 
 }
