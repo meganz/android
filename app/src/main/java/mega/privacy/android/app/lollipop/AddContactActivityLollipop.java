@@ -283,6 +283,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else if (contactType == Constants.CONTACT_TYPE_DEVICE) {
                 if (queryPermissions) {
                     getBothContacts();
+                    addedContactsPhone.clear();
                     boolean found;
                     PhoneContactInfo contactPhone;
                     MegaContactAdapter contactMEGA;
