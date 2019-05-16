@@ -9604,6 +9604,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     /*
+    * Stop the playing when this message is removed*/
+    public void stopPlaying(long msgId){
+        for(MessageVoiceClip m: messagesPlaying) {
+            if(m.getIdMessage() == msgId){
+                if(m.getMediaPlayer().isPlaying()){
+                    m.getMediaPlayer().stop();
+                }
+                m.getMediaPlayer().release();
+                m.setMediaPlayer(null);
+                messagesPlaying.remove(m);
+                break;
+            }
+        }
+    }
+
+    /*
      * Restore values when a playback ends
      */
     private void completionMediaPlayer(long msgId){
@@ -9666,10 +9682,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("destroyVoiceElemnts()");
         if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
             for(MessageVoiceClip m:messagesPlaying){
-                if(m.getMediaPlayer()!=null){
-                    m.getMediaPlayer().release();
-                    m.setMediaPlayer(null);
-                }
+                m.getMediaPlayer().release();
+                m.setMediaPlayer(null);
             }
         }
         messagesPlaying.clear();

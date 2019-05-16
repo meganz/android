@@ -5444,6 +5444,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         int resultModify = -1;
         if(msg.isDeleted()){
+            if(adapter!=null){
+                adapter.stopPlaying(msg.getMsgId());
+            }
             deleteMessage(msg, false);
             return;
         }
@@ -5612,7 +5615,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void deleteMessage(MegaChatMessage msg, boolean rejected){
         log("deleteMessage");
-
         int indexToChange = -1;
 
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
