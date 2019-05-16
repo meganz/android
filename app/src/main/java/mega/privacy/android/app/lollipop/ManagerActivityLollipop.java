@@ -16833,7 +16833,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 File avatarFile = buildAvatarFile(this,oldEmail + ".jpg");
                 if (isFileAvailable(avatarFile)) {
                     File newFile = buildAvatarFile(this, email + ".jpg");
-                    if(isFileAvailable(newFile)) {
+                    if(newFile != null) {
                         boolean result = avatarFile.renameTo(newFile);
                         if (result) {
                             log("The avatar file was correctly renamed");

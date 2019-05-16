@@ -1075,26 +1075,24 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		log("setOfflineAvatar");
 		File avatar = buildAvatarFile(this, email + ".jpg");
 
-		if (isFileAvailable(avatar)) {
-			Bitmap imBitmap = null;
-			if (avatar.exists()) {
-				if (avatar.length() > 0) {
-					BitmapFactory.Options bOpts = new BitmapFactory.Options();
-					bOpts.inPurgeable = true;
-					bOpts.inInputShareable = true;
-					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-					if (imBitmap != null) {
-						contactPropertiesImage.setImageBitmap(imBitmap);
-						imageGradient.setVisibility(View.VISIBLE);
+        if (isFileAvailable(avatar)) {
+            Bitmap imBitmap = null;
+            if (avatar.length() > 0) {
+                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                bOpts.inPurgeable = true;
+                bOpts.inInputShareable = true;
+                imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
+                if (imBitmap != null) {
+                    contactPropertiesImage.setImageBitmap(imBitmap);
+                    imageGradient.setVisibility(View.VISIBLE);
 
-						if (imBitmap != null && !imBitmap.isRecycled()) {
-							int colorBackground = getDominantColor1(imBitmap);
-							imageLayout.setBackgroundColor(colorBackground);
-						}
-					}
-				}
-			}
-		}
+                    if (imBitmap != null && !imBitmap.isRecycled()) {
+                        int colorBackground = getDominantColor1(imBitmap);
+                        imageLayout.setBackgroundColor(colorBackground);
+                    }
+                }
+            }
+        }
 	}
 
 	public void setProfileAvatar(File avatar) {

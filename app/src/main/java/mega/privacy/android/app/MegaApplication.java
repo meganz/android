@@ -43,6 +43,7 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -565,12 +566,25 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					});
 		}
 		EmojiCompat.init(config);
-
+        clearPublicCache();
 
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
 	}
+
+	private void clearPublicCache() {
+	    new Thread() {
+
+            @Override
+            public void run() {
+                File dir =getExternalCacheDir();
+                if(dir != null) {
+                    Util.cleanDir(dir);
+                }
+            }
+        }.start();
+    }
 
 	public void askForFullAccountInfo(){
 		log("askForFullAccountInfo");
