@@ -1,5 +1,7 @@
 package mega.privacy.android.app.components.voiceClip;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -7,6 +9,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.graphics.drawable.AnimatorInflaterCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -36,7 +39,8 @@ public class AnimationHelper {
     private Handler handler1, handler2;
     private static int durationAlpha = 350;
     private static int durationTraslate = 250;
-    private static int durationBasket = 450;
+    private static int durationBasket = 800;
+    private static int durationMicro = 500;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
         this.context = context;
@@ -191,20 +195,20 @@ public class AnimationHelper {
         smallBlinkingMic.startAnimation(alphaAnimation);
     }
 
-    public void moveRecordButtonAndSlideToCancelBack(final RelativeLayout recordBtn, float initialX) {
-        log("moveRecordButtonAndSlideToCancelBack()");
-        final ValueAnimator positionAnimator = ValueAnimator.ofFloat(recordBtn.getX(), initialX);
-        positionAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-        positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float x = (Float) animation.getAnimatedValue();
-                recordBtn.setX(x);
+    public void moveRecordButtonAndSlideToCancelBack(final RelativeLayout recordBtnLayout, float initialX) {
+        ValueAnimator anim = ValueAnimator.ofFloat(recordBtnLayout.getX(), initialX);
+        anim.setInterpolator(new AccelerateDecelerateInterpolator());
+        anim.setDuration(durationMicro);
 
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
+        {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation)
+            {
+                float x = (Float) animation.getAnimatedValue();
+                recordBtnLayout.setX(x);
             }
         });
-        positionAnimator.setDuration(1000);
-        positionAnimator.start();
 
     }
 
@@ -224,11 +228,11 @@ public class AnimationHelper {
         }
     }
 
+
     /*
     *Check if a new recording has started when the record button was pressed
     */
     public void setStartRecorded(boolean startRecorded) {
-        log("setStartRecorded()  -> "+startRecorded);
         isStartRecorded = startRecorded;
     }
 

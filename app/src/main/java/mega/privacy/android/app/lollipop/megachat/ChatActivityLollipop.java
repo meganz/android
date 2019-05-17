@@ -39,9 +39,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -861,6 +859,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 placeRecordButton(RECORD_BUTTON_DESACTIVATED);
             }
         });
+
 
         emojiKeyboard.setOnPlaceButtonListener(new OnPlaceButtonListener() {
             @Override

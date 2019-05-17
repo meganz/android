@@ -157,22 +157,22 @@ public class RecordView extends RelativeLayout {
     }
 
     private void hideViews(boolean hideSmallMic) {
+        log("hideViews ");
         slideToCancelLayout.setVisibility(GONE);
         cancelRecordLayout.setVisibility(GONE);
         startStopCounterTime(false);
 
         if (hideSmallMic){
             smallBlinkingMic.setVisibility(GONE);
-           inicializateAnimationHelper();
-        }else{
-            if(animationHelper!=null){
-                animationHelper.animateBasket(basketInitialX);
-                animationHelper.setStartRecorded(false);
-                return;
+            inicializateAnimationHelper();
+            if (recordListener != null) {
+                recordListener.onCancel();
             }
+            return;
         }
-        if (recordListener != null) {
-            recordListener.onCancel();
+        if(animationHelper!=null){
+            animationHelper.animateBasket(basketInitialX);
+            animationHelper.setStartRecorded(false);
         }
     }
 
@@ -384,10 +384,9 @@ public class RecordView extends RelativeLayout {
                 if ((recordBtnLayout!=null)&&(slideToCancelLayout.getX() <= (counterTime.getLeft()))){
                     log("CANCELING");
 
-                    hideViews(isLessThanOneSecond(time));
                     animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtnLayout, initialX);
-
                     slideToCancelTranslation(0);
+                    hideViews(isLessThanOneSecond(time));
 
                     isSwiped = true;
                     userBehaviour = UserBehaviour.CANCELING;
@@ -504,6 +503,7 @@ public class RecordView extends RelativeLayout {
     public void setOnBasketAnimationEndListener(OnBasketAnimationEnd onBasketAnimationEndListener) {
         animationHelper.setOnBasketAnimationEndListener(onBasketAnimationEndListener);
     }
+
     public void setLessThanSecondAllowed(boolean isAllowed) {
         isLessThanSecondAllowed = isAllowed;
     }
