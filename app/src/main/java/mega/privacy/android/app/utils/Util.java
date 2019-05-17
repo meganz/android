@@ -1334,7 +1334,7 @@ public class Util {
 				  }
 			  }
 		  } catch (Exception ex) {
-			  log("Error IP Address: " + ex.toString());
+			  log("Error getting local IP address: " + ex.toString());
 		  }
 		  return null;
    }

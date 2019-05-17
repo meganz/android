@@ -44,8 +44,8 @@ public class NetworkStateReceiver extends BroadcastReceiver {
         MegaApplication mApplication = ((MegaApplication)context.getApplicationContext());
 
         if(ni != null && ni.getState() == NetworkInfo.State.CONNECTED) {
+            log("Network state: CONNECTED");
 
-            log("getState = "+ni.getState());
             megaApi = mApplication.getMegaApi();
 
             if(Util.isChatEnabled()){
@@ -58,12 +58,15 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             String previousIP = mApplication.getLocalIpAddress();
             String currentIP = Util.getLocalIpAddress(context);
 
+            log("Previous IP: " + previousIP);
+            log("Current IP: " + currentIP);
+
             mApplication.setLocalIpAddress(currentIP);
 
             if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0))
             {
                 if ((previousIP == null) || (currentIP.compareTo(previousIP) != 0)) {
-                    log("reconnect and retryPendingConnections");
+                    log("Reconnecting...");
                     megaApi.reconnect();
 
                     if (megaChatApi != null){
@@ -71,7 +74,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                     }
                 }
                 else{
-                    log("retryPendingConnections");
+                    log("Retrying pending connections...");
                     megaApi.retryPendingConnections();
 
                     if (megaChatApi != null){
@@ -93,6 +96,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 }
             }, 2 * 1000);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
+            log("Network state: DISCONNECTED");
             mApplication.setLocalIpAddress(null);
             connected = false;
         }
