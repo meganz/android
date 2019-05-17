@@ -3042,10 +3042,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:{
                     log("Edit text");
-                    editingMessage = true;
-                    messageToEdit = messagesSelected.get(0).getMessage();
-                    textChat.setText(messageToEdit.getContent());
-                    textChat.setSelection(textChat.getText().length());
+                    if((messagesSelected!=null)&&(messagesSelected.size()>0)&& (messagesSelected.get(0)!=null)){
+                        editingMessage = true;
+                        messageToEdit = messagesSelected.get(0).getMessage();
+                        textChat.setText(messageToEdit.getContent());
+                        textChat.setSelection(textChat.getText().length());
+                    }
+
                     //Show keyboard
 
                     break;

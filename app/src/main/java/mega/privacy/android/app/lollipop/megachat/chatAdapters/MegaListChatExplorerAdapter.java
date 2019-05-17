@@ -128,7 +128,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.chat_explorer_list_item_layout);
         holder.avatarImage = (RoundedImageView) v.findViewById(R.id.chat_explorer_list_avatar);
         holder.initialLetter = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_initial_letter);
-        holder.initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
         holder.titleText = (EmojiTextView) v.findViewById(R.id.chat_explorer_list_title);
         holder.stateIcon = (ImageView) v.findViewById(R.id.chat_explorer_list_contact_state);
         holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
@@ -136,8 +135,10 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             holder.titleText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+            holder.initialLetter.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
         }else{
             holder.titleText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+            holder.initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
         }
 
         v.setTag(holder);

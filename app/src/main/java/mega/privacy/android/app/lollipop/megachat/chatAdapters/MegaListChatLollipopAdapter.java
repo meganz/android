@@ -536,21 +536,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 			((ViewHolderNormalChatList)holder).contactInitialLetter = (EmojiTextView) v.findViewById(R.id.recent_chat_list_initial_letter);
-			((ViewHolderNormalChatList)holder).contactInitialLetter.setEmojiSize(Util.scaleWidthPx(30,outMetrics));
 			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
+			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
+
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
-			}else{
-				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-			}
-
-
-			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
-			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				((ViewHolderNormalChatList)holder).contactInitialLetter.setEmojiSize(Util.scaleWidthPx(20,outMetrics));
 				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
 			}else{
+				((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+				((ViewHolderNormalChatList)holder).contactInitialLetter.setEmojiSize(Util.scaleWidthPx(30,outMetrics));
 				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
 			}
+
 
 			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 			((ViewHolderNormalChatList)holder).iconMyAudioOff = (ImageView) v.findViewById(R.id.recent_chat_list_micro_off);

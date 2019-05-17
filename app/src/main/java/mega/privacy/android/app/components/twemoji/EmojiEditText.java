@@ -49,27 +49,21 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     }
 
     @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
+        if(text.toString().equals("")){
+            return;
+        }
+
+        final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+        final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+        EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
 
         if((mContext instanceof GroupChatInfoActivityLollipop) || (mContext instanceof AddContactActivityLollipop)){
-            if(text.toString().equals("")){
-            }else{
-                final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-                final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-                EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
-                int maxAllowed = ChatUtil.getMaxAllowed(getText());
-                setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
-                super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
-            }
-
+            int maxAllowed = ChatUtil.getMaxAllowed(getText());
+            setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxAllowed)});
+            super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
         }else{
-            if(text.toString().equals("")){
-            }else{
-                if(lengthAfter>lengthBefore){
-                    final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-                    final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-                    EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
-                    super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
-                }
+            if(lengthAfter>lengthBefore){
+                super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
             }
         }
     }

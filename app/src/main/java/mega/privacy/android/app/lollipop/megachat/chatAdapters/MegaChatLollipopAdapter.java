@@ -116,6 +116,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static int CONTACT_MESSAGE_LAND = 28;
     public static int CONTACT_MESSAGE_PORT = 48;
 
+    public static int MAX_WIDTH_NAME_LAND = 280;
+    public static int MAX_WIDTH_NAME_PORT = 160;
+
+    public static int MAX_WIDTH_MESSAGE_LAND = 310;
+    public static int MAX_WIDTH_MESSAGE_PORT = 275;
+
+    public static int EMOJI_SIZE_LAND = 30;
+    public static int EMOJI_SIZE_PORT = 20;
+
+
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
@@ -744,15 +754,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
             holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
             holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
-
             holder.titleOwnMessage.setGravity(Gravity.RIGHT);
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
-            }else{
-                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
-            }
-
-//        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
 
             holder.previewFramePort = (RelativeLayout) v.findViewById(R.id.preview_frame_portrait);
             holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
@@ -909,38 +911,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnLandscape.setTag(holder);
             holder.forwardOwnLandscape.setVisibility(View.GONE);
             holder.forwardOwnLandscape.setOnClickListener(this);
-
-            holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
             holder.ownManagementMessageText = (EmojiTextView) v.findViewById(R.id.own_management_message_text);
-
-            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
-                holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-            }else{
-                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
-                holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-            }
-            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
-
+            holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
             holder.ownManagementMessageIcon = (ImageView) v.findViewById(R.id.own_management_message_icon);
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-                holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-            } else {
-                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-                holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-            }
 
             //Contact messages
             holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
             holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
-
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
-            }else{
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
-            }
 
             holder.contactImageView = (RoundedImageView) v.findViewById(R.id.contact_thumbnail);
             holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_initial_letter);
@@ -950,14 +927,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = (EmojiTextView) v.findViewById(R.id.content_contact_message_text);
-
-            RelativeLayout.LayoutParams paramsContactMessage = (RelativeLayout.LayoutParams) holder.contentContactMessageText.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
-                paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
-            }
-            holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
 
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
@@ -980,13 +949,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.urlContactMessageLayout.setLayoutParams(params);
             }
 
-            RelativeLayout.LayoutParams paramsContactRichLink = (RelativeLayout.LayoutParams) holder.urlContactMessageLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsContactRichLink.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
-                paramsContactRichLink.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
-            }
-            holder.urlContactMessageLayout.setLayoutParams(paramsContactRichLink);
+
 
             holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
             holder.forwardContactRichLinks.setTag(holder);
@@ -1037,13 +1000,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
             holder.contentContactMessageAttachLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_attach_layout);
-            RelativeLayout.LayoutParams paramsContactAttach = (RelativeLayout.LayoutParams) holder.contentContactMessageAttachLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsContactAttach.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
-                paramsContactAttach.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
-            }
-            holder.contentContactMessageAttachLayout.setLayoutParams(paramsContactAttach);
+
 
             holder.contentContactMessageFile = (RelativeLayout) v.findViewById(R.id.content_contact_message_file);
             holder.forwardContactFile = (RelativeLayout) v.findViewById(R.id.forward_contact_file);
@@ -1055,19 +1012,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.layoutAvatarMessages = (RelativeLayout) v.findViewById(R.id.layout_avatar);
             holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
-            RelativeLayout.LayoutParams paramsContactContact = (RelativeLayout.LayoutParams) holder.contentContactMessageContactLayout.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsContactContact.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
-            }else{
-                paramsContactContact.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
-            }
-            holder.contentContactMessageContactLayout.setLayoutParams(paramsContactContact);
+
 
             holder.forwardContactContact = (RelativeLayout) v.findViewById(R.id.forward_contact_contact);
             holder.forwardContactContact.setTag(holder);
             holder.forwardContactContact.setVisibility(View.GONE);
 
-//            holder.contentContactMessageContactLayout.setVisibility(View.GONE);
             holder.contentContactMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout_avatar);
             holder.contentContactMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_contact_message_contact_thumb);
             holder.contentContactMessageContactName = (TextView) v.findViewById(R.id.content_contact_message_contact_name);
@@ -1078,19 +1028,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.iconContactTypeDocPortraitPreview = (ImageView) v.findViewById(R.id.contact_attachment_type_icon_portrait);
 
             holder.contactManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.contact_management_message_layout);
-
             holder.contactManagementMessageText = (EmojiTextView) v.findViewById(R.id.contact_management_message_text);
-            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
-            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
-                holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-
-            }else{
-                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
-                holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-
-            }
-            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             holder.contactManagementMessageIcon = (ImageView) v.findViewById(R.id.contact_management_message_icon);
 
             if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
@@ -1104,23 +1042,55 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementAvatarMessageText = (TextView) v.findViewById(R.id.contact_management_message_text_with_avatar);
             holder.contactManagementAvatarSubTextLayout = (RelativeLayout) v.findViewById(R.id.contact_subtext_layout_with_avatar);
 
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-
-                holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-            } else {
-                holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-
-                holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-            }
+            RelativeLayout.LayoutParams paramsContactContact = (RelativeLayout.LayoutParams) holder.contentContactMessageContactLayout.getLayoutParams();
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            RelativeLayout.LayoutParams paramsContactAttach = (RelativeLayout.LayoutParams) holder.contentContactMessageAttachLayout.getLayoutParams();
+            RelativeLayout.LayoutParams paramsContactRichLink = (RelativeLayout.LayoutParams) holder.urlContactMessageLayout.getLayoutParams();
+            RelativeLayout.LayoutParams paramsContactMessage = (RelativeLayout.LayoutParams) holder.contentContactMessageText.getLayoutParams();
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                paramsContactContact.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+                paramsContactAttach.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
+                paramsContactRichLink.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
+                paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_LAND, outMetrics);
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
 
-                holder.nameContactText.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+                holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
+                holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
+                holder.nameContactText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_NAME_LAND, outMetrics));
+                holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_LAND, outMetrics));
+                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
+                holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
+                holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_LAND, outMetrics));
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
             } else {
+                paramsContactContact.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+                paramsContactAttach.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
+                paramsContactRichLink.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
+                paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
 
-                holder.nameContactText.setMaxWidth(Util.scaleWidthPx(160, outMetrics));
+                holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
+                holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
+                holder.nameContactText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_NAME_PORT, outMetrics));
+                holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_PORT, outMetrics));
+                holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
+                holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
+                holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
+                holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_PORT, outMetrics));
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
             }
+
+            holder.contentContactMessageContactLayout.setLayoutParams(paramsContactContact);
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
+            holder.contentContactMessageAttachLayout.setLayoutParams(paramsContactAttach);
+            holder.urlContactMessageLayout.setLayoutParams(paramsContactRichLink);
+            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
             v.setTag(holder);
 

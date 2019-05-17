@@ -272,7 +272,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             //Info Layout
             avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
             initialLetter = (EmojiTextView) findViewById(R.id.chat_group_properties_initial_letter);
-            initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                initialLetter.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+            }else{
+                initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
+            }
             if (chat.getTitle().length() > 0){
                 String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
                 initialLetter.setText(firstLetter);
