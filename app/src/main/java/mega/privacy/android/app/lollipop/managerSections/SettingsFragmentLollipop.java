@@ -2251,27 +2251,25 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	/**
 	 * Refresh the Camera Uploads service settings depending on the service status.
 	 */
-	private void refreshCameraUploadsSettings() {
-		log("refreshCameraUploadsSettings");
-        if (cameraUpload){
+    private void refreshCameraUploadsSettings() {
+        log("refreshCameraUploadsSettings");
+        boolean cuEnabled = false;
+        if (prefs != null) {
+            cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
+        }
+        if (!cuEnabled) {
             log("Camera ON");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                log("Lollipop version");
+            String[] PERMISSIONS = {
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+            };
 
-                String[] PERMISSIONS = {
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                };
-
-                if(!Util.hasPermissions(context, PERMISSIONS)){
-                    ActivityCompat.requestPermissions((ManagerActivityLollipop)context, PERMISSIONS, Constants.REQUEST_CAMERA_UPLOAD);
-                }else{
-                    enableCameraUpload();
-                }
-            }else{
+            if (!Util.hasPermissions(context,PERMISSIONS)) {
+                ActivityCompat.requestPermissions((ManagerActivityLollipop)context,PERMISSIONS,Constants.REQUEST_CAMERA_UPLOAD);
+            } else {
                 enableCameraUpload();
             }
-        }
-        else{
+        } else {
             disableCameraUpload();
         }
     }

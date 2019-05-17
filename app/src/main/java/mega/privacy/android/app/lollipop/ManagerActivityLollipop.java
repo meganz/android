@@ -135,8 +135,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -194,11 +192,11 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -238,8 +236,9 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
+import static mega.privacy.android.app.utils.Util.showSnackBar;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -1613,17 +1612,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 
             case Constants.REQUEST_CAMERA_UPLOAD:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                     if(sttFLol != null && sttFLol.isAdded()){
                         sttFLol.enableCameraUpload();
                     }
+                } else {
+                    showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
                 }
 
                 break;
             }
 
             case Constants.REQUEST_CAMERA_ON_OFF:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                     if(cuFL != null && cuFL.isAdded()){
                         cuFL.cameraOnOff();
                     }
@@ -1633,9 +1634,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
 
             case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                TL.log(this, "@#@", "result: " + requestCode);
+                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                     if(cuFL != null && cuFL.isAdded()){
                         cuFL.cameraOnOffFirstTime();
+                    }
+                } else {
+                    if(cuFL != null && cuFL.isAdded()){
+                        cuFL.onStoragePermissionRefused();
                     }
                 }
 

@@ -124,6 +124,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     MegaNode secondaryUploadNode = null;
 
     private DateFormat sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+
+    private List<MegaTransfer> cuTransfers = new ArrayList<>();
     
     boolean isLoggingIn = false;
     
@@ -216,7 +218,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     intent.getAction().equals(ACTION_LOGOUT)) {
                 log("onStartCommand intent action is " + intent.getAction());
                 stopped = true;
-                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
+                for(MegaTransfer transfer : cuTransfers) {
+                    megaApi.cancelTransfer(transfer);
+                }
+                megaApi.resetTotalUploads();
                 finish();
                 return START_NOT_STICKY;
             }
@@ -1450,6 +1455,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api,MegaTransfer transfer) {
         log("onTransferStart: " + transfer.getFileName());
+        cuTransfers.add(transfer);
     }
     
     @Override

@@ -93,6 +93,7 @@ import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
+import static mega.privacy.android.app.utils.Util.showSnackBar;
 
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, MegaRequestListenerInterface{
@@ -221,6 +222,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
+
+	public void onStoragePermissionRefused() {
+        showSnackBar(context, Constants.SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), -1);
+        toCloudDrive();
+    }
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -1653,7 +1659,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	@Override
     public void onClick(View v) {
         ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
-        String[] permissions = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        String[] permissions = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE};
         
         switch (v.getId()) {
             case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
@@ -1689,13 +1695,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                 break;
             }
             case R.id.cam_sync_button_skip: {
-                ((ManagerActivityLollipop)context).setFirstLogin(false);
-                dbH.setCamSyncEnabled(false);
-                ((ManagerActivityLollipop)context).setInitialCloudDrive();
+                toCloudDrive();
                 break;
             }
         }
     }
+
+    private void toCloudDrive() {
+        ((ManagerActivityLollipop)context).setFirstLogin(false);
+        dbH.setCamSyncEnabled(false);
+        ((ManagerActivityLollipop)context).setInitialCloudDrive();
+    }
+
     
     private void requestCameraUploadPermission(String[] permissions, int requestCode){
         ActivityCompat.requestPermissions((ManagerActivityLollipop)context,

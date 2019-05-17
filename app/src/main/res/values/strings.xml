@@ -1789,7 +1789,7 @@
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
 	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
-
+    <string name="on_refuse_storage_permission" context="User refuse to permit the storage permission when enable camera upload">Camera upload needs access your photos, media on your device.</string>
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of what to upload.">Original</item>
         <item context="the options of what to upload.">Medium</item>
