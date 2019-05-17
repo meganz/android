@@ -15,8 +15,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:textColor="@color/copyright_text"
+            android:textColor="@color/name_my_account"
             android:text="@string/recovery_key_exported_dialog_title"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="bold"
             android:layout_marginBottom="20dp"/>
 
         <TextView
@@ -24,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/grey_achievements_invite_friends"
             android:text="@string/recovery_key_exported_dialog_text"
             android:layout_marginBottom="32dp"/>
 
@@ -34,13 +36,11 @@
             android:layout_height="36dp"
             android:background="@android:color/transparent"
             android:elevation="0dp"
-            android:paddingLeft="12sp"
-            android:paddingRight="12sp"
-            android:layout_marginRight="-25dp"
             android:layout_gravity="right"
             android:textColor="@color/accentColor"
             android:text="@string/cam_sync_ok"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            style="@style/ButtonStyle"/>
 
     </LinearLayout>
 

@@ -97,7 +97,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6.0_227";
+	static final public String USER_AGENT = "MEGAAndroid/3.6.1_238";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -224,8 +224,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					AccountController.localLogoutApp(getApplicationContext());
 				}
 			}
-			else if(request.getType() == MegaRequest.TYPE_LOGIN){
-				log("BackgroundRequestListener:onRequestFinish:TYPE_LOGIN");
+			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
+				log("BackgroundRequestListener:onRequestFinish:TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
 				}
@@ -593,7 +593,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	public void askForAccountDetails(){
-
+		log("askForAccountDetails");
+		if (dbH != null) {
+			dbH.resetAccountDetailsTimeStamp();
+		}
 		megaApi.getAccountDetails(null);
 	}
 

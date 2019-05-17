@@ -1791,11 +1791,11 @@ public class ChatController {
                     String localPath = Util.getLocalFile(context, tempNode.getName(), tempNode.getSize(), parentPath);
                     //Check if the file is already downloaded
                     if(localPath != null){
-                        log("download:localPath != null");
+                        log("localPath != null");
                         try {
                             log("download:Call to copyFile: localPath: ");
                             Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-
+                            
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
                                 if (tempNode != null){
@@ -1811,6 +1811,12 @@ public class ChatController {
                         }
                         catch(Exception e) {
                             log("Exception!!");
+                        }
+                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                        if(!autoPlayEnabled){
+                            log("auto play disabled");
+                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE, context.getString(R.string.general_already_downloaded),-1);
+                            return;
                         }
 
                         if(isVoiceClip){
