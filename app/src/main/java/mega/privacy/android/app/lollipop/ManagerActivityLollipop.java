@@ -550,6 +550,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
 	private AlertDialog openLinkDialog;
+	private boolean openLinkDialogIsShown = false;
+	private boolean openLinkDialogIsErrorShown = false;
 	private AlertDialog alertNotPermissionsUpload;
 	private AlertDialog clearRubbishBinDialog;
 	private AlertDialog downloadConfirmationDialog;
@@ -1706,6 +1708,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
 		outState.putInt("accountFragmentPreUpgradeAccount", accountFragmentPreUpgradeAccount);
 		outState.putInt("comesFromNotificationDeepBrowserTreeIncoming", comesFromNotificationDeepBrowserTreeIncoming);
+		outState.putBoolean("openLinkDialogIsShown", openLinkDialogIsShown);
+		if (openLinkDialogIsShown) {
+			if (openLinkText != null && openLinkText.getText() != null) {
+				outState.putString("openLinkText", openLinkText.getText().toString());
+			}
+			else {
+				outState.putString("openLinkText", "");
+			}
+			outState.putBoolean("openLinkDialogIsErrorShown", openLinkDialogIsErrorShown);
+		}
 	}
 
 	@Override
@@ -1774,6 +1786,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
 			accountFragmentPreUpgradeAccount = savedInstanceState.getInt("accountFragmentPreUpgradeAccount", -1);
 			comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt("comesFromNotificationDeepBrowserTreeIncoming", -1);
+			openLinkDialogIsShown = savedInstanceState.getBoolean("openLinkDialogIsShown", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -3016,6 +3029,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (firstTimeAfterInstallation) {
 			askForAccess();
+		}
+
+		if (openLinkDialogIsShown) {
+			showOpenLinkDialog();
+			String text = savedInstanceState.getString("openLinkText", "");
+			openLinkText.setText(text);
+			openLinkText.setSelection(text.length());
+			boolean openLinkDialogIsErrorShown = savedInstanceState.getBoolean("openLinkDialogIsErrorShown", false);
+			if (openLinkDialogIsErrorShown) {
+				openLink(text);
+			}
 		}
 
 		log("END onCreate");
@@ -10915,11 +10939,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private void showOpenLinkError(boolean show, int error) {
 		if (openLinkDialog != null) {
 			if (show) {
+				openLinkDialogIsErrorShown = true;
 				openLinkText.setTextColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 				openLinkText.getBackground().mutate().clearColorFilter();
 				openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.dark_primary_color), PorterDuff.Mode.SRC_ATOP);
 				openLinkError.setVisibility(View.VISIBLE);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+					if (openLinkText.getText().toString().isEmpty()) {
+						openLinkErrorText.setText(R.string.invalid_file_folder_link_empty);
+						return;
+					}
                     switch (error) {
                         case Constants.CHAT_LINK: {
                             openLinkErrorText.setText(R.string.valid_chat_link);
@@ -10938,10 +10967,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     }
                 }
                 else if (drawerItem == DrawerItem.CHAT) {
+					if (openLinkText.getText().toString().isEmpty()) {
+						openLinkErrorText.setText(R.string.invalid_chat_link_empty);
+						return;
+					}
                     openLinkErrorText.setText(R.string.invalid_chat_link_args);
                 }
 			}
 			else {
+				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
 					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
 					openLinkText.getBackground().mutate().clearColorFilter();
@@ -10956,6 +10990,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private void dismissOpenLinkDialog() {
 		try {
 			openLinkDialog.dismiss();
+			openLinkDialogIsShown = false;
 		} catch (Exception e) {}
 	}
 
@@ -11083,6 +11118,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		try {
 			openLinkDialog.show();
+			openLinkDialogIsShown = true;
 		}catch (Exception e){}
 	}
 
