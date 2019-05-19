@@ -2232,7 +2232,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
-
+                if(confirmLogoutDialog != null) {
+                    confirmLogoutDialog.dismiss();
+                }
+                enableLoginButton();
                 String errorMessage = "";
 
                 if (error.getErrorCode() == MegaError.API_ESID){
@@ -2420,6 +2423,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 readyToManager();
 
             }else{
+                if(confirmLogoutDialog != null) {
+                    confirmLogoutDialog.dismiss();
+                }
+                enableLoginButton();
                 log("Error fetch nodes: "+error.getErrorCode());
                 String errorMessage;
                 if (error.getErrorCode() == MegaError.API_ESID){
@@ -3000,6 +3007,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         backToLoginForm();
                         backWhileLogin = true;
                         MegaApplication.setLoggingIn(false);
+                        LoginActivityLollipop.isFetchingNodes = false;
                         loginClicked = false;
                         firstTime = true;
                         if (megaChatApi == null){
