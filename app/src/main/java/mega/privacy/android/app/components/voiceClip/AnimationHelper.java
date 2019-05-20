@@ -139,36 +139,36 @@ public class AnimationHelper {
     */
     public void resetBasketAnimation() {
         log("resetBasketAnimation()");
-        if (isBasketAnimating) {
-            if(translateAnimation1!=null){
-                translateAnimation1.reset();
-                translateAnimation1.cancel();
-            }
-            if(translateAnimation2!=null){
-                translateAnimation2.reset();
-                translateAnimation2.cancel();
-            }
-            if(micAnimation!=null) {
-                micAnimation.cancel();
-            }
-            if(smallBlinkingMic!=null) {
-                smallBlinkingMic.clearAnimation();
-            }
-            if(basketImg!=null) {
-                basketImg.clearAnimation();
-            }
-
-            if (handler1 != null)
-                handler1.removeCallbacksAndMessages(null);
-            if (handler2 != null)
-                handler2.removeCallbacksAndMessages(null);
-
-            basketImg.setVisibility(INVISIBLE);
-            smallBlinkingMic.setX(micX);
-            smallBlinkingMic.setY(micY);
-            smallBlinkingMic.setVisibility(View.GONE);
-            isBasketAnimating = false;
+        if (!isBasketAnimating) return;
+        
+        if(translateAnimation1!=null){
+            translateAnimation1.reset();
+            translateAnimation1.cancel();
         }
+        if(translateAnimation2!=null){
+            translateAnimation2.reset();
+            translateAnimation2.cancel();
+        }
+        if(micAnimation!=null) {
+            micAnimation.cancel();
+        }
+        if(smallBlinkingMic!=null) {
+            smallBlinkingMic.clearAnimation();
+        }
+        if(basketImg!=null) {
+            basketImg.clearAnimation();
+        }
+
+        if (handler1 != null)
+            handler1.removeCallbacksAndMessages(null);
+        if (handler2 != null)
+            handler2.removeCallbacksAndMessages(null);
+
+        basketImg.setVisibility(INVISIBLE);
+        smallBlinkingMic.setX(micX);
+        smallBlinkingMic.setY(micY);
+        smallBlinkingMic.setVisibility(View.GONE);
+        isBasketAnimating = false;
     }
 
 

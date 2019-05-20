@@ -2192,291 +2192,291 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				long messageId = chat.getLastMessageId();
 				MegaChatMessage message = megaChatApi.getMessage(chat.getChatId(), messageId);
-				if(message!=null){
-					MegaChatContainsMeta meta = message.getContainsMeta();
-					if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-						log("Geolocation message");
-						long lastMsgSender = chat.getLastMessageSender();
-						if(lastMsgSender==megaChatApi.getMyUserHandle()){
+				if(message==null) return;
 
-							log("getLastMessageSender: the last message is mine: "+lastMsgSender);
-							Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-							me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				MegaChatContainsMeta meta = message.getContainsMeta();
+				if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+					log("Geolocation message");
+					long lastMsgSender = chat.getLastMessageSender();
+					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
-							Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
-							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							CharSequence indexedText = TextUtils.concat(me, myMessage);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-						}
-						else{
-							log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
+						log("getLastMessageSender: the last message is mine: "+lastMsgSender);
+						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-							if(chat.isGroup()){
-								MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+						Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						CharSequence indexedText = TextUtils.concat(me, myMessage);
+						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+					}
+					else{
+						log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
 
-								((ViewHolderNormalChatList)holder).currentPosition = position;
-								((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+						if(chat.isGroup()){
+							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
-								String fullNameAction = "";
-								if(chatRoom!=null){
-									fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-									if(fullNameAction==null){
-										fullNameAction = "";
-									}
+							((ViewHolderNormalChatList)holder).currentPosition = position;
+							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-									if(fullNameAction.trim().length()<=0){
-										fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-									}
-								}
-								else{
-									log("ERROR: the chatroom is NULL: "+chat.getChatId());
+							String fullNameAction = "";
+							if(chatRoom!=null){
+								fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+								if(fullNameAction==null){
+									fullNameAction = "";
 								}
 
 								if(fullNameAction.trim().length()<=0){
-
-//					megaChatApi.getUserFirstname();
-									if(fullNameAction.isEmpty()){
-										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-											log("3-Call for nonContactName: "+ lastMsgSender);
-											fullNameAction = "Unknown name";
-											((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-											((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-											ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
-											megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserEmail(lastMsgSender, listener);
-										}
-										else{
-											log("4-Name already asked and no name received: "+ lastMsgSender);
-										}
-									}
-								}
-
-								Spannable name = new SpannableString(fullNameAction+": ");
-								name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-								if(chat.getUnreadCount()==0){
-									log("Message READ");
-
-									Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									CharSequence indexedText = TextUtils.concat(name, myMessage);
-									((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-								}
-								else{
-									log("Message NOt read");
-									Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									CharSequence indexedText = TextUtils.concat(name, myMessage);
-									((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+									fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
 								}
 							}
 							else{
-								if(chat.getUnreadCount()==0){
-									log("Message READ");
-									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-								}
-								else{
-									log("Message NOt read");
-									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-								}
-
-								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.title_geolocation_message));
+								log("ERROR: the chatroom is NULL: "+chat.getChatId());
 							}
-						}
-					}
-					else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
-						log("Rich link message");
-						if(lastMessageString==null){
-							log("Message Type-> "+messageType+" last content is NULL ");
-							lastMessageString = context.getString(R.string.error_message_unrecognizable);
-						}
-						else{
-							log("Message Type-> "+messageType+" last content: "+lastMessageString + "length: "+lastMessageString.length());
-						}
 
-						long lastMsgSender = chat.getLastMessageSender();
-						if(lastMsgSender==megaChatApi.getMyUserHandle()){
+							if(fullNameAction.trim().length()<=0){
 
-							log("getLastMessageSender: the last message is mine: "+lastMsgSender);
-							Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-							me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//					megaChatApi.getUserFirstname();
+								if(fullNameAction.isEmpty()){
+									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+										log("3-Call for nonContactName: "+ lastMsgSender);
+										fullNameAction = "Unknown name";
+										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+										megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+										megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+										megaChatApi.getUserEmail(lastMsgSender, listener);
+									}
+									else{
+										log("4-Name already asked and no name received: "+ lastMsgSender);
+									}
+								}
+							}
 
-							if(lastMessageString!=null) {
-								Spannable myMessage = new SpannableString(lastMessageString);
+							Spannable name = new SpannableString(fullNameAction+": ");
+							name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+							if(chat.getUnreadCount()==0){
+								log("Message READ");
+
+								Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
 								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								CharSequence indexedText = TextUtils.concat(me, myMessage);
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+								CharSequence indexedText = TextUtils.concat(name, myMessage);
+								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+							}
+							else{
+								log("Message NOt read");
+								Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
 						}
 						else{
-							log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
-
-							if(chat.isGroup()){
-								MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
-								((ViewHolderNormalChatList)holder).currentPosition = position;
-								((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-
-								String fullNameAction = "";
-								if(chatRoom!=null){
-									fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-									if(fullNameAction==null){
-										fullNameAction = "";
-									}
-
-									if(fullNameAction.trim().length()<=0){
-										fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-									}
-								}
-								else{
-									log("ERROR: the chatroom is NULL: "+chat.getChatId());
-								}
-
-								if(fullNameAction.trim().length()<=0){
-
-//					megaChatApi.getUserFirstname();
-									if(fullNameAction.isEmpty()){
-										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-											log("3-Call for nonContactName: "+ lastMsgSender);
-											fullNameAction = "Unknown name";
-											((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-											((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-											ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
-											megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserEmail(lastMsgSender, listener);
-										}
-										else{
-											log("4-Name already asked and no name received: "+ lastMsgSender);
-										}
-									}
-								}
-
-								Spannable name = new SpannableString(fullNameAction+": ");
-								name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-								if(chat.getUnreadCount()==0){
-									log("Message READ");
-
-									Spannable myMessage = new SpannableString(lastMessageString);
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									CharSequence indexedText = TextUtils.concat(name, myMessage);
-									((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-								}
-								else{
-									log("Message NOt read");
-									Spannable myMessage = new SpannableString(lastMessageString);
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									CharSequence indexedText = TextUtils.concat(name, myMessage);
-									((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-								}
+							if(chat.getUnreadCount()==0){
+								log("Message READ");
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 							}
 							else{
-								if(chat.getUnreadCount()==0){
-									log("Message READ");
-									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-								}
-								else{
-									log("Message NOt read");
-									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-								}
-
-								((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
+								log("Message NOt read");
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 							}
+
+							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.title_geolocation_message));
 						}
 					}
-					else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
-						log("Invalid meta message");
-						long lastMsgSender = chat.getLastMessageSender();
-						if(lastMsgSender==megaChatApi.getMyUserHandle()){
+				}
+				else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
+					log("Rich link message");
+					if(lastMessageString==null){
+						log("Message Type-> "+messageType+" last content is NULL ");
+						lastMessageString = context.getString(R.string.error_message_unrecognizable);
+					}
+					else{
+						log("Message Type-> "+messageType+" last content: "+lastMessageString + "length: "+lastMessageString.length());
+					}
 
-							log("getLastMessageSender: the last message is mine: "+lastMsgSender);
-							Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-							me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					long lastMsgSender = chat.getLastMessageSender();
+					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
-							Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+						log("getLastMessageSender: the last message is mine: "+lastMsgSender);
+						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						if(lastMessageString!=null) {
+							Spannable myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(me, myMessage);
 							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 						}
-						else{
-							log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
+					}
+					else{
+						log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
 
-							if(chat.isGroup()){
-								MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+						if(chat.isGroup()){
+							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
-								((ViewHolderNormalChatList)holder).currentPosition = position;
-								((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+							((ViewHolderNormalChatList)holder).currentPosition = position;
+							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
-								String fullNameAction = "";
-								if(chatRoom!=null){
-									fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-									if(fullNameAction==null){
-										fullNameAction = "";
-									}
-
-									if(fullNameAction.trim().length()<=0){
-										fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
-									}
-								}
-								else{
-									log("ERROR: the chatroom is NULL: "+chat.getChatId());
+							String fullNameAction = "";
+							if(chatRoom!=null){
+								fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+								if(fullNameAction==null){
+									fullNameAction = "";
 								}
 
 								if(fullNameAction.trim().length()<=0){
-
-//					megaChatApi.getUserFirstname();
-									if(fullNameAction.isEmpty()){
-										if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
-											log("3-Call for nonContactName: "+ lastMsgSender);
-											fullNameAction = "Unknown name";
-											((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-											((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
-											ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
-											megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
-											megaChatApi.getUserEmail(lastMsgSender, listener);
-										}
-										else{
-											log("4-Name already asked and no name received: "+ lastMsgSender);
-										}
-									}
-								}
-
-								Spannable name = new SpannableString(fullNameAction+": ");
-								name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-								if(chat.getUnreadCount()==0){
-									log("Message READ");
-									Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									CharSequence indexedText = TextUtils.concat(name, myMessage);
-									((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-								}
-								else{
-									log("Message NOt read");
-									Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
-									myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-									CharSequence indexedText = TextUtils.concat(name, myMessage);
-									((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+									fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
 								}
 							}
 							else{
-								if(chat.getUnreadCount()==0){
-									log("Message READ");
-									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+								log("ERROR: the chatroom is NULL: "+chat.getChatId());
+							}
+
+							if(fullNameAction.trim().length()<=0){
+
+//					megaChatApi.getUserFirstname();
+								if(fullNameAction.isEmpty()){
+									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+										log("3-Call for nonContactName: "+ lastMsgSender);
+										fullNameAction = "Unknown name";
+										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+										megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+										megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+										megaChatApi.getUserEmail(lastMsgSender, listener);
+									}
+									else{
+										log("4-Name already asked and no name received: "+ lastMsgSender);
+									}
 								}
-								else{
-									log("Message NOt read");
-									((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							}
+
+							Spannable name = new SpannableString(fullNameAction+": ");
+							name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+							if(chat.getUnreadCount()==0){
+								log("Message READ");
+
+								Spannable myMessage = new SpannableString(lastMessageString);
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								CharSequence indexedText = TextUtils.concat(name, myMessage);
+								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+							}
+							else{
+								log("Message NOt read");
+								Spannable myMessage = new SpannableString(lastMessageString);
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								CharSequence indexedText = TextUtils.concat(name, myMessage);
+								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+							}
+						}
+						else{
+							if(chat.getUnreadCount()==0){
+								log("Message READ");
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+							}
+							else{
+								log("Message NOt read");
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							}
+
+							((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
+						}
+					}
+				}
+				else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+					log("Invalid meta message");
+					long lastMsgSender = chat.getLastMessageSender();
+					if(lastMsgSender==megaChatApi.getMyUserHandle()){
+
+						log("getLastMessageSender: the last message is mine: "+lastMsgSender);
+						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+						Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						CharSequence indexedText = TextUtils.concat(me, myMessage);
+						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+					}
+					else{
+						log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
+
+						if(chat.isGroup()){
+							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+
+							((ViewHolderNormalChatList)holder).currentPosition = position;
+							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+
+							String fullNameAction = "";
+							if(chatRoom!=null){
+								fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+								if(fullNameAction==null){
+									fullNameAction = "";
 								}
 
-								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.error_meta_message_invalid));
+								if(fullNameAction.trim().length()<=0){
+									fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+								}
 							}
+							else{
+								log("ERROR: the chatroom is NULL: "+chat.getChatId());
+							}
+
+							if(fullNameAction.trim().length()<=0){
+
+//					megaChatApi.getUserFirstname();
+								if(fullNameAction.isEmpty()){
+									if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+										log("3-Call for nonContactName: "+ lastMsgSender);
+										fullNameAction = "Unknown name";
+										((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+										((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
+										ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender, chatRoom.isPreview());
+										megaChatApi.getUserFirstname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+										megaChatApi.getUserLastname(lastMsgSender, chatRoom.getAuthorizationToken(), listener);
+										megaChatApi.getUserEmail(lastMsgSender, listener);
+									}
+									else{
+										log("4-Name already asked and no name received: "+ lastMsgSender);
+									}
+								}
+							}
+
+							Spannable name = new SpannableString(fullNameAction+": ");
+							name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+							if(chat.getUnreadCount()==0){
+								log("Message READ");
+								Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								CharSequence indexedText = TextUtils.concat(name, myMessage);
+								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+							}
+							else{
+								log("Message NOt read");
+								Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								CharSequence indexedText = TextUtils.concat(name, myMessage);
+								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+							}
+						}
+						else{
+							if(chat.getUnreadCount()==0){
+								log("Message READ");
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+							}
+							else{
+								log("Message NOt read");
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							}
+
+							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.error_meta_message_invalid));
 						}
 					}
 				}

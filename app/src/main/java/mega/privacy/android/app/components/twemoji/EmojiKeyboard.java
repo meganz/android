@@ -168,56 +168,53 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void showLetterKeyboard(){
-        if((!isLetterKeyboardShown) && (editInterface instanceof View)){
-            log("showLetterKeyboard()");
-            hideEmojiKeyboard();
+        if (isLetterKeyboardShown || !(editInterface instanceof View)) return;
+
+        log("showLetterKeyboard()");
+        hideEmojiKeyboard();
+        final View view = (View) editInterface;
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return;
+        imm.showSoftInput(view, 0, null);
+        isLetterKeyboardShown = true;
+        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+        needToReplace();
+    }
+
+    private void needToReplace() {
+        if (buttonListener == null) return;
+
+        buttonListener.needToPlace();
+    }
+    public void showEmojiKeyboard(){
+        if (isEmojiKeyboardShown) return;
+
+        hideLetterKeyboard();
+        setVisibility(VISIBLE);
+
+        isEmojiKeyboardShown = true;
+        emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+        if (editInterface instanceof View){
             final View view = (View) editInterface;
             view.setFocusableInTouchMode(true);
             view.requestFocus();
-            final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm == null) return;
-            imm.showSoftInput(view, 0, null);
-            isLetterKeyboardShown = true;
-            emojiIcon.setImageResource(R.drawable.ic_emojicon);
-            if (buttonListener != null) {
-                buttonListener.needToPlace();
-            }
         }
 
-    }
-
-    public void showEmojiKeyboard(){
-        if(!isEmojiKeyboardShown){
-            hideLetterKeyboard();
-            setVisibility(VISIBLE);
-
-            isEmojiKeyboardShown = true;
-            emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
-            if (editInterface instanceof View){
-                final View view = (View) editInterface;
-                view.setFocusableInTouchMode(true);
-                view.requestFocus();
-            }
-            if (buttonListener != null) {
-                log("showEmojiKeyboard:needToPlace");
-                buttonListener.needToPlace();
-            }
-        }
+        needToReplace();
     }
 
     public void hideLetterKeyboard() {
-        if((isLetterKeyboardShown) && (editInterface instanceof View)){
-            final View view = (View) editInterface;
-            view.clearFocus();
-            final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (imm == null) return;
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
-            isLetterKeyboardShown = false;
-            if (buttonListener != null) {
-                buttonListener.needToPlace();
-            }
+        if (!isLetterKeyboardShown || !(editInterface instanceof View)) return;
 
-        }
+        final View view = (View) editInterface;
+        view.clearFocus();
+        final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return;
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
+        isLetterKeyboardShown = false;
+        needToReplace();
     }
 
     public void hideEmojiKeyboard(){
@@ -226,9 +223,7 @@ public class EmojiKeyboard extends LinearLayout {
             recentEmoji.persist();
             variantEmoji.persist();
             setVisibility(GONE);
-            if (buttonListener != null) {
-                buttonListener.needToPlace();
-            }
+            needToReplace();
             isEmojiKeyboardShown = false;
             if (editInterface instanceof View) {
                 final View view = (View) editInterface;

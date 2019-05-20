@@ -99,9 +99,6 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_marginRight="147dp"-->
-
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
         android:layout_width="wrap_content"

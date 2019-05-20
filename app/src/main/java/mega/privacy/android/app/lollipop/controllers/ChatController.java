@@ -1503,7 +1503,41 @@ public class ChatController {
         checkSizeBeforeDownload(path, nodeList, isVoiceClip);
     }
 
-    public void prepareForDownloadLollipop(final ArrayList<MegaNode> nodeList, final boolean isVoiceClip){
+    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
+        prepareForChatDownload(list, false);
+    }
+    public void prepareForChatDownload(ArrayList<MegaNodeList> list, boolean isVoiceClip){
+        log("prepareForChatDownload 1");
+        ArrayList<MegaNode> nodeList =  new ArrayList<>();
+        MegaNodeList megaNodeList;
+        for (int i= 0; i<list.size(); i++){
+            megaNodeList = list.get(i);
+            for (int j=0; j<megaNodeList.size(); j++){
+                nodeList.add(megaNodeList.get(j));
+            }
+        }
+        prepareForDownloadVersions(nodeList,isVoiceClip);
+    }
+
+    public void prepareForChatDownload(MegaNodeList list){
+        prepareForChatDownload(list, false);
+    }
+
+    public void prepareForChatDownload(MegaNodeList list, boolean isVoiceClip){
+        log("prepareForChatDownload 2 ");
+        ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
+        prepareForDownloadVersions(nodeList, isVoiceClip);
+    }
+
+    public void prepareForChatDownload(MegaNode node){
+        log("prepareForChatDownload 3");
+
+        ArrayList<MegaNode> nodeList = new ArrayList<>();
+        nodeList.add(node);
+        prepareForDownloadVersions(nodeList,false);
+    }
+
+    private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList, final boolean isVoiceClip){
         log("prepareForDownloadLollipop: "+nodeList.size()+" files to download, ");
         long size = 0;
         long[] hashes = new long[nodeList.size()];
@@ -1595,63 +1629,6 @@ public class ChatController {
             log("NOT askMe");
             filePathDefault(downloadLocationDefaultPath,nodeList,isVoiceClip);
         }
-    }
-
-    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
-        prepareForChatDownload(list, false);
-    }
-    public void prepareForChatDownload(ArrayList<MegaNodeList> list, boolean isVoiceClip){
-        log("prepareForChatDownload 1");
-        ArrayList<MegaNode> nodeList =  new ArrayList<>();
-        MegaNodeList megaNodeList;
-        for (int i= 0; i<list.size(); i++){
-            megaNodeList = list.get(i);
-            for (int j=0; j<megaNodeList.size(); j++){
-                nodeList.add(megaNodeList.get(j));
-            }
-        }
-        prepareForDownloadVersions(nodeList,isVoiceClip);
-    }
-
-    public void prepareForChatDownload(MegaNodeList list){
-        prepareForChatDownload(list, false);
-    }
-
-    public void prepareForChatDownload(MegaNodeList list, boolean isVoiceClip){
-        log("prepareForChatDownload 2 ");
-        ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
-        prepareForDownloadVersions(nodeList, isVoiceClip);
-    }
-
-    public void prepareForChatDownload(MegaNode node){
-        log("prepareForChatDownload 3");
-
-        ArrayList<MegaNode> nodeList = new ArrayList<>();
-        nodeList.add(node);
-        prepareForDownloadVersions(nodeList,false);
-    }
-
-    private void prepareForDownloadVersions(ArrayList<MegaNode> nodeList, boolean isVoiceClip){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            prepareForDownloadLollipop(nodeList, isVoiceClip);
-        }else{
-            prepareForDownloadPreLollipop(nodeList, isVoiceClip);
-        }
-    }
-
-    public void prepareForDownloadPreLollipop(ArrayList<MegaNode> nodeList, boolean isVoiceClip){
-        log("prepareForDownloadPreLollipop: "+nodeList.size()+" files to download");
-
-        if (dbH == null){
-            dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-        }
-
-        boolean advancedDevices=false;
-        String downloadLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, isVoiceClip);
-
-        File defaultPathF = new File(downloadLocationDefaultPath);
-        defaultPathF.mkdirs();
-        checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList, isVoiceClip);
     }
 
     public void checkSizeBeforeDownload(String parentPath, ArrayList<MegaNode> nodeList) {

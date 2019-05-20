@@ -1000,10 +1000,8 @@ public class Util {
 		//Not found, searching in the download folder
 		if(destDir != null){
 			File file = new File(destDir, fileName);
-			if(file.exists()){
-				if(file.length() == fileSize){
-					return file.getAbsolutePath();
-				}
+			if(file.exists() && file.length() == fileSize){
+				return file.getAbsolutePath();
 			}
 
 		}
@@ -1177,10 +1175,8 @@ public class Util {
 
 		//Get extension:
 		String[] s = fileName.split("\\.");
-		if (s != null){
-			if (s.length > 0){
-				extension = s[s.length-1];
-			}
+		if (s != null && s.length > 0){
+			extension = s[s.length-1];
 		}
 		//Get date time:
 		try{
@@ -1824,30 +1820,6 @@ public class Util {
 		return px*myWidthPx/360; //Based on Eduardo's measurements		
 		
 	}
-
-//	public static boolean isVoiceClip(String path) {
-//		log("isVoiceClip: "+path);
-//		try{
-//			String extension = "";
-//			String[] s = path.split("\\.");
-//			if (s != null){
-//				if (s.length > 0){
-//					extension = s[s.length-1];
-//					log("isVoiceClip: extension"+extension);
-//
-//				}
-//			}
-//
-//			if(extension.equals("opus")){
-//				return true;
-//			}else{
-//				return false;
-//			}
-//		}catch(Exception e){
-//			log("Exception: "+e.getMessage());
-//			return false;
-//		}
-//	}
 	
 	public static boolean isVideoFile(String path) {
 		log("isVideoFile: "+path);

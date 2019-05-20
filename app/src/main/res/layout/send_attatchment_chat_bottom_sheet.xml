@@ -103,14 +103,6 @@
                         android:textSize="16sp"/>
                 </LinearLayout>
 
-                <!--<LinearLayout-->
-                    <!--android:id="@+id/send_attachment_chat_separator"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="1dp"-->
-                    <!--android:layout_marginLeft="72dp"-->
-                    <!--android:orientation="vertical"-->
-                    <!--android:background="@color/chat_sliding_panel_separator"/>-->
-
                 <!--Contact-->
                 <LinearLayout
                     android:id="@+id/send_attachment_chat_contact_layout"

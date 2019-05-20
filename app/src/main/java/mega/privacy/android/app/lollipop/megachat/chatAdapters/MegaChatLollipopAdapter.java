@@ -171,17 +171,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(holder == null){
                 holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(position);
             }
-            if(holder!=null){
-                log("ChatVoiceClipAsyncTask:onPreExecute");
-                if(messageHandle == myUserHandle){
-                    holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
-                    holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
-                    holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
-                }else{
-                    holder.uploadingContactProgressbarVoiceclip.setVisibility(View.VISIBLE);
-                    holder.contentContactMessageVoiceClipPlay.setVisibility(View.GONE);
-                    holder.notAvailableContactVoiceclip.setVisibility(View.GONE);
-                }
+            if(holder==null) return;
+
+            log("ChatVoiceClipAsyncTask:onPreExecute");
+            if(messageHandle == myUserHandle){
+                holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
+                holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
+                holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
+            }else{
+                holder.uploadingContactProgressbarVoiceclip.setVisibility(View.VISIBLE);
+                holder.contentContactMessageVoiceClipPlay.setVisibility(View.GONE);
+                holder.notAvailableContactVoiceclip.setVisibility(View.GONE);
             }
             super.onPreExecute();
         }
@@ -3508,24 +3508,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    Bitmap getResizeBitmap (Bitmap originalBitmap) {
+    private Bitmap getResizeBitmap (Bitmap originalBitmap) {
 
-        if (originalBitmap != null) {
-            int widthResizeBitmap = originalBitmap.getWidth();
-            int heightResizeBitmap = originalBitmap.getWidth() / 2;
-            int topResizeBitmap = heightResizeBitmap / 2;
-            int bottomResizeBitmap = topResizeBitmap + heightResizeBitmap;
-            Bitmap resizeBitmap = Bitmap.createBitmap(widthResizeBitmap, heightResizeBitmap, Bitmap.Config.ARGB_8888);
+        if (originalBitmap == null) return null;
 
-            Canvas canvas = new Canvas(resizeBitmap);
-            Rect desRect = new Rect(0, 0, widthResizeBitmap, heightResizeBitmap);
-            Rect srcRect =  new Rect(0, topResizeBitmap, widthResizeBitmap, bottomResizeBitmap);
-            canvas.drawBitmap(originalBitmap, srcRect, desRect, null);
+        int widthResizeBitmap = originalBitmap.getWidth();
+        int heightResizeBitmap = originalBitmap.getWidth() / 2;
+        int topResizeBitmap = heightResizeBitmap / 2;
+        int bottomResizeBitmap = topResizeBitmap + heightResizeBitmap;
+        Bitmap resizeBitmap = Bitmap.createBitmap(widthResizeBitmap, heightResizeBitmap, Bitmap.Config.ARGB_8888);
 
-            return resizeBitmap;
-        }
+        Canvas canvas = new Canvas(resizeBitmap);
+        Rect desRect = new Rect(0, 0, widthResizeBitmap, heightResizeBitmap);
+        Rect srcRect =  new Rect(0, topResizeBitmap, widthResizeBitmap, bottomResizeBitmap);
+        canvas.drawBitmap(originalBitmap, srcRect, desRect, null);
 
-        return null;
+        return resizeBitmap;
     }
 
     public void bindGeoLocationMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -9448,23 +9446,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * When the download of a voice clip ends, update the view with the result
      */
     public void finishedVoiceClipDownload(long nodeHandle, int resultTransfer){
-        if((messages!=null) && (!messages.isEmpty()) && (messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
-            for(int i=0; i<messages.size(); i++) {
-                if((messages.get(i).getMessage()!=null) &&(messages.get(i).getMessage().getMegaNodeList()!=null) &&(messages.get(i).getMessage().getMegaNodeList().size()>0) &&(messages.get(i).getMessage().getMegaNodeList().get(0).getHandle() == nodeHandle)) {
-                    for(MessageVoiceClip messageVoiceClip:messagesPlaying){
-                        if(messageVoiceClip.getIdMessage() == messages.get(i).getMessage().getMsgId()){
-                            messageVoiceClip.setIsAvailable(resultTransfer);
-                            int positionInAdapter = i+1;
-                            ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
-                            if(holder!=null){
-                                log("finishedVoiceClipDownload");
-                                notifyItemChanged(positionInAdapter);
-                            }
-                            break;
+        if(messages==null || messages.isEmpty() || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
+        for(int i=0; i<messages.size(); i++) {
+            if((messages.get(i).getMessage()!=null) &&(messages.get(i).getMessage().getMegaNodeList()!=null) &&(messages.get(i).getMessage().getMegaNodeList().size()>0) &&(messages.get(i).getMessage().getMegaNodeList().get(0).getHandle() == nodeHandle)) {
+                for(MessageVoiceClip messageVoiceClip:messagesPlaying){
+                    if(messageVoiceClip.getIdMessage() == messages.get(i).getMessage().getMsgId()){
+                        messageVoiceClip.setIsAvailable(resultTransfer);
+                        int positionInAdapter = i+1;
+                        ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
+                        if(holder!=null){
+                            log("finishedVoiceClipDownload");
+                            notifyItemChanged(positionInAdapter);
                         }
+                        break;
                     }
-                    break;
                 }
+                break;
             }
         }
     }
@@ -9505,39 +9503,40 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
         log("playOrPauseVoiceClip: position = "+positionInAdapter);
         AndroidMegaChatMessage currentMessage = getMessageAt(positionInAdapter);
-        if((currentMessage!=null)&&(currentMessage.getMessage()!=null)&&(currentMessage.getMessage().getType() == MegaChatMessage.TYPE_VOICE_CLIP)){
-            for(MessageVoiceClip m: messagesPlaying){
-                if(m.getIdMessage() == currentMessage.getMessage().getMsgId()){
-                    if(m.getMediaPlayer().isPlaying()){
-                        log("playOrPauseVoiceClip:isPlaying: PLAY -> PAUSE");
-                       pauseVoiceClip(m,positionInAdapter);
-                       return;
-                    }
-                    if(m.isPaused()){
-                        log("playOrPauseVoiceClip:notPlaying: PAUSE -> PLAY");
-                        playVoiceClip(m, null);
-                        return;
-                    }
 
-                    log("playOrPauseVoiceClip:notPlaying: find voice clip");
-                    MegaNodeList nodeList = currentMessage.getMessage().getMegaNodeList();
-                    if(nodeList.size()==1){
-                        MegaNode node = nodeList.get(0);
-                        if(MimeTypeList.typeForName(node.getName()).isAudio()){
-                            String voiceNotesLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, true);
-                            String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
-                            boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, node);
-                            if (localPath != null && (isDownloaded || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))) {
-                                log("indVoiceClip:localPath != null - found it ----> play");
-                                playVoiceClip(m, localPath);
-                                return;
-                            }
-                            log("findVoiceClip:localPath == null -> downloadVoiceClip");
-                            downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
-                        }
-                    }
-                    break;
+        if(currentMessage==null || currentMessage.getMessage()==null || currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP) return;
+
+        for(MessageVoiceClip m: messagesPlaying){
+            if(m.getIdMessage() == currentMessage.getMessage().getMsgId()){
+                if(m.getMediaPlayer().isPlaying()){
+                    log("playOrPauseVoiceClip:isPlaying: PLAY -> PAUSE");
+                   pauseVoiceClip(m,positionInAdapter);
+                   return;
                 }
+                if(m.isPaused()){
+                    log("playOrPauseVoiceClip:notPlaying: PAUSE -> PLAY");
+                    playVoiceClip(m, null);
+                    return;
+                }
+
+                log("playOrPauseVoiceClip:notPlaying: find voice clip");
+                MegaNodeList nodeList = currentMessage.getMessage().getMegaNodeList();
+                if(nodeList.size()==1){
+                    MegaNode node = nodeList.get(0);
+                    if(MimeTypeList.typeForName(node.getName()).isAudio()){
+                        String voiceNotesLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, true);
+                        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
+                        boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, node);
+                        if (localPath != null && (isDownloaded || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))) {
+                            log("indVoiceClip:localPath != null - found it ----> play");
+                            playVoiceClip(m, localPath);
+                            return;
+                        }
+                        log("findVoiceClip:localPath == null -> downloadVoiceClip");
+                        downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
+                    }
+                }
+                break;
             }
         }
     }
@@ -9649,12 +9648,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public void stopAllReproductionsInProgress(){
         removeCallBacks();
-        if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
-            for(MessageVoiceClip m:messagesPlaying){
-                if(m.getMediaPlayer().isPlaying()){
-                    log("stopAllReproductionsInProgress(): PLAY -> STOP");
-                    completionMediaPlayer(m.getIdMessage());
-                }
+        if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
+        for(MessageVoiceClip m:messagesPlaying){
+            if(m.getMediaPlayer().isPlaying()){
+                log("stopAllReproductionsInProgress(): PLAY -> STOP");
+                completionMediaPlayer(m.getIdMessage());
             }
         }
     }
@@ -9753,12 +9752,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private void removeCallBacks(){
         log("removeCallBacks()");
-        if(handlerVoiceNotes!=null) {
-            if (runnableVC != null) {
-                handlerVoiceNotes.removeCallbacks(runnableVC);
-            }
-            handlerVoiceNotes.removeCallbacksAndMessages(null);
+        if(handlerVoiceNotes==null) return;
+
+        if (runnableVC != null) {
+            handlerVoiceNotes.removeCallbacks(runnableVC);
         }
+        handlerVoiceNotes.removeCallbacksAndMessages(null);
     }
 
     void setContactMessageName(int pos, ViewHolderMessageChat holder, long handle, boolean visibility) {

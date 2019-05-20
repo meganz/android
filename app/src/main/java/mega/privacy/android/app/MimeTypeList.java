@@ -211,7 +211,7 @@ public class MimeTypeList {
 	 * Check is MimeType of audio type
 	 */
 	public boolean isAudio() {
-		return type.startsWith("audio/") || extension.equals("m4a");
+		return type.startsWith("audio/") || extension.equals("opus");
 	}
 
 	public boolean isAudioNotSupported() {

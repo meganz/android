@@ -1177,19 +1177,16 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		int id = Integer.parseInt(idFound);
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
-		if(pendingMessages!=null && pendingMessages.size()>0){
-			for(int i=0; i<pendingMessages.size();i++) {
-				PendingMessageSingle pendMsg = pendingMessages.get(i);
-				if (pendMsg.getId() == id) {
-					if (megaChatApi != null) {
-						requestSent++;
-						pendMsg.setNodeHandle(transfer.getNodeHandle());
-						pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
-						log("attachVoiceClips() - STATE_ATTACHING");
-						megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
+		if(pendingMessages == null || pendingMessages.isEmpty()) return;
 
-					}
-				}
+		for(int i=0; i<pendingMessages.size();i++) {
+			PendingMessageSingle pendMsg = pendingMessages.get(i);
+			if (pendMsg.getId() == id && megaChatApi != null) {
+				requestSent++;
+				pendMsg.setNodeHandle(transfer.getNodeHandle());
+				pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
+				log("attachVoiceClips() - STATE_ATTACHING");
+				megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
 			}
 		}
 	}
