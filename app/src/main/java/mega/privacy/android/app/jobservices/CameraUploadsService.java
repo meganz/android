@@ -183,12 +183,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public void onTypeChanges(int type) {
         log("onTypeChanges: " + type);
-        prefs = dbH.getPreferences();
+        DatabaseHandler handler = DatabaseHandler.getDbHandler(this);
+        MegaPreferences prefs = handler.getPreferences();
         if(prefs != null) {
             if(type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi())) {
                 //pause the sync
                 pauseByNetworkStateChange = true;
-//                finish();
             } else {
                 pauseByNetworkStateChange = false;
             }
@@ -196,21 +196,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
-    private boolean hasStoragePermission() {
-        String[] PERMISSIONS = {
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-        };
-        return Util.hasPermissions(this, PERMISSIONS);
-    }
-
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
         log("public int onStartCommand(Intent intent, int flags, int startId)");
-        if(!hasStoragePermission()) {
-            return START_NOT_STICKY;
-        }
-
         initService();
         isServiceRunning = true;
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
@@ -1120,14 +1108,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     private void initService() {
         log("initService()");
+        registerNetworkTypeChangeReceiver();
         try {
             app = (MegaApplication)getApplication();
         } catch (Exception ex) {
-            finish();
-        }
-    
-        //if already over quota, no need to process further
-        if(app.getStorageState() == MegaApiJava.STORAGE_STATE_RED){
             finish();
         }
         
@@ -1199,8 +1183,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             dbH.deleteAllSyncRecords(TYPE_ANY);
             dbH.saveShouldClearCamsyncRecords(false);
         }
-
-        registerNetworkTypeChangeReceiver();
     }
     
     private void handleException(Exception e) {

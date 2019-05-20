@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -12,9 +13,11 @@ import android.text.format.DateUtils;
 
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.DaemonService;
+import nz.mega.sdk.MegaApiJava;
 
 @TargetApi(21)
 public class JobUtil {
@@ -88,9 +91,12 @@ public class JobUtil {
         log("schedule job failed");
         return START_JOB_FAILED;
     }
-    
-    public static synchronized void startCameraUploadService(Context context){
-        if (!CameraUploadsService.isServiceRunning) {
+
+    public static synchronized void startCameraUploadService(Context context) {
+        boolean isOverquota = isOverquota(context);
+        boolean hasStoragePermission = Util.hasPermissions(context,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (!CameraUploadsService.isServiceRunning && !isOverquota && hasStoragePermission) {
             Intent newIntent = new Intent(context,CameraUploadsService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 log("startCameraUploadService: starting on Oreo or above: ");
@@ -102,6 +108,11 @@ public class JobUtil {
         } else {
             log("startCameraUploadService: service not started because service is running ");
         }
+    }
+
+    private static boolean isOverquota(Context context) {
+        MegaApplication app = (MegaApplication)context.getApplicationContext();
+        return app.getStorageState() == MegaApiJava.STORAGE_STATE_RED;
     }
 
     public static synchronized void stopRunningCameraUploadService(Context context) {
