@@ -1365,7 +1365,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if(rtcAudioManager!=null){
             rtcAudioManager.stop();
         }
-        ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
+
         super.onDestroy();
     }
 
@@ -1586,8 +1586,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if(rtcAudioManager!=null){
                             rtcAudioManager.stop();
                         }
-                        ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
-
+                        ((MegaApplication) getApplication()).setSpeakerStatus(callChat.getChatid(), false);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             super.finishAndRemoveTask();
                         } else {
@@ -1611,7 +1610,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         if(rtcAudioManager!=null){
                             rtcAudioManager.stop();
                         }
-                        ChatUtil.activateSpeaker(false,((MegaApplication) getApplication()));
+                        ((MegaApplication) getApplication()).setSpeakerStatus(callChat.getChatid(), false);
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             super.finishAndRemoveTask();
@@ -2030,7 +2029,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         linearFAB.setLayoutParams(layoutCompress);
                         linearFAB.requestLayout();
                         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
-                        ChatUtil.activateSpeaker(true,(MegaApplication) getApplication());
                         megaChatApi.answerChatCall(chatId, true, this);
                         clearHandlers();
 
@@ -2074,10 +2072,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case R.id.speaker_fab: {
                 log("Click on speaker fab");
-                if(((MegaApplication) getApplication()).isSpeakerOn()){
-                    ChatUtil.activateSpeaker(false,(MegaApplication) getApplication());
+                if(((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid())){
+                    ((MegaApplication)getApplication()).setSpeakerStatus(callChat.getChatid(), false);
                 }else{
-                    ChatUtil.activateSpeaker(true,(MegaApplication) getApplication());
+                    ((MegaApplication)getApplication()).setSpeakerStatus(callChat.getChatid(), true);
                 }
                 updateLocalSpeakerStatus();
                 if ((callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)) {
@@ -2117,7 +2115,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         linearFAB.setLayoutParams(layoutCompress);
                         linearFAB.requestLayout();
                         linearFAB.setOrientation(LinearLayout.HORIZONTAL);
-                        ChatUtil.activateSpeaker(false,(MegaApplication) getApplication());
                         megaChatApi.answerChatCall(chatId, false, this);
                         clearHandlers();
                         answerCallFAB.clearAnimation();
@@ -2397,8 +2394,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             }else if((callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)||(callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
 
-                log("showInitialFABConfiguration: other case");
-
                 relativeVideo.setVisibility(View.VISIBLE);
                 if(speakerFAB.getVisibility()!=View.VISIBLE){
                     speakerFAB.show();
@@ -2660,25 +2655,21 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateLocalSpeakerStatus(){
         log("updateLocalSpeakerStatus");
         if(rtcAudioManager==null){
-            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), ((MegaApplication) getApplication()).isSpeakerOn());
+            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), ((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid()));
         }
         if(rtcAudioManager!=null){
             log("updateLocalSpeakerStatus enable speaker");
             rtcAudioManager.stop();
             rtcAudioManager.start(null);
-            rtcAudioManager.activateSpeaker(((MegaApplication) getApplication()).isSpeakerOn());
-            if(((MegaApplication) getApplication()).isSpeakerOn()){
+            rtcAudioManager.activateSpeaker(((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid()));
+            if(((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid())){
                 speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                 speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
             }else{
                 speakerFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                 speakerFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_speaker_off));
             }
-
         }
-
-
-
     }
 
     public void updateRemoteVideoStatus(long userPeerId, long userClientId) {
@@ -3185,7 +3176,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (megaChatApi.isSignalActivityRequired()) {
                 megaChatApi.signalPresenceActivity();
             }
-            ChatUtil.activateSpeaker(false,(MegaApplication) getApplication());
+            ((MegaApplication) getApplication()).setSpeakerStatus(callChat.getChatid(), false);
             megaChatApi.answerChatCall(chatId, false, this);
         }
     }
@@ -3197,7 +3188,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (megaChatApi.isSignalActivityRequired()) {
                 megaChatApi.signalPresenceActivity();
             }
-            ChatUtil.activateSpeaker(true,(MegaApplication) getApplication());
+            ((MegaApplication) getApplication()).setSpeakerStatus(callChat.getChatid(), true);
             megaChatApi.answerChatCall(chatId, true, this);
         }
     }

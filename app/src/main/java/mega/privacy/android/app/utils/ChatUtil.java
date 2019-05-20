@@ -225,14 +225,6 @@ public class ChatUtil {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
-    public static void activateSpeaker(boolean activateSpeaker, MegaApplication app){
-        if(activateSpeaker){
-            app.setSpeakerStatus(true);
-        }else{
-            app.setSpeakerStatus(false);
-        }
-    }
-
     public static void activateChrono(boolean activateChrono, Chronometer chronometer, MegaChatCall callChat){
         if(activateChrono){
             if((callChat!=null)&&(chronometer!=null)&&(chronometer.getVisibility() == GONE)){

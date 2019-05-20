@@ -44,7 +44,9 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -126,7 +128,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
-	private static boolean speakerStatus = false;
+	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<Long, Boolean>();
 
 	private static long openCallChatId = -1;
 
@@ -1914,13 +1916,19 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public MyAccountInfo getMyAccountInfo() {
 		return myAccountInfo;
 	}
-	public static boolean isSpeakerOn() {
-		return speakerStatus;
+
+	public static boolean isSpeakerStatus(long chatId){
+		boolean entryExists = hashMapSpeaker.containsKey(chatId);
+		if(entryExists){
+			return hashMapSpeaker.get(chatId);
+		}
+		setSpeakerStatus(chatId, false);
+		return false;
+	}
+	public static void setSpeakerStatus(long chatId, boolean speakerStatus){
+		hashMapSpeaker.put(chatId, speakerStatus);
 	}
 
-	public static void setSpeakerStatus(boolean speakerStatus) {
-		MegaApplication.speakerStatus = speakerStatus;
-	}
 
 	public int getStorageState() { return storageState; }
 }

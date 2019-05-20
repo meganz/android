@@ -183,7 +183,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if(chat!=null){
-                            ChatUtil.activateSpeaker(false,((MegaApplication) ((Activity)context).getApplication()));
+                            ((MegaApplication) ((Activity)context).getApplication()).setSpeakerStatus(chat.getChatId(), false);
                             megaChatApi.startChatCall(chat.getChatId(), false, (ContactInfoActivityLollipop) context);
                         }
                         else{
@@ -201,7 +201,7 @@ public class CreateChatToPerformActionListener implements MegaChatRequestListene
                     else{
                         MegaChatRoom chat = megaChatApi.getChatRoom(request.getChatHandle());
                         if(chat!=null){
-                            ChatUtil.activateSpeaker(true,((MegaApplication) ((Activity)context).getApplication()));
+                            ((MegaApplication) ((Activity)context).getApplication()).setSpeakerStatus(chat.getChatId(), true);
                             megaChatApi.startChatCall(chat.getChatId(), true, (ContactInfoActivityLollipop) context);
                         }
                         else{

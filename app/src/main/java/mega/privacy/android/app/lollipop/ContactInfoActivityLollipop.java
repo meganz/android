@@ -912,7 +912,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				startActivity(i);
 			}
 			else{
-				ChatUtil.activateSpeaker(startVideo,(MegaApplication) getApplication());
+				((MegaApplication) getApplication()).setSpeakerStatus(chatRoomTo.getChatId(), startVideo);
 				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
 
 
