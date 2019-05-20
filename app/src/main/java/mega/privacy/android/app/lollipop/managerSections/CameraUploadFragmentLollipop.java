@@ -91,7 +91,6 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
 
 
@@ -1457,25 +1456,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 		}
   
-		if(isDeviceSupportCompression()){
-            //video quality
-            dbH.setCameraUploadVideoQuality(MEDIUM);
-            dbH.setConversionOnCharging(true);
-            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-        }else{
-            dbH.setCameraUploadVideoQuality(ORIGINAL);
-            dbH.setConversionOnCharging(false);
-            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-        }
-        
-        handler.postDelayed(new Runnable() {
-            
-            @Override
-            public void run() {
-                log("cameraOnOffFirstTime Now I start the service");
-                JobUtil.startCameraUploadService(context);
-            }
-        },1 * 1000);
+		saveCompressionSettings();
+        startCU();
 		
 		((ManagerActivityLollipop)context).refreshCameraUpload();
 	}
@@ -1494,75 +1476,34 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 
 		if (isEnabled){
-			dbH.setCamSyncTimeStamp(0);
-			dbH.setCamVideoSyncTimeStamp(0);
-			dbH.setSecSyncTimeStamp(0);
-			dbH.setSecVideoSyncTimeStamp(0);
-			dbH.setCamSyncEnabled(false);
+			resetCUTimeStampsAndCache();
+            dbH.setCamSyncEnabled(false);
 			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
-			Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-
-			if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            } else {
-                Intent stopIntent = null;
-                stopIntent = new Intent(context, CameraSyncService.class);
-                stopIntent.setAction(CameraSyncService.ACTION_STOP);
-                context.startService(stopIntent);
-            }
-			
+            JobUtil.stopRunningCameraUploadService(context);
 			((ManagerActivityLollipop)context).refreshCameraUpload();
 		}
-		else{					
-			
-			prefs = dbH.getPreferences();
-			if (prefs != null){
-				if (prefs.getCamSyncLocalPath() != null){
-					if (prefs.getCamSyncLocalPath().compareTo("") != 0){
-						
-						if (prefs.getCamSyncFileUpload() != null){
-							if (prefs.getCamSyncFileUpload().compareTo("") != 0){
-								if (prefs.getCamSyncWifi() != null){
-									if (prefs.getCamSyncWifi().compareTo("") != 0){
-										dbH.setCamSyncTimeStamp(0);
-										dbH.setCamVideoSyncTimeStamp(0);
-										dbH.setSecSyncTimeStamp(0);
-										dbH.setSecVideoSyncTimeStamp(0);
-										dbH.setCamSyncEnabled(true);
-                                        dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
-                                        Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-                                        
-                                        //video quality
-                                        if(isDeviceSupportCompression()){
-                                            dbH.setCameraUploadVideoQuality(MEDIUM);
-                                            dbH.setConversionOnCharging(true);
-                                            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-                                        }else{
-                                            dbH.setCameraUploadVideoQuality(ORIGINAL);
-                                            dbH.setConversionOnCharging(false);
-                                            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-                                        }
-
-                                        Handler handler = new Handler();
-                                        handler.postDelayed(new Runnable() {
-
-                                            @Override
-                                            public void run() {
-                                                log("cameraOnOff, Now I start the service");
-                                                JobUtil.startCameraUploadService(context);
-                                            }
-                                        },1 * 1000);
-                                        
-                                        ((ManagerActivityLollipop)context).refreshCameraUpload();
-										
-										return;		
-									}
-								}								
-							}
-						}
-					}
-				}
-			}
+		else{
+            
+            prefs = dbH.getPreferences();
+            if (prefs != null &&
+                    prefs.getCamSyncLocalPath() != null &&
+                    prefs.getCamSyncLocalPath().compareTo("") != 0 &&
+                    prefs.getCamSyncFileUpload() != null &&
+                    prefs.getCamSyncFileUpload().compareTo("") != 0 &&
+                    prefs.getCamSyncWifi().compareTo("") != 0 &&
+                    prefs.getCamSyncWifi() != null
+            ) {
+                resetCUTimeStampsAndCache();
+                dbH.setCamSyncEnabled(true);
+                dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+                
+                //video quality
+                saveCompressionSettings();
+                startCU();
+                ((ManagerActivityLollipop)context).refreshCameraUpload();
+                
+                return;
+            }
 			
 			AlertDialog wifiDialog;
 			
@@ -1576,28 +1517,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					log("onClick AlertDialog");
-					dbH.setCamSyncTimeStamp(0);
-					dbH.setCamVideoSyncTimeStamp(0);
-					dbH.setSecSyncTimeStamp(0);
-					dbH.setSecVideoSyncTimeStamp(0);
-					dbH.setCamSyncEnabled(true);
-                    dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+					resetCUTimeStampsAndCache();
+                    dbH.setCamSyncEnabled(true);
 					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
-                    Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-					File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+                    File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 					String localPath = localFile.getAbsolutePath();
 					dbH.setCamSyncLocalPath(localPath);
 					dbH.setCameraFolderExternalSDCard(false);
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            log("popup onclick - Now I start the service");
-                            JobUtil.startCameraUploadService(context);
-                        }
-                    },1 * 1000);
+                    startCU();
 				
 					((ManagerActivityLollipop)context).refreshCameraUpload();
 					switch (which){
@@ -1659,15 +1586,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
             case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
             case R.id.relative_layout_file_list_browser_camera_upload_on_off: {
                 if (type == TYPE_CAMERA) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        
-                        if (Util.hasPermissions(context,permissions)) {
-                            cameraOnOff();
-                        } else {
-                            requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF);
-                        }
-                    } else {
+                    if (Util.hasPermissions(context,permissions)) {
                         cameraOnOff();
+                    } else {
+                        requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF);
                     }
                 } else {
                     ((ManagerActivityLollipop)context).moveToSettingsSection();
@@ -1675,15 +1597,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
                 break;
             }
             case R.id.cam_sync_button_ok: {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    
-                    if (Util.hasPermissions(context,permissions)) {
-                        cameraOnOffFirstTime();
-                    }else{
-                        requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME);
-                    }
-                } else {
+                if (Util.hasPermissions(context,permissions)) {
                     cameraOnOffFirstTime();
+                }else{
+                    requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME);
                 }
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
                 break;
@@ -1800,7 +1717,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-//							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
 							String localPath = Util.findLocalPath(psHMegaNode);
 
                             if (localPath != null && checkFingerprint(psHMegaNode,localPath)) {
@@ -1879,30 +1795,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         }
         return false;
     }
-
-	public String findLocalPath (String fileName, long fileSize, MegaNode file) {
-		log("findLocalPath");
-		String localPath = null;
-
-		localPath = getPath(fileName, fileSize, defaultPath, file);
-		if (localPath != null) {
-			return localPath;
-		}
-
-		if (localPath == null){
-			boolean isOnMegaDownloads = false;
-			localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-			File f = new File(downloadLocationDefaultPath, file.getName());
-			if(f.exists() && (f.length() == file.getSize())){
-				isOnMegaDownloads = true;
-			}
-			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
-				return localPath;
-			}
-		}
-
-		return null;
-	}
 
 	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
 		log("getPath");
@@ -2723,4 +2615,36 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public ArrayList<PhotoSyncHolder> getNodesArray() {
 		return nodesArray;
 	}
+    
+    private void resetCUTimeStampsAndCache(){
+        dbH.setCamSyncTimeStamp(0);
+        dbH.setCamVideoSyncTimeStamp(0);
+        dbH.setSecSyncTimeStamp(0);
+        dbH.setSecVideoSyncTimeStamp(0);
+        dbH.saveShouldClearCamsyncRecords(true);
+        Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
+    }
+    
+    private void saveCompressionSettings(){
+        if(isDeviceSupportCompression()){
+            dbH.setCameraUploadVideoQuality(MEDIUM);
+            dbH.setConversionOnCharging(true);
+        }else{
+            dbH.setCameraUploadVideoQuality(ORIGINAL);
+            dbH.setConversionOnCharging(false);
+        }
+        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+    }
+    
+    private void startCU() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            
+            @Override
+            public void run() {
+                log("starting CU");
+                JobUtil.startCameraUploadService(context);
+            }
+        },1000);
+    }
 }

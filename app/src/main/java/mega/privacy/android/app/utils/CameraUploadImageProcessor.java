@@ -22,21 +22,19 @@ public class CameraUploadImageProcessor {
 
     private static int PREVIEW_SIZE = 1000;
 
-    public static void createImageThumbnail(Context context,MegaApiJava api,String localPath,File dst) {
+    public static void createImageThumbnail(MegaApiJava api,String localPath,File dst) {
         log("createImageThumbnail for: " + localPath);
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
-            Bitmap thumbnail = getImageThumbnailFromDB(context,localPath);
-            processThumbnail(thumbnail, api, localPath, dst);
+            processThumbnail(null, api, localPath, dst);
         }
     }
 
-    public static void createVideoThumbnail(Context context,MegaApiJava api,String localPath,File dst) {
+    public static void createVideoThumbnail(MegaApiJava api,String localPath,File dst) {
         log("createVideoThumbnail for: " + localPath);
         boolean result = MegaUtilsAndroid.createThumbnail(new File(localPath),dst);
         if (!result) {
-            Bitmap thumbnail = getVideoThumbnailFromDB(context,localPath);
-            processThumbnail(thumbnail, api, localPath, dst);
+            processThumbnail(null, api, localPath, dst);
         }
     }
 
@@ -152,41 +150,6 @@ public class CameraUploadImageProcessor {
                 return Bitmap.createScaledBitmap(bmThumbnail,w,h,true);
             }
         } catch (Exception e) {
-        }
-        return null;
-    }
-
-    private static Bitmap getVideoThumbnailFromDB(Context context,String localPath) {
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                new String[] {_ID},
-                MediaStore.Video.Media.DATA + "=?",
-                new String[] {localPath},
-                null);
-        long id = 0;
-        if (cursor != null && cursor.moveToFirst()) {
-            log(localPath + "'s id is " + id);
-            id = cursor.getLong(cursor.getColumnIndex(_ID));
-            cursor.close();
-            return MediaStore.Video.Thumbnails.getThumbnail(resolver,id,MediaStore.Video.Thumbnails.MICRO_KIND,null);
-        }
-        return null;
-    }
-
-    private static Bitmap getImageThumbnailFromDB(Context context,String localPath) {
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] {_ID},
-                MediaStore.Images.Media.DATA + "=?",
-                new String[] {localPath},
-                null);
-        long id = 0;
-        if (cursor != null && cursor.moveToFirst()) {
-            log(localPath + "'s id is " + id);
-            id = cursor.getLong(cursor.getColumnIndex(_ID));
-            cursor.close();
-            return MediaStore.Images.Thumbnails.getThumbnail(resolver,id,MediaStore.Images.Thumbnails.MICRO_KIND,null);
         }
         return null;
     }

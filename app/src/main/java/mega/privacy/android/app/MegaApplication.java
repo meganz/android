@@ -4,10 +4,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,13 +16,11 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.provider.CallLog;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.text.emoji.EmojiCompat;
 import android.support.text.emoji.FontRequestEmojiCompatConfig;
 import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -51,7 +45,6 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -92,7 +85,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.Util.toCDATA;
-import static mega.privacy.android.app.utils.JobUtil.startJob;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCUJob;
 
 
 
@@ -414,10 +407,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-        
-        if (Util.isDeviceSupportParallelUpload()) {
-            startJob(getApplicationContext());
-        }
+        scheduleCUJob(getApplicationContext());
 		
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;

@@ -28,7 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -43,14 +42,13 @@ import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-
-import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 
 public class AccountController implements View.OnClickListener{
 
@@ -569,14 +567,7 @@ public class AccountController implements View.OnClickListener{
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
-            if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            } else {
-                Intent stopIntent = null;
-                stopIntent = new Intent(context, CameraSyncService.class);
-                stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-                context.startService(stopIntent);
-            }
+            JobUtil.stopRunningCameraUploadService(context);
         }
         dbH.clearOffline();
 

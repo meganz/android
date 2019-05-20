@@ -1430,30 +1430,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         }
     }
 
-    public String findLocalPath (String fileName, long fileSize, MegaNode file) {
-        log("findLocalPath");
-        String localPath = null;
-
-        localPath = getPath(fileName, fileSize, defaultPath, file);
-        if (localPath != null) {
-            return localPath;
-        }
-
-        if (localPath == null){
-            boolean isOnMegaDownloads = false;
-            localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-            File f = new File(downloadLocationDefaultPath, file.getName());
-            if(f.exists() && (f.length() == file.getSize())){
-                isOnMegaDownloads = true;
-            }
-            if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
-                return localPath;
-            }
-        }
-
-        return null;
-    }
-
     public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
         log("getPath");
         String path = null;

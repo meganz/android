@@ -10,13 +10,12 @@ import android.os.Handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.JobUtil.startJob;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCUJob;
 
 public class NetworkStateReceiver extends BroadcastReceiver {
 
@@ -67,38 +66,22 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 log("reconnect and retryPendingConnections");
                 megaApi.reconnect();
 
-//                if (megaChatApi != null){
-//                    megaChatApi.retryPendingConnections(true, null);
-//                }
+                if (megaChatApi != null){
+                    megaChatApi.retryPendingConnections(true, null);
+                }
             }
             else{
 
                 log("retryPendingConnections");
                 megaApi.retryPendingConnections();
 
-//                if (megaChatApi != null){
-//                    megaChatApi.retryPendingConnections(false, null);
-//                }
-            }
-
-            if (megaChatApi != null){
-                megaChatApi.retryPendingConnections(true, null);
+                if (megaChatApi != null){
+                    megaChatApi.retryPendingConnections(false, null);
+                }
             }
 
             connected = true;
-            handler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    log("Now I start the service");
-                    if (Util.isDeviceSupportParallelUpload()) {
-                        startJob(c);
-                    }else{
-                        c.startService(new Intent(c, CameraSyncService.class));
-                    }
-                    handler.removeCallbacksAndMessages(null);
-                }
-            }, 2 * 1000);
+            scheduleCUJob(c);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
             connected = false;
         }
