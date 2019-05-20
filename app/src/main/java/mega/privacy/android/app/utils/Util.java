@@ -112,12 +112,13 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCUJob;
 
 
 public class Util {
 
     public static final String PATTERN = "yyyy-MM-dd HH.mm.ss";
-    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 300;
+    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
 	
 	public static float dpWidthAbs = 360;
 	public static float dpHeightAbs = 592;
@@ -2267,10 +2268,6 @@ public class Util {
     
     public static boolean isDeviceSupportCompression(){
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-    }
-    
-    public static boolean isDeviceSupportParallelUpload(){
-	    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
     
     public static void purgeDirectory(File dir) {

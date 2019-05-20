@@ -236,6 +236,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.Util.showSnackBar;
@@ -1613,7 +1614,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
             case Constants.REQUEST_CAMERA_UPLOAD:{
                 if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                    if(sttFLol != null && sttFLol.isAdded()){
+                    sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
+                    if(sttFLol != null){
                         sttFLol.enableCameraUpload();
                     }
                 } else {
@@ -1625,7 +1627,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
             case Constants.REQUEST_CAMERA_ON_OFF:{
                 if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                    if(cuFL != null && cuFL.isAdded()){
+                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if(cuFL != null){
                         cuFL.cameraOnOff();
                     }
                 }
@@ -1634,13 +1637,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
 
             case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
-                TL.log(this, "@#@", "result: " + requestCode);
                 if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                    if(cuFL != null && cuFL.isAdded()){
+                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if(cuFL != null){
                         cuFL.cameraOnOffFirstTime();
                     }
                 } else {
-                    if(cuFL != null && cuFL.isAdded()){
+                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if(cuFL != null){
                         cuFL.onStoragePermissionRefused();
                     }
                 }
@@ -1938,16 +1942,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-		    		    if(Util.isDeviceSupportParallelUpload()){
-                            cancelAllJobs(getApplicationContext());
-                        }else{
-                            Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
-                            cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-                            cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            cancelTourIntent.setAction(newIntent.getAction());
-                            startActivity(cancelTourIntent);
-                        }
-
+                        stopRunningCameraUploadService(getApplicationContext());
 		    			finish();
 		    			return;
 		    		}
@@ -2386,16 +2381,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-                        if(Util.isDeviceSupportParallelUpload()){
-                            cancelAllJobs(getApplicationContext());
-                        }else{
-                            Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-                            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.setAction(getIntent().getAction());
-                            startActivity(intent);
-                        }
-
+                        stopRunningCameraUploadService(getApplicationContext());
 						finish();
 						return;
 					}
@@ -3509,61 +3495,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
                     log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
-                    if (!Util.isDeviceSupportParallelUpload()) {
-                        Intent tempIntent = null;
-                        String title = null;
-                        String text = null;
-                        if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                            tempIntent = new Intent(this, CameraSyncService.class);
-                            tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-                            title = getString(R.string.cam_sync_syncing);
-                            text = getString(R.string.cam_sync_cancel_sync);
-                        }
+                    String title = null;
+                    String text = null;
+                    if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                        title = getString(R.string.cam_sync_syncing);
+                        text = getString(R.string.cam_sync_cancel_sync);
+                    }
 
-                        final Intent cancelIntent = tempIntent;
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//					builder.setTitle(title);
-                        builder.setMessage(text);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(text);
 
-                        builder.setPositiveButton(getString(R.string.cam_sync_stop),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        startService(cancelIntent);
-                                    }
-                                });
-                        builder.setNegativeButton(getString(R.string.general_cancel), null);
-                        final AlertDialog dialog = builder.create();
-                        try {
-                            dialog.show();
-                        } catch (Exception ex) {
-                            startService(cancelIntent);
-                        }
-                    } else {
-                        String title = null;
-                        String text = null;
-                        if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                            title = getString(R.string.cam_sync_syncing);
-                            text = getString(R.string.cam_sync_cancel_sync);
-                        }
-
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setMessage(text);
-
-                        builder.setPositiveButton(getString(R.string.cam_sync_stop),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        cancelAllJobs(ManagerActivityLollipop.this);
-                                        dbH.setCamSyncEnabled(false);
-                                    }
-                                });
-                        builder.setNegativeButton(getString(R.string.general_cancel), null);
-                        final AlertDialog dialog = builder.create();
-                        try {
-                            dialog.show();
-                        } catch (Exception ex) {
-                            cancelAllJobs(ManagerActivityLollipop.this);
-                            dbH.setCamSyncEnabled(false);
-                        }
+                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                                    dbH.setCamSyncEnabled(false);
+                                }
+                            });
+                    builder.setNegativeButton(getString(R.string.general_cancel), null);
+                    final AlertDialog dialog = builder.create();
+                    try {
+                        dialog.show();
+                    } catch (Exception ex) {
+                        stopRunningCameraUploadService(ManagerActivityLollipop.this);
+                        dbH.setCamSyncEnabled(false);
                     }
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
@@ -17416,7 +17371,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Pressed button positive to cancel transfer");
 						megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
-                        JobUtil.cancelAllJobs(ManagerActivityLollipop.this);
+                        JobUtil.stopRunningCameraUploadService(ManagerActivityLollipop.this);
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:

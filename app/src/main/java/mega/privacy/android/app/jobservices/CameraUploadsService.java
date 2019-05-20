@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -74,6 +73,7 @@ import static mega.privacy.android.app.jobservices.SyncRecord.STATUS_TO_COMPRESS
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
+import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
     
@@ -331,6 +331,13 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     private void getFilesFromMediaStore() {
         log("getFilesFromMediaStore()");
+        cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
+        if (cameraUploadNode == null) {
+            log("ERROR: cameraUploadNode == null");
+            finish();
+            return;
+        }
+        
         if (!wl.isHeld()) {
             wl.acquire();
         }
@@ -416,12 +423,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             
             //Primary Media Folder
             Cursor cursorCamera;
+            String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
+            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
             if (isVideo) {
-                String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
-                cursorCamera = app.getContentResolver().query(uri,projection,selectionCameraVideo,selectionArgs,order);
+                cursorCamera = app.getContentResolver().query(uri,projection,selectionCameraVideo,selectionArgs,orderVideo);
             } else {
-                String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
-                cursorCamera = app.getContentResolver().query(uri,projection,selectionCamera,selectionArgs,order);
+                cursorCamera = app.getContentResolver().query(uri,projection,selectionCamera,selectionArgs,orderImage);
             }
             if (cursorCamera != null) {
                 extractMedia(cursorCamera,false,isVideo);
@@ -432,24 +439,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 log("if(secondaryEnabled)");
                 Cursor cursorSecondary;
                 if (isVideo) {
-                    String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
-                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondaryVideo,selectionArgs,order);
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondaryVideo,selectionArgs,orderVideo);
                 } else {
-                    String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC LIMIT 0," + PAGE_SIZE;
-                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,order);
+                    cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,orderImage);
                 }
                 
                 if (cursorSecondary != null) {
                     extractMedia(cursorSecondary,true,isVideo);
                 }
             }
-        }
-        
-        cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
-        if (cameraUploadNode == null) {
-            log("ERROR: cameraUploadNode == null");
-            finish();
-            return;
         }
         
         totalUploaded = 0;
@@ -514,7 +512,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     continue;
                 }
 
-                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath)) {
+                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running) {
                     try {
                         log("waiting for disk space to process");
                         Thread.sleep(1000);
@@ -541,13 +539,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             }
 
             String path;
-            if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO) {
-                path = file.getNewPath();
-                File temp = new File(path);
-                if (!temp.exists()) {
-                    path = file.getLocalPath();
-                }
-            } else if (file.getType() == SyncRecord.TYPE_VIDEO && shouldCompressVideo()) {
+            if (isCompressedVideo || file.getType() == SyncRecord.TYPE_PHOTO || (file.getType() == SyncRecord.TYPE_VIDEO && shouldCompressVideo())) {
                 path = file.getNewPath();
                 File temp = new File(path);
                 if (!temp.exists()) {
@@ -679,7 +671,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             
             String extension = "";
             String[] s = fileName.split("\\.");
-            if (s != null) {
+            if (s != null && s.length > 0) {
                 if (s.length > 0) {
                     extension = s[s.length - 1];
                 }
@@ -782,76 +774,20 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             }
                         }
                     }
-//                    if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
-//                        //Change the file names as device
-//                        log("Call Look for Rename Task");
-//                        final MegaNode existingNode = nodeExists;
-//                        final MegaNode parentNode = uploadNode;
-//                        handler.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                new LookForRenameTask(media,parentNode).rename(existingNode);
-//                            }
-//                        });
-//                    }
                 }
             }
         }
         return pendingList;
     }
     
-    private class LookForRenameTask {
-        Media media;
-        String photoFinalName;
-        MegaNode uploadNode;
-        
-        public LookForRenameTask(Media media,MegaNode uploadNode) {
-            this.media = media;
-            this.uploadNode = uploadNode;
-        }
-        
-        protected Boolean rename(MegaNode nodeExists) {
-            log("rename the file: " + media.filePath);
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(getLastModifiedTime(media));
-            log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
-            boolean photoAlreadyExists = false;
-            ArrayList<MegaNode> nL = megaApi.getChildren(uploadNode,MegaApiJava.ORDER_ALPHABETICAL_ASC);
-            for (int i = 0;i < nL.size();i++) {
-                if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(getLastModifiedTime(media),media.filePath)) == 0) {
-                    photoAlreadyExists = true;
-                }
-            }
-            
-            if (!photoAlreadyExists) {
-                int photoIndex = 0;
-                this.photoFinalName = null;
-                do {
-                    photoFinalName = Util.getPhotoSyncNameWithIndex(getLastModifiedTime(media),media.filePath,photoIndex);
-                    photoIndex++;
-                } while (megaApi.getChildNode(uploadNode,photoFinalName) != null);
-                
-                log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-                megaApi.renameNode(nodeExists,photoFinalName,CameraUploadsService.this);
-                log("RENAMED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
-
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-    
     private boolean checkFile(Media media,String path) {
         
-        if (media.filePath != null) {
-            if (path != null) {
-                if (path.compareTo("") != 0) {
-                    if (media.filePath.startsWith(path)) {
-                        return true;
-                    }
-                }
-            }
+        if (media.filePath != null &&
+                path != null &&
+                path.compareTo("") != 0 &&
+                media.filePath.startsWith(path)
+        ) {
+            return true;
         }
         
         return false;
@@ -944,10 +880,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                 if (megaApi.getRootNode() == null) {
                                     isLoggingIn = MegaApplication.isLoggingIn();
                                     if (!isLoggingIn) {
-                                        
-                                        isLoggingIn = true;
-                                        MegaApplication.setLoggingIn(isLoggingIn);
-                                        
+    
+                                        setLoginState(true);
+    
                                         if (Util.isChatEnabled()) {
                                             log("shouldRun: Chat is ENABLED");
                                             if (megaChatApi == null) {
@@ -1289,7 +1224,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         
         if (isOverQuota) {
             showStorageOverQuotaNotification();
-            JobUtil.cancelAllJobs(this);
+            JobUtil.stopRunningCameraUploadService(this);
         }
         
         if (mVideoCompressor != null) {
@@ -1329,8 +1264,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onRequestFinish(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
         if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
-            isLoggingIn = false;
-            MegaApplication.setLoggingIn(isLoggingIn);
+            setLoginState(false);
         }
     }
     
@@ -1354,14 +1288,14 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("onRequestFinish: " + request.getRequestString());
         
         try {
-            requestFinished(api,request,e);
+            requestFinished(request,e);
         } catch (Throwable th) {
             log("onTransferFinish error: " + th.getMessage());
             th.printStackTrace();
         }
     }
     
-    private synchronized void requestFinished(MegaApiJava api,MegaRequest request,MegaError e) {
+    private synchronized void requestFinished(MegaRequest request,MegaError e) {
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Fast login OK");
@@ -1369,8 +1303,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 megaApi.fetchNodes(this);
             } else {
                 log("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
+                setLoginState(false);
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
@@ -1388,9 +1321,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 } else {
                     log("chatSettings NULL - readyToManager");
                 }
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                
+                setLoginState(false);
+    
                 try {
                     log("Start service here MegaRequest.TYPE_FETCH_NODES");
                     task = createWorkerThread();
@@ -1401,8 +1333,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 }
             } else {
                 log("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
+                setLoginState(false);
                 finish();
             }
         } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
@@ -1445,6 +1376,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (request.getType() == MegaRequest.TYPE_RENAME) {
             //No need to handle anything
         }
+    }
+    
+    private void setLoginState(boolean b) {
+        isLoggingIn = b;
+        MegaApplication.setLoggingIn(b);
     }
     
     @Override
@@ -1531,8 +1467,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     final File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     final File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//                    megaApi.createImageThumbnail(record.getLocalPath(),thumb.getAbsolutePath());
-//                    megaApi.createPreview(finalRecord.getLocalPath(),preview.getAbsolutePath());
                     final SyncRecord finalRecord = record;
                     if(Util.isVideoFile(transfer.getPath())) {
                         threadPool.execute(new Runnable() {
@@ -1543,7 +1477,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                 if(!preview.exists()) {
                                     CameraUploadImageProcessor.createVideoPreview(CameraUploadsService.this,img, preview);
                                 }
-                                CameraUploadImageProcessor.createVideoThumbnail(CameraUploadsService.this,api,finalRecord.getLocalPath(),thumb);
+                                CameraUploadImageProcessor.createVideoThumbnail(api,finalRecord.getLocalPath(),thumb);
                             }
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
@@ -1555,7 +1489,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                                 if(!preview.exists()) {
                                     CameraUploadImageProcessor.createImagePreview(img, preview);
                                 }
-                                CameraUploadImageProcessor.createImageThumbnail(CameraUploadsService.this,api,finalRecord.getLocalPath(),thumb);
+                                CameraUploadImageProcessor.createImageThumbnail(api,finalRecord.getLocalPath(),thumb);
                             }
                         });
                     }
@@ -1727,12 +1661,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 log("shouldStartVideoCompression " + false);
                 return false;
             }
-            log("shouldStartVideoCompression " + true);
-            return true;
-        } else {
-            log("shouldStartVideoCompression " + true);
-            return true;
         }
+        log("shouldStartVideoCompression " + true);
+        return true;
     }
     
     @Override
@@ -1806,7 +1737,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private synchronized void updateProgressNotification() {
         //refresh UI every 1 seconds to avoid too much workload on main thread
         long now = System.currentTimeMillis();
-        if (now - lastUpdated > 1000) {
+        if (now - lastUpdated > ONTRANSFERUPDATE_REFRESH_MILLIS) {
             lastUpdated = now;
         } else {
             return;
@@ -1906,7 +1837,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     .setContentText(contentText)
                     .setOnlyAlertOnce(true)
                     .setColor(ContextCompat.getColor(this,R.color.mega));
-            mNotification = mBuilder.getNotification();
+            mNotification = mBuilder.build();
         }
         
         mNotificationManager.notify(notificationId,mNotification);
@@ -1954,7 +1885,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     .setContentTitle(message).setContentInfo(contentText)
                     .setColor(ContextCompat.getColor(this,R.color.mega))
                     .setOngoing(false);
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.getNotification());
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.build());
         }
     }
     

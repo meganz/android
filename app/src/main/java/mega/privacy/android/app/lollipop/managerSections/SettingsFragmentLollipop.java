@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -10,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,7 +51,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -78,18 +75,16 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
-import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
-import static mega.privacy.android.app.utils.JobUtil.startJob;
+import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
+import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
-import static mega.privacy.android.app.utils.Util.isDeviceSupportParallelUpload;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
-//import android.support.v4.preference.PreferenceFragment;
-import nz.mega.sdk.MegaTransfer;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -650,19 +645,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                     //video quality
                     String uploadQuality = prefs.getUploadVideoQuality();
                     int quality;
-                    if(uploadQuality == null){
+                    if (uploadQuality == null || uploadQuality.isEmpty()) {
                         dbH.setCameraUploadVideoQuality(MEDIUM);
                         quality = VIDEO_QUALITY_MEDIUM;
-                        videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-                    }else{
-                        if(Integer.parseInt(uploadQuality) == ORIGINAL){
-                            videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
-                            quality = VIDEO_QUALITY_ORIGINAL;
-                        }else{
-                            quality = VIDEO_QUALITY_MEDIUM;
-                            videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-                        }
+                    } else if (Integer.parseInt(uploadQuality) == ORIGINAL) {
+                        quality = VIDEO_QUALITY_ORIGINAL;
+                    } else {
+                        quality = VIDEO_QUALITY_MEDIUM;
                     }
+                    videoQuality.setValueIndex(quality);
                     videoQuality.setSummary(videoQuality.getEntry());
 
                     //require me to charge
@@ -1393,21 +1384,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			cameraUploadHow.setSummary(wifi);
-            if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            }
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Util.isDeviceSupportParallelUpload()) {
-                        startJob(context);
-                    }else{
-                        context.startService(new Intent(context, CameraSyncService.class));
-                    }
-				}
-			}, 5 * 1000);
+            rescheduleCameraUpload(context);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_WHAT_TO) == 0){
 			switch(Integer.parseInt((String)newValue)){
@@ -1434,34 +1411,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 			}
 			cameraUploadWhat.setSummary(fileUpload);
-			dbH.setCamSyncTimeStamp(0);
-			dbH.setCamVideoSyncTimeStamp(0);
-			dbH.setSecSyncTimeStamp(0);
-			dbH.setSecVideoSyncTimeStamp(0);
-			dbH.saveShouldClearCamsyncRecords(true);
-            Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-
-            if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            }else{
-                Intent photosVideosIntent = null;
-                photosVideosIntent = new Intent(context, CameraSyncService.class);
-                photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-                context.startService(photosVideosIntent);
-            }
-
-            handler.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    log("Now I start the service");
-                    if (Util.isDeviceSupportParallelUpload()) {
-                        startJob(context);
-                    }else{
-                        context.startService(new Intent(context, CameraSyncService.class));
-                    }
-                }
-            }, 10 * 1000);
+			resetCUTimeStampsAndCache();
+            rescheduleCameraUpload(context);
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
 
             log( "video quality selected");
@@ -1487,7 +1438,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
             }
 
             videoQuality.setSummary(videoQuality.getEntry());
-            restartCameraUpload();
+            rescheduleCameraUpload(context);
 
         } else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			pinLockCodeTxt = (String) newValue;
@@ -1786,18 +1737,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				cameraUploadCategory.addPreference(localSecondaryFolder);
 				cameraUploadCategory.addPreference(megaSecondaryFolder);
 				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Util.isDeviceSupportParallelUpload()) {
-                            startJob(context);
-                        }else{
-                            context.startService(new Intent(context, CameraSyncService.class));
-                        }
-					}
-				}, 5 * 1000);
+				rescheduleCameraUpload(context);
 				
 			}
 			else{				
@@ -2311,34 +2251,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				log("pickedDirNAme NULL");
 			}
 
-			dbH.setCamSyncTimeStamp(0);
-			dbH.setCamVideoSyncTimeStamp(0);
-			dbH.setSecSyncTimeStamp(0);
-			dbH.setSecVideoSyncTimeStamp(0);
-            dbH.saveShouldClearCamsyncRecords(true);
-            Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-
-			if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            }else{
-                Intent photosVideosIntent = null;
-                photosVideosIntent = new Intent(context, CameraSyncService.class);
-                photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-                context.startService(photosVideosIntent);
-            }
-			
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Util.isDeviceSupportParallelUpload()) {
-                        startJob(context);
-                    }else {
-                        context.startService(new Intent(context, CameraSyncService.class));
-                    }
-				}
-			}, 10 * 1000);
+			resetCUTimeStampsAndCache();
+			rescheduleCameraUpload(context);
 		}
 		else if(requestCode == Constants.SET_PIN){
 			if(resultCode == Activity.RESULT_OK) {
@@ -2378,34 +2292,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			isExternalSDCard = false;
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
-			dbH.setCamSyncTimeStamp(0);
-			dbH.setCamVideoSyncTimeStamp(0);
-            dbH.setSecSyncTimeStamp(0);
-            dbH.setSecVideoSyncTimeStamp(0);
-            dbH.saveShouldClearCamsyncRecords(true);
-            Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-
-			if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            }else{
-                Intent photosVideosIntent = null;
-                photosVideosIntent = new Intent(context, CameraSyncService.class);
-                photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-                context.startService(photosVideosIntent);
-            }
-			
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Util.isDeviceSupportParallelUpload()) {
-                        startJob(context);
-                    }else{
-                        context.startService(new Intent(context, CameraSyncService.class));
-                    }
-				}
-			}, 10 * 1000);
+            resetCUTimeStampsAndCache();
+            rescheduleCameraUpload(context);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
@@ -2420,28 +2308,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			dbH.setSecSyncTimeStamp(0);
 			dbH.setSecVideoSyncTimeStamp(0);
 			prefs.setLocalPathSecondaryFolder(secondaryPath);
-
-			if (Util.isDeviceSupportParallelUpload()) {
-                cancelAllJobs(context);
-            }else{
-                Intent photosVideosIntent = null;
-                photosVideosIntent = new Intent(context, CameraSyncService.class);
-                photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-                context.startService(photosVideosIntent);
-            }
-
-			handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Util.isDeviceSupportParallelUpload()) {
-                        startJob(context);
-                    }else{
-                        context.startService(new Intent(context, CameraSyncService.class));
-                    }
-				}
-			}, 5 * 1000);
+			rescheduleCameraUpload(context);
 		}		
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Mega folder to sync
@@ -2463,29 +2330,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
 				dbH.setSecVideoSyncTimeStamp(0);
-
-				if (Util.isDeviceSupportParallelUpload()) {
-                    cancelAllJobs(context);
-                }else{
-                    Intent photosVideosIntent = null;
-                    photosVideosIntent = new Intent(context, CameraSyncService.class);
-                    photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-                    context.startService(photosVideosIntent);
-                }
-				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Util.isDeviceSupportParallelUpload()) {
-                            startJob(context);
-                        }else{
-                            context.startService(new Intent(context, CameraSyncService.class));
-                        }
-					}
-				}, 5 * 1000);
-				
+				rescheduleCameraUpload(context);
 				log("Mega folder to secondary uploads change!!");
 			}
 			else{
@@ -2508,43 +2353,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				camSyncHandle = handle;
 				camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);	
 				camSyncMegaPath = camSyncMegaNode.getName();
-				
 				megaCameraFolder.setSummary(camSyncMegaPath);
-				dbH.setCamSyncTimeStamp(0);
-				dbH.setCamVideoSyncTimeStamp(0);
-                dbH.setSecSyncTimeStamp(0);
-                dbH.setSecVideoSyncTimeStamp(0);
-                dbH.saveShouldClearCamsyncRecords(true);
-                Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
-
-				if (Util.isDeviceSupportParallelUpload()) {
-                    cancelAllJobs(context);
-                }else{
-                    Intent photosVideosIntent = null;
-                    photosVideosIntent = new Intent(context, CameraSyncService.class);
-                    photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-                    context.startService(photosVideosIntent);
-                }
-				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Util.isDeviceSupportParallelUpload()) {
-                            startJob(context);
-                        }else{
-                            context.startService(new Intent(context, CameraSyncService.class));
-                        }
-					}
-				}, 10 * 1000);
-				
+                resetCUTimeStampsAndCache();
+				rescheduleCameraUpload(context);
 				log("Mega folder to sync the Camera CHANGED!!");
 			}
 			else{
 				log("Error choosing the Mega folder to sync the Camera");
 			}
-			
 		}
 	}
 
@@ -3030,39 +2846,29 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         cameraUploadCategory.removePreference(localSecondaryFolder);
         cameraUploadCategory.removePreference(megaSecondaryFolder);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            File[] fs = context.getExternalFilesDirs(null);
-            if (fs.length == 1){
-                cameraUploadCategory.addPreference(localCameraUploadFolder);
-                cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-            }
-            else{
-                if (fs.length > 1){
-                    if (fs[1] == null){
-                        cameraUploadCategory.addPreference(localCameraUploadFolder);
-                        cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-                    }
-                    else{
-                        cameraUploadCategory.removePreference(localCameraUploadFolder);
-                        cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
-                    }
-                }
-            }
-        }
-        else{
+        File[] fs = context.getExternalFilesDirs(null);
+        if (fs.length == 1){
             cameraUploadCategory.addPreference(localCameraUploadFolder);
             cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+        }
+        else{
+            if (fs.length > 1){
+                if (fs[1] == null){
+                    cameraUploadCategory.addPreference(localCameraUploadFolder);
+                    cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+                }
+                else{
+                    cameraUploadCategory.removePreference(localCameraUploadFolder);
+                    cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+                }
+            }
         }
     }
 
     public void disableCameraUpload(){
         log("Camera OFF");
         cameraUpload = false;
-        dbH.setCamSyncTimeStamp(0);
-        dbH.setCamVideoSyncTimeStamp(0);
-        dbH.setSecSyncTimeStamp(0);
-        dbH.setSecVideoSyncTimeStamp(0);
-        dbH.saveShouldClearCamsyncRecords(true);
+        resetCUTimeStampsAndCache();
         handler.postDelayed(new Runnable() {
 
             @Override
@@ -3076,16 +2882,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
         dbH.setCamSyncEnabled(false);
         dbH.setSecondaryUploadEnabled(false);
-        Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
         secondaryUpload = false;
-        if (Util.isDeviceSupportParallelUpload()) {
-            cancelAllJobs(context);
-        }else{
-            Intent stopIntent = null;
-            stopIntent = new Intent(context, CameraSyncService.class);
-            stopIntent.setAction(CameraSyncService.ACTION_STOP);
-            context.startService(stopIntent);
-        }
+        stopRunningCameraUploadService(context);
 
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
         cameraUploadOn.setSummary("");
@@ -3192,7 +2990,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 cameraUploadCharging.setSummary(chargingHelper);
                 dbH.setChargingOnSize(size);
                 prefs.setChargingOnSize(size + "");
-                restartCameraUpload();
+                rescheduleCameraUpload(context);
             }else{
                 resetSizeInput(input);
             }
@@ -3234,7 +3032,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
     private void disableVideoCompressionSizeSettingsAndRestartUpload(){
         disableVideoCompressionSizeSettings();
-        restartCameraUpload();
+        rescheduleCameraUpload(context);
     }
 
     private void enableVideoQualitySettings(){
@@ -3276,31 +3074,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
     private void enableVideoCompressionSizeSettingsAndRestartUpload(){
         enableVideoCompressionSizeSettings();
-        restartCameraUpload();
-    }
-
-    private void restartCameraUpload(){
-        if (Util.isDeviceSupportParallelUpload()) {
-            cancelAllJobs(context);
-        }else{
-            Intent photosVideosIntent = null;
-            photosVideosIntent = new Intent(context, CameraSyncService.class);
-            photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-            context.startService(photosVideosIntent);
-        }
-
-        handler.postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                log("Now I start the service");
-                if (Util.isDeviceSupportParallelUpload()) {
-                    startJob(context);
-                }else{
-                    context.startService(new Intent(context, CameraSyncService.class));
-                }
-            }
-        }, 10 * 1000);
+        rescheduleCameraUpload(context);
     }
 
     private boolean isNewSettingValid(String primaryPath, String secondaryPath, String primaryHandle, String secondaryHandle){
@@ -3311,5 +3085,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         }else{
             return true;
         }
+    }
+
+    private void resetCUTimeStampsAndCache(){
+        dbH.setCamSyncTimeStamp(0);
+        dbH.setCamVideoSyncTimeStamp(0);
+        dbH.setSecSyncTimeStamp(0);
+        dbH.setSecVideoSyncTimeStamp(0);
+        dbH.saveShouldClearCamsyncRecords(true);
+        Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
     }
 }

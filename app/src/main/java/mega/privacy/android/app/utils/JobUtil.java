@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.text.format.DateUtils;
 
 import java.util.List;
@@ -15,12 +16,12 @@ import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.DaemonService;
 
-import static mega.privacy.android.app.utils.Util.isDeviceSupportParallelUpload;
-
 @TargetApi(21)
 public class JobUtil {
 
     public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
+    
+    public static final int CU_RESCHEDULE_INTERVAL = 5000;   //milliseconds
 
     public static final int START_JOB_FAILED = -1;
 
@@ -46,8 +47,8 @@ public class JobUtil {
     }
 
     public static int restart(Context context) {
-        cancelAllJobs(context);
-        return startJob(context);
+        stopRunningCameraUploadService(context);
+        return scheduleCUJob(context);
     }
 
     public static synchronized int startDaemon(Context context) {
@@ -69,8 +70,8 @@ public class JobUtil {
         return START_JOB_FAILED;
     }
 
-    public static synchronized int startJob(Context context) {
-        log("startJob");
+    public static synchronized int scheduleCUJob(Context context) {
+        log("scheduleCUJob");
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
@@ -89,7 +90,7 @@ public class JobUtil {
     }
     
     public static synchronized void startCameraUploadService(Context context){
-        if (isDeviceSupportParallelUpload() && !CameraUploadsService.isServiceRunning) {
+        if (!CameraUploadsService.isServiceRunning) {
             Intent newIntent = new Intent(context,CameraUploadsService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 log("startCameraUploadService: starting on Oreo or above: ");
@@ -99,17 +100,28 @@ public class JobUtil {
                 context.startService(newIntent);
             }
         } else {
-            log("startCameraUploadService: service not started, isDeviceSupportParallelUpload() is " + isDeviceSupportParallelUpload() + " and isServiceRunning " + CameraUploadsService.isServiceRunning);
+            log("startCameraUploadService: service not started because service is running ");
         }
     }
 
-
-    public static synchronized void cancelAllJobs(Context context) {
-        log("stop working service");
-        //stop service
+    public static synchronized void stopRunningCameraUploadService(Context context) {
+        log("stopRunningCameraUploadService");
         Intent stopIntent = new Intent(context,CameraUploadsService.class);
         stopIntent.setAction(CameraUploadsService.ACTION_STOP);
         context.startService(stopIntent);
+    }
+    
+    public static void rescheduleCameraUpload(final Context context) {
+        stopRunningCameraUploadService(context);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            
+            @Override
+            public void run() {
+                log("Rescheduling CU");
+                scheduleCUJob(context);
+            }
+        },CU_RESCHEDULE_INTERVAL);
     }
 
     private static void log(String message) {

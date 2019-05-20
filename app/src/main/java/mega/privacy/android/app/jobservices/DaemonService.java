@@ -13,7 +13,7 @@ public class DaemonService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        int result = JobUtil.startJob(this);
+        int result = JobUtil.scheduleCUJob(this);
         log("start job result: " + result + ", success=" + (result != JobUtil.START_JOB_FAILED));
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return false;
