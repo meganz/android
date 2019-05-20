@@ -1623,14 +1623,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 break;
             }
 
-            case Constants.REQUEST_CAMERA_ON_OFF:{
-                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                    cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
-                    if(cuFL != null){
+            case Constants.REQUEST_CAMERA_ON_OFF: {
+                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    cuFL = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if (cuFL != null) {
                         cuFL.cameraOnOff();
                     }
+                } else {
+                    showSnackBar(this,Constants.SNACKBAR_TYPE,getString(R.string.on_refuse_storage_permission),-1);
                 }
-
                 break;
             }
 
