@@ -521,7 +521,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (ret == MegaChatApi.INIT_NO_CACHE)
 						{
 							log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-							megaChatApi.enableGroupChatCalls(true);
 
 						}
 						else if (ret == MegaChatApi.INIT_ERROR)
@@ -544,7 +543,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 				}
