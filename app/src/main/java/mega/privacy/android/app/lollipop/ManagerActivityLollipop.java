@@ -14809,12 +14809,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	 */
 	private void checkStorageStatus(int newStorageState, boolean onCreate) {
         Intent intent = new Intent(this,UploadService.class);
+        MegaApplication app = (MegaApplication)getApplication();
         switch (newStorageState) {
             case MegaApiJava.STORAGE_STATE_GREEN:
                 log("STORAGE STATE GREEN");
                 intent.setAction(Constants.ACTION_STORAGE_STATE_CHANGED);
                 startService(intent);
-				int accountType = ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType();
+				int accountType = app.getMyAccountInfo().getAccountType();
 				if(accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE){
 					log("ACCOUNT TYPE FREE");
 					if(Util.showMessageRandom()){
@@ -14854,6 +14855,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 		}
 
+		app.setStorageState(storageState);
 		storageState = newStorageState;
 	}
 

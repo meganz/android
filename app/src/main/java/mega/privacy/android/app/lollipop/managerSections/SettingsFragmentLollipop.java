@@ -103,6 +103,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	private static int REQUEST_MEGA_CAMERA_FOLDER = 3000;
 	private static int REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER = 4000;
 	private static int REQUEST_MEGA_SECONDARY_MEDIA_FOLDER = 5000;
+	private final String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
+    private final String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
 	
 	private final int COMPRESSION_QUEUE_SIZE_MIN = 100;
 	private final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
@@ -318,7 +320,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	RecyclerView listView;
 
 	boolean setAutoaccept = false;
-    AlertDialog newFolderDialog;
+    AlertDialog compressionQueueSizeDialog;
+    private EditText queueSizeInput;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1173,6 +1176,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label).replace("$size",size + getResources().getString(R.string.hint_MB));
         cameraUploadCharging.setSummary(chargingHelper);
 
+        if(savedInstanceState != null){
+            boolean isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false);
+            if(isShowingQueueDialog){
+                showResetCompressionQueueSizeDialog();
+                String input = savedInstanceState.getString(KEY_SET_QUEUE_SIZE, "");
+                queueSizeInput.setText(input);
+                queueSizeInput.setSelection(input.length());
+            }
+        }
 	}
 
 	public void setVersionsInfo(){
@@ -2905,35 +2917,36 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
-
+        int margin = 20;
+    
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        params.setMargins(Util.px2dp(margin, outMetrics), Util.px2dp(margin, outMetrics), Util.px2dp(margin, outMetrics), 0);
 
-        final EditText input = new EditText(context);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        layout.addView(input, params);
-
-        input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-        input.setHint(getString(R.string.hint_MB));
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        queueSizeInput = new EditText(context);
+        queueSizeInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        layout.addView(queueSizeInput, params);
+    
+        queueSizeInput.setSingleLine();
+        queueSizeInput.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        queueSizeInput.setHint(getString(R.string.hint_MB));
+        queueSizeInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        queueSizeInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String value = v.getText().toString().trim();
-                    setCompressionQueueSize(value, input);
+                    setCompressionQueueSize(value, queueSizeInput);
 
                     return true;
                 }
                 return false;
             }
         });
-
-        input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+    
+        queueSizeInput.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+        queueSizeInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -2941,19 +2954,13 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 }
             }
         });
-
+    
+        params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.px2dp(margin+5, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(margin, outMetrics), 0);
         final TextView text = new TextView(context);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
         text.setText(getString(R.string.settings_compression_queue_subtitle));
-        float density = getResources().getDisplayMetrics().density;
-        float scaleW = Util.getScaleW(outMetrics, density);
-        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (11*scaleW));
-        layout.addView(text);
-
-        LinearLayout.LayoutParams params_text_error = (LinearLayout.LayoutParams) text.getLayoutParams();
-        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.setMargins(Util.scaleWidthPx(25, outMetrics), 0,Util.scaleWidthPx(25, outMetrics),0);
-        text.setLayoutParams(params_text_error);
+        layout.addView(text,params);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(getString(R.string.settings_video_compression_queue_size_popup_title));
@@ -2963,28 +2970,28 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
         builder.setView(layout);
-        newFolderDialog = builder.create();
-        newFolderDialog.show();
+        compressionQueueSizeDialog = builder.create();
+        compressionQueueSizeDialog.show();
 
-        newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+        compressionQueueSizeDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String value = input.getText().toString().trim();
-                setCompressionQueueSize(value, input);
+                String value = queueSizeInput.getText().toString().trim();
+                setCompressionQueueSize(value, queueSizeInput);
             }
         });
     }
 
     private void setCompressionQueueSize(String value, EditText input){
         if (value.length() == 0) {
-            newFolderDialog.dismiss();
+            compressionQueueSizeDialog.dismiss();
             return;
         }
 
         try{
             int size = Integer.parseInt(value);
             if(isQueueSizeValid(size)){
-                newFolderDialog.dismiss();
+                compressionQueueSizeDialog.dismiss();
                 cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
                 String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label).replace("$size",size + getResources().getString(R.string.hint_MB));
                 cameraUploadCharging.setSummary(chargingHelper);
@@ -3094,5 +3101,14 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         dbH.setSecVideoSyncTimeStamp(0);
         dbH.saveShouldClearCamsyncRecords(true);
         Util.purgeDirectory(new File(context.getCacheDir().toString() + File.separator));
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(compressionQueueSizeDialog != null && compressionQueueSizeDialog.isShowing()){
+            outState.putBoolean(KEY_SET_QUEUE_DIALOG, true);
+            outState.putString(KEY_SET_QUEUE_SIZE, queueSizeInput.getText().toString());
+        }
     }
 }

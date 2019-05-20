@@ -1899,5 +1899,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		MegaApplication.speakerStatus = speakerStatus;
 	}
 
-	public int getStorageState() { return storageState; }
+	public int getStorageState() {
+	    return storageState;
+	}
+    
+    public void setStorageState(int state) {
+	    this.storageState = state;
+	}
 }

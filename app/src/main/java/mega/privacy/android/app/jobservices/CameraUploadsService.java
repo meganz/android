@@ -1120,6 +1120,17 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     private void initService() {
         log("initService()");
+        try {
+            app = (MegaApplication)getApplication();
+        } catch (Exception ex) {
+            finish();
+        }
+    
+        //if already over quota, no need to process further
+        if(app.getStorageState() == MegaApiJava.STORAGE_STATE_RED){
+            finish();
+        }
+        
         mContext = getApplicationContext();
         int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -1153,12 +1164,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else {
             PAGE_SIZE = 400;
             PAGE_SIZE_VIDEO = 10;
-        }
-        
-        try {
-            app = (MegaApplication)getApplication();
-        } catch (Exception ex) {
-            finish();
         }
         
         megaApi = app.getMegaApi();
