@@ -84,6 +84,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static String ACTION_STOP = "STOP_SYNC";
     public static String ACTION_LOGOUT = "LOGOUT_SYNC";
     public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER = "PHOTOS_VIDEOS_NEW_FOLDER";
+    public static String CU_CACHE_FOLDER = "cu";
     private String ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE";
     private String ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR";
     private String ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST";
@@ -125,8 +126,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private DateFormat sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
 
-    private List<MegaTransfer> cuTransfers = new ArrayList<>();
-    
     boolean isLoggingIn = false;
     
     MegaApiAndroid megaApi;
@@ -197,9 +196,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
     }
 
+    private boolean hasStoragePermission() {
+        String[] PERMISSIONS = {
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+        return Util.hasPermissions(this, PERMISSIONS);
+    }
+
     @Override
     public int onStartCommand(Intent intent,int flags,int startId) {
         log("public int onStartCommand(Intent intent, int flags, int startId)");
+        if(!hasStoragePermission()) {
+            return START_NOT_STICKY;
+        }
+
         initService();
         isServiceRunning = true;
         showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_initializing_title),null,false);
@@ -218,10 +229,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     intent.getAction().equals(ACTION_LOGOUT)) {
                 log("onStartCommand intent action is " + intent.getAction());
                 stopped = true;
-                for(MegaTransfer transfer : cuTransfers) {
-                    megaApi.cancelTransfer(transfer);
-                }
-                megaApi.resetTotalUploads();
+                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
                 finish();
                 return START_NOT_STICKY;
             }
@@ -1176,7 +1184,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
-        tempRoot = mContext.getCacheDir().toString() + File.separator;
+        tempRoot = new File(getCacheDir(),CU_CACHE_FOLDER).getAbsolutePath();
         File root = new File(tempRoot);
         if (!root.exists()) {
             root.mkdirs();
@@ -1391,7 +1399,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     @Override
     public void onTransferStart(MegaApiJava api,MegaTransfer transfer) {
         log("onTransferStart: " + transfer.getFileName());
-        cuTransfers.add(transfer);
     }
     
     @Override
