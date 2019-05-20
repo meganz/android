@@ -30,10 +30,12 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
-  public static final int TITLE_TOOLBAR__CHAT_PORTRAIT = 170;
-  public static final int TITLE_TOOLBAR__CALL_PORTRAIT = 200;
-  public static final int TITLE_TOOLBAR_LANDSCAPE = 300;
-  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
+  public static final int TITLE_TOOLBAR_CHAT_PORTRAIT = 170;
+  public static final int TITLE_TOOLBAR_CALL_PORTRAIT = 200;
+  public static final int TITLE_TOOLBAR_CHAT_LANDSCAPE = 300;
+    public static final int TITLE_TOOLBAR_CALL_LANDSCAPE = 350;
+
+    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
 
   private Context mContext;
   private Display display;
@@ -63,6 +65,11 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   public EmojiTextView(Context context,@Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     mContext = context;
+
+    if(mContext==null){
+        return;
+    }
+
     if (!isInEditMode()) {
       EmojiManager.getInstance().verifyInstalled();
     }
@@ -97,13 +104,13 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
             if (inContext== null) {
                 return;
             }
-            if ((inContext instanceof ChatActivityLollipop)||(inContext instanceof ChatCallActivity)) {
-                if(inContext instanceof ChatCallActivity){
-                    display = ((ChatCallActivity)inContext).getWindowManager().getDefaultDisplay();
-                }else {
-                    display = ((ChatActivityLollipop)inContext).getWindowManager().getDefaultDisplay();
-                }
-                setTextViewMax(TITLE_TOOLBAR_LANDSCAPE, TITLE_TOOLBAR__CHAT_PORTRAIT);
+            if(inContext instanceof ChatCallActivity){
+                display = ((ChatCallActivity)inContext).getWindowManager().getDefaultDisplay();
+                setTextViewMax(TITLE_TOOLBAR_CALL_LANDSCAPE, TITLE_TOOLBAR_CALL_PORTRAIT);
+
+            }else if (inContext instanceof ChatActivityLollipop){
+                display = ((ChatActivityLollipop)inContext).getWindowManager().getDefaultDisplay();
+                setTextViewMax(TITLE_TOOLBAR_CHAT_LANDSCAPE, TITLE_TOOLBAR_CHAT_PORTRAIT);
             }
         }
     }

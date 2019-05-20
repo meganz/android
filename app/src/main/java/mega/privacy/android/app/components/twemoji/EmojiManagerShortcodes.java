@@ -19,7 +19,7 @@ public final class EmojiManagerShortcodes {
         if(EmojiManagerShortcodes.emojiData == null || EmojiManagerShortcodes.emojiData.size() < 1)
         try {
                 Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setLenient().create();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("emoticons/emoji.json")));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open("emojisshortcodes/emoji.json")));
                 EmojiManagerShortcodes.emojiData = gson.fromJson(reader, new TypeToken<ArrayList<EmojiShortcodes>>(){}.getType());
                 reader.close();
         } catch (Exception e) {
