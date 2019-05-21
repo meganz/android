@@ -179,7 +179,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     int marginBottomActivated;
     boolean newVisibility = false;
     boolean getMoreHistory=false;
-    private int RECORD_FINISHED = R.raw.record_finished;
 
     int minutesLastGreen = -1;
     boolean isLoadingHistory = false;
@@ -623,9 +622,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButton.setEnabled(true);
 
         recordView = (RecordView) findViewById(R.id.record_view);
-        recordView.setCancelBounds(1);
         recordView.setLessThanSecondAllowed(false);
-        recordView.setCustomSounds(R.raw.record_start, R.raw.record_finished, 0);
         recordView.setVisibility(View.GONE);
 
         bubbleLayout = (LinearLayout) findViewById(R.id.bubble_layout);
@@ -816,13 +813,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("recordView.setOnRecordListener:onStart");
-                startRecording();
+                prepareRecording();
             }
             @Override
             public void onLessThanSecond() {
                 log("recordView.setOnRecordListener:onLessThanSecond");
                 showBubble();
             }
+
             @Override
             public void onCancel() {
                 log("recordView.setOnRecordListener:onCancel");
@@ -837,6 +835,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onFinish(long recordTime) {
                 log("recordView.setOnRecordListener:onFinish");
                 sendRecording();
+            }
+
+            @Override
+            public void finishedSound() {
+                log("recordView.setOnRecordListener:finishedSound ---> startRecording");
+                startRecording();
             }
         });
 
@@ -1902,17 +1906,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     /*
-     * Start recording
+    *Prepare recording
      */
-    public void startRecording(){
-        log("startRecording() ");
+    public void prepareRecording(){
+        log("prepareRecording");
+        if(!checkPermissionsVoiceClip()) return;
+        recordView.playSound(Constants.TYPE_START_RECORD);
         if(adapter!=null) {
             adapter.stopAllReproductionsInProgress();
         }
 
-        if(!checkPermissionsVoiceClip()) return;
-
-        log("startRecording() with Permissions");
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
         File newFolder = new File(path);
         newFolder.mkdirs();
@@ -1924,7 +1927,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(myAudioRecorder==null || outputFileVoiceNotes == null) return;
 
-        log("startRecording: myAudioRecorder initialized and dataSourceConfigure ");
         myAudioRecorder.reset();
         myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -1935,6 +1937,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+        /*
+     * Start recording
+     */
+    public void startRecording(){
+        log("startRecording() with Permissions");
+        if(myAudioRecorder == null) return;
         myAudioRecorder.start();
         setRecordingNow(true);
     }
@@ -1944,13 +1955,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      */
     private void cancelRecording(){
         log("cancelRecording");
-        if(!recordView.isRecordingNow()) return;
-
+        if(!isRecordingNow()) return;
         if(myAudioRecorder!=null){
             myAudioRecorder.reset();
             outputFileVoiceNotes = null;
+            setRecordingNow(false);
         }
-        setRecordingNow(false);
     }
 
     /*
@@ -1958,14 +1968,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     */
     private void sendRecording(){
         log("sendRecording");
-        if(!recordView.isRecordingNow()) return;
-
-        setRecordingNow(false);
-        if (myAudioRecorder == null) return;
-
+        if((!recordView.isRecordingNow()) || (myAudioRecorder == null)) return;
         try{
-            recordView.playSound(RECORD_FINISHED);
+
+            log("sendRecording: playSound - RECORD_FINISHED");
             myAudioRecorder.stop();
+            recordView.playSound(Constants.TYPE_END_RECORD);
+            setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
             outputFileVoiceNotes = null;
         }catch(RuntimeException ex){ }
@@ -2011,18 +2020,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     /*
-     *Record button activated
-     */
-    private void recordButtonActivated(){
-        log("recordButtonActivated");
-        recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
-        recordButton.activateOnTouchListener(true);
-        recordButton.activateOnClickListener(false);
-        recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
-        recordButton.setColorFilter(null);
-    }
-
-    /*
      *Record button deactivated or ready to send
      */
     private void recordButtonDeactivated(boolean isDesactivated){
@@ -2048,7 +2045,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      *Update the record button view depending on the state the recording is in
      */
     private void recordButtonStates(int recordButtonState){
-        log("recordButtonStates");
+        log("recordButtonStates == "+recordButtonState);
 
         if(currentRecordButtonState == recordButtonState) return;
 
@@ -2062,7 +2059,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(recordButtonState == RECORD_BUTTON_SEND){
                 recordButtonDeactivated(false);
             }else{
-                recordButtonActivated();
+                recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
+                recordButton.activateOnTouchListener(true);
+                recordButton.activateOnClickListener(false);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
+                recordButton.setColorFilter(null);
             }
 
         }else if(currentRecordButtonState == RECORD_BUTTON_DESACTIVATED){
@@ -2077,6 +2078,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void showBubble(){
         log("showBubble");
+
+        recordView.playSound(Constants.TYPE_ERROR_RECORD);
         bubbleLayout.setAlpha(1);
         bubbleLayout.setVisibility(View.VISIBLE);
         bubbleLayout.animate().alpha(0).setDuration(4000);
@@ -2135,6 +2138,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * Know if you're recording right now
      */
     public void setRecordingNow(boolean recordingNow) {
+        log("setRecordingNow -> "+recordingNow);
         recordView.setRecordingNow(recordingNow);
         if(recordView.isRecordingNow()){
             recordButtonStates(RECORD_BUTTON_ACTIVATED);
@@ -4348,15 +4352,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             openMegaLink(url, false);
                                         }
                                     }
-                                }
-                            }else if(m.getMessage().getType()==MegaChatMessage.TYPE_VOICE_CLIP){
-                                log("TYPE_VOICE_CLIP");
-
-                                MegaNodeList nodeList = m.getMessage().getMegaNodeList();
-                                if(nodeList.size()==1){//
-                                    MegaNode node = nodeList.get(0);
-                                   if (MimeTypeList.typeForName(node.getName()).isAudio()){ }
-                                }else{
                                 }
                             }
                         }
@@ -7777,7 +7772,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("uploadPictureOrVoiceClip: path "+path);
         File selfie = new File(path);
 
-        if(!(MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudio()) && !(MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage())){
+        if(!(MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudioVoiceClip()) && !(MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage())){
             log("uploadPictureOrVoiceClip:it is not an audio or image");
             return;
         }
@@ -7786,7 +7781,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
         pMsgSingle.setChatId(idChat);
         if(isVoiceClip){
-            log("uploadPictureOrVoiceClip: TYPE_VOICE_CLIP");
             pMsgSingle.setType(Constants.TYPE_VOICE_CLIP);
         }
         long timestamp = System.currentTimeMillis()/1000;
@@ -7810,7 +7804,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
         if(isVoiceClip){
-            intent.putExtra(ChatUploadService.EXTRA_SHOW_NOTIFICATION, false);
+            intent.putExtra("type", Constants.EXTRA_VOICE_CLIP);
         }
         startService(intent);
     }

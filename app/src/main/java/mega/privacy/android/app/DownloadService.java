@@ -83,7 +83,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
-	public static String EXTRA_SHOW_NOTIFICATION = "SHOW_NOTIFICATION";
 
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -95,9 +94,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean canceled;
 
 	private String pathFileToOpen;
-	private boolean showNotification = true;
 	private boolean openFile = true;
-
+	private String type = "";
 	private boolean isOverquota = false;
 	private long downloadedBytesToOverquota = 0;
 
@@ -223,7 +221,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
         openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
-        showNotification = intent.getBooleanExtra(EXTRA_SHOW_NOTIFICATION, true);
+		type = intent.getStringExtra("type");
 
 		Uri contentUri = null;
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
@@ -282,7 +280,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					pendingIntents.add(intent);
-					if(showNotification){
+					if(!type.equals(Constants.EXTRA_VOICE_CLIP)){
 						updateProgressNotification();
 					}
 					megaApi.fastLogin(gSession, this);
@@ -418,7 +416,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			log("CurrentDocument is not null");
 
 			if(highPriority){
-				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", "", this);
+
+				String data = "";
+				if((type!=null)&&(type.equals(Constants.EXTRA_VOICE_CLIP))){
+					data = Constants.EXTRA_VOICE_CLIP;
+				}
+				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
+
 			}
 			else{
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
@@ -477,7 +481,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
                 log("CurrentDocument is not null");
 				if(highPriority){
-					megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", "", this);
+					String data = "";
+					if((type!=null)&&(type.equals(Constants.EXTRA_VOICE_CLIP))){
+						data = Constants.EXTRA_VOICE_CLIP;
+					}
+					megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 				}
 				else{
 					megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
@@ -1451,9 +1459,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("*onTransferStart:Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
+		log("onTransferStart:Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
-		if((transfer.getType()==MegaTransfer.TYPE_DOWNLOAD)&&(showNotification)){
+		if((transfer.getAppData() != null)&&(transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+		if((transfer.getType()==MegaTransfer.TYPE_DOWNLOAD)){
 			transfersCount++;
 			updateProgressNotification();
 		}
@@ -1464,15 +1473,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("onTransferFinish: " + transfer.getNodeHandle());
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
-			transfersCount--;
 
-			if((!transfer.isFolderTransfer())&&(showNotification)){
+			if((transfer.getAppData()==null) || (!transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))){
+				transfersCount--;
+			}
+
+			if(!transfer.isFolderTransfer()){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
 					String size = Util.getSizeString(transfer.getTotalBytes());
 					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 					dbH.setCompletedTransfer(completedTransfer);
 				}
-				updateProgressNotification();
+				if((transfer.getAppData()==null) || (!transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))){
+					updateProgressNotification();
+				}
 			}
 
 			if (canceled) {
@@ -1610,6 +1624,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 				}
 			}
+			if((transfer.getAppData()!=null) && (transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
 
 			if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
 				onQueueComplete(transfer.getNodeHandle());
@@ -2211,7 +2226,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if((!transfer.isFolderTransfer())&&(showNotification)){
+			if((transfer.getAppData() != null)&&(transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+
+			if(!transfer.isFolderTransfer()){
 				updateProgressNotification();
 			}
 		}
@@ -2230,14 +2247,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if(credentials!=null){
 						log("Credentials is NOT null");
 					}
-
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 					isOverquota = true;
 					log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
-
-					if(showNotification){
-						showTransferOverquotaNotification();
-					}
+					if((transfer.getAppData() != null)&&(transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+					showTransferOverquotaNotification();
 				}
 			}
 		}

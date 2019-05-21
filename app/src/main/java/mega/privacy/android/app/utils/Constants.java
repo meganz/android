@@ -55,6 +55,8 @@ public class Constants {
 
 	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
+	public static String EXTRA_VOICE_CLIP = "VOICE_CLIP";
+
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
 	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
@@ -135,6 +137,10 @@ public class Constants {
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
     public static final int REQUEST_WRITE_STORAGE_TAKE_PICTURE = 14;
 	public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
+
+	public static final int TYPE_START_RECORD = 1;
+	public static final int TYPE_END_RECORD = 2;
+	public static final int TYPE_ERROR_RECORD = 3;
 
     public static final int PRO_LITE = 4;
 	public static final int FREE = 0;

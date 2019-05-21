@@ -1964,8 +1964,7 @@ public class ChatController {
 
                         if(isVoiceClip){
                             service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                            service.putExtra(DownloadService.EXTRA_SHOW_NOTIFICATION, false);
-
+                            service.putExtra("type", Constants.EXTRA_VOICE_CLIP );
                         }else{
                             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                                 service.putExtra("fromMV", true);

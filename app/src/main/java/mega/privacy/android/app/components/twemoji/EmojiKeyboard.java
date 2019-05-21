@@ -185,7 +185,6 @@ public class EmojiKeyboard extends LinearLayout {
 
     private void needToReplace() {
         if (buttonListener == null) return;
-
         buttonListener.needToPlace();
     }
     public void showEmojiKeyboard(){

@@ -6,4 +6,5 @@ public interface OnRecordListener {
     void onLock();
     void onFinish(long recordTime);
     void onLessThanSecond();
+    void finishedSound();
 }

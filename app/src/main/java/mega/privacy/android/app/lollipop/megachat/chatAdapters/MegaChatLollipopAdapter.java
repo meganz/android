@@ -1444,7 +1444,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
             if (path != null) {
-                if((MimeTypeList.typeForName(path).isAudio()) && (type==Constants.TYPE_VOICE_CLIP)){
+                if((MimeTypeList.typeForName(path).isAudioVoiceClip()) && (type==Constants.TYPE_VOICE_CLIP)){
                     log("onBindViewHolderUploading:TYPE_VOICE_CLIP");
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
@@ -6129,7 +6129,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaNodeList nodeListOwn = message.getMegaNodeList();
         if(nodeListOwn.size()==1) {
             MegaNode node = nodeListOwn.get(0);
-            if (MimeTypeList.typeForName(node.getName()).isAudio()) {
+            if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
                 if(node.getDuration()<0){
                     holder.totalDurationOfVoiceClip = (-node.getDuration())*1000;
                 }else{
@@ -9523,7 +9523,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 MegaNodeList nodeList = currentMessage.getMessage().getMegaNodeList();
                 if(nodeList.size()==1){
                     MegaNode node = nodeList.get(0);
-                    if(MimeTypeList.typeForName(node.getName()).isAudio()){
+                    if(MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()){
                         String voiceNotesLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, true);
                         String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), voiceNotesLocationDefaultPath);
                         boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, node);

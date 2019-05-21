@@ -213,6 +213,12 @@ public class MimeTypeList {
 	public boolean isAudio() {
 		return type.startsWith("audio/") || extension.equals("opus");
 	}
+	/*
+	 * Check is MimeType of voice type
+	 */
+	public boolean isAudioVoiceClip() {
+		return type.startsWith("audio/") || extension.equals("m4a");
+	}
 
 	public boolean isAudioNotSupported() {
 		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
