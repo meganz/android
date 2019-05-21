@@ -59,7 +59,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/mega_zxcvbn.cpp \
     sdk/src/mediafileattribute.cpp \
     sdk/src/mega_evt_tls.cpp \
-    sdk/src/mega_ccronexpr.cpp
+    sdk/src/mega_ccronexpr.cpp \
+    sdk/src/raid.cpp
     
 C_SOURCES = sdk/src/mega_glob.c
 
