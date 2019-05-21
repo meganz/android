@@ -26,7 +26,7 @@
         android:layout_marginTop="30dp"
         android:layout_below="@+id/link_title"
         android:inputType="textMultiLine"
-        android:autoLink="none"/>
+        android:textColorLink="@color/name_my_account"/>
 
     <RelativeLayout
         android:id="@+id/link_error"

@@ -10950,11 +10950,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
                     switch (error) {
                         case Constants.CHAT_LINK: {
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case Constants.CONTACT_LINK: {
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
                             break;
