@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
@@ -50,6 +52,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private Button nextButton;
     private boolean isSelectedCountryValid, isPhoneNumberValid, isUserLocked, shouldDisableNextButton;
     private String selectedCountryCode, selectedCountryName, selectedDialCode;
+    private ArrayList<String> countryCodeList;
     
     
     @Override
@@ -218,7 +221,11 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         switch (v.getId()) {
             case (R.id.verify_account_country_selector): {
                 log("verify_account_country_selector clicked");
-                launchCountryPicker();
+                if (this.countryCodeList != null) {
+                    launchCountryPicker();
+                } else {
+                    log("Country code is not loaded");
+                }
                 break;
             }
             case (R.id.verify_account_next_button): {
@@ -261,7 +268,9 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     
     private void launchCountryPicker() {
         log("launchCountryPicker");
-        startActivityForResult(new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class),Constants.REQUEST_CODE_COUNTRY_PICKER);
+        Intent intent = new Intent(getApplicationContext(),CountryCodePickerActivityLollipop.class);
+        intent.putStringArrayListExtra("country_code", this.countryCodeList);
+        startActivityForResult(intent, Constants.REQUEST_CODE_COUNTRY_PICKER);
     }
     
     private void nextButtonClicked() {

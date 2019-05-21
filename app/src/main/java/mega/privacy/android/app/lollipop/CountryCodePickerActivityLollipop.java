@@ -21,17 +21,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
@@ -56,6 +50,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     private Toolbar toolbar;
     private String searchInput;
     private SearchView.SearchAutoComplete searchAutoComplete;
+    private ArrayList<String> receivedCountryCodes;
     public static final String COUNTRY_NAME = "name";
     public static final String DIAL_CODE = "dial_code";
     public static final String COUNTRY_CODE = "code";
@@ -64,6 +59,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contry_code_picker);
+        receivedCountryCodes = getIntent().getExtras().getStringArrayList("country_code");
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -222,41 +218,22 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     }
 
     public List<Country> loadCountries() {
-        List<Country> countries = new ArrayList<>();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(getResources().getAssets().open("countries.json")));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            JSONArray ja = new JSONArray(sb.toString());
-            for (int i = 0;i < ja.length();i++) {
-                JSONObject jo = ja.getJSONObject(i);
-                countries.add(new Country(jo.getString(COUNTRY_NAME),jo.getString(DIAL_CODE),jo.getString(COUNTRY_CODE)));
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                br.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        //To decode received country codes from SMSVerificationActivity
+        // Each string in ArrayList is "DO:1809,1829,1849,"
+        ArrayList<Country> countryCodeList = new ArrayList<>();
+        if (this.receivedCountryCodes != null) {
+            for (String countryString : receivedCountryCodes) {
+                int splitIndex = countryString.indexOf(":");
+                String countryCode = countryString.substring(0, countryString.indexOf(":"));
+                String [] dialCodes = countryString.substring(splitIndex + 1).split(",");
+                for (String dialCode : dialCodes) {
+                    Locale locale = new Locale("", countryCode);
+                    String countryName = locale.getDisplayName();
+                    countryCodeList.add(new Country(countryName, ("+" + dialCode), countryCode));
+                }
             }
         }
-        Collections.sort(countries,new Comparator<Country>() {
-            
-            @Override
-            public int compare(Country o1,Country o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
-            }
-        });
-        return countries;
+        return countryCodeList;
     }
 
     @Override
