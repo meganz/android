@@ -33,6 +33,8 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaStringList;
+import nz.mega.sdk.MegaStringListMap;
 
 import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.COUNTRY_CODE;
 import static mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop.COUNTRY_NAME;
@@ -199,6 +201,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 divider1.setBackgroundColor(Color.parseColor("#8A000000"));
             }
         }
+        megaApi.getCountryCallingCodes(this);
     }
     
     @Override
@@ -413,6 +416,26 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 isPhoneNumberValid = false;
                 String errorMessage = getResources().getString(R.string.verify_account_invalid_phone_number);
                 showPhoneNumberValidationError(errorMessage);
+            }
+        }
+
+        if (request.getType() == MegaRequest.TYPE_GET_COUNTRY_CALLING_CODES) {
+            if (e.getErrorCode() == MegaError.API_OK) {
+                ArrayList<String> codedCountryCode = new ArrayList<>();
+                MegaStringListMap listMap = request.getMegaStringListMap();
+                MegaStringList keyList = listMap.getKeys();
+                for (int i = 0; i < keyList.size(); i++) {
+                    String key = keyList.get(i);
+                    StringBuffer contentBuffer = new StringBuffer();
+                    contentBuffer.append(key + ":");
+                    for (int j = 0; j < listMap.get(key).size(); j++) {
+                        contentBuffer.append(listMap.get(key).get(j) + ",");
+                    }
+                    codedCountryCode.add(contentBuffer.toString());
+                }
+                this.countryCodeList = codedCountryCode;
+            } else {
+                log("the country code is not responded correctly");
             }
         }
     }
