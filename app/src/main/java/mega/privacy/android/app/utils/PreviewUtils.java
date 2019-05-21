@@ -51,33 +51,15 @@ public class PreviewUtils {
 	public static void setPreviewCache(long handle, Bitmap bitmap){
 		previewCache.put(handle, bitmap);
 	}
-	
-	public static Bitmap getPreviewFromFolder(MegaNode node, Context context){
-		File previewDir = getPreviewFolder(context);
-		File preview = new File(previewDir, node.getBase64Handle()+".jpg");
-		Bitmap bitmap = null;
-		if (preview.exists()){
-			if (preview.length() > 0){
-				bitmap = getBitmapForCache(preview, context);
-				if (bitmap == null) {
-					preview.delete();
-				}
-				else{
-					previewCache.put(node.getHandle(), bitmap);
-				}
-			}
-		}
-		return previewCache.get(node.getHandle());
-	}
 
-    public static Bitmap getPreviewFromFolderForFileLink(MegaNode node, Context context){
+    public static Bitmap getPreviewFromFolder(MegaNode node, Context context){
 	    Bitmap bmp = previewCache.get(node.getHandle());
 	    if(bmp == null) {
             File previewDir = getPreviewFolder(context);
             File preview = new File(previewDir, node.getBase64Handle()+".jpg");
             if (preview.exists()){
                 if (preview.length() > 0){
-                    bmp = getBitmapForCacheFileLink(preview, context);
+                    bmp = getBitmapForCache(preview, context);
                     if (bmp == null) {
                         preview.delete();
                     }
@@ -125,19 +107,7 @@ public class PreviewUtils {
 		return bitmap;
 	}
 
-	/*
-	 * Load Bitmap for cache
-	 */
-    public static Bitmap getBitmapForCache(File bmpFile, Context context) {
-        BitmapFactory.Options bOpts = new BitmapFactory.Options();
-        bOpts.inPurgeable = true;
-        bOpts.inInputShareable = true;
-        log("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
-        Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
-        return bmp;
-    }
-
-    public static Bitmap getBitmapForCacheFileLink(File bmpFile,Context context) {
+    public static Bitmap getBitmapForCache(File bmpFile,Context context) {
         BitmapFactory.Options bOpts = new BitmapFactory.Options();
         bOpts.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
@@ -158,7 +128,7 @@ public class PreviewUtils {
         return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(),bOpts);
     }
 
-	//code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html
+	/*code from developer.android, https://developer.android.com/topic/performance/graphics/load-bitmap.html*/
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
