@@ -188,46 +188,11 @@ public class NodeController {
         }
     }
 
-    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
-        log("selectChatsToSendNodes");
-
-        int size = nodes.size();
-        long[] longArray = new long[size];
-
-        for(int i=0;i<nodes.size();i++){
-            longArray[i] = nodes.get(i).getHandle();
-        }
-
-        selectChatsToSendNodes(longArray);
-    }
-
     public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
         log("checkIfNodeIsMineAndSelectChatsToSendNode");
-        if (node != null) {
-            if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
-                selectChatsToSendNode(node);
-            }
-            else {
-                String nodeFP = megaApi.getFingerprint(node);
-                ArrayList<MegaNode> nodes = megaApi.getNodesByFingerprint(nodeFP);
-                MegaNode nodeOwner = null;
-                if (nodes != null) {
-                    for (int i=0; i<nodes.size(); i++) {
-                        if (megaApi.getAccess(nodes.get(i)) == MegaShare.ACCESS_OWNER){
-                            nodeOwner = nodes.get(i);
-                            break;
-                        }
-                    }
-                }
-                if (nodeOwner != null) {
-                    selectChatsToSendNode(nodeOwner);
-                }
-                else {
-                    CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-                    copyAndSendToChatListener.copyNode(node);
-                }
-            }
-        }
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        nodes.add(node);
+        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
@@ -244,7 +209,7 @@ public class NodeController {
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
             if (currentNode != null) {
-                if (megaApi.getAccess(currentNode) == MegaShare.ACCESS_OWNER) {
+                if (currentNode.getOwner() == megaApi.getMyUserHandleBinary()) {
                     ownerNodes.add(currentNode);
                 }
                 else {
@@ -253,7 +218,7 @@ public class NodeController {
                     MegaNode nodeOwner = null;
                     if (fNodes != null) {
                         for (int j=0; j<fNodes.size(); j++) {
-                            if (megaApi.getAccess(fNodes.get(j)) == MegaShare.ACCESS_OWNER){
+                            if (fNodes.get(j).getOwner() == megaApi.getMyUserHandleBinary()){
                                 nodeOwner = fNodes.get(j);
                                 break;
                             }
@@ -278,17 +243,15 @@ public class NodeController {
         }
     }
 
-    public void selectChatsToSendNode(MegaNode node){
-        log("selectChatsToSendNode");
-
-        long[] longArray = new long[1];
-        longArray[0] = node.getHandle();
-
-        selectChatsToSendNodes(longArray);
-    }
-
-    public void selectChatsToSendNodes(long[] longArray){
+    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
         log("selectChatsToSendNodes");
+
+        int size = nodes.size();
+        long[] longArray = new long[size];
+
+        for(int i=0;i<nodes.size();i++){
+            longArray[i] = nodes.get(i).getHandle();
+        }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
         i.putExtra("NODE_HANDLES", longArray);
@@ -838,7 +801,6 @@ public class NodeController {
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
-//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
                                         log("The video has not thumb");
@@ -853,7 +815,13 @@ public class NodeController {
                         catch(Exception e) {
                             log("Exception!!");
                         }
-
+    
+                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                        if (!autoPlayEnabled) {
+                            log("auto play disabled");
+                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
+                            return;
+                        }
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             log("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
@@ -1074,12 +1042,13 @@ public class NodeController {
                 }
             }
             log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-            if (numberOfNodesAlreadyDownloaded > 0){
-                String msg = context.getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-                if (numberOfNodesPending > 0){
-                    msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
+            if (numberOfNodesAlreadyDownloaded > 0) {
+                String msg;
+                msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded,numberOfNodesAlreadyDownloaded,numberOfNodesAlreadyDownloaded);
+                if (numberOfNodesPending > 0) {
+                    msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
                 }
-                showSnackbar(Constants.SNACKBAR_TYPE, msg);
+                showSnackbar(Constants.SNACKBAR_TYPE,msg);
             }
         }
     }
