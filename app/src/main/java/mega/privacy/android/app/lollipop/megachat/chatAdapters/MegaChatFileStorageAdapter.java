@@ -209,20 +209,13 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
                 .centerCrop()
                 .into(holder.photo);
 
-
-
-        if (!multipleSelect) {
+        if((!multipleSelect) || (!this.isItemChecked(position))){
             holder.photoSelectedIcon.setVisibility(View.GONE);
             holder.photoSelectedStroke.setVisibility(View.GONE);
-        }else {
-            if(this.isItemChecked(position)){
-                holder.photoSelectedIcon.setVisibility(View.VISIBLE);
-                holder.photoSelectedStroke.setVisibility(View.VISIBLE);
-            }else{
-                holder.photoSelectedIcon.setVisibility(View.GONE);
-                holder.photoSelectedStroke.setVisibility(View.GONE);
-            }
+            return;
         }
+        holder.photoSelectedIcon.setVisibility(View.VISIBLE);
+        holder.photoSelectedStroke.setVisibility(View.VISIBLE);
     }
 
     @Override

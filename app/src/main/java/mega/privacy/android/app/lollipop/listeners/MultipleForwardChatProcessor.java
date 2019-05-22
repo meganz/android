@@ -162,24 +162,12 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                         return;
                                     }
                                     MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                    if(nodeToAttach!=null){
-                                        if(chatHandles[0]==idChat){
-                                            megaChatApi.attachVoiceMessage(chatHandles[0], nodeToAttach.getHandle(), this);
-                                        }else{
-                                            megaChatApi.attachVoiceMessage(chatHandles[0], nodeToAttach.getHandle(), this);
-                                        }
-                                    }else{
-                                        log("ERROR - Node to attach is NULL - one node not attached");
-                                    }
+                                    attachVoiceClip(chatHandles[0], nodeToAttach);
                                 }
                             }else{
                                 for (int j = 0; j < nodeList.size(); j++) {
                                     MegaNode temp = nodeList.get(j);
-                                    if(chatHandles[0]==idChat){
-                                        megaChatApi.attachVoiceMessage(chatHandles[0], temp.getHandle(), this);
-                                    }else{
-                                        megaChatApi.attachVoiceMessage(chatHandles[0], temp.getHandle(), this);
-                                    }
+                                    attachVoiceClip(chatHandles[0], temp);
                                 }
                             }
                             break;
@@ -314,25 +302,12 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                                             return;
                                         }
                                         MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                        if(nodeToAttach!=null){
-                                            if(chatHandles[k]==idChat){
-                                                megaChatApi.attachVoiceMessage(chatHandles[k], nodeToAttach.getHandle(), this);
-                                            }else{
-                                                megaChatApi.attachVoiceMessage(chatHandles[k], nodeToAttach.getHandle(), this);
-                                            }
-                                        }else{
-                                            log("ERROR - Node to attach is NULL - one node not attached");
-                                        }
+                                        attachVoiceClip(chatHandles[k], nodeToAttach);
                                     }
                                 }else{
                                     for (int j = 0; j < nodeList.size(); j++) {
                                         MegaNode temp = nodeList.get(j);
-
-                                        if(chatHandles[k]==idChat){
-                                            megaChatApi.attachVoiceMessage(chatHandles[k], temp.getHandle(), this);
-                                        }else{
-                                            megaChatApi.attachVoiceMessage(chatHandles[k], temp.getHandle(), this);
-                                        }
+                                        attachVoiceClip(chatHandles[k], temp);
                                     }
                                 }
                                 break;
@@ -363,6 +338,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
         }
 
 
+    }
+
+    private void attachVoiceClip(long chatHandle, MegaNode megaNode){
+        if(megaNode == null) return;
+        megaChatApi.attachVoiceMessage(chatHandle, megaNode.getHandle(), this);
     }
 
     @Override
