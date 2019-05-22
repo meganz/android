@@ -158,11 +158,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private class ChatVoiceClipAsyncTask extends AsyncTask<MegaNodeList, Void, Integer>{
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
         int position;
-        long messageHandle;
+        long userHandle;
         MegaNodeList nodelist;
-        public ChatVoiceClipAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder, int position, long messageHandle) {
+        public ChatVoiceClipAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder, int position, long userHandle) {
             this.holder = holder;
-            this.messageHandle = messageHandle;
+            this.userHandle = userHandle;
             this.position = position;
         }
 
@@ -174,7 +174,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if(holder==null) return;
 
             log("ChatVoiceClipAsyncTask:onPreExecute");
-            if(messageHandle == myUserHandle){
+            if(userHandle == myUserHandle){
                 holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                 holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
@@ -6108,7 +6108,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaChatMessage message = androidMessage.getMessage();
         final long messageUserHandle = message.getUserHandle();
         final long messageId = message.getMsgId();
+        long messageHandle = -1;
 
+
+        holder.totalDurationOfVoiceClip = 0;
+        MegaNodeList nodeListOwn = message.getMegaNodeList();
+        if(nodeListOwn.size()==1) {
+            MegaNode node = nodeListOwn.get(0);
+            messageHandle = node.getHandle();
+            if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
+                if(node.getDuration()<0){
+                    holder.totalDurationOfVoiceClip = (-node.getDuration())*1000;
+                }else{
+                    holder.totalDurationOfVoiceClip = (node.getDuration() * 1000);
+                }
+            }
+        }
         boolean exist = false;
         if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
             for(MessageVoiceClip m:messagesPlaying){
@@ -6120,23 +6135,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         if(!exist){
-            MessageVoiceClip messagePlaying = new MessageVoiceClip(messageId, messageUserHandle);
+            MessageVoiceClip messagePlaying = new MessageVoiceClip(messageId, messageUserHandle, messageHandle);
             log("bindVoiceClipAttachmentMessage: addMessage in messagesPlaying");
             messagesPlaying.add(messagePlaying);
         }
 
-        holder.totalDurationOfVoiceClip = 0;
-        MegaNodeList nodeListOwn = message.getMegaNodeList();
-        if(nodeListOwn.size()==1) {
-            MegaNode node = nodeListOwn.get(0);
-            if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
-                if(node.getDuration()<0){
-                    holder.totalDurationOfVoiceClip = (-node.getDuration())*1000;
-                }else{
-                    holder.totalDurationOfVoiceClip = (node.getDuration() * 1000);
-                }
-            }
-        }
 
         MessageVoiceClip currentMessagePlaying = null;
         for(MessageVoiceClip m: messagesPlaying){
@@ -6245,27 +6248,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             }else {
 
-                if((holder.totalDurationOfVoiceClip == 0) || (currentMessagePlaying.getIsAvailable() != Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER)){
+                if((holder.totalDurationOfVoiceClip == 0) || (currentMessagePlaying.getIsAvailable() == Constants.ERROR_VOICE_CLIP_TRANSFER)){
                     log("bindVC:myMessage:SENT -> duraton 0 or available != successful");
-                    if(currentMessagePlaying.getIsAvailable() == Constants.ERROR_VOICE_CLIP_TRANSFER){
-                        holder.notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
-                        holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
-                    }else {
-                        holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
-                        holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
-                    }
-
+                    holder.notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
+                    holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
                     holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
-
                     holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
                     holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
                     holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
-
                     holder.contentOwnMessageVoiceClipDuration.setText("--:--");
 
                 }else{
-                    log("bindVC:myMessage:SENT available");
-                    boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, nodeListOwn.get(0));
+                    log("bindVC:myMessage:SENT available ---- positionINAdapter = "+positionInAdapter+", isAvailable = "+currentMessagePlaying.getIsAvailable());
+
+                    boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, message.getMegaNodeList().get(0));
                     if(!isDownloaded){
                         log("bindVC:myMessage: is not downloaded ---> downloadVoiceClip");
                         holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
@@ -6278,7 +6274,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         holder.contentOwnMessageVoiceClipDuration.setText("--:--");
 
-                        downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), nodeListOwn);
+                        downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), message.getMegaNodeList());
 
                     }else{
                         log("bindVC:myMessage: is downloaded");
@@ -6461,15 +6457,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.VISIBLE);
             holder.contentContactMessageVoiceClipSeekBar.setMax(holder.totalDurationOfVoiceClip);
 
-            if((holder.totalDurationOfVoiceClip == 0) || (currentMessagePlaying.getIsAvailable() != Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER)){
+            if((holder.totalDurationOfVoiceClip == 0) || (currentMessagePlaying.getIsAvailable() == Constants.ERROR_VOICE_CLIP_TRANSFER)){
                 log("bindVC:ContMessage:SENT -> duraton 0 or available != successful");
-                if(currentMessagePlaying.getIsAvailable() == Constants.ERROR_VOICE_CLIP_TRANSFER){
-                    holder.notAvailableContactVoiceclip.setVisibility(View.VISIBLE);
-                    holder.uploadingContactProgressbarVoiceclip.setVisibility(View.GONE);
-                }else{
-                    holder.uploadingContactProgressbarVoiceclip.setVisibility(View.VISIBLE);
-                    holder.notAvailableContactVoiceclip.setVisibility(View.GONE);
-                }
+                holder.notAvailableContactVoiceclip.setVisibility(View.VISIBLE);
+                holder.uploadingContactProgressbarVoiceclip.setVisibility(View.GONE);
+
                 holder.contentContactMessageVoiceClipPlay.setVisibility(View.GONE);
 
                 holder.contentContactMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
@@ -9433,10 +9425,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     /*
      * Download a voice note using an asynctask
      */
-    private void downloadVoiceClip(final ViewHolderMessageChat holder,int position, long handle, MegaNodeList nodeList){
+    private void downloadVoiceClip(final ViewHolderMessageChat holder,int position, long userHandle, final MegaNodeList nodeList){
         log("downloadVoiceClip() ");
         try {
-            new MegaChatLollipopAdapter.ChatVoiceClipAsyncTask(holder, position,handle).execute(nodeList);
+            new MegaChatLollipopAdapter.ChatVoiceClipAsyncTask(holder, position, userHandle).execute(nodeList);
         } catch (Exception ex) {
             log("Too many AsyncTasks");
         }
@@ -9448,21 +9440,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void finishedVoiceClipDownload(long nodeHandle, int resultTransfer){
         if(messages==null || messages.isEmpty() || messagesPlaying==null || messagesPlaying.isEmpty()) return;
 
-        for(int i=0; i<messages.size(); i++) {
-            if((messages.get(i).getMessage()!=null) &&(messages.get(i).getMessage().getMegaNodeList()!=null) &&(messages.get(i).getMessage().getMegaNodeList().size()>0) &&(messages.get(i).getMessage().getMegaNodeList().get(0).getHandle() == nodeHandle)) {
-                for(MessageVoiceClip messageVoiceClip:messagesPlaying){
-                    if(messageVoiceClip.getIdMessage() == messages.get(i).getMessage().getMsgId()){
-                        messageVoiceClip.setIsAvailable(resultTransfer);
+        for(MessageVoiceClip messagevc : messagesPlaying){
+            if(messagevc.getMessageHandle() == nodeHandle){
+                messagevc.setIsAvailable(resultTransfer);
+                for(int i=0; i<messages.size();i++){
+                    if(messages.get(i).getMessage().getMsgId() == messagevc.getIdMessage()){
                         int positionInAdapter = i+1;
                         ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
                         if(holder!=null){
-                            log("finishedVoiceClipDownload");
                             notifyItemChanged(positionInAdapter);
                         }
                         break;
                     }
                 }
-                break;
             }
         }
     }

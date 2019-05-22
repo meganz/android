@@ -17393,9 +17393,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if(transferCallback<transfer.getNotificationNumber()) {
-
 			transferCallback = transfer.getNotificationNumber();
-
 			long now = Calendar.getInstance().getTimeInMillis();
 			lastTimeOnTransferUpdate = now;
 

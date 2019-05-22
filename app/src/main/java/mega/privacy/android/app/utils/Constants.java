@@ -284,7 +284,6 @@ public class Constants {
 
 	public static int SUCCESSFUL_VOICE_CLIP_TRANSFER = 1;
 	public static int ERROR_VOICE_CLIP_TRANSFER = 2;
-	public static int INPROGRESS_VOICE_CLIP_TRANSFER = 3;
 
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";

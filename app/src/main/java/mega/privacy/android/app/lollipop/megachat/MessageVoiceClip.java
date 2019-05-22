@@ -8,14 +8,24 @@ public class MessageVoiceClip {
 
     long idMessage;
     long userHandle;
+    long messageHandle;
     int progress = 0;
     boolean isPaused = false;
     MediaPlayer mediaPlayer = null;
-    int isAvailable = Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER;
+    int isAvailable = 0;
 
-    public MessageVoiceClip(long idMessage, long userHandle) {
+    public MessageVoiceClip(long idMessage, long userHandle, long messageHandle) {
         this.idMessage = idMessage;
         this.userHandle = userHandle;
+        this.messageHandle = messageHandle;
+    }
+
+    public long getMessageHandle() {
+        return messageHandle;
+    }
+
+    public void setMessageHandle(long messageHandle) {
+        this.messageHandle = messageHandle;
     }
 
     public long getIdMessage() {

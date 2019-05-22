@@ -1470,7 +1470,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		log("onTransferFinish: " + transfer.getNodeHandle());
+		log("onTransferFinish: " + transfer.getNodeHandle()+", getType = "+transfer.getType());
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 
@@ -1601,11 +1601,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				{
 					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
 					intent.putExtra("nodeHandle", transfer.getNodeHandle());
-					if(error.getErrorCode() == MegaError.API_EEXIST){
-						intent.putExtra("resultTransfer", Constants.INPROGRESS_VOICE_CLIP_TRANSFER);
-					}else{
-						intent.putExtra("resultTransfer", Constants.ERROR_VOICE_CLIP_TRANSFER);
-					}
+					intent.putExtra("resultTransfer", Constants.ERROR_VOICE_CLIP_TRANSFER);
 					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
 					log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());

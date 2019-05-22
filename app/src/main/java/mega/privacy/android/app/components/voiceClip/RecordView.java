@@ -64,7 +64,7 @@ public class RecordView extends RelativeLayout {
     private Context context;
     private OnRecordListener recordListener;
     private boolean isSwiped, isLessThanSecondAllowed = false;
-    private MediaPlayer player;
+    private MediaPlayer player = null;
     private AudioManager audioManager;;
     private AnimationHelper animationHelper;
     private View layoutLock;
