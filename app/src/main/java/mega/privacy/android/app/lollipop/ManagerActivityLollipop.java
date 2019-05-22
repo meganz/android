@@ -2262,7 +2262,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
 						}else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 					else{

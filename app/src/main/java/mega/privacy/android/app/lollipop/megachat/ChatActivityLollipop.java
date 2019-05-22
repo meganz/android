@@ -1676,13 +1676,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatRoom!=null){
             log("onPrepareOptionsMenu chatRoom!=null");
-            callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
             if (chatRoom.isGroup()) {
                 videoMenuItem.setVisible(false);
             }else{
-                videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                 videoMenuItem.setEnabled(false);
                 videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.white_50_opacity));
             }
@@ -1699,28 +1697,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 archiveMenuItem.setVisible(false);
             }else {
                 if(megaChatApi.getNumCalls() <= 0){
-                    callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                     callMenuItem.setEnabled(true);
                     callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
 
                     if (chatRoom.isGroup()) {
                         videoMenuItem.setVisible(false);
                     }else{
-                        videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                         videoMenuItem.setEnabled(true);
                         videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
                     }
 
                 }else{
                     if( (megaChatApi!=null) && (!ChatUtil.participatingInACall(megaChatApi)) && (!megaChatApi.hasCallInChatRoom(chatRoom.getChatId()))){
-                        callMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                         callMenuItem.setEnabled(true);
                         callMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
 
                         if (chatRoom.isGroup()) {
                             videoMenuItem.setVisible(false);
                         }else{
-                            videoMenuItem.setVisible(megaChatApi.areGroupChatCallEnabled());
                             videoMenuItem.setEnabled(true);
                             videoMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
                         }
