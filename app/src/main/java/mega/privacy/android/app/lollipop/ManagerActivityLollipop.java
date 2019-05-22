@@ -17409,6 +17409,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
+        
+        //workaround - can not get folder transfer children detail except using global listener
+        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
+            Intent intent = new Intent(this,UploadService.class);
+            if (e.getErrorCode() == MegaError.API_OK) {
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_OK);
+                startService(intent);
+            }else{
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_FAILED);
+                startService(intent);
+            }
+        }
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
