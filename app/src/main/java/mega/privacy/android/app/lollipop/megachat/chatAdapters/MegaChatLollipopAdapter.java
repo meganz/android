@@ -1455,7 +1455,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).notAvailableOwnVoiceclip.setVisibility(View.GONE);
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipDuration.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(0));
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipDuration.setText("--:--");
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipSeekBar.setProgress(0);
