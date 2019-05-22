@@ -14,12 +14,8 @@ public final class CacheFolderManager {
 
     public static final String QR_FOLDER = "qrMEGA";
 
-    public static boolean isPrivateCacheDirAvailable(Context context) {
-        File privateCacheDir = context.getCacheDir();
-        return privateCacheDir != null && privateCacheDir.canWrite();
-    }
-
     public static File getCacheFolder(Context context,String folderName) {
+        log("create cache folder: " + folderName);
         File cacheFolder = new File(context.getCacheDir(),folderName);
         if (cacheFolder.exists()) {
             return cacheFolder;
@@ -30,10 +26,6 @@ public final class CacheFolderManager {
                 return null;
             }
         }
-    }
-
-    public static File buildThumbnailFile(Context context,String fileName) {
-        return getCacheFile(context,THUMBNAIL_FOLDER,fileName);
     }
 
     public static File buildQrFile(Context context,String fileName) {
@@ -58,5 +50,9 @@ public final class CacheFolderManager {
 
     public static boolean isFileAvailable(File file) {
         return file != null && file.exists();
+    }
+
+    public static void log(String message) {
+        Util.log("CacheFolderManager", message);
     }
 }
