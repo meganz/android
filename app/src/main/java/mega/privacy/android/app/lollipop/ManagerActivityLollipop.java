@@ -6353,7 +6353,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
+		playTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
+		pauseTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_pause_white, R.color.black));
 		cancelAllTransfersMenuItem.setVisible(false);
 		clearCompletedTransfers.setVisible(false);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
