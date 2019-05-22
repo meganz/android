@@ -230,7 +230,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					outState.putBoolean("contentAvatar", contentAvatar);
 				}
 			}
-			if (!contentAvatar){
+			if (!contentAvatar && initialLetterInvite != null){
 				outState.putString("initialLetter", initialLetterInvite.getText().toString());
 			}
 		}
