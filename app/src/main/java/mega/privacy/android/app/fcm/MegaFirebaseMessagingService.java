@@ -237,6 +237,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                     if(app.isActivityVisible()){
                         log("App on foreground --> return");
+                        retryPendingConnections();
                         return;
                     }
 
