@@ -172,21 +172,23 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             //fetch photos from gallery
             new FetchPhotosTask(fileStorageFragment).execute();
 
-            if (adapter.getItemCount() == 0){
-                sendIcon.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.GONE);
-                emptyTextView.setVisibility(View.VISIBLE);
-            }else{
-                if(adapter.isMultipleSelect()){
-                    sendIcon.setVisibility(View.VISIBLE);
-                }else{
-                    sendIcon.setVisibility(View.GONE);
-                }
-                recyclerView.setVisibility(View.VISIBLE);
-                emptyTextView.setVisibility(View.GONE);
-            }
+           checkAdapterItems(this);
         }
             return v;
+    }
+
+    private static void checkAdapterItems(ChatFileStorageFragment context){
+        context.sendIcon.setVisibility(View.GONE);
+        if (context.adapter.getItemCount() == 0){
+            context.recyclerView.setVisibility(View.GONE);
+            context.emptyTextView.setVisibility(View.VISIBLE);
+            return;
+        }
+        if(context.adapter.isMultipleSelect()){
+            context.sendIcon.setVisibility(View.VISIBLE);
+        }
+        context.recyclerView.setVisibility(View.VISIBLE);
+        context.emptyTextView.setVisibility(View.GONE);
     }
 
 
@@ -232,26 +234,11 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     public void setNodes(ArrayList<String> mPhotoUris){
 
         this.mPhotoUris = mPhotoUris;
-            if (adapter != null){
-                adapter.setNodes(mPhotoUris);
+        if(adapter == null) return;
 
-                if (adapter.getItemCount() == 0){
-                    sendIcon.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.GONE);
-                    emptyTextView.setVisibility(View.VISIBLE);
-                }else{
-                    if(adapter.isMultipleSelect()){
-                        sendIcon.setVisibility(View.VISIBLE);
-                    }else{
-                        sendIcon.setVisibility(View.GONE);
-                    }
-                    recyclerView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.GONE);
-                }
-            }
-            else{
-                log("grid adapter is NULL");
-            }
+        adapter.setNodes(mPhotoUris);
+        checkAdapterItems(this);
+
     }
 
     public int getItemCount(){
@@ -271,11 +258,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void clearSelections() {
-        if(adapter != null){
-            if(adapter.isMultipleSelect()){
-                adapter.clearSelections();
-            }
-        }
+        if((adapter == null)||(!adapter.isMultipleSelect())) return;
+        adapter.clearSelections();
+
     }
 
     public void hideMultipleSelect() {
@@ -370,19 +355,9 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
                     context.mPhotoUris.addAll(photoUris);
                     context.adapter.notifyDataSetChanged();
                 }
-                if (context.adapter.getItemCount() == 0){
-                    context.sendIcon.setVisibility(View.GONE);
-                    context.recyclerView.setVisibility(View.GONE);
-                    context.emptyTextView.setVisibility(View.VISIBLE);
-                }else{
-                    if(context.adapter.isMultipleSelect()){
-                        context.sendIcon.setVisibility(View.VISIBLE);
-                    }else{
-                        context.sendIcon.setVisibility(View.GONE);
-                    }
-                    context.recyclerView.setVisibility(View.VISIBLE);
-                    context.emptyTextView.setVisibility(View.GONE);
-                }
+
+                checkAdapterItems(context);
+
             }
         }
     }
