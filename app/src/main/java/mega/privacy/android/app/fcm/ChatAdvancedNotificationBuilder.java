@@ -225,14 +225,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                         if((message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(message.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
                             log("buildNotificationPreN() TYPE_NODE_ATTACHMENT || TYPE_VOICE_CLIP");
-                            MegaNodeList nodeList = message.getMegaNodeList();
-                            if(nodeList != null) {
-                                if (nodeList.size() == 1) {
-                                    MegaNode node = nodeList.get(0);
-                                    log("Node Name: " + node.getName());
-                                    messageContent = node.getName();
-                                }
-                            }
+                            messageContent= checkMessageContentAttachmentOrVoiceClip (message);
                         }
                         else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             log("buildNotificationPreN() TYPE_CONTACT_ATTACHMENT");
@@ -265,7 +258,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                         }else if(message.getType()==MegaChatMessage.TYPE_CONTAINS_META){
                             log("buildNotification() TYPE_CONTAINS_META");
-                            messageContent = checkMessageContent(message);
+                            messageContent = checkMessageContentMeta(message);
                         }
                         else{
                             log("buildNotificationPreN() OTHER");
@@ -323,7 +316,15 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    private String checkMessageContent(MegaChatMessage message){
+    private String checkMessageContentAttachmentOrVoiceClip(MegaChatMessage message){
+        MegaNodeList nodeList = message.getMegaNodeList();
+        if((nodeList != null) && (nodeList.size() == 1)) {
+            return nodeList.get(0).getName();
+        }
+        return null;
+    }
+
+    private String checkMessageContentMeta(MegaChatMessage message){
         MegaChatContainsMeta meta = message.getContainsMeta();
         if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
             return  context.getString(R.string.title_geolocation_message);
@@ -418,15 +419,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             if(msg!=null){
                 if((msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (msg.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                    log("buildNotification() TYPE_NODE_ATTACHMENT || TYPE_VOICE_CLIP");
-                    MegaNodeList nodeList = msg.getMegaNodeList();
-                    if(nodeList != null) {
-                        if (nodeList.size() == 1) {
-                            MegaNode node = nodeList.get(0);
-                            log("Node Name: " + node.getName());
-                            messageContent = node.getName();
-                        }
-                    }
+                    messageContent= checkMessageContentAttachmentOrVoiceClip (msg)
                 }
                 else if(msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                     log("buildNotification() TYPE_CONTACT_ATTACHMENT");
@@ -458,7 +451,7 @@ public final class ChatAdvancedNotificationBuilder {
                     messageContent = context.getString(R.string.history_cleared_message);
                 }else if(msg.getType()==MegaChatMessage.TYPE_CONTAINS_META){
                     log("buildNotification() TYPE_CONTAINS_META");
-                    messageContent  = checkMessageContent(msg);
+                    messageContent  = checkMessageContentMeta(msg);
 
                 }
                 else{

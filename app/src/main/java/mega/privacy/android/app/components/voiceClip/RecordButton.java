@@ -32,10 +32,10 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
 
     private void init(Context context, AttributeSet attrs) {
-        if (attrs != null) {
-            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
-            typedArray.recycle();
-        }
+        if(attrs == null) return;
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RecordButton);
+        typedArray.recycle();
+
     }
 
     public void setRecordView(RecordView recordView) {
@@ -65,9 +65,8 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     }
 
     public void setClip(View v) {
-        if (v.getParent() == null) {
-            return;
-        }
+        if (v.getParent() == null) return;
+
         if (v instanceof ViewGroup) {
             ((ViewGroup) v).setClipChildren(false);
             ((ViewGroup) v).setClipToPadding(false);
@@ -107,9 +106,8 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
 
     @Override
     public void onClick(View v) {
-        if (onRecordClickListener != null){
-            onRecordClickListener.onClick(v);
-        }
+        if (onRecordClickListener == null) return;
+        onRecordClickListener.onClick(v);
     }
 
     public static void log(String message) {
