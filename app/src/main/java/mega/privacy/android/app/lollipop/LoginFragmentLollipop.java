@@ -1287,7 +1287,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("enableChat: condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1307,7 +1306,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         log("enableChat: condition ret == OK -- chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                 }
                 else{
@@ -1369,7 +1367,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (ret == MegaChatApi.INIT_NO_CACHE)
                     {
                         log("startFastLogin: condition ret == MegaChatApi.INIT_NO_CACHE");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                     else if (ret == MegaChatApi.INIT_ERROR)
                     {
@@ -1389,7 +1386,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                     else{
                         log("startFastLogin: condition ret == OK -- chat correctly initialized");
-                        megaChatApi.enableGroupChatCalls(true);
                     }
                     log("After init: "+ret);
                 }
@@ -1609,7 +1605,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
                     disableLoginButton();
                     megaApi.login(lastEmail, lastPassword, this);
-                    megaChatApi.enableGroupChatCalls(true);
                 }
                 else{
                     log("ERROR INIT CHAT: " + ret);
