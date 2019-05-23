@@ -265,12 +265,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                         }else if(message.getType()==MegaChatMessage.TYPE_CONTAINS_META){
                             log("buildNotification() TYPE_CONTAINS_META");
-                            MegaChatContainsMeta meta = message.getContainsMeta();
-                            if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-                                messageContent = context.getString(R.string.title_geolocation_message);
-                            }else{
-                                messageContent = message.getContent();
-                            }
+                            messageContent = checkMessageContent(message);
                         }
                         else{
                             log("buildNotificationPreN() OTHER");
@@ -326,6 +321,14 @@ public final class ChatAdvancedNotificationBuilder {
         else{
             notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_CHAT);
         }
+    }
+
+    private String checkMessageContent(MegaChatMessage message){
+        MegaChatContainsMeta meta = message.getContainsMeta();
+        if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
+            return  context.getString(R.string.title_geolocation_message);
+        }
+        return message.getContent();
     }
 
     public Notification buildNotification(Uri uriParameter, String vibration, String groupKey, MegaChatRoom chat, ArrayList<MegaChatMessage> unreadMessageList) {
@@ -455,12 +458,8 @@ public final class ChatAdvancedNotificationBuilder {
                     messageContent = context.getString(R.string.history_cleared_message);
                 }else if(msg.getType()==MegaChatMessage.TYPE_CONTAINS_META){
                     log("buildNotification() TYPE_CONTAINS_META");
-                    MegaChatContainsMeta meta = msg.getContainsMeta();
-                    if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-                        messageContent = context.getString(R.string.title_geolocation_message);
-                    }else{
-                        messageContent = msg.getContent();
-                    }
+                    messageContent  = checkMessageContent(msg);
+
                 }
                 else{
                     log("buildNotification() OTHER");
