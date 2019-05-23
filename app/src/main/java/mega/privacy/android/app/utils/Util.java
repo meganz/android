@@ -91,14 +91,20 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import mega.privacy.android.app.AndroidLogger;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -612,6 +618,20 @@ public class Util {
 		if (connectivityManager != null) {
 			networkInfo = connectivityManager
 					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		}
+		return networkInfo == null ? false : networkInfo.isConnected();
+	}
+
+	/*
+	 * Check is device on Mobile Data
+	 */
+	public static boolean isOnMobileData(Context context) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = null;
+		if (connectivityManager != null) {
+			networkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
@@ -1283,20 +1303,38 @@ public class Util {
 		return numberOfNodes;
 	}
 	
-	public static String getLocalIpAddress()
+	public static String getLocalIpAddress(Context context)
   {
 		  try {
 			  for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				  NetworkInterface intf = en.nextElement();
+				  String interfaceName = intf.getName();
+
+				  // Ensure get the IP from the current active network interface
+				  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					  ConnectivityManager cm =
+							  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+					  String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
+					  if (interfaceName.compareTo(activeInterfaceName) != 0) {
+					  	continue;
+					  }
+				  }
+				  else {
+					  if ((isOnWifi(context) && !interfaceName.contains("wlan") && !interfaceName.contains("ath")) ||
+							  (isOnMobileData(context) && !interfaceName.contains("data") && !interfaceName.contains("rmnet"))) {
+					  	continue;
+					  }
+				  }
+
 				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					  InetAddress inetAddress = enumIpAddr.nextElement();
-					  if (!inetAddress.isLoopbackAddress()) {
-						  return inetAddress.getHostAddress().toString();
+					  if (inetAddress != null && !inetAddress.isLoopbackAddress()) {
+					  	return inetAddress.getHostAddress();
 					  }
 				  }
 			  }
 		  } catch (Exception ex) {
-			  log("Error IP Address: " + ex.toString());
+			  log("Error getting local IP address: " + ex.toString());
 		  }
 		  return null;
    }
@@ -2217,6 +2255,46 @@ public class Util {
 		}
 		return true;
 	}
+    
+    public static void showSnackBar(Context context,int snackbarType,String message,int idChat) {
+        if (context instanceof ChatFullScreenImageViewer) {
+            ((ChatFullScreenImageViewer)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof AudioVideoPlayerLollipop) {
+            ((AudioVideoPlayerLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof PdfViewerActivityLollipop) {
+            ((PdfViewerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof ChatActivityLollipop) {
+            ((ChatActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof NodeAttachmentHistoryActivity) {
+            ((NodeAttachmentHistoryActivity)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop)context).showSnackbar(snackbarType,message,idChat);
+        } else if (context instanceof BaseActivity) {
+            View rootView = getRootViewFromContext(context);
+            if (rootView == null) {
+                log("unable to show snack bar, view does not exist");
+            } else {
+                ((BaseActivity)context).showSnackbar(snackbarType,rootView,message,idChat);
+            }
+        }
+    }
+    
+    private static View getRootViewFromContext(Context context) {
+        BaseActivity activity = (BaseActivity)context;
+        View rootView = null;
+        try {
+            rootView = activity.findViewById(android.R.id.content);
+            if (rootView == null) {
+                rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
+            }
+            if (rootView == null) {
+                rootView = ((ViewGroup)((BaseActivity)context).findViewById(android.R.id.content)).getChildAt(0);//get first view
+            }
+        } catch (Exception e) {
+            log("getRootViewFromContext " + e.getMessage());
+        }
+        return rootView;
+    }
 
 	public static void hideKeyboard(Activity activity, int flag){
 

@@ -319,8 +319,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		setAccountDetails();
 
-		refreshAccountInfo();
-
 		return v;
 	}
     
@@ -329,6 +327,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         super.onResume();
         //Refresh
 		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+		refreshAccountInfo();
         updateView();
     }
     
@@ -421,7 +420,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("megaApi.getExtendedAccountDetails SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForExtendedAccountDetails();
 		}
-		log("Check the last call to callToPaymentMethods");
+		log("Check the last call to getPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			log("megaApi.getPaymentMethods SEND");
 			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
@@ -596,8 +595,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_account_type_button:{
 				log("Upgrade Account button");
+				((ManagerActivityLollipop) context).setAccountFragmentPreUpgradeAccount(Constants.MY_ACCOUNT_FRAGMENT);
 				((ManagerActivityLollipop)context).showUpAF();
-
 				break;
 			}
 			case R.id.my_account_achievements_layout:{
