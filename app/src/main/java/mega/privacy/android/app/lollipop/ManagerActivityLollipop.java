@@ -2262,7 +2262,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
 						}else{
 							log("onCreate: Chat correctly initialized");
-							megaChatApi.enableGroupChatCalls(true);
 						}
 					}
 					else{
@@ -6354,7 +6353,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
+		playTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
+		pauseTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_pause_white, R.color.black));
 		cancelAllTransfersMenuItem.setVisible(false);
 		clearCompletedTransfers.setVisible(false);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
@@ -17410,6 +17411,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
+        
+        //workaround - can not get folder transfer children detail except using global listener
+        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
+            Intent intent = new Intent(this,UploadService.class);
+            if (e.getErrorCode() == MegaError.API_OK) {
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_OK);
+                startService(intent);
+            }else{
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_FAILED);
+                startService(intent);
+            }
+        }
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
