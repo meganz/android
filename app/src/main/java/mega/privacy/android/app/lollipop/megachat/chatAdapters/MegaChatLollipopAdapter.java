@@ -6129,8 +6129,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+        if(messagesPlaying == null) messagesPlaying = new ArrayList<>();
         boolean exist = false;
-        if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
+
+        if(!messagesPlaying.isEmpty()){
             for(MessageVoiceClip m:messagesPlaying){
                 if(m.getIdMessage() == messageId){
                     exist = true;
@@ -6248,13 +6250,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
                 holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
 
-
                 holder.contentOwnMessageVoiceClipDuration.setText("-:--");
 
             }else {
 
                 if((holder.totalDurationOfVoiceClip == 0) || (currentMessagePlaying.getIsAvailable() == Constants.ERROR_VOICE_CLIP_TRANSFER)){
-                    log("bindVC:myMessage:SENT -> duraton 0 or available != successful");
+                    log("bindVC:myMessage:SENT -> duraton 0 or available == error");
                     holder.notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
                     holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
                     holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
@@ -6264,21 +6265,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentOwnMessageVoiceClipDuration.setText("--:--");
 
                 }else{
-                    log("bindVC:myMessage:SENT available ---- positionINAdapter = "+positionInAdapter+", isAvailable = "+currentMessagePlaying.getIsAvailable());
-
-                    boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, message.getMegaNodeList().get(0));
+                    log("bindVC:myMessage:SENT -> available ");
+                    boolean isDownloaded = false;
+                    if((message.getMegaNodeList() != null) && (message.getMegaNodeList().size()>0) && (message.getMegaNodeList().get(0) != null)){
+                        isDownloaded = ChatUtil.isInMegaVoiceNotes(context, message.getMegaNodeList().get(0));
+                    }
                     if(!isDownloaded){
-                        log("bindVC:myMessage: is not downloaded ---> downloadVoiceClip");
+                        log("bindVC:myMessage: is not downloaded ");
                         holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
                         holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                         holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
-
                         holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
                         holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
                         holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
-
                         holder.contentOwnMessageVoiceClipDuration.setText("--:--");
-
                         downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), message.getMegaNodeList());
 
                     }else{
@@ -6288,10 +6288,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
 
                         if(currentMessagePlaying.getMediaPlayer().isPlaying()){
-                            log("bindVC:myMessage: is playing ");
                             holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
                         }else{
-                            log("bindVC:myMessage: is not playing ");
                             holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
                         }
 
@@ -6342,10 +6340,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("Multiselect ON");
                 holder.contentOwnMessageVoiceClipPlay.setOnClickListener(null);
                 if (this.isItemChecked(positionInAdapter)) {
-                    log("bindVC:myMessage: MultiselectON -> restartMediaPlayer");
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
                 } else {
-                    log("NOT selected");
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                 }
             }
@@ -6476,7 +6472,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageVoiceClipDuration.setText("--:--");
 
             }else{
-                boolean isDownloaded = ChatUtil.isInMegaVoiceNotes(context, nodeListOwn.get(0));
+                boolean isDownloaded = false;
+                if((message.getMegaNodeList() != null) && (message.getMegaNodeList().size()>0) && (message.getMegaNodeList().get(0) != null)){
+                    isDownloaded = ChatUtil.isInMegaVoiceNotes(context, message.getMegaNodeList().get(0));
+                }
                 if(!isDownloaded){
                     log("bindVC:ContMessage -> is not downloaded -> downloadVoiceClip");
                     holder.uploadingContactProgressbarVoiceclip.setVisibility(View.VISIBLE);
@@ -6489,7 +6488,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     holder.contentContactMessageVoiceClipDuration.setText("--:--");
 
-                    downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), nodeListOwn);
+                    downloadVoiceClip(holder, positionInAdapter, message.getUserHandle(), message.getMegaNodeList());
 
                 }else{
                     log("bindVC:ContMessage -> is downloaded");
@@ -6498,10 +6497,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.uploadingContactProgressbarVoiceclip.setVisibility(View.GONE);
 
                     if(currentMessagePlaying.getMediaPlayer().isPlaying()){
-                        log("bindVC:ContMessage: is playing");
                         holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
                     }else{
-                        log("bindVC:ContMessage: is not Playing");
                         holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
                     }
 
