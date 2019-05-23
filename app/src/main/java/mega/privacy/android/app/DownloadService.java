@@ -1494,10 +1494,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					try{ wl.release(); } catch(Exception ex) {}
 
 				log("Download cancelled: " + transfer.getNodeHandle());
-				Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
-				intent.putExtra("nodeHandle", transfer.getNodeHandle());
-				intent.putExtra("resultTransfer", Constants.ERROR_VOICE_CLIP_TRANSFER);
-				LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+				resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
 
 				File file = new File(transfer.getPath());
 				file.delete();
@@ -1507,11 +1505,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				if (error.getErrorCode() == MegaError.API_OK) {
-					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
-					intent.putExtra("nodeHandle", transfer.getNodeHandle());
-					intent.putExtra("resultTransfer", Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
-					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
+					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
 
 					log("DOWNLOADFILE: " + transfer.getPath());
 
@@ -1597,12 +1591,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else
 				{
-					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
-					intent.putExtra("nodeHandle", transfer.getNodeHandle());
-					intent.putExtra("resultTransfer", Constants.ERROR_VOICE_CLIP_TRANSFER);
-					LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
 
-					log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
 					if(!transfer.isFolderTransfer()){
 						errorCount++;
@@ -1624,6 +1614,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				onQueueComplete(transfer.getNodeHandle());
 			}
 		}
+	}
+
+	private void resultTransfersVoiceClip(long nodeHandle, int result){
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
+		intent.putExtra("nodeHandle",nodeHandle);
+		intent.putExtra("resultTransfer", result);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
 	private void alterDocument(Uri uri, String fileName) {
