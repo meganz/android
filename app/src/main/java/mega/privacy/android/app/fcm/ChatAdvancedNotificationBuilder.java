@@ -419,7 +419,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             if(msg!=null){
                 if((msg.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (msg.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                    messageContent= checkMessageContentAttachmentOrVoiceClip (msg)
+                    messageContent= checkMessageContentAttachmentOrVoiceClip(msg);
                 }
                 else if(msg.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                     log("buildNotification() TYPE_CONTACT_ATTACHMENT");
