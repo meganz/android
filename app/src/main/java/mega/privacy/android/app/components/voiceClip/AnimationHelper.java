@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -64,17 +65,11 @@ public class AnimationHelper {
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
-        alphaAnimation1 = new AlphaAnimation(0.2f, 1.0f);
-        alphaAnimation1.setDuration(durationAlpha);
-        alphaAnimation1.setFillAfter(true);
-        alphaAnimation2 = new AlphaAnimation(1.0f, 0.0f);
-        alphaAnimation2.setDuration(durationAlpha);
-        alphaAnimation2.setFillAfter(true);
+        alphaAnimation1 = initializeAlphaAnimation(0.2f, 1.0f);
+        alphaAnimation2 = initializeAlphaAnimation(1.0f, 0.0f);
 
-        translateAnimation1 = new TranslateAnimation(basketInitialX, basketInitialX + 90, 0, 0);
-        translateAnimation1.setDuration(durationTraslate);
-        translateAnimation2 = new TranslateAnimation(basketInitialX + 90, basketInitialX, 0, 0);
-        translateAnimation2.setDuration(durationAlpha);
+        translateAnimation1 = initializeTranslateAnimation(basketInitialX,basketInitialX+90);
+        translateAnimation2 = initializeTranslateAnimation(basketInitialX+90,basketInitialX);
 
         micAnimation.start();
         basketImg.setImageDrawable(animatedVectorDrawable);
@@ -133,6 +128,40 @@ public class AnimationHelper {
         });
     }
 
+    private AlphaAnimation initializeAlphaAnimation(float start, float end){
+        AlphaAnimation anim = new AlphaAnimation(start, end);
+        anim.setDuration(durationAlpha);
+        anim.setFillAfter(true);
+        return anim;
+    }
+
+    private TranslateAnimation initializeTranslateAnimation( float fromX, float toX){
+        TranslateAnimation anim = new TranslateAnimation(fromX, toX, 0, 0);
+        anim.setDuration(durationTraslate);
+        return anim;
+    }
+
+    private void resetAnimation(Animation anim){
+            if(anim == null) return;
+            anim.reset();
+            anim.cancel();
+    }
+
+    private void resetAnimationSet(AnimatorSet anim){
+        if(anim == null) return;
+        anim.cancel();
+    }
+
+    private void clearAnimation(ImageView imageView){
+        if(imageView == null) return;
+        imageView.clearAnimation();
+    }
+
+    private void removeCallbacks(Handler handler){
+        if(handler == null) return;
+        handler.removeCallbacksAndMessages(null);
+    }
+
 
     /*
     * Stop the current animation and revert views back to default state
@@ -140,29 +169,15 @@ public class AnimationHelper {
     public void resetBasketAnimation() {
         log("resetBasketAnimation()");
         if (!isBasketAnimating) return;
-        
-        if(translateAnimation1!=null){
-            translateAnimation1.reset();
-            translateAnimation1.cancel();
-        }
-        if(translateAnimation2!=null){
-            translateAnimation2.reset();
-            translateAnimation2.cancel();
-        }
-        if(micAnimation!=null) {
-            micAnimation.cancel();
-        }
-        if(smallBlinkingMic!=null) {
-            smallBlinkingMic.clearAnimation();
-        }
-        if(basketImg!=null) {
-            basketImg.clearAnimation();
-        }
 
-        if (handler1 != null)
-            handler1.removeCallbacksAndMessages(null);
-        if (handler2 != null)
-            handler2.removeCallbacksAndMessages(null);
+        resetAnimation(translateAnimation1);
+        resetAnimation(translateAnimation2);
+        resetAnimationSet(micAnimation);
+        clearAnimation(smallBlinkingMic);
+        clearAnimation(basketImg);
+        removeCallbacks(handler1);
+        removeCallbacks(handler2);
+
 
         basketImg.setVisibility(INVISIBLE);
         smallBlinkingMic.setX(micX);
@@ -174,16 +189,11 @@ public class AnimationHelper {
 
     public void clearAlphaAnimation(boolean hideView) {
         log("clearAlphaAnimation()");
-        if(alphaAnimation != null){
-            alphaAnimation.cancel();
-            alphaAnimation.reset();
-        }
-        if(smallBlinkingMic!=null) {
-            smallBlinkingMic.clearAnimation();
-        }
-        if (hideView) {
-            smallBlinkingMic.setVisibility(View.GONE);
-        }
+        resetAnimation(alphaAnimation);
+        clearAnimation(smallBlinkingMic);
+        if(!hideView)return;
+        smallBlinkingMic.setVisibility(View.GONE);
+
     }
 
     public void animateSmallMicAlpha() {

@@ -724,9 +724,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		log("onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
-		log("transfer.getPath:" + transfer.getPath());
-		
+		log("onTransferFinish: path " + transfer.getPath() + " size " + transfer.getTransferredBytes());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
             
             if(isTransferBelongsToFolderTransfer(transfer)){
