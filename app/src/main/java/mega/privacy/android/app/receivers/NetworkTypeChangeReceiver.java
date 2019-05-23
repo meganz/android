@@ -10,19 +10,10 @@ import mega.privacy.android.app.utils.Util;
 
 public class NetworkTypeChangeReceiver extends BroadcastReceiver {
 
-    private static NetworkTypeChangeReceiver receiver;
-
     private OnNetworkTypeChangeCallback callback;
 
     public static final int MOBILE = 0;
     public static final int WIFI = 1;
-
-    public static NetworkTypeChangeReceiver getInstance() {
-        if (receiver == null) {
-            receiver = new NetworkTypeChangeReceiver();
-        }
-        return receiver;
-    }
 
     @Override
     public void onReceive(Context context,Intent intent) {

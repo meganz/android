@@ -138,7 +138,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     static String gSession;
     private boolean isSec;
     boolean stopped = false;
-    
+    private NetworkTypeChangeReceiver receiver;
+
     public class Media {
         public String filePath;
         public long timestamp;
@@ -172,7 +173,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         log("onDestroy()");
         super.onDestroy();
         isServiceRunning = false;
-        unregisterReceiver(NetworkTypeChangeReceiver.getInstance());
+        if(receiver != null) {
+            unregisterReceiver(receiver);
+        }
     }
     
     @Nullable
@@ -236,7 +239,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void registerNetworkTypeChangeReceiver() {
-        NetworkTypeChangeReceiver receiver = NetworkTypeChangeReceiver.getInstance();
+        receiver = new NetworkTypeChangeReceiver();
         registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
         receiver.setCallback(this);
     }
