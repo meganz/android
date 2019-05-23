@@ -382,7 +382,10 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     private void setActivityResult (final MapAddress location) {
 
+        if(location == null) return;
+
         progressBar.setVisibility(View.VISIBLE);
+
 
         final Double latitude = location.getLatLng().latitude;
         final Double longitude = location.getLatLng().longitude;
