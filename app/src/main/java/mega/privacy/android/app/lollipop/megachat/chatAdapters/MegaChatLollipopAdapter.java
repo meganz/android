@@ -1524,7 +1524,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                         }
                     }
-                    log("Node Name: " + name);
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -5526,7 +5525,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (nodeList != null) {
                 if (nodeList.size() == 1) {
                     MegaNode node = nodeList.get(0);
-                    log("Node Name: " + node.getName());
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -5745,7 +5743,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         MegaNode temp = nodeList.get(i);
                         if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
                             count++;
-                            log("Node Name: " + temp.getName());
                             totalSize = totalSize + temp.getSize();
                         }
                     }
@@ -5900,7 +5897,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (nodeList != null) {
                 if (nodeList.size() == 1) {
                     MegaNode node = nodeList.get(0);
-                    log("Node Name: " + node.getName());
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -6072,7 +6068,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         MegaNode temp = nodeList.get(i);
                         if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
                             count++;
-                            log("Node Name: " + temp.getName());
                             totalSize = totalSize + temp.getSize();
                         }
                     }
