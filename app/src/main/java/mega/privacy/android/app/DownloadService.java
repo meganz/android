@@ -214,6 +214,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		return START_NOT_STICKY;
 	}
 
+	private boolean isVoiceClipType(String value){
+		if((value!=null)&&(value.contains(Constants.EXTRA_VOICE_CLIP))) return true;
+		return false;
+
+	}
+
     protected void onHandleIntent(final Intent intent) {
         log("onHandleIntent");
 
@@ -278,9 +284,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					pendingIntents.add(intent);
-					if(!type.equals(Constants.EXTRA_VOICE_CLIP)){
-						updateProgressNotification();
-					}
+					if(!isVoiceClipType(type)) updateProgressNotification();
+
 					megaApi.fastLogin(gSession, this);
 					return;
 				}
@@ -416,13 +421,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(highPriority){
 
 				String data = "";
-				if((type!=null)&&(type.equals(Constants.EXTRA_VOICE_CLIP))){
-					data = Constants.EXTRA_VOICE_CLIP;
-				}
+				if(isVoiceClipType(type)) data = Constants.EXTRA_VOICE_CLIP;
 				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 
-			}
-			else{
+			}else{
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 			}
         }
@@ -480,9 +482,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 log("CurrentDocument is not null");
 				if(highPriority){
 					String data = "";
-					if((type!=null)&&(type.equals(Constants.EXTRA_VOICE_CLIP))){
-						data = Constants.EXTRA_VOICE_CLIP;
-					}
+					if(isVoiceClipType(type)) data = Constants.EXTRA_VOICE_CLIP;
 					megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 				}
 				else{
@@ -1459,7 +1459,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferStart:Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
-		if((transfer.getAppData() != null)&&(transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+		if(isVoiceClipType(transfer.getAppData())) return;
 		if((transfer.getType()==MegaTransfer.TYPE_DOWNLOAD)){
 			transfersCount++;
 			updateProgressNotification();
@@ -1472,9 +1472,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 
-			if((transfer.getAppData()==null) || (!transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))){
-				transfersCount--;
-			}
+			if(!isVoiceClipType(transfer.getAppData())) transfersCount--;
 
 			if(!transfer.isFolderTransfer()){
 				if(transfer.getState()==MegaTransfer.STATE_COMPLETED){
@@ -1482,9 +1480,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle()+"");
 					dbH.setCompletedTransfer(completedTransfer);
 				}
-				if((transfer.getAppData()==null) || (!transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))){
-					updateProgressNotification();
-				}
+
+				if(!isVoiceClipType(transfer.getAppData())) updateProgressNotification();
 			}
 
 			if (canceled) {
@@ -1608,7 +1605,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 				}
 			}
-			if((transfer.getAppData()!=null) && (transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+			if(isVoiceClipType(transfer.getAppData())) return;
 
 			if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
 				onQueueComplete(transfer.getNodeHandle());
@@ -2217,7 +2214,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if((transfer.getAppData() != null)&&(transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+			if(isVoiceClipType(transfer.getAppData())) return;
 
 			if(!transfer.isFolderTransfer()){
 				updateProgressNotification();
@@ -2241,7 +2238,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 					isOverquota = true;
 					log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
-					if((transfer.getAppData() != null)&&(transfer.getAppData().equals(Constants.EXTRA_VOICE_CLIP))) return;
+					if(isVoiceClipType(transfer.getAppData())) return;
 					showTransferOverquotaNotification();
 				}
 			}
