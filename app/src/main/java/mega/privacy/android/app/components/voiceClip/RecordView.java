@@ -334,7 +334,10 @@ public class RecordView extends RelativeLayout {
                 return;
             }
 
-            if(player == null) return;
+            if(player == null){
+                typeStart(type);
+                return;
+            }
 
             player.reset();
             player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -349,8 +352,8 @@ public class RecordView extends RelativeLayout {
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        mp.reset();
                         recordListenerOptions(FINISH_SOUND,0);
+                        mp.reset();
                     }
                 });
             }else{

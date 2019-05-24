@@ -1907,7 +1907,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(!checkPermissionsVoiceClip()) return;
         recordView.playSound(Constants.TYPE_START_RECORD);
         stopReproductions();
+    }
 
+
+        /*
+     * Start recording
+     */
+    public void startRecording(){
+        log("startRecording() with Permissions");
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
         File newFolder = new File(path);
         newFolder.mkdirs();
@@ -1926,20 +1933,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         try {
             myAudioRecorder.prepare();
+            myAudioRecorder.start();
+            setRecordingNow(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-
-        /*
-     * Start recording
-     */
-    public void startRecording(){
-        log("startRecording() with Permissions");
-        if(myAudioRecorder == null) return;
-        myAudioRecorder.start();
-        setRecordingNow(true);
     }
 
     /*
