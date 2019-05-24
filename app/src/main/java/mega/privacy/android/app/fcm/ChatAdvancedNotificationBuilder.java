@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fcm;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -35,7 +36,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -91,6 +91,8 @@ public final class ChatAdvancedNotificationBuilder {
         dbH = DatabaseHandler.getDbHandler(context);
         this.megaApi = megaApi;
         this.megaChatApi = megaChatApi;
+
+        createChatSummaryChannel(context);
     }
 
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaHandleList unreadHandleList) {
@@ -675,6 +677,34 @@ public final class ChatAdvancedNotificationBuilder {
         return defaultAvatar;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
+    public static void createChatSummaryChannel(Context context) {
+        String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
+        String notificationChannelNameChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
+        String notificationChannelIdChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
+        String notificationChannelNameChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
+
+        NotificationChannel channelWithVibration = new NotificationChannel(notificationChannelIdChatSummary,notificationChannelNameChatSummary,NotificationManager.IMPORTANCE_HIGH);
+        channelWithVibration.setShowBadge(true);
+        channelWithVibration.setVibrationPattern(new long[] {0,500});
+        channelWithVibration.enableLights(true);
+        //green light
+        channelWithVibration.setLightColor(Color.rgb(0,255,0));
+        //current ringtone for notification
+        channelWithVibration.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),Notification.AUDIO_ATTRIBUTES_DEFAULT);
+
+        NotificationChannel channelNoVibration = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate,notificationChannelNameChatSummaryNoVibrate,NotificationManager.IMPORTANCE_HIGH);
+        channelNoVibration.setShowBadge(true);
+        channelNoVibration.enableVibration(false);
+        channelNoVibration.setVibrationPattern(new long[] {0});
+
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.createNotificationChannel(channelWithVibration);
+            manager.createNotificationChannel(channelNoVibration);
+        }
+    }
+
     public Notification buildSummary (String groupKey, boolean beep){
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -715,29 +745,6 @@ public final class ChatAdvancedNotificationBuilder {
                     }
                 }
 
-                NotificationChannel channel = null;
-                if (vibrationEnabled){
-                    channel = new NotificationChannel(notificationChannelIdChatSummary, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
-                    channel.setShowBadge(true);
-                }
-                else{
-                    channel = new NotificationChannel(notificationChannelIdChatSummaryNoVibrate, notificationChannelNameChatSummaryNoVibrate, NotificationManager.IMPORTANCE_HIGH);
-                    channel.setShowBadge(true);
-                    channel.enableVibration(false);
-                    channel.setVibrationPattern(new long[] {0L});
-                }
-
-                if (notificationManager != null) {
-                    if (notificationManager.getNotificationChannel(notificationChannelIdChatSummary) != null){
-                        notificationManager.deleteNotificationChannel(notificationChannelIdChatSummary);
-                    }
-                    if (notificationManager.getNotificationChannel(notificationChannelIdChatSummaryNoVibrate) != null){
-                        notificationManager.deleteNotificationChannel(notificationChannelIdChatSummaryNoVibrate);
-                    }
-
-                    notificationManager.createNotificationChannel(channel);
-                }
-
                 NotificationCompat.Builder notificationBuilderO = null;
                 if (vibrationEnabled){
                     notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
@@ -759,50 +766,6 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
         else{
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
-            }
-
-            notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify)
-                    .setShowWhen(true)
-                    .setGroup(groupKey)
-                    .setGroupSummary(true)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
-
-            return notificationBuilder.build();
-        }
-    }
-
-    public Notification buildSummary(String groupKey) {
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.ACTION_CHAT_SUMMARY);
-        intent.putExtra("CHAT_ID", -1);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(notificationChannelIdChatSummary, notificationChannelNameChatSummary, NotificationManager.IMPORTANCE_HIGH);
-            channel.setShowBadge(true);
-            if (notificationManager != null){
-                notificationManager.createNotificationChannel(channel);
-            }
-
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
-            notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
-
-            notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify)
-                    .setShowWhen(true)
-                    .setGroup(groupKey)
-                    .setGroupSummary(true)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
-
-            return notificationBuilderO.build();
-        }
-        else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

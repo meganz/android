@@ -10,15 +10,14 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +31,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -45,6 +43,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -1884,9 +1883,20 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			}
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_NESTED_NOTIFICATIONS) == 0){
-			//Intent to new activity Chat Settings
-			Intent i = new Intent(context, ChatPreferencesActivity.class);
-			startActivity(i);
+		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+		        //create default chat summary channel
+                ChatAdvancedNotificationBuilder.createChatSummaryChannel(context);
+		        //to system channel settings page
+                Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+                // change the setting of chat summary channel
+                intent.putExtra(Settings.EXTRA_CHANNEL_ID, Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
+                startActivity(intent);
+            } else {
+                //Intent to new activity Chat Settings
+                Intent i = new Intent(context, ChatPreferencesActivity.class);
+                startActivity(i);
+            }
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			//Intent to reset the PIN
