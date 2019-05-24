@@ -10,6 +10,7 @@ import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -135,7 +136,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -193,11 +193,11 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -2288,7 +2288,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		rootNode = megaApi.getRootNode();
-		if (rootNode == null){
+		if (rootNode == null || LoginActivityLollipop.isBackFromLoginPage){
 			 if (getIntent() != null){
 			 	log("Action: "+getIntent().getAction());
 				if (getIntent().getAction() != null){
@@ -6354,7 +6354,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
+		playTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
+		pauseTransfersMenuIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_pause_white, R.color.black));
 		cancelAllTransfersMenuItem.setVisible(false);
 		clearCompletedTransfers.setVisible(false);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
@@ -13682,11 +13684,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-			if(cFLol!=null){
-				if(cFLol.isMultipleselect()){
-					cFLol.hideMultipleSelect();
-					cFLol.clearSelectionsNoAnimations();
-				}
+			if(cFLol!=null && cFLol.isMultipleselect()){
+				cFLol.hideMultipleSelect();
+				cFLol.clearSelectionsNoAnimations();
 			}
 
 			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
@@ -17419,6 +17419,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
+        
+        //workaround - can not get folder transfer children detail except using global listener
+        if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
+            Intent intent = new Intent(this,UploadService.class);
+            if (e.getErrorCode() == MegaError.API_OK) {
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_OK);
+                startService(intent);
+            }else{
+                intent.setAction(Constants.ACTION_CHILD_UPLOADED_FAILED);
+                startService(intent);
+            }
+        }
 
 		if(transferCallback<transfer.getNotificationNumber()) {
 
@@ -18856,4 +18868,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     public void setAccountFragmentPreUpgradeAccount (int accountFragment) {
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
+    
+    @Override
+    public void onTrimMemory(int level) {
+        // Determine which lifecycle or system event was raised.
+        //we will stop creating thumbnails while the phone is running low on memory to prevent OOM
+        log("onTrimMemory lvl " + level);
+        if(level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL){
+            log("low memory");
+            ThumbnailUtilsLollipop.isDeviceMemoryLow = true;
+        }else{
+            log("memory ok");
+            ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
+        }
+    }
 }
