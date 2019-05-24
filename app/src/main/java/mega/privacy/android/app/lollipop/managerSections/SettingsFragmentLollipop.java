@@ -976,7 +976,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 		if (cameraUpload){
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
-            cameraUploadOn.setSummary(R.string.settings_camera_upload_status_helper_label);
 			cameraUploadHow.setSummary(wifi);
 			localCameraUploadFolder.setSummary(camSyncLocalPath);
 			localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
@@ -2844,7 +2843,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         }, 1 * 1000);
 
         cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
-        cameraUploadOn.setSummary(R.string.settings_camera_upload_status_helper_label);
         cameraUploadHow.setSummary(wifi);
         localCameraUploadFolder.setSummary(camSyncLocalPath);
         localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
