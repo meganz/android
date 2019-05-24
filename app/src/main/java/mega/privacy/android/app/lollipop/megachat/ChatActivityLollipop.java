@@ -1863,10 +1863,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_invite_chat:{
+                if(recordView.isRecordingNow()) break;
+
                 chooseAddParticipantDialog();
                 break;
             }
             case R.id.cab_menu_contact_info_chat:{
+                if(recordView.isRecordingNow()) break;
+
                 if(chatRoom.isGroup()){
                     Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
                     i.putExtra("handle", chatRoom.getChatId());
@@ -1880,16 +1884,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{
+                if(recordView.isRecordingNow()) break;
+
                 log("Clear history selected!");
                 showConfirmationClearChat(chatRoom);
                 break;
             }
             case R.id.cab_menu_leave_chat:{
+                if(recordView.isRecordingNow()) break;
+
                 log("Leave selected!");
                 showConfirmationLeaveChat(chatRoom);
                 break;
             }
             case R.id.cab_menu_archive_chat:{
+                if(recordView.isRecordingNow()) break;
+
                 log("Archive/unarchive selected!");
                 ChatController chatC = new ChatController(chatActivity);
                 chatC.archiveChat(chatRoom);
@@ -3117,6 +3127,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.toolbar_maps:{
                 log("onClick:toolbar_chat");
+                if(recordView.isRecordingNow()) break;
+
                 showGroupInfoActivity();
                 break;
             }
