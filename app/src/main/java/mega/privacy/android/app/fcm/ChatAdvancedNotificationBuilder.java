@@ -91,8 +91,9 @@ public final class ChatAdvancedNotificationBuilder {
         dbH = DatabaseHandler.getDbHandler(context);
         this.megaApi = megaApi;
         this.megaChatApi = megaChatApi;
-
-        createChatSummaryChannel(context);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createChatSummaryChannel(context);
+        }
     }
 
     public void sendBundledNotification(Uri uriParameter, String vibration, long chatId, MegaHandleList unreadHandleList) {
