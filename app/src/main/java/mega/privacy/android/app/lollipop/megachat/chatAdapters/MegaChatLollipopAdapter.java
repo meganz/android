@@ -749,13 +749,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout pinnedContactLocationLayout;
         TextView pinnedContactLocationInfoText;
 
-        //Management messages with avatar
-        RelativeLayout contactManagementAvatarMainLayout;
-        RoundedImageView contactManagementAvatarImage;
-        TextView contactManagementAvatarInitialLetter;
-        TextView contactManagementAvatarMessageText;
-        RelativeLayout contactManagementAvatarSubTextLayout;
-
         public String filePathUploading;
 
         public long getUserHandle() {
@@ -1588,9 +1581,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
-
-        ((ViewHolderMessageChat) holder).contactManagementAvatarMainLayout.setVisibility(View.GONE);
-        ((ViewHolderMessageChat) holder).contactManagementAvatarSubTextLayout.setVisibility(View.GONE);
 
         AndroidMegaChatMessage androidMessage = messages.get(position - 1);
         MegaChatMessage message = messages.get(position - 1).getMessage();
