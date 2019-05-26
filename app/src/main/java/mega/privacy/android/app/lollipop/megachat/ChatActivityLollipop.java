@@ -2545,9 +2545,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         closeChat(true);
 
@@ -3620,7 +3618,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                                 if(mediaFileUri==null){
                                                     log("itemClick:ERROR:NULLmediaFileUri");
-                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                 }
                                                 else{
                                                     mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -3630,7 +3628,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 Uri mediaFileUri = Uri.fromFile(mediaFile);
                                                 if(mediaFileUri==null){
                                                     log("itemClick:ERROR:NULLmediaFileUri");
-                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                 }
                                                 else{
                                                     mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -3670,12 +3668,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                     }
                                                     else{
                                                         log("itemClick:ERROR:httpServerGetLocalLink");
-                                                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                     }
                                                 }
                                                 else{
                                                     log("itemClick:ERROR:httpServerGetLocalLink");
-                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                 }
                                             }
                                             else {
@@ -3729,7 +3727,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                                 if(mediaFileUri==null){
                                                     log("itemClick:ERROR:NULLmediaFileUri");
-                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                 }
                                                 else{
                                                     pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -3739,7 +3737,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 Uri mediaFileUri = Uri.fromFile(mediaFile);
                                                 if(mediaFileUri==null){
                                                     log("itemClick:ERROR:NULLmediaFileUri");
-                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                 }
                                                 else{
                                                     pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
@@ -3776,12 +3774,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                     }
                                                     else{
                                                         log("itemClick:ERROR:httpServerGetLocalLink");
-                                                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                     }
                                                 }
                                                 else{
                                                     log("itemClick:ERROR:httpServerGetLocalLink");
-                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.email_verification_text_error), -1);
+                                                    showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_text_error), -1);
                                                 }
                                             }
                                             else {
