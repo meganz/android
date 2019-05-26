@@ -531,12 +531,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     @Override
-    public void onBackPressed() {
-        super.callToSuperBack = true;
-        super.onBackPressed();
-    }
-
-    @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
 
     }

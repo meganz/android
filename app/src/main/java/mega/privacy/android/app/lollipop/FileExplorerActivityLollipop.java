@@ -848,10 +848,19 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (mTabsAdapterExplorer == null){
 							tabLayoutExplorer.setVisibility(View.VISIBLE);
 							viewPagerExplorer.setVisibility(View.VISIBLE);
-							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+                            if (Util.isChatEnabled()) {
+                                mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+                            }
+                            else {
+                            	isChatFirst = false;
+                                mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
+                            }
 							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
 							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
+							if (!Util.isChatEnabled() && mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2) {
+                                tabLayoutExplorer.removeTabAt(2);
+                            }
 						}
 					}
 					else{
@@ -1542,8 +1551,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed: "+tabShown);
-		super.callToSuperBack = false;
-		super.onBackPressed();
+		retryConnectionsAndSignalPresence();
 
 		String cFTag;
 		if(tabShown==CLOUD_TAB){
@@ -1623,7 +1631,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else{
-			super.callToSuperBack = true;
 			super.onBackPressed();
 		}
 
@@ -2087,7 +2094,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			finishActivity();
 		}
 		else{
-			showSnackbar(getString(R.string.email_verification_text_error));
+			showSnackbar(getString(R.string.general_text_error));
 		}
 	}
 
@@ -3488,6 +3495,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	ChatExplorerFragment getChatExplorerFragment () {
+
+		if (!Util.isChatEnabled()) {
+			return null;
+		}
+
 		String chatTag1;
 		if (importFileF) {
 			chatTag1  ="chatExplorer";
