@@ -65,9 +65,7 @@ public final class ChatAdvancedNotificationBuilder {
     private String notificationChannelIdChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_ID;
     private String notificationChannelNameChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_NAME;
     private String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
-    private String notificationChannelNameChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
     private String notificationChannelIdChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
-    private String notificationChannelNameChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
     private String notificationChannelIdInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelNameInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
     private String notificationChannelIdIncomingCall = Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
@@ -499,7 +497,8 @@ public final class ChatAdvancedNotificationBuilder {
         if(vibration!=null){
             if(vibration.equals("true")){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notificationBuilderO.setVibrate(new long[] {0, 500});
+                    //use the channel with vibration
+                    notificationBuilderO.setChannelId(notificationChannelIdChatSummary);
                 }
                 else{
                     notificationBuilder.setVibrate(new long[] {0, 500});
