@@ -138,7 +138,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect, isPlaying;
     private SparseBooleanArray selectedItems;
-    MediaPlayer mediaPlayer = new MediaPlayer();
+//    MediaPlayer mediaPlayer = new MediaPlayer();
     private MegaChatLollipopAdapter megaChatAdapter;
     ArrayList<MessageVoiceClip> messagesPlaying = new ArrayList<>();
 
@@ -8871,14 +8871,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
         log("playOrPauseVoiceClip: position = "+positionInAdapter);
         AndroidMegaChatMessage currentMessage = getMessageAt(positionInAdapter);
-
         if(currentMessage==null || currentMessage.getMessage()==null || currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP) return;
 
         for(MessageVoiceClip m: messagesPlaying){
             if(m.getIdMessage() == currentMessage.getMessage().getMsgId()){
                 if(m.getMediaPlayer().isPlaying()){
                     log("playOrPauseVoiceClip:isPlaying: PLAY -> PAUSE");
-                   pauseVoiceClip(m,positionInAdapter);
+                    pauseVoiceClip(m,positionInAdapter);
                    return;
                 }
                 if(m.isPaused()){
@@ -8928,20 +8927,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void playVoiceClip(MessageVoiceClip m, String voiceClipPath){
         log("playVoiceClip");
         stopAllReproductionsInProgress();
-        m.setPaused(false);
-        if(voiceClipPath != null){
+        final long mId = m.getIdMessage();
+
+        if(voiceClipPath == null){
+            m.getMediaPlayer().seekTo(m.getProgress());
+            m.getMediaPlayer().start();
+            m.setPaused(false);
+            prepareMediaPlayer(mId);
+        }else{
             try {
                 m.getMediaPlayer().reset();
                 m.getMediaPlayer().setDataSource(voiceClipPath);
                 m.getMediaPlayer().setLooping(false);
                 m.getMediaPlayer().prepare();
+                m.setPaused(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            m.getMediaPlayer().seekTo(m.getProgress());
         }
-        m.getMediaPlayer().seekTo(m.getProgress());
-
-        final long mId = m.getIdMessage();
 
         m.getMediaPlayer().setOnErrorListener(new MediaPlayer.OnErrorListener() {
             public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
@@ -8955,6 +8959,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             public void onPrepared(MediaPlayer mediaPlayer) {
                 log("mediaPlayerVoiceNotes:onPrepared");
                 mediaPlayer.start();
+
                 prepareMediaPlayer(mId);
 
             }
