@@ -46,7 +46,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -138,7 +137,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     MegaChatApiAndroid megaChatApi;
     boolean multipleSelect, isPlaying;
     private SparseBooleanArray selectedItems;
-//    MediaPlayer mediaPlayer = new MediaPlayer();
     private MegaChatLollipopAdapter megaChatAdapter;
     ArrayList<MessageVoiceClip> messagesPlaying = new ArrayList<>();
 
@@ -8840,7 +8838,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     private void updatingSeekBar(long messageId, int progress){
         for(MessageVoiceClip m: messagesPlaying){
-            if((m.getIdMessage() == messageId)&&(m.getMediaPlayer().isPlaying())) {
+            if(m.getIdMessage() == messageId) {
                 log("updatingSeekBar - update mediaplayer");
                 m.setProgress(progress);
                 m.getMediaPlayer().seekTo(m.getProgress());
