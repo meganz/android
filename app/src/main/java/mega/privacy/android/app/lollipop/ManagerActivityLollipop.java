@@ -1636,6 +1636,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
 
             case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
+                if(permissions.length == 0) {
+                    return;
+                }
                 if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                     cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
                     if(cuFL != null){
