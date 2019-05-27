@@ -5968,6 +5968,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }else{
                 log("Multiselect ON");
                 holder.contentOwnMessageVoiceClipPlay.setOnClickListener(null);
+                if(currentMessagePlaying.getMediaPlayer().isPlaying()){
+                    currentMessagePlaying.getMediaPlayer().pause();
+                    currentMessagePlaying.setProgress(currentMessagePlaying.getMediaPlayer().getCurrentPosition());
+                    currentMessagePlaying.setPaused(true);
+                    removeCallBacks();
+                }
+                holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
+                holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
+
                 if (this.isItemChecked(positionInAdapter)) {
                     holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
                 } else {
@@ -6176,7 +6185,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 log("Multiselect ON");
                 holder.contentContactMessageVoiceClipPlay.setOnClickListener(null);
-
+                holder.contentOwnMessageVoiceClipPlay.setOnClickListener(null);
+                if(currentMessagePlaying.getMediaPlayer().isPlaying()){
+                    currentMessagePlaying.getMediaPlayer().pause();
+                    currentMessagePlaying.setProgress(currentMessagePlaying.getMediaPlayer().getCurrentPosition());
+                    currentMessagePlaying.setPaused(true);
+                    removeCallBacks();
+                }
+                holder.contentContactMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
+                holder.contentContactMessageVoiceClipSeekBar.setEnabled(false);
                 if (this.isItemChecked(positionInAdapter)) {
                     log("bindVC:contact Message: MultiselectON -> restartMediaPlayer ");
                     holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
