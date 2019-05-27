@@ -70,7 +70,9 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     public void onResume() {
         super.onResume();
         setStatusBarColor(viewPager.getCurrentItem());
-        //This is to force the scroll view to bottom to show buttons
+
+        // For small screen like nexus one or bigger screen, this is to force the scroll view to bottom to show buttons
+        // Meanwhile, tour image glide could also be shown
         baseContainer.post(new Runnable() {
             @Override
             public void run() {
