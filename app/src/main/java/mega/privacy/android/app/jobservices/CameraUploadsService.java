@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,8 +26,6 @@ import android.support.v4.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,80 +92,93 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     public static boolean isServiceRunning = false;
     
     private NotificationCompat.Builder mBuilder;
-    NotificationManager mNotificationManager;
+    private NotificationManager mNotificationManager;
     
     private int notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS;
     private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
     private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
     
-    Thread task;
+    private Thread task;
     
-    static public boolean running = false;
+    public static boolean running = false;
     private Handler handler;
     
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     
-    WifiManager.WifiLock lock;
-    PowerManager.WakeLock wl;
+    private WifiManager.WifiLock lock;
+    private PowerManager.WakeLock wl;
     
     private boolean isOverQuota = false;
     private boolean canceled;
     private boolean pauseByNetworkStateChange;
-
-    DatabaseHandler dbH;
     
-    MegaPreferences prefs;
-    String localPath = "";
-    ChatSettings chatSettings;
-    long cameraUploadHandle = -1;
-    boolean secondaryEnabled = false;
-    String localPathSecondary = "";
-    long secondaryUploadHandle = -1;
-    MegaNode secondaryUploadNode = null;
-
-    private DateFormat sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-
-    boolean isLoggingIn = false;
+    private DatabaseHandler dbH;
     
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
-    MegaApplication app;
+    private MegaPreferences prefs;
+    private String localPath = "";
+    private ChatSettings chatSettings;
+    private long cameraUploadHandle = -1;
+    private boolean secondaryEnabled = false;
+    private String localPathSecondary = "";
+    private long secondaryUploadHandle = -1;
+    private MegaNode secondaryUploadNode = null;
     
-    int LOGIN_IN = 12;
+    private boolean isLoggingIn = false;
+    
+    private MegaApiAndroid megaApi;
+    private MegaChatApiAndroid megaChatApi;
+    private MegaApplication app;
+    
+    private int LOGIN_IN = 12;
     
     private long lastUpdated = 0;
-    static String gSession;
+    private static String gSession;
     private boolean isSec;
-    boolean stopped = false;
+    private boolean stopped = false;
     private NetworkTypeChangeReceiver receiver;
-
+    
     public class Media {
         public String filePath;
         public long timestamp;
     }
     
-    Queue<Media> cameraFiles = new LinkedList<>();
-    Queue<Media> primaryVideos = new LinkedList<>();
-    Queue<Media> secondaryVideos = new LinkedList<>();
-    ArrayList<SyncRecord> pendingUploadsList = new ArrayList<>();
-    ArrayList<SyncRecord> pendingUploadsListSecondary = new ArrayList<>();
-    ArrayList<SyncRecord> pendingVideoUploadsList = new ArrayList<>();
-    ArrayList<SyncRecord> pendingVideoUploadsListSecondary = new ArrayList<>();
-    Queue<Media> mediaFilesSecondary = new LinkedList<>();
-    MegaNode cameraUploadNode = null;
+    private Queue<Media> cameraFiles = new LinkedList<>();
+    private Queue<Media> primaryVideos = new LinkedList<>();
+    private Queue<Media> secondaryVideos = new LinkedList<>();
+    private ArrayList<SyncRecord> pendingUploadsList = new ArrayList<>();
+    private ArrayList<SyncRecord> pendingUploadsListSecondary = new ArrayList<>();
+    private ArrayList<SyncRecord> pendingVideoUploadsList = new ArrayList<>();
+    private ArrayList<SyncRecord> pendingVideoUploadsListSecondary = new ArrayList<>();
+    private Queue<Media> mediaFilesSecondary = new LinkedList<>();
+    private MegaNode cameraUploadNode = null;
     private int totalUploaded;
     private int totalToUpload;
     
-    long currentTimeStamp = 0;
-    long secondaryTimeStamp = 0;
-    long currentVideoTimeStamp = 0;
-    long secondaryVideoTimeStamp = 0;
-    Notification mNotification;
-    Intent mIntent;
-    PendingIntent mPendingIntent;
+    private long currentTimeStamp = 0;
+    private long secondaryTimeStamp = 0;
+    private long currentVideoTimeStamp = 0;
+    private long secondaryVideoTimeStamp = 0;
+    private Notification mNotification;
+    private Intent mIntent;
+    private PendingIntent mPendingIntent;
     private String tempRoot;
-    Context mContext;
+    private Context mContext;
     private VideoCompressor mVideoCompressor;
+    
+    private BroadcastReceiver chargingStopReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context,Intent intent) {
+            if(mVideoCompressor != null && isChargingRequired(mVideoCompressor.getTotalInputSize() / (1024 * 1024))){
+                log("detected device stops charging");
+                mVideoCompressor.stop();
+            }
+        }
+    };
+    
+    @Override
+    public void onCreate() {
+        registerReceiver(chargingStopReceiver,new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
+    }
 
     @Override
     public void onDestroy() {
@@ -176,6 +188,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if(receiver != null) {
             unregisterReceiver(receiver);
         }
+        unregisterReceiver(chargingStopReceiver);
     }
     
     @Nullable
@@ -1161,7 +1174,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             return;
         }
         
-        dbH = DatabaseHandler.getDbHandler(mContext);
+        initDbH();
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         String previousIP = app.getLocalIpAddress();
         String currentIP = Util.getLocalIpAddress();
@@ -1651,13 +1664,11 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
     
     private boolean shouldStartVideoCompression(long queueSize) {
+    
+        if (isChargingRequired(queueSize) && !Util.isCharging(mContext)) {
+            log("shouldStartVideoCompression " + false);
+            return false;
         
-        if (prefs.getConversionOnCharging() != null && Boolean.parseBoolean(prefs.getConversionOnCharging())) {
-            int queueSizeLimit = Integer.parseInt(prefs.getChargingOnSize());
-            if (queueSize > queueSizeLimit && !Util.isCharging(mContext)) {
-                log("shouldStartVideoCompression " + false);
-                return false;
-            }
         }
         log("shouldStartVideoCompression " + true);
         return true;
@@ -2061,6 +2072,27 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 ex.printStackTrace();
             }
         }
-        
+    }
+    
+    private boolean isChargingRequired(long queueSize) {
+        initDbH();
+        MegaPreferences preferences = dbH.getPreferences();
+        if (preferences != null && preferences.getConversionOnCharging() != null) {
+            if (Boolean.parseBoolean(preferences.getConversionOnCharging())) {
+                int queueSizeLimit = Integer.parseInt(preferences.getChargingOnSize());
+                if (queueSize > queueSizeLimit) {
+                    log("isChargingRequired " + true + ", queue size is " + queueSize + ", limit size is " + queueSizeLimit);
+                    return true;
+                }
+            }
+        }
+        log("isChargingRequired " + false);
+        return false;
+    }
+    
+    private void initDbH(){
+        if(dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
     }
 }
