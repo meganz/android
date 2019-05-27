@@ -5969,6 +5969,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("Multiselect ON");
                 holder.contentOwnMessageVoiceClipPlay.setOnClickListener(null);
                 if(currentMessagePlaying.getMediaPlayer().isPlaying()){
+                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
                     currentMessagePlaying.getMediaPlayer().pause();
                     currentMessagePlaying.setProgress(currentMessagePlaying.getMediaPlayer().getCurrentPosition());
                     currentMessagePlaying.setPaused(true);
@@ -6186,6 +6187,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("Multiselect ON");
                 holder.contentContactMessageVoiceClipPlay.setOnClickListener(null);
                 if(currentMessagePlaying.getMediaPlayer().isPlaying()){
+                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+
                     currentMessagePlaying.getMediaPlayer().pause();
                     currentMessagePlaying.setProgress(currentMessagePlaying.getMediaPlayer().getCurrentPosition());
                     currentMessagePlaying.setPaused(true);
