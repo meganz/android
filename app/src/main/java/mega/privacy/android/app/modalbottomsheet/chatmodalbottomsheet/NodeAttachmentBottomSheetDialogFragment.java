@@ -161,7 +161,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
         LinearLayout separatorRemove = (LinearLayout) contentView.findViewById(R.id.separator_remove);
 
-        if(message.getMessage()==null){
+        if(message == null || message.getMessage() == null){
             return;
         }
 
@@ -201,160 +201,156 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             nodeInfo.setMaxWidth(Util.scaleWidthPx(210, outMetrics));
         }
 
-        if (message != null) {
-            nodeList = message.getMessage().getMegaNodeList();
+        nodeList = message.getMessage().getMegaNodeList();
 
-            if(nodeList==null){
-                log("Error, nodeList is NULL");
-                return;
-            }
+        if(nodeList == null){
+            log("Error: nodeList is NULL");
+            return;
+        }
 
-            if(handle==-1){
-                node = nodeList.get(0);
-            }
-            else{
-                node = getNodeByHandle(handle);
-            }
+        if(handle == -1){
+            node = nodeList.get(0);
+        }
+        else{
+            node = getNodeByHandle(handle);
+        }
 
-            if(node!=null) {
-                log("node is NOT null");
+        if (node == null) {
+            log("Error: node is NULL");
+            return;
+        }
 
-                if(handle==-1){
-                    log("Panel shown from ChatActivity");
-                    if(nodeList.size()==1){
-                        log("one file included");
+        if(handle == -1){
+            log("Panel shown from ChatActivity");
+            if(nodeList.size()==1){
+                log("one file included");
 
-                        if (node.hasThumbnail()) {
-                            log("Node has thumbnail");
-                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.setMargins(20, 0, 12, 0);
-                            nodeThumb.setLayoutParams(params1);
+                if (node.hasThumbnail()) {
+                    log("Node has thumbnail");
+                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                    params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                    params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                    params1.setMargins(20, 0, 12, 0);
+                    nodeThumb.setLayoutParams(params1);
 
-                            thumb = ThumbnailUtils.getThumbnailFromCache(node);
-                            if (thumb != null) {
-                                nodeThumb.setImageBitmap(thumb);
-                            } else {
-                                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-                                if (thumb != null) {
-                                    nodeThumb.setImageBitmap(thumb);
-                                } else {
-                                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                                }
-                            }
-                        }
-                        else {
-                            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                        }
-
-                        nodeName.setText(node.getName());
-
-                        long nodeSize = node.getSize();
-                        nodeInfo.setText(Util.getSizeString(nodeSize));
-
-                        optionView.setVisibility(View.GONE);
-                    }
-                    else{
-                        log("Several nodes in the message");
-                        optionView.setVisibility(View.VISIBLE);
-
-                        long totalSize = 0;
-                        int count = 0;
-                        for(int i=0; i<nodeList.size(); i++){
-                            MegaNode temp = nodeList.get(i);
-                            if(!(megaChatApi.isRevoked(chatId, temp.getHandle()))){
-                                count++;
-                                log("Node Name: "+temp.getName());
-                                totalSize = totalSize + temp.getSize();
-                            }
-                        }
-                        nodeInfo.setText(Util.getSizeString(totalSize));
-                        MegaNode node = nodeList.get(0);
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                        if(count==1){
-                            nodeName.setText(node.getName());
-                        }
-                        else{
-                            nodeName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
-                        }
-
-                        if(nodeList.size()==count){
-                            optionViewText.setText(getString(R.string.general_view));
-                        }
-                        else{
-                            optionViewText.setText(getString(R.string.general_view_with_revoke, nodeList.size()-count));
-                        }
-                    }
-                }
-                else{
-                    log("Panel shown from NodeAttachmenntActivity - always one file selected");
-
-                    if (node.hasThumbnail()) {
-                        log("Node has thumbnail");
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.setMargins(20, 0, 12, 0);
-                        nodeThumb.setLayoutParams(params1);
-
-                        thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                    thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                    if (thumb != null) {
+                        nodeThumb.setImageBitmap(thumb);
+                    } else {
+                        thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
                         if (thumb != null) {
                             nodeThumb.setImageBitmap(thumb);
                         } else {
-                            thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-                            if (thumb != null) {
-                                nodeThumb.setImageBitmap(thumb);
-                            } else {
-                                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                            }
+                            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                         }
                     }
-                    else {
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                    }
-
-                    nodeName.setText(node.getName());
-
-                    long nodeSize = node.getSize();
-                    nodeInfo.setText(Util.getSizeString(nodeSize));
-
-                    optionView.setVisibility(View.GONE);
-                }
-
-                if (optionView.getVisibility() == View.GONE) {
-                    separatorInfo.setVisibility(View.GONE);
                 }
                 else {
-                    separatorInfo.setVisibility(View.VISIBLE);
-                }
-                if ((optionDownload.getVisibility() == View.GONE && optionImport.getVisibility() == View.GONE && optionForwardLayout.getVisibility() == View.GONE && optionSaveOffline.getVisibility() == View.GONE)
-                        || optionRemove.getVisibility() == View.GONE) {
-                    separatorRemove.setVisibility(View.GONE);
-                }
-                else {
-                    separatorRemove.setVisibility(View.VISIBLE);
+                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 }
 
-                dialog.setContentView(contentView);
+                nodeName.setText(node.getName());
 
-                mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-//                mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//
-//                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//                    mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-//                }
-//                else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-//                    mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-//                }
+                long nodeSize = node.getSize();
+                nodeInfo.setText(Util.getSizeString(nodeSize));
 
-                mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
-                mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                optionView.setVisibility(View.GONE);
             }
             else{
-                log("node is NULL");
+                log("Several nodes in the message");
+                optionView.setVisibility(View.VISIBLE);
+
+                long totalSize = 0;
+                int count = 0;
+                for(int i=0; i<nodeList.size(); i++){
+                    MegaNode temp = nodeList.get(i);
+                    if(!(megaChatApi.isRevoked(chatId, temp.getHandle()))){
+                        count++;
+                        log("Node Name: "+temp.getName());
+                        totalSize = totalSize + temp.getSize();
+                    }
+                }
+                nodeInfo.setText(Util.getSizeString(totalSize));
+                MegaNode node = nodeList.get(0);
+                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                if(count==1){
+                    nodeName.setText(node.getName());
+                }
+                else{
+                    nodeName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
+                }
+
+                if(nodeList.size()==count){
+                    optionViewText.setText(getString(R.string.general_view));
+                }
+                else{
+                    optionViewText.setText(getString(R.string.general_view_with_revoke, nodeList.size()-count));
+                }
             }
         }
+        else{
+            log("Panel shown from NodeAttachmenntActivity - always one file selected");
+
+            if (node.hasThumbnail()) {
+                log("Node has thumbnail");
+                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                params1.setMargins(20, 0, 12, 0);
+                nodeThumb.setLayoutParams(params1);
+
+                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                if (thumb != null) {
+                    nodeThumb.setImageBitmap(thumb);
+                } else {
+                    thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                    if (thumb != null) {
+                        nodeThumb.setImageBitmap(thumb);
+                    } else {
+                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+                    }
+                }
+            }
+            else {
+                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+            }
+
+            nodeName.setText(node.getName());
+
+            long nodeSize = node.getSize();
+            nodeInfo.setText(Util.getSizeString(nodeSize));
+
+            optionView.setVisibility(View.GONE);
+        }
+
+        if (optionView.getVisibility() == View.GONE) {
+            separatorInfo.setVisibility(View.GONE);
+        }
+        else {
+            separatorInfo.setVisibility(View.VISIBLE);
+        }
+        if ((optionDownload.getVisibility() == View.GONE && optionImport.getVisibility() == View.GONE && optionForwardLayout.getVisibility() == View.GONE && optionSaveOffline.getVisibility() == View.GONE)
+                || optionRemove.getVisibility() == View.GONE) {
+            separatorRemove.setVisibility(View.GONE);
+        }
+        else {
+            separatorRemove.setVisibility(View.VISIBLE);
+        }
+
+        dialog.setContentView(contentView);
+
+        mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
+//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//        }
+//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//        }
+
+        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     public MegaNode getNodeByHandle(long handle){
