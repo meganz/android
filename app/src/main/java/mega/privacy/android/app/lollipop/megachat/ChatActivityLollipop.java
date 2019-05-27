@@ -327,6 +327,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ArrayList<AndroidMegaChatMessage> bufferMessages;
     ArrayList<AndroidMegaChatMessage> bufferManualSending;
     ArrayList<AndroidMegaChatMessage> bufferSending;
+    ArrayList<MessageVoiceClip> messagesPlaying;
+
 
     public static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     public static int TYPE_MESSAGE_NEW_MESSAGE = 1;
@@ -1009,8 +1011,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         if(lastIdMsgSeen != -1){
                             isTurn = true;
                         }
-
                         generalUnreadCount = savedInstanceState.getLong("generalUnreadCount",-1);
+                        boolean isPlaying = savedInstanceState.getBoolean("isAnyPlaying", false);
+                        if(isPlaying){
+                            long idMessageVoicePlaying = savedInstanceState.getLong("idMessageVoicePlaying", -1);
+                            long messageHandleVoicePlaying = savedInstanceState.getLong("messageHandleVoicePlaying", -1);
+                            long userHandleVoicePlaying = savedInstanceState.getLong("userHandleVoicePlaying", -1);
+                            int progressVoicePlaying = savedInstanceState.getInt("progressVoicePlaying", 0);
+                            if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
+                                for(MessageVoiceClip m:messagesPlaying){
+                                    m.getMediaPlayer().release();
+                                    m.setMediaPlayer(null);
+                                }
+                                messagesPlaying.clear();
+                            }
+
+
+                            if(messagesPlaying == null) messagesPlaying = new ArrayList<>();
+                            boolean exist = false;
+
+                            if(!messagesPlaying.isEmpty()){
+                                for(MessageVoiceClip m:messagesPlaying){
+                                    if(m.getIdMessage() == idMessageVoicePlaying){
+                                        exist = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(!exist){
+                                MessageVoiceClip messagePlaying = new MessageVoiceClip(idMessageVoicePlaying, messageHandleVoicePlaying, userHandleVoicePlaying);
+                                messagePlaying.setProgress(progressVoicePlaying);
+                                messagePlaying.setPlayingNow(true);
+                                messagesPlaying.add(messagePlaying);
+                            }
+                        }
                     }
 
                     String text = null;
@@ -1098,8 +1132,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
                 bufferSending = new ArrayList<AndroidMegaChatMessage>();
 
+
                 if (adapter == null) {
-                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
                 }
@@ -3344,7 +3379,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if (adapter == null){
                 log("sendMessageToUI:adapter NULL");
-                adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
                 adapter.setHasStableIds(true);
                 listView.setLayoutManager(mLayoutManager);
                 listView.setAdapter(adapter);
@@ -5394,6 +5429,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onHistoryReloaded");
         bufferMessages.clear();
         messages.clear();
+        if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
+            for(MessageVoiceClip m:messagesPlaying){
+                m.getMediaPlayer().release();
+                m.setMediaPlayer(null);
+            }
+        }
+        messagesPlaying.clear();
 
         invalidateOptionsMenu();
         log("Load new history");
@@ -5626,7 +5668,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 //Create adapter
                 if (adapter == null) {
-                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                    adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,messagesPlaying,  listView);
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
                 } else {
@@ -5742,7 +5784,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     //Create adapter
                     if (adapter == null) {
-                        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+                        adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
                         adapter.setHasStableIds(true);
                         listView.setAdapter(adapter);
                     } else {
@@ -5779,7 +5821,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         //Create adapter
         if(adapter==null){
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
@@ -5963,7 +6005,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             log("Create adapter");
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
@@ -6017,7 +6059,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             log("Create adapter");
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages,messagesPlaying,  listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
@@ -6108,7 +6150,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //Create adapter
         if(adapter==null){
             log("Create adapter");
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
             adapter.setHasStableIds(true);
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
@@ -6583,7 +6625,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.messages = messages;
         //Create adapter
         if (adapter == null) {
-            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
+            adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, messagesPlaying, listView);
             adapter.setHasStableIds(true);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
@@ -7039,6 +7081,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         messages.clear();
                     }
 
+                    if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
+                        for(MessageVoiceClip m:messagesPlaying){
+                            m.getMediaPlayer().release();
+                            m.setMediaPlayer(null);
+                        }
+                        messagesPlaying.clear();
+                    }
+
                     adapter.notifyDataSetChanged();
                     closeChat(false);
                     MegaApplication.setOpenChatId(-1);
@@ -7192,6 +7242,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
         outState.putBoolean("isShareLinkDialogDismissed", isShareLinkDialogDismissed);
+        MessageVoiceClip messageVoiceClip = adapter.getVoiceClipPlaying();
+        if(messageVoiceClip!=null){
+            outState.putBoolean("isAnyPlaying",true);
+            outState.putLong("idMessageVoicePlaying", messageVoiceClip.getIdMessage());
+            outState.putLong("messageHandleVoicePlaying", messageVoiceClip.getMessageHandle());
+            outState.putLong("userHandleVoicePlaying", messageVoiceClip.getUserHandle());
+            outState.putInt("progressVoicePlaying", messageVoiceClip.getProgress());
+        }else{
+            outState.putBoolean("isAnyPlaying",false);
+
+        }
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
     }
@@ -7390,7 +7451,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onResume(){
         log("onResume");
         super.onResume();
-
 
         if(idChat!=-1 && chatRoom!=null) {
 

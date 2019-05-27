@@ -14,6 +14,8 @@ public class MessageVoiceClip {
     MediaPlayer mediaPlayer = null;
     int isAvailable = 0;
 
+    boolean isPlayingNow = false;
+
     public MessageVoiceClip(long idMessage, long userHandle, long messageHandle) {
         this.idMessage = idMessage;
         this.userHandle = userHandle;
@@ -47,7 +49,6 @@ public class MessageVoiceClip {
     public MediaPlayer getMediaPlayer() {
         if(this.mediaPlayer == null){
             this.mediaPlayer =  new MediaPlayer();
-            this.progress = 0;
         }
         return mediaPlayer;
     }
@@ -76,6 +77,14 @@ public class MessageVoiceClip {
 
     public void setIsAvailable(int isAvailable) {
         this.isAvailable = isAvailable;
+    }
+
+    public boolean isPlayingNow() {
+        return isPlayingNow;
+    }
+
+    public void setPlayingNow(boolean playingNow) {
+        isPlayingNow = playingNow;
     }
 
 
