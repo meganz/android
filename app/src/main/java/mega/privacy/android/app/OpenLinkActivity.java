@@ -542,7 +542,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
 					Intent inviteContact = new Intent(this, ManagerActivityLollipop.class);
 					inviteContact.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
-					inviteContact.putExtra("contactHandle", handle);
+					inviteContact.putExtra(Constants.CONTACT_HANDLE, handle);
 					startActivity(inviteContact);
 					finish();
 				} else {
