@@ -135,7 +135,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
+import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -166,6 +166,7 @@ import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLo
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
@@ -193,7 +194,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
@@ -434,7 +434,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	//Tabs in Shares
 	TabLayout tabLayoutCloud;
-	SharesPageAdapter cloudPageAdapter;
+	CloudPageAdapter cloudPageAdapter;
 	ViewPager viewPagerCloud;
 
     //Tabs in Shares
@@ -514,14 +514,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public String pathNavigationOffline;
 	public int deepBrowserTreeIncoming = 0;
 	public int deepBrowserTreeOutgoing = 0;
+	int indexCloud = -1;
 	int indexShares = -1;
 	int indexContacts = -1;
-//	int indexChat = -1;
 	int indexAccount = -1;
 	int indexTransfers = -1;
 
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;
+    private RecentsFragment rF;
     private RubbishBinFragmentLollipop rubbishBinFLol;
     private OfflineFragmentLollipop oFLol;
     private InboxFragmentLollipop iFLol;
@@ -1652,6 +1653,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 		}
 
+		if (viewPagerCloud != null) {
+			indexCloud = viewPagerCloud.getCurrentItem();
+		}
+		outState.putInt("indexCloud", indexCloud);
+
 		if (viewPagerShares != null) {
 			indexShares = viewPagerShares.getCurrentItem();
 		}
@@ -1747,6 +1753,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchDate = savedInstanceState.getLongArray("searchDate");
 			firstLogin = savedInstanceState.getBoolean("firstLogin");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+			indexCloud = savedInstanceState.getInt("indexCloud", indexCloud);
+			log("savedInstanceState -> indexCloud: "+indexCloud);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
 			indexContacts = savedInstanceState.getInt("indexContacts", 0);
@@ -2206,7 +2214,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void onPageSelected(int position) {
-
+				supportInvalidateOptionsMenu();
+				checkScrollElevation();
+				if(position == 1){
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCloud, 0);
+					if (fbFLol != null && fbFLol.isAdded() && fbFLol.isMultipleselect()){
+						fbFLol.actionMode.finish();
+					}
+				}
+				setToolbarTitle();
+				showFabButton();
 			}
 
 			@Override
@@ -3071,18 +3088,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			onAskingPermissionsFragment = true;
 
-			tabLayoutContacts.setVisibility(View.GONE);
-			viewPagerContacts.setVisibility(View.GONE);
-			tabLayoutShares.setVisibility(View.GONE);
-			viewPagerShares.setVisibility(View.GONE);
-			tabLayoutMyAccount.setVisibility(View.GONE);
-			viewPagerMyAccount.setVisibility(View.GONE);
-			tabLayoutTransfers.setVisibility(View.GONE);
-			viewPagerTransfers.setVisibility(View.GONE);
 			abL.setVisibility(View.GONE);
-
-			fragmentContainer.setVisibility(View.VISIBLE);
-			drawerLayout.closeDrawer(Gravity.LEFT);
+			setTabsVisibility();
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 			supportInvalidateOptionsMenu();
 			hideFabButton();
@@ -3259,14 +3266,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		replaceFragment(tonF, FragmentTag.TURN_ON_NOTIFICATIONS.getTag());
 
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
+		setTabsVisibility();
 		abL.setVisibility(View.GONE);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -3276,7 +3276,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
 		}
 
-		fragmentContainer.setVisibility(View.VISIBLE);
 		drawerLayout.closeDrawer(Gravity.LEFT);
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		supportInvalidateOptionsMenu();
@@ -3645,10 +3644,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Exception NotificationManager - remove contact notification");
 					}
 					setToolbarTitle();
-					log("onPostResume: shared tabs visible");
-					tabLayoutShares.setVisibility(View.VISIBLE);
-					tabLayoutShares.setVisibility(View.VISIBLE);
-					viewPagerShares.setVisibility(View.VISIBLE);
 		    		break;
 	    		}
 				case SETTINGS:{
@@ -4399,27 +4394,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("selectDrawerItemCloudDrive");
 
 		tB.setVisibility(View.VISIBLE);
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
 
-		fragmentContainer.setVisibility(View.VISIBLE);
+		if (cloudPageAdapter == null){
+			log("selectDrawerItemCloudDrive: cloudPageAdapter is NULL");
+			cloudPageAdapter = new CloudPageAdapter(getSupportFragmentManager(), this);
+			viewPagerCloud.setAdapter(cloudPageAdapter);
+			tabLayoutCloud.setupWithViewPager(viewPagerCloud);
 
-		fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-		if (fbFLol == null) {
-			fbFLol = FileBrowserFragmentLollipop.newInstance();
+			//Force on CreateView, addTab do not execute onCreateView
+			if(indexCloud!=-1){
+				log("selectDrawerItemCloudDrive: The index of the TAB Cloud is: "+indexCloud);
+				if (viewPagerCloud != null){
+					if(indexCloud==0){
+						log("selectDrawerItemCloudDrive: after creating tab in CLOUD TAB: "+parentHandleBrowser);
+						viewPagerCloud.setCurrentItem(0);
+					}
+					else{
+						viewPagerCloud.setCurrentItem(1);
+					}
+				}
+				indexCloud=-1;
+			}
+			else {
+				//No bundle, no change of orientation
+				log("selectDrawerItemCloudDrive: indexCloud is NOT -1");
+			}
 		}
-		replaceFragment(fbFLol, FragmentTag.CLOUD_DRIVE.getTag());
 
 		if (!firstTimeAfterInstallation){
 			log("Its NOT first time");
-			drawerLayout.closeDrawer(Gravity.LEFT);
-
 			int dbContactsSize = dbH.getContactsSize();
 			int sdkContactsSize = megaApi.getContacts().size();
 			if (dbContactsSize != sdkContactsSize){
@@ -4431,8 +4434,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else{
 			log("Its first time");
-
-//			drawerLayout.openDrawer(Gravity.LEFT);
 			//Fill the contacts DB
 			FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 			fillDBContactsTask.execute();
@@ -5031,22 +5032,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove contact notification");
 		}
 
-		tabLayoutCloud.setVisibility(View.GONE);
-		viewPagerCloud.setVisibility(View.GONE);
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
-		fragmentContainer.setVisibility(View.GONE);
-
 		if (sharesPageAdapter == null){
 			log("selectDrawerItemSharedItems: sharesPageAdapter is NULL");
-			tabLayoutShares.setVisibility(View.VISIBLE);
-			viewPagerShares.setVisibility(View.VISIBLE);
-
 			sharesPageAdapter = new SharesPageAdapter(getSupportFragmentManager(),this);
 			viewPagerShares.setAdapter(sharesPageAdapter);
 			tabLayoutShares.setupWithViewPager(viewPagerShares);
@@ -5073,11 +5060,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 
 		}
-		else{
-			log("selectDrawerItemSharedItems: sharesPageAdapter NOT null");
-			tabLayoutShares.setVisibility(View.VISIBLE);
-			viewPagerShares.setVisibility(View.VISIBLE);
-		}
 
 		setToolbarTitle();
 
@@ -5088,7 +5070,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
 			}
 		}
-		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void selectDrawerItemContacts (){
@@ -5111,23 +5092,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		setToolbarTitle();
 
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
-		fragmentContainer.setVisibility(View.GONE);
-
-		tabLayoutContacts.setVisibility(View.VISIBLE);
-		viewPagerContacts.setVisibility(View.VISIBLE);
-
 		if (contactsPageAdapter == null){
 			log("contactsPageAdapter == null");
-
-			tabLayoutContacts.setVisibility(View.VISIBLE);
-			viewPagerContacts.setVisibility(View.VISIBLE);
 			contactsPageAdapter = new ContactsPageAdapter(getSupportFragmentManager(),this);
 			viewPagerContacts.setAdapter(contactsPageAdapter);
 			tabLayoutContacts.setupWithViewPager(viewPagerContacts);
@@ -5228,8 +5194,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			}
 		});
-
-		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void selectDrawerItemAccount(){
@@ -5239,38 +5203,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaApi.getFolderInfo(megaApi.getRootNode(), this);
 		}
 
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
 		switch(accountFragment){
 			case Constants.UPGRADE_ACCOUNT_FRAGMENT:{
 				log("Show upgrade FRAGMENT");
-				fragmentContainer.setVisibility(View.VISIBLE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
 				showUpAF();
 				break;
 			}
 			case Constants.MONTHLY_YEARLY_FRAGMENT:{
 				log("Show monthly yearly FRAGMENT");
-				fragmentContainer.setVisibility(View.VISIBLE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
 				showmyF(selectedPaymentMethod, selectedAccountType);
 				showFabButton();
 				break;
 			}
 			default:{
 				log("Show myAccount Fragment");
-				fragmentContainer.setVisibility(View.GONE);
 				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
-
-				tabLayoutMyAccount.setVisibility(View.VISIBLE);
-				viewPagerMyAccount.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterMyAccount == null){
 					log("mTabsAdapterMyAccount == null");
@@ -5346,8 +5293,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					public void onPageScrollStateChanged(int state) {
 					}
 				});
-
-				drawerLayout.closeDrawer(Gravity.LEFT);
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
@@ -5365,17 +5310,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
-		fragmentContainer.setVisibility(View.VISIBLE);
-
 		notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
 		if (notificFragment == null){
 			log("New NotificationsFragment");
@@ -5389,8 +5323,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		setToolbarTitle();
 
 		showFabButton();
-
-		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void selectDrawerItemTransfers(){
@@ -5401,20 +5333,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		drawerItem = DrawerItem.TRANSFERS;
 
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-
-		fragmentContainer.setVisibility(View.GONE);
-
-		drawerLayout.closeDrawer(Gravity.LEFT);
-
-		tabLayoutTransfers.setVisibility(View.VISIBLE);
-		viewPagerTransfers.setVisibility(View.VISIBLE);
 
 		if (mTabsAdapterTransfers == null){
 			log("mTabsAdapterTransfers == null");
@@ -5504,17 +5422,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		setToolbarTitle();
 
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
-		fragmentContainer.setVisibility(View.VISIBLE);
-
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 		if (rChatFL == null){
 			log("New REcentChatFragment");
@@ -5528,7 +5435,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			rChatFL.setStatus();
 		}
 		log("show chats");
-		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void setBottomNavigationCurrentItem (int item) {
@@ -5548,6 +5454,68 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+	}
+
+	public void setTabsVisibility() {
+    	tabLayoutCloud.setVisibility(View.GONE);
+    	viewPagerCloud.setVisibility(View.GONE);
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
+
+    	fragmentContainer.setVisibility(View.GONE);
+
+    	switch (drawerItem) {
+			case CLOUD_DRIVE: {
+				tabLayoutCloud.setVisibility(View.VISIBLE);
+				viewPagerCloud.setVisibility(View.VISIBLE);
+				break;
+			}
+			case SHARED_ITEMS: {
+				tabLayoutShares.setVisibility(View.VISIBLE);
+				viewPagerShares.setVisibility(View.VISIBLE);
+				break;
+			}
+			case CONTACTS: {
+				tabLayoutContacts.setVisibility(View.VISIBLE);
+				viewPagerContacts.setVisibility(View.VISIBLE);
+				break;
+			}
+			case ACCOUNT: {
+				switch(accountFragment){
+					case Constants.CENTILI_FRAGMENT:
+					case Constants.FORTUMO_FRAGMENT:
+					case Constants.CC_FRAGMENT:
+					case Constants.UPGRADE_ACCOUNT_FRAGMENT:
+					case Constants.MONTHLY_YEARLY_FRAGMENT:{
+						fragmentContainer.setVisibility(View.VISIBLE);
+						break;
+					}
+					default:{
+						tabLayoutMyAccount.setVisibility(View.VISIBLE);
+						viewPagerMyAccount.setVisibility(View.VISIBLE);
+						break;
+					}
+				}
+				break;
+			}
+			case TRANSFERS: {
+				tabLayoutTransfers.setVisibility(View.VISIBLE);
+				viewPagerTransfers.setVisibility(View.VISIBLE);
+				break;
+			}
+			default: {
+				fragmentContainer.setVisibility(View.VISIBLE);
+				break;
+			}
+		}
+
+		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	@SuppressLint("NewApi")
@@ -5584,20 +5552,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-				tabLayoutContacts.setVisibility(View.GONE);
-				viewPagerContacts.setVisibility(View.GONE);
-				tabLayoutShares.setVisibility(View.GONE);
-				viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
 				replaceFragment(rubbishBinFLol, FragmentTag.RUBBISH_BIN.getTag());
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
-				drawerLayout.closeDrawer(Gravity.LEFT);
 
 				if (openFolderRefresh){
 					onNodesCloudDriveUpdate();
@@ -5624,17 +5579,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					oFLol.findNodes();
     			}
 
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
 				replaceFragment(oFLol, FragmentTag.OFFLINE.getTag());
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -5643,19 +5587,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
 					}
-
-//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//					if (!hasCameraPermission) {
-//						ActivityCompat.requestPermissions(this,
-//				                new String[]{Manifest.permission.CAMERA},
-//				                ManagerActivityLollipop.REQUEST_CAMERA);
-//					}
-
-//					if (hasStoragePermission && hasCameraPermission){
 				}
-
-
-    			drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
@@ -5674,20 +5606,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					cuFL = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_CAMERA);
 				}
 
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
 				replaceFragment(cuFL, FragmentTag.CAMERA_UPLOADS.getTag());
-
-				drawerLayout.closeDrawer(Gravity.LEFT);
 
 				setToolbarTitle();
     			supportInvalidateOptionsMenu();
@@ -5709,20 +5628,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
 				}
 
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
 				replaceFragment(muFLol, FragmentTag.MEDIA_UPLOADS.getTag());
-
-				drawerLayout.closeDrawer(Gravity.LEFT);
 
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
@@ -5742,20 +5648,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					iFLol = InboxFragmentLollipop.newInstance();
 				}
 
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
 				replaceFragment(iFLol, FragmentTag.INBOX.getTag());
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
-    			drawerLayout.closeDrawer(Gravity.LEFT);
 
 				if (openFolderRefresh){
 					onNodesInboxUpdate();
@@ -5805,18 +5698,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				aB.setSubtitle(null);
 				tB.setVisibility(View.VISIBLE);
 
-    			drawerLayout.closeDrawer(Gravity.LEFT);
-
     			supportInvalidateOptionsMenu();
-
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
 
 				sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
     			if (sttFLol != null){
@@ -5834,8 +5716,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				replaceFragment(sttFLol, FragmentTag.SETTINGS.getTag());
 
-				fragmentContainer.setVisibility(View.VISIBLE);
-
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
@@ -5850,8 +5730,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-				drawerLayout.closeDrawer(Gravity.LEFT);
-
     			drawerItem = DrawerItem.SEARCH;
     			sFLol = (SearchFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SEARCH.getTag());
     			if (sFLol != null) {
@@ -5859,18 +5737,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				sFLol = SearchFragmentLollipop.newInstance();
 
-				tabLayoutContacts.setVisibility(View.GONE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			tabLayoutShares.setVisibility(View.GONE);
-    			viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
 				replaceFragment(sFLol, FragmentTag.SEARCH.getTag());
-
-				fragmentContainer.setVisibility(View.VISIBLE);
 				showFabButton();
 
     			break;
@@ -5926,6 +5793,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
     	}
 
+    	setTabsVisibility();
     	checkScrollElevation();
 
 		if (megaApi.multiFactorAuthAvailable()) {
@@ -6120,14 +5988,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showCC(int type, int payMonth, boolean refresh){
 
 		accountFragment = Constants.CC_FRAGMENT;
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
 
 		ccFL = (CreditCardFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CREDIT_CARD.getTag());
 		if (ccFL == null) {
@@ -6143,7 +6003,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			replaceFragment(ccFL, FragmentTag.CREDIT_CARD.getTag());
 		}
 
-		fragmentContainer.setVisibility(View.VISIBLE);
+        setTabsVisibility();
 	}
 
 	public void updateInfoNumberOfSubscriptions(){
@@ -6163,41 +6023,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     }
 
 	public void showFortumo(){
-		accountFragment = Constants.FORTUMO_FRAGMENT;
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
 		fFL = (FortumoFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.FORTUMO.getTag());
 		if (fFL == null){
 			fFL = new FortumoFragmentLollipop();
 		}
 		replaceFragment(fFL, FragmentTag.FORTUMO.getTag());
-		fragmentContainer.setVisibility(View.VISIBLE);
+		setTabsVisibility();
 	}
 
 	public void showCentili(){
 		accountFragment = Constants.CENTILI_FRAGMENT;
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
 
 		ctFL = (CentiliFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CENTILI.getTag());
 		if (ctFL == null){
 			ctFL = new CentiliFragmentLollipop();
 		}
 		replaceFragment(ctFL, FragmentTag.CENTILI.getTag());
-		fragmentContainer.setVisibility(View.VISIBLE);
+		setTabsVisibility();
 	}
 
 	public void showmyF(int paymentMethod, int type){
@@ -6206,22 +6048,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
 		setToolbarTitle();
 
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
 		myFL = (MonthlyAnnualyFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MONTHLY_ANUALLY.getTag());
 		if (myFL == null){
 			myFL = new MonthlyAnnualyFragmentLollipop();
 		}
 		myFL.setInfo(paymentMethod, type);
 		replaceFragment(myFL, FragmentTag.MONTHLY_ANUALLY.getTag());
-		fragmentContainer.setVisibility(View.VISIBLE);
+		setTabsVisibility();
 	}
 
 	public void showUpAF(){
@@ -6230,22 +6063,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 		setToolbarTitle();
 
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
-
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if(upAFL==null){
 			upAFL = new UpgradeAccountFragmentLollipop();
 		}
 		replaceFragment(upAFL, FragmentTag.UPGRADE_ACCOUNT.getTag());
-		fragmentContainer.setVisibility(View.VISIBLE);
-
+		setTabsVisibility();
 		supportInvalidateOptionsMenu();
 		showFabButton();
 	}
@@ -7669,9 +7492,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						//Cloud Drive
-						fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-						if (fbFLol != null){
-							fbFLol.onBackPressed();
+						int index = viewPagerCloud.getCurrentItem();
+						if (cloudPageAdapter !=  null) {
+							if (index == 1) {
+								//RECENTS
+								rF = (RecentsFragment) cloudPageAdapter.instantiateItem(viewPagerCloud, 1);
+								if (rF != null && rF.isAdded()) {
+									backToDrawerItem(CLOUD_DRIVE_BNV);
+								}
+							}
+							else {
+								//CLOUD
+								fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCloud, 0);
+								if (fbFLol != null && fbFLol.isAdded()) {
+									fbFLol.onBackPressed();
+								}
+							}
 						}
 		    		}
 					else if (drawerItem == DrawerItem.RUBBISH_BIN){
@@ -9334,14 +9170,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		replaceFragment(eRKeyF, FragmentTag.EXPORT_RECOVERY_KEY.getTag());
 
-		tabLayoutContacts.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
-		tabLayoutShares.setVisibility(View.GONE);
-		viewPagerShares.setVisibility(View.GONE);
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		viewPagerMyAccount.setVisibility(View.GONE);
-		tabLayoutTransfers.setVisibility(View.GONE);
-		viewPagerTransfers.setVisibility(View.GONE);
 		abL.setVisibility(View.GONE);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -9351,8 +9179,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		}
 
-		fragmentContainer.setVisibility(View.VISIBLE);
-		drawerLayout.closeDrawer(Gravity.LEFT);
+		setTabsVisibility();
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		supportInvalidateOptionsMenu();
 		hideFabButton();
@@ -9507,12 +9334,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-
-			fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
-			if (fbFLol != null && fbFLol.onBackPressed() != 0) {
-				return;
+			int index = viewPagerCloud.getCurrentItem();
+			if (cloudPageAdapter !=  null) {
+				if (index == 1) {
+					//RECENTS
+					rF = (RecentsFragment) cloudPageAdapter.instantiateItem(viewPagerCloud, 1);
+					if (rF != null && rF.isAdded() && rF.onBackPressed() == 0) {
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItemLollipop(drawerItem);
+						return;
+					}
+				}
+				else {
+					//CLOUD
+					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCloud, 0);
+					if (fbFLol != null && fbFLol.isAdded() && fbFLol.onBackPressed() == 0) {
+						super.onBackPressed();
+					}
+				}
 			}
-			super.onBackPressed();
 		}
 		else if (drawerItem == DrawerItem.RUBBISH_BIN){
 			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RUBBISH_BIN.getTag());
@@ -11597,6 +11437,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
 				selectDrawerItemAccount();
+				setTabsVisibility();
 			}
 		});
 
@@ -12767,13 +12608,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public int getHeightToPanel(BottomSheetDialogFragment dialog){
 
 		if(dialog instanceof NodeOptionsBottomSheetDialogFragment){
-//			if(fragmentContainer != null && aB != null && tabLayoutCloud != null && tabLayoutCloud.getHeight() != 0){
-//				final Rect r = new Rect();
-//				fragmentContainer.getWindowVisibleDisplayFrame(r);
-//				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
-//			}
-//			else
-			if(fragmentContainer != null && aB != null && tabLayoutShares != null && tabLayoutShares.getHeight() != 0){
+			if(fragmentContainer != null && aB != null && tabLayoutCloud != null && tabLayoutCloud.getHeight() != 0){
+				final Rect r = new Rect();
+				fragmentContainer.getWindowVisibleDisplayFrame(r);
+				return (r.height() - aB.getHeight() - tabLayoutCloud.getHeight());
+			}
+			else if(fragmentContainer != null && aB != null && tabLayoutShares != null && tabLayoutShares.getHeight() != 0){
 				final Rect r = new Rect();
 				fragmentContainer.getWindowVisibleDisplayFrame(r);
 				return (r.height() - aB.getHeight() - tabLayoutShares.getHeight());

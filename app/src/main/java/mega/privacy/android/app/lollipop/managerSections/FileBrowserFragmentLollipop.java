@@ -862,6 +862,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 log("click transfers layout");
                 
                 ((ManagerActivityLollipop)getActivity()).selectDrawerItemTransfers();
+				((ManagerActivityLollipop)getActivity()).setTabsVisibility();
                 ((ManagerActivityLollipop)getActivity()).invalidateOptionsMenu();
                 break;
             }
