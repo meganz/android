@@ -350,12 +350,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     float elevation = 0;
 
 	public enum FragmentTag {
-		CLOUD_DRIVE, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
+		CLOUD_DRIVE, RECENTS, OFFLINE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH,
 		TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, MONTHLY_ANUALLY, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS;
 
 		public String getTag () {
 			switch (this) {
 				case CLOUD_DRIVE: return "fbFLol";
+				case RECENTS: return "rF";
 				case RUBBISH_BIN: return "rubbishBinFLol";
 				case OFFLINE: return "oFLol";
 				case CAMERA_UPLOADS: return "cuFLol";
@@ -430,6 +431,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	RoundedImageView nVPictureProfile;
 	TextView spaceTV;
 	ProgressBar usedSpacePB;
+
+	//Tabs in Shares
+	TabLayout tabLayoutCloud;
+	SharesPageAdapter cloudPageAdapter;
+	ViewPager viewPagerCloud;
 
     //Tabs in Shares
 	TabLayout tabLayoutShares;
@@ -2188,6 +2194,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else {
 			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
 		}
+
+		//TABS section Cloud Drive
+		tabLayoutCloud = (TabLayout) findViewById(R.id.sliding_tabs_cloud);
+		viewPagerCloud = (ViewPager) findViewById(R.id.cloud_tabs_pager);
+		viewPagerCloud.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+
+			}
+		});
 
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
@@ -5005,6 +5031,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Exception NotificationManager - remove contact notification");
 		}
 
+		tabLayoutCloud.setVisibility(View.GONE);
+		viewPagerCloud.setVisibility(View.GONE);
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
 		tabLayoutMyAccount.setVisibility(View.GONE);

@@ -1713,17 +1713,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         setOverviewLayout();
     }
 
-//	public void notifyDataSetChanged(){
-//		log("notifyDataSetChanged");
-//		if (adapter != null){
-//			adapter.notifyDataSetChanged();
-//		}
-//	}
-
-//	public boolean getIsList(){
-//		return isList;
-//	}
-    
     private static void log(String log) {
         Util.log("FileBrowserFragmentLollipop",log);
     }

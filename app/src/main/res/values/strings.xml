@@ -229,6 +229,7 @@
     <string name="cancel_all_transfer_confirmation">Delete all transfers?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
+    <string name="section_recents" context="Title of the screen that shows the recents files in the account.">Recents</string>
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
