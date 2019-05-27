@@ -129,6 +129,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	private static boolean closedChat = true;
 	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<Long, Boolean>();
+	private static HashMap<Long, Boolean> hashMapCallLayout = new HashMap<Long, Boolean>();
 
 	private static long openCallChatId = -1;
 
@@ -1842,6 +1843,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		log("Launch call: "+chatRoom.getTitle());
 
+		if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+			setCallLayoutStatus(call.getChatid(), true);
+		}
+
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {
@@ -1917,7 +1922,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		return myAccountInfo;
 	}
 
-	public static boolean isSpeakerStatus(long chatId){
+	public static boolean getSpeakerStatus(long chatId){
 		boolean entryExists = hashMapSpeaker.containsKey(chatId);
 		if(entryExists){
 			return hashMapSpeaker.get(chatId);
@@ -1928,6 +1933,19 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public static void setSpeakerStatus(long chatId, boolean speakerStatus){
 		hashMapSpeaker.put(chatId, speakerStatus);
 	}
+
+	public static boolean getCallLayoutStatus(long chatId){
+		boolean entryExists = hashMapCallLayout.containsKey(chatId);
+		if(entryExists){
+			return hashMapCallLayout.get(chatId);
+		}
+		setCallLayoutStatus(chatId, false);
+		return false;
+	}
+	public static void setCallLayoutStatus(long chatId, boolean callLayoutStatus){
+		hashMapCallLayout.put(chatId, callLayoutStatus);
+	}
+
 
 
 	public int getStorageState() { return storageState; }

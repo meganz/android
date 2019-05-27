@@ -182,8 +182,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     int totalVideosAllowed = 0;
 
-    static ChatCallActivity chatCallActivityActivity = null;
-
     FloatingActionButton videoFAB;
     FloatingActionButton microFAB;
     FloatingActionButton rejectFAB;
@@ -434,8 +432,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         log("onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calls_chat);
-
-        chatCallActivityActivity = this;
 
         MegaApplication.setShowPinScreen(true);
 
@@ -2072,7 +2068,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
             case R.id.speaker_fab: {
                 log("Click on speaker fab");
-                if(((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid())){
+                if(((MegaApplication) getApplication()).getSpeakerStatus(callChat.getChatid())){
                     ((MegaApplication)getApplication()).setSpeakerStatus(callChat.getChatid(), false);
                 }else{
                     ((MegaApplication)getApplication()).setSpeakerStatus(callChat.getChatid(), true);
@@ -2275,6 +2271,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                                 @Override
                                 public void onAnimationEnd(Animation animation) {
+                                    videoFAB.setVisibility(View.INVISIBLE);
 
                                     linearFAB.setOrientation(LinearLayout.HORIZONTAL);
                                     RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -2367,6 +2364,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                                 @Override
                                 public void onAnimationEnd(Animation animation) {
+                                    answerCallFAB.setVisibility(View.INVISIBLE);
                                     RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                                     layoutCompress.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                                     layoutCompress.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
@@ -2655,14 +2653,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private void updateLocalSpeakerStatus(){
         log("updateLocalSpeakerStatus");
         if(rtcAudioManager==null){
-            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), ((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid()));
+            rtcAudioManager = AppRTCAudioManager.create(getApplicationContext(), ((MegaApplication) getApplication()).getSpeakerStatus(callChat.getChatid()));
         }
         if(rtcAudioManager!=null){
             log("updateLocalSpeakerStatus enable speaker");
             rtcAudioManager.stop();
             rtcAudioManager.start(null);
-            rtcAudioManager.activateSpeaker(((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid()));
-            if(((MegaApplication) getApplication()).isSpeakerStatus(callChat.getChatid())){
+            rtcAudioManager.activateSpeaker(((MegaApplication) getApplication()).getSpeakerStatus(callChat.getChatid()));
+            if(((MegaApplication) getApplication()).getSpeakerStatus(callChat.getChatid())){
                 speakerFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
                 speakerFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_speaker_on));
             }else{

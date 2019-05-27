@@ -71,33 +71,24 @@ public class ChatUtil {
     /*Method to return to the call which I am participating*/
     public static void returnCall(Context context, MegaChatApiAndroid megaChatApi){
         log("returnCall()");
-        if(megaChatApi!=null){
-            long chatId = getChatCallInProgress(megaChatApi);
-            MegaChatCall call = megaChatApi.getChatCall(chatId);
-            if(call!=null){
-                MegaApplication.setShowPinScreen(false);
-                Intent intent = new Intent(context, ChatCallActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("chatHandle", chatId);
-                intent.putExtra("callId", call.getId());
-                context.startActivity(intent);
-            }
-        }
+        if((megaChatApi == null) || (megaChatApi.getChatCall(getChatCallInProgress(megaChatApi)) == null)) return;
+        long chatId = getChatCallInProgress(megaChatApi);
+        MegaChatCall call = megaChatApi.getChatCall(chatId);
+        MegaApplication.setShowPinScreen(false);
+        Intent intent = new Intent(context, ChatCallActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("chatHandle", chatId);
+        intent.putExtra("callId", call.getId());
+        context.startActivity(intent);
+
     }
 
     /*Method to know if a call is established*/
     public static boolean isEstablishedCall(MegaChatApiAndroid megaChatApi, long chatId){
-        if(megaChatApi!=null){
-            MegaChatCall call = megaChatApi.getChatCall(chatId);
-            if(call != null){
-                if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                    return true;
-                }else{
-                    return false;
 
-                }
-            }
-        }
+        if((megaChatApi == null) || (megaChatApi.getChatCall(chatId) == null)) return false;
+        MegaChatCall call = megaChatApi.getChatCall(chatId);
+        if((call.getStatus() <= MegaChatCall.CALL_STATUS_REQUEST_SENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_JOINING) || (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)) return true;
         return false;
     }
     public static void log(String origin, String message) {
@@ -226,20 +217,15 @@ public class ChatUtil {
     }
 
     public static void activateChrono(boolean activateChrono, Chronometer chronometer, MegaChatCall callChat){
-        if(activateChrono){
-            if((callChat!=null)&&(chronometer!=null)&&(chronometer.getVisibility() == GONE)){
-                chronometer.setVisibility(View.VISIBLE);
-                chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
-                chronometer.start();
-                chronometer.setFormat(" %s");
-            }
-        }else{
-            if((chronometer!=null) && (chronometer.getVisibility()==View.VISIBLE)){
+        if((activateChrono) && ((callChat!=null)&&(chronometer!=null)&&(chronometer.getVisibility() == GONE))){
+            chronometer.setVisibility(View.VISIBLE);
+            chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
+            chronometer.start();
+            chronometer.setFormat(" %s");
+        }else if((chronometer!=null) && (chronometer.getVisibility()==View.VISIBLE)){
                 chronometer.stop();
                 chronometer.setVisibility(View.GONE);
-            }
         }
-
     }
 
     private static void log(String message) {
