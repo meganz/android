@@ -1820,7 +1820,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if((megaChatApi!=null)&&(!ChatUtil.participatingInACall(megaChatApi))){
                     log("startCall there is not a call in this chat and i'm not in other call ---- false");
                     MegaApplication.setCallLayoutStatus(idChat, false);
-
                     ((MegaApplication) getApplication()).setSpeakerStatus(chatRoom.getChatId(), startVideo);
                     megaChatApi.startChatCall(idChat, startVideo, this);
                 }
