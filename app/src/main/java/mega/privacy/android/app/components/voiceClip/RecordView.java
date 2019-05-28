@@ -273,7 +273,6 @@ public class RecordView extends RelativeLayout {
                 recordListener.finishedSound();
                 break;
             }
-
             default:break;
         }
     }
@@ -508,6 +507,25 @@ public class RecordView extends RelativeLayout {
         animationHelper.setStartRecorded(false);
     }
 
+    protected void onActionCancel(RelativeLayout recordBtnLayout){
+        log("onActionCancel()");
+
+        userBehaviour = UserBehaviour.NONE;
+        elapsedTime = System.currentTimeMillis() - startTime;
+        removeHandlerPadLock();
+        flagRB = false;
+        firstX = 0;
+        firstY = 0;
+        lastX = 0;
+        lastY = 0;
+
+        recordButtonTranslation(recordBtnLayout,0,0);
+        slideToCancelTranslation(0);
+        startStopCounterTime(false);
+        inicializateAnimationHelper();
+        showLock(false);
+        recordListenerOptions(CANCEL_RECORD, 0);
+    }
     protected void onActionUp(RelativeLayout recordBtnLayout) {
         log("onActionUp()");
 
@@ -534,9 +552,10 @@ public class RecordView extends RelativeLayout {
         log("onActionUp:more than a second");
         if (!isSwiped) {
             recordListenerOptions(FINISH_RECORD, elapsedTime);
-            animationHelper.clearAlphaAnimation(true);
-            animationHelper.setStartRecorded(false);
-
+            if(animationHelper!=null){
+                animationHelper.clearAlphaAnimation(true);
+                animationHelper.setStartRecorded(false);
+            }
         }
         showLock(false);
     }

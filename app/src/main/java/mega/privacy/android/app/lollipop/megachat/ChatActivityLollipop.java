@@ -41,6 +41,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -625,6 +626,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButtonLayout = (RelativeLayout) findViewById(R.id.record_button_layout);
         recordButton = (RecordButton) findViewById(R.id.record_button);
         recordButton.setEnabled(true);
+        recordButton.setHapticFeedbackEnabled(true);
 
         recordView = (RecordView) findViewById(R.id.record_view);
         recordView.setLessThanSecondAllowed(false);
@@ -816,6 +818,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onCancel() {
                 log("recordView.setOnRecordListener:onCancel");
+                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 cancelRecording();
             }
             @Override
@@ -840,6 +843,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onAnimationEnd() {
                 log("recordView.setOnBasketAnimationEndListener:onAnimationEnd");
+                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 cancelRecording();
             }
 
@@ -2021,6 +2025,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.stop();
             recordView.playSound(Constants.TYPE_END_RECORD);
             setRecordingNow(false);
+            recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
+
             uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
             outputFileVoiceNotes = null;
         }catch(RuntimeException ex){
@@ -2127,6 +2133,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void showBubble(){
         log("showBubble");
+        recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
 
         recordView.playSound(Constants.TYPE_ERROR_RECORD);
         bubbleLayout.setAlpha(1);

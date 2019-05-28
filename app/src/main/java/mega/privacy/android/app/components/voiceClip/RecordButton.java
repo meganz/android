@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +79,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-            log("onTouch");
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
                     log("onTouch() - ACTION_DOWN");
@@ -93,6 +93,16 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
                 case MotionEvent.ACTION_UP: {
                     log("onTouch() - ACTION_UP");
                     recordView.onActionUp((RelativeLayout) v.getParent());
+                    break;
+                }
+                case MotionEvent.ACTION_CANCEL: {
+                    log("onTouch() - ACTION_CANCEL");
+                    recordView.onActionCancel((RelativeLayout) v.getParent());
+                    break;
+                }
+                default:{
+                    log("onTouch() - default");
+
                     break;
                 }
             }

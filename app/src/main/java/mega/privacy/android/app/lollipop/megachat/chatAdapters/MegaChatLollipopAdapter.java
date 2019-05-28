@@ -9048,14 +9048,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void destroyVoiceElemnts(){
         log("destroyVoiceElemnts()");
-        if((messagesPlaying!=null) && (!messagesPlaying.isEmpty())){
-            for(MessageVoiceClip m:messagesPlaying){
-                m.getMediaPlayer().release();
-                m.setMediaPlayer(null);
-            }
-            messagesPlaying.clear();
-        }
         removeCallBacks();
+        if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
+        for(MessageVoiceClip m:messagesPlaying){
+            m.getMediaPlayer().release();
+            m.setMediaPlayer(null);
+        }
+        messagesPlaying.clear();
     }
 
     @Override
