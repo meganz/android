@@ -347,7 +347,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private RelativeLayout recordLayout;
     private RelativeLayout recordButtonLayout;
     private RecordButton recordButton;
-    private MediaRecorder myAudioRecorder;
+    private MediaRecorder myAudioRecorder = null;
     private LinearLayout bubbleLayout;
     private TextView bubbleText;
     private RecordView recordView;
@@ -1969,18 +1969,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
         outputFileVoiceNotes = path + "/note_voice"+name;
 
-        if(myAudioRecorder==null || outputFileVoiceNotes == null) return;
+        if(outputFileVoiceNotes == null) return;
 
-        myAudioRecorder.reset();
-        myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        myAudioRecorder.setOutputFile(outputFileVoiceNotes);
-        myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        if(myAudioRecorder == null)  myAudioRecorder = new MediaRecorder();
+
         try {
+            myAudioRecorder.reset();
+            myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
+            myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             myAudioRecorder.prepare();
             myAudioRecorder.start();
             setRecordingNow(true);
         } catch (IOException e) {
+            log("startRecording: error try to start recording");
             e.printStackTrace();
         }
 
@@ -2013,7 +2016,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
             outputFileVoiceNotes = null;
-        }catch(RuntimeException ex){ }
+        }catch(RuntimeException ex){
+            log("sendRecording: error try to send recording");
+
+        }
     }
 
     /*
@@ -2177,10 +2183,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("setRecordingNow -> "+recordingNow);
         recordView.setRecordingNow(recordingNow);
         if(recordView.isRecordingNow()){
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ChatUtil.lockOrientationLandscape(this);
+            }else{
+                ChatUtil.lockOrientationPortrait(this);
+            }
+
             recordButtonStates(RECORD_BUTTON_ACTIVATED);
             if(emojiKeyboard!=null) emojiKeyboard.setListenerActivated(false);
             return;
         }
+        ChatUtil.unlockOrientation(this);
         recordButtonStates(RECORD_BUTTON_DESACTIVATED);
         if(emojiKeyboard!=null) emojiKeyboard.setListenerActivated(true);
 
@@ -7242,6 +7255,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
         outState.putBoolean("isShareLinkDialogDismissed", isShareLinkDialogDismissed);
+        if(adapter == null) return;
         MessageVoiceClip messageVoiceClip = adapter.getVoiceClipPlaying();
         if(messageVoiceClip!=null){
             outState.putBoolean("isAnyPlaying",true);

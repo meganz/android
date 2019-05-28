@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -36,6 +37,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -319,6 +321,9 @@ public final class ChatAdvancedNotificationBuilder {
     private String checkMessageContentAttachmentOrVoiceClip(MegaChatMessage message){
         MegaNodeList nodeList = message.getMegaNodeList();
         if((nodeList != null) && (nodeList.size() == 1)) {
+            if((MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip()) ){
+                return context.getString(R.string.title_voiceclip_message);
+            }
             return nodeList.get(0).getName();
         }
         return null;

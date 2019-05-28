@@ -8727,6 +8727,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(handlerVoiceNotes == null){
             handlerVoiceNotes = new Handler();
         }
+        if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
         for (MessageVoiceClip m : messagesPlaying) {
             if ((m.getIdMessage() == msgId)&&(m.getMediaPlayer().isPlaying())) {
                 log("prepareMediaPlayer");
@@ -8748,6 +8750,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Update the view while a voice clip is playing
      */
     private void statePlaying(long msgId){
+        if(messages==null || messages.isEmpty() || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
         for(MessageVoiceClip m: messagesPlaying){
             if((m.getIdMessage() == msgId)&&(m.getMediaPlayer().isPlaying())){
                 m.setProgress(m.getMediaPlayer().getCurrentPosition());
@@ -8815,6 +8819,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
       * Updating the seekBar element and the mediaplayer progress
      */
     private void updatingSeekBar(long messageId, int progress){
+        if(messages==null || messages.isEmpty() || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
         for(MessageVoiceClip m: messagesPlaying){
             if(m.getIdMessage() == messageId) {
                 log("updatingSeekBar - update mediaplayer");
@@ -8847,8 +8853,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
         log("playOrPauseVoiceClip: position = "+positionInAdapter);
         AndroidMegaChatMessage currentMessage = getMessageAt(positionInAdapter);
-        if(currentMessage==null || currentMessage.getMessage()==null || currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP) return;
-
+        if(currentMessage==null || currentMessage.getMessage()==null || currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP || messagesPlaying==null || messagesPlaying.isEmpty()) return;
         for(MessageVoiceClip m: messagesPlaying){
             if(m.getIdMessage() == currentMessage.getMessage().getMsgId()){
                 if(m.getMediaPlayer().isPlaying()){
@@ -8952,6 +8957,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     /*
     * Stop the playing when this message is removed*/
     public void stopPlaying(long msgId){
+        if(messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
         for(MessageVoiceClip m: messagesPlaying) {
             if(m.getIdMessage() == msgId){
                 if(m.getMediaPlayer().isPlaying()){
@@ -8969,6 +8976,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Restore values when a playback ends
      */
     private void completionMediaPlayer(long msgId){
+        if(messages==null || messages.isEmpty() || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+
         for(MessageVoiceClip m: messagesPlaying) {
             if(m.getIdMessage() == msgId){
                 log("completionMediaPlayer ");
@@ -8993,6 +9002,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     /* Get the voice clip that it is playing*/
 
     public MessageVoiceClip getVoiceClipPlaying(){
+        if(messagesPlaying==null || messagesPlaying.isEmpty()) return null;
         for(MessageVoiceClip m:messagesPlaying){
             if(m.getMediaPlayer().isPlaying()){
                 return m;

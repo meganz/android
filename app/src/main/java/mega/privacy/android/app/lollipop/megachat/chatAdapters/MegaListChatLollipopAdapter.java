@@ -2017,6 +2017,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
 			else if(messageType==MegaChatMessage.TYPE_CHAT_TITLE) {
+				log("Message type TYPE_CHAT_TITLE");
 
 				String messageContent = chat.getLastMessage();
 				String fullNameAction = getFullNameAction(chat);
@@ -2045,6 +2046,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 
 			}else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
+				log("Message type TYPE_CALL_STARTED");
+
 				String textToShow = context.getResources().getString(R.string.call_started_messages);
 				Spanned result = null;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -2057,6 +2060,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 
 			}else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
+				log("Message type TYPE_CALL_ENDED");
+
 				String messageContent = chat.getLastMessage();
 
 				char separator = 0x01;
@@ -2189,6 +2194,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
 			else if(messageType==MegaChatMessage.TYPE_CONTAINS_META){
+				log("Message type TYPE_CONTAINS_META");
 
 				long messageId = chat.getLastMessageId();
 				MegaChatMessage message = megaChatApi.getMessage(chat.getChatId(), messageId);
@@ -2196,7 +2202,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				MegaChatContainsMeta meta = message.getContainsMeta();
 				if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-					log("Geolocation message");
+					log("Message type TYPE_CONTAINS_META:CONTAINS_META_GEOLOCATION");
 					long lastMsgSender = chat.getLastMessageSender();
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
@@ -2487,8 +2493,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					log("Message Type-> "+messageType+" last content is NULL ");
 					lastMessageString = context.getString(R.string.error_message_unrecognizable);
 				}
-				else{
-					log("Message Type-> "+messageType+" last content: "+lastMessageString + "length: "+lastMessageString.length());
+				else if(messageType==MegaChatMessage.TYPE_VOICE_CLIP){
+					lastMessageString = context.getString(R.string.title_voiceclip_message);
+
+//						log("Message Type-> "+messageType+" last content: "+lastMessageString + "length: "+lastMessageString.length());
 				}
 
 				long lastMsgSender = chat.getLastMessageSender();

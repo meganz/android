@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Environment;
 import android.util.TypedValue;
@@ -257,6 +258,21 @@ public class ChatUtil {
         builder.setTitle(R.string.action_delete_link);
         builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    /** Locks the device window in landscape mode. */
+    public static void lockOrientationLandscape(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    /** Locks the device window in portrait mode. */
+    public static void lockOrientationPortrait(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    /** Allows user to freely use portrait or landscape mode. */
+    public static void unlockOrientation(Activity activity) {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     private static void log(String message) {

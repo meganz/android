@@ -370,7 +370,7 @@ public class RecordView extends RelativeLayout {
         public void run() {
             if(flagRB){
                 startStopCounterTime(true);
-                handlerShowPadLock.postDelayed(runPadLock, 3000);
+                handlerShowPadLock.postDelayed(runPadLock, 1000);
                 recordListenerOptions(START_RECORD, 0);
             }
         }
