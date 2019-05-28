@@ -2134,6 +2134,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 else if (action.equals(Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
                                     intent = new Intent(context, FolderLinkActivityLollipop.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                     intent.setData(uriData);
                                 }
                                 else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
