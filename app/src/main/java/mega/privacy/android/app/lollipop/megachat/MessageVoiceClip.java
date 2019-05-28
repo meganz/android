@@ -13,8 +13,7 @@ public class MessageVoiceClip {
     boolean isPaused = false;
     MediaPlayer mediaPlayer = null;
     int isAvailable = 0;
-
-    boolean isPlayingNow = false;
+    boolean isPlayingWhenTheScreenRotated = false;
 
     public MessageVoiceClip(long idMessage, long userHandle, long messageHandle) {
         this.idMessage = idMessage;
@@ -79,13 +78,14 @@ public class MessageVoiceClip {
         this.isAvailable = isAvailable;
     }
 
-    public boolean isPlayingNow() {
-        return isPlayingNow;
+    public boolean isPlayingWhenTheScreenRotated() {
+        return isPlayingWhenTheScreenRotated;
     }
 
-    public void setPlayingNow(boolean playingNow) {
-        isPlayingNow = playingNow;
+    public void setPlayingWhenTheScreenRotated(boolean playingWhenTheScreenRotated) {
+        isPlayingWhenTheScreenRotated = playingWhenTheScreenRotated;
     }
+
 
 
 }

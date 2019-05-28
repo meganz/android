@@ -1039,9 +1039,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
                             }
                             if(!exist){
-                                MessageVoiceClip messagePlaying = new MessageVoiceClip(idMessageVoicePlaying, messageHandleVoicePlaying, userHandleVoicePlaying);
+                                MessageVoiceClip messagePlaying = new MessageVoiceClip(idMessageVoicePlaying, userHandleVoicePlaying, messageHandleVoicePlaying);
                                 messagePlaying.setProgress(progressVoicePlaying);
-                                messagePlaying.setPlayingNow(true);
+                                messagePlaying.setPlayingWhenTheScreenRotated(true);
                                 messagesPlaying.add(messagePlaying);
                             }
                         }
