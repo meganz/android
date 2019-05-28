@@ -93,7 +93,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
 
     private LocationManager locationManager;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private Geocoder geocoder;
+    private static Geocoder geocoder;
     private List<Address> addresses;
     private MapAddress currentAddress;
     private LatLng myLocation = null;
@@ -154,6 +154,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         currentLocationName = (TextView) findViewById(R.id.address_name_label);
         currentLocationAddres = (TextView) findViewById(R.id.address_label);
         sendCurrentLocationLandscapeLayout = (RelativeLayout) findViewById(R.id.send_current_location_layout_landscape);
+        sendCurrentLocationLandscapeLayout.setOnClickListener(this);
         currentLocationLandscape = (TextView) findViewById(R.id.address_name_label_landscape);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -311,7 +312,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             public void onSuccess(Location location) {
                 if (location != null) {
                     log("getLastLocation() onSuccess");
-                    addresses = getAddresses(location.getLatitude(), location.getLongitude(), 1);
+                    addresses = getAddresses(getApplicationContext(), location.getLatitude(), location.getLongitude(), 1);
                     if (addresses != null) {
                         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                             currentAddress = new MapAddress(new LatLng(location.getLatitude(), location.getLongitude()), getString(R.string.current_location_label), addresses.get(0).getAddressLine(0));
@@ -352,32 +353,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
         return bitmap;
-    }
-
-    private void saveSnapshotAsImage (Bitmap bitmap, int quality) {
-        File defaultDownloadLocation = null;
-
-        if (Environment.getExternalStorageDirectory() != null) {
-            defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR + "/");
-        }
-        else{
-            defaultDownloadLocation = getFilesDir();
-        }
-        defaultDownloadLocation.mkdirs();
-        File outFile = new File(defaultDownloadLocation.getAbsolutePath(), "mapSnapshot.jpg");
-
-        if (outFile == null)  return;
-
-        log("DATA connection new file != null");
-        FileOutputStream fOut;
-        try {
-            fOut = new FileOutputStream(outFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fOut);
-            fOut.flush();
-            fOut.close();
-            bitmap.recycle();
-            log("DATA connection file compressed");
-        } catch (Exception e) {}
     }
 
     private void setActivityResult (final MapAddress location) {
@@ -441,7 +416,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
                             byteArray = stream.toByteArray();
                         }
-                        saveSnapshotAsImage(bitmap, quality);
                         log("The bitmaps has "+byteArray.length+" final size with quality: "+quality);
 
                         Intent intent = new Intent();
@@ -461,9 +435,9 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         });
     }
 
-    private List<Address> getAddresses (double latitude, double longitude, int maxResults) {
+    public static List<Address> getAddresses (Context context, double latitude, double longitude, int maxResults) {
         if (geocoder == null) {
-            geocoder = new Geocoder(this, Locale.getDefault());
+            geocoder = new Geocoder(context, Locale.getDefault());
         }
         try {
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, maxResults);
@@ -526,7 +500,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         LatLng latLng = mMap.getCameraPosition().target;
         if (latLng == null) return;
 
-        addresses = getAddresses(latLng.latitude, latLng.longitude, 1);
+        addresses = getAddresses(getApplicationContext(), latLng.latitude, latLng.longitude, 1);
         String title = getString(R.string.title_marker_maps);
         if (fullscreenIconMarker == null) {
             fullscreenIconMarker = drawableBitmap(Util.mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
@@ -601,6 +575,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.send_current_location_layout_landscape:
             case R.id.send_current_location_layout: {
                 setActivityResult(currentAddress);
                 break;

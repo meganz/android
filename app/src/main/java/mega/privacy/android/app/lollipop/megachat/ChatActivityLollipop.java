@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -128,6 +129,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatGeolocation;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatMessage;
@@ -341,6 +343,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     Handler handler;
 
     private AlertDialog locationDialog;
+    private boolean isLocationDialogShown = false;
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
@@ -996,6 +999,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
                         mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
                         isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
+                        isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
 
                         if(visibilityMessageJump){
                             if(typeMessageJump == TYPE_MESSAGE_NEW_MESSAGE){
@@ -1199,6 +1203,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 loadHistory();
                 log("On create: stateHistory: " + stateHistory);
+                if (isLocationDialogShown) {
+                    showSendLocationDialog();
+                }
             }
         }
         else{
@@ -3256,12 +3263,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             locationDialog.dismiss();
+                            isLocationDialogShown = false;
                         } catch (Exception e){}
                     }
                 });
 
         locationDialog = builder.create();
+        locationDialog.setCancelable(false);
+        locationDialog.setCanceledOnTouchOutside(false);
         locationDialog.show();
+        isLocationDialogShown = true;
     }
 
     public void attachFromFileStorage(){
@@ -4298,6 +4309,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         url = meta.getRichPreview().getUrl();
                                     }else if (meta.getType()==MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
                                         url = m.getMessage().getContent();
+                                        MegaChatGeolocation location = meta.getGeolocation();
+                                        if (location != null) {
+                                            float latitude = location.getLatitude();
+                                            float longitude = location.getLongitude();
+                                            List<Address> addresses = MapsActivity.getAddresses(this, latitude, longitude, 1);
+                                            if (addresses != null && !addresses.isEmpty()) {
+                                                String address = addresses.get(0).getAddressLine(0);
+                                                if (address != null) {
+                                                    url = "geo:" + latitude + "," + longitude + "?q=" + Uri.encode(address);
+                                                }
+                                            }
+                                        }
                                     }
                                     if (url == null) return;
                                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -7267,6 +7290,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             outState.putBoolean("isAnyPlaying",false);
 
         }
+        outState.putBoolean("isLocationDialogShown", isLocationDialogShown);
 //        outState.putInt("position_imageDrag", position_imageDrag);
 //        outState.putSerializable("holder_imageDrag", holder_imageDrag);
     }
