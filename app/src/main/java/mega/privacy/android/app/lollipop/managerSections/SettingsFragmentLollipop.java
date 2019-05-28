@@ -1744,21 +1744,16 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 
 				localSecondaryFolder.setSummary(localSecondaryFolderPath);
-				
 				cameraUploadCategory.addPreference(localSecondaryFolder);
 				cameraUploadCategory.addPreference(megaSecondaryFolder);
-				
-				rescheduleCameraUpload(context);
-				
 			}
-			else{				
-
+			else{
 				dbH.setSecondaryUploadEnabled(false);
-				
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
 				cameraUploadCategory.removePreference(localSecondaryFolder);
 				cameraUploadCategory.removePreference(megaSecondaryFolder);
-			}			
+			}
+			rescheduleCameraUpload(context);
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ADVANCED_DEVICES) == 0){
 			log("Changing the advances devices preference");
