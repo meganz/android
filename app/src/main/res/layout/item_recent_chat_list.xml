@@ -103,7 +103,7 @@
         android:textColor="@color/accentColor" />
 
     <LinearLayout
-        android:id="@+id/last_message_voice_clip"
+        android:id="@+id/last_message_voice_clip_or_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/recent_chat_list_name"
@@ -111,20 +111,17 @@
         android:orientation="horizontal"
         android:visibility="gone">
         <ImageView
-            android:id="@+id/last_message_voice_clip_ic"
+            android:id="@+id/last_message_voice_clip_or_location_ic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_mic_on_small"
             android:background="@null"/>
         <TextView
-            android:id="@+id/last_message_voice_clip_text"
+            android:id="@+id/last_message_voice_clip_or_location_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:singleLine="true"
-            android:maxLines="1"
-            android:text="00:00"
-            android:textColor="@color/ic_mic_read_message" />
+            android:maxLines="1" />
     </LinearLayout>
 
 

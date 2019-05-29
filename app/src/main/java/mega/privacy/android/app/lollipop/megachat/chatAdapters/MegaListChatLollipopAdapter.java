@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,7 +43,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -144,9 +142,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		TextView contactInitialLetter;
 		EmojiTextView textViewContactName;
 		EmojiTextView textViewContent;
-		LinearLayout voiceClipLayout;
-		TextView voiceClipText;
-		ImageView voiceClipIc;
+		LinearLayout voiceClipOrLocationLayout;
+		TextView voiceClipOrLocationText;
+		ImageView voiceClipOrLocationIc;
 		TextView textViewDate;
 		ImageView iconMyVideoOn;
 		ImageView iconMyAudioOff;
@@ -573,10 +571,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
 				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
 			}
-            ((ViewHolderNormalChatList)holder).voiceClipLayout = (LinearLayout) v.findViewById(R.id.last_message_voice_clip);
-            ((ViewHolderNormalChatList)holder).voiceClipLayout.setVisibility(View.GONE);
-			((ViewHolderNormalChatList)holder).voiceClipText = (TextView) v.findViewById(R.id.last_message_voice_clip_text);
-			((ViewHolderNormalChatList)holder).voiceClipIc = (ImageView) v.findViewById(R.id.last_message_voice_clip_ic);
+            ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout = (LinearLayout) v.findViewById(R.id.last_message_voice_clip_or_location);
+            ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
+			((ViewHolderNormalChatList)holder).voiceClipOrLocationText = (TextView) v.findViewById(R.id.last_message_voice_clip_or_location_text);
+			((ViewHolderNormalChatList)holder).voiceClipOrLocationIc = (ImageView) v.findViewById(R.id.last_message_voice_clip_or_location_ic);
 
 			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 			((ViewHolderNormalChatList)holder).iconMyAudioOff = (ImageView) v.findViewById(R.id.recent_chat_list_micro_off);
@@ -1322,7 +1320,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			log("MessageType: "+messageType);
 			String lastMessageString = chat.getLastMessage();
 
-            ((ViewHolderNormalChatList)holder).voiceClipLayout.setVisibility(View.GONE);
+            ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
 
 			if(messageType==MegaChatMessage.TYPE_INVALID){
 				log("Message Type -> INVALID");
@@ -2219,17 +2217,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
 					log("Message type TYPE_CONTAINS_META:CONTAINS_META_GEOLOCATION");
 					long lastMsgSender = chat.getLastMessageSender();
+					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
+					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(R.string.title_geolocation_message);
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 						log("getLastMessageSender: the last message is mine: "+lastMsgSender);
-						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-						Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-						CharSequence indexedText = TextUtils.concat(me, myMessage);
-						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+						((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.word_me)+" ");
+						setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, true);
 					}
 					else{
 						log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
@@ -2275,36 +2270,26 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								}
 							}
 
-							Spannable name = new SpannableString(fullNameAction+": ");
-							name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+							((ViewHolderNormalChatList)holder).textViewContent.setText(fullNameAction+": ");
 							if(chat.getUnreadCount()==0){
 								log("Message READ");
-
-								Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								CharSequence indexedText = TextUtils.concat(name, myMessage);
-								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, true);
 							}
 							else{
 								log("Message NOt read");
-								Spannable myMessage = new SpannableString(context.getString(R.string.title_geolocation_message));
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-								CharSequence indexedText = TextUtils.concat(name, myMessage);
-								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, false);
 							}
 						}
 						else{
 							if(chat.getUnreadCount()==0){
 								log("Message READ");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, true);
 							}
 							else{
 								log("Message NOt read");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, false);
 							}
-
-							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.title_geolocation_message));
+							((ViewHolderNormalChatList)holder).textViewContent.setText("");
 						}
 					}
 				}
@@ -2510,7 +2495,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				else if(messageType==MegaChatMessage.TYPE_VOICE_CLIP){
 					lastMessageString = "";
-					((ViewHolderNormalChatList)holder).voiceClipLayout.setVisibility(View.VISIBLE);
+					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					long idLastMessage = chat.getLastMessageId();
 					long idChat = chat.getChatId();
 					long duration = 0;
@@ -2526,7 +2511,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 						}
 					}
-					((ViewHolderNormalChatList)holder).voiceClipText.setText(ChatUtil.milliSecondsToTimer(duration));
+					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(ChatUtil.milliSecondsToTimer(duration));
 				}
 
 				long lastMsgSender = chat.getLastMessageSender();
@@ -2542,9 +2527,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
 						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-						((ViewHolderNormalChatList)holder).voiceClipIc.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_on_small));
-						((ViewHolderNormalChatList)holder).voiceClipIc.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ic_mic_read_message)));
-						((ViewHolderNormalChatList)holder).voiceClipText.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_read_message));
+						setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 					}
 				}
 				else{
@@ -2602,10 +2585,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_on_small));
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ic_mic_read_message)));
-							((ViewHolderNormalChatList)holder).voiceClipText.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_read_message));
-
+							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 						}
 						else{
 							log("Message NOt read");
@@ -2613,25 +2593,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 							CharSequence indexedText = TextUtils.concat(name, myMessage);
 							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_on_small));
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ic_mic_unread_message)));
-							((ViewHolderNormalChatList)holder).voiceClipText.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_unread_message));
+							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
 					}
 					else{
 						if(chat.getUnreadCount()==0){
 							log("Message READ");
 							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_on_small));
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ic_mic_read_message)));
-							((ViewHolderNormalChatList)holder).voiceClipText.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_read_message));
+							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, true);
 						}
 						else{
 							log("Message NOt read");
 							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mic_on_small));
-							((ViewHolderNormalChatList)holder).voiceClipIc.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.ic_mic_unread_message)));
-							((ViewHolderNormalChatList)holder).voiceClipText.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_unread_message));
+							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
 
 						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
@@ -2642,6 +2616,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		else{
 			log("Holder is NULL: "+position);
 			notifyItemChanged(position);
+		}
+	}
+
+	private void setVoiceClipOrLocationLayout(ImageView image, TextView text, int resource, boolean isRead) {
+		if (isRead) {
+			image.setImageDrawable(Util.mutateIconSecondary(context, resource, R.color.ic_mic_read_message));
+			text.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_read_message));
+		}
+		else {
+			image.setImageDrawable(Util.mutateIconSecondary(context, resource, R.color.ic_mic_unread_message));
+			text.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_unread_message));
 		}
 	}
 
