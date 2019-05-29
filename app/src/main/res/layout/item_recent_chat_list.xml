@@ -102,6 +102,32 @@
         android:maxLines="1"
         android:textColor="@color/accentColor" />
 
+    <LinearLayout
+        android:id="@+id/last_message_voice_clip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/recent_chat_list_name"
+        android:layout_toRightOf="@id/recent_chat_list_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/last_message_voice_clip_ic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_mic_on_small"
+            android:background="@null"/>
+        <TextView
+            android:id="@+id/last_message_voice_clip_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:text="00:00"
+            android:textColor="@color/ic_mic_read_message" />
+    </LinearLayout>
+
+
     <TextView
         android:id="@+id/recent_chat_list_date"
         android:layout_width="wrap_content"

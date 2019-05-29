@@ -963,7 +963,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageVoiceClipSeekBar = (SeekBar) v.findViewById(R.id.content_own_message_voice_clip_seekBar);
             holder.contentOwnMessageVoiceClipSeekBar.setProgress(0);
             holder.contentOwnMessageVoiceClipDuration = (TextView) v.findViewById(R.id.content_own_message_voice_clip_duration);
-            holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(0));
+            holder.contentOwnMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(0));
             holder.uploadingOwnProgressbarVoiceclip = (RelativeLayout) v.findViewById(R.id.uploading_own_progressbar_voiceclip);
             holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
 
@@ -1170,7 +1170,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageVoiceClipSeekBar = (SeekBar) v.findViewById(R.id.content_contact_message_voice_clip_seekBar);
             holder.contentContactMessageVoiceClipSeekBar.setProgress(0);
             holder.contentContactMessageVoiceClipDuration = (TextView) v.findViewById(R.id.content_contact_message_voice_clip_duration);
-            holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(0));
+            holder.contentContactMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(0));
             holder.uploadingContactProgressbarVoiceclip = (RelativeLayout) v.findViewById(R.id.uploading_contact_progressbar_voiceclip);
             holder.uploadingContactProgressbarVoiceclip.setVisibility(View.GONE);
             holder.notAvailableContactVoiceclip = (ImageView) v.findViewById(R.id.content_contact_message_voice_clip_not_available);
@@ -5904,9 +5904,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
 
                         if(currentMessagePlaying.getProgress() == 0){
-                            holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
+                            holder.contentOwnMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(holder.totalDurationOfVoiceClip));
                         }else{
-                            holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(currentMessagePlaying.getProgress()));
+                            holder.contentOwnMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(currentMessagePlaying.getProgress()));
                         }
 
                         holder.contentOwnMessageVoiceClipSeekBar.setProgress(currentMessagePlaying.getProgress());
@@ -6101,9 +6101,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
 
                     if(currentMessagePlaying.getProgress() == 0){
-                        holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(holder.totalDurationOfVoiceClip));
+                        holder.contentContactMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(holder.totalDurationOfVoiceClip));
                     }else{
-                        holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(currentMessagePlaying.getProgress()));
+                        holder.contentContactMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(currentMessagePlaying.getProgress()));
                     }
 
                     holder.contentContactMessageVoiceClipSeekBar.setProgress(currentMessagePlaying.getProgress());
@@ -8764,12 +8764,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
                                 holder.contentOwnMessageVoiceClipSeekBar.setProgress(m.getProgress());
-                                holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(m.getProgress()));
+                                holder.contentOwnMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(m.getProgress()));
                             }else{
                                 holder.contentContactMessageVoiceClipPlay.setVisibility(View.VISIBLE);
                                 holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
                                 holder.contentContactMessageVoiceClipSeekBar.setProgress(m.getProgress());
-                                holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(m.getProgress()));
+                                holder.contentContactMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(m.getProgress()));
                             }
                         }
                         break;
@@ -8833,9 +8833,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if(holder!=null){
                             log("updatingSeekBar - update holder views");
                             if(m.getUserHandle() == megaChatApi.getMyUserHandle()){
-                                holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(m.getProgress()));
+                                holder.contentOwnMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(m.getProgress()));
                             }else{
-                                holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(m.getProgress()));
+                                holder.contentContactMessageVoiceClipDuration.setText(ChatUtil.milliSecondsToTimer(m.getProgress()));
                             }
                         }
                         break;
@@ -9025,25 +9025,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 completionMediaPlayer(m.getIdMessage());
             }
         }
-    }
-
-
-    private String milliSecondsToTimer(long milliseconds) {
-        String finalTimerString = "";
-        String secondsString = "";
-        int hours = (int) (milliseconds / (1000 * 60 * 60));
-        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
-        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-        if (hours > 0) {
-            finalTimerString = hours + ":";
-        }
-        if (seconds < 10) {
-            secondsString = "0" + seconds;
-        } else {
-            secondsString = "" + seconds;
-        }
-        finalTimerString = finalTimerString + minutes + ":" + secondsString;
-        return finalTimerString;
     }
 
     public void destroyVoiceElemnts(){
