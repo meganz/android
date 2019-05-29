@@ -155,7 +155,7 @@ import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, View.OnTouchListener {
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -854,7 +854,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 recordView.setVisibility(View.VISIBLE);
                 recordLayout.setVisibility(View.VISIBLE);
                 recordButtonLayout.setVisibility(View.VISIBLE);
-                recordButton.activateOnTouchListener(false);
+                activateOnTouchListenerLayout(false);
                 recordButtonDeactivated(true);
                 placeRecordButton(RECORD_BUTTON_DESACTIVATED);
             }
@@ -870,7 +870,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     recordButtonLayout.setVisibility(View.VISIBLE);
                 }
                 recordView.setVisibility(View.INVISIBLE);
-                recordButton.activateOnTouchListener(true);
+                activateOnTouchListenerLayout(true);
                 placeRecordButton(RECORD_BUTTON_DESACTIVATED);
             }
         });
@@ -961,6 +961,47 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         initAfterIntent(getIntent(), savedInstanceState);
 
         log("FINISH on Create");
+    }
+
+    public void activateOnTouchListenerLayout(boolean flag){
+        recordButton.activateOnTouchListener(flag);
+        recordButton.activateOnClickListener(!flag);
+        if(flag){
+            recordButtonLayout.setOnTouchListener(this);
+        }else{
+            recordButtonLayout.setOnTouchListener(null);
+        }
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                log("onTouch() - ACTION_DOWN");
+                recordButton.actionDown((RelativeLayout) v, event);
+                break;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                log("onTouch() - ACTION_MOVE");
+                recordButton.actionMove((RelativeLayout) v, event);
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                log("onTouch() - ACTION_UP");
+                recordButton.actionUp((RelativeLayout) v, event);
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL: {
+                log("onTouch() - ACTION_CANCEL");
+                recordButton.actionCancel((RelativeLayout) v, event);
+                break;
+            }
+            default:{
+                log("onTouch() - default");
+                break;
+            }
+        }
+        return true;
     }
 
     private void showLetterKB(){
@@ -2085,13 +2126,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButton.setVisibility(View.VISIBLE);
 
         if(isDesactivated){
-            recordButton.activateOnClickListener(false);
+            activateOnTouchListenerLayout(true);
             recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
             recordButton.setColorFilter(null);
             return;
         }
-        recordButton.activateOnTouchListener(false);
-        recordButton.activateOnClickListener(true);
+        activateOnTouchListenerLayout(false);
         recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
         recordButton.setColorFilter(ContextCompat.getColor(context, R.color.accentColor));
     }
@@ -2115,8 +2155,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 recordButtonDeactivated(false);
             }else{
                 recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
-                recordButton.activateOnTouchListener(true);
-                recordButton.activateOnClickListener(false);
+                activateOnTouchListenerLayout(true);
                 recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
                 recordButton.setColorFilter(null);
             }
@@ -2125,7 +2164,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("recordButtonStates:DESACTIVATED");
             showChatOptions();
             recordView.setVisibility(View.GONE);
-            recordButton.activateOnTouchListener(true);
             recordButtonDeactivated(true);
         }
         placeRecordButton(currentRecordButtonState);

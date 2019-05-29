@@ -77,32 +77,44 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
         }
     }
 
+    public void actionDown(View v, MotionEvent event){
+        recordView.onActionDown((RelativeLayout) v.getParent(), event);
+    }
+    public void actionMove(View v, MotionEvent event){
+        recordView.onActionMove((RelativeLayout) v.getParent(), event);
+    }
+    public void actionUp(View v, MotionEvent event){
+        recordView.onActionUp((RelativeLayout) v.getParent());
+    }
+    public void actionCancel(View v, MotionEvent event){
+        recordView.onActionCancel((RelativeLayout) v.getParent());
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
                     log("onTouch() - ACTION_DOWN");
-                    recordView.onActionDown((RelativeLayout) v.getParent(), event);
+                    actionDown((RelativeLayout) v.getParent(), event);
                     break;
                 }
                 case MotionEvent.ACTION_MOVE: {
                     log("onTouch() - ACTION_MOVE");
-                    recordView.onActionMove((RelativeLayout) v.getParent(), event);
+                    actionMove((RelativeLayout) v.getParent(), event);
                     break;
                 }
                 case MotionEvent.ACTION_UP: {
                     log("onTouch() - ACTION_UP");
-                    recordView.onActionUp((RelativeLayout) v.getParent());
+                    actionUp((RelativeLayout) v.getParent(), event);
                     break;
                 }
                 case MotionEvent.ACTION_CANCEL: {
                     log("onTouch() - ACTION_CANCEL");
-                    recordView.onActionCancel((RelativeLayout) v.getParent());
+                    actionCancel((RelativeLayout) v.getParent(), event);
                     break;
                 }
                 default:{
                     log("onTouch() - default");
-
                     break;
                 }
             }

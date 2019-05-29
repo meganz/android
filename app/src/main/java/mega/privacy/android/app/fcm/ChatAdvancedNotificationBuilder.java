@@ -321,8 +321,16 @@ public final class ChatAdvancedNotificationBuilder {
     private String checkMessageContentAttachmentOrVoiceClip(MegaChatMessage message){
         MegaNodeList nodeList = message.getMegaNodeList();
         if((nodeList != null) && (nodeList.size() == 1)) {
-            if((MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip()) ){
-                return context.getString(R.string.title_voiceclip_message);
+            MegaNode node = nodeList.get(0);
+            if((MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) ){
+                long duration = 0;
+                if(node.getDuration()<0){
+                    duration = (-node.getDuration())*1000;
+                }else{
+                    duration = (node.getDuration()*1000);
+                }
+                String result = context.getString(R.string.title_voiceclip_message)+" "+ChatUtil.milliSecondsToTimer(duration);
+                return result;
             }
             return nodeList.get(0).getName();
         }
