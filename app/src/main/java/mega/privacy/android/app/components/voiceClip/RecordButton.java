@@ -76,41 +76,27 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             setClip((View) v.getParent());
         }
     }
-
-    public void actionDown(View v, MotionEvent event){
-        recordView.onActionDown((RelativeLayout) v.getParent(), event);
-    }
-    public void actionMove(View v, MotionEvent event){
-        recordView.onActionMove((RelativeLayout) v.getParent(), event);
-    }
-    public void actionUp(View v, MotionEvent event){
-        recordView.onActionUp((RelativeLayout) v.getParent());
-    }
-    public void actionCancel(View v, MotionEvent event){
-        recordView.onActionCancel((RelativeLayout) v.getParent());
-    }
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
                     log("onTouch() - ACTION_DOWN");
-                    actionDown((RelativeLayout) v.getParent(), event);
+                    recordView.onActionDown((RelativeLayout) v.getParent(), event);
                     break;
                 }
                 case MotionEvent.ACTION_MOVE: {
                     log("onTouch() - ACTION_MOVE");
-                    actionMove((RelativeLayout) v.getParent(), event);
+                    recordView.onActionMove((RelativeLayout) v.getParent(), event);
                     break;
                 }
                 case MotionEvent.ACTION_UP: {
                     log("onTouch() - ACTION_UP");
-                    actionUp((RelativeLayout) v.getParent(), event);
+                    recordView.onActionUp((RelativeLayout) v.getParent());
                     break;
                 }
                 case MotionEvent.ACTION_CANCEL: {
                     log("onTouch() - ACTION_CANCEL");
-                    actionCancel((RelativeLayout) v.getParent(), event);
+                    recordView.onActionCancel((RelativeLayout) v.getParent());
                     break;
                 }
                 default:{
