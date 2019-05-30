@@ -651,8 +651,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             filteredContacts.addAll(phoneContacts);
 
             //keep all contacts for records
-            totalContacts.addAll(megaContacts);
-            totalContacts.addAll(phoneContacts);
+            totalContacts.addAll(filteredContacts);
             return null;
         }
 
@@ -689,7 +688,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                     String email = contactInfo.getEmail().toLowerCase();
                     String name = contactInfo.getName().toLowerCase();
                     int type = contactInfo.getType();
-                    if (email.contains(query) || name.contains(query)) {
+                    if ((email.contains(query) || name.contains(query)) && !isContactAdded(contactInfo)) {
                         if (type == TYPE_PHONE_CONTACT) {
                             phoneContacts.add(contactInfo);
                         } else if (type == TYPE_MEGA_CONTACT) {
@@ -731,7 +730,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     }
 
     private TextView createTextView(String name) {
-        //todo create contact view, this is only place holder
         TextView textView = new TextView(this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -741,12 +739,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     }
 
     private void refreshList(){
-        filteredContacts.clear();
-        for (ContactInfo contactInfo: totalContacts){
+        ArrayList<ContactInfo> list = new ArrayList<>();
+        for (ContactInfo contactInfo: filteredContacts){
             if(!isContactAdded(contactInfo)){
-                filteredContacts.add(contactInfo);
+                list.add(contactInfo);
             }
         }
+
+        filteredContacts.clear();
+        filteredContacts.addAll(list);
         setPhoneAdapterContacts(filteredContacts);
     }
 
