@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -30,6 +31,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     final int READ_WRITE = 0;
     final int CAMERA = 1;
     final int CALLS = 2;
+    final int CONTACTS = 3;
 
     Context context;
 
@@ -49,12 +51,13 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     boolean isAllowingAccessShown = false;
     int permissionsPosition = 0;
     int numItems = 0;
-    int[] items = new int[3];
+    int[] items = new int[4];
     int currentPermission = 0;
     boolean writeGranted = false;
     boolean readGranted = false;
     boolean cameraGranted = false;
     boolean microphoneGranted = false;
+    boolean contactsGranted = false;
 //    boolean writeCallsGranted = false;
 
     int[] mImages;
@@ -65,6 +68,15 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (!Util.isTablet(getActivity())) {
+            log("allow all screens after this permission fragment");
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        }
     }
 
     @Override
@@ -95,18 +107,21 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 R.drawable.photos,
                 R.drawable.enable_camera,
                 R.drawable.calls,
+                R.drawable.contacts
         };
 
         mTitles = new String[] {
                 context.getString(R.string.allow_acces_media_title),
                 context.getString(R.string.allow_acces_camera_title),
-                context.getString(R.string.allow_acces_calls_title)
+                context.getString(R.string.allow_acces_calls_title),
+                context.getString(R.string.allow_acces_contact_title)
         };
 
         mSubtitles =  new String[] {
                 context.getString(R.string.allow_acces_media_subtitle),
                 context.getString(R.string.allow_acces_camera_subtitle),
-                context.getString(R.string.allow_acces_calls_subtitle_microphone)
+                context.getString(R.string.allow_acces_calls_subtitle_microphone),
+                context.getString(R.string.allow_acces_contact_subtitle)
         };
 
 
@@ -131,42 +146,28 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             writeGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             cameraGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA);
             microphoneGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO);
-//            writeCallsGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG);
+            contactsGranted = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this.getActivity());
+//          writeCallsGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG);
 
             if (!readGranted || !writeGranted) {
+                items[numItems] = READ_WRITE;
                 numItems++;
-                items[0] = currentPermission = READ_WRITE;
-                if (!cameraGranted) {
-                    numItems++;
-                    items[1] = CAMERA;
-                    if (!microphoneGranted/* || !writeCallsGranted*/){
-                        numItems++;
-                        items[2] = CALLS;
-                    }
-                }
-                else if (!microphoneGranted/* || !writeCallsGranted*/) {
-                    numItems++;
-                    items[1] = CALLS;
-                }
-
-                setContent(READ_WRITE);
             }
-            else if (!cameraGranted) {
+            if (!cameraGranted) {
+                items[numItems] = CAMERA;
                 numItems++;
-                items[0] = currentPermission = CAMERA;
-                if (!microphoneGranted/* || !writeCallsGranted*/) {
-                    numItems++;
-                    items[1] = CALLS;
-                }
-
-                setContent(CAMERA);
             }
-            else if (!microphoneGranted/* || !writeCallsGranted*/) {
+            if (!microphoneGranted) {
+                items[numItems] = CALLS;
                 numItems++;
-                items[0] = currentPermission = CALLS;
-                setContent(CALLS);
+            }
+            if (!contactsGranted) {
+                items[numItems] = CONTACTS;
+                numItems++;
             }
 
+            currentPermission = items[0];
+            setContent(currentPermission);
             showSetupLayout();
         }
         else {
@@ -176,7 +177,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             currentPermission = savedInstanceState.getInt("currentPermission", 0);
             items = savedInstanceState.getIntArray("items");
             microphoneGranted = savedInstanceState.getBoolean("microphoneGranted", false);
-//            writeCallsGranted = savedInstanceState.getBoolean("writeCallsGranted", false);
+//          writeCallsGranted = savedInstanceState.getBoolean("writeCallsGranted", false);
 
             setContent(currentPermission);
 
@@ -188,11 +189,15 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             }
         }
 
+        if (isAllowingAccessShown) {
+            ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+        }
+
         if (numItems == 1){
             itemsLayout.setVisibility(View.GONE);
         }
         else {
-            itemsText.setText(getString(R.string.wizard_steps_indicator, 1, numItems));
+            itemsText.setText(getString(R.string.wizard_steps_indicator, currentPermission + 1, numItems));
         }
     }
 
@@ -259,6 +264,11 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
                 askForCallsPermissions();
                 break;
             }
+
+            case CONTACTS: {
+                askForContactsPermissions();
+                break;
+            }
         }
     }
 
@@ -312,6 +322,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 //        }
     }
 
+    void askForContactsPermissions() {
+        if (!contactsGranted) {
+            log("CONTACT");
+            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_FRAGMENT);
+        }
+    }
     void showSetupLayout () {
         setupLayout.setVisibility(View.VISIBLE);
         allowAccessLayout.setVisibility(View.GONE);
@@ -352,6 +368,10 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        if (!Util.isTablet(getActivity())) {
+            log("only allow portrait when the device is mobile");
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     }
 
     private static void log(String log) {
