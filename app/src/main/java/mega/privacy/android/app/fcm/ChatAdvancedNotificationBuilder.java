@@ -329,7 +329,7 @@ public final class ChatAdvancedNotificationBuilder {
                 }else{
                     duration = (node.getDuration()*1000);
                 }
-                String result = context.getString(R.string.title_voiceclip_message)+" "+ChatUtil.milliSecondsToTimer(duration);
+                String result = "\uD83C\uDF99 " + ChatUtil.milliSecondsToTimer(duration);
                 return result;
             }
             return nodeList.get(0).getName();
@@ -340,7 +340,7 @@ public final class ChatAdvancedNotificationBuilder {
     private String checkMessageContentMeta(MegaChatMessage message){
         MegaChatContainsMeta meta = message.getContainsMeta();
         if(meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-            return  context.getString(R.string.title_geolocation_message);
+            return  "\uD83D\uDCCD " + context.getString(R.string.title_geolocation_message);
         }
         return message.getContent();
     }

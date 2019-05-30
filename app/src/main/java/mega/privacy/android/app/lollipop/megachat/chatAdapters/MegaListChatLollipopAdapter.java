@@ -154,7 +154,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RelativeLayout circlePendingMessages;
 
 		TextView numberPendingMessages;
-		RelativeLayout layoutPendingMessages;
 		ImageView muteIcon;
 		ImageView contactStateIcon;
 		ImageView privateChatIcon;
@@ -330,7 +329,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.itemLayout.setOnClickListener(null);
 					holder.itemLayout.setOnLongClickListener(null);
 
-					((ViewHolderNormalChatList)holder).layoutPendingMessages.setAlpha(.4f);
+					((ViewHolderNormalChatList)holder).circlePendingMessages.setAlpha(.4f);
 
 					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(context.getResources().getColor(R.color.text_secondary));
 					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(context.getResources().getColor(R.color.text_secondary));
@@ -344,7 +343,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.itemLayout.setOnClickListener(this);
 					holder.itemLayout.setOnLongClickListener(null);
 
-					((ViewHolderNormalChatList)holder).layoutPendingMessages.setAlpha(1.0f);
+					((ViewHolderNormalChatList)holder).circlePendingMessages.setAlpha(1.0f);
 
 					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
@@ -360,55 +359,46 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnLongClickListener(this);
 			}
 
-			if(Util.isChatEnabled() && chat.isCallInProgress()){
-				if((megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
-
-					MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
-					if(call!=null){
-						log("call status: "+call.getStatus());
-						if((chat.isGroup()) && ((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT))){
-							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
-							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-							((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
-							((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
-							((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
-
-						}else{
-							((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-							if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
-								((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_started_messages));
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-								((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
-								if(call.hasLocalAudio()){
-									((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
-								}else{
-									((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.VISIBLE);
-								}
-
-								if(call.hasLocalVideo()){
-									((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.VISIBLE);
-								}else{
-									((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
-								}
-							}
-						}
-					}else{
-						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+			if(Util.isChatEnabled() && chat.isCallInProgress() && (megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
+				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
+				if(call!=null){
+					log("call status: "+call.getStatus());
+					if((chat.isGroup()) && ((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT))){
+						((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
+						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
+						((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
+						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+						((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
 						((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
 						((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
+
+					}else{
+						((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+						if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+							((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
+							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.call_started_messages));
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							((ViewHolderNormalChatList)holder).textViewContent.setVisibility(View.VISIBLE);
+							if(call.hasLocalAudio()){
+								((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
+							}else{
+								((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.VISIBLE);
+							}
+
+							if(call.hasLocalVideo()){
+								((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.VISIBLE);
+							}else{
+								((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
+							}
+						}
 					}
-				}else{
-					((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-					((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
-					((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
+					return;
 				}
-			}else{
-				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
-				((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
-				((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
 			}
 
+			((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+			((ViewHolderNormalChatList)holder).iconMyAudioOff.setVisibility(View.GONE);
+			((ViewHolderNormalChatList)holder).iconMyVideoOn.setVisibility(View.GONE);
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
 			((ViewHolderArchivedChatList)holder).textViewArchived.setOnClickListener(this);
@@ -594,7 +584,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setOnClickListener(null);
 			}
 
-			((ViewHolderNormalChatList)holder).layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
 			((ViewHolderNormalChatList)holder).circlePendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_circle);
 			((ViewHolderNormalChatList)holder).numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
@@ -637,30 +626,27 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //		numberString="20";
 		int size = numberString.length();
 
+		((ViewHolderNormalChatList)holder).circlePendingMessages.setVisibility(View.VISIBLE);
 		switch(size){
 			case 0:{
 				log("0 digits - error!");
-				((ViewHolderNormalChatList)holder).layoutPendingMessages.setVisibility(View.GONE);
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setVisibility(View.GONE);
 				break;
 			}
 			case 1:{
 				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_1));
-				((ViewHolderNormalChatList)holder).layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 			case 2:{
 				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_2));
-				((ViewHolderNormalChatList)holder).layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 			case 3:{
 				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_3));
-				((ViewHolderNormalChatList)holder).layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 			default:{
 				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_4));
-				((ViewHolderNormalChatList)holder).layoutPendingMessages.setVisibility(View.VISIBLE);
 				break;
 			}
 		}
@@ -1262,7 +1248,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				setUnreadCount(unreadMessages, holder);
 			}
 			else{
-				((ViewHolderNormalChatList)holder).layoutPendingMessages.setVisibility(View.INVISIBLE);
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setVisibility(View.GONE);
 			}
 		}
 		else{
@@ -1315,6 +1301,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
+
+			if(Util.isChatEnabled() && chat != null && chat.isCallInProgress() && (megaChatApi != null) && (megaChatApi.getNumCalls() != 0)){
+				MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
+				if(call!=null){
+					return;
+				}
+			}
 
 			int messageType = chat.getLastMessageType();
 			log("MessageType: "+messageType);
@@ -2220,6 +2213,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(R.string.title_geolocation_message);
 					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+					((ViewHolderNormalChatList)holder).textViewContent.setText("");
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 						log("getLastMessageSender: the last message is mine: "+lastMsgSender);
@@ -2289,7 +2283,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								log("Message NOt read");
 								setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_location_small, false);
 							}
-							((ViewHolderNormalChatList)holder).textViewContent.setText("");
 						}
 					}
 				}
@@ -2500,18 +2493,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					long idChat = chat.getChatId();
 					long duration = 0;
 					MegaChatMessage m = megaChatApi.getMessage(idChat, idLastMessage);
-					MegaNodeList megaNodeList = m.getMegaNodeList();
-					if((megaNodeList != null) && (megaNodeList.size() == 1)){
-						MegaNode node = megaNodeList.get(0);
-						if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
-							if(node.getDuration()<0){
-								duration = (-node.getDuration())*1000;
-							}else{
-								duration = (node.getDuration()*1000);
+					if (m != null) {
+						MegaNodeList megaNodeList = m.getMegaNodeList();
+						if ((megaNodeList != null) && (megaNodeList.size() == 1)) {
+							MegaNode node = megaNodeList.get(0);
+							if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
+								if (node.getDuration() < 0) {
+									duration = (-node.getDuration()) * 1000;
+								} else {
+									duration = (node.getDuration() * 1000);
+								}
 							}
 						}
+						((ViewHolderNormalChatList) holder).voiceClipOrLocationText.setText(ChatUtil.milliSecondsToTimer(duration));
 					}
-					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(ChatUtil.milliSecondsToTimer(duration));
 				}
 
 				long lastMsgSender = chat.getLastMessageSender();
