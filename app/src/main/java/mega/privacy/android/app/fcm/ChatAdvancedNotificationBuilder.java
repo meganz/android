@@ -1265,9 +1265,6 @@ public final class ChatAdvancedNotificationBuilder {
                         log("Do not show notification - opened chat");
                     }
                 }
-
-                Notification summary = buildSummary(GROUP_KEY, request.getFlag());
-                notificationManager.notify(Constants.NOTIFICATION_SUMMARY_CHAT, summary);
             } else {
                 log("Mute for the last chat");
             }

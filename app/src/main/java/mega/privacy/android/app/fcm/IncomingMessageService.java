@@ -54,7 +54,7 @@ public class IncomingMessageService extends IncomingCallService {
                 .setAutoCancel(false);
         NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
             mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
             if (mNotificationManager != null) {
