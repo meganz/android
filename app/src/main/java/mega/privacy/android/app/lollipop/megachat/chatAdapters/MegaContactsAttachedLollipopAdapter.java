@@ -240,7 +240,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);
 		    holderGrid.contactInitialLetter = (TextView) v.findViewById(R.id.contact_grid_initial_letter);
 		    holderGrid.textViewContactName = (TextView) v.findViewById(R.id.contact_grid_name);
-		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
+//		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
 		    holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_grid_three_dots);
 			holderGrid.contactStateIcon = (ImageView) v.findViewById(R.id.contact_grid_drawable_state);
 
