@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,7 +46,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.adapters.PhoneContactsLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.ContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -58,6 +57,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT;
+import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT_HEADER;
+import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT;
+import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT_HEADER;
 
 
 public class InviteContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface {
@@ -77,8 +81,8 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private TextView emptyTextView, emptySubTextView;
     private ProgressBar progressBar;
     private String inputString;
-    private PhoneContactsLollipopAdapter adapterPhone;
-    private ArrayList<PhoneContactInfo> phoneContacts, addedContactsPhone, filteredContactsPhone, contactsMEGA;
+    private ContactsLollipopAdapter adapterPhone;
+    private ArrayList<ContactInfo> phoneContacts, addedContactsPhone, filteredContactsPhone, contactsMEGA;
     private FilterContactsTask filterContactsTask;
     private FastScroller fastScroller;
     private FloatingActionButton fabButton;
@@ -98,7 +102,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    private void setPhoneAdapterContacts(ArrayList<PhoneContactInfo> contacts) {
+    private void setPhoneAdapterContacts(ArrayList<ContactInfo> contacts) {
 //        if (filteredContactsPhone != null) {
 //            if (filteredContactsPhone.size() == 0) {
 //                showEmptyTextView();
@@ -108,11 +112,11 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 //        }
 //
 //        if (adapterPhone == null) {
-//            adapterPhone = new PhoneContactsLollipopAdapter(this,contacts);
+//            adapterPhone = new ContactsLollipopAdapter(this,contacts);
 //
 //            recyclerViewList.setAdapter(adapterPhone);
 //
-//            adapterPhone.SetOnItemClickListener(new PhoneContactsLollipopAdapter.OnItemClickListener() {
+//            adapterPhone.SetOnItemClickListener(new ContactsLollipopAdapter.OnItemClickListener() {
 //
 //                @Override
 //                public void onItemClick(View view,int position) {
@@ -157,7 +161,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             return;
         }
 
-        final PhoneContactInfo contact = adapterPhone.getItem(position);
+        final ContactInfo contact = adapterPhone.getItem(position);
         if (contact == null) {
             return;
         }
@@ -209,9 +213,11 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return mail;
     }
 
-    private ArrayList<PhoneContactInfo> getPhoneContacts() {
+    private ArrayList<ContactInfo> getPhoneContacts() {
         log("getPhoneContacts");
-        ArrayList<PhoneContactInfo> contactList = new ArrayList<>();
+        ArrayList<ContactInfo> contactList = new ArrayList<>();
+        ContactInfo phoneContactHeader = new ContactInfo(-1, "Phone Contact", "", "", TYPE_PHONE_CONTACT_HEADER);
+        contactList.add(phoneContactHeader);
         log("inputString empty");
         String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''  AND " + ContactsContract.Contacts.IN_VISIBLE_GROUP + "=1";
 
@@ -233,11 +239,11 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
                     if (inputString == "" || inputString == null) {
                         log("VALID Contact: " + name + " ---> " + emailAddress);
-                        PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
+                        ContactInfo contactPhone = new ContactInfo(id, name, emailAddress, null, TYPE_PHONE_CONTACT);
                         contactList.add(contactPhone);
                     } else if (!inputString.isEmpty() && (name.toUpperCase().contains(inputString.toUpperCase()) || emailAddress.toUpperCase().contains(inputString.toUpperCase()))) {
                         log("VALID Contact: " + name + " ---> " + emailAddress + " inputString: " + inputString);
-                        PhoneContactInfo contactPhone = new PhoneContactInfo(id, name, emailAddress, null);
+                        ContactInfo contactPhone = new ContactInfo(id, name, emailAddress, null, TYPE_PHONE_CONTACT);
                         contactList.add(contactPhone);
                     }
                 }
@@ -349,10 +355,9 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         recyclerViewList.setLayoutManager(linearLayoutManager);
         recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
-        adapterPhone = new PhoneContactsLollipopAdapter(this, phoneContacts);
+        adapterPhone = new ContactsLollipopAdapter(this, phoneContacts);
         recyclerViewList.setAdapter(adapterPhone);
         containerContacts = findViewById(R.id.container_list_contacts);
-        //setRecyclersVisibility();
 
         fastScroller = findViewById(R.id.fastScroller);
         fastScroller.setRecyclerView(recyclerViewList);
@@ -505,7 +510,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return false;
     }
 
-    private void inviteContacts(ArrayList<PhoneContactInfo> addedContacts) {
+    private void inviteContacts(ArrayList<ContactInfo> addedContacts) {
         log("inviteContacts");
 
         String contactEmail;
@@ -629,27 +634,26 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     }
 
-    private ArrayList<PhoneContactInfo> megaContactToPhoneContact(ArrayList<MegaUser> megaContacts) {
-        ArrayList<PhoneContactInfo> result = new ArrayList<>();
+    private ArrayList<ContactInfo> megaContactToPhoneContact(ArrayList<MegaUser> megaContacts) {
+        ArrayList<ContactInfo> result = new ArrayList<>();
+        if(megaContacts.size() > 0){
+            ContactInfo megaContactHeader = new ContactInfo(-1, "Mega Contact", "", "", TYPE_MEGA_CONTACT_HEADER);
+            result.add(megaContactHeader);
+        }else {
+            return result;
+        }
         for (MegaUser user : megaContacts) {
             MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-            if(false && contactDB != null){
-                long id = user.getHandle();
-                String name = "miss";//contactDB.getName() + contactDB.getLastName();
-                String email = user.getEmail();
-                String phoneNumber = "missing now ";//
-
-                PhoneContactInfo info = new PhoneContactInfo(id, name, email, phoneNumber);
-                result.add(info);
-            }else{
-                long id = user.getHandle();
-                String name = "miss";//contactDB.getName() + contactDB.getLastName();
-                String email = user.getEmail();
-                String phoneNumber = "missing now ";//
-
-                PhoneContactInfo info = new PhoneContactInfo(id, name, email, phoneNumber);
-                result.add(info);
+            long id = 0;
+            String name = "", email = "", phoneNumber = "";
+            if (contactDB != null) {
+                id = 2;//todo user.getHandle();
+                name = contactDB.getName() + contactDB.getLastName();
+                email = user.getEmail();
+                phoneNumber = "missing now ";//
             }
+            ContactInfo info = new ContactInfo(id, name, email, phoneNumber, TYPE_MEGA_CONTACT);
+            result.add(info);
         }
 
         return result;
@@ -695,7 +699,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         protected Void doInBackground(Void... voids) {
             String query = null;
             if (query != null && !query.equals("")) {
-                PhoneContactInfo contactPhone;
+                ContactInfo contactPhone;
 
                 for (int i = 0; i < filteredContactsPhone.size(); i++) {
                     contactPhone = filteredContactsPhone.get(i);
