@@ -662,7 +662,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 @Override
                 public void run() {
                     progressBar.setVisibility(View.GONE);
-                    contactsAdapter.notifyDataSetChanged();
+                    refreshList();
                     setRecyclersVisibility();
                     visibilityFastScroller();
 
@@ -738,6 +738,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return textView;
     }
 
+    private boolean isContactAdded(ContactInfo contactInfo){
+        for (ContactInfo addedContact: addedContacts){
+            if(addedContact.getId() == contactInfo.getId()){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void refreshList(){
         ArrayList<ContactInfo> list = new ArrayList<>();
         for (ContactInfo contactInfo: filteredContacts){
@@ -749,14 +758,5 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         filteredContacts.clear();
         filteredContacts.addAll(list);
         setPhoneAdapterContacts(filteredContacts);
-    }
-
-    private boolean isContactAdded(ContactInfo contactInfo){
-        for (ContactInfo addedContact: addedContacts){
-            if(addedContact.getId() == contactInfo.getId()){
-                return true;
-            }
-        }
-        return false;
     }
 }
