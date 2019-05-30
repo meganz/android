@@ -99,7 +99,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6.1_238";
+	static final public String USER_AGENT = "MEGAAndroid/3.6.2_239";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -320,19 +320,22 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 					if(myAccountInfo!=null && request.getMegaAccountDetails()!=null){
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
-						myAccountInfo.setAccountDetails();
+						myAccountInfo.setAccountDetails(request.getNumDetails());
 
-						MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
+						boolean sessions = (request.getNumDetails() & myAccountInfo.hasSessionsDetails) != 0;
+						if (sessions) {
+							MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
 
-						if(megaAccountSession!=null){
-							log("getMegaAccountSESSION not Null");
-							dbH.setExtendedAccountDetailsTimestamp();
-							long mostRecentSession = megaAccountSession.getMostRecentUsage();
+							if(megaAccountSession!=null){
+								log("getMegaAccountSESSION not Null");
+								dbH.setExtendedAccountDetailsTimestamp();
+								long mostRecentSession = megaAccountSession.getMostRecentUsage();
 
-							String date = TimeUtils.formatDateAndTime(getApplicationContext(),mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
+								String date = TimeUtils.formatDateAndTime(getApplicationContext(),mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
 
-							myAccountInfo.setLastSessionFormattedDate(date);
-							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
+								myAccountInfo.setLastSessionFormattedDate(date);
+								myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
+							}
 						}
 
 						log("onRequest TYPE_ACCOUNT_DETAILS: "+myAccountInfo.getUsedPerc());
