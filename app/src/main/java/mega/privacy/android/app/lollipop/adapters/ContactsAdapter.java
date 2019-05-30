@@ -36,13 +36,13 @@ import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT_HE
 import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT;
 import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT_HEADER;
 
-public class ContactsLollipopAdapter extends RecyclerView.Adapter<ContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> {
+public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolderPhoneContactsLollipop> {
 
     private Context mContext;
     private List<ContactInfo> contactData;
     private LayoutInflater inflater;
 
-    public ContactsLollipopAdapter(Context context, ArrayList<ContactInfo> phoneContacts) {
+    public ContactsAdapter(Context context, ArrayList<ContactInfo> phoneContacts) {
         this.mContext = context;
         this.contactData = phoneContacts == null ? new ArrayList<ContactInfo>() : phoneContacts;
         this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -63,6 +63,10 @@ public class ContactsLollipopAdapter extends RecyclerView.Adapter<ContactsLollip
             return contactData.get(position);
         }
         return null;
+    }
+
+    public void setContactData(ArrayList<ContactInfo> contactData){
+        this.contactData = contactData;
     }
 
     @Override
@@ -217,6 +221,6 @@ public class ContactsLollipopAdapter extends RecyclerView.Adapter<ContactsLollip
     }
 
     private static void log(String message) {
-        Util.log("ContactsLollipopAdapter", message);
+        Util.log("ContactsAdapter", message);
     }
 }
