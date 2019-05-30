@@ -41,11 +41,13 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     private Context mContext;
     private List<ContactInfo> contactData;
     private LayoutInflater inflater;
+    private OnItemClickListener callback;
 
-    public ContactsAdapter(Context context, ArrayList<ContactInfo> phoneContacts) {
+    public ContactsAdapter(Context context, ArrayList<ContactInfo> phoneContacts, OnItemClickListener callback) {
         this.mContext = context;
         this.contactData = phoneContacts == null ? new ArrayList<ContactInfo>() : phoneContacts;
         this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.callback = callback;
     }
 
     @Override
@@ -65,7 +67,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         return null;
     }
 
-    public void setContactData(ArrayList<ContactInfo> contactData){
+    public void setContactData(ArrayList<ContactInfo> contactData) {
         this.contactData = contactData;
     }
 
@@ -109,6 +111,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         View rowView = inflater.inflate(R.layout.contact_list_section_header, parentView, false);
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
+        holder.contactId = -1;
         return holder;
     }
 
@@ -135,23 +138,34 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         holder.phoneEmailTextView.setText(contact.getEmail());
         holder.contactLayout.setBackgroundColor(Color.WHITE);
 
-        createDefaultAvatar(holder, isMegaContact);
-        try {
-            InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
-                    ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
+        if (!isMegaContact) {
+            boolean processFailed = false;
+            try {
+                InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
+                        ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, holder.contactId));
 
-            if (inputStream != null) {
-                Bitmap photo = BitmapFactory.decodeStream(inputStream);
-                holder.imageView.setImageBitmap(photo);
-                inputStream.close();
-                holder.initialLetter.setVisibility(View.GONE);
+                if (inputStream != null) {
+                    Bitmap photo = BitmapFactory.decodeStream(inputStream);
+                    holder.imageView.setImageBitmap(photo);
+                    inputStream.close();
+                    holder.initialLetter.setVisibility(View.GONE);
+                } else {
+                    processFailed = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                processFailed = true;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            if (processFailed) {
+                createDefaultAvatar(holder, isMegaContact);
+            }
+        } else {
+            createDefaultAvatar(holder, isMegaContact);
         }
     }
 
-    class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder {
+    class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
         private RelativeLayout contactLayout;
         private TextView contactNameTextView;
         private TextView phoneEmailTextView;
@@ -164,10 +178,24 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
         public ViewHolderPhoneContactsLollipop(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (callback != null) {
+                int position = getAdapterPosition();
+                if (position < contactData.size()) {
+                    ContactInfo contactInfo = contactData.get(position);
+                    if (contactInfo.getType() == TYPE_MEGA_CONTACT || contactInfo.getType() == TYPE_PHONE_CONTACT) {
+                        callback.onItemClick(v, position);
+                    }
+                }
+            }
         }
     }
 
-    interface OnItemClickListener {
+    public interface OnItemClickListener {
         void onItemClick(View view, int position);
     }
 
