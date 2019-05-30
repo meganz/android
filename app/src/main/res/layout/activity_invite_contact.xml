@@ -40,21 +40,49 @@
                 android:layout_height="60dp"
                 android:background="@color/white">
 
-                <EditText
-                    android:id="@+id/type_mail_edittext"
+                <HorizontalScrollView xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/scroller"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="18dp"
-                    android:layout_marginRight="18dp"
-                    android:backgroundTint="@color/white"
-                    android:hint="@string/type_mail"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:textColor="@color/text_login"
-                    android:textColorHint="@color/mail_my_account"
-                    android:textCursorDrawable="@drawable/cursor_color"
-                    android:textSize="14sp" />
+                    android:layout_height="match_parent"
+                    android:fillViewport="true"
+                    tools:context=".MainActivity">
+
+                    <RelativeLayout
+                        android:id="@+id/text_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="20dp">
+
+                        <LinearLayout
+                            android:id="@+id/label_container"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingLeft="10dp" />
+
+                        <EditText
+                            android:id="@+id/type_mail_edittext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="18dp"
+                            android:layout_toRightOf="@+id/label_container"
+                            android:backgroundTint="@color/white"
+                            android:hint="@string/type_mail"
+                            android:inputType="textEmailAddress"
+                            android:maxLines="1"
+                            android:minWidth="100dp"
+                            android:singleLine="true"
+                            android:textColor="@color/text_login"
+                            android:textColorHint="@color/mail_my_account"
+                            android:textCursorDrawable="@drawable/cursor_color"
+                            android:textSize="14sp" />
+
+                    </RelativeLayout>
+                </HorizontalScrollView>
 
                 <View
                     android:id="@+id/separator_type"
@@ -95,7 +123,6 @@
             android:id="@+id/add_contact_list_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/container_linear_layout"
             android:background="@color/white">
 
             <ScrollView
@@ -105,7 +132,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <ImageView
@@ -181,4 +208,5 @@
         android:src="@drawable/ic_send_white"
         android:stateListAnimator="@anim/button_elevation"
         android:tint="@android:color/white" />
+
 </RelativeLayout>

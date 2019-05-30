@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -31,8 +32,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -88,6 +92,8 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private FloatingActionButton fabButton;
     private RelativeLayout typeContactLayout;
     private EditText typeContactEditText;
+    private HorizontalScrollView scrollView;
+    private LinearLayout itemContainer;
 
     private void visibilityFastScroller() {
         fastScroller.setRecyclerView(recyclerViewList);
@@ -323,6 +329,9 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         aB.setSubtitle("");
         setTitleAB();
 
+        scrollView = findViewById(R.id.scroller);
+        itemContainer = findViewById(R.id.label_container);
+
         container = findViewById(R.id.relative_container_invite_contact);
         fabButton = findViewById(R.id.fab_button_next);
         fabButton.setOnClickListener(this);
@@ -543,9 +552,21 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 break;
             }
             case R.id.fab_button_next: {
-                inviteContacts(addedContactsPhone);
-                Util.hideKeyboard(this, 0);
-                break;
+
+                //todo temp code to be restored
+//                inviteContacts(addedContactsPhone);
+//                Util.hideKeyboard(this, 0);
+//                break;
+
+                itemContainer.addView(createTextView());
+                itemContainer.invalidate();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        scrollView.fullScroll(android.view.View.FOCUS_RIGHT);
+                    }
+                }, 100);
             }
         }
     }
@@ -636,10 +657,10 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     private ArrayList<ContactInfo> megaContactToPhoneContact(ArrayList<MegaUser> megaContacts) {
         ArrayList<ContactInfo> result = new ArrayList<>();
-        if(megaContacts.size() > 0){
+        if (megaContacts.size() > 0) {
             ContactInfo megaContactHeader = new ContactInfo(-1, "Mega Contact", "", "", TYPE_MEGA_CONTACT_HEADER);
             result.add(megaContactHeader);
-        }else {
+        } else {
             return result;
         }
         for (MegaUser user : megaContacts) {
@@ -687,7 +708,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             visibilityFastScroller();
 
             //todo
-            if(phoneContacts.size() > 0){
+            if (phoneContacts.size() > 0) {
                 setEmptyStateVisibility(false);
             }
         }
@@ -718,5 +739,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             // setPhoneAdapterContacts(filteredContactsPhone);
             visibilityFastScroller();
         }
+    }
+
+    private TextView createTextView() {
+        //todo create contact view, this is only place holder
+        TextView textView = new TextView(this);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        textView.setText(" contact ");
+        return textView;
     }
 }
