@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
+import android.graphics.Bitmap;
+
 public class ContactInfo extends PhoneContactInfo {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
@@ -9,6 +11,7 @@ public class ContactInfo extends PhoneContactInfo {
 
     private boolean isHighlighted;
     private int type;
+    private Bitmap bitmap;
 
     public ContactInfo(long id, String name, String email, String phoneNumber, int type) {
         super(id, name, email, phoneNumber);
@@ -17,6 +20,18 @@ public class ContactInfo extends PhoneContactInfo {
 
     public int getType() {
         return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 
     public boolean isHighlighted() {

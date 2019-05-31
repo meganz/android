@@ -37,7 +37,7 @@
             <RelativeLayout
                 android:id="@+id/layout_type_mail"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:background="@color/white">
 
                 <HorizontalScrollView xmlns:tools="http://schemas.android.com/tools"
@@ -50,8 +50,7 @@
                     <RelativeLayout
                         android:id="@+id/text_container"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:layout_marginTop="20dp">
+                        android:layout_height="50dp">
 
                         <LinearLayout
                             android:id="@+id/label_container"
@@ -79,7 +78,7 @@
                             android:textColor="@color/text_login"
                             android:textColorHint="@color/mail_my_account"
                             android:textCursorDrawable="@drawable/cursor_color"
-                            android:textSize="14sp" />
+                            android:textSize="13sp" />
 
                     </RelativeLayout>
                 </HorizontalScrollView>
@@ -112,6 +111,31 @@
 
                 <View
                     android:id="@+id/separator_scan_qr"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/divider_upgrade_account" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/layout_more"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:paddingLeft="16dp"
+                    android:text="@string/label_more"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accentColor"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"

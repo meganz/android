@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
@@ -130,6 +131,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     private void bindHeader(ViewHolderPhoneContactsLollipop holder, ContactInfo contact) {
         holder.headerTextView.setText(contact.getName());
+        holder.headerTextView.setTextColor(mContext.getResources().getColor(R.color.black));
     }
 
     private void bindContact(ViewHolderPhoneContactsLollipop holder, ContactInfo contact, boolean isMegaContact) {

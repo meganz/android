@@ -28,6 +28,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -94,6 +95,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private HorizontalScrollView scrollView;
     private LinearLayout itemContainer;
     private Handler handler;
+    private LayoutInflater inflater;
 
     private void visibilityFastScroller() {
         fastScroller.setRecyclerView(recyclerViewList);
@@ -266,7 +268,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         megaApi = app.getMegaApi();
         dbH = DatabaseHandler.getDbHandler(this);
         handler = new Handler();
-
+        inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
 
         phoneContacts = new ArrayList<>();
@@ -710,17 +712,20 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         filterContactsTask.execute();
     }
 
-    private TextView createTextView(String name, final int id) {
+    private View createTextView(String name, final int id) {
+        log("createTextView contact name is " + name);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
 
-        //todo create a new item - temp code
-        TextView textView = new TextView(this);
-        textView.setId(id);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        textView.setText(name);
-        textView.setClickable(true);
-        textView.setOnClickListener(new View.OnClickListener() {
+        final int MARGIN_LEFT = Util.px2dp(10, outMetrics);
+        params.setMargins(MARGIN_LEFT, 0, 0, 0);
+        View rowView = inflater.inflate(R.layout.selected_contact_item, null, false);
+        rowView.setLayoutParams(params);
+        rowView.setId(id);
+        rowView.setClickable(true);
+        rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ContactInfo contactInfo = addedContacts.get(v.getId());
@@ -731,7 +736,10 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 setTitleAB();
             }
         });
-        return textView;
+
+        TextView displayName = rowView.findViewById(R.id.contact_name);
+        displayName.setText(name);
+        return rowView;
     }
 
     private void refreshAddedContactsView() {
@@ -790,7 +798,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     }
 
-    private void invitePhoneContacts (ArrayList<String> phoneNumbers) {
+    private void invitePhoneContacts(ArrayList<String> phoneNumbers) {
         String recipents = "smsto:";
         for (String phone : phoneNumbers) {
             recipents += (phone + ";");
