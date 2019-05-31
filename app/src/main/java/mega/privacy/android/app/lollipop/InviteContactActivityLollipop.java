@@ -292,7 +292,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         container = findViewById(R.id.relative_container_invite_contact);
         fabButton = findViewById(R.id.fab_button_next);
         fabButton.setOnClickListener(this);
-        typeContactEditText = findViewById(R.id.type_mail_edittext);
+        typeContactEditText = findViewById(R.id.type_mail_edit_text);
         typeContactEditText.addTextChangedListener(this);
         typeContactEditText.setOnEditorActionListener(this);
         typeContactEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
