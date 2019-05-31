@@ -8,6 +8,8 @@ public class ContactInfo extends PhoneContactInfo {
     public static final int TYPE_PHONE_CONTACT_HEADER = 1;
     public static final int TYPE_MEGA_CONTACT = 2;
     public static final int TYPE_PHONE_CONTACT = 3;
+    public static final int TYPE_MANUAL_INPUT_EMAIL = 4;
+    public static final int TYPE_MANUAL_INPUT_PHONE = 5;
 
     private boolean isHighlighted;
     private int type;
