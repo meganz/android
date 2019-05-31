@@ -72,7 +72,7 @@
     <color name="transparent_mega">#80db0605</color>
     
     <color name="delimiterColor">#e6e6e6</color>
-
+    <color name="contactSelected">#FFB6EBE4</color>
     <color name="accentColor">#FF00BFA5</color>
     <color name="accentColorTransparent">#5900BFA5</color>
     <color name="accentColorLight">#9900BFA5</color>

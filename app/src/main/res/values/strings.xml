@@ -130,6 +130,11 @@
         <item context="Title of the contact list" quantity="other">contacts</item>
     </plurals>
 
+    <plurals name="num_contacts_selected">
+        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected " quantity="one">%d contact</item>
+        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
+    </plurals>
+
     <plurals name="general_num_folders">
         <item context="Singular of folder/directory. 1 folder" quantity="one">folder</item>
         <item context="Plural of folder/directory. 2 folders" quantity="other">folders</item>
@@ -1261,6 +1266,7 @@
         <item context="Singular" quantity="one">%1$s [A]is typing&#8230;[/A]</item>
         <item context="Plural" quantity="other">%1$s [A]are typing&#8230;[/A]</item>
     </plurals>
+
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing&#8230;[/A]</string>
 	<string name="label_more" context="button label more">More</string>

@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -137,7 +139,13 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         holder.contactNameTextView.setText(contact.getName());
         holder.phoneEmailTextView.setText(contact.getEmail());
         holder.contactLayout.setBackgroundColor(Color.WHITE);
+        if (contact.isHighlighted()) {
+            setItemHighlighted(holder.contactLayout);
+        } else {
+            setItemNormal(holder.contactLayout);
+        }
 
+        //todo to be improved
         if (!isMegaContact) {
             boolean processFailed = false;
             try {
@@ -183,13 +191,20 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
         @Override
         public void onClick(View v) {
-            if (callback != null) {
-                int position = getAdapterPosition();
-                if (position < contactData.size()) {
-                    ContactInfo contactInfo = contactData.get(position);
-                    if (contactInfo.getType() == TYPE_MEGA_CONTACT || contactInfo.getType() == TYPE_PHONE_CONTACT) {
-                        callback.onItemClick(v, position);
+            int position = getAdapterPosition();
+            if (callback != null && position < contactData.size()) {
+                ContactInfo contactInfo = contactData.get(position);
+                if (contactInfo.getType() == TYPE_MEGA_CONTACT || contactInfo.getType() == TYPE_PHONE_CONTACT) {
+                    boolean isSelected = !contactInfo.isHighlighted();
+                    if (isSelected) {
+                        contactInfo.setHighlighted(true);
+                        setItemHighlighted(v);
+                    } else {
+                        contactInfo.setHighlighted(false);
+                        setItemNormal(v);
                     }
+
+                    callback.onItemClick(v, position);
                 }
             }
         }
@@ -246,6 +261,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         holder.initialLetter.setText(initial);
         holder.initialLetter.setTextSize(24);
         holder.initialLetter.setTextColor(Color.WHITE);
+    }
+
+    private void setItemHighlighted(View view) {
+        view.setBackgroundColor(mContext.getResources().getColor(R.color.contactSelected));
+    }
+
+    private void setItemNormal(View view) {
+        view.setBackgroundColor(mContext.getResources().getColor(R.color.white));
     }
 
     private static void log(String message) {
