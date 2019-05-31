@@ -62,6 +62,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MANUAL_INPUT_EMAIL;
+import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MANUAL_INPUT_PHONE;
 import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT;
 import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT;
@@ -428,6 +430,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         }
     }
 
+    private boolean isValidPhone(CharSequence target) {
+        if (target == null) {
+            return false;
+        } else {
+            log("isValid");
+            return Constants.PHONE_NUMBER.matcher(target).matches();
+        }
+    }
+
     @Override
     public void afterTextChanged(Editable editable) {
         refreshKeyboard();
@@ -442,8 +453,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             if (s.isEmpty() || s.equals("null") || s.equals("")) {
                 Util.hideKeyboard(this, 0);
             } else {
-                boolean isValid = isValidEmail(s.trim());
-                if (isValid) {
+                boolean isEmailValid = isValidEmail(s.trim());
+                boolean isPhoneValid = isValidPhone(s.trim());
+                if (isEmailValid) {
+                    addContactInfo(s.trim(), TYPE_MANUAL_INPUT_EMAIL);
+                } else if (isPhoneValid) {
+                    addContactInfo(s.trim(), TYPE_MANUAL_INPUT_PHONE);
+                }
+
+                if (isEmailValid || isPhoneValid) {
                     typeContactEditText.getText().clear();
                     Util.hideKeyboard(this, 0);
                 }
@@ -738,7 +756,17 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         itemContainer.removeAllViews();
         for (int i = 0; i < addedContacts.size(); i++) {
             ContactInfo contactInfo = addedContacts.get(i);
-            itemContainer.addView(createTextView(contactInfo.getName(), i));
+            String displayedLabel = "";
+            if (contactInfo.getName().equals("")) {
+                if (!contactInfo.getEmail().equals("")) {
+                    displayedLabel = contactInfo.getEmail();
+                } else if (!contactInfo.getPhoneNumber().equals("")) {
+                    displayedLabel = contactInfo.getPhoneNumber();
+                }
+            } else {
+                displayedLabel = contactInfo.getName();
+            }
+            itemContainer.addView(createTextView(displayedLabel, i));
         }
         itemContainer.invalidate();
     }
@@ -811,6 +839,29 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         intent.putStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS, emails);
         Util.hideKeyboard(this, 0);
         finish();
+    }
+
+    private void addContactInfo(String inputString, int type) {
+        ContactInfo info = null;
+        switch (type) {
+            case TYPE_MANUAL_INPUT_EMAIL: {
+                info = new ContactInfo(inputString.hashCode(), "", inputString, "", TYPE_MANUAL_INPUT_EMAIL);
+                break;
+            }
+
+            case TYPE_MANUAL_INPUT_PHONE: {
+                info = new ContactInfo(inputString.hashCode(), "", "", inputString, TYPE_MANUAL_INPUT_PHONE);
+                break;
+            }
+            default:
+                break;
+        }
+        if (info != null) {
+            if (!isContactAdded(info)) {
+                addedContacts.add(info);
+            }
+            refreshAddedContactsView();
+        }
     }
 
 }
