@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -467,30 +468,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return false;
     }
 
-    private void inviteContacts(ArrayList<ContactInfo> addedContacts) {
-        log("inviteContacts");
-
-        String contactEmail;
-        ArrayList<String> contactsSelected = new ArrayList<>();
-        if (addedContacts != null) {
-            for (int i = 0; i < addedContacts.size(); i++) {
-                contactEmail = addedContacts.get(i).getEmail();
-                if (contactEmail != null) {
-                    contactsSelected.add(contactEmail);
-                }
-            }
-        }
-
-        Intent intent = new Intent();
-        for (int i = 0; i < contactsSelected.size(); i++) {
-            log("setResultContacts: " + contactsSelected.get(i));
-        }
-
-        setResult(RESULT_OK, intent);
-        Util.hideKeyboard(this, 0);
-        finish();
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -778,4 +755,62 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private void refreshList() {
         setPhoneAdapterContacts(filteredContacts);
     }
+
+    private void inviteContacts(ArrayList<ContactInfo> addedContacts) {
+        log("inviteContacts");
+
+        // Email contacts to be invited
+        ArrayList<String> contactsEmailsSelected = new ArrayList<>();
+        // Phone contacts to be invited
+        ArrayList<String> contactsPhoneSelected = new ArrayList<>();
+
+
+        if (addedContacts != null) {
+            String contactEmail;
+            String contactPhone;
+            for (ContactInfo contact : addedContacts) {
+                contactEmail = contact.getEmail();
+                contactPhone = contact.getPhoneNumber();
+                if (contactEmail != null) {
+                    contactsEmailsSelected.add(contactEmail);
+                } else if (contactPhone != null) {
+                    contactsPhoneSelected.add(contactPhone);
+                }
+            }
+        }
+
+        if (contactsPhoneSelected.size() > 0) {
+            invitePhoneContacts(contactsPhoneSelected);
+        }
+
+        if (contactsEmailsSelected.size() > 0) {
+            inviteEmailContacts(contactsEmailsSelected);
+        }
+
+
+    }
+
+    private void invitePhoneContacts (ArrayList<String> phoneNumbers) {
+        String recipents = "smsto:";
+        for (String phone : phoneNumbers) {
+            recipents += (phone + ";");
+            log("setResultPhoneContacts: " + phone);
+        }
+        String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message);
+        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents));
+        smsIntent.putExtra("sms_body", smsBody);
+        startActivity(smsIntent);
+    }
+
+    private void inviteEmailContacts(ArrayList<String> emails) {
+        Intent intent = new Intent();
+        for (String email : emails) {
+            log("setResultEmailContacts: " + email);
+        }
+        setResult(RESULT_OK, intent);
+        intent.putStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS, emails);
+        Util.hideKeyboard(this, 0);
+        finish();
+    }
+
 }
