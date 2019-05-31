@@ -1687,7 +1687,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
         if (!canceled) {
-            String message = progress + "% " + getString(R.string.message_compress_video);
+            String message =  getString(R.string.message_compress_video,progress,"%");
             String subText = getString(R.string.title_compress_video) + " " + currentIndexString;
             showProgressNotification(progress,mPendingIntent,message,subText,"");
         }

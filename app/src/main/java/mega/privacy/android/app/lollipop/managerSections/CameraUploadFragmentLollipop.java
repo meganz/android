@@ -1525,7 +1525,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					log("onClick AlertDialog");
 					resetCUTimeStampsAndCache();
                     dbH.setCamSyncEnabled(true);
-					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
+					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                     File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 					String localPath = localFile.getAbsolutePath();
 					dbH.setCamSyncLocalPath(localPath);

@@ -87,7 +87,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right|center_vertical"
                     android:layout_weight="1"
-                    android:checked="true"
                     android:gravity="right" />
             </LinearLayout>
 

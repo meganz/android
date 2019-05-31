@@ -35,6 +35,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
@@ -582,6 +583,8 @@ public class AccountController implements View.OnClickListener{
         dbH.clearPendingMessage();
 
         dbH.clearAttributes();
+
+        dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
         dbH.clearChatSettings();
         dbH.setEnabledChat(true + "");

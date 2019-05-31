@@ -2271,7 +2271,7 @@
 	<string name="title_compression_size_over_limit" context="display when compression larger than setting">Video Conversion Size</string>
 	<string name="message_compression_size_over_limit" context="display when compression larger than settin">The total size of the videos to convert exceeds $size MB, please plug in your device to continue.</string>
 	<string name="message_keep_device_name" context="changed file name setting">Setting will take affect from next time Camera Upload run</string>
-	<string name="message_compress_video" context="notification message when compressiong video">has been compressed </string>
+	<string name="message_compress_video" context="notification message when compressiong video">%1$d%2$s has been compressed </string>
 	<string name="title_compress_video" context="notification title when compressiong video">Compressing Videos</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 

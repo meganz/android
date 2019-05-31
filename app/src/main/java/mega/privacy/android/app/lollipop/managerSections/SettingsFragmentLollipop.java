@@ -607,14 +607,15 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				}
 
 				if (prefs.getCamSyncFileUpload() == null){
-					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
-					fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
+					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+					fileUpload = getString(R.string.settings_camera_upload_only_photos);
 				}
 				else{
 					switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
 						case MegaPreferences.ONLY_PHOTOS:{
 							fileUpload = getString(R.string.settings_camera_upload_only_photos);
 							cameraUploadWhat.setValueIndex(0);
+							disableVideoQualitySettings();
 							break;
 						}
 						case MegaPreferences.ONLY_VIDEOS:{
@@ -2803,9 +2804,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
         megaCameraFolder.setSummary(camSyncMegaPath);
 
-        dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
-        fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
-        cameraUploadWhat.setValueIndex(2);
+        //upload photos only as default
+        dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+        fileUpload = getString(R.string.settings_camera_upload_only_photos);
+        cameraUploadWhat.setValueIndex(0);
 
         if(isDeviceSupportCompression()){
             enableVideoQualitySettings();
