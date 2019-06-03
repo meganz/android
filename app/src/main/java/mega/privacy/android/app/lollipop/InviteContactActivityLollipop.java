@@ -377,8 +377,16 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 String temp = s.toString();
                 char last = s.charAt(s.length() - 1);
                 if (last == ' ') {
-                    boolean isValid = isValidEmail(temp.trim());
-                    if (isValid) {
+                    String processedString = temp.trim();
+                    boolean isEmailValid = isValidEmail(processedString);
+                    boolean isPhoneValid = isValidPhone(processedString);
+                    if (isEmailValid) {
+                        addContactInfo(processedString, TYPE_MANUAL_INPUT_EMAIL);
+                    } else if (isPhoneValid) {
+                        addContactInfo(processedString, TYPE_MANUAL_INPUT_PHONE);
+                    }
+                    refreshInviteContactButton();
+                    if (isEmailValid || isPhoneValid) {
                         typeContactEditText.getText().clear();
                     }
                     if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -425,16 +433,17 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         refreshKeyboard();
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             String s = v.getText().toString();
+            String processedStrong = s.trim();
             log("s: " + s);
             if (s.isEmpty() || s.equals("null") || s.equals("")) {
                 Util.hideKeyboard(this, 0);
             } else {
-                boolean isEmailValid = isValidEmail(s.trim());
-                boolean isPhoneValid = isValidPhone(s.trim());
+                boolean isEmailValid = isValidEmail(processedStrong);
+                boolean isPhoneValid = isValidPhone(processedStrong);
                 if (isEmailValid) {
-                    addContactInfo(s.trim(), TYPE_MANUAL_INPUT_EMAIL);
+                    addContactInfo(processedStrong, TYPE_MANUAL_INPUT_EMAIL);
                 } else if (isPhoneValid) {
-                    addContactInfo(s.trim(), TYPE_MANUAL_INPUT_PHONE);
+                    addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE);
                 }
                 refreshInviteContactButton();
                 if (isEmailValid || isPhoneValid) {
