@@ -9,7 +9,7 @@
     android:focusableInTouchMode="true">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/add_contact_toolbar"
+        android:id="@+id/invite_contact_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -21,10 +21,10 @@
         app:titleTextColor="@color/name_my_account" />
 
     <LinearLayout
-        android:id="@+id/add_contacts_container"
+        android:id="@+id/invite_contacts_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/add_contact_toolbar"
+        android:layout_below="@+id/invite_contact_toolbar"
         android:orientation="vertical">
 
         <LinearLayout
@@ -121,6 +121,7 @@
                 android:id="@+id/layout_more"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:clickable="true"
                 android:background="@color/white">
 
                 <TextView
@@ -144,7 +145,7 @@
         </LinearLayout>
 
         <RelativeLayout
-            android:id="@+id/add_contact_list_layout"
+            android:id="@+id/invite_contact_list_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white">
@@ -155,18 +156,19 @@
                 android:layout_centerInParent="true">
 
                 <LinearLayout
+                    android:id="@+id/empty_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <ImageView
-                        android:id="@+id/add_contact_list_empty_image"
+                        android:id="@+id/invite_contact_list_empty_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal" />
 
                     <TextView
-                        android:id="@+id/add_contact_list_empty_text"
+                        android:id="@+id/invite_contact_list_empty_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -175,7 +177,7 @@
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/add_contact_list_empty_subtext"
+                        android:id="@+id/invite_contact_list_empty_subtext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="34dp"
@@ -188,7 +190,7 @@
                         android:textSize="14sp" />
 
                     <ProgressBar
-                        android:id="@+id/add_contact_progress_bar"
+                        android:id="@+id/invite_contact_progress_bar"
                         style="?android:attr/progressBarStyleLargeInverse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -204,7 +206,7 @@
                 android:layout_height="wrap_content">
 
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/add_contact_list"
+                    android:id="@+id/invite_contact_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:choiceMode="multipleChoice"

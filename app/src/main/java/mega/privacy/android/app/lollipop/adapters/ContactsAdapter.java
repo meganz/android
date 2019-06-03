@@ -164,12 +164,6 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
         holder.phoneEmailTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
         holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
-        //todo
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-//                RelativeLayout.LayoutParams.WRAP_CONTENT,
-//                RelativeLayout.LayoutParams.WRAP_CONTENT
-//        );
-//        holder.imageView.setLayoutParams(params);
         holder.initialLetter = rowView.findViewById(R.id.contact_explorer_initial_letter);
         return holder;
     }
@@ -177,6 +171,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     private void bindHeader(ViewHolderPhoneContactsLollipop holder, ContactInfo contact) {
         holder.headerTextView.setText(contact.getName());
         holder.headerTextView.setTextColor(mContext.getResources().getColor(R.color.black));
+        holder.headerTextView.setBackgroundColor(Color.WHITE);
     }
 
     private void bindContact(ViewHolderPhoneContactsLollipop holder, ContactInfo contact, boolean isMegaContact) {
