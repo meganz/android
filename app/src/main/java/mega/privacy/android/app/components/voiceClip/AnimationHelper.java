@@ -38,9 +38,9 @@ public class AnimationHelper {
     private AlphaAnimation alphaAnimation1;
     private AlphaAnimation alphaAnimation2;
     private Handler handler1, handler2;
-    private static int durationAlpha = 350;
+    private static int durationAlpha = 300;
     private static int durationTraslate = 250;
-    private static int durationBasket = 800;
+    private static int durationBasket = 600;
     private static int durationMicro = 500;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {

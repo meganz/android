@@ -2485,6 +2485,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
 
-    <string name="title_voiceclip_message" context="Title of a chat message that contains voice clip info">Voice message</string>
+    <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice clip while on a call in progress">Recording voice clip is not allowed during a call</string>
+
 
 </resources>

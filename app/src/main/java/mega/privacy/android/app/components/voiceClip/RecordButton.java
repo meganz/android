@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +11,10 @@ import android.widget.RelativeLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
-
 public class RecordButton extends AppCompatImageView implements View.OnTouchListener, View.OnClickListener {
     private RecordView recordView;
     private OnRecordClickListener onRecordClickListener;
+
 
     public RecordButton(Context context) {
         super(context);

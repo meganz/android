@@ -627,7 +627,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButton = (RecordButton) findViewById(R.id.record_button);
         recordButton.setEnabled(true);
         recordButton.setHapticFeedbackEnabled(true);
-
         recordView = (RecordView) findViewById(R.id.record_view);
         recordView.setLessThanSecondAllowed(false);
         recordView.setVisibility(View.GONE);
@@ -807,11 +806,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onStart() {
                 log("recordView.setOnRecordListener:onStart");
+                if(!isAllowedToRecord()) return;
                 prepareRecording();
             }
             @Override
             public void onLessThanSecond() {
                 log("recordView.setOnRecordListener:onLessThanSecond");
+                if(!isAllowedToRecord()) return;
                 showBubble();
             }
 
@@ -961,6 +962,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         initAfterIntent(getIntent(), savedInstanceState);
 
         log("FINISH on Create");
+    }
+
+    private boolean isAllowedToRecord(){
+        if(ChatUtil.participatingInACall(megaChatApi)){
+            showSnackbar(Constants.SNACKBAR_TYPE, context.getString(R.string.not_allowed_recording_voice_clip), -1);
+            return false;
+        }
+
+        if(!checkPermissionsVoiceClip()) return false;
+
+        return true;
+
     }
 
     private void showLetterKB(){
@@ -1960,7 +1973,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      */
     public void prepareRecording(){
         log("prepareRecording");
-        if(!checkPermissionsVoiceClip()) return;
         recordView.playSound(Constants.TYPE_START_RECORD);
         stopReproductions();
     }
@@ -2134,7 +2146,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showBubble(){
         log("showBubble");
         recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
-
         recordView.playSound(Constants.TYPE_ERROR_RECORD);
         bubbleLayout.setAlpha(1);
         bubbleLayout.setVisibility(View.VISIBLE);
@@ -7897,6 +7908,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+
+        if((call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) && (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+            log("onChatCallUpdate ");
+            cancelRecording();
+        }
+
         if (call.getChatid() == idChat) {
             if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 
@@ -7906,11 +7923,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     case MegaChatCall.CALL_STATUS_RING_IN:
                     case MegaChatCall.CALL_STATUS_REQUEST_SENT:
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
-                        log("onChatCallUpdate:STATUS: "+callStatus);
                         showCallLayout(call);
                         break;
                     }
-
                     case MegaChatCall.CALL_STATUS_DESTROYED: {
                         log("onChatCallUpdate:STATUS: DESTROYED");
 
@@ -7930,7 +7945,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         invalidateOptionsMenu();
                         break;
                     }
-
                     default:
                         break;
                 }
@@ -7941,6 +7955,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }else{
             log("onChatCallUpdate: different chat");
+
         }
     }
 

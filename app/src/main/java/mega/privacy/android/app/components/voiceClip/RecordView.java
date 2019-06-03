@@ -106,6 +106,7 @@ public class RecordView extends RelativeLayout {
         init(context, attrs, defStyleAttr, -1);
     }
 
+
     private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         View view = View.inflate(context, R.layout.record_view_layout, null);
         addView(view);
@@ -163,7 +164,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private void hideViews(boolean lessThanASecond) {
-        log(" hideViews lessThanASecond = "+lessThanASecond);
+        log("hideViews lessThanASecond = "+lessThanASecond);
         slideToCancelLayout.setVisibility(GONE);
         cancelRecordLayout.setVisibility(GONE);
         startStopCounterTime(false);
