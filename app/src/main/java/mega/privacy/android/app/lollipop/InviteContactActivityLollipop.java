@@ -136,20 +136,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         emptyTextView.setText(result);
     }
 
-    private void itemClick(View view, int position) {
-        log("on item click");
-        inputString = typeContactEditText.getText().toString();
-        if (contactsAdapter == null) {
-            return;
-        }
-
-        final ContactInfo contact = contactsAdapter.getItem(position);
-        if (contact == null) {
-            return;
-        }
-
-    }
-
     private void setEmptyStateVisibility(boolean visible) {
         if (visible) {
             emptyImageView.setVisibility(View.VISIBLE);
@@ -164,18 +150,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     public static void log(String message) {
         Util.log("AddContactActivityLollipop", message);
-    }
-
-    private String getMegaContactMail(MegaContactAdapter contact) {
-        String mail = null;
-        if (contact != null) {
-            if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
-                mail = contact.getMegaUser().getEmail();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
-                mail = contact.getMegaContactDB().getMail();
-            }
-        }
-        return mail;
     }
 
     private ArrayList<ContactInfo> getPhoneContacts() {
@@ -224,27 +198,27 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return contactList;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
-
-        int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home: {
-                onBackPressed();
-                break;
-            }
-            case R.id.action_scan_qr: {
-                initScanQR();
-                break;
-            }
-            case R.id.action_send_invitation: {
-                Util.hideKeyboard(this, 0);
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        log("onOptionsItemSelected");
+//
+//        int id = item.getItemId();
+//        switch (id) {
+//            case android.R.id.home: {
+//                onBackPressed();
+//                break;
+//            }
+//            case R.id.action_scan_qr: {
+//                initScanQR();
+//                break;
+//            }
+//            case R.id.action_send_invitation: {
+//                Util.hideKeyboard(this, 0);
+//                break;
+//            }
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     public void onBackPressed() {
@@ -501,6 +475,11 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             case R.id.fab_button_next: {
                 inviteContacts(addedContacts);
                 Util.hideKeyboard(this, 0);
+                break;
+            }
+            case R.id.layout_more:{
+                log("more button clicked");
+                //todo
                 break;
             }
         }

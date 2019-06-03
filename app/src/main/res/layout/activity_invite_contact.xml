@@ -201,8 +201,7 @@
             <RelativeLayout
                 android:id="@+id/container_list_contacts"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_height="wrap_content">
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/add_contact_list"
