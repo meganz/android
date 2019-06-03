@@ -808,7 +808,11 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     private void refreshInviteContactButton() {
         log("refreshInviteContactButton");
-        enableFabButton(addedContacts.size() > 0);
+        String stringInEditText = typeContactEditText.getText().toString();
+        Boolean isStringValidNow = stringInEditText.length() == 0
+                || isValidEmail(stringInEditText)
+                || isValidPhone(stringInEditText);
+        enableFabButton(addedContacts.size() > 0 && isStringValidNow);
     }
 
     private boolean isContactAdded(ContactInfo contactInfo) {
