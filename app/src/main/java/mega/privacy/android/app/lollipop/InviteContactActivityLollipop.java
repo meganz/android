@@ -189,6 +189,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         progressBar = findViewById(R.id.invite_contact_progress_bar);
         refreshInviteContactButton();
 
+        //orientation changes
         if (savedInstanceState != null) {
             phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
             megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
@@ -198,6 +199,12 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             refreshAddedContactsView();
             setRecyclersVisibility();
             setTitleAB();
+            if(totalContacts.size() > 0){
+                setEmptyStateVisibility(false);
+            }else{
+                setEmptyStateVisibility(true);
+                showEmptyTextView();
+            }
         } else {
             queryIfHasReadContactsPermissions();
         }
