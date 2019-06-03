@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
@@ -335,6 +336,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
         progressBar = findViewById(R.id.add_contact_progress_bar);
         queryIfHasReadContactsPermissions();
+        refreshInviteContactButton();
     }
 
     private void setTitleAB() {
@@ -462,7 +464,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 } else if (isPhoneValid) {
                     addContactInfo(s.trim(), TYPE_MANUAL_INPUT_PHONE);
                 }
-
+                refreshInviteContactButton();
                 if (isEmailValid || isPhoneValid) {
                     typeContactEditText.getText().clear();
                     Util.hideKeyboard(this, 0);
@@ -624,7 +626,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         }
 
         refreshAddedContactsView();
-
+        refreshInviteContactButton();
         //refresh scroll view
         handler.postDelayed(new Runnable() {
             @Override
@@ -779,6 +781,10 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         itemContainer.invalidate();
     }
 
+    private void refreshInviteContactButton() {
+        enableFabButton(addedContacts.size() > 0);
+    }
+
     private boolean isContactAdded(ContactInfo contactInfo) {
         for (ContactInfo addedContact : addedContacts) {
             if (addedContact.getId() == contactInfo.getId()) {
@@ -870,6 +876,12 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             }
             refreshAddedContactsView();
         }
+    }
+
+    private void enableFabButton(Boolean enableFabButtpn) {
+        int lintColor = enableFabButtpn ? R.color.accentColor : R.color.disable_fab_invite_contact;
+        fabButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(lintColor)));
+        fabButton.setEnabled(enableFabButtpn);
     }
 
 }
