@@ -7003,15 +7003,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(recordView!=null){
             recordView.destroyHandlers();
         }
-        if(megaApi != null) {
-            megaApi.removeRequestListener(this);
-        }
-        if (megaChatApi != null) {
-            megaChatApi.closeChatRoom(idChat, this);
-            MegaApplication.setClosedChat(true);
-            megaChatApi.removeChatListener(this);
-            megaChatApi.removeChatCallListener(this);
-        }
+
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
@@ -7043,6 +7035,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(voiceclipDownloadedReceiver);
+
+        if(megaApi != null) {
+            megaApi.removeRequestListener(this);
+        }
+        if (megaChatApi != null) {
+            megaChatApi.closeChatRoom(idChat, this);
+            MegaApplication.setClosedChat(true);
+            megaChatApi.removeChatListener(this);
+            megaChatApi.removeChatCallListener(this);
+        }
 
         super.onDestroy();
     }
