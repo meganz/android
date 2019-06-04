@@ -112,7 +112,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCUJob;
 
 
 public class Util {
@@ -212,6 +211,17 @@ public class Util {
 			return null;
 		}
 	}
+
+    public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
+        String nodeFingerprint = node.getFingerprint();
+        String nodeOriginalFingerprint = node.getOriginalFingerprint();
+
+        String fileFingerprint = megaApi.getFingerprint(localPath);
+        if (fileFingerprint != null) {
+            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
+        }
+        return false;
+    }
 
 	public static File createTemporalURLFile(String name, String data){
 
@@ -1030,7 +1040,7 @@ public class Util {
      * @param node MegaNode in cloud drive which should be a video.
      * @return Corresponding local path of the node.
      */
-    public static String findLocalPath (MegaNode node) {
+    public static String findVideoLocalPath (MegaNode node) {
         String path = queryByNameAndSize(MediaStore.Video.Media.INTERNAL_CONTENT_URI,node);
         if(path == null) {
             path = queryByNameAndSize(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,node);

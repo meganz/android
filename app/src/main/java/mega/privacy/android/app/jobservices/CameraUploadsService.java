@@ -202,12 +202,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         DatabaseHandler handler = DatabaseHandler.getDbHandler(this);
         MegaPreferences prefs = handler.getPreferences();
         if(prefs != null) {
-            if(type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi())) {
-                //pause the sync
-                pauseByNetworkStateChange = true;
-            } else {
-                pauseByNetworkStateChange = false;
-            }
+            pauseByNetworkStateChange = type == MOBILE && Boolean.valueOf(prefs.getCamSyncWifi());
             megaApi.pauseTransfers(pauseByNetworkStateChange);
         }
     }

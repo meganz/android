@@ -1611,7 +1611,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 
             case Constants.REQUEST_CAMERA_UPLOAD:{
-                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     sttFLol = (SettingsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.SETTINGS.getTag());
                     if(sttFLol != null){
                         sttFLol.enableCameraUpload();
@@ -1624,7 +1624,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
 
             case Constants.REQUEST_CAMERA_ON_OFF: {
-                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     cuFL = (CameraUploadFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
                     if (cuFL != null) {
                         cuFL.cameraOnOff();
@@ -1639,7 +1639,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 if(permissions.length == 0) {
                     return;
                 }
-                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
                     if(cuFL != null){
                         cuFL.cameraOnOffFirstTime();

@@ -29,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -1489,15 +1490,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			((ManagerActivityLollipop)context).refreshCameraUpload();
 		}
 		else{
-            
             prefs = dbH.getPreferences();
             if (prefs != null &&
-                    prefs.getCamSyncLocalPath() != null &&
-                    prefs.getCamSyncLocalPath().compareTo("") != 0 &&
-                    prefs.getCamSyncFileUpload() != null &&
-                    prefs.getCamSyncFileUpload().compareTo("") != 0 &&
-                    prefs.getCamSyncWifi().compareTo("") != 0 &&
-                    prefs.getCamSyncWifi() != null
+                    !TextUtils.isEmpty(prefs.getCamSyncLocalPath()) &&
+                    !TextUtils.isEmpty(prefs.getCamSyncFileUpload()) &&
+                    !TextUtils.isEmpty(prefs.getCamSyncWifi())
             ) {
                 resetCUTimeStampsAndCache();
                 dbH.setCamSyncEnabled(true);
@@ -1586,7 +1583,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	@Override
     public void onClick(View v) {
         ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
-        String[] permissions = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE};
+        String[] permissions = {android.Manifest.permission.READ_EXTERNAL_STORAGE};
         
         switch (v.getId()) {
             case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
@@ -1728,9 +1725,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = Util.findLocalPath(psHMegaNode);
-
-                            if (localPath != null && checkFingerprint(psHMegaNode,localPath)) {
+							String localPath = Util.findVideoLocalPath(psHMegaNode);
+                            if (localPath != null && Util.checkFingerprint(megaApi,psHMegaNode,localPath)) {
 								File mediaFile = new File(localPath);
 
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1795,17 +1791,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			log("isGrid");
 		}
 	}
-
-    private boolean checkFingerprint(MegaNode node,String localPath) {
-        String nodeFingerprint = node.getFingerprint();
-        String nodeOriginalFingerprint = node.getOriginalFingerprint();
-
-        String fileFingerprint = megaApi.getFingerprint(localPath);
-        if (fileFingerprint != null) {
-            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
-        }
-        return false;
-    }
 
 	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
 		log("getPath");

@@ -2207,7 +2207,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         if (!cuEnabled) {
             log("Camera ON");
             String[] PERMISSIONS = {
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     android.Manifest.permission.READ_EXTERNAL_STORAGE
             };
 
@@ -2811,9 +2810,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
         if(isDeviceSupportCompression()){
             enableVideoQualitySettings();
-            dbH.setCameraUploadVideoQuality(MEDIUM);
-            videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-            videoQuality.setSummary(videoQuality.getEntry());
         }else{
             disableVideoQualitySettings();
             dbH.setCameraUploadVideoQuality(ORIGINAL);
