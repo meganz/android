@@ -44,13 +44,13 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -591,19 +591,19 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 							dbH.setCamSyncHandle(-1);
 							camSyncHandle = (long) -1;
 							//Meanwhile is not created, set just the name
-							camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+							camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 						}
 					}
 					else{
 						//Meanwhile is not created, set just the name
-						camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+						camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 					}
 				}
 				else{
 					dbH.setCamSyncHandle(-1);
 					camSyncHandle = (long) -1;
 					//Meanwhile is not created, set just the name
-					camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+					camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
 				}
 
 				if (prefs.getCamSyncFileUpload() == null){
@@ -1026,16 +1026,16 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 								megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 							}
 							else{
-								megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+								megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 							}
 						}
 						else{
-							megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+							megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 						}
 					}
 					else{
 						log("handleSecondaryMediaFolder empty string");
-						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 					}
 
 				}
@@ -1043,7 +1043,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 					log("handleSecondaryMediaFolder Null");
 					dbH.setSecondaryFolderHandle(-1);
 					handleSecondaryMediaFolder = (long) -1;
-					megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 				}
 
 				//check if the local secondary folder exists
@@ -1711,11 +1711,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 				//Check MEGA folder
 				if(handleSecondaryMediaFolder!=null){
 					if(handleSecondaryMediaFolder==-1){
-						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 					}
 				}
 				else{
-					megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = CameraUploadsService.SECONDARY_UPLOADS;
 				}
 
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
@@ -2165,9 +2165,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 			log("Camera OFF");
 			secondaryUpload = false;
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-				Intent stopIntent = null;
-				stopIntent = new Intent(context, CameraSyncService.class);
-				stopIntent.setAction(CameraSyncService.ACTION_STOP);
+				Intent stopIntent = new Intent(context, CameraUploadsService.class);
+				stopIntent.setAction(CameraUploadsService.ACTION_STOP);
 				context.startService(stopIntent);
 			}
 			else {
@@ -2795,11 +2794,11 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
         if(camSyncHandle!=null){
             if(camSyncHandle==-1){
-                camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+                camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
             }
         }
         else{
-            camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+            camSyncMegaPath = CameraUploadsService.CAMERA_UPLOADS;
         }
 
         megaCameraFolder.setSummary(camSyncMegaPath);

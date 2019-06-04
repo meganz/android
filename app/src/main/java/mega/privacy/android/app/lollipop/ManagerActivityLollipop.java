@@ -114,7 +114,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -135,6 +134,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -18773,7 +18773,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}else{
-			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+			if(n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
 				}
