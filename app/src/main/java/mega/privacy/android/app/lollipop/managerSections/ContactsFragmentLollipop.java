@@ -222,13 +222,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				avatarImage.buildDrawingCache(true);
 				Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
 
-				ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
-				avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
-				byte[] avatarByteArray = avatarOutputStream.toByteArray();
-				outState.putByteArray("avatar", avatarByteArray);
-				outState.putBoolean("contentAvatar", contentAvatar);
+				if (avatarBitmap != null) {
+					ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+					avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+					byte[] avatarByteArray = avatarOutputStream.toByteArray();
+					outState.putByteArray("avatar", avatarByteArray);
+					outState.putBoolean("contentAvatar", contentAvatar);
+				}
 			}
-			if (!contentAvatar){
+			if (!contentAvatar && initialLetterInvite != null){
 				outState.putString("initialLetter", initialLetterInvite.getText().toString());
 			}
 		}
@@ -509,7 +511,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		});
 
-		((ManagerActivityLollipop) context).handleInviteContact = 0;
+		((ManagerActivityLollipop) context).deleteInviteContactHandle();
 	}
 
 	public void showAlertDialog (int title, int text, final boolean success) {
@@ -572,7 +574,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			case R.id.view_contact: {
 				inviteShown = false;
-				((ManagerActivityLollipop) context).handleInviteContact = 0;
 				if (inviteAlertDialog != null){
 					inviteAlertDialog.dismiss();
 				}
@@ -631,7 +632,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					intent.putExtra("newGroup", true);
 					intent.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
 					((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT);
-//					}
 
 					clearSelections();
 					hideMultipleSelect();

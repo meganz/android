@@ -154,6 +154,8 @@ public class Constants {
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
+    public static String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
+    public static String ACTION_CHILD_UPLOADED_FAILED = "ACTION_CHILD_UPLOADED_FAILED";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	public static String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
@@ -263,11 +265,15 @@ public class Constants {
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 	public static int NOTIFICATION_CHAT_UPLOAD = 15;
+    public static int NOTIFICATION_UPLOAD_FOLDER = 16;
+    public static int NOTIFICATION_UPLOAD_FINAL_FOLDER = 17;
 
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
 	public static String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
-	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA Upload";
+    public static String NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER = "FolderUploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA File Upload";
+    public static String NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER = "MEGA Folder Upload";
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
 	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
@@ -332,4 +338,12 @@ public class Constants {
 	public static final int SNACKBAR_TYPE = 0;
 	public static final int MESSAGE_SNACKBAR_TYPE = 1;
 	public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
+
+	public static final int FILE_LINK = 200;
+	public static final int FOLDER_LINK = 201;
+	public static final int CHAT_LINK = 202;
+	public static final int CONTACT_LINK = 203;
+	public static final int ERROR_LINK = -1;
+
+	public static final String CONTACT_HANDLE = "contactHandle";
 }

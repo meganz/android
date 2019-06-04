@@ -37,14 +37,13 @@
 
     <string name="general_retry" context="Button to try retry some action">重试</string>
     <string name="general_open_browser" context="Button to open the default web browser">打开浏览器</string>
-
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     -->
     <string name="general_loading" context="state previous to import a file">读取中</string>
     <string name="general_importing" context="state while importing the file">正在汇入</string>
     <string name="general_forwarding" context="state while importing the file">转发</string>
-    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">导入</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">输入</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">储存空间</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">流量限制</string>
     <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">订阅</string>
@@ -518,6 +517,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">从文件系统中挑选</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -648,6 +648,7 @@
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">清除缓存</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">清除离线文件</string>
 
+	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">取消账户</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">目前已使用%s</string>
@@ -875,7 +876,7 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">电子邮件验证</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">请确认您的电子信箱以继续</string>
-    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">发生错误，请再试一次。</string>
+    <string name="general_text_error" context="Text to inform the user when an error occurs">发生错误，请再试一次。</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">您必须登录才能执行此操作。</string>
@@ -1262,6 +1263,9 @@
 	<string name="label_close" context="button label Close">关闭</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">概述</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">储存空间</string>
+	<string name="label_storage_upgrade_account" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '200GB Storage'.">储存空间</string>
+	<string name="label_transfer_quota_upgrade_account" context="label of transfer quota in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show '1 TB Transfer quota'.">传输流量</string>
+	<string name="label_transfer_quota_achievements" context="label of transfer quota in achievements page, it is being used with a variable, e.g. '30GB Transfer quota'.">传输流量</string>
 
     <string name="account_plan" context="Title of the section about the plan in the storage tab in My Account Section">会员方案</string>
     <string name="storage_space" context="Title of the section about the storage space in the storage tab in My Account Section">存储空间</string>
@@ -1358,10 +1362,20 @@
         <item context="Plural" quantity="other">正在上传 %1$d 个文件，共%2$d个文件中。</item>
     </plurals>
 
+	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
+		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
+		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+	</plurals>
+
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
         <item context="Singular" quantity="one">已上传%1$d个文件</item>
         <item context="Plural" quantity="other">已上传%1$d个文件</item>
     </plurals>
+
+	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
+		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
+		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">共 %1$s</string>
 
@@ -1429,7 +1443,7 @@
 
     <string name="copyright_alert_title" context="text_copyright_alert_title">致所有使用者的著作权警告</string>
     <string name="copyright_alert_first_paragraph" context="text_copyright_alert_first_paragraph">MEGA尊重他人之著作权，且要求MEGA的云端服务使用者遵守著作权法。</string>
-    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">严禁使用MEGA云端服务侵害他人之知识产权。您不得上传、下载、储存、分享、展示、流通、散布、寄发、提供链接、传播或以其他方式侵犯任何知识产权，或提供任何侵犯个人或团体知识产权之文件、数据或内容。</string>
+    <string name="copyright_alert_second_paragraph" context="text_copyright_alert_second_paragraph">严禁使用MEGA云端服务侵犯知识产权。您不得上传、下载、储存、分享、显示、串流、分发、寄送电子邮件、提供链接、传输或以其他方式提供任何侵犯任何个人或单位的知识产权或其他产权的文件、资料或内容。</string>
     <string name="copyright_alert_agree_button" context="text of the Agree button">同意</string>
     <string name="copyright_alert_disagree_button" context="text of the Disagree button">反对</string>
 
@@ -1480,7 +1494,7 @@
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">完全访问权限</string>
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">只读</string>
-    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">可读&amp; 可编辑</string>
+    <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">可读写</string>
 
     <string name="attachment_uploading_state_uploading">正在上传&#8230;</string>
     <string name="attachment_uploading_state_error">错误！未发送</string>
@@ -1712,7 +1726,7 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">正在处理链接&#8230;</string>
 
-    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">您的密码太容易被猜到了。请尝试增加密码长度。结合大小写。添加特殊字元。不要使用名字或单词。</string>
+    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">您的密码过于简单。请尝试增加密码长度。结合字母大小写。添加特殊字符。切勿使用名字或单词。</string>
     <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">您可使用此密码，但建议您增加密码强度。</string>
     <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">该密码不容易被攻破。请确保您会将它牢记。</string>
     <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">该密码不容易被攻破。请确保您会将它牢记。</string>
@@ -1810,6 +1824,7 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">发送至聊天</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog 'Do you remember your password?'">你还记得本帐号的密码吗？</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog 'Do you remember your password?' when logout">您即将注销帐号，请测试您是否记得密码。\n如果您忘记密码，您将无法再次访问您在MEGA上的数据。</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog 'Do you remember your password?'">请测试密码是否正确。若您忘记密码了，您有可能因此而丢失储存的数据。</string>
     <string name="remember_pwd_dialog_do_not_show" context="'Do you remember your password?' dialog option that permits user do not show it again">不再显示</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">测试密码</string>
@@ -1821,7 +1836,7 @@
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">您即将注销帐号，请测试您是否记得密码。\n如果您忘记密码，您将无法再次访问您在MEGA上的数据。</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">复制到粘贴板</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">导出恢复金匙</string>
-    <string name="option_logout_anyway" context="Option that permits user logout">注销账号</string>
+    <string name="proceed_to_logout" context="Option that permits user logout">继续登出</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">恢复密钥</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">保存至文件系统</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">已复制到剪贴板</string>
@@ -1912,7 +1927,7 @@
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">请务必将此种子备份到安全的地方，以防丢失设备。</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">请输入验证程序中生成的6位验证码。</string>
     <string name="general_verify" context="Text button">确认</string>
-    <string name="general_next" context="Text button">下一步</string>
+    <string name="general_next" context="Text button">次一</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">生成种子或QR码时出错，请再试一次。</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">双重验证已启用</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">您在下次登录账户时，系统会要求您输入验证程序中提供的6位验证码。</string>
@@ -2022,7 +2037,7 @@
     <string name="confirmation_delete_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">要将%s从会话中删除吗？</string>
 
     <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">文件版本</string>
-    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d文件版本，总计%2$s</string>
+    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1$d 文件版本，总计 %2$s</string>
 
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">文件管理</string>
 
@@ -2101,6 +2116,7 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">聊天活动</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">您有一条新消息</string>
+	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">垃圾桶定时清理</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">垃圾桶会自动清理。</string>
@@ -2114,9 +2130,46 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">如果您想要禁用垃圾桶定时清理或设置延长保留期限，您需要订阅PRO计划。</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">天</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
 
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable Encrypted Key Rotation</string>
+    <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a chat link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the chat link.[/B]</string>
+
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete chat link</string>
+
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">您将退出除当前活动以外的所有其他活动会话。</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">您想要关闭所有会话吗？</string>
+
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat. Please keep the placeholder because is to show the number of participants in runtime.">%d 人参与</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">Join</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">Observers</string>
+
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the chat link.</string>
+
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the chat link.</string>
+
+    <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were previously a member of. Do you want to join the chat again?</string>
+    <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat.</string>
+
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
+
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
+
+    <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid chat link</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="action_open_chat_link" context="Menu item">Open chat link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">邀请已发送至联系人%s，可在‘发送请求\'选项卡中查阅。</string>
 
@@ -2227,6 +2280,10 @@
         <item context="Plural of participant. 2 participants" quantity="other">%d 人参与</item>
     </plurals>
 
+    <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">您可以为聊天生成一个链接，但在此之前您需要先设置话题：</string>
+
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
+
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]从[/A] %s / [A]月[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">续订期间可以随时取消定期计划</string>
     <string name="call_started_messages" context="Message shown when a call starts.">Call Started</string>
@@ -2236,6 +2293,16 @@
 
     <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]无 [/B][A]通知[/A][B]。[/B]</string>
 
+    <string name="general_setup_mega" context="Permissions screen title">安装MEGA</string>
+    <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
+    <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow access to photos, media and files.</string>
+    <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, media and files MEGA needs your permission.</string>
+    <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
+    <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
+    <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
+    <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">已共享文件</string>
 
     <string name="error_message_already_sent" context="Error mesage when trying to remove an uploading attachment that has already finished">附件已发送</string>
@@ -2282,17 +2349,118 @@
         <item context="version items" quantity="other">消息已转发</item>
     </plurals>
 
+    <plurals name="num_files_not_send" context="Alert shown when a num of files have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d file was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files were not sent to %d chats</item>
+    </plurals>
+
+    <plurals name="num_contacts_not_send" context="Alert shown when a num of contacts have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d contact was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d contacts were not sent to %d chats</item>
+    </plurals>
+
+    <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
+        <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
+    </plurals>
+
+    <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
+
+    <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>
+    <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">正在准备文件</string>
+    <string name="sent_as_message" context="Label indicating some content has been sent as message">Sent as a message.</string>
+    <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">错误。 该文件尚未发送到任何选定的对话</string>
+    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No[/A] [B]Items[/B]</string>
+
+    <string name="delete_versions" context="Action delete all file versions">删除旧版本</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
+    <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Please note that the current file will not be deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
+
+    <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
+        <item context="version item" quantity="one">%d version deleted successfully</item>
+        <item context="version items" quantity="other">%d versions deleted successfully</item>
+    </plurals>
+
+    <plurals name="versions_not_deleted" formatted="false" context="Alert shown when some versions are not deleted successfully">
+        <item context="version item" quantity="one">%d version not deleted</item>
+        <item context="version items" quantity="other">%d versions not deleted</item>
+    </plurals>
+
+    <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
+
+    <string name="title_tour_one" context="Title of first tour screen">您持有这把密钥</string>
+    <string name="content_tour_one" cotext="Content of first tour screen">安全即是我们存在的意义。您的文件会在我们的加密机器下受到安全保护，并且只有您可以访问您的文件。</string>
+    <string name="title_tour_two" cotext="Title of second tour screen">已加密聊天</string>
+    <string name="content_tour_two" cotext="Content of second tour screen">使用您的云盘即可享有完全加密的语音与视频通话、群发信息以及文件共享整合。</string>
+    <string name="title_tour_three" cotext="Title of third tour screen">创建您的网络</string>
+    <string name="content_tour_three" cotext="Content of third tour screen">无需离开MEGA即可添加联系人、创建网络、协同合作以及进行语音与视频通话</string>
+    <string name="title_tour_four" cotext="Title of fourth tour screen">云备份您的照片</string>
+    <string name="content_tour_four" cotext="Content of fourth tour screen">相机上传是任何移动设备的基本功能，我们已为您开启。 立即创建您的帐户。</string>
+
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">输入您的密码</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s是受密码保护的PDF文档。 请输入密码打开PDF。</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">您输入的密码错误，请再试一次。</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">您输入的密码无效。</string>
 
+    <string name="unknownn_file" context="Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly">It is not possible to open the file. It is an unknown file or has not been possible to unzip successfully.</string>
+
     <string name="not_allow_play_alert" context="Alert shown when exists some call and the user tries to play an audio or video">It is not possible to play media files while there is a call in progress.</string>
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
-    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen">%s started a group call. Tap to join.</string>
-    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to call %s</string>
-    <string name="call_in_progress_layout_without_time" context="Title of the layout to return to a call from the chat screen">Tap to return to call</string>
-    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">应答</string>
-    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">忽视</string>
+    <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
 
+    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
+
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+
+    <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">You have joined the chat successfully.</string>
+
+    <string name="wizard_steps_indicator" context="Label that indicates the steps of a wizard">%1$d of %2$d</string>
+
+    <string name="hint_action_search" context="Hint of the Search view">Search&#8230;</string>
+    <string name="answer_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and answered.">应答</string>
+    <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">忽略</string>
+    <string name="outgoing_audio_call_starting" context="Subtitle of the call screen when a outgoing audio call is just starting in a individual chat">Starting audio call&#8230;</string>
+    <string name="outgoing_video_call_starting" context="Subtitle of the call screen when a outgoing video call is just starting in a individual chat">Starting video call&#8230;</string>
+    <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call ">%s muted this call</string>
+    <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+
+    <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Already downloaded. Copied to selected path.</string>
+
+    <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
+    <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
+
+    <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
+
+    <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">参与者可通过此链接加入您的群组。</string>
+    <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">新聊天链接</string>
+    <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">输入群名称</string>
+    <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+
+    <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">No chat link available.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
+
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ACCEPTED)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (DELETED)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (DENIED)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+
+	<plurals name="file_already_downloaded">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+	</plurals>
+
+	<plurals name="file_pending_download">
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d的文件待处理</item>
+	</plurals>
 </resources>
