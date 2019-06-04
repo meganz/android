@@ -358,7 +358,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									if (ret == MegaChatApi.INIT_NO_CACHE)
 									{
 										log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-										megaChatApi.enableGroupChatCalls(true);
 
 									}
 									else if (ret == MegaChatApi.INIT_ERROR)
@@ -378,7 +377,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									}
 									else{
 										log("shouldRun: Chat correctly initialized");
-										megaChatApi.enableGroupChatCalls(true);
 									}
 								}
 							}

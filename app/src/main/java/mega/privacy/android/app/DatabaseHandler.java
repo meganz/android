@@ -752,8 +752,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
 		try{
-			Cursor cursor = db.rawQuery(selectQuery, null);		
-			if (cursor.moveToFirst()) {
+			Cursor cursor = db.rawQuery(selectQuery, null);
+			//get the credential of last login
+			if (cursor.moveToLast()) {
 				int id = Integer.parseInt(cursor.getString(0));
 				String email = decrypt(cursor.getString(1));
 				String session = decrypt(cursor.getString(2));
@@ -2350,8 +2351,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setAccountDetailsTimeStamp (){
+		setAccountDetailsTimeStamp(System.currentTimeMillis()/1000);
+	}
+
+	public void resetAccountDetailsTimeStamp (){
+		setAccountDetailsTimeStamp(-1);
+	}
+
+	private void setAccountDetailsTimeStamp (long accountDetailsTimeStamp){
 		log("setAccountDetailsTimeStamp");
-		long accountDetailsTimeStamp = System.currentTimeMillis()/1000;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
