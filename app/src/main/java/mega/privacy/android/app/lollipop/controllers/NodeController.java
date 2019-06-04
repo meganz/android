@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -188,46 +189,11 @@ public class NodeController {
         }
     }
 
-    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
-        log("selectChatsToSendNodes");
-
-        int size = nodes.size();
-        long[] longArray = new long[size];
-
-        for(int i=0;i<nodes.size();i++){
-            longArray[i] = nodes.get(i).getHandle();
-        }
-
-        selectChatsToSendNodes(longArray);
-    }
-
     public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
         log("checkIfNodeIsMineAndSelectChatsToSendNode");
-        if (node != null) {
-            if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
-                selectChatsToSendNode(node);
-            }
-            else {
-                String nodeFP = megaApi.getFingerprint(node);
-                ArrayList<MegaNode> nodes = megaApi.getNodesByFingerprint(nodeFP);
-                MegaNode nodeOwner = null;
-                if (nodes != null) {
-                    for (int i=0; i<nodes.size(); i++) {
-                        if (megaApi.getAccess(nodes.get(i)) == MegaShare.ACCESS_OWNER){
-                            nodeOwner = nodes.get(i);
-                            break;
-                        }
-                    }
-                }
-                if (nodeOwner != null) {
-                    selectChatsToSendNode(nodeOwner);
-                }
-                else {
-                    CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-                    copyAndSendToChatListener.copyNode(node);
-                }
-            }
-        }
+        ArrayList<MegaNode> nodes = new ArrayList<>();
+        nodes.add(node);
+        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
@@ -244,7 +210,7 @@ public class NodeController {
         for (int i=0; i<nodes.size(); i++) {
             currentNode = nodes.get(i);
             if (currentNode != null) {
-                if (megaApi.getAccess(currentNode) == MegaShare.ACCESS_OWNER) {
+                if (currentNode.getOwner() == megaApi.getMyUserHandleBinary()) {
                     ownerNodes.add(currentNode);
                 }
                 else {
@@ -253,7 +219,7 @@ public class NodeController {
                     MegaNode nodeOwner = null;
                     if (fNodes != null) {
                         for (int j=0; j<fNodes.size(); j++) {
-                            if (megaApi.getAccess(fNodes.get(j)) == MegaShare.ACCESS_OWNER){
+                            if (fNodes.get(j).getOwner() == megaApi.getMyUserHandleBinary()){
                                 nodeOwner = fNodes.get(j);
                                 break;
                             }
@@ -278,17 +244,15 @@ public class NodeController {
         }
     }
 
-    public void selectChatsToSendNode(MegaNode node){
-        log("selectChatsToSendNode");
-
-        long[] longArray = new long[1];
-        longArray[0] = node.getHandle();
-
-        selectChatsToSendNodes(longArray);
-    }
-
-    public void selectChatsToSendNodes(long[] longArray){
+    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
         log("selectChatsToSendNodes");
+
+        int size = nodes.size();
+        long[] longArray = new long[size];
+
+        for(int i=0;i<nodes.size();i++){
+            longArray[i] = nodes.get(i).getHandle();
+        }
 
         Intent i = new Intent(context, ChatExplorerActivity.class);
         i.putExtra("NODE_HANDLES", longArray);
@@ -838,7 +802,6 @@ public class NodeController {
 
                             if(Util.isVideoFile(parentPath+"/"+tempNode.getName())){
                                 log("Is video!!!");
-//								MegaNode videoNode = megaApi.getNodeByHandle(tempNode.getNodeHandle());
                                 if (tempNode != null){
                                     if(!tempNode.hasThumbnail()){
                                         log("The video has not thumb");
@@ -853,7 +816,13 @@ public class NodeController {
                         catch(Exception e) {
                             log("Exception!!");
                         }
-
+    
+                        boolean autoPlayEnabled = Boolean.parseBoolean(dbH.getAutoPlayEnabled());
+                        if (!autoPlayEnabled) {
+                            log("auto play disabled");
+                            Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.general_already_downloaded),-1);
+                            return;
+                        }
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             log("MimeTypeList ZIP");
                             File zipFile = new File(localPath);
@@ -1074,12 +1043,13 @@ public class NodeController {
                 }
             }
             log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-            if (numberOfNodesAlreadyDownloaded > 0){
-                String msg = context.getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-                if (numberOfNodesPending > 0){
-                    msg = msg + context.getString(R.string.pending_multiple, numberOfNodesPending);
+            if (numberOfNodesAlreadyDownloaded > 0) {
+                String msg;
+                msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded,numberOfNodesAlreadyDownloaded,numberOfNodesAlreadyDownloaded);
+                if (numberOfNodesPending > 0) {
+                    msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download,numberOfNodesPending,numberOfNodesPending);
                 }
-                showSnackbar(Constants.SNACKBAR_TYPE, msg);
+                showSnackbar(Constants.SNACKBAR_TYPE,msg);
             }
         }
     }
@@ -1122,12 +1092,15 @@ public class NodeController {
         megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
     }
 
-    public void importLink(String url) {
-
+    public int importLink(String url) {
         try {
             url = URLDecoder.decode(url, "UTF-8");
         }
-        catch (UnsupportedEncodingException e) {}
+        catch (Exception e) {
+            log("Error decoding URL: " + url);
+            log(e.toString());
+        }
+
         url.replace(' ', '+');
         if(url.startsWith("mega://")){
             url = url.replace("mega://", "https://mega.co.nz/");
@@ -1136,36 +1109,31 @@ public class NodeController {
         log("url " + url);
 
         // Download link
-        if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
-            log("open link url");
-
-//			Intent openIntent = new Intent(this, ManagerActivityLollipop.class);
+        if (AndroidMegaRichLinkMessage.isFileLink(url)) {
             Intent openFileIntent = new Intent(context, FileLinkActivityLollipop.class);
             openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFileIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
             openFileIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFileIntent);
-//			finish();
-            return;
+            return Constants.FILE_LINK;
         }
-
-        // Folder Download link
-        else if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
-            log("folder link url");
+        else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
             Intent openFolderIntent = new Intent(context, FolderLinkActivityLollipop.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));
             ((ManagerActivityLollipop) context).startActivity(openFolderIntent);
-//			finish();
-            return;
+            return Constants.FOLDER_LINK;
         }
-        else{
-            log("wrong url");
-            Intent errorIntent = new Intent(context, ManagerActivityLollipop.class);
-            errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            ((ManagerActivityLollipop) context).startActivity(errorIntent);
+        else if (AndroidMegaRichLinkMessage.isChatLink(url)) {
+            return Constants.CHAT_LINK;
         }
+        else if (AndroidMegaRichLinkMessage.isContactLink(url)) {
+            return Constants.CONTACT_LINK;
+        }
+
+        log("wrong url");
+        return Constants.ERROR_LINK;
     }
 
     //old getPublicLinkAndShareIt
