@@ -79,7 +79,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		catch (UnsupportedEncodingException e) {}
 		url.replace(' ', '+');
 		if(url.startsWith("mega://")){
-			url = url.replace("mega://", "https://mega.co.nz/");
+			url = url.replace("mega://", "https://mega.nz/");
 		}
 
 		if (url.startsWith("https://www.mega.co.nz")){
@@ -88,6 +88,10 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		if (url.startsWith("https://www.mega.nz")){
 			url = url.replace("https://www.mega.nz", "https://mega.nz");
+		}
+
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length()-1);
 		}
 		
 		log("url " + url);
@@ -538,7 +542,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 					long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
 					Intent inviteContact = new Intent(this, ManagerActivityLollipop.class);
 					inviteContact.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
-					inviteContact.putExtra("handle", handle);
+					inviteContact.putExtra(Constants.CONTACT_HANDLE, handle);
 					startActivity(inviteContact);
 					finish();
 				} else {
@@ -628,7 +632,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 							log("LINK is null");
 							log(e.getErrorString() + "___" + e.getErrorCode());
 //							Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
-							setError(getString(R.string.email_verification_text_error));
+							setError(getString(R.string.general_text_error));
 						}
 					}
 					else{

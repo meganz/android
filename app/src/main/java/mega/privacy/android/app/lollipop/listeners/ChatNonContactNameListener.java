@@ -32,15 +32,33 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     boolean receivedLastName = false;
     boolean receivedEmail = false;
     MegaApiAndroid megaApi;
+    boolean isPreview = false;
+    int pos;
 
-    public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle) {
+    public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle, boolean isPreview) {
         this.context = context;
         this.holder = holder;
-        //MegaChatLollipopAdapter.ViewHolderMessageChat holder
-        //MegaChatLollipopAdapter adapter
         this.adapter = adapter;
         this.isUserHandle = true;
         this.userHandle = userHandle;
+        this.isPreview = isPreview;
+
+        dbH = DatabaseHandler.getDbHandler(context);
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+    }
+
+    public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle, boolean isPreview, int pos) {
+        this.context = context;
+        this.holder = holder;
+        this.adapter = adapter;
+        this.isUserHandle = true;
+        this.userHandle = userHandle;
+        this.isPreview = isPreview;
+        this.pos = pos;
+
         dbH = DatabaseHandler.getDbHandler(context);
 
         if (megaApi == null){
@@ -76,56 +94,47 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         log("onRequestFinish()");
 
         if (e.getErrorCode() == MegaError.API_OK){
+            if (adapter == null) {
+                return;
+            }
+
+            if(adapter instanceof MegaChatLollipopAdapter && holder == null){
+                log("holder is NULL 1");
+                holder = ((MegaChatLollipopAdapter)adapter).queryIfHolderNull(pos);
+                if (holder == null) {
+                    log("holder is NULL 2");
+                    return;
+                }
+            }
+            else {
+                log("otro adapter holder is NULL");
+            }
+
             if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
                 log("->First name received");
                 firstName = request.getText();
                 receivedFirstName = true;
-                if(firstName!=null){
-                    if(!firstName.trim().isEmpty()){
-                        dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
-                    }
-                }
-                if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                    updateAdapter(((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).currentPosition);
-                }
-                else if(holder instanceof MegaChatLollipopAdapter.ViewHolderMessageChat){
-                    log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
-                    updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
+                if(firstName!=null&& !firstName.trim().isEmpty()){
+                    dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
+                    updateAdapter(holder.getAdapterPosition());
                 }
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
                 log("->Last name received");
                 lastName = request.getText();
                 receivedLastName = true;
-                if(lastName!=null){
-                    if(!lastName.trim().isEmpty()){
-                        dbH.setNonContactFirstName(lastName, request.getUserHandle()+"");
-                    }
-                }
-
-                if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                    updateAdapter(((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).currentPosition);
-                }
-                else if(holder instanceof MegaChatLollipopAdapter.ViewHolderMessageChat){
-                    log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
-                    updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
+                if(lastName!=null && !lastName.trim().isEmpty()){
+                    dbH.setNonContactLastName(lastName, request.getUserHandle()+"");
+                    updateAdapter(holder.getAdapterPosition());
                 }
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
                 log("->Email received");
                 mail = request.getText();
                 receivedEmail = true;
-                if(mail!=null){
-                    if(!mail.trim().isEmpty()){
-                        dbH.setNonContactEmail(mail, request.getUserHandle()+"");
-                    }
-                }
-                if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                    updateAdapter(((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).currentPosition);
-                }
-                else if(holder instanceof MegaChatLollipopAdapter.ViewHolderMessageChat){
-                    log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
-                    updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
+                if(mail!=null && !mail.trim().isEmpty()){
+                    dbH.setNonContactEmail(mail, request.getUserHandle()+"");
+                    updateAdapter(holder.getAdapterPosition());
                 }
             }
         }
@@ -136,8 +145,9 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
 
     public void updateAdapter(int position) {
         log("updateAdapter: "+position);
-        if(receivedFirstName&&receivedLastName&&receivedEmail){
-
+        if ((!isPreview && receivedFirstName && receivedLastName && receivedEmail)
+            || (isPreview && receivedFirstName && receivedLastName)){
+            log("updateAdapter");
             if(adapter instanceof MegaChatLollipopAdapter){
                 ((MegaChatLollipopAdapter)adapter).notifyItemChanged(position);
             }
