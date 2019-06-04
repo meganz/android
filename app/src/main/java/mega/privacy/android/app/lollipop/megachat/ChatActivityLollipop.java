@@ -786,6 +786,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Intent is not null");
             intentAction = newIntent.getAction();
             if (intentAction != null){
+
                 if (intentAction.equals(Constants.ACTION_OPEN_CHAT_LINK) || intentAction.equals(Constants.ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
                     megaChatApi.openChatPreview(link, this);
@@ -881,9 +882,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 dbH.setChatItemPreferences(prefs);
             }
 
-            megaChatApi.closeChatRoom(idChat, null);
-
+            megaChatApi.closeChatRoom(idChat, this);
             boolean result = megaChatApi.openChatRoom(idChat, this);
+
             log("Result of open chat: " + result);
             if(result){
                 MegaApplication.setClosedChat(false);
@@ -6224,7 +6225,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode()==MegaChatError.ERROR_EXIST){
                 if (idChat != -1 && megaChatApi.getChatRoom(idChat) != null) {
                     log("Close previous chat");
-                    megaChatApi.closeChatRoom(idChat, null);
+                    megaChatApi.closeChatRoom(idChat, this);
                 }
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
@@ -6371,11 +6372,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             handlerKeyboard.removeCallbacksAndMessages(null);
         }
 
-        if (megaChatApi != null) {
+        if ((megaChatApi != null) && (idChat != -1)) {
             megaChatApi.closeChatRoom(idChat, this);
             MegaApplication.setClosedChat(true);
             megaChatApi.removeChatListener(this);
             megaChatApi.removeChatCallListener(this);
+
+            if((chatRoom!=null)&& (chatRoom.isPreview())){
+                megaChatApi.closeChatPreview(idChat);
+            }
         }
 
         if (handler != null) {
@@ -6395,21 +6400,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void closeChat(boolean shouldLogout){
         log("closeChat");
-        if(idChat!=-1){
-            megaChatApi.closeChatRoom(idChat, this);
-        }
-
-        if(chatRoom!=null){
-            if(chatRoom.isPreview()){
-                megaChatApi.closeChatPreview(idChat);
-
-                if(chatC.isInAnonymousMode() && shouldLogout){
-                    megaChatApi.logout();
-                }
+        if((megaChatApi == null) || (idChat == -1)) return;
+        if((chatRoom!=null)&& (chatRoom.isPreview())){
+            megaChatApi.closeChatPreview(idChat);
+            if(chatC.isInAnonymousMode() && shouldLogout){
+                megaChatApi.logout();
             }
         }
 
+        megaChatApi.closeChatRoom(idChat, this);
         MegaApplication.setClosedChat(true);
+        megaChatApi.removeChatListener(this);
+        megaChatApi.removeChatCallListener(this);
+
     }
 
     @Override
