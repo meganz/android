@@ -981,13 +981,15 @@ public class ThumbnailUtilsLollipop {
 		ViewHolderFileStorage holder;
 		FileStorageLollipopAdapter adapter;
 		MegaApiAndroid megaApi;
+		int position;
 
-		AttachThumbnailToFileStorageExplorerTask(Context context, MegaApiAndroid megaApi, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter) {
+		AttachThumbnailToFileStorageExplorerTask(Context context, MegaApiAndroid megaApi, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter, int position) {
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
 			this.thumbFile = null;
 			this.megaApi = megaApi;
+			this.position = position;
 		}
 
 		@Override
@@ -1003,7 +1005,7 @@ public class ThumbnailUtilsLollipop {
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
 			if (shouldContinueObject){
-				onThumbnailGeneratedExplorerLollipop(megaApi, this.thumbFile, this.originalFile, holder);
+				onThumbnailGeneratedExplorerLollipop(megaApi, this.thumbFile, this.originalFile, holder, adapter, position);
 			}
 		}
 	}
@@ -1099,13 +1101,17 @@ public class ThumbnailUtilsLollipop {
 		log("AttachThumbnailTask end");		
 	}
 
-	private static void onThumbnailGeneratedExplorerLollipop(MegaApiAndroid megaApi,File thumbFile, File originalFile, ViewHolderFileStorage holder){
+	private static void onThumbnailGeneratedExplorerLollipop(MegaApiAndroid megaApi,File thumbFile, File originalFile, ViewHolderFileStorage holder, FileStorageLollipopAdapter adapter, int position){
 		log("onPreviewGenerated");
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
-		holder.imageView.setImageBitmap(bitmap);
-		thumbnailCache.put(megaApi.getFingerprint(originalFile.getAbsolutePath()), bitmap);
+		//holder.imageView.setImageBitmap(bitmap);
+		String key = megaApi.getFingerprint(originalFile.getAbsolutePath());
+		if (key != null && bitmap != null) {
+			thumbnailCache.put(megaApi.getFingerprint(originalFile.getAbsolutePath()), bitmap);
+		}
+		adapter.notifyItemChanged(position);
 		log("AttachThumbnailTask end");
 	}
 
@@ -1387,7 +1393,7 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 
-	public static void createThumbnailExplorerLollipop(Context context, FileDocument document, ViewHolderFileStorage holder, MegaApiAndroid megaApi, FileStorageLollipopAdapter adapter) {
+	public static void createThumbnailExplorerLollipop(Context context, FileDocument document, ViewHolderFileStorage holder, MegaApiAndroid megaApi, FileStorageLollipopAdapter adapter, int position) {
 		if (!MimeTypeList.typeForName(document.getName()).isImage() &&
 				!MimeTypeList.typeForName(document.getName()).isVideo()) {
 			log("no image or video");
@@ -1408,7 +1414,7 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		// if the thumbnail bitmap is cached in device file directory
+//		 if the thumbnail bitmap is cached in device file directory
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg" );
@@ -1421,7 +1427,7 @@ public class ThumbnailUtilsLollipop {
         }
 
 		// There is no cache before, we have to start an async task to have the thumb nail bitmap
-		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, holder, adapter).execute(document);
+		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, holder, adapter, position).execute(document);
 
 	}
 	
