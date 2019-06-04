@@ -40,11 +40,18 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/file_list_view_browser"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:choiceMode="multipleChoice" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/list_view_recents"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:choiceMode="multipleChoice"
+                    android:orientation="vertical"/>
+
+            </FrameLayout>
 
             <mega.privacy.android.app.components.scrollBar.FastScroller
                 android:id="@+id/fastscroll"

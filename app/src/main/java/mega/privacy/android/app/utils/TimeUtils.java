@@ -300,6 +300,20 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
+    public static String formatBucketDate(Context context, long ts) {
+        Calendar cal = Util.calculateDateFromTimestamp(ts);
+        Calendar calToday = Calendar.getInstance();
+        TimeUtils tc = new TimeUtils(TimeUtils.DATE);
+
+        if (tc.compare(cal, calToday) == 0) {
+            return context.getString(R.string.label_today);
+        }
+        else {
+            Date date = cal.getTime();
+            return new SimpleDateFormat("EEEE, d MMM yyyy").format(date);
+        }
+    }
+
     private static void log(String message) {
         Util.log("TimeUtils", message);
     }

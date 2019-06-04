@@ -16692,6 +16692,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							maFLol.updateContactsCount();
 							maFLol.updateView();
                         }
+
+						rF = (RecentsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENTS.getTag());
+						if (rF != null) {
+							rF.setVisibleContacts();
+						}
 					}
 				}
 				else{
@@ -16976,7 +16981,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 
+		refreshFragment(FragmentTag.RECENTS.getTag());
+
 		onNodesCloudDriveUpdate();
+
+		if(cloudPageAdapter!=null){
+			cloudPageAdapter.notifyDataSetChanged();
+		}
 
 		onNodesSearchUpdate();
 
