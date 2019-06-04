@@ -3523,8 +3523,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     try {
                         dialog.show();
                     } catch (Exception ex) {
-                        stopRunningCameraUploadService(ManagerActivityLollipop.this);
-                        dbH.setCamSyncEnabled(false);
+                        log(ex.toString());
                     }
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){

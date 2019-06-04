@@ -598,8 +598,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     try {
                         dialog.show();
                     } catch (Exception ex) {
-                        stopRunningCameraUploadService(LoginActivityLollipop.this);
-                        dbH.setCamSyncEnabled(false);
+                        log(ex.toString());
                     }
                 }
                 else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
