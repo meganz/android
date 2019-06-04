@@ -432,7 +432,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                     } else if (isPhoneValid) {
                         addContactInfo(processedString, TYPE_MANUAL_INPUT_PHONE);
                     }
-                    refreshInviteContactButton();
                     if (isEmailValid || isPhoneValid) {
                         typeContactEditText.getText().clear();
                     }
@@ -448,6 +447,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
             filterContactsTask.cancel(true);
         }
+        refreshInviteContactButton();
         startFilterTask();
         refreshKeyboard();
     }
@@ -474,7 +474,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 } else if (isPhoneValid) {
                     addContactInfo(processedStrong, TYPE_MANUAL_INPUT_PHONE);
                 }
-                refreshInviteContactButton();
                 if (isEmailValid || isPhoneValid) {
                     typeContactEditText.getText().clear();
                     Util.hideKeyboard(this, 0);
@@ -488,6 +487,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 startFilterTask();
                 Util.hideKeyboard(this, 0);
             }
+            refreshInviteContactButton();
             return true;
         }
         if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
@@ -619,6 +619,8 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
         refreshAddedContactsView();
         refreshInviteContactButton();
+        //clear input text view after selection
+        typeContactEditText.setText("");
         //refresh scroll view
         handler.postDelayed(new Runnable() {
             @Override
@@ -776,6 +778,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 contactInfo.setHighlighted(false);
                 addedContacts.remove(id);
                 refreshAddedContactsView();
+                refreshInviteContactButton();
                 refreshList();
                 setTitleAB();
             }
