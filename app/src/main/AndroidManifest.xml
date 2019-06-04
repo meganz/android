@@ -429,11 +429,6 @@
         </activity>
 
         <service
-            android:name="CameraSyncService"
-            android:exported="false" >
-        </service>
-
-        <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
         </service>

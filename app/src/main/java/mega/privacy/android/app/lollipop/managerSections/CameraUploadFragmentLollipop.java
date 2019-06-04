@@ -59,7 +59,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -69,6 +68,7 @@ import mega.privacy.android.app.components.DividerItemDecorationV2;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -901,7 +901,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1106,7 +1106,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (photosyncHandle == -1) {
 					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 					for (int i = 0; i < nl.size(); i++) {
-						if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+						if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
 							photosyncHandle = nl.get(i).getHandle();
 							dbH.setCamSyncHandle(photosyncHandle);
 							listView.setVisibility(View.VISIBLE);
@@ -1988,7 +1988,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (photosyncHandle == -1){
 				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
-					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					if ((CameraUploadsService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
 						dbH.setCamSyncHandle(photosyncHandle);
 						if (listView != null){

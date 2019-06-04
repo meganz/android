@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -64,13 +63,13 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -1265,10 +1264,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void setFolderInfoNavigation(MegaNode n){
 		log("setFolderInfoNavigation");
 		String cameraSyncHandle = null;
-//					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
-//						((ManagerActivityLollipop)context).cameraUploadsClicked();
-//						return;
-//					}
         //Check if the item is the Camera Uploads folder
         if (dbH.getPreferences() != null) {
             prefs = dbH.getPreferences();
@@ -1333,7 +1328,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 }
             }
         } else {
-            if (n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)) {
+            if (n.getName().equals(CameraUploadsService.SECONDARY_UPLOADS)) {
                 if (prefs != null) {
                     prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
                 }

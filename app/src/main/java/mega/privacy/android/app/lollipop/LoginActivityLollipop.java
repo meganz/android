@@ -466,11 +466,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     }
 
-    public void startCameraSyncService(boolean firstTimeCam, int time) {
-        log("startCameraSyncService");
-        Intent intent = null;
+    public void startCameraUploadService(boolean firstTimeCam, int time) {
+        log("startCameraUploadService");
         if (firstTimeCam) {
-            intent = new Intent(this, ManagerActivityLollipop.class);
+            Intent intent = new Intent(this, ManagerActivityLollipop.class);
             intent.putExtra("firstLogin", true);
             startActivity(intent);
             finish();
@@ -599,8 +598,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                     try {
                         dialog.show();
                     } catch (Exception ex) {
-                        stopRunningCameraUploadService(LoginActivityLollipop.this);
-                        dbH.setCamSyncEnabled(false);
+                        log(ex.toString());
                     }
                 }
                 else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
