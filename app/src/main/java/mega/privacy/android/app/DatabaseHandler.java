@@ -2845,66 +2845,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
-	public void setCamSyncTimeStamp (long camSyncTimeStamp){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_TIMESTAMP + "= '" + encrypt(camSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(camSyncTimeStamp + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
-	}
-
-    public void setCamVideoSyncTimeStamp (long camVideoSyncTimeStamp){
-        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()){
-            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_VIDEO_SYNC_TIMESTAMP + "= '" + encrypt(camVideoSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
-            db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-        }
-        else{
-            values.put(KEY_CAM_VIDEO_SYNC_TIMESTAMP, encrypt(camVideoSyncTimeStamp + ""));
-            db.insert(TABLE_PREFERENCES, null, values);
-        }
-        cursor.close();
+    public void setCamSyncTimeStamp(long camSyncTimeStamp) {
+        log("setCamSyncTimeStamp: " + camSyncTimeStamp);
+        setLongValue(TABLE_PREFERENCES, KEY_CAM_SYNC_TIMESTAMP, camSyncTimeStamp);
     }
 
-	public void setSecSyncTimeStamp (long secSyncTimeStamp){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_SYNC_TIMESTAMP + "= '" + encrypt(secSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(secSyncTimeStamp + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
-	}
+    public void setCamVideoSyncTimeStamp(long camVideoSyncTimeStamp) {
+        log("setCamVideoSyncTimeStamp: " + camVideoSyncTimeStamp);
+        setLongValue(TABLE_PREFERENCES, KEY_CAM_VIDEO_SYNC_TIMESTAMP, camVideoSyncTimeStamp);
+    }
+
+    public void setSecSyncTimeStamp(long secSyncTimeStamp) {
+        log("setSecSyncTimeStamp: " + secSyncTimeStamp);
+        setLongValue(TABLE_PREFERENCES, KEY_SEC_SYNC_TIMESTAMP, secSyncTimeStamp);
+    }
 
     public void setSecVideoSyncTimeStamp (long secVideoSyncTimeStamp){
-        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        log("setSecVideoSyncTimeStamp: " + secVideoSyncTimeStamp);
+        setLongValue(TABLE_PREFERENCES,KEY_SEC_VIDEO_SYNC_TIMESTAMP,secVideoSyncTimeStamp);
+    }
+
+    private void setLongValue(String tableName, String columnName, long value) {
+        String selectQuery = "SELECT * FROM " + tableName;
         ContentValues values = new ContentValues();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()){
-            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_VIDEO_SYNC_TIMESTAMP + "= '" + encrypt(secVideoSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
-            db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
-        }
-        else{
-            values.put(KEY_SEC_VIDEO_SYNC_TIMESTAMP, encrypt(secVideoSyncTimeStamp + ""));
-            db.insert(TABLE_PREFERENCES, null, values);
+        if (cursor.moveToFirst()) {
+            String UPDATE_TABLE = "UPDATE " + tableName + " SET " + columnName + "= '" + encrypt(String.valueOf(value)) + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_TABLE);
+        } else {
+            values.put(columnName, encrypt(String.valueOf(value)));
+            db.insert(tableName, null, values);
         }
         cursor.close();
     }

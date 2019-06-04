@@ -2,30 +2,27 @@ package mega.privacy.android.app.jobservices;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
-import android.os.Build;
 
-import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 
 public class CameraUploadStarterService extends JobService {
 
+    /**
+     * @see  JobService#onStartJob
+     */
     @Override
     public boolean onStartJob(JobParameters params) {
+
         try {
             log("Starter start service here");
-            int result = JobUtil.startDaemon(this);
-            log("start daemon result: " + result + ", success=" + (result != JobUtil.START_JOB_FAILED));
             startCameraUploadService(this);
         } catch (Exception e) {
             log("starter Exception: " + e.getMessage() + "_" + e.getStackTrace());
         }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return false;
-        } else {
-            return true;
-        }
+        //there's no more work to be done for this job.
+        return false;
     }
 
     private void log(String message) {

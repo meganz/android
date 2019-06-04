@@ -16,7 +16,6 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.jobservices.CameraUploadStarterService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
-import mega.privacy.android.app.jobservices.DaemonService;
 import nz.mega.sdk.MegaApiJava;
 
 @TargetApi(21)
@@ -52,25 +51,6 @@ public class JobUtil {
     public static int restart(Context context) {
         stopRunningCameraUploadService(context);
         return scheduleCUJob(context);
-    }
-
-    public static synchronized int startDaemon(Context context) {
-        log("startDaemon");
-        if (isJobScheduled(context,DAEMON_JOB_ID)) {
-            return START_JOB_FAILED;
-        }
-        JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(DAEMON_JOB_ID,new ComponentName(context,DaemonService.class));
-            jobInfoBuilder.setPeriodic(DAEMON_INTERVAL);
-            jobInfoBuilder.setPersisted(true);
-            jobInfoBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-            int result = jobScheduler.schedule(jobInfoBuilder.build());
-            log("daemon scheduled successfully");
-            return result;
-        }
-        log("schedule daemon failed");
-        return START_JOB_FAILED;
     }
 
     public static synchronized int scheduleCUJob(Context context) {
