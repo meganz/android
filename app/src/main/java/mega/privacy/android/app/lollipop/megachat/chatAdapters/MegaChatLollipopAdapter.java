@@ -8367,11 +8367,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         boolean isRemoved = false;
         if((removedMessages!=null)&&(removedMessages.size()>0)){
             for(RemovedMessage removeMsg:removedMessages){
-                if(removeMsg.getMsgId() == message.getMsgId()){
-                    if(removeMsg.getMsgTempId() == message.getTempId()){
-                        isRemoved = true;
-                        break;
-                    }
+                if(removeMsg.getMsgId() == message.getMsgId() && removeMsg.getMsgTempId() == message.getTempId()){
+                    isRemoved = true;
+                    break;
                 }
             }
         }
