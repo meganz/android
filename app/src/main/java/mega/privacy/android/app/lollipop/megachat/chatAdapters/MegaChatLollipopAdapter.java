@@ -122,7 +122,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static int MAX_WIDTH_MESSAGE_LAND = 310;
     public static int MAX_WIDTH_MESSAGE_PORT = 275;
 
-    public static int EMOJI_SIZE_LAND = 30;
+    public static int EMOJI_SIZE_LAND = 20;
     public static int EMOJI_SIZE_PORT = 20;
 
 
@@ -1060,10 +1060,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
                 holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
                 holder.nameContactText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_NAME_LAND, outMetrics));
-                holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_LAND, outMetrics));
+                holder.contactManagementMessageText.setEmojiSize(Util.px2dp(EMOJI_SIZE_LAND, outMetrics));
                 holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
                 holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_LAND, outMetrics));
-                holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_LAND, outMetrics));
+                holder.ownManagementMessageText.setEmojiSize(Util.px2dp(EMOJI_SIZE_LAND, outMetrics));
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
                 holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
             } else {
@@ -1077,12 +1077,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
                 holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
                 holder.nameContactText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_NAME_PORT, outMetrics));
-                holder.contactManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_PORT, outMetrics));
+                holder.contactManagementMessageText.setEmojiSize(Util.px2dp(EMOJI_SIZE_PORT, outMetrics));
                 holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
                 holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
                 holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_MESSAGE_PORT, outMetrics));
                 holder.ownManagementMessageText.setEmojiSize(Util.scaleWidthPx(EMOJI_SIZE_PORT, outMetrics));
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.px2dp(CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
                 holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
             }
 
