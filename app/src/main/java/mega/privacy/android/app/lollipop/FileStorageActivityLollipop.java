@@ -504,8 +504,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		    path = new File(sdRoot);
         }
 
-		if (cameraFolderSettings){
-			if (Environment.getExternalStorageDirectory() != null){
+		if (cameraFolderSettings) {
+			if (Environment.getExternalStorageDirectory() != null) {
 				path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 			}
 		}
