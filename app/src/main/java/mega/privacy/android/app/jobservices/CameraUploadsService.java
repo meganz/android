@@ -1657,7 +1657,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
             String title = getString(R.string.title_compression_size_over_limit);
             String size = prefs.getChargingOnSize();
-            String message = getString(R.string.message_compression_size_over_limit).replace("$size",size);
+            String message = getString(R.string.message_compression_size_over_limit, size + getString(R.string.label_file_size_mega_byte));
             showNotification(title,message,pendingIntent,true);
         }
         
