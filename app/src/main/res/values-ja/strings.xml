@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">回復キーをクリップボードにコピーするかテキストファイルとして保存します</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">保存</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">回復キーが正常にクリップボードにコピーされました</string>
 
     <string name="change_pass" context="Button to change the password">変更する</string>
 
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">写真、メディア、ファイルへのアクセスを許可します。</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">写真、メディア、ファイルを共有するには、MEGAはあなたの許可が必要です。</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">カメラを有効にする</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">あなたのカメラへのアクセスを許可して、ドキュメントのスキャン、写真の撮影、ビデオ通話を行います。</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">通話を有効にする</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">あなたのマイクへのアクセスを許可して、暗号化通話を行います。</string>
     <string name="general_enable_access" context="General enable access">アクセスを有効にする</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">共有ファイル</string>
 
@@ -2364,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d個のメッセージが%dチャットに送信されませんでした</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d個のメッセージが%d個のチャットに送信されませんでした</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">コンテンツが%dチャットに送信されませんでした</string>
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B]さんがグループチャットに参加しました。[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">この会話は、一度削除されるとチャットリンクからアクセスできなくなります。</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">暗号化されたキーローテーションでは、新規グループチャットを作成せずにチャットリンクを取得することはできません。</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">新規グループチャットを作成してチャットリンクを取得しますか？　</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
 

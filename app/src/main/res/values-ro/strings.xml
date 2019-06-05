@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copiază cheia de recuperare în clipboard sau salveaz-o ca fișier text</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Salvează</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Cheia de recuperare a fost copiată cu succes în clipboard</string>
 
     <string name="change_pass" context="Button to change the password">Schimbă</string>
 
@@ -1453,8 +1453,8 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Afișează informații</string>
 
-    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
-    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+    <string name="context_link_removal_error" context="error message">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</string>
+    <string name="context_link_action_error" context="error message">Acțiunea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Scrie e-mailul utilizatorului</string>
 
@@ -1685,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">A apărut o eroare la încercarea de descărcare a fișierului QR. Poate fișierul nu există. Te rugăm să încerci din nou mai târziu.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">Codul QR a fost descărcat cu succes în %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invitație netrimisă</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">Codul QR sau linkul de contact este nevalid. Te rugăm să încerci să scanezi un cod valid sau să deschizi un link valid.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">Invitația nu a fost trimisă. %s este deja în lista de contacte.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">Invitația nu a fost trimisă. A apărut o eroare la procesarea acesteia.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Se generează codul QR&#8230;</string>
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Permite accesul la fotografii, conținut media și fișiere.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Pentru a partaja fotografii, conținut media și fișiere, MEGA are nevoie de permisiunea ta.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activează camera</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activează apelurile</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <string name="general_enable_access" context="General enable access">Activează accesul</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fișiere partajate</string>
 
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] s-a alăturat chatului de grup.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Această conversație nu va mai fi accesibilă prin linkul chatului odată ce acesta a fost eliminat.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Rotația cheii criptate nu îți permite să obții un link de chat fără a crea un nou chat de grup.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Vrei să creezi un nou chat de grup și să obții un link al chatului?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotația cheii este puțin mai sigură, dar nu îți permite să creezi un link al chatului, iar noii participanți nu vor vedea mesajele din trecut.</string>
 
