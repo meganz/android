@@ -406,10 +406,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     public void showSnackbar(View view, String s){
         if (view == null) {
-            showSnackbar(drawerLayout, s);
+            showSnackbar(Constants.SNACKBAR_TYPE, drawerLayout, s);
         }
         else {
-            showSnackbar(view, s);
+            showSnackbar(Constants.SNACKBAR_TYPE, view, s);
         }
     }
 
