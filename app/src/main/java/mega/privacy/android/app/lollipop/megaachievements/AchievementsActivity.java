@@ -229,11 +229,9 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
         else{

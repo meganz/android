@@ -843,14 +843,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			log("none");
 		}
 	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-		super.callToSuperBack = true;
-		super.onBackPressed();
-	}
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 

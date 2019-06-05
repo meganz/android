@@ -152,6 +152,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
+			
 		}
 
 		if (megaChatApi == null){
@@ -830,13 +831,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		}
 		intent.putExtra("messageIds", array);
 		startActivity(intent);
-	}
-
-	@Override
-	public void onBackPressed() {
-		log("onBackPressed");
-		super.callToSuperBack = true;
-		super.onBackPressed();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1759,6 +1753,10 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, container, s);
 	}
+    
+    public void showSnackbar(int type, String s,int chatId){
+        showSnackbar(type, container, s, chatId);
+    }
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
 		log("askSizeConfirmationBeforeChatDownload");

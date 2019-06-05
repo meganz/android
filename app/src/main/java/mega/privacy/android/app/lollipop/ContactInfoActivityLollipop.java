@@ -1854,12 +1854,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void onBackPressed() {
-		super.callToSuperBack = true;
-		super.onBackPressed();
-	}
-
-	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
 	}
