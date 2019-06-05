@@ -1608,7 +1608,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
         fabImageGroup = (FloatingActionButton) findViewById(R.id.image_group_floating_button);
         nameGroup = (EmojiEditText) findViewById(R.id.name_group_edittext);
-        nameGroup.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
+        nameGroup.setEmojiSize(Util.px2dp(15, outMetrics));
         nameGroup.setFilters(new InputFilter[] {new InputFilter.LengthFilter(MAX_ALLOWED_CHARACTERS_AND_EMOJIS)});
 
         nameGroup.setOnLongClickListener(new View.OnLongClickListener() {

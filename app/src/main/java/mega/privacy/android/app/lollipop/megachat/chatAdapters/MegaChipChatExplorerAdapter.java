@@ -99,11 +99,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
         holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
 
         holder.textViewName = (EmojiTextView) v.findViewById(R.id.name_chip);
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            holder.textViewName.setEmojiSize(Util.scaleWidthPx(5, outMetrics));
-        }else{
-            holder.textViewName.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-        }
+        holder.textViewName.setEmojiSize(Util.px2dp(10, outMetrics));
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
 
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);

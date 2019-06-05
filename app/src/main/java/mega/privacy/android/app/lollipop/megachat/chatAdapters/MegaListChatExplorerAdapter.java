@@ -133,16 +133,10 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.lastSeenStateText = (MarqueeTextView) v.findViewById(R.id.chat_explorer_list_last_seen_state);
         holder.participantsText = (TextView) v.findViewById(R.id.chat_explorer_list_participants);
 
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            holder.titleText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-            holder.initialLetter.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-        }else{
-            holder.titleText.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-            holder.initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
-        }
+        holder.titleText.setEmojiSize(Util.px2dp(20, outMetrics));
+        holder.initialLetter.setEmojiSize(Util.px2dp(30, outMetrics));
 
         v.setTag(holder);
-
         return holder;
     }
 
