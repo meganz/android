@@ -2266,7 +2266,7 @@
 	<string name="message_compression_size_over_limit" context="display when compression larger than setting">The total size of the videos to convert exceeds %s, please plug in your device to continue.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
 	<string name="message_compress_video" context="Notification message when compressiong video to show the converted percentage. Please, keep the placeholder because it for add the percentage value in runtime.">%1$d%2$s has been compressed </string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos</string>
+	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
     <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">

@@ -631,6 +631,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 						default:{
 							fileUpload = getString(R.string.settings_camera_upload_only_photos);
 							cameraUploadWhat.setValueIndex(0);
+                            disableVideoQualitySettings();
 							break;
 						}
 					}
@@ -2807,14 +2808,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         fileUpload = getString(R.string.settings_camera_upload_only_photos);
         cameraUploadWhat.setValueIndex(0);
 
-        if(isDeviceSupportCompression()){
-            enableVideoQualitySettings();
-        }else{
-            disableVideoQualitySettings();
-            dbH.setCameraUploadVideoQuality(ORIGINAL);
-            dbH.setConversionOnCharging(false);
-            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-        }
+        disableVideoQualitySettings();
+        dbH.setCameraUploadVideoQuality(ORIGINAL);
+        dbH.setConversionOnCharging(false);
+        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
 
         dbH.setCamSyncWifi(true);
         wifi = getString(R.string.cam_sync_wifi);
@@ -3035,6 +3032,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
     private void enableVideoQualitySettings(){
 	    if(isDeviceSupportCompression()){
             cameraUploadCategory.addPreference(videoQuality);
+            prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
             dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
             videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
             videoQuality.setSummary(videoQuality.getEntry());

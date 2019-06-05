@@ -73,6 +73,7 @@ import static mega.privacy.android.app.jobservices.SyncRecord.TYPE_ANY;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLIS;
+import static mega.privacy.android.app.utils.Util.context;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
     
@@ -247,9 +248,12 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void registerNetworkTypeChangeReceiver() {
+        if(receiver != null) {
+            unregisterReceiver(receiver);
+        }
         receiver = new NetworkTypeChangeReceiver();
-        registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
         receiver.setCallback(this);
+        registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
     
     private Thread createWorkerThread() {
@@ -1184,7 +1188,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
-        tempRoot = new File(getCacheDir(),CU_CACHE_FOLDER).getAbsolutePath();
+        tempRoot = new File(getCacheDir(),CU_CACHE_FOLDER).getAbsolutePath() + File.separator;
         File root = new File(tempRoot);
         if (!root.exists()) {
             root.mkdirs();
@@ -1629,7 +1633,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         totalUploaded = 0;
         totalToUpload = 0;
         
-        mVideoCompressor = new VideoCompressor(getApplicationContext(),CameraUploadsService.this);
+        mVideoCompressor = new VideoCompressor(this,this);
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
@@ -1680,10 +1684,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         showNotification(title,message,pendingIntent,true);
     }
     
-    public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
+    public synchronized void onCompressUpdateProgress(int progress) {
         if (!canceled) {
             String message =  getString(R.string.message_compress_video,progress,"%");
-            String subText = getString(R.string.title_compress_video) + " " + currentIndexString;
+            String subText = context.getString(R.string.title_compress_video, mVideoCompressor.getCurrentFileIndex(),mVideoCompressor.getTotalCount());
             showProgressNotification(progress,mPendingIntent,message,subText,"");
         }
     }
@@ -1705,7 +1709,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         File srcFile = new File(localPath);
         if (srcFile.exists()) {
             StatFs stat = new StatFs(tempRoot);
-            double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+            double availableFreeSpace = stat.getAvailableBytes();
             if (availableFreeSpace > srcFile.length()) {
                 log("can not compress but got enough disk space, so should be un-supported format issue");
                 String newPath = record.getNewPath();

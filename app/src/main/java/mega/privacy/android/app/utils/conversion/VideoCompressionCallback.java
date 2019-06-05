@@ -4,7 +4,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 
 public interface VideoCompressionCallback {
 
-    void onCompressUpdateProgress(int progress,String currentIndexString);
+    void onCompressUpdateProgress(int progress);
     
     void onCompressSuccessful(SyncRecord record);
     
