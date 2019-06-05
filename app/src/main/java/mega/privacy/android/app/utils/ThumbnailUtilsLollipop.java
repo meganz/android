@@ -75,7 +75,8 @@ public class ThumbnailUtilsLollipop {
 	public static File thumbDir;
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
-	
+	public static Boolean isDeviceMemoryLow = false;
+
 	static HashMap<Long, ThumbnailDownloadListenerListBrowser> listenersList = new HashMap<Long, ThumbnailDownloadListenerListBrowser>();
 	static HashMap<Long, ThumbnailDownloadListenerGridBrowser> listenersGrid = new HashMap<Long, ThumbnailDownloadListenerGridBrowser>();
 	static HashMap<Long, ThumbnailDownloadListenerExplorerLollipop> listenersExplorerLollipop = new HashMap<Long, ThumbnailDownloadListenerExplorerLollipop>();
@@ -385,7 +386,7 @@ public class ThumbnailUtilsLollipop {
 
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
-							final Bitmap bitmap = getBitmapForCache(thumb, context);
+							final Bitmap bitmap = getBitmapForCacheForList(thumb, context);
 							if (bitmap != null) {
 								thumbnailCache.put(handle, bitmap);
 								if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
@@ -962,6 +963,15 @@ public class ThumbnailUtilsLollipop {
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
 	}
+    
+    private static Bitmap getBitmapForCacheForList(File bmpFile, Context context) {
+        if(isDeviceMemoryLow){
+            return null;
+        }
+        BitmapFactory.Options bOpts = new BitmapFactory.Options();
+        Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
+        return bmp;
+    }
 	
 	public static class ResizerParams {
 		File file;
