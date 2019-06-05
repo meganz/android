@@ -46,7 +46,7 @@
 
                         <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/title_toolbar"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:fontFamily="sans-serif-light"
@@ -56,7 +56,7 @@
                             android:textSize="20sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:layout_toLeftOf="@+id/icons_layout"
+                            android:layout_alignParentLeft="true"
                             android:ellipsize="end"/>
 
                         <LinearLayout
@@ -64,7 +64,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_alignParentRight="true"
+                            android:layout_toRightOf="@id/title_toolbar"
                             android:layout_alignParentTop="true">
 
                             <ImageView

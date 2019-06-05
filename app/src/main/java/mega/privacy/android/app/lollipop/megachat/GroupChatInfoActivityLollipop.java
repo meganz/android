@@ -272,16 +272,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             //Info Layout
             avatarImageView = (RoundedImageView) findViewById(R.id.chat_group_properties_thumbnail);
             initialLetter = (EmojiTextView) findViewById(R.id.chat_group_properties_initial_letter);
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                initialLetter.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-            }else{
-                initialLetter.setEmojiSize(Util.scaleWidthPx(30, outMetrics));
-            }
             if (chat.getTitle().length() > 0){
                 String firstLetter = ChatUtil.getFirstLetter(chat.getTitle());
                 initialLetter.setText(firstLetter);
             }
-
+            initialLetter.setEmojiSize(Util.px2dp(30, outMetrics));
             createGroupChatAvatar();
 
             infoLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_info_layout);
@@ -295,18 +290,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             infoTitleChatText = (EmojiTextView) findViewById(R.id.chat_group_contact_properties_info_title);
             infoTitleChatText.setText(chat.getTitle());
+            infoTitleChatText.setEmojiSize(Util.px2dp(20, outMetrics));
+
             infoNumParticipantsText = (TextView) findViewById(R.id.chat_group_contact_properties_info_participants);
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                infoTitleChatText.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-            }else{
-                infoTitleChatText.setEmojiSize(Util.scaleWidthPx(15, outMetrics));
-            }
 
             editImageView = (ImageView) findViewById(R.id.chat_group_contact_properties_edit_icon);
             editImageView.setOnClickListener(this);
 
             //Notifications Layout
-
             notificationsLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_notifications_layout);
             notificationsLayout.setVisibility(View.VISIBLE);
 

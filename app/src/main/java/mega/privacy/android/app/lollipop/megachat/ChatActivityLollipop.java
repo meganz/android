@@ -494,12 +494,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         toolbarElementsInside = (RelativeLayout) findViewById(R.id.toolbar_elements_inside);
         titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            titleToolbar.setEmojiSize(Util.scaleWidthPx(12, outMetrics));
-        }else{
-            titleToolbar.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-        }
+        titleToolbar.setEmojiSize(Util.px2dp(20, outMetrics));
 
         individualSubtitleToobar = (MarqueeTextView) tB.findViewById(R.id.individual_subtitle_toolbar);
         groupalSubtitleToolbar = (TextView) tB.findViewById(R.id.groupal_subtitle_toolbar);
@@ -560,11 +555,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            textChat.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
-        }else{
-            textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
-        }
+        textChat.setEmojiSize(Util.px2dp(20, outMetrics));
 
         emojiKeyboard = (EmojiKeyboard)findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
