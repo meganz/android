@@ -6378,9 +6378,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
-        ChatUtil.activateChrono(false, subtitleChronoCall, null);
         hideCallInProgressLayout(null);
-
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
 
         super.onDestroy();
@@ -7216,6 +7214,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call){
+        log("showCallInProgressLayout");
+
         if(callInProgressLayout.getVisibility() == View.VISIBLE) return;
         callInProgressLayout.setVisibility(View.VISIBLE);
         callInProgressLayout.setOnClickListener(this);
@@ -7224,14 +7224,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
     private void hideCallInProgressLayout(MegaChatCall call){
+        log("hideCallInProgressLayout");
         if (callInProgressLayout.getVisibility() == View.GONE)  return;
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressLayout.setOnClickListener(null);
         ChatUtil.activateChrono(false, callInProgressChrono, call);
-
         setSubtitleVisibility();
         ChatUtil.activateChrono(false, subtitleChronoCall, call);
-        hideCallInProgressLayout(call);
         invalidateOptionsMenu();
     }
 
@@ -7254,9 +7253,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     case MegaChatCall.CALL_STATUS_DESTROYED: {
                         setSubtitleVisibility();
-                        ChatUtil.activateChrono(false, subtitleChronoCall, call);
                         hideCallInProgressLayout(call);
-                        invalidateOptionsMenu();
                         break;
                     }
 
@@ -7300,21 +7297,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 showCallInProgressLayout(textLayout, false, call);
-                usersWithVideo();
 
             }else{
                 //Individual:
                 log("showCallLayout: USER_NO_PRESENT || RING_IN - Individual");
-                ChatUtil.activateChrono(false, subtitleChronoCall, call);
                 hideCallInProgressLayout(call);
             }
 
         }else if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
             log("showCallLayout: REQUEST_SENT");
 
-            ChatUtil.activateChrono(false, subtitleChronoCall, call);
-            log("showCallLayout: call layout status in this chat");
             if(MegaApplication.getCallLayoutStatus(idChat)){
+                ChatUtil.activateChrono(false, subtitleChronoCall, call);
                 showCallInProgressLayout(getString(R.string.call_in_progress_layout), false, call);
             }else{
                 hideCallInProgressLayout(call);
