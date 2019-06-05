@@ -35,6 +35,7 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
@@ -189,7 +190,14 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
     }
 
     public void checkScroll () {
+        if (listView == null) return;
 
+        if ((listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE)) {
+            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+        }
+        else {
+            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+        }
     }
 
     public int onBackPressed() {
