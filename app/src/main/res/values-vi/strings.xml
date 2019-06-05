@@ -1685,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Lỗi phát sinh trong quá trình tải về tệp tin ảnh mã QR. Có thể tệp tin không còn tồn tại nữa. Xin thử lại sau.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">Mã ảnh QR đã được tải về tới vị trí %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Lời mời chưa được gửi</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">Mã QR hoặc đường liên kết tên liên lạc không hợp lệ. Xin thử quét mã khác hoặc đường liên kết phù hợp.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">Lời mời không gửi đi được. %s đã có tên trong liên lạc.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">Thư mời không gửi được. Có lỗi phát sinh.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Đang tạo ra mã ảnh QR&#8230;</string>
@@ -2133,16 +2133,16 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Để tắt Lịch Dọn Dẹp Thùng Rác hay gia hạn chờ thời gian tự dọn dẹp được lâu hơn, tài khoản cần phải nâng cấp lên hạng PRO.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">ngày</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Lấy đường liên kết tới Cuộc Chát</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Quản lý liên kết cuộc chát</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Bật Luân Phiên Mã Khóa</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] vừa tạo đường liên kết tới cuộc chát.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] đã xóa đường liên kết tới cuộc chát.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Xóa đường liên kết tới cuộc chát</string>
 
     <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Việc này sẽ đăng xuất tài khoản ra khỏi tất cả các thiết bị ngoại trừ phiên hiện hành này.</string>
@@ -2154,25 +2154,25 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Theo Dõi</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Lỗi tải tới đường liên kết chát.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Lỗi khởi tạo chát phát sinh khi tải đường liên kết cuộc chát.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Bạn đang cố thử xem qua tổng quan của phòng chát mà bạn đã từng là thành viên. Bạn có muốn tham gia vào lại phòng chát hay không?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Bạn đã là thành viên trong cuộc chát này.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] đã bật luân phiên mã khóa.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Cuộc trò chuyện này không còn tồn tại nữa</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Đường liên kết chát không hợp lệ</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Luân Phiên Mã Khóa</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
-    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
+    <string name="action_open_chat_link" context="Menu item">Mở đường liên kết tới chát</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Lời mời đã được gửi tới %s trước đây rồi. Theo dõi tình trạng của lời mời trong phần Yêu Cầu Gửi Đi.</string>
 
@@ -2285,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Trước khi tạo ra đường liên kết tới cuộc chát này, chủ đề phòng chát cần phải được chọn trước:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Đường liên kết tới chát đã được ghi vào bộ nhớ</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Giá từ[/A] %s / [A]tháng[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Các gói thuê bao tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
@@ -2364,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d tin nhắn chưa được gửi tới %d cuộc chát thành công</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d tin nhắn chưa được gửi tới %d cuộc chát thành công</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Nội dung chưa được gửi tới %d cuộc chát thành công</string>
@@ -2375,11 +2375,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Lỗi. Tệp tin chưa gửi được tới cuộc chat đã chọn.</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Không có[/A] [B]Mục nào[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
+    <string name="delete_versions" context="Action delete all file versions">Xoá các phiên bản cũ</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Xóa các phiên bản cũ?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Xin lưu ý rằng tệp tin hiện hành trong tài khoản sẽ không bị xóa đi.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Các phiên bản cũ đã được xóa.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Các phiên bản cũ chưa xóa xong.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d phiên bản đã được xóa thành công</item>
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] đã tham gia vào nhóm chát.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Luân Phiên Mã Khóa sẽ không cho phép bạn đi vào liên kết tới chát mà bỏ qua việc tạo cuộc chát mới.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Luân phiên mã khóa giúp cho việc an ninh được nâng cấp hơn, nhưng sẽ không cho phép bất kỳ ai tạo ra đường liên kết tới cuộc chát và người mới tham gia vào chát sẽ không thấy các tin nhắn diễn ra từ trước.</string>
 

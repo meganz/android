@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copier la clé de récupération dans le presse-papiers ou l\'enregistrer comme fichier texte.</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Enregistrer</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La clé de récupération été copiée avec succès dans le presse-papiers</string>
 
     <string name="change_pass" context="Button to change the password">Modifier</string>
 
@@ -1685,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Une erreur est survenue en tentant de télécharger le fichier QR. Le fichier n\'existe peut-être pas. Veuillez ressayer ultérieurement.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">Le code QR a été téléchargé avec succès sur %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">L\'invitation n\'a pas été envoyée</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">Le code QR ou le lien de contact est invalide. Veuillez essayer de balayer un code valide ou d\'ouvrir un lien valide.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">L\'invitation n\'a pas été envoyée. %s est déjà dans votre liste de contacts.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">L\'invitation n\'a pas été envoyée. Une erreur est survenue lors de son traitement.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Création du code QR&#8230;</string>
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Autoriser l\'accès aux photos, aux médias et aux fichiers</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Pour partager des photos, des médias et des fichiers, MEGA a besoin de votre autorisation.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activer l\'appareil photo</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Autorisez l\'accès à votre appareil photo pour numériser des documents, prendre des photos et faire des appels vidéo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Autoriser les appels</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Autorisez l\'accès à votre microphone pour faire des appels chiffrés.</string>
     <string name="general_enable_access" context="General enable access">Autoriser l\'accès</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Fichiers partagés</string>
 
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] s\'est joint à la conversation de groupe.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Le lien vers la conversation ne permettra plus d\'y accéder une fois qu\'il aura été supprimé.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">La rotation de la clé chiffrée ne vous permet pas d\'obtenir de lien vers une conversation sans en créer une nouvelle.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Souhaitez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est légèrement plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
 

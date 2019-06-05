@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copie a chave de recuperação à área de transferência ou salve-a como um arquivo de texto</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Salvar</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">A chave de recuperação foi copiada para a área de transferência</string>
 
     <string name="change_pass" context="Button to change the password">Alterar</string>
 
@@ -1453,8 +1453,8 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Mostrar informações</string>
 
-    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
-    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+    <string name="context_link_removal_error" context="error message">Não foi possível remover o link. Por favor, tente novamente mais tarde.</string>
+    <string name="context_link_action_error" context="error message">Não foi possível acessar o link. Por favor, tente novamente mais tarde.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Escreva e-mail do usuário</string>
 
@@ -1685,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Ocorreu um erro ao tentar baixar o arquivo QR. Talvez o arquivo não exista. Por favor, tente novamente mais tarde.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">O código QR foi salvo em %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Convite não enviado.</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">O código QR ou o link de contato é inválido. Por favor, tente escanear um código válido ou acessar um link válido.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">O convite não foi enviado. %s já está na sua lista de contatos.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">O convite não foi enviado. Ocorreu um erro ao processá-lo.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Gerando o código QR&#8230;</string>
@@ -2139,8 +2139,8 @@
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Ativar a rotação da chave de criptografia</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] criou um link para o chat.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deletou o link do chat.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
@@ -2154,25 +2154,25 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Expectadores</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Não foi possível carregar o link do chat.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Não foi possível carregar o link do chat.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Você está tentando visualizar um chat do qual você já participou. Você quer se unir ao chat novamente?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Você já está participando deste chat.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">A visualização deste chat já não está disponível. Se você sair da visualização, não será possível reabri-la.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ativou a rotação da chave de criptografia.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Já não é possível acessar este chat</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Link de chat inválido</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotação da chave de criptografia</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
-    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
+    <string name="action_open_chat_link" context="Menu item">Abrir o link do chat</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">A solicitação de contato a %s já foi enviada anteriormente e pode ser consultada na aba Solicitações enviadas.</string>
 
@@ -2285,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Antes de poder gerar um link para este chat, você precisa adicionar uma descrição:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Link do chat copiado para a área de transferência</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]A partir de[/A] %s [A]por mês[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* A assinatura pode ser cancelada em qualquer momento antes da data de renovação.</string>
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Permitir acesso a fotos, arquivos multimídia e outros arquivos.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">O MEGA precisa de sua permissão para compartilhar otos, arquivos multimídia e outros arquivos.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Ativar câmera</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permita o acesso à sua câmera para escanear documentos, tirar fotos e fazer videochamadas.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Ativar chamadas</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permitir acesso ao seu microfone para fazer chamadas criptografadas.</string>
     <string name="general_enable_access" context="General enable access">Permitir acesso</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Arquivos compartilhados</string>
 
@@ -2364,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d mensagem não foi enviada para %d chats</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d mensagens não foram enviadas para %d chats</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">O conteúdo não foi enviado para %d chats</string>
@@ -2375,11 +2375,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Erro. O arquivo não foi enviado a nenhum dos chats selecionados.</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Não há[/A] [B]items[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
+    <string name="delete_versions" context="Action delete all file versions">Deletar versões anteriores</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Deletar versões anteriores?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Tenha em mente que o arquivo atual não será deletado.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">As versões anteriores foram deletadas.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Não foi possível deletar as versões anteriores.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d versão foi deletada</item>
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] se uniu ao chat de grupo.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Se o link for eliminado, este chat já não poderá ser acessado usando-o.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">A rotação da chave de criptografia não permite que você obtenha um link do chat sem criar um novo chat em grupo.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Você quer criar um novo chat de grupo e obter um link do chat?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
 

@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Skopiuj klucz do schowka i zapisz jako plik tekstowy</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Zapisz</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Klucz odzyskiwania został pomyślnie skopiowany do schowka</string>
 
     <string name="change_pass" context="Button to change the password">Zmień</string>
 
@@ -1453,8 +1453,8 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Pokaż info</string>
 
-    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
-    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+    <string name="context_link_removal_error" context="error message">Usunięcie linku nie powiodło się. Spróbuj ponownie później.</string>
+    <string name="context_link_action_error" context="error message">Działanie łącza nie powiodło się. Spróbuj ponownie później.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Wpisz adres e-mail użytkownika</string>
 
@@ -1685,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Wystąpił błąd podczas pobieranie pliku z kodu QR. prawdopodobnie plik nie istnieje. Spróbuj ponownie.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">Kod QR został pobrany do %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Zaproszenie nie zostało wysłane</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">Kod QR lub link do kontaktu jest nieprawidłowy. Spróbuj zeskanować prawidłowy kod lub otworzyć prawidłowy link.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">Zaproszenie nie zostało wysłane. %s jest już na liście Twoich kontaktów.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">Zaproszenie nie zostało wysłane. Wystąpił błąd podczas przetwarzania.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generowanie kodu QR&#8230;</string>
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Zezwalaj na dostęp do zdjęć, multimediów i plików.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Aby udostępnić zdjęcia, multimedia i pliki, MEGA potrzebuje twojej zgody.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Włącz kamerę</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Umożliwia dostęp do aparatu w celu skanowania dokumentów, robienia zdjęć i wykonywania połączeń wideo.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Włącz połączenia</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Zezwalaj na dostęp do mikrofonu, aby wykonywać połączenia szyfrowane.</string>
     <string name="general_enable_access" context="General enable access">Włącz dostęp</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Udostępnione pliki</string>
 

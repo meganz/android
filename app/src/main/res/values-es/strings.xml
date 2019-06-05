@@ -653,7 +653,7 @@
 
 
 
-	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancelar cuenta</string>
+    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancelar cuenta</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actualmente en uso %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando</string>
@@ -2133,14 +2133,14 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Para desactivar la limpieza automática de la papelera o establecer un período de retención más largo, hazte PRO.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">días</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obtener enlace del chat</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gestionar enlace del chat</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Activar rotación de la clave de cifrado</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">La rotación de la clave es ligeramente más segura, pero no podrás crear un enlace del chat y los nuevos participantes no verán los mensajes anteriores.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] ha creado un enlace del chat.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ha eliminado un enlace del chat.[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
@@ -2154,25 +2154,25 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Expectadores</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">No se ha podido cargar el enlace del chat.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">No se ha podido empezar el chat al cargar el enlace del chat.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Estás intentando obtener una vista previa de un chat del que anteriormente eras miembro. ¿Quieres volver a unirte al chat?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Ya eres miembro de este chat.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Esta vista previa del chat ya no está disponible. Si abandonas la vista previa, no podrás volver a abrirla.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Esta conversación ya no está disponible.</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Enlace del chat invalido</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotación de la clave de cifrado</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">La rotación de la clave es ligeramente más segura, pero no podrás crear un enlace del chat y los nuevos participantes no verán los mensajes anteriores.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">La rotación de la clave es ligeramente más segura, pero no podrás crear un enlace del chat y los nuevos participantes no verán los mensajes anteriores.</string>
-    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
+    <string name="action_open_chat_link" context="Menu item">Abrir enlace del chat</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">La invitación para %s se ha enviado anteriormente y se puede consultar en la pestaña Solicitudes enviadas.</string>
 
@@ -2285,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Enlace del chat copiado al portapapeles</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Desde[/A] %s / [A]mes[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* la suscripción automática se puede cancelar en cualquier momento antes de la fecha de renovación.</string>
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Activar acceso a fotos, archivos multimedia y archivos.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">MEGA necesita tu permiso para que puedas compartir fotos, archivos multimedia y archivos.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Activar cámara</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Permite el acceso a la cámara para escanear documentos, hacer fotos y videollamadas.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Activar llamadas</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Permite al acceso al micrófono para realizar llamadas cifradas.</string>
     <string name="general_enable_access" context="General enable access">Permite acceso</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Archivos compartidos</string>
 
@@ -2364,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">No se ha podido enviar %d mensaje a %d chats</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">No se han podido enviar %d mensajes a %d chats</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">No se ha podido enviar el contenido a %d chats</string>
@@ -2375,11 +2375,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Error. El archivo no se ha enviado a ninguno de los chats seleccionados</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]No hay[/A] [B]elementos[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
+    <string name="delete_versions" context="Action delete all file versions">Eliminar versiones anteriores</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">¿Quieres eliminar las versiones anteriores?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Ten en cuenta que el archivo actual no se eliminará.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Se han eliminado las versiones anteriores.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">No se han podido eliminar las versiones anteriores.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">Se ha eliminado %d  versión</item>
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] se ha unido al chat de grupo.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">No se podrá acceder a esta conversación a través del enlace del chat una vez que se haya eliminado.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">La rotación de la clave de cifrado no te permite obtener un enlace del chat sin crear un nuevo chat de grupo.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">¿Quieres crear un nuevo chat de grupo y obtener un enlace del chat?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotación de la clave es ligeramente más segura, pero no podrás crear un enlace del chat y los nuevos participantes no verán los mensajes anteriores.</string>
 

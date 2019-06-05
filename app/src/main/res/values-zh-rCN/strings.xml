@@ -2133,18 +2133,18 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">如果您想要禁用垃圾桶定时清理或设置延长保留期限，您需要订阅PRO计划。</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">天</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Enable Encrypted Key Rotation</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a chat link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the chat link.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete chat link</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">您将退出除当前活动以外的所有其他活动会话。</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">您想要关闭所有会话吗？</string>
 
@@ -2154,25 +2154,25 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Observers</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the chat link.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the chat link.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were previously a member of. Do you want to join the chat again?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is no longer available. If you leave the preview, you won’t be able to reopen it.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid chat link</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
-    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
+    <string name="action_open_chat_link" context="Menu item">Open chat link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">邀请已发送至联系人%s，可在‘发送请求\'选项卡中查阅。</string>
 
@@ -2285,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">您可以为聊天生成一个链接，但在此之前您需要先设置话题：</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]从[/A] %s / [A]月[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">续订期间可以随时取消定期计划</string>
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Allow access to photos, media and files.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">To share photos, media and files MEGA needs your permission.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Enable camera</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Allow access to your camera to scan documents, take pictures and make video calls.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Enable calls</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Allow access to your microphone to make encrypted calls.</string>
     <string name="general_enable_access" context="General enable access">Enable access</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">已共享文件</string>
 
@@ -2364,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d message was not sent to %d chats</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages were not sent to %d chats</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a chat link?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
 

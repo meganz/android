@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">복구 키를 클립보드에 복사하거나 텍스트 파일로 저장하세요</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">저장</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">복구 키가 성공적으로 클립보드에 복사되었습니다</string>
 
     <string name="change_pass" context="Button to change the password">변경</string>
 
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">사진, 미디어 그리고 파일에 대한 접근 허용</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">사진, 미디어와 파일을 공유하려면 MEGA는 당신의 허가가 필요합니다.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">카메라 활성화</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">문서 스캔, 사진 촬영 그리고 영상 통화를 하려면 당신의 카메라에 대한 접근을 허용하세요.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">통화 활성화</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <string name="general_enable_access" context="General enable access">접근 허용</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">공유된 파일</string>
 
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A]님이[B] 단체 대화에 참여하였습니다.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">대화 링크가 삭제되면 이 대화에 대화 링크를 통하여 참여할 수 없게 됩니다.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">암호화 키 순환은 새 단체 대화를 만드는 것 없이 대화 링크를 만드는 것을 허용하지 않습니다.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">새 단체 대화를 만들고 대화 링크를 생성할까요?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
 

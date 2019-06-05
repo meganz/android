@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Скопируйте ключ восстановления  в буфер обмена или сохраните как текстовый файл</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Сохранить</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Ключ восстановления скопирован в буфер обмена</string>
 
     <string name="change_pass" context="Button to change the password">Изменить</string>
 
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Разрешить доступ к фотографиям, медиа и файлам.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Для обмена фотографиями, медиа и файлами MEGA нужно ваше разрешение.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Разрешить доступ к камере</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Разрешите доступ к камере для сканирования документов, фотографирования и видеозвонков.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Разрешить звонки</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Разрешите доступ к микрофону для зашифрованных звонков.</string>
     <string name="general_enable_access" context="General enable access">Открыть доступ</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Общие файлы</string>
 
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] вошёл в чат.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Беседа больше не будет доступна по ссылке на чат после удаления.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Чередование ключей шифрования не позволяет получить ссылку на чат без создания нового группового чата.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Хотите создать новый групповой чат и получить ссылку на него?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Чередование ключей немного более безопасно, но не позволяет создать ссылку на чат, а новые участники не будут видеть старые сообщения.</string>
 

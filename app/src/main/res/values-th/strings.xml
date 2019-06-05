@@ -852,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">คัดลอกคีย์การกู้คืนไปยังคลิปบอร์ดหรือบันทึกเป็นไฟล์ข้อความ</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">บันทึก</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">คีย์การกู้คืนถูกคัดลอกไปยังคลิปบอร์ดเรียบร้อยแล้ว</string>
 
     <string name="change_pass" context="Button to change the password">เปลี่ยน</string>
 
@@ -1453,8 +1453,8 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">แสดงข้อมูล</string>
 
-    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
-    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
+    <string name="context_link_removal_error" context="error message">การลบลิงก์ล้มเหลว กรุณาลองอีกครั้งในภายหลัง</string>
+    <string name="context_link_action_error" context="error message">การทำงานของลิงก์ล้มเหลว กรุณาลองใหม่อีกครั้งในภายหลัง</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">เขียนอีเมลผู้ใช้</string>
 
@@ -1685,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">เกิดข้อผิดพลาดขณะพยายามดาวน์โหลดไฟล์ QR บางทีไฟล์อาจจะไม่มีอยู่ กรุณาลองใหม่อีกครั้งในภายหลัง</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">คิวอาร์โค้ด ได้ดาวน์โหลดไปยัง %s เรียบร้อยแล้ว</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">ยังไม่ได้ส่งคำเชิญ</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">คิวอาร์โค้ดหรือรายชื่อผู้ติดต่อไม่ถูกต้อง ลองสแกนโค้ดที่ถูกต้องหรือเปิดลิงก์ที่ถูกต้องอีกครั้ง</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">ยังไม่ได้ส่งคำเชิญ %s อยู่ในรายชื่อติดต่อของคุณแล้ว</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">ยังไม่ได้ส่งคำเชิญ เกิดข้อผิดพลาดในการประมวลผล</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">กำลังสร้างคิวอาร์โค้ด&#8230;</string>
@@ -2161,7 +2161,7 @@
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">คุณกำลังพยายามดูตัวอย่างแชทที่คุณเคยเป็นสมาชิก คุณต้องการเข้าร่วมการแชทอีกครั้งหรือไม่</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">คุณได้เข้าร่วมแชทนี้แล้ว</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">ตัวอย่างแชทนี้ไม่สามารถใช้ได้อีกต่อไป หากคุณออกจากหน้าตัวอย่าง คุณจะไม่สามารถเปิดอีกครั้งได้</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ได้เปิดใช้งาน Encrypted Key Rotation[/B]</string>
 
@@ -2301,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">อนุญาตให้เข้าถึงรูปภาพ มีเดียและไฟล์</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">ในการแชร์รูปภาพ สื่อและไฟล์ MEGA ต้องได้รับอนุญาตจากคุณ</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">เปิดใช้งานกล้อง</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">อนุญาตให้เข้าถึงกล้องของคุณเพื่อสแกนเอกสาร ถ่ายภาพและสนทนาทางวิดีโอ</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">เปิดใช้งานการโทร</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">อนุญาตให้เข้าถึงไมโครโฟนของคุณ เพื่อให้โทรแบบเข้ารหัสได้</string>
     <string name="general_enable_access" context="General enable access">เปิดใช้งานการเข้าถึง</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">ไฟล์ที่ใช้ร่วมกัน</string>
 
@@ -2364,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">ข้อความ %d รายการไม่ได้ถูกส่งไปยังแชท %d</item>
-        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
+        <item context="Plural of file. 2 files" quantity="other">ไม่ได้ส่งข้อความ %d ข้อความถึงแชท %d</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">เนื้อหาไม่ได้ถูกส่งไปยังแชท %d</string>
@@ -2416,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] ได้เข้าร่วมแชทกลุ่ม[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">การสนทนานี้จะไม่สามารถเข้าถึงผ่านลิงก์แชทเมื่อถูกลบออกแล้วได้อีกต่อไป</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">การเข้ารหัส Key Rotation ไม่อนุญาตให้คุณรับลิงก์แชทโดยไม่ต้องสร้างแชทกลุ่มใหม่</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">คุณต้องการสร้างแชทกลุ่มใหม่และรับลิงก์แชทหรือไม่</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
 

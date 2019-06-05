@@ -16,6 +16,7 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
+import nz.mega.sdk.MegaUser;
 
 public class MyAccountInfo {
 
@@ -25,6 +26,9 @@ public class MyAccountInfo {
     MegaAccountDetails accountInfo = null;
     BitSet paymentBitSet = null;
     long numberOfSubscriptions = -1;
+    int subscriptionStatus = -1;
+    long subscriptionRenewTime = -1;
+    long proExpirationTime = -1;
     String usedFormatted = "";
     String totalFormatted = "";
     String formattedUsedCloud = "";
@@ -32,6 +36,8 @@ public class MyAccountInfo {
     String formattedUsedIncoming = "";
     String formattedUsedRubbish = "";
     String formattedAvailableSpace = "";
+    String usedTransferFormatted = "";
+    String totalTransferFormatted = "";
     int levelInventory = -1;
     int levelAccountDetails = -1;
 
@@ -68,6 +74,11 @@ public class MyAccountInfo {
     int numVersions = -1;
     long previousVersionsSize = -1;
 
+    public final int hasStorageDetails = 0x01;
+    public final int hasTransferDetails = 0x02;
+    public final int hasProDetails = 0x04;
+    public final int hasSessionsDetails = 0x020;
+
     public MyAccountInfo(Context context){
         log("MyAccountInfo created");
 
@@ -82,7 +93,7 @@ public class MyAccountInfo {
         }
     }
 
-    public void setAccountDetails(){
+    public void setAccountDetails(int numDetails){
         log("setAccountDetails");
 
         if(accountInfo==null){
@@ -90,91 +101,105 @@ public class MyAccountInfo {
             return;
         }
 
-        long totalStorage = accountInfo.getStorageMax();
-        long usedCloudDrive = -1;
-        long usedInbox = -1;
-        long usedRubbish = -1;
-        long usedIncoming = 0;
-        boolean totalGb = false;
+        boolean storage = (numDetails & hasStorageDetails) != 0;
+        boolean transfer = (numDetails & hasTransferDetails) != 0;
+        boolean pro = (numDetails & hasProDetails) != 0;
 
-        //Check size of the different nodes
-        if(megaApi.getRootNode()!=null){
-            usedCloudDrive = accountInfo.getStorageUsed(megaApi.getRootNode().getHandle());
-            formattedUsedCloud = Util.getSizeString(usedCloudDrive);
-        }
+        if (storage) {
+            long totalStorage = accountInfo.getStorageMax();
+            long usedCloudDrive = -1;
+            long usedInbox = -1;
+            long usedRubbish = -1;
+            long usedIncoming = 0;
 
-        if(megaApi.getInboxNode()!=null){
-            usedInbox = accountInfo.getStorageUsed(megaApi.getInboxNode().getHandle());
-            if(usedInbox<1){
-                formattedUsedInbox = "";
+            //Check size of the different nodes
+            if(megaApi.getRootNode()!=null){
+                usedCloudDrive = accountInfo.getStorageUsed(megaApi.getRootNode().getHandle());
+                formattedUsedCloud = Util.getSizeString(usedCloudDrive);
             }
-            else {
-                formattedUsedInbox = Util.getSizeString(usedInbox);
+
+            if(megaApi.getInboxNode()!=null){
+                usedInbox = accountInfo.getStorageUsed(megaApi.getInboxNode().getHandle());
+                if(usedInbox<1){
+                    formattedUsedInbox = "";
+                }
+                else {
+                    formattedUsedInbox = Util.getSizeString(usedInbox);
+                }
+            }
+
+            if(megaApi.getRubbishNode()!=null){
+                usedRubbish = accountInfo.getStorageUsed(megaApi.getRubbishNode().getHandle());
+                formattedUsedRubbish = Util.getSizeString(usedRubbish);
+            }
+
+            ArrayList<MegaNode> nodes=megaApi.getInShares();
+            if(nodes!=null){
+                for(int i=0;i<nodes.size();i++){
+                    MegaNode nodeIn = nodes.get(i);
+                    usedIncoming = usedIncoming + accountInfo.getStorageUsed(nodeIn.getHandle());
+                }
+            }
+
+            formattedUsedIncoming = Util.getSizeString(usedIncoming);
+
+            totalFormatted = Util.getSizeString(totalStorage);
+
+            usedStorage = accountInfo.getStorageUsed();
+            usedFormatted=Util.getSizeString(usedStorage);
+
+            usedPerc = 0;
+            if (totalStorage != 0){
+                usedPerc = (int)((100 * usedStorage) / totalStorage);
+            }
+
+            long availableSpace = totalStorage - usedStorage;
+            if (availableSpace < 0) {
+                formattedAvailableSpace = Util.getSizeString(0);
+            }
+            else{
+                formattedAvailableSpace = Util.getSizeString(availableSpace);
             }
         }
 
-        if(megaApi.getRubbishNode()!=null){
-            usedRubbish = accountInfo.getStorageUsed(megaApi.getRubbishNode().getHandle());
-            formattedUsedRubbish = Util.getSizeString(usedRubbish);
+        if (transfer) {
+            totalTransferFormatted = Util.getSizeString(accountInfo.getTransferMax());
+            usedTransferFormatted = Util.getSizeString(accountInfo.getTransferOwnUsed());
         }
 
-        ArrayList<MegaNode> nodes=megaApi.getInShares();
-        if(nodes!=null){
-            for(int i=0;i<nodes.size();i++){
-                MegaNode nodeIn = nodes.get(i);
-                usedIncoming = usedIncoming + accountInfo.getStorageUsed(nodeIn.getHandle());
+        if (pro) {
+            accountType = accountInfo.getProLevel();
+            subscriptionStatus = accountInfo.getSubscriptionStatus();
+            subscriptionRenewTime = accountInfo.getSubscriptionRenewTime();
+            proExpirationTime = accountInfo.getProExpiration();
+
+            switch (accountType){
+                case 0:{
+                    levelAccountDetails = -1;
+                    break;
+                }
+                case 1:{
+                    levelAccountDetails = 1;
+                    break;
+                }
+                case 2:{
+                    levelAccountDetails = 2;
+                    break;
+                }
+                case 3:{
+                    levelAccountDetails = 3;
+                    break;
+                }
+                case 4:{
+                    levelAccountDetails = 0;
+                    break;
+                }
             }
-        }
-
-        formattedUsedIncoming = Util.getSizeString(usedIncoming);
-
-        totalFormatted = Util.getSizeString(totalStorage);
-
-        usedStorage = accountInfo.getStorageUsed();
-        usedFormatted=Util.getSizeString(usedStorage);
-
-        usedPerc = 0;
-        if (totalStorage != 0){
-            usedPerc = (int)((100 * usedStorage) / totalStorage);
-        }
-
-        long availableSpace = totalStorage - usedStorage;
-        if (availableSpace < 0) {
-            formattedAvailableSpace = Util.getSizeString(0);
-        }
-        else{
-            formattedAvailableSpace = Util.getSizeString(availableSpace);
         }
 
         accountDetailsFinished = true;
 
-        accountType = accountInfo.getProLevel();
-
-        switch (accountType){
-            case 0:{
-                levelAccountDetails = -1;
-                break;
-            }
-            case 1:{
-                levelAccountDetails = 1;
-                break;
-            }
-            case 2:{
-                levelAccountDetails = 2;
-                break;
-            }
-            case 3:{
-                levelAccountDetails = 3;
-                break;
-            }
-            case 4:{
-                levelAccountDetails = 0;
-                break;
-            }
-        }
-
         log("LEVELACCOUNTDETAILS: " + levelAccountDetails + "; LEVELINVENTORY: " + levelInventory + "; INVENTORYFINISHED: " + inventoryFinished);
-
     }
 
     public MegaAccountDetails getAccountInfo() {
@@ -204,6 +229,30 @@ public class MyAccountInfo {
 
     public void setNumberOfSubscriptions(long numberOfSubscriptions) {
         this.numberOfSubscriptions = numberOfSubscriptions;
+    }
+
+    public int getSubscriptionStatus() {
+        return subscriptionStatus;
+    }
+
+    public void setSubscriptionStatus(int subscriptionStatus) {
+        this.subscriptionStatus = subscriptionStatus;
+    }
+
+    public long getSubscriptionRenewTime() {
+        return subscriptionRenewTime;
+    }
+
+    public void setSubscriptionRenewTime(long subscriptionRenewTime) {
+        this.subscriptionRenewTime = subscriptionRenewTime;
+    }
+
+    public long getProExpirationTime() {
+        return proExpirationTime;
+    }
+
+    public void setProExpirationTime(long proExpirationTime) {
+        this.proExpirationTime = proExpirationTime;
     }
 
     public BitSet getPaymentBitSet() {
@@ -293,9 +342,13 @@ public class MyAccountInfo {
             fullName = firstNameText + " " + lastNameText;
         }
 
-        if (fullName.trim().length() <= 0){
+        if (fullName.trim().length() <= 0) {
             log("Put email as fullname");
-            String email = megaApi.getMyUser().getEmail();
+            String email = "";
+            MegaUser user = megaApi.getMyUser();
+            if (user != null) {
+                email = user.getEmail();
+            }
             String[] splitEmail = email.split("[@._]");
             fullName = splitEmail[0];
         }
@@ -408,6 +461,22 @@ public class MyAccountInfo {
 
     public void setFormattedAvailableSpace(String formattedAvailableSpace) {
         this.formattedAvailableSpace = formattedAvailableSpace;
+    }
+
+    public String getTotalTansferFormatted() {
+        return totalTransferFormatted;
+    }
+
+    public void setTotalTransferFormatted(String totalTransferFormatted) {
+        this.totalTransferFormatted = totalTransferFormatted;
+    }
+
+    public String getUsedTransferFormatted() {
+        return usedTransferFormatted;
+    }
+
+    public void setUsedTransferFormatted(String usedTransferFormatted) {
+        this.usedTransferFormatted = usedTransferFormatted;
     }
 
     public void setFirstLetter(String firstLetter) {
