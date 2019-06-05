@@ -124,6 +124,10 @@ public class ChatUtil {
         String resultTitle = EmojiUtilsShortcodes.emojify(title);
         resultTitle = resultTitle.trim();
 
+        if(!resultTitle.isEmpty() && resultTitle.length() == 1){
+            return resultTitle;
+        }
+
         if(!resultTitle.isEmpty()){
             String lastEmoji = resultTitle.substring(0,2);
             int numEmojis = EmojiManager.getInstance().getNumEmojis(lastEmoji);
