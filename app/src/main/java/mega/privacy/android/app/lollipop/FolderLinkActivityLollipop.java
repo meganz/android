@@ -1244,7 +1244,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							log("API_EARGS - show alert dialog");
 							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 							builder.setMessage(getString(R.string.general_error_folder_not_found));
-							builder.setTitle(getString(R.string.general_error_word));
+							builder.setTitle(getString(R.string.link_broken));
+							builder.setCancelable(false);
 
 							builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
 								@Override
@@ -1540,8 +1541,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 					}
-
-
+					builder.setCancelable(false);
 					builder.setPositiveButton(
 							getString(android.R.string.ok),
 							new DialogInterface.OnClickListener() {
