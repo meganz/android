@@ -113,26 +113,8 @@ public class VideoDownsampling {
         }
     }
 
-    void prepareAndChangeResolution(VideoUpload video) throws Exception {
+    public void prepareAndChangeResolution(VideoUpload video) throws Exception {
         log("prepareAndChangeResolution");
-        processSingleVideo(video);
-    }
-
-    private void resetWidthAndHeight(String mInputFile) {
-        MediaMetadataRetriever m = new MediaMetadataRetriever();
-        m.setDataSource(mInputFile);
-
-        int rotation = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
-        if (rotation == 90 || rotation == 270) {
-            mWidth = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-            mHeight = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-        } else {
-            mWidth = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-            mHeight = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-        }
-    }
-
-    private void processSingleVideo(VideoUpload video) throws Exception {
         Exception exception = null;
         String mInputFile = video.original;
 
@@ -179,8 +161,8 @@ public class VideoDownsampling {
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
             MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
             MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
-                            inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                            inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
             outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
             outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
 
@@ -274,6 +256,20 @@ public class VideoDownsampling {
             if(context instanceof ChatUploadService) {
                 ((ChatUploadService)context).finishDownsampling(mOutputFile, true, video.idPendingMessage);
             }
+        }
+    }
+
+    private void resetWidthAndHeight(String mInputFile) {
+        MediaMetadataRetriever m = new MediaMetadataRetriever();
+        m.setDataSource(mInputFile);
+
+        int rotation = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
+        if (rotation == 90 || rotation == 270) {
+            mWidth = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+            mHeight = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        } else {
+            mWidth = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+            mHeight = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
         }
     }
 

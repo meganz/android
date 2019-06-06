@@ -189,7 +189,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         if(receiver != null) {
             unregisterReceiver(receiver);
         }
-        unregisterReceiver(chargingStopReceiver);
+        if(chargingStopReceiver != null) {
+            unregisterReceiver(chargingStopReceiver);
+        }
     }
     
     @Nullable
@@ -1131,11 +1133,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         
         mContext = getApplicationContext();
-        int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        }
-        
+        int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
         WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
         PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
@@ -1176,7 +1174,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         initDbH();
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         String previousIP = app.getLocalIpAddress();
-        String currentIP = Util.getLocalIpAddress();
+        String currentIP = Util.getLocalIpAddress(getApplicationContext());
         if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
             app.setLocalIpAddress(currentIP);
         } else if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0) && (currentIP.compareTo(previousIP) != 0)) {
@@ -1923,7 +1921,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         
         try {
             StatFs stat = new StatFs(tempRoot);
-            double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+            double availableFreeSpace = stat.getAvailableBytes();
             if (availableFreeSpace <= srcFile.length()) {
                 log(ERROR_NOT_ENOUGH_SPACE);
                 return ERROR_NOT_ENOUGH_SPACE;

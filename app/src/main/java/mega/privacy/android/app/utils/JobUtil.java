@@ -50,11 +50,11 @@ public class JobUtil {
 
     public static int restart(Context context) {
         stopRunningCameraUploadService(context);
-        return scheduleCUJob(context);
+        return scheduleCameraUploadJob(context);
     }
 
-    public static synchronized int scheduleCUJob(Context context) {
-        log("scheduleCUJob");
+    public static synchronized int scheduleCameraUploadJob(Context context) {
+        log("scheduleCameraUploadJob");
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
@@ -110,7 +110,7 @@ public class JobUtil {
             @Override
             public void run() {
                 log("Rescheduling CU");
-                scheduleCUJob(context);
+                scheduleCameraUploadJob(context);
             }
         },CU_RESCHEDULE_INTERVAL);
     }

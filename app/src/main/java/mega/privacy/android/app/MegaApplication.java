@@ -85,7 +85,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.Util.toCDATA;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCUJob;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 
 
 
@@ -407,7 +407,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-        scheduleCUJob(getApplicationContext());
+        scheduleCameraUploadJob(getApplicationContext());
 		
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;

@@ -56,7 +56,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
-import static mega.privacy.android.app.utils.JobUtil.scheduleCUJob;
+import static mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob;
 
 public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
@@ -480,7 +480,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    scheduleCUJob(LoginActivityLollipop.this);
+                    scheduleCameraUploadJob(LoginActivityLollipop.this);
                 }
             }, time);
         }
