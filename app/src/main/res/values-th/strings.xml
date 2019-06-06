@@ -450,7 +450,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d รายการถูกย้ายเรียบร้อยแล้ว</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">ไม่สามารถย้ายรายการ %d ได้สำเร็จ</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">ย้ายไปถังขยะเรียบร้อยแล้ว</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">รายการ %d ถูกย้ายไปที่ถังขยะเรียบร้อยแล้ว</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d รายการถูกย้ายไปถังขยะเรียบร้อยแล้ว</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">&#160;และส่ง %d รายการไม่สำเร็จ</string>
     <string name="context_no_moved" context="error message">ผิดพลาด ยังไม่ได้ย้าย</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">แชร์เรียบร้อยแล้ว</string>
@@ -483,7 +483,7 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">โฟลเดอร์แชร์ร่วมกันไม่ได้</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">ผิดพลาด โฟลเดอร์ที่แชร์จะยังคงแชร์อยู่กับผู้ติดต่อคนอื่น</string>
     <string name="context_select_one_file" context="option available for just one file">เลือกไฟล์เพียงไฟล์เดียว</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">เคลียร์ถังขยะเสร็จแล้ว</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">เคลียร์ถังขยะเรียบร้อยแล้ว</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">ผิดพลาด ถังขยะไม่ได้ถูกเคลียร์ออก</string>
 
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">คุณกำลังจะยกเลิกการสมัครสมาชิก MEGA ของคุณ กรุณาแจ้งให้เราทราบได้หรือไม่ หากมีสิ่งใดที่เราสามารถทำได้เพื่ออำนวยความสะดวกให้แก่คุณ</string>
@@ -646,10 +646,14 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">ขั้นสูง</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">เคลียร์แคช</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">เคลียร์ไฟล์ออฟไลน์</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">เคลียร์ไฟล์ออฟไลน์</string>
 
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
 	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">ยกเลิกบัญชีของคุณ</string>
+
+
+
+	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">ยกเลิกบัญชีของคุณ</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">ใช้ไปแล้ว %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">กำลังคำนวณ</string>
@@ -1781,8 +1785,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">คุณภาพไฟล์มีเดีย</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">ต้นฉบับ</item>
-        <item context="the options of what to upload.">ปานกลาง</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">สายที่ไม่ได้รับ</string>
@@ -1830,7 +1834,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">ทดสอบรหัสผ่าน</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">ทดสอบรหัสผ่านของคุณ</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">ยอมรับรหัสผ่านแล้ว</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">รหัสผ่านผิด!\nสำรองคีย์การกู้คืนของคุณโดยเร็วที่สุด!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">ส่งออกคีย์การกู้คืนแล้ว</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">คีย์การกู้คืนถูกส่งออกไปยังส่วนออฟไลน์เป็น MEGARecoveryKey.txt\nหมายเหตุ: ไฟล์จะถูกลบออกถ้าคุณออกจากระบบ กรุณาเก็บไว้ในที่ปลอดภัย</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">คุณกำลังจะออกจากระบบ กรุณาทดสอบรหัสผ่านเพื่อให้แน่ใจว่าคุณจำได้\nหากคุณลืมรหัสผ่าน คุณจะสูญเสียการเข้าถึงข้อมูล MEGA ของคุณ</string>
@@ -2117,7 +2121,6 @@
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">กิจกรรมในแชท</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">คุณอาจมีข้อความใหม่</string>
 	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
-
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">ตัวกำหนดเวลาทำความสะอาดถังขยะ</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">ถังขยะจะถูกเคลียร์ให้คุณโดยอัตโนมัติ</string>
 
@@ -2130,18 +2133,18 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">หากต้องการปิดใช้งานตัวกำหนดเวลาทำความสะอาดถังขยะหรือตั้งระยะเวลาเก็บรักษาที่นานขึ้น คุณต้องสมัครแผน PRO</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">วัน</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">รับลิงก์แชท</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">จัดการลิงก์แชท</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">เปิดใช้งาน Encrypted Key Rotation</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] ได้สร้างลิงก์แชท[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ได้ลบลิงก์แชท[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">ลบลิงก์แชท</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">ลิงก์แชท</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">การดำเนินการนี้จะนำคุณออกจากเซสชันที่ใช้งานอยู่ทั้งหมดยกเว้นที่มีอยู่ในปัจจุบัน</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">คุณต้องการปิดเซสชันอื่นทั้งหมดหรือไม่</string>
 
@@ -2151,9 +2154,9 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">ผู้สังเกตการณ์</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">เกิดข้อผิดพลาดในการโหลดลิงก์แชท</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">เกิดข้อผิดพลาดในการเริ่มต้นแชทเมื่อโหลดลิงก์แชท</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">คุณกำลังพยายามดูตัวอย่างแชทที่คุณเคยเป็นสมาชิก คุณต้องการเข้าร่วมการแชทอีกครั้งหรือไม่</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">คุณได้เข้าร่วมแชทนี้แล้ว</string>
@@ -2163,13 +2166,13 @@
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ได้เปิดใช้งาน Encrypted Key Rotation[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">ลิงก์แชทไม่ถูกต้อง</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key Rotation จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
-    <string name="action_open_chat_link" context="Menu item">เปิดลิงก์แชท</string>
+    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">คำเชิญให้ติดต่อ %s มีการส่งไปแล้วและสามารถดูได้ในแท็บคำขอที่ส่งแล้ว</string>
 
@@ -2282,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">ก่อนที่คุณจะสามารถสร้างลิงก์สำหรับการแชทนี้คุณต้องตั้งคำอธิบาย:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">คัดลอกลิงก์แชทไปยังคลิปบอร์ดแล้ว</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]จาก[/A] %s / [A]เดือน[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* การสมัครสมาชิกแบบจ่ายเป็นประจำสามารถยกเลิกได้ทุกเมื่อก่อนวันที่ต่ออายุจะมาถึง</string>
@@ -2340,7 +2343,7 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">สายเรียกเข้า&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">กำลังโทร&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">ข้อความมีส่วนประกอบของเมตาดาต้าไม่ถูกต้อง</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">ข้อความมีส่วนประกอบของเมตาดาต้าไม่ถูกต้อง</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2372,11 +2375,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">ผิดพลาด ไฟล์ยังไม่ได้ส่งไปยังแชทที่เลือกไว้</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]ไม่มี[/A][B]รายการใด ๆ[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">ลบเวอร์ชันเก่า</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">ลบเวอร์ชันเก่าหรือไม่</string>
+    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">โปรดทราบว่าไฟล์ปัจจุบันจะไม่ถูกลบ</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">ลบเวอร์ชันเก่าแล้ว</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">เวอร์ชันเก่าไม่ถูกลบ</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">ลบเวอร์ชัน %d สำเร็จแล้ว</item>

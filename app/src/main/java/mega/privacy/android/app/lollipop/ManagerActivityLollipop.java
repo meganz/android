@@ -632,6 +632,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public long comesFromNotificationHandle = -1;
 	public long comesFromNotificationHandleSaved = -1;
 	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
+	private boolean isCreatingChatFolder = false;
 
 	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
@@ -5037,14 +5038,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setToolbarTitle();
-
-		if(Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			if (parentNode == null) {
-				log("Create folder: " + CHAT_FOLDER);
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
-			}
-		}
+        createMyChatFolder();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -5453,13 +5447,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		catch (Exception e){
 			log("Exception NotificationManager - remove all notifications");
 		}
-
-		MegaNode parentNode = megaApi.getNodeByPath("/"+CHAT_FOLDER);
-		if(parentNode == null){
-			log("Create folder: "+CHAT_FOLDER);
-			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
-		}
-
+        
+        createMyChatFolder();
 		setToolbarTitle();
 
 		tabLayoutShares.setVisibility(View.GONE);
@@ -6236,13 +6225,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-				if(Util.isChatEnabled()) {
-					MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-					if (parentNode == null) {
-						log("Create folder: " + CHAT_FOLDER);
-						megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), null);
-					}
-				}
+                createMyChatFolder();
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {
@@ -16357,9 +16340,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				statusDialog.dismiss();
 			}
 			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
+            if(isCreatingChatFolder && CHAT_FOLDER.equals(request.getName())){
+                isCreatingChatFolder = false;
+                return;
+            }
+            if (e.getErrorCode() == MegaError.API_OK){
+                showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
 					if (fbFLol != null){
@@ -18705,12 +18691,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.accountFragmentPreUpgradeAccount = accountFragment;
 	}
 
-	public void deleteInviteContactHandle () {
+	public void deleteInviteContactHandle(){
 		handleInviteContact = -1;
 	}
 
     @Override
-    public void onTrimMemory(int level) {
+    public void onTrimMemory(int level){
         // Determine which lifecycle or system event was raised.
         //we will stop creating thumbnails while the phone is running low on memory to prevent OOM
         log("onTrimMemory lvl " + level);
@@ -18722,4 +18708,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             ThumbnailUtilsLollipop.isDeviceMemoryLow = false;
         }
     }
+
+	private void createMyChatFolder() {
+		if (Util.isChatEnabled()) {
+			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
+			if (parentNode == null && !isCreatingChatFolder) {
+				log("Create folder: " + CHAT_FOLDER);
+				isCreatingChatFolder = true;
+				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
+			}
+		}
+	}
 }

@@ -450,7 +450,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d elementów zostało przeniesione</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d elementów nie zostało przeniesione</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Przeniesiono do kosza</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d elementów zostało przeniesione do kosza</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d elementów przeniesiono do kosza</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">&#160;and %d elementów nie zostało wysłanych</string>
     <string name="context_no_moved" context="error message">Błąd. Nie przeniesiono</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Poprawnie udostępniono</string>
@@ -483,7 +483,7 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">Ten katalog nie jest już dostępny</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Błąd, ten katalog jest wciąż udostępniony z innym kontaktem</string>
     <string name="context_select_one_file" context="option available for just one file">Wybierz tylko jeden plik</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Kosz został opróżniony</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Koszt został wyczyszczony</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Błąd. Kosz nie został opróżniony</string>
 
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Masz zamiary anulować swoją MEGA subskrypcję. Proszę, podziel się z nami swoją opinia i powodami, może jesteśmy wstanie pomóć zmienić Twoje zdanie</string>
@@ -517,7 +517,7 @@
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
     <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Wybierz z systemu plików</string>
-    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Pick from</string>
+    <string name="upload_to_filesystem_from" context="upload to. Then choose to browse the file system to choose a file">Wybierz z</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -646,10 +646,14 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Zaawansowane</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Wyczyść pamięć podręczną</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Usuń pliki offline</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">Usuń pliki offline</string>
 
-	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Usuń swoje konto</string>
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
+	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Otwórz plik po pobraniu</string>
+
+
+
+	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Usuń swoje konto</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Obecnie używane %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Obliczanie</string>
@@ -1363,8 +1367,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_notification" context="Text of the notification shown when the folder upload service is running">
-		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
-		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+		<item context="Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Przesyłanie %1$d do folderu %2$d</item>
+		<item context="Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Wgrywanie %1$d z %2$d katalogów</item>
 	</plurals>
 
     <plurals name="upload_service_final_notification" context="Text of the notification shown when the upload service has finished">
@@ -1373,8 +1377,8 @@
     </plurals>
 
 	<plurals name="folder_upload_service_final_notification" context="Text of the notification shown when the folder upload service has finished">
-		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
-		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+		<item context="Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Wgrano %1$d katalog</item>
+		<item context="Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Wgrano %1$d katalogów</item>
 	</plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Rozmiar: %1$s</string>
@@ -1781,8 +1785,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Jakość plików</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Oryginalny</item>
-        <item context="the options of what to upload.">Średnie</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Opuszczone rozmowy</string>
@@ -1830,7 +1834,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Przetestuj hasło</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Przetestuj swoje hasło</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Hasło zaakceptowane</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Złe hasło!\nUtwórz kopię zapasową klucza odzyskiwania tak szybko, jak to możliwe!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Klucz zapasowy został wyeksportowany</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Klucz odzyskiwania został wyeksportowany do sekcji Offline jako MEGARecoveryKey.txt.\nUwaga: Zostanie usunięty, jeśli się wylogujesz, przechowuj go w bezpiecznym miejscu.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Za chwilę się wylogujesz, przetestuj hasło, aby je zapamiętać.\nJeśli zgubisz hasło, utracisz dostęp do swoich danych MEGA.</string>
@@ -2116,8 +2120,7 @@
 
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Aktywność na czacie</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Możesz mieć nowe wiadomości</string>
-	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
-
+	<string name="retrieving_message_title" context="When app is retrieving push message">Pobieranie wiadomości</string>
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Opróżnianie kosza</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Kosz na śmieci jest automatycznie sprawdzany.</string>
 
@@ -2130,18 +2133,18 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">dni</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Uzyskaj link do czatu</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Zarządzaj linkiem do czatu</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Włącz szyfrowanie zaszyfrowanych kluczy</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzyć łącza do czatu, a nowi uczestnicy nie będą widzieć poprzednich wiadomości.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] utworzył link do czatu.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] usunął link do czatu.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Usuń link czatu</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Link do czatu</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Spowoduje to wylogowanie wszystkich innych aktywnych sesji oprócz bieżącego.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Czy chcesz zamknąć wszystkie inne sesje?</string>
 
@@ -2151,25 +2154,25 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Obserwatorzy</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Błąd podczas ładowania linku do czatu.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Błąd inicjowania czatu podczas ładowania łącza czatu.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Próbujesz wyświetlić podgląd czatu, którego wcześniej byłeś członkiem. Czy chcesz ponownie dołączyć do czatu?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Uczestniczysz już w tym czacie.</string>
 
-    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">Ten podgląd czatu nie jest już dostępny. Jeśli opuścisz podgląd, nie będziesz mógł go ponownie otworzyć.</string>
+    <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available. If you leave the preview, you won’t be able to reopen it.</string>
 
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] włączony szyfrowany obrót klucza.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Ta rozmowa nie jest już dostępna</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Nieprawidłowy link do czatu</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Szyfrowanie zaszyfrowanych kluczy</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzyć łącza do czatu, a nowi uczestnicy nie będą widzieć poprzednich wiadomości.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzyć łącza do czatu, a nowi uczestnicy nie będą widzieć poprzednich wiadomości.</string>
-    <string name="action_open_chat_link" context="Menu item">Otwórz link do czatu</string>
+    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Zaproszenie do kontaktu %s zostało wysłane wcześniej i można się z nim zapoznać na karcie Żądania wysłane.</string>
 
@@ -2282,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Zanim wygenerujesz link do tego czatu, musisz ustawić opis:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Czat Link skopiowany do schowka</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Od[/A] %s / [A]miesiąc[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Subskrypcja cykliczna może zostać anulowana w dowolnym momencie przed datą odnowienia.</string>
@@ -2340,7 +2343,7 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Połączenie przychodzące&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Dzwonię&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Wiadomość zawiera nieprawidłowe metadane</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Wiadomość zawiera nieprawidłowe metadane</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2361,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">Wiadomość %d nie została wysłana do czatów %d</item>
-        <item context="Plural of file. 2 files" quantity="other">%d wiadomości nie zostały wysłane do %d czatów</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Treść nie została wysłana do czatów %d</string>
@@ -2372,11 +2375,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Błąd. Plik nie został wysłany do wybranych czatów.</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Brak[/A] [B]elementów[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">Usuń stare wersje</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Czy usunąć stare wersje?</string>
+    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Pamiętaj, że bieżący plik nie zostanie usunięty.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Stare wersje usunięte.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Stare wersje nie zostały usunięte.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d wersja usunięta pomyślnie</item>
@@ -2399,7 +2402,7 @@
     <string name="title_tour_four" cotext="Title of fourth tour screen">Twoje zdjęcia w chmurze</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Przesyłanie z kamer to podstawowa funkcja każdego urządzenia mobilnego, a my jesteśmy objęci. Utwórz teraz swoje konto.</string>
 
-    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Wprowadź hasło</string>
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Wprowadz swoje hasło</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s to dokument PDF chroniony hasłem. Wprowadź hasło, aby otworzyć plik PDF.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Podałeś złe hasło, spróbuj ponownie.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">Wprowadzone hasło jest nieprawidłowe.</string>
@@ -2413,9 +2416,9 @@
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant's name in runtime.">[A]%1$s[/A][B] dołączył do grupowego czatu.[/B]</string>
 
-    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">Ta rozmowa nie będzie już dostępna za pośrednictwem łącza czatu po jej usunięciu.</string>
-    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Rotacja zaszyfrowanego klucza nie pozwala uzyskać połączenia czatu bez tworzenia nowego czatu grupowego.</string>
-    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Czy chcesz utworzyć nowy czat grupowy i uzyskać link do czatu?</string>
+    <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the Chat Link you are about to delete.</string>
+    <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a Chat Link without creating a new group chat.</string>
+    <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Do you want to create a new group chat and get a Chat Link?</string>
 
     <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzyć łącza do czatu, a nowi uczestnicy nie będą widzieć poprzednich wiadomości.</string>
 
@@ -2442,25 +2445,25 @@
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">Nowy link do czatu</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Wprowadź nazwę grupy</string>
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">Aby utworzyć link do czatu, musisz nazwać grupę.</string>
-    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA’s encrypted chat.</string>
+    <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Zaproś kontakty i zacznij bezpiecznie rozmawiać za pomocą szyfrowanego czatu MEGA.</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">Brak dostępnego linku do czatu.</string>
-    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
+    <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Usunięto link do czatu.</string>
 
-    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ACCEPTED)</string>
-    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (DELETED)</string>
-    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (DENIED)</string>
-    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (IGNORED)</string>
-    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (REMINDED)</string>
-    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (PENDING)</string>
+    <string name="contact_request_status_accepted" context="The status of pending contact request (ACCEPTED), placeholder is contact request creation time">%1$s (ZAAKCEPTOWANE)</string>
+    <string name="contact_request_status_deleted" context="The status of pending contact request (DELETED), placeholder is contact request creation time">%1$s (USUNIĘTE)</string>
+    <string name="contact_request_status_denied" context="The status of pending contact request (DENIED), placeholder is contact request creation time">%1$s (ODRZUCONE)</string>
+    <string name="contact_request_status_ignored" context="The status of pending contact request (IGNORED), placeholder is contact request creation time">%1$s (ZIGNOROWANE)</string>
+    <string name="contact_request_status_reminded" context="The status of pending contact request (REMINDED), placeholder is contact request creation time">%1$s (ZAPAMIĘTANE)</string>
+    <string name="contact_request_status_pending" context="The status of pending contact request (PENDING), placeholder is contact request creation time">%1$s (OCZEKUJĄCE)</string>
 
 	<plurals name="file_already_downloaded">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d plik już pobrany.&#160;</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d plików już pobranych.&#160;</item>
 	</plurals>
 
 	<plurals name="file_pending_download">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d plik oczekuje.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d plików oczekuje.</item>
 	</plurals>
 </resources>
