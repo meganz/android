@@ -244,8 +244,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (parentNode != null) {
 			log("The destination "+Constants.CHAT_FOLDER+ " already exists");
 			handleIntentIfFolderExisit(intent);
-		}
-		else {
+		} else {
 			log("The destination "+Constants.CHAT_FOLDER+ " does not exist, we need to create the folder then upload files");
 			megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
 			preservedIntent = intent;
@@ -313,11 +312,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
 			PendingMessageSingle pendingMsg = null;
-			if(idPendMsg!=-1){
+			if (idPendMsg!=-1) {
 				pendingMsg = dbH.findPendingMessageById(idPendMsg);
 			}
 
-			if(pendingMsg!=null){
+			if (pendingMsg!=null) {
 				sendOriginalAttachments = DBUtil.isSendOriginalAttachments(this);
 				log("sendOriginalAttachments is "+sendOriginalAttachments);
 
@@ -343,6 +342,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 	}
+
 	void initUpload (ArrayList<PendingMessageSingle> pendingMsgs) {
 
 		PendingMessageSingle pendingMsg = pendingMsgs.get(0);
@@ -1308,7 +1308,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		if(request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
 			if (e.getErrorCode() == MegaError.API_OK) {
 				log("Create folder successfully, continue on pending chat upload");
 				if (parentNode == null) {
@@ -1324,9 +1324,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			    mNotificationManager.cancel(notificationId);
 			    stopSelf();
 			    log("after stopSelf");
-			}parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
+			}
+			parentNode = megaApi.getNodeByPath("/"+Constants.CHAT_FOLDER);
 		}
-		if (e.getErrorCode()==MegaError.API_OK){
+
+		if (e.getErrorCode()==MegaError.API_OK) {
 			log("onRequestFinish OK");
 		}
 		else {
