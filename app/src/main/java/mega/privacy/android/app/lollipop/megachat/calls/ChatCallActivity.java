@@ -305,12 +305,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
             int callStatus = callChat.getStatus();
             if ((callStatus == MegaChatCall.CALL_STATUS_RING_IN) || (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) ||(callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) ){
-                setProfileAvatar(megaChatApi.getMyUserHandle());
-                setProfileAvatar(chat.getPeerHandle(0));
-                myAvatarLayout.setVisibility(View.VISIBLE);
-                if((callStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT)){
-                    contactAvatarLayout.setVisibility(View.VISIBLE);
-                }
+
                 if((callStatus == MegaChatCall.CALL_STATUS_RING_IN)){
                     displayLinearFAB(true);
                 }else{
@@ -348,8 +343,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
                 titleToolbar.setText(chat.getTitle());
-
-                updateSubTitle();
                 updateScreenStatus();
                 updateLocalSpeakerStatus();
 
@@ -558,6 +551,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }
 
         parentBigCameraGroupCall.setLayoutParams(paramsBigCameraGroupCall);
+        parentBigCameraGroupCall.setOnClickListener(this);
+
         fragmentBigCameraGroupCall = (FrameLayout) findViewById(R.id.fragment_big_camera_group_call);
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
         microFragmentBigCameraGroupCall = (ImageView) findViewById(R.id.micro_fragment_big_camera_group_call);
@@ -632,6 +627,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             myInitialLetter = (TextView) findViewById(R.id.call_chat_my_image_initial_letter);
 
             contactAvatarLayout = (RelativeLayout) findViewById(R.id.call_chat_contact_image_rl);
+            contactAvatarLayout.setOnClickListener(this);
             contactAvatarLayout.setVisibility(View.GONE);
             contactImage = (RoundedImageView) findViewById(R.id.call_chat_contact_image);
             contactInitialLetter = (TextView) findViewById(R.id.call_chat_contact_image_initial_letter);
@@ -1068,7 +1064,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     protected void hideActionBar() {
-        if(aB == null || aB.isShowing()) return;
+        if(aB == null || !aB.isShowing()) return;
 
         if(tB == null){
             aB.hide();
@@ -2558,7 +2554,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
                             ft.commitNowAllowingStateLoss();
                         }
-                        contactAvatarLayout.setOnClickListener(null);
                         contactAvatarLayout.setVisibility(GONE);
                         parentRemoteFS.setVisibility(View.VISIBLE);
                         fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
@@ -2573,7 +2568,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             remoteCameraFragmentFS = null;
                         }
                         contactAvatarLayout.setVisibility(View.VISIBLE);
-                        contactAvatarLayout.setOnClickListener(this);
                         parentRemoteFS.setVisibility(View.GONE);
                         fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
                     }
@@ -2590,7 +2584,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             remoteCameraFragmentFS = null;
                         }
                         contactAvatarLayout.setVisibility(View.VISIBLE);
-                        contactAvatarLayout.setOnClickListener(this);
                         parentRemoteFS.setVisibility(View.GONE);
                         fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
 
@@ -2605,7 +2598,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                             ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
                             ft.commitNowAllowingStateLoss();
                         }
-                        contactAvatarLayout.setOnClickListener(null);
                         contactAvatarLayout.setVisibility(GONE);
                         parentRemoteFS.setVisibility(View.VISIBLE);
                         fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
@@ -2769,11 +2761,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         log("remoteCameraClick");
         getCall();
         if((callChat == null) || (callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS)) return;
+
         if (aB.isShowing()) {
             hideActionBar();
             hideFABs();
             return;
         }
+
         showActionBar();
         showInitialFABConfiguration();
     }
@@ -3081,8 +3075,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         bigRecyclerView.setAdapter(null);
                         bigRecyclerView.setVisibility(GONE);
                         bigRecyclerViewLayout.setVisibility(GONE);
-
-                        parentBigCameraGroupCall.setOnClickListener(null);
                         parentBigCameraGroupCall.setVisibility(View.GONE);
 
                         recyclerViewLayout.setVisibility(View.VISIBLE);
@@ -3118,8 +3110,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         recyclerView.setAdapter(null);
                         recyclerView.setVisibility(GONE);
                         recyclerViewLayout.setVisibility(View.GONE);
-
-                        parentBigCameraGroupCall.setOnClickListener(this);
                         parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
                         bigRecyclerViewLayout.setVisibility(View.VISIBLE);
@@ -3153,8 +3143,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
                     bigRecyclerViewLayout.setVisibility(GONE);
-
-                    parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
                 }
 
@@ -3186,8 +3174,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         bigRecyclerView.setAdapter(null);
                         bigRecyclerView.setVisibility(GONE);
                         bigRecyclerViewLayout.setVisibility(GONE);
-
-                        parentBigCameraGroupCall.setOnClickListener(null);
                         parentBigCameraGroupCall.setVisibility(View.GONE);
                         recyclerViewLayout.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.VISIBLE);
@@ -3234,7 +3220,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         recyclerView.setAdapter(null);
                         recyclerView.setVisibility(GONE);
                         recyclerViewLayout.setVisibility(View.GONE);
-                        parentBigCameraGroupCall.setOnClickListener(this);
                         parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
                         bigRecyclerViewLayout.setVisibility(View.VISIBLE);
@@ -3277,7 +3262,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     bigRecyclerView.setAdapter(null);
                     bigRecyclerView.setVisibility(GONE);
                     bigRecyclerViewLayout.setVisibility(GONE);
-                    parentBigCameraGroupCall.setOnClickListener(null);
                     parentBigCameraGroupCall.setVisibility(View.GONE);
                 }
             }
