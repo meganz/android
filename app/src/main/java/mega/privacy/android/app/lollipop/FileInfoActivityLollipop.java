@@ -637,7 +637,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
         Rect rect = new Rect();
         getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
-        params.setMargins(Util.px2dp(16, outMetrics), Util.px2dp(107, outMetrics) + rect.top, 0, Util.px2dp(14, outMetrics));
+        params.setMargins(Util.px2dp(16, outMetrics), Util.px2dp(90, outMetrics) + rect.top, 0, Util.px2dp(14, outMetrics));
         iconToolbarLayout.setLayoutParams(params);
 
         imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);

@@ -102,7 +102,7 @@ public final class ChatAdvancedNotificationBuilder {
         ArrayList<MegaChatMessage> unreadMessages = new ArrayList<>();
         for(int i=0;i<unreadHandleList.size();i++){
             MegaChatMessage message = megaChatApi.getMessage(chatId, unreadHandleList.get(i));
-            log("Chat: "+chat.getTitle()+" messagID: "+unreadHandleList.get(i));
+            log("Chat: "+chat.getChatId()+" messagID: "+unreadHandleList.get(i));
             if(message!=null){
                 unreadMessages.add(message);
             }
@@ -230,7 +230,7 @@ public final class ChatAdvancedNotificationBuilder {
                             if(nodeList != null) {
                                 if (nodeList.size() == 1) {
                                     MegaNode node = nodeList.get(0);
-                                    log("Node Name: " + node.getName());
+                                    log("Node Handle: " + node.getHandle());
                                     messageContent = node.getName();
                                 }
                             }
@@ -246,7 +246,6 @@ public final class ChatAdvancedNotificationBuilder {
                                     name = message.getUserName(0);
                                 }
                                 String email = message.getUserName(0);
-                                log("Contact Name: " + name);
                                 messageContent = email;
                             }
                             else{
@@ -409,7 +408,7 @@ public final class ChatAdvancedNotificationBuilder {
                     if(nodeList != null) {
                         if (nodeList.size() == 1) {
                             MegaNode node = nodeList.get(0);
-                            log("Node Name: " + node.getName());
+                            log("Node Handle: " + node.getHandle());
                             messageContent = node.getName();
                         }
                     }
@@ -425,7 +424,6 @@ public final class ChatAdvancedNotificationBuilder {
                             name = msg.getUserName(0);
                         }
                         String email = msg.getUserName(0);
-                        log("Contact EMail: " + name);
                         messageContent = email;
                     }
                     else{
