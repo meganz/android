@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
@@ -24,6 +25,8 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -51,19 +54,39 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     public class ViewHolderBucket extends RecyclerView.ViewHolder {
 
-        RelativeLayout headerLayout;
-        TextView headerText;
-        RelativeLayout itemBucketLayout;
-        ImageView imageThumbnail;
-        TextView title;
-        TextView actionBy;
-        TextView subtitle;
-        ImageView sharedIcon;
-        ImageView actionIcon;
-        TextView time;
-        ImageButton threeDots;
-        LinearLayout mediaLayout;
-        RecyclerView mediaRecycler;
+        private RelativeLayout headerLayout;
+        private TextView headerText;
+        private RelativeLayout itemBucketLayout;
+        private ImageView imageThumbnail;
+        private TextView title;
+        private TextView actionBy;
+        private TextView subtitle;
+        private ImageView sharedIcon;
+        private ImageView actionIcon;
+        private TextView time;
+        private ImageButton threeDots;
+        private LinearLayout mediaLayout;
+        private RecyclerView mediaRecycler;
+
+        private long document = -1;
+
+        public long getDocument() {
+            return document;
+        }
+
+        public void setImageThumbnail(Bitmap image) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.imageThumbnail.getLayoutParams();
+            params.width = params.height = Util.px2dp(36, outMetrics);
+            int margin = Util.px2dp(18, outMetrics);
+            params.setMargins(margin, margin, margin,0);
+
+            this.imageThumbnail.setLayoutParams(params);
+            this.imageThumbnail.setImageBitmap(image);
+        }
+
+        public ImageView getImageThumbnail() {
+            return imageThumbnail;
+        }
 
         public ViewHolderBucket(View itemView) {
             super(itemView);
@@ -73,6 +96,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     @Override
     public RecentsAdapter.ViewHolderBucket onCreateViewHolder(ViewGroup parent, int viewType) {
         log("onCreateViewHolder");
+
+        outMetrics = context.getResources().getDisplayMetrics();
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bucket,parent,false);
         ViewHolderBucket holder = new ViewHolderBucket(v);
 
@@ -156,13 +181,42 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.sharedIcon.setVisibility(View.GONE);
             }
             holder.time.setText(item.getTime());
+
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageThumbnail.getLayoutParams();
+            params.width = params.height = Util.px2dp(48, outMetrics);
+            int margin = Util.px2dp(12, outMetrics);
+            params.setMargins(margin, margin, margin,0);
+            holder.imageThumbnail.setLayoutParams(params);
             holder.imageThumbnail.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
             holder.mediaLayout.setVisibility(View.GONE);
 
             if (nodeList.size() == 1) {
+                holder.document = node.getHandle();
                 holder.threeDots.setVisibility(View.VISIBLE);
                 holder.threeDots.setOnClickListener(this);
                 holder.title.setText(node.getName());
+
+                Bitmap thumbnail = ThumbnailUtils.getThumbnailFromCache(node);
+                if (thumbnail == null) {
+                    thumbnail = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                    if (thumbnail == null) {
+                        try {
+                            if (node.hasThumbnail()) {
+                                thumbnail = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+                            }
+                            else  {
+                                ThumbnailUtilsLollipop.createThumbnailList(context, node, holder,megaApi,this);
+                            }
+                        } catch (Exception e) {
+                            log("Error getting or creating node thumbnail");
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (thumbnail != null) {
+                    holder.setImageThumbnail(thumbnail);
+                }
             }
             else {
                 holder.threeDots.setVisibility(View.INVISIBLE);
@@ -277,6 +331,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
                     break;
                 }
+
                 break;
             }
         }
