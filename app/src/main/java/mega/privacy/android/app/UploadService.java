@@ -156,7 +156,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         mBuilder = new Notification.Builder(UploadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        megaApi.addTransferListener(this);
 	}
 
 	@Override
@@ -216,10 +215,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private synchronized void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
-        MegaTransferListenerInterface placeHolderListener = null;
 		String action = intent.getAction();
 		log("action is " + action);
 		if(action != null){
+            if(Constants.ACTION_CHILD_UPLOADED_OK.equals(action)){
+                childUploadSucceeded++;
+                return;
+            }else if(Constants.ACTION_CHILD_UPLOADED_FAILED.equals(action)){
+                childUploadFailed++;
+                return;
+            }
             if (Constants.ACTION_OVERQUOTA_STORAGE.equals(action)) {
                 isOverquota = 1;
             }else if(Constants.ACTION_STORAGE_STATE_CHANGED.equals(action)){
@@ -254,10 +259,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             acquireLock();
             totalFolderUploads++;
 			if (nameInMEGA != null){
-                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,placeHolderListener);
+                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
 			}
 			else{
-				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), placeHolderListener);
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 			}
 		}
 		else {
@@ -267,8 +272,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						log("CHECK_FILE_TO_UPLOAD_UPLOAD");
                         acquireLock();
 						totalFileUploads++;
-						totalUploads++;
-
+                        totalUploads++;
 						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
 						break;
 					}
@@ -295,15 +299,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
                         if (lastModified == 0) {
                             if (nameInMEGA != null) {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,placeHolderListener);
+                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,this);
                             } else {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),placeHolderListener);
+                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),this);
                             }
                         } else {
                             if (nameInMEGA != null) {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,lastModified / 1000,placeHolderListener);
+                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),nameInMEGA,lastModified / 1000,this);
                             } else {
-                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),lastModified / 1000,placeHolderListener);
+                                megaApi.startUpload(file.getAbsolutePath(),megaApi.getNodeByHandle(parentHandle),lastModified / 1000,this);
                             }
                         }
 
@@ -322,9 +326,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						totalFileUploads++;
 
 						if (nameInMEGA != null) {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, placeHolderListener);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
 						} else {
-							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), placeHolderListener);
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 						}
 						break;
 					}
@@ -747,11 +751,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
             if(isTransferBelongsToFolderTransfer(transfer)){
-                if (error.getErrorCode() == MegaError.API_OK) {
-                    childUploadSucceeded++;
-                }else{
-                    childUploadFailed++;
-                }
                 return;
             }
 
