@@ -450,7 +450,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d itens movidos com êxito</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d itens não foram movidos</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Movido à lixeira</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d items foram movidos à lixeira</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d itens movidos para a Lixeira com sucesso</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">&#160;e %d itens não foram enviados corretamente</string>
     <string name="context_no_moved" context="error message">Erro. Não foi movido</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Compartilhado corretamente</string>
@@ -483,7 +483,7 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">A pasta não está mais compartilhado</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Erro, a pasta ainda esta a ser compartilhada com outro contato</string>
     <string name="context_select_one_file" context="option available for just one file">Selecione somente um arquivo</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">A lixeira foi esvaziada</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Lixeira esvaziada com êxito</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Erro. A lixeira não foi esvaziada</string>
 
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Você está prestes a cancelar a sua assinatura MEGA. Por favor, deixe-nos saber se existe alguma coisa que possamos fazer para ajudá-lo a mudar de ideia</string>
@@ -646,10 +646,14 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avançado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Deletar cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Deletar arquivos offline</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">Deletar arquivos offline</string>
 
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
 	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancelar a sua conta</string>
+
+
+
+	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancelar a sua conta</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Atualmente usando %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando</string>
@@ -1781,8 +1785,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Qualidade multimídia do chat</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Original</item>
-        <item context="the options of what to upload.">Média</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Chamada perdida</string>
@@ -1830,7 +1834,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Confirmar a senha</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Confirme a sua senha</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Senha correta</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Senha incorreta!\nSalve a sua chave de recuperação o mais rápido possível!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">A chave de recuperação foi exportada</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">A chave de recuperação foi exportada para a seção Offline como MEGARecoveryKey.txt.\nAviso: a chave será excluída se você fizer logout. Por favor, guarde-a em um local seguro.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Você está prestes a sair. Por favor, confirme a sua senha para garantir que você se lembra dela.\nSe você perder a sua senha, perderá o acesso aos seus dados no MEGA.</string>
@@ -2117,7 +2121,6 @@
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Atividade no chat</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Você pode ter novas mensagens</string>
 	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
-
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Planejador de limpeza da lixeira</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">A sua Lixeira será esvaziada de forma automática.</string>
 
@@ -2130,8 +2133,8 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Para desativar o Planejador de limpeza da lixeira ou definir um período de retenção mais longo, você precisa assinar um plano PRO.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">dias</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Obter o link do chat</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Administrar o link do chat</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Ativar a rotação da chave de criptografia</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">A rotação de chaves é um pouco mais segura, mas não permite criar um link do chat, e os novos participantes não verão as mensagens anteriores.</string>
@@ -2139,9 +2142,9 @@
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] criou um link para o chat.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deletou o link do chat.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Deletar o link do chat</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Link do chat</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Essa ação fará o logout de todas as outras sessões ativas, exceto a atual.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Você quer fechar as demais sessões?</string>
 
@@ -2340,7 +2343,7 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Chamada recebida&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Chamando&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">A mensagem contém metadados inválidos</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">A mensagem contém metadados inválidos</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
