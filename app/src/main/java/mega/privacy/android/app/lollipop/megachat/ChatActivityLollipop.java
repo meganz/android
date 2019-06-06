@@ -7637,7 +7637,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    private void addInbufferSending(AndroidMegaChatMessage androidMsg){
+    private void addInBufferSending(AndroidMegaChatMessage androidMsg){
         if(bufferSending.isEmpty()){
             bufferSending.add(0,androidMsg);
         }else{
