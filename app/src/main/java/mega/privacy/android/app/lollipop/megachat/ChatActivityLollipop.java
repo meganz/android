@@ -1999,9 +1999,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         try {
             myAudioRecorder.reset();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
+            myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            myAudioRecorder.setOutputFile(outputFileVoiceNotes);
             myAudioRecorder.prepare();
             myAudioRecorder.start();
             setRecordingNow(true);
