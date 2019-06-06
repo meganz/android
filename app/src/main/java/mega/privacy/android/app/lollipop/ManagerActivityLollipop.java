@@ -193,6 +193,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
@@ -237,6 +238,9 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
@@ -1825,27 +1829,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 
-		File thumbDir;
-		if (getExternalCacheDir() != null){
-			thumbDir = new File (getExternalCacheDir(), "thumbnailsMEGA");
-			thumbDir.mkdirs();
-			log("------------------ThumbnailsMEGA folder created: "+thumbDir.getAbsolutePath());
-		}
-		else{
-			thumbDir = getDir("thumbnailsMEGA", 0);
-		}
+        CacheFolderManager.createCacheFolders(this);
 
-		File previewDir;
-		if (getExternalCacheDir() != null){
-			previewDir = new File (getExternalCacheDir(), "previewsMEGA");
-			previewDir.mkdirs();
-		}
-
-		else{
-			previewDir = getDir("previewsMEGA", 0);
-		}
-
-		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		managerActivity = this;
 		app = (MegaApplication)getApplication();
@@ -3770,15 +3756,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setProfileAvatar(){
 		log("setProfileAvatar");
-		File avatar = null;
-		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-		}
-		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
-		}
+		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
 		Bitmap imBitmap = null;
-		if (avatar.exists()){
+		if (isFileAvailable(avatar)){
 			if (avatar.length() > 0){
 				BitmapFactory.Options options = new BitmapFactory.Options();
 				options.inJustDecodeBounds = true;
@@ -3793,13 +3773,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 				if (imBitmap == null) {
 					avatar.delete();
-					if (getExternalCacheDir() != null){
-						megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
-					}
-					else{
-						megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
-					}
-				}
+                    megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
+                }
 				else{
 					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
@@ -3819,21 +3794,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else{
-				if (getExternalCacheDir() != null){
-					megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-				}
-				else{
-					megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-				}
+                megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(), this);
 			}
 		}
 		else{
-			if (getExternalCacheDir() != null){
-				megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-			}
-			else{
-				megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
-			}
+            megaApi.getUserAvatar(megaApi.getMyUser(),buildAvatarFile(this,megaApi.getMyUser().getEmail() + ".jpg").getAbsolutePath(),this);
 		}
 	}
 
@@ -3854,15 +3819,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
 		log("setOfflineAvatar");
 
-		File avatar = null;
-		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-		}
-		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), email + ".jpg");
-		}
+		File avatar = buildAvatarFile(this, email + ".jpg");
 		Bitmap imBitmap = null;
-		if (avatar.exists()) {
+		if (isFileAvailable(avatar)) {
 			if (avatar.length() > 0) {
 				BitmapFactory.Options options = new BitmapFactory.Options();
 				options.inJustDecodeBounds = true;
@@ -14032,39 +13991,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 
 				String myEmail =  megaApi.getMyUser().getEmail();
-				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
+				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";
 				File imgFile = new File(filePath);
 
-				String newPath = null;
-				File qrFile = null;
-				if (getExternalCacheDir() != null){
-					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
-					File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
-					qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-				}else{
-					log("getExternalCacheDir() is NULL");
-					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
-					File qrDir = getApplicationContext().getDir("qrMEGA", 0);
-					qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
-				}
-				if (qrFile.exists()) {
+                File qrFile = buildQrFile(this,myEmail + "QRcode.jpg");
+                File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");
+				if (isFileAvailable(qrFile)) {
 					qrFile.delete();
 				}
 
-				if(newPath!=null) {
-					File newFile = new File(newPath);
-					log("NEW - the destination of the avatar is: " + newPath);
-					if (newFile != null) {
-						MegaUtilsAndroid.createAvatar(imgFile, newFile);
-						megaApi.setAvatar(newFile.getAbsolutePath(), this);
-
-					} else {
-						log("Error new path avatar!!");
-					}
-
-				}else{
-					log("ERROR! Destination PATH is NULL");
-				}
+                if (newFile != null) {
+                    log("NEW - the destination of the avatar is: " + newFile.getAbsolutePath());
+                    MegaUtilsAndroid.createAvatar(imgFile,newFile);
+                    megaApi.setAvatar(newFile.getAbsolutePath(),this);
+                } else {
+                    log("ERROR! Destination PATH is NULL");
+                }
 			}else{
 				log("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
 			}
@@ -15122,42 +15064,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Chosen picture to change the avatar: "+avatarPath);
 						File imgFile = new File(avatarPath);
 //						String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-						String newPath = null;
-						File qrFile = null;
-						if (getExternalCacheDir() != null){
-							newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
-							File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
-							qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
-						}
-						else{
-							log("getExternalCacheDir() is NULL");
-							newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
-							File qrDir = getApplicationContext().getDir("qrMEGA", 0);
-							qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
-						}
+                        File qrFile = buildQrFile(this,megaApi.getMyUser().getEmail() + "QRcode.jpg");
+                        File newFile = buildAvatarFile(this, megaApi.getMyUser().getEmail() + "Temp.jpg");
 
-						if (qrFile.exists()) {
+
+						if (isFileAvailable(qrFile)) {
 							qrFile.delete();
 						}
-
-						if(newPath!=null){
-							File newFile = new File(newPath);
-							log("NEW - the destination of the avatar is: "+newPath);
-							if(newFile!=null){
-								MegaUtilsAndroid.createAvatar(imgFile, newFile);
-								maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-								if(maFLol!=null){
-									megaApi.setAvatar(newFile.getAbsolutePath(), this);
-								}
-
-							}
-							else{
-								log("Error new path avatar!!");
-							}
-						}
-						else{
-							log("ERROR! Destination PATH is NULL");
-						}
+                        if (newFile != null) {
+                            log("NEW - the destination of the avatar is: " + newFile.getAbsolutePath());
+                            MegaUtilsAndroid.createAvatar(imgFile,newFile);
+                            maFLol = (MyAccountFragmentLollipop)getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
+                            if (maFLol != null) {
+                                megaApi.setAvatar(newFile.getAbsolutePath(),this);
+                            }
+                        } else {
+                            log("ERROR! Destination PATH is NULL");
+                        }
 
 
 //						String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/"+name;
@@ -15636,29 +15559,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
-
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
-					if(request.getFile()!=null){
-						log("old path: "+request.getFile());
-						File oldFile = new File(request.getFile());
-						if(oldFile!=null){
-							if(oldFile.exists()){
-								String newPath = null;
-								if (getExternalCacheDir() != null){
-									newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
-								}
-								else{
-									log("getExternalCacheDir() is NULL");
-									newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
-								}
-								File newFile = new File(newPath);
-								boolean result = oldFile.renameTo(newFile);
-								if(result){
-									log("The avatar file was correctly renamed");
-								}
-							}
-						}
+                    if (request.getFile() != null) {
+                        log("old path: " + request.getFile());
+                        File oldFile = new File(request.getFile());
+                        if (isFileAvailable(oldFile)) {
+                            File newFile = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg");
+                            boolean result = oldFile.renameTo(newFile);
+                            if (result) {
+                                log("The avatar file was correctly renamed");
+                            }
+                        }
 						log("User avatar changed!");
 						showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.success_changing_user_avatar), -1);
 					}
@@ -16702,35 +16614,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
 							log("The user: "+user.getEmail()+"changed his AVATAR");
 
-							File avatar = null;
-							if (this.getExternalCacheDir() != null){
-								avatar = new File(this.getExternalCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-							}
-							else{
-								avatar = new File(this.getCacheDir().getAbsolutePath(), user.getEmail() + ".jpg");
-							}
+							File avatar = buildAvatarFile(this, user.getEmail() + ".jpg");
 							Bitmap bitmap = null;
-							if (avatar.exists()){
+							if (isFileAvailable(avatar)){
 								avatar.delete();
 							}
 
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
-								log("I change my avatar");
-								if (getExternalCacheDir() != null){
-									String destinationPath = null;
-									destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
-									if(destinationPath!=null){
-										log("The destination of the avatar is: "+destinationPath);
-										megaApi.getUserAvatar(megaApi.getMyUser(), destinationPath, this);
-									}
-									else{
-										log("ERROR! Destination PATH is NULL");
-									}
-								}
-								else{
-									log("getExternalCacheDir() is NULL");
-									megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
-								}
+                                log("I change my avatar");
+                                String destinationPath = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg").getAbsolutePath();
+                                log("The destination of the avatar is: " + destinationPath);
+                                megaApi.getUserAvatar(megaApi.getMyUser(),destinationPath,this);
 							}
 							else {
 								log("Update de ContactsFragment");
@@ -16859,34 +16753,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		String oldEmail = dbH.getMyEmail();
 		if(oldEmail!=null){
 			log("updateMyEmail:oldEmail: "+oldEmail);
-
-			try{
-				File avatarFile = null;
-				if (getExternalCacheDir() != null){
-					avatarFile = new File(getExternalCacheDir().getAbsolutePath(), oldEmail + ".jpg");
-				}
-				else{
-					avatarFile = new File(getCacheDir().getAbsolutePath(), oldEmail + ".jpg");
-				}
-
-				if(avatarFile!=null){
-					if(avatarFile.exists()){
-						String newPath = null;
-						if (getExternalCacheDir() != null){
-							newPath = getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg";
-						}
-						else{
-							log("getExternalCacheDir() is NULL");
-							newPath = getCacheDir().getAbsolutePath() + "/" + email + ".jpg";
-						}
-						File newFile = new File(newPath);
-						boolean result = avatarFile.renameTo(newFile);
-						if(result){
-							log("The avatar file was correctly renamed");
-						}
-					}
-				}
-			}
+            try {
+                File avatarFile = buildAvatarFile(this,oldEmail + ".jpg");
+                if (isFileAvailable(avatarFile)) {
+                    File newFile = buildAvatarFile(this, email + ".jpg");
+                    if(newFile != null) {
+                        boolean result = avatarFile.renameTo(newFile);
+                        if (result) {
+                            log("The avatar file was correctly renamed");
+                        }
+                    }
+                }
+            }
 			catch(Exception e){
 				log("EXCEPTION renaming the avatar on changing email");
 			}
@@ -17363,7 +17241,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(transfer.isStreamingTransfer()){
 			return;
 		}
-        
+
         //workaround - can not get folder transfer children detail except using global listener
         if(transfer.getType()==MegaTransfer.TYPE_UPLOAD && transfer.getFolderTransferTag() > 0) {
             Intent intent = new Intent(this,UploadService.class);
@@ -18816,7 +18694,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void deleteInviteContactHandle(){
 		handleInviteContact = -1;
 	}
-    
+
     @Override
     public void onTrimMemory(int level){
         // Determine which lifecycle or system event was raised.
