@@ -4489,7 +4489,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(!noMoreNoSentMessages){
                         log("onMessageLoaded: NOT noMoreNoSentMessages");
-                        addInbufferSending(androidMsg);
+                        addInBufferSending(androidMsg);
                     }else{
                         log("Try to recover the initial msg");
                         if(msg.getMsgId()!=-1){
@@ -4535,7 +4535,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("onMessageLoaded: Message " + returnValue + " modified!");
                         return;
                     }
-                    addInbufferSending(androidMsg);
+                    addInBufferSending(androidMsg);
                     if(!noMoreNoSentMessages){
                         log("onMessageLoaded: NOT noMoreNoSentMessages");
                     }
@@ -4549,7 +4549,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("onMessageLoaded: Message " + returnValue + " modified!");
                     return;
                 }
-                addInbufferSending(androidMsg);
+                addInBufferSending(androidMsg);
                 if(!noMoreNoSentMessages){
                     log("onMessageLoaded: NOT noMoreNoSentMessages");
                 }
