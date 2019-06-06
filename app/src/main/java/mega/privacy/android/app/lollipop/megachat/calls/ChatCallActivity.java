@@ -36,6 +36,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -977,8 +978,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             email = chat.getPeerEmail(0);
             name = chat.getPeerFullname(0);
         }
-        if (megaChatApi != null) {
-            avatar = buildAvatarFile(this,email + ".jpg");
+        if (!TextUtils.isEmpty(email)) {
+            avatar = buildAvatarFile(this, email + ".jpg");
         }
 
         if ((isFileAvailable(avatar)) && (avatar.length() > 0)) {
@@ -1116,8 +1117,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             File avatar = null;
             Bitmap bitmap = null;
 
-            if (megaChatApi != null) {
-                avatar = buildAvatarFile(this,peerEmail + ".jpg");
+            if (!TextUtils.isEmpty(peerEmail)) {
+                avatar = buildAvatarFile(this, peerEmail + ".jpg");
             }
 
             if (isFileAvailable(avatar) && (avatar.length() > 0)) {

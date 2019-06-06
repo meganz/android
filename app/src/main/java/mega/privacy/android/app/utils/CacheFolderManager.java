@@ -28,6 +28,49 @@ public final class CacheFolderManager {
         }
     }
 
+    public static void createCacheFolders(Context context) {
+        File thumbDir = getCacheFolder(context,THUMBNAIL_FOLDER);
+        if (isFileAvailable(thumbDir)) {
+            log("thumbnailsMEGA folder created: " + thumbDir.getAbsolutePath());
+        } else {
+            log("create thumbnailsMEGA failed");
+        }
+
+        File previewDir = getCacheFolder(context,PREVIEW_FOLDER);
+        if (isFileAvailable(previewDir)) {
+            log("previewsMEGA folder created: " + previewDir.getAbsolutePath());
+        } else {
+            log("create previewsMEGA failed");
+        }
+
+        File avatarDir = getCacheFolder(context,AVATAR_FOLDER);
+        if (isFileAvailable(avatarDir)) {
+            log("avatarsMEGA folder created: " + avatarDir.getAbsolutePath());
+        } else {
+            log("create avatarsMEGA failed");
+        }
+
+        File qrDir = getCacheFolder(context,QR_FOLDER);
+        if (isFileAvailable(qrDir)) {
+            log("qrMEGA folder created: " + qrDir.getAbsolutePath());
+        } else {
+            log("create qrMEGA failed");
+        }
+    }
+
+    public static void clearPublicCache(final Context context) {
+        new Thread() {
+
+            @Override
+            public void run() {
+                File dir = context.getExternalCacheDir();
+                if(dir != null) {
+                    Util.cleanDir(dir);
+                }
+            }
+        }.start();
+    }
+
     public static File buildQrFile(Context context,String fileName) {
         return getCacheFile(context,QR_FOLDER,fileName);
     }

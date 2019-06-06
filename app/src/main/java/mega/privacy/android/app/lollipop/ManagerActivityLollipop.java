@@ -240,7 +240,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
-import static mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder;
 import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
@@ -1829,7 +1828,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cC = new ContactController(this);
 		aC = new AccountController(this);
 
-        createCacheFolders();
+        CacheFolderManager.createCacheFolders(this);
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -3031,36 +3030,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		log("END onCreate");
 	}
-
-    private void createCacheFolders() {
-        File thumbDir = getCacheFolder(this,CacheFolderManager.THUMBNAIL_FOLDER);
-        if (isFileAvailable(thumbDir)) {
-            log("------------------thumbnailsMEGA folder created: " + thumbDir.getAbsolutePath());
-        } else {
-            log("create thumbnailsMEGA failed");
-        }
-
-        File previewDir = getCacheFolder(this,CacheFolderManager.PREVIEW_FOLDER);
-        if (isFileAvailable(previewDir)) {
-            log("------------------previewsMEGA folder created: " + previewDir.getAbsolutePath());
-        } else {
-            log("create previewsMEGA failed");
-        }
-
-        File avatarDir = getCacheFolder(this,CacheFolderManager.AVATAR_FOLDER);
-        if (isFileAvailable(avatarDir)) {
-            log("------------------avatarsMEGA folder created: " + avatarDir.getAbsolutePath());
-        } else {
-            log("create avatarsMEGA failed");
-        }
-
-        File qrDir = getCacheFolder(this,CacheFolderManager.QR_FOLDER);
-        if (isFileAvailable(qrDir)) {
-            log("------------------qrMEGA folder created: " + qrDir.getAbsolutePath());
-        } else {
-            log("create qrMEGA failed");
-        }
-    }
 
 	private void openContactLink (long handle) {
     	if (handle == -1) {
@@ -15612,7 +15581,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     if (request.getFile() != null) {
                         log("old path: " + request.getFile());
                         File oldFile = new File(request.getFile());
-                        if (oldFile.exists()) {
+                        if (isFileAvailable(oldFile)) {
                             File newFile = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg");
                             boolean result = oldFile.renameTo(newFile);
                             if (result) {
