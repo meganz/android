@@ -525,7 +525,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     continue;
                 }
 
-                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running) {
+                // only retry for 20 times
+                int counter = 20;
+                while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running && counter != 0) {
+                    counter--;
                     try {
                         log("waiting for disk space to process");
                         Thread.sleep(1000);
@@ -574,7 +577,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     MegaNode node = checkExsitBySize(parent,toUpload.length());
                     if(node != null && node.getOriginalFingerprint() == null) {
                         dbH.deleteSyncRecordByPath(path,isSec);
-                        megaApi.setOriginalFingerprint(node,file.getOriginFingerprint(),this);
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
@@ -1174,15 +1176,21 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         initDbH();
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         String previousIP = app.getLocalIpAddress();
+        // the new logic implemented in NetworkStateReceiver
         String currentIP = Util.getLocalIpAddress(getApplicationContext());
-        if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
-            app.setLocalIpAddress(currentIP);
-        } else if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0) && (currentIP.compareTo(previousIP) != 0)) {
-            app.setLocalIpAddress(currentIP);
-            log("reconnect");
-            megaApi.reconnect();
+        app.setLocalIpAddress(currentIP);
+        if ((currentIP != null) && (currentIP.length() != 0) && (currentIP.compareTo("127.0.0.1") != 0))
+        {
+            if ((previousIP == null) || (currentIP.compareTo(previousIP) != 0)) {
+                log("Reconnecting...");
+                megaApi.reconnect();
+            }
+            else{
+                log("Retrying pending connections...");
+                megaApi.retryPendingConnections();
+            }
         }
-        
+        // end new logic
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
@@ -2012,46 +2020,50 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
         return output;
     }
-    
-    private MegaNode getPossibleNodeFromCloud(String localFingerPrint,MegaNode uploadNode) {
+
+    private MegaNode getPossibleNodeFromCloud(String localFingerPrint, MegaNode uploadNode) {
         log("getPossibleNodeFromCloud");
-        MegaNode nodeExistsFP = null;
-        MegaNode nodeExistsFPO = null;
-        
-        ArrayList<MegaNode> possibleNodeListFP = megaApi.getNodesByFingerprint(localFingerPrint);
-        if (possibleNodeListFP != null && possibleNodeListFP.size() > 0) {
-            nodeExistsFP = possibleNodeListFP.get(0);
-            for (int i = 0;i < possibleNodeListFP.size();i++) {
-                MegaNode node = possibleNodeListFP.get(i);
-                if (node.getParentHandle() == uploadNode.getHandle()) {
-                    log("nodeExistsFP found from same destination");
-                    return node;
-                }
-            }
-        }
-        
-        MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint,null);
-        if (possibleNodeListFPO != null && possibleNodeListFPO.size() > 0) {
-            nodeExistsFPO = possibleNodeListFPO.get(0);
-            for (int i = 0;i < possibleNodeListFPO.size();i++) {
-                MegaNode node = possibleNodeListFPO.get(i);
-                if (node.getParentHandle() == uploadNode.getHandle()) {
-                    log("nodeExistsFPO found from same destination");
-                    return node;
-                }
-            }
-        }
-        
-        if (nodeExistsFP != null) {
-            log("nodeExist found");
-            return nodeExistsFP;
-        } else if (nodeExistsFPO != null) {
-            log("nodeExistsFPO found");
-            return nodeExistsFPO;
+        MegaNode nodeFP = megaApi.getNodeByFingerprint(localFingerPrint, uploadNode);
+        if (nodeFP != null) {
+            // the desired node
+            log("found node with same fingerprint in the same folder!");
+            return nodeFP;
         } else {
-            log("no possible node found");
-            return null;
+            // search all the places to find out a node which has the given fingerprint.
+            ArrayList<MegaNode> possibleNodeListFP = megaApi.getNodesByFingerprint(localFingerPrint);
+            if (possibleNodeListFP != null && possibleNodeListFP.size() > 0) {
+                // the node has the given fingerprint but doesn't belong to uploadNode folder.
+                nodeFP = possibleNodeListFP.get(0);
+                if (nodeFP != null) {
+                    log("found node with same fingerprint in other folder!");
+                    return nodeFP;
+                }
+            }
         }
+
+        MegaNodeList possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
+        MegaNode nodeFPO = getFirstNodeFromList(possibleNodeListFPO);
+        if (nodeFPO != null) {
+            log("found node with same original fingerprint in the same folder!");
+            return nodeFPO;
+        }
+
+        possibleNodeListFPO = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
+        nodeFPO = getFirstNodeFromList(possibleNodeListFPO);
+        if (nodeFPO != null) {
+            log("found node with same original fingerprint in the other folder!");
+            return nodeFPO;
+        }
+
+        log("no possibile node found");
+        return null;
+    }
+
+    private MegaNode getFirstNodeFromList(MegaNodeList megaNodeList) {
+        if(megaNodeList != null && megaNodeList.size() > 0) {
+            return megaNodeList.get(0);
+        }
+        return null;
     }
     
     private void releaseLocks() {

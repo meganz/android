@@ -116,7 +116,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class Util {
 
-    public static final String PATTERN = "yyyy-MM-dd HH.mm.ss";
+    public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
     public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
 	
 	public static float dpWidthAbs = 360;
@@ -1243,7 +1243,7 @@ public class Util {
 	}
 
 	public static String getPhotoSyncName (long timeStamp, String fileName){
-        DateFormat sdf = new SimpleDateFormat(PATTERN,Locale.getDefault());
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
@@ -1251,7 +1251,7 @@ public class Util {
         if(photoIndex == 0) {
             return getPhotoSyncName(timeStamp, fileName);
         }
-        DateFormat sdf = new SimpleDateFormat(PATTERN,Locale.getDefault());
+        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
 	}
 	
