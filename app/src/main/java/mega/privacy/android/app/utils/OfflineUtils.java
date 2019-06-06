@@ -244,7 +244,6 @@ public class OfflineUtils {
                     }
                 }
                 else if(from==Constants.INBOX_ADAPTER){
-
                     if (Environment.getExternalStorageDirectory() != null) {
                         offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
                         log("offline File INCOMING: " + offlineFile.getAbsolutePath());
@@ -264,33 +263,31 @@ public class OfflineUtils {
                         offlineFile = context.getFilesDir();
                     }
                 }
-                if (offlineFile != null) {
-                    if (offlineFile.exists()) {
-                        log("FOUND!!!: " + node.getHandle() + " " + node.getName());
-                        return true;
-                    }
-                    else {
-                        log("Not found: " + node.getHandle() + " " + node.getName());
-                        return false;
-                    }
-                }
-                else {
-                    log("Not found offLineFile is NULL");
-                    return false;
+                if (offlineFile != null && offlineFile.exists()) {
+                    log("FOUND!!!: " + node.getHandle() + " " + node.getName());
+                    return true;
                 }
             }
-            else{
-                log("offLineNode is NULL");
-                return false;
-            }
         }
-        else{
-            log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
-            return false;
-        }
+
+        return false;
     }
 
+    public static int getComesFrom (MegaNode node, MegaApiAndroid megaApi) {
 
+        MegaNode parentNode = megaApi.getParentNode(node);
+
+        if (parentNode != null) {
+            while (megaApi.getParentNode(parentNode) != null) {
+                parentNode = megaApi.getParentNode(parentNode);
+            }
+
+            if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()) return Constants.INBOX_ADAPTER;
+            else if (parentNode.isInShare()) return Constants.INCOMING_SHARES_ADAPTER;
+        }
+
+        return Constants.GENERAL_OTHERS_ADAPTER;
+    }
 
     public static long findIncomingParentHandle(MegaNode nodeToFind, MegaApiAndroid megaApi){
         log("findIncomingParentHandle");

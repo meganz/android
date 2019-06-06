@@ -303,10 +303,15 @@ public class TimeUtils implements Comparator<Calendar> {
     public static String formatBucketDate(Context context, long ts) {
         Calendar cal = Util.calculateDateFromTimestamp(ts);
         Calendar calToday = Calendar.getInstance();
+        Calendar calYesterday = Calendar.getInstance();
+        calYesterday.add(Calendar.DATE, -1);
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
         if (tc.compare(cal, calToday) == 0) {
             return context.getString(R.string.label_today);
+        }
+        else if (tc.compare(cal, calYesterday) == 0) {
+            return context.getString(R.string.label_yesterday);
         }
         else {
             Date date = cal.getTime();

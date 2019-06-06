@@ -22,6 +22,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -255,13 +256,27 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         ViewHolderBucket holder = (ViewHolderBucket) v.getTag();
         if (holder == null) return;
 
+        RecentsItem item = getItemtAtPosition(holder.getAdapterPosition());
+        if (item == null) return;
+
+        MegaNode node = getNodeOfItem(item);
+
         switch (v.getId()) {
             case R.id.three_dots:{
                 log("three_dots click");
+                if (node != null) {
+                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
+                }
                 break;
             }
             case R.id.item_bucket_layout: {
                 log("item_bucket_layout click");
+                MegaNodeList nodeList = getMegaNodeListOfItem(item);
+                if (nodeList == null) break;
+                if (nodeList.size() == 1) {
+
+                    break;
+                }
                 break;
             }
         }
@@ -278,6 +293,26 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size()) return null;
 
         return recentsItems.get(pos);
+    }
+
+    private MegaRecentActionBucket getBucketOfItem (RecentsItem item) {
+        if (item == null) return null;
+
+        return item.getBucket();
+    }
+
+    private MegaNodeList getMegaNodeListOfItem (RecentsItem item) {
+       MegaRecentActionBucket bucket = getBucketOfItem(item);
+        if (bucket == null) return null;
+
+        return bucket.getNodes();
+    }
+
+    private MegaNode getNodeOfItem (RecentsItem item) {
+        MegaNodeList nodeList = getMegaNodeListOfItem(item);
+        if (nodeList == null || nodeList.size() > 1) return null;
+
+        return nodeList.get(0);
     }
 
     @Override
