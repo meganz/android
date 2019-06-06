@@ -5488,8 +5488,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		catch (Exception e){
 			log("Exception NotificationManager - remove all notifications");
 		}
-        
-        createMyChatFolder();
+
 		setToolbarTitle();
 
 		tabLayoutShares.setVisibility(View.GONE);
