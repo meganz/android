@@ -250,7 +250,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (destination.length() == node.getSize()) {
                         File previewDir = PreviewUtils.getPreviewFolder(context);
                         File previewFile = new File(previewDir, node.getBase64Handle() + ".jpg");
-                        log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
+                        log("BASE64: " + node.getBase64Handle() + "name: " + node.getHandle());
                         boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 
                         if (previewCreated) {
@@ -1253,7 +1253,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                     }
                 }
-                log("Node Name: " + name);
+                log("Node handle: " + message.getPendingMessage().getNodeHandle());
 
                 if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     log("Landscape configuration");
@@ -4536,7 +4536,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (nodeList.size() == 1) {
                     MegaNode node = nodeList.get(0);
-                    log("Node Name: " + node.getName());
+                    log("Node Handle: " + node.getHandle());
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -4755,7 +4755,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         MegaNode temp = nodeList.get(i);
                         if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
                             count++;
-                            log("Node Name: " + temp.getName());
+                            log("Node Handle: " + temp.getHandle());
                             totalSize = totalSize + temp.getSize();
                         }
                     }
@@ -4886,7 +4886,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (nodeList != null) {
                 if (nodeList.size() == 1) {
                     MegaNode node = nodeList.get(0);
-                    log("Node Name: " + node.getName());
+                    log("Node Handle: " + node.getHandle());
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -5088,7 +5088,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         MegaNode temp = nodeList.get(i);
                         if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
                             count++;
-                            log("Node Name: " + temp.getName());
+                            log("Node Handle: " + temp.getHandle());
                             totalSize = totalSize + temp.getSize();
                         }
                     }
@@ -5335,7 +5335,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name = message.getUserEmail(0);
                 }
                 String email = message.getUserEmail(0);
-                log("Contact Name: " + name);
                 holder.contentContactMessageContactName.setText(name);
                 holder.contentContactMessageContactEmail.setText(email);
                 setUserAvatar(holder, message);
@@ -5347,7 +5346,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
-                log("Names of attached contacts: " + name);
                 holder.contentContactMessageContactName.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentContactMessageContactEmail.setText(email);
@@ -6098,7 +6096,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             name = message.getUserEmail(0);
         }
         String email = message.getUserEmail(0);
-        log("Contact Name: " + name);
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
 
         ChatAttachmentAvatarListener listener;
@@ -6323,7 +6320,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
             else{
-                log("Group chat initial letter is: "+firstLetter);
                 if(firstLetter.equals("(")){
                     if(isMyMsg){
                         holder.urlOwnMessageGroupAvatarText.setVisibility(View.INVISIBLE);
@@ -6970,7 +6966,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             String name = holder.contentOwnMessageFileName.getText().toString();
 
-                            log("Update my preview: " + name);
                             if (bitmap.getWidth() < bitmap.getHeight()) {
                                 log("Portrait");
 
@@ -7468,7 +7463,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
             log("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
-            log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
+            log("onRequestFinish: Node: " + request.getNodeHandle());
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE) {
                 if (e.getErrorCode() == MegaError.API_OK) {
@@ -7499,7 +7494,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(n!=null){
             int duration = n.getDuration();
             String timeString = "";
-            log("duration: "+n.getDuration());
             if (duration > 0) {
                 int hours = duration / 3600;
                 int minutes = (duration % 3600) / 60;
@@ -7510,9 +7504,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     timeString = String.format("%d:%02d", minutes, seconds);
                 }
-
-                log("The duration is: " + hours + " " + minutes + " " + seconds);
-            }
+             }
             return timeString;
         }
         return "";
