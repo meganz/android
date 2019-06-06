@@ -102,15 +102,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private int notificationIdFinalForFolderUpload = Constants.NOTIFICATION_UPLOAD_FINAL_FOLDER;
     private String notificationChannelIdForFolderUpload = Constants.NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER;
     private String notificationChannelNameForFolderUpload = Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER;
-	MegaRequestListenerInterface megaRequestListener;
-	MegaTransferListenerInterface megaTransferListener;
 
     private ExecutorService threadPool = Executors.newCachedThreadPool();
-
-	private int notificationId = Constants.NOTIFICATION_UPLOAD;
-	private int notificationIdFinal = Constants.NOTIFICATION_UPLOAD_FINAL;
-	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_UPLOAD_ID;
-	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME;
 
 	private HashMap<String, String> transfersCopy;
     private HashMap<Integer, MegaTransfer> mapProgressFileTransfers;
@@ -121,18 +114,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private int totalFolderUploadsCompleted = 0;
     private int totalFolderUploads = 0;
     private int totalFolderUploadsCompletedSuccessfully = 0;
-	HashMap<Integer, MegaTransfer> mapProgressTransfers;
-	int totalUploadsCompleted = 0;
+
 	int totalUploads = 0;
-	int uploadCount;
-	int currentUpload;
+    int uploadCount;
+    int currentUpload;
 
 	//0 - not overquota, not pre-overquota
 	//1 - overquota
 	//2 - pre-overquota
     private int isOverquota = 0;
 
-    private long lastUpdated;
     private int uploadedFileCount;
 
     @SuppressLint("NewApi")
@@ -287,14 +278,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
 						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-
-						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
-
-//						Intent i = new Intent(this, ManagerActivityLollipop.class);
-//						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-//						i.putExtra("MESSAGE", sShow);
-//						startActivity(i);
 						log("Return - file already uploaded");
 				        uploadedFileCount++;
 						return;
@@ -347,12 +330,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
 						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-//						String sShow = file.getName() + " " + getString(R.string.general_already_uploaded);
-//						Intent i = new Intent(this, ManagerActivityLollipop.class);
-//						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-//						i.putExtra("MESSAGE", sShow);
-//						startActivity(i);
                         uploadedFileCount++;
 						log("Return - file already uploaded");
 						return;
