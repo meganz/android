@@ -306,22 +306,22 @@ public class ShareInfo {
 				return;
 			}
 
-            if (title != null) {
-                if (title.contains("../") || title.contains(("..%2F"))) {
-                    log("Internal path traversal: " + title);
-                    return;
-                }
-                log("Internal No path traversal: " + title);
-                if (context instanceof PdfViewerActivityLollipop) {
-                    log("context of PdfViewerActivityLollipop");
-                    if (!title.endsWith(".pdf")) {
-                        title += ".pdf";
-                    }
-                }
-                file = new File(context.getCacheDir(),title);
-            } else {
+            if (title == null) {
+                log("title is null, return!");
                 return;
             }
+            if (title.contains("../") || title.contains(("..%2F"))) {
+                log("Internal path traversal: " + title);
+                return;
+            }
+            log("Internal No path traversal: " + title);
+            if (context instanceof PdfViewerActivityLollipop) {
+                log("context of PdfViewerActivityLollipop");
+                if (!title.endsWith(".pdf")) {
+                    title += ".pdf";
+                }
+            }
+            file = new File(context.getCacheDir(), title);
 
 			log("Start copy to: "+file.getAbsolutePath());
 

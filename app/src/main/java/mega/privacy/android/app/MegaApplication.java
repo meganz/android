@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -569,25 +570,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					});
 		}
 		EmojiCompat.init(config);
-        clearPublicCache();
+		// clear the cache files stored in the external cache folder.
+        CacheFolderManager.clearPublicCache(this);
 
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
 	}
-
-	private void clearPublicCache() {
-	    new Thread() {
-
-            @Override
-            public void run() {
-                File dir =getExternalCacheDir();
-                if(dir != null) {
-                    Util.cleanDir(dir);
-                }
-            }
-        }.start();
-    }
 
 	public void askForFullAccountInfo(){
 		log("askForFullAccountInfo");

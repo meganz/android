@@ -1079,8 +1079,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             Bitmap imBitmap = null;
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
                 imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
                 if (imBitmap != null) {
                     contactPropertiesImage.setImageBitmap(imBitmap);
@@ -1101,8 +1099,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		if (avatar.exists()) {
 			if (avatar.length() > 0) {
 				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
 				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (imBitmap == null) {
 					avatar.delete();
@@ -1562,8 +1558,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if (isFileAvailable(avatar)) {
 					if (avatar.length() > 0) {
 						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
 						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 						if (imBitmap == null) {
 							avatar.delete();
