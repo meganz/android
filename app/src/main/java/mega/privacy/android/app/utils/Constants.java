@@ -341,4 +341,13 @@ public class Constants {
 
 	public static final int HEADER_VIEW_TYPE = 0;
 	public static final int ITEM_VIEW_TYPE = 1;
+
+	public static final int FILE_LINK = 200;
+	public static final int FOLDER_LINK = 201;
+	public static final int CHAT_LINK = 202;
+	public static final int CONTACT_LINK = 203;
+	public static final int ERROR_LINK = -1;
+
+	public static final String CONTACT_HANDLE = "contactHandle";
+
 }

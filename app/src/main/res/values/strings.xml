@@ -166,6 +166,8 @@
     <string name="alert_no_app" context="Alert text before download">There is no app to open the file %s. Do you want to continue with the download?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Do not show again</string>
 
+    <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Are you sure that you want to cancel the current login process?</string>
+
     <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">Email</string>
     <string name="password_text" context="password label">Password</string>
@@ -721,7 +723,10 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
     <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
-    <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Wrong PIN code, please try again. You have %2d attempts left</string>
+    <plurals name="pin_lock_incorrect_alert">
+        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN code, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong PIN code, please try again. You have %2d attempts left</item>
+    </plurals>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Codes don’t match</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Enter your PIN Code</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-Enter your PIN Code</string>
@@ -1426,7 +1431,7 @@
     </plurals>
 
     <string name="general_view" context="Menu option">View files</string>
-    <string name="add_to_cloud" context="Menu option">Add to Cloud Drive</string>
+    <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
     <string name="save_for_offline" context="Menu option">Save for offline</string>
 
     <string name="general_view_contacts" context="Menu option">View contacts</string>
@@ -1782,8 +1787,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Original</item>
-        <item context="the options of what to upload.">Medium</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
@@ -1873,6 +1878,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Servers are too busy. Please wait.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Too many requests. Please wait.</string>
+    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait.</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
@@ -1982,8 +1988,6 @@
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid message format</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid message signature</string>
-
-    <string name="add_to_cloud_import" context="Menu option">Add to Cloud Drive</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error occurred trying to create the stream</string>
 
@@ -2439,6 +2443,14 @@
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
 
+    <string name="hint_paste_link" context="Hint shown in the open link alert dialog">Paste link</string>
+    <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
+    <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please, enter a valid file or folder link</string>
+    <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please, enter a valid chat link</string>
+    <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
+    <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
+    <string name="action_open_contact_link" context="Menu item">Open contact link</string>
+
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">New chat link</string>
     <string name="enter_group_name" context="Title of the dialog shown when the user it is creating a chat link and the chat has not title">Enter group name</string>
@@ -2464,7 +2476,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
 	</plurals>
-
+    
     <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A][B].[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%s and %d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
@@ -2476,4 +2488,5 @@
     <string name="create_action_bucket" context="Label that indicates who uploaded a file into a recents bucket">[A]created by [/A]%s</string>
     <string name="update_action_bucket" context="Label that indicates who updated a file into a recents bucket">[A]updated by [/A]%s</string>
     <string name="bucket_word_me" context="Used in recents list screen to indicate an action done by me">me</string>
+
 </resources>
