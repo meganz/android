@@ -240,6 +240,7 @@ public class ShareInfo {
 		try {
 			inputStream = context.getContentResolver().openInputStream(uri);
 		} catch (FileNotFoundException fileNotFound) {
+		    log("FileNotFoundException, can't find uri: " + uri);
 		    return;
         } catch (Exception e) {
 			log("inputStream EXCEPTION!");
