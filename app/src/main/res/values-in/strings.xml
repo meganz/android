@@ -450,7 +450,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">%d item berhasil dipindahkan</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d item tidak berhasil dipindahkan</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Pindah ke sampah dengan sukses</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d item berhasil dipindahkan ke sampah</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d item berhasil dipindahkan ke Sampah</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">&#160; dan %d item tidak berhasil dikirim</string>
     <string name="context_no_moved" context="error message">Error. Belum dipindahkan</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Telah berhasil membagikan</string>
@@ -483,7 +483,7 @@
     <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">Folder tidak lagi dibagikan</string>
     <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, folder masih dibagikan dengan kontak lain</string>
     <string name="context_select_one_file" context="option available for just one file">Pilih hanya satu file</string>
-    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Sampah dikosongkan dengan sukses</string>
+    <string name="rubbish_bin_emptied" context="success message when emptying the RB">Sampah telah berhasil dikosongkan</string>
     <string name="rubbish_bin_no_emptied" context="error message when emptying the RB">Error. Sampah tidak dikosongkan</string>
 
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Anda akan membatalkan langganan MEGA Anda. Beri tahu kami jika ada yang bisa kami lakukan untuk membantu Anda berubah pikiran</string>
@@ -646,10 +646,14 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Lanjutan</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Hapus Cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Hapus File Offilne</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">Hapus File Offilne</string>
 
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
 	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Hapus akun anda</string>
+
+
+
+	<string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Hapus akun anda</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Sekarang memakai %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Berhitung</string>
@@ -848,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Salin Kunci Pemulihan ke clipboard atau simpan sebagai file teks</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Simpan</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">Recovery Key telah berhasil disalin</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
 
     <string name="change_pass" context="Button to change the password">Ganti</string>
 
@@ -1449,8 +1453,8 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Tampilkan info</string>
 
-    <string name="context_link_removal_error" context="error message">Penghapusan tautan gagal. Coba lagi nanti.</string>
-    <string name="context_link_action_error" context="error message">Link action gagal. Coba kembali lagi nanti.</string>
+    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
+    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Tulis e-mail pengguna</string>
 
@@ -1681,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">Terjadi kesalahan saat mencoba mengunduh file QR. Mungkin file itu tidak ada. Silakan, coba lagi nanti.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">Kode QR telah berhasil diunduh ke %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Undangan tidak terkirim</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">Kode QR atau tautan kontak tidak valid. Coba pindai kode yang valid atau untuk membuka tautan yang valid.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">Undangan belum dikirim. %s sudah ada dalam daftar kontak Anda.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">Undangan belum dikirim. Kesalahan terjadi saat memprosesnya.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Membuat Kode QR &#8230;</string>
@@ -1781,8 +1785,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Kualitas media chat</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Original</item>
-        <item context="the options of what to upload.">Sedang</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Panggilan tidak terjawab</string>
@@ -1830,7 +1834,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Test password</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test password anda</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password diterima</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Kata sandi salah! \nCadangkan Kunci Pemulihan Anda sesegera mungkin!</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Recovery Key terekspor</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">Kunci Pemulihan telah diekspor ke bagian Offline sebagai MEGARecoveryKey.txt. \nCatatan: Ini akan dihapus jika Anda keluar, simpan di tempat yang aman.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Anda akan keluar, silakan uji kata sandi Anda untuk memastikan Anda mengingatnya. \nJika Anda kehilangan kata sandi, Anda akan kehilangan akses ke data MEGA Anda.</string>
@@ -2117,7 +2121,6 @@
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Aktivitas chat</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Anda mungkin memiliki pesan baru</string>
 	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
-
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Scheduler Pembersih Sampah</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">Sampah dibersihkan untuk Anda secara otomatis.</string>
 
@@ -2130,18 +2133,18 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">Untuk menonaktifkan Penjadwalan Pembersihan Rubbish-Bin atau menetapkan periode retensi yang lebih lama, Anda harus berlangganan ke rencana PRO.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">hari</string>
-    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Dapatkan Tautan Obrolan</string>
-    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Kelola Tautan Obrolan</string>
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get Chat Link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage Chat Link</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Nyalakan Encrypted Key Rotation</string>
     <string name="make_chat_private_option_text" context="Subtitle of the option to make a public chat private">Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
 
-    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] membuat Tautan Obrolan.[/B]</string>
-    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] menghapus Tautan Obrolan.[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] created a Chat Link.[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] deleted the Chat Link.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Hapus Tautan Obrolan</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Tautan Obrolan</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Ini akan mengeluarkan Anda di semua sesi aktif lainnya kecuali sesi saat ini.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Apakah Anda ingin menutup semua sesi lainnya?</string>
 
@@ -2151,9 +2154,9 @@
 
     <string name="observers_chat_label" context="Label for observers of a group chat">Pengamat</string>
 
-    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Kesalahan memuat Tautan Obrolan.</string>
+    <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the Chat Link.</string>
 
-    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Kesalahan saat memulai obrolan saat memuat Tautan Obrolan.</string>
+    <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the Chat Link.</string>
 
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">Anda mencoba melihat pratinjau obrolan yang sebelumnya Anda menjadi anggotanya. Apakah Anda ingin bergabung dengan obrolan lagi?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">Anda sudah berpartisipasi dalam obrolan ini.</string>
@@ -2163,13 +2166,13 @@
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] mengaktifkan rotasi kunci terenkripsi.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Percakapan ini tidak lagi tersedia</string>
-    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Tautan Obrolan tidak valid</string>
+    <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Invalid Chat Link</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted Key Rotation</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
-    <string name="action_open_chat_link" context="Menu item">Buka Tautan Obrolan</string>
+    <string name="action_open_chat_link" context="Menu item">Open Chat Link</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">Undangan untuk menghubungi %s telah dikirim sebelumnya dan dapat dikonsultasikan di tab Permintaan Terkirim.</string>
 
@@ -2282,7 +2285,7 @@
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Sebelum Anda dapat membuat tautan untuk obrolan ini, Anda perlu menetapkan deskripsi:</string>
 
-    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Tautan Obrolan disalin ke papan klip</string>
+    <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">Chat Link copied to the clipboard</string>
 
     <string name="type_month" context="Label to show the price of each plan in the upgrade account section">[A]Dari[/A] %s / [A]bulan[/A] *</string>
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* langganan berulang dapat dibatalkan kapan saja sebelum tanggal perpanjangan</string>
@@ -2298,10 +2301,10 @@
     <string name="allow_acces_media_title" cotext="Title of the screen asking permissions for files">Izinkan akses ke foto, media, dan file.</string>
     <string name="allow_acces_media_subtitle" context="Subtitle of the screen asking permissions for files">Untuk berbagi foto, video, dan file, MEGA memerlukan izin Anda.</string>
     <string name="allow_acces_camera_title" cotext="Title of the screen asking permissions for camera">Aktifkan kamera</string>
-    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">Untuk memindai dokumen, ambil gambar dan buat panggilan video memungkinkan akses ke kamera Anda.</string>
+    <string name="allow_acces_camera_subtitle" context="Subtitle of the screen asking permissions for camera">To scan documents, take pictures and make video calls allow access to your camera.</string>
     <string name="allow_acces_calls_title" cotext="Title of the screen asking permissions for microphone and write in log calls">Aktifkan panggilan</string>
     <string name="allow_acces_calls_subtitle" context="Subtitle of the screen asking permissions for microphone and write in log calls">To make encrypted calls allow access to your microphone and call log.</string>
-    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">Untuk membuat panggilan terenkripsi memungkinkan akses ke mikrofon Anda.</string>
+    <string name="allow_acces_calls_subtitle_microphone" context="Subtitle of the screen asking permissions for microphone">To make encrypted calls allow access to your microphone.</string>
     <string name="general_enable_access" context="General enable access">Aktifkan akses</string>
     <string name="title_chat_shared_files_info" context="Title of the option on chat info screen to list all the files sent to the chat">Shared Files</string>
 
@@ -2340,7 +2343,7 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Panggilan masuk&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Panggilan&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">Pesan berisi metadata yang tidak valid</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">Pesan berisi metadata yang tidak valid</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2361,7 +2364,7 @@
 
     <plurals name="num_messages_not_send" context="Alert shown when a num of messages have not been sent because of any error occurs">
         <item context="Singular of file. 1 file" quantity="one">%d pesan tidak terkirim ke %d obrolan</item>
-        <item context="Plural of file. 2 files" quantity="other">%d pesan tidak terkirim ke %d obrolan</item>
+        <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
     </plurals>
 
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">Konten tidak dikirim ke %d obrolan</string>
@@ -2372,11 +2375,11 @@
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">Error. File belum dikirim ke salah satu obrolan yang dipilih</string>
     <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A]Tidak[/A] [B]Item[/B]</string>
 
-    <string name="delete_versions" context="Action delete all file versions">Hapus semua</string>
-    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Hapus versi lama?</string>
+    <string name="delete_versions" context="Action delete all file versions">Delete old versions</string>
+    <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">Delete old versions?</string>
     <string name="text_delete_version_history" context="Text of the dialog shown when it wants to delete the version history of a file">Harap perhatikan bahwa file saat ini tidak akan dihapus.</string>
-    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Versi lama dihapus.</string>
-    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Versi lama tidak dihapus.</string>
+    <string name="version_history_deleted" context="Alert shown when the version history was deleted correctly">Old versions deleted.</string>
+    <string name="version_history_deleted_erroneously" context="Alert shown when the version history was deleted erroneously">Old versions not deleted.</string>
 
     <plurals name="versions_deleted_succesfully" formatted="false" context="Confirmation message after deleted file versions">
         <item context="version item" quantity="one">%d versi berhasil dihapus</item>
@@ -2399,7 +2402,7 @@
     <string name="title_tour_four" cotext="Title of fourth tour screen">Foto Anda di Cloud</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Unggahan Kamera adalah fitur penting untuk perangkat seluler apa pun dan kami telah melindungi Anda. Buat akun Anda sekarang.</string>
 
-    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Masukkan kata sandi Anda</string>
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Masukkan password anda</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s adalah dokumen PDF yang dilindungi kata sandi. Silakan masukkan kata sandi untuk membuka PDF.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Anda telah memasukkan kata sandi yang salah, silakan coba lagi.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">Kata sandi yang Anda masukkan tidak valid.</string>
