@@ -46,7 +46,6 @@ import org.webrtc.VideoCapturer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -1671,9 +1670,18 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					break;
 				}
 
+				case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION: {
+					log("onChatCallUpdate:STATUS: CALL_STATUS_TERMINATING_USER_PARTICIPATION");
+					hashMapSpeaker.remove(call.getChatid());
+					break;
+				}
+
 				case MegaChatCall.CALL_STATUS_DESTROYED: {
 					log("onChatCallUpdate:STATUS: DESTROYED");
-					//Show missed call if time out ringing (for incoming calls)
+
+                    hashMapSpeaker.remove(call.getChatid());
+
+                    //Show missed call if time out ringing (for incoming calls)
 					try{
 						if(((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode()==MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))){
 						log("onChatCallUpdate:TERM_CODE_ANSWER_TIMEOUT");
@@ -1817,6 +1825,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 					break;
 				}
+
 				default:
 					break;
 			}
