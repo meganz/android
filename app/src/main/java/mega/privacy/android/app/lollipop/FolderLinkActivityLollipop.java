@@ -203,6 +203,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 
 					onFileClick(handleList);
+					clearSelections();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -559,7 +560,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		fileLinkDownloadButton.setLayoutParams(downloadTextParams);
 
 		fileLinkImportButton = (TextView) findViewById(R.id.folder_link_file_link_button_import);
-		fileLinkImportButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+		fileLinkImportButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		fileLinkImportButton.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams importTextParams = (LinearLayout.LayoutParams)fileLinkImportButton.getLayoutParams();
@@ -2160,8 +2161,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						handleList.add(documents.get(i).getHandle());
 					}
 					onFileClick(handleList);
-
-				}else{
+					clearSelections();
+				} else {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 						if (!hasStoragePermission) {

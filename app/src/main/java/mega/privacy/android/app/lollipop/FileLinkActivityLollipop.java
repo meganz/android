@@ -221,7 +221,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		downloadButton.setVisibility(View.INVISIBLE);
 
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
 
