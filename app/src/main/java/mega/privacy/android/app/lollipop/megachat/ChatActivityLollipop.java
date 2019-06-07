@@ -154,6 +154,8 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener {
 
@@ -348,6 +350,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
+    private String outputFileName = "";
     private RelativeLayout recordLayout;
     private RelativeLayout recordButtonLayout;
     private RecordButton recordButton;
@@ -1975,21 +1978,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     /*
      * Start recording
      */
+
     public void startRecording(){
         log("startRecording() with Permissions");
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
-        File newFolder = new File(path);
-        newFolder.mkdirs();
-        outputFileVoiceNotes = path + "/note_voice.m4a";
+
         long timeStamp = System.currentTimeMillis()/1000;
-        File voiceFile = new File(outputFileVoiceNotes);
-        String name = Util.getVoiceClipName(timeStamp, voiceFile.getAbsolutePath());
-        outputFileVoiceNotes = path + "/note_voice"+name;
-
+        outputFileName ="/note_voice"+Util.getVoiceClipName(timeStamp);
+        File vcFile =  buildVoiceClipFile(this, outputFileName);
+        outputFileVoiceNotes = vcFile.getAbsolutePath();
         if(outputFileVoiceNotes == null) return;
-
         if(myAudioRecorder == null)  myAudioRecorder = new MediaRecorder();
-
         try {
             myAudioRecorder.reset();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -1999,11 +1997,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.prepare();
             myAudioRecorder.start();
             setRecordingNow(true);
+
         } catch (IOException e) {
-            log("startRecording: error try to start recording");
+            log("error try to start recording");
+            if(myAudioRecorder!=null){
+                myAudioRecorder.reset();
+                myAudioRecorder.release();
+                myAudioRecorder = null;
+            }
+            outputFileVoiceNotes = null;
+            outputFileName = null;
+            setRecordingNow(false);
             e.printStackTrace();
         }
-
     }
 
     /*
@@ -2011,9 +2017,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      */
     private void cancelRecording(){
         log("cancelRecording");
-        if(!isRecordingNow()) return;
-        if(myAudioRecorder == null) return;
+        if(!isRecordingNow() || myAudioRecorder == null) return;
+        myAudioRecorder.stop();
         myAudioRecorder.reset();
+        deleteOwnVoiceClip(outputFileName);
         outputFileVoiceNotes = null;
         setRecordingNow(false);
 
@@ -2026,13 +2033,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("sendRecording");
         if((!recordView.isRecordingNow()) || (myAudioRecorder == null)) return;
         try{
-
             log("sendRecording: playSound - RECORD_FINISHED");
             myAudioRecorder.stop();
             recordView.playSound(Constants.TYPE_END_RECORD);
             setRecordingNow(false);
             recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
-
             uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
             outputFileVoiceNotes = null;
         }catch(RuntimeException ex){
@@ -4108,7 +4113,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
 
-                                        String downloadLocationDefaultPath = ChatUtil.getDefaultLocationPath(this,false);
+                                        String downloadLocationDefaultPath = Util.getDownloadLocation(this);
                                         String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
                                         log("localPath: "+localPath);
 
@@ -5327,22 +5332,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //        mLayoutManager.scrollToPosition(0);
     }
     public void sendToDownload(MegaNodeList nodelist){
-        log("sendToDownload ");
-        chatC.prepareForChatDownload(nodelist, true);
+        log("sendToDownload");
+        chatC.prepareForChatDownload(nodelist);
     }
 
     /*
-    * Delete a voice note from local storage
+     * Delete a voice note from local storage
      */
     public void deleteOwnVoiceClip(String nameFile){
         log("deleteOwnVoiceClip");
-        String path = ChatUtil.getDefaultLocationPath(context, true);
-        File f = new File(path, nameFile);
-        if(f.exists()){
-            f.delete();
-        }
+        File localFile = buildVoiceClipFile(this, nameFile);
+        if (isFileAvailable(localFile) && localFile.exists()) {
+            log("deleteOwnVoiceClip : exists");
+            localFile.delete();
 
+        }
     }
+
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         log("onMessageUpdate!: "+ msg.getMsgId());
@@ -7824,14 +7830,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void uploadPictureOrVoiceClip(String path, boolean isVoiceClip){
         if(path == null) return;
-
-        log("uploadPictureOrVoiceClip: path "+path);
-        File selfie = new File(path);
+        File selfie;
+        if(isVoiceClip){
+            selfie = buildVoiceClipFile(this, outputFileName);
+        }else {
+            selfie = new File(path);
+        }
 
         if(!(MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudioVoiceClip()) && !(MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage())){
             log("uploadPictureOrVoiceClip:it is not an audio or image");
             return;
         }
+
+        if(isVoiceClip && !isFileAvailable(selfie)) return;
 
         Intent intent = new Intent(this, ChatUploadService.class);
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
@@ -7864,6 +7875,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         startService(intent);
     }
+
 
     private void showOverquotaAlert(boolean prewarning){
         log("showOverquotaAlert: prewarning: "+prewarning);

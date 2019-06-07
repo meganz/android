@@ -2495,6 +2495,7 @@
 	</plurals>
 
     <string name="not_allowed_recording_voice_clip" context="Error message when trying to record a voice clip while on a call in progress">Recording voice clip is not allowed during a call</string>
+    <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice clip and occurs an error to process the action">An error occurred while trying to upload the Voice clip.</string>
 
 
 </resources>

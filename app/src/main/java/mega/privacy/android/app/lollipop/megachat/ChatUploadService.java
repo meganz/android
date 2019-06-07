@@ -61,6 +61,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	static final float DOWNSCALE_IMAGES_PX = 2000000f;
@@ -295,8 +298,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			else {
 				long chatId = intent.getLongExtra(EXTRA_CHAT_ID, -1);
 				type = intent.getStringExtra("type");
-				log("onHandleIntent: type = "+type);
-
 				long idPendMsg = intent.getLongExtra(EXTRA_ID_PEND_MSG, -1);
 				PendingMessageSingle pendingMsg = null;
 				if(idPendMsg!=-1){
@@ -342,7 +343,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	void initUpload (ArrayList<PendingMessageSingle> pendingMsgs, String type) {
-		log("initUpload: type = "+type);
+		log("initUpload");
 
 		PendingMessageSingle pendingMsg = pendingMsgs.get(0);
 		File file = new File(pendingMsg.getFilePath());
@@ -519,8 +520,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 		else{
-			log("DATA connection is OTHER");
-
 			for (PendingMessageSingle pendMsg : pendingMsgs) {
 				pendingMessages.add(pendMsg);
 			}
@@ -1037,17 +1036,24 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					ChatUploadService.this.cancel();
 					log("after cancel");
-					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-					File f = new File(pathSelfie);
-					//Delete recursively all files and folder
-					if (f.exists()) {
-						if (f.isDirectory()) {
-							if (f.list().length <= 0) {
-								f.delete();
+					if(appData.contains(Constants.EXTRA_VOICE_CLIP)) {
+						File localFile = buildVoiceClipFile(this, transfer.getFileName());
+						if (isFileAvailable(localFile) && !localFile.getName().equals(transfer.getFileName())) {
+							localFile.delete();
+						}
+					}else {
+						String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+						File f = new File(pathSelfie);
+						//Delete recursively all files and folder
+						if (f.exists()) {
+							if (f.isDirectory()) {
+								if (f.list().length <= 0) {
+									f.delete();
+								}
 							}
 						}
-					}
 						f.delete();
+					}
 
 				}
 				else{
@@ -1280,7 +1286,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		for(int i=0; i<pendingMessages.size();i++) {
 			PendingMessageSingle pendMsg = pendingMessages.get(i);
 			if (pendMsg.getId() == id) {
-//				requestSent++;
 				pendMsg.setNodeHandle(transfer.getNodeHandle());
 				pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
 				megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);

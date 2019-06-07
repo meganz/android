@@ -14,6 +14,8 @@ public final class CacheFolderManager {
 
     public static final String QR_FOLDER = "qrMEGA";
 
+    public static final String VOICE_CLIP_FOLDER = "voiceClipsMEGA";
+
     public static File getCacheFolder(Context context,String folderName) {
         log("create cache folder: " + folderName);
         File cacheFolder = new File(context.getCacheDir(),folderName);
@@ -56,6 +58,13 @@ public final class CacheFolderManager {
         } else {
             log("create qrMEGA failed");
         }
+
+        File voiceClipDir = getCacheFolder(context,VOICE_CLIP_FOLDER);
+        if (isFileAvailable(voiceClipDir)) {
+            log("voiceClipsMEGA folder created: " + voiceClipDir.getAbsolutePath());
+        } else {
+            log("create voiceClipsMEGA failed");
+        }
     }
 
     public static void clearPublicCache(final Context context) {
@@ -69,6 +78,10 @@ public final class CacheFolderManager {
                 }
             }
         }.start();
+    }
+
+    public static File buildVoiceClipFile(Context context,String fileName) {
+        return getCacheFile(context, VOICE_CLIP_FOLDER,fileName);
     }
 
     public static File buildQrFile(Context context,String fileName) {

@@ -103,28 +103,6 @@ public class ChatUtil {
         return false;
     }
 
-    /* Get the corresponding path, Mega Downloads or Mega Voice Notes*/
-    public static String getDefaultLocationPath(Context context, boolean isVoiceNote){
-        String locationPath;
-        if(isVoiceNote){
-            locationPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.voiceNotesDIR;
-        }else{
-            locationPath = Util.getDownloadLocation(context);
-        }
-        return locationPath;
-    }
-
-    /* Know if a voice note is downloaded in the Mega Voice Notes folder*/
-    public static boolean isInMegaVoiceNotes(Context context, MegaNode node){
-            String voiceNotesLocationDefaultPath = ChatUtil.getDefaultLocationPath(context, true);
-            File f = new File(voiceNotesLocationDefaultPath, node.getName());
-            boolean result = false;
-            if((f.exists())&&(f.length() == node.getSize())){
-                result = true;
-            }
-            return result;
-    }
-
     /* Get the height of the action bar */
     public static int getActionBarHeight(Activity activity, Resources resources) {
         int actionBarHeight = 0;
