@@ -723,7 +723,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
 
         Toast.makeText(context, builder, Toast.LENGTH_LONG).show();
-        log("showStateInfo: "+builder);
     }
 
     /////Multiselect/////
@@ -1062,7 +1061,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void listItemUpdate(MegaChatListItem item) {
-        log("listItemUpdate: "+item.getTitle());
+        log("listItemUpdate");
 
         if(!isAdded()){
             log("return!");
@@ -1081,6 +1080,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
 
+        if(item == null){
+            log("item is null");
+            return;
+        }
+
+        log("listItemUpdate: chatId: "+item.getChatId());
+
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_STATUS)){
             log("listItemUpdate: Change status: MegaChatListItem.CHANGE_TYPE_STATUS");
         }
@@ -1096,52 +1102,46 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)){
 
-            log("listItemUpdate: Change unread count: "+item.getTitle());
-            if(item!=null){
-
-                if (adapterList == null || adapterList.getItemCount()==0){
-                    setChats();
-                }
-                else{
-                    long chatHandleToUpdate = item.getChatId();
-                    int indexToReplace = -1;
-                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                    while (itrReplace.hasNext()) {
-                        MegaChatListItem chat = itrReplace.next();
-                        if(chat!=null){
-                            if(chat.getChatId()==chatHandleToUpdate){
-                                indexToReplace = itrReplace.nextIndex()-1;
-                                break;
-                            }
-                        }
-                        else{
+            log("listItemUpdate: Change unread count");
+            if (adapterList == null || adapterList.getItemCount()==0){
+                setChats();
+            }
+            else{
+                long chatHandleToUpdate = item.getChatId();
+                int indexToReplace = -1;
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if(chat!=null){
+                        if(chat.getChatId()==chatHandleToUpdate){
+                            indexToReplace = itrReplace.nextIndex()-1;
                             break;
                         }
                     }
-                    if(indexToReplace!=-1){
-                        log("Index to replace: "+indexToReplace);
-                        log("Unread count: "+item.getUnreadCount());
-
-                        chats.set(indexToReplace, item);
-                        if(item.getUnreadCount()==0){
-                            onUnreadCountChange(indexToReplace, false);
-                            onLastMessageChange(indexToReplace);
-                        }
-                        else{
-                            onUnreadCountChange(indexToReplace, true);
-                        }
-
+                    else{
+                        break;
+                    }
+                }
+                if(indexToReplace!=-1){
+                    log("Index to replace: "+indexToReplace);
+                    chats.set(indexToReplace, item);
+                    if(item.getUnreadCount()==0){
+                        log("no unread count");
+                        onUnreadCountChange(indexToReplace, false);
+                        onLastMessageChange(indexToReplace);
+                    }
+                    else{
+                        onUnreadCountChange(indexToReplace, true);
                     }
                 }
             }
+
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)){
-
             log("Change last ts: "+item.getChanges());
 
             long chatHandleToUpdate = item.getChatId();
             int indexToReplace = -1;
-
             if(chats!=null && !chats.isEmpty()){
                 ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
                 while (itrReplace.hasNext()) {
@@ -1172,246 +1172,219 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         else if((item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE))){
 
-            log("listItemUpdate: Change title: "+item.getTitle());
-
-            if(item!=null){
-
-                if (adapterList == null || adapterList.getItemCount()==0){
-                    setChats();
-                }
-                else{
-                    long chatHandleToUpdate = item.getChatId();
-                    int indexToReplace = -1;
-                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                    while (itrReplace.hasNext()) {
-                        MegaChatListItem chat = itrReplace.next();
-                        if(chat!=null){
-                            if(chat.getChatId()==chatHandleToUpdate){
-                                indexToReplace = itrReplace.nextIndex()-1;
-                                break;
-                            }
-                        }
-                        else{
+            log("listItemUpdate: Change title ");
+            if (adapterList == null || adapterList.getItemCount()==0){
+                setChats();
+            }
+            else{
+                long chatHandleToUpdate = item.getChatId();
+                int indexToReplace = -1;
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if(chat!=null){
+                        if(chat.getChatId()==chatHandleToUpdate){
+                            indexToReplace = itrReplace.nextIndex()-1;
                             break;
                         }
                     }
-                    if(indexToReplace!=-1){
-                        log("Index to replace: "+indexToReplace);
-                        log("New title: "+item.getTitle());
-
-                        chats.set(indexToReplace, item);
-                        onTitleChange(indexToReplace);
+                    else{
+                        break;
                     }
                 }
+                if(indexToReplace!=-1){
+                    log("Index to replace: "+indexToReplace);
+                    chats.set(indexToReplace, item);
+                    onTitleChange(indexToReplace);
+                }
             }
+
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_MSG)){
 
-            log("listItemUpdate: Change last message: "+item.getTitle());
-
-            if(item!=null){
-
-                if (adapterList == null || adapterList.getItemCount()==0){
-                    setChats();
-                }
-                else{
-                    long chatHandleToUpdate = item.getChatId();
-                    int indexToReplace = -1;
-                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                    while (itrReplace.hasNext()) {
-                        MegaChatListItem chat = itrReplace.next();
-                        if(chat!=null){
-                            if(chat.getChatId()==chatHandleToUpdate){
-                                indexToReplace = itrReplace.nextIndex()-1;
-                                break;
-                            }
-                        }
-                        else{
+            log("listItemUpdate: Change last message: ");
+            if (adapterList == null || adapterList.getItemCount()==0){
+                setChats();
+            }
+            else{
+                long chatHandleToUpdate = item.getChatId();
+                int indexToReplace = -1;
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if(chat!=null){
+                        if(chat.getChatId()==chatHandleToUpdate){
+                            indexToReplace = itrReplace.nextIndex()-1;
                             break;
                         }
                     }
-                    if(indexToReplace!=-1){
-                        log("Index to replace: "+indexToReplace);
-
-                        if(item.getLastMessage()!=null){
-                            log("New last content: "+item.getLastMessage());
-                        }
-                        else{
-                            log("New last content is NULL");
-                        }
-
-                        chats.set(indexToReplace, item);
-                        onLastMessageChange(indexToReplace);
+                    else{
+                        break;
                     }
                 }
+                if(indexToReplace!=-1){
+                    log("Index to replace: "+indexToReplace);
+                    chats.set(indexToReplace, item);
+                    onLastMessageChange(indexToReplace);
+                }
             }
+
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)){
 
             log("listItemUpdate: Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
             log("listItemUpdate: Own privilege: "+item.getOwnPrivilege());
-
-            if(item!=null){
-
-                if (adapterList.getItemCount()!=0){
-
-                    long chatHandleToRemove = item.getChatId();
-                    int indexToRemove = -1;
-                    ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                    while (itrReplace.hasNext()) {
-                        MegaChatListItem chat = itrReplace.next();
-                        if(chat!=null){
-                            if(chat.getChatId()==chatHandleToRemove){
-                                indexToRemove = itrReplace.nextIndex()-1;
-                                break;
-                            }
-                        }
-                        else{
+            if (adapterList.getItemCount()!=0){
+                long chatHandleToRemove = item.getChatId();
+                int indexToRemove = -1;
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if(chat!=null){
+                        if(chat.getChatId()==chatHandleToRemove){
+                            indexToRemove = itrReplace.nextIndex()-1;
                             break;
                         }
                     }
-                    if(indexToRemove!=-1){
-                        log("Index to replace: "+indexToRemove);
-                        chats.remove(indexToRemove);
+                    else{
+                        break;
+                    }
+                }
+                if(indexToRemove!=-1){
+                    log("Index to replace: "+indexToRemove);
+                    chats.remove(indexToRemove);
 
-                        adapterList.removeChat(chats, indexToRemove);
-                        adapterList.setPositionClicked(-1);
+                    adapterList.removeChat(chats, indexToRemove);
+                    adapterList.setPositionClicked(-1);
 
-                        if (adapterList.getItemCount() == 0 && emptyArchivedChats()){
-                            log("adapterList.getItemCount() == 0");
-                            listView.setVisibility(View.GONE);
-                            emptyLayout.setVisibility(View.VISIBLE);
-                        }
-                        else{
-                            log("adapterList.getItemCount() NOT = 0");
-                            listView.setVisibility(View.VISIBLE);
-                            emptyLayout.setVisibility(View.GONE);
-                        }
+                    if (adapterList.getItemCount() == 0 && emptyArchivedChats()){
+                        log("adapterList.getItemCount() == 0");
+                        listView.setVisibility(View.GONE);
+                        emptyLayout.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        listView.setVisibility(View.VISIBLE);
+                        emptyLayout.setVisibility(View.GONE);
                     }
                 }
             }
+
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_ARCHIVE)){
             log("listItemUpdate: Change: MegaChatListItem.CHANGE_TYPE_ARCHIVE");
+            if(context instanceof ManagerActivityLollipop){
+                if(item.isArchived()){
+                    log("New archived element:remove from list");
+                    if (adapterList.getItemCount()!=0){
 
-            if(item!=null){
-
-                if(context instanceof ManagerActivityLollipop){
-                    if(item.isArchived()){
-                        log("New archived element:remove from list");
-                        if (adapterList.getItemCount()!=0){
-
-                            long chatHandleToRemove = item.getChatId();
-                            int indexToRemove = -1;
-                            ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                            while (itrReplace.hasNext()) {
-                                MegaChatListItem chat = itrReplace.next();
-                                if(chat!=null){
-                                    if(chat.getChatId()==chatHandleToRemove){
-                                        indexToRemove = itrReplace.nextIndex()-1;
-                                        break;
-                                    }
-                                }
-                                else{
+                        long chatHandleToRemove = item.getChatId();
+                        int indexToRemove = -1;
+                        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                        while (itrReplace.hasNext()) {
+                            MegaChatListItem chat = itrReplace.next();
+                            if(chat!=null){
+                                if(chat.getChatId()==chatHandleToRemove){
+                                    indexToRemove = itrReplace.nextIndex()-1;
                                     break;
                                 }
                             }
-                            if(indexToRemove!=-1){
-                                log("Index to replace: "+indexToRemove);
-                                chats.remove(indexToRemove);
+                            else{
+                                break;
+                            }
+                        }
+                        if(indexToRemove!=-1){
+                            log("Index to replace: "+indexToRemove);
+                            chats.remove(indexToRemove);
 
-                                adapterList.removeChat(chats, indexToRemove);
-                                adapterList.setPositionClicked(-1);
+                            adapterList.removeChat(chats, indexToRemove);
+                            adapterList.setPositionClicked(-1);
 
-                                if (adapterList.getItemCount() == 0 && emptyArchivedChats()){
-                                    log("adapterList.getItemCount() == 0");
-                                    listView.setVisibility(View.GONE);
-                                    emptyLayout.setVisibility(View.VISIBLE);
-                                }
-                                else{
-                                    log("adapterList.getItemCount() NOT = 0");
-                                    listView.setVisibility(View.VISIBLE);
-                                    emptyLayout.setVisibility(View.GONE);
-                                }
+                            if (adapterList.getItemCount() == 0 && emptyArchivedChats()){
+                                log("adapterList.getItemCount() == 0");
+                                listView.setVisibility(View.GONE);
+                                emptyLayout.setVisibility(View.VISIBLE);
+                            }
+                            else{
+                                listView.setVisibility(View.VISIBLE);
+                                emptyLayout.setVisibility(View.GONE);
+                            }
 
-                                if (chats.isEmpty()) {
-                                    ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                                }
+                            if (chats.isEmpty()) {
+                                ((ManagerActivityLollipop) context).invalidateOptionsMenu();
                             }
                         }
                     }
-                    else{
-                        log("New unarchived element:refresh chat list");
-                        setChats();
-                        if (chats.size() == 1) {
-                            ((ManagerActivityLollipop) context).invalidateOptionsMenu();
-                        }
-                    }
-                    //Update last position
-                    if(adapterList!=null){
-                        adapterList.notifyItemChanged(chats.size()+1);
-                    }
-
-                    if(!emptyArchivedChats()){
-                        listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(16, outMetrics));
-                    }
-                    else{
-                        listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(78, outMetrics));
-                    }
-
-                    checkScroll();
                 }
-                else if(context instanceof ArchivedChatsActivity){
-                    if(item.isArchived()){
-                        log("New archived element:refresh chat list");
-                        setChats();
+                else{
+                    log("New unarchived element:refresh chat list");
+                    setChats();
+                    if (chats.size() == 1) {
+                        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
                     }
-                    else{
-                        log("New unarchived element:remove from Archive list");
-                        if (adapterList.getItemCount()!=0){
-
-                            long chatHandleToRemove = item.getChatId();
-                            int indexToRemove = -1;
-                            ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                            while (itrReplace.hasNext()) {
-                                MegaChatListItem chat = itrReplace.next();
-                                if(chat!=null){
-                                    if(chat.getChatId()==chatHandleToRemove){
-                                        indexToRemove = itrReplace.nextIndex()-1;
-                                        break;
-                                    }
-                                }
-                                else{
-                                    break;
-                                }
-                            }
-                            if(indexToRemove!=-1){
-                                log("Index to replace: "+indexToRemove);
-                                chats.remove(indexToRemove);
-
-                                adapterList.removeChat(chats, indexToRemove);
-                                adapterList.setPositionClicked(-1);
-
-                                if (adapterList.getItemCount() == 0){
-                                    log("adapterList.getItemCount() == 0");
-                                    showEmptyChatScreen();
-                                    ((ArchivedChatsActivity) context).invalidateOptionsMenu();
-                                }
-                                else{
-                                    log("adapterList.getItemCount() NOT = 0");
-                                    listView.setVisibility(View.VISIBLE);
-                                    emptyLayout.setVisibility(View.GONE);
-                                }
-                            }
-                        }
-                    }
-                    checkScroll();
                 }
+                //Update last position
+                if(adapterList!=null){
+                    adapterList.notifyItemChanged(chats.size()+1);
+                }
+
+                if(!emptyArchivedChats()){
+                    listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(16, outMetrics));
+                }
+                else{
+                    listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(78, outMetrics));
+                }
+
+                checkScroll();
             }
+            else if(context instanceof ArchivedChatsActivity){
+                if(item.isArchived()){
+                    log("New archived element:refresh chat list");
+                    setChats();
+                }
+                else{
+                    log("New unarchived element:remove from Archive list");
+                    if (adapterList.getItemCount()!=0){
+
+                        long chatHandleToRemove = item.getChatId();
+                        int indexToRemove = -1;
+                        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                        while (itrReplace.hasNext()) {
+                            MegaChatListItem chat = itrReplace.next();
+                            if(chat!=null){
+                                if(chat.getChatId()==chatHandleToRemove){
+                                    indexToRemove = itrReplace.nextIndex()-1;
+                                    break;
+                                }
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                        if(indexToRemove!=-1){
+                            log("Index to replace: "+indexToRemove);
+                            chats.remove(indexToRemove);
+
+                            adapterList.removeChat(chats, indexToRemove);
+                            adapterList.setPositionClicked(-1);
+
+                            if (adapterList.getItemCount() == 0){
+                                log("adapterList.getItemCount() == 0");
+                                showEmptyChatScreen();
+                                ((ArchivedChatsActivity) context).invalidateOptionsMenu();
+                            }
+                            else{
+                                listView.setVisibility(View.VISIBLE);
+                                emptyLayout.setVisibility(View.GONE);
+                            }
+                        }
+                    }
+                }
+                checkScroll();
+            }
+
         }
         else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CALL)||item.hasChanged(MegaChatListItem.CHANGE_TYPE_CHAT_MODE)){
             log("listItemUpdate: Change: MegaChatListItem.CHANGE_TYPE_CALL or CHANGE_TYPE_CHAT_MODE");
-
             if (adapterList == null || adapterList.getItemCount()==0){
                 setChats();
             }
@@ -1442,7 +1415,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             log("listItemUpdate: Other change: "+item.getChanges());
 
             if(item!=null){
-                log("New chat: "+item.getTitle());
+                log("New chat");
                 setChats();
                 MegaChatRoom chatToCheck = megaChatApi.getChatRoom(item.getChatId());
                 updateCacheForNonContacts(chatToCheck);
@@ -1600,15 +1573,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void onTitleChange(int position){
         log("onTitleChange");
-
         adapterList.setTitle(position, null);
-
         interactionUpdate(position);
     }
 
     public void onUnreadCountChange(int position, boolean updateOrder){
         log("onUnreadCountChange");
-
         adapterList.setPendingMessages(position, null);
 
         if(updateOrder){
@@ -1720,11 +1690,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
 
         if (participantFirstName.trim().length() <= 0){
-            log("Participant1: "+participantFirstName);
             return participantLastName;
         }
         else{
-            log("Participant2: "+participantLastName);
             return participantFirstName + " " + participantLastName;
         }
     }
@@ -1953,7 +1921,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case Constants.REQUEST_CAMERA: {
-                log("REQUEST_CAMERA");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsCall()){
                         log("REQUEST_CAMERA -> returnTheCall");
@@ -1963,7 +1930,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 break;
             }
             case Constants.RECORD_AUDIO: {
-                log("RECORD_AUDIO");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(checkPermissionsCall()){
                         log("RECORD_AUDIO -> returnTheCall");

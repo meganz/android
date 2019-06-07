@@ -96,6 +96,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
@@ -294,18 +297,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 PreviewUtils.previewCache.put(node.getHandle(), preview);
                 return 0;
             } else {
-                if (context.getExternalCacheDir() != null) {
-                    cacheDir = context.getExternalCacheDir();
-                } else {
-                    cacheDir = context.getCacheDir();
-                }
-                destination = new File(cacheDir, node.getName());
+                destination = buildPreviewFile(context, node.getName());
 
-                if (destination.exists()) {
+                if (isFileAvailable(destination)) {
                     if (destination.length() == node.getSize()) {
                         File previewDir = PreviewUtils.getPreviewFolder(context);
                         File previewFile = new File(previewDir, node.getBase64Handle() + ".jpg");
-                        log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
+                        log("BASE64: " + node.getBase64Handle() + "name: " + node.getHandle());
                         boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 
                         if (previewCreated) {
@@ -1490,6 +1488,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                         }
                     }
+
+                    log("Node handle: " + message.getPendingMessage().getNodeHandle());
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -5179,6 +5179,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (nodeList.size() == 1) {
                     MegaNode node = nodeList.get(0);
 
+                    log("Node Handle: " + node.getHandle());
+
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
                         float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, context.getResources().getDisplayMetrics());
@@ -5396,6 +5398,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         MegaNode temp = nodeList.get(i);
                         if (!(megaChatApi.isRevoked(chatRoom.getChatId(), temp.getHandle()))) {
                             count++;
+                            log("Node Handle: " + temp.getHandle());
                             totalSize = totalSize + temp.getSize();
                         }
                     }
@@ -5527,6 +5530,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (nodeList != null) {
                 if (nodeList.size() == 1) {
                     MegaNode node = nodeList.get(0);
+
+                    log("Node Handle: " + node.getHandle());
 
                     if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         log("Landscape configuration");
@@ -6158,7 +6163,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                 }
             }
-
         }
     }
 
@@ -6375,7 +6379,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name = message.getUserEmail(0);
                 }
                 String email = message.getUserEmail(0);
-                log("Contact Name: " + name);
                 holder.contentContactMessageContactName.setText(name);
                 holder.contentContactMessageContactEmail.setText(email);
                 setUserAvatar(holder, message);
@@ -6387,7 +6390,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
-                log("Names of attached contacts: " + name);
                 holder.contentContactMessageContactName.setText(name);
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentContactMessageContactEmail.setText(email);
@@ -7148,7 +7150,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             name = message.getUserEmail(0);
         }
         String email = message.getUserEmail(0);
-        log("Contact Name: " + name);
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(message.getUserHandle(0));
 
         ChatAttachmentAvatarListener listener;
@@ -7160,14 +7161,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             listener = new ChatAttachmentAvatarListener(context, holder, this, false);
         }
 
-        File avatar = null;
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap = null;
-        if (avatar.exists()) {
+        if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -7181,11 +7177,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         return;
                     }
 
-                    if (context.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                    } else {
-                        megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                    }
+                    megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
                 } else {
                     if (myUserHandle == message.getUserHandle()) {
                         holder.contentOwnMessageContactInitialLetter.setVisibility(View.GONE);
@@ -7201,11 +7193,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     return;
                 }
 
-                if (context.getExternalCacheDir() != null) {
-                    megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                } else {
-                    megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                }
+                megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
             }
         } else {
             if (megaApi == null) {
@@ -7213,11 +7201,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             }
 
-            if (context.getExternalCacheDir() != null) {
-                megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-            } else {
-                megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-            }
+            megaApi.getUserAvatar(email,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
         }
     }
 
@@ -7228,15 +7212,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         createDefaultAvatarContact(holder, userHandleEncoded, name);
         ChatAttachmentAvatarListener listener = new ChatAttachmentAvatarListener(context, holder, this, false);
 
-        File avatar = null;
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), userHandleEncoded + ".jpg");
-        }
+        File avatar = buildAvatarFile(context, userHandleEncoded + ".jpg");
 
         Bitmap bitmap = null;
-        if (avatar.exists()) {
+        if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
@@ -7250,11 +7229,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         return;
                     }
 
-                    if (context.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(userHandleEncoded, context.getExternalCacheDir().getAbsolutePath() + "/" + userHandleEncoded + ".jpg", listener);
-                    } else {
-                        megaApi.getUserAvatar(userHandleEncoded, context.getCacheDir().getAbsolutePath() + "/" + userHandleEncoded + ".jpg", listener);
-                    }
+                    megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, userHandleEncoded + ".jpg").getAbsolutePath(), listener);
                 } else {
                     holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.contactImageView.setImageBitmap(bitmap);
@@ -7265,11 +7240,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     return;
                 }
 
-                if (context.getExternalCacheDir() != null) {
-                    megaApi.getUserAvatar(userHandleEncoded, context.getExternalCacheDir().getAbsolutePath() + "/" + userHandleEncoded + ".jpg", listener);
-                } else {
-                    megaApi.getUserAvatar(userHandleEncoded, context.getCacheDir().getAbsolutePath() + "/" + userHandleEncoded + ".jpg", listener);
-                }
+                megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, userHandleEncoded + ".jpg").getAbsolutePath(), listener);
             }
         } else {
 
@@ -7278,11 +7249,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             }
 
-            if (context.getExternalCacheDir() != null) {
-                megaApi.getUserAvatar(userHandleEncoded, context.getExternalCacheDir().getAbsolutePath() + "/" + userHandleEncoded + ".jpg", listener);
-            } else {
-                megaApi.getUserAvatar(userHandleEncoded, context.getCacheDir().getAbsolutePath() + "/" + userHandleEncoded + ".jpg", listener);
-            }
+            megaApi.getUserAvatar(userHandleEncoded, buildAvatarFile(context, userHandleEncoded + ".jpg").getAbsolutePath(), listener);
         }
     }
 
@@ -7373,7 +7340,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
             else{
-                log("Group chat initial letter is: "+firstLetter);
                 if(firstLetter.equals("(")){
                     if(isMyMsg){
                         holder.urlOwnMessageGroupAvatarText.setVisibility(View.INVISIBLE);
@@ -8016,7 +7982,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             String name = holder.contentOwnMessageFileName.getText().toString();
 
-                            log("Update my preview: " + name);
                             if (bitmap.getWidth() < bitmap.getHeight()) {
                                 log("Portrait");
 
@@ -8514,7 +8479,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
             log("onRequestFinish: " + request.getType() + "__" + request.getRequestString());
-            log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
+            log("onRequestFinish: Node: " + request.getNodeHandle());
 
             if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE) {
                 if (e.getErrorCode() == MegaError.API_OK) {
@@ -8545,7 +8510,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(n!=null){
             int duration = n.getDuration();
             String timeString = "";
-            log("duration: "+n.getDuration());
             if (duration > 0) {
                 int hours = duration / 3600;
                 int minutes = (duration % 3600) / 60;
@@ -8556,9 +8520,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     timeString = String.format("%d:%02d", minutes, seconds);
                 }
-
-                log("The duration is: " + hours + " " + minutes + " " + seconds);
-            }
+             }
             return timeString;
         }
         return "";

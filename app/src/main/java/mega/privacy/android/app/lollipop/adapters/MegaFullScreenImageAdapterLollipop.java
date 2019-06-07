@@ -56,6 +56,9 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
 	private Activity activity;
@@ -171,15 +174,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				return 0;
 			}
 			else{
-				if (activity.getExternalCacheDir() != null){
-					cacheDir = activity.getExternalCacheDir();
-				}
-				else{
-					cacheDir = activity.getCacheDir();
-				}
-				destination = new File(cacheDir, node.getName());
+				destination = buildPreviewFile(activity,node.getName());
 				
-				if (destination.exists()){
+				if (isFileAvailable(destination)){
 					if (destination.length() == node.getSize()){
 						File previewDir = PreviewUtils.getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");

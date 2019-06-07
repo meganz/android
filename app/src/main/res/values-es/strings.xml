@@ -450,7 +450,7 @@
     <string name="number_correctly_moved" context="success message when moving a node">Se han movido %d archivos</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">No se han podido mover %d elementos</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Movido a la Papelera correctamente</string>
-    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">Se han movido %d elementos a la Papelera</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d archivos enviados a la Papelera correctamente</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">No se han podido enviar &#160;y %d elementos</string>
     <string name="context_no_moved" context="error message">Error. No se ha podido mover</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">La carpeta se ha compartido</string>
@@ -646,9 +646,13 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Avanzado</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Borrar caché</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Eliminar archivos sin conexión</string>
+	<string name="settings_advanced_features_offline" context="Settings preference title for offline files">Eliminar archivos sin conexión</string>
 
+	<string name="settings_auto_play" context="Settings category title for auto open a downloaded file">Auto Play</string>
 	<string name="settings_auto_play_label" context="description of switch 'Open file when download is completed'">Open file when downloaded</string>
+
+
+
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancelar cuenta</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actualmente en uso %s</string>
@@ -848,7 +852,7 @@
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copia la Clave de recuperación en el portapapeles o guárdala como archivo de texto</string>
 
     <string name="save_action" context="Action of the button to save the master key as a text file">Guardar</string>
-    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">La Clave de recuperación ha sido copiada correctamente</string>
+    <string name="copy_MK_confirmation" context="Alert message when the master key has been successfully copied to the ClipBoard">The Recovery Key has been successfully copied</string>
 
     <string name="change_pass" context="Button to change the password">Cambiar</string>
 
@@ -1449,8 +1453,8 @@
 
     <string name="download_show_info" context="Hint how to cancel the download">Más información</string>
 
-    <string name="context_link_removal_error" context="error message">No se ha podido eliminar el enlace. Vuelve a intentarlo más tarde.</string>
-    <string name="context_link_action_error" context="error message">Error con el enlace. Vuelve a intentarlo más tarde.</string>
+    <string name="context_link_removal_error" context="error message">Link removal failed. Try again later.</string>
+    <string name="context_link_action_error" context="error message">Link action failed. Try again later.</string>
 
     <string name="title_write_user_email" context="title of the dialog shown when sending or sharing a folder">Introduce la dirección de correo electrónico del usuario</string>
 
@@ -1681,7 +1685,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">No se ha podido descargar el archivo del QR. Es posible que el archivo no exista. Por favor, inténtalo de nuevo más tarde.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">El código QR se ha descargado en el %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invitación no enviada</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">El código QR o el enlace de contacto no son válidos. Intenta escanear un código válido o abrir un enlace válido.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">La invitación no ha sido enviada. %s ya está en tu lista de contactos.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">La invitación no ha sido enviada. Se ha producido un error al procesarla.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generando código QR&#8230;</string>
@@ -1781,8 +1785,8 @@
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Calidad multimedia del chat</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
-        <item context="the options of what to upload.">Original</item>
-        <item context="the options of what to upload.">Media</item>
+        <item context="the options of origin quality multimedia file to upload.">Original quality</item>
+        <item context="the options of medium quality multimedia file to  upload.">Medium quality</item>
     </string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Llamada perdida</string>
@@ -1830,7 +1834,7 @@
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog 'Do you remember your password?' that permits user test his password">Prueba tu contraseña</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Prueba tu contraseña</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Contraseña correcta</string>
-    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">¡Contraseña incorrecta!\nGuarda tu Clave de recuperación lo antes posible.</string>
+    <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
     <string name="recovery_key_exported_dialog_title" context="Title of the dialog 'Recovery Key exported'">Clave de recuperación guardada</string>
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">La Clave de recuperación se ha exportado a la sección Sin conexión como MEGARecoveryKey.txt.\nAviso: Si cierras sesión la clave se eliminará, guárdala en un lugar seguro.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Estás a punto de cerrar sesión. Prueba tu contraseña para asegurarte de que la recuerdas.\nSi pierdes tu contraseña, perderás el acceso a tus datos en MEGA.</string>
@@ -2117,7 +2121,6 @@
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Actividad de chat</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">Podrías tener mensajes nuevos</string>
 	<string name="retrieving_message_title" context="When app is retrieving push message">Retrieving message</string>
-
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Limpieza automática de la papelera</string>
     <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">La Papelera se vacía automáticamente.</string>
 
@@ -2139,9 +2142,9 @@
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator's name in runtime. ">[A]%1$s[/A][B] ha creado un enlace del chat.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator's name in runtime.">[A]%1$s[/A][B] ha eliminado un enlace del chat.[/B]</string>
 
-    <string name="action_delete_link" context="Title of the option to delete a chat link">Eliminar enlace del chat</string>
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete Chat Link</string>
 
-    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Enlace del chat</string>
+    <string name="title_alert_chat_link_error" context="Title of the alert when a chat link is invalid">Chat Link</string>
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">Se cerrarán todas las demás sesiones activas, excepto la actual.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">¿Quieres cerrar las demás sesiones?</string>
 
@@ -2340,7 +2343,7 @@
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Llamada entrante&#8230;</string>
     <string name="outgoing_call_starting" context="Subtitle of the call screen when a outgoing call is just starting">Llamando&#8230;</string>
 
-    <string name="error_meta_message_invalid" context="Content of a invalid meta message ">El mensaje contiene metadatos inválidos</string>
+    <string name="error_meta_message_invalid" context="Content of a invalid meta message">El mensaje contiene metadatos inválidos</string>
 
     <string name="second_row_info_item_shared_file_chat" context="Info shown in the subtitle of each row of the shared files to chat: sender name . date">%1$s . %2$s</string>
 
@@ -2399,7 +2402,7 @@
     <string name="title_tour_four" cotext="Title of fourth tour screen">Tus fotos en la nube</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">La función Subidas de la cámara es esencial para cualquier dispositivo móvil y nosotros la tenemos. Crea tu cuenta ahora.</string>
 
-    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Introduce la contraseña</string>
+    <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Introduce tu contraseña</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s es un documento PDF protegido por contraseña. Por favor introduce la contraseña para abrir el PDF.</string>
     <string name="error_pdf_password" context="Error of the dialog shown wen a pdf required password and the user types a wrong password">Has introducido la contraseña incorrecta, prueba de nuevo.</string>
     <string name="error_max_pdf_password" context="Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password">La contraseña que has introducido no es válida.</string>

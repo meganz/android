@@ -719,7 +719,7 @@ public class Util {
         }
     }
     
-    private static void cleanDir(File dir) {
+    public static void cleanDir(File dir) {
         File[] files = dir.listFiles();
 
 		if(files !=null){
@@ -1026,14 +1026,7 @@ public class Util {
 	 * Check is file belongs to the app
 	 */
 	public static boolean isLocal(Context context, File file) {
-		File tmp = null;
-		if (context.getExternalCacheDir() != null){
-			tmp = new File (context.getExternalCacheDir(), "tmp");
-		}
-		else{
-			tmp = context.getDir("tmp", 0);
-		}
-			
+        File tmp = context.getDir("tmp", 0);
 		return file.getAbsolutePath().contains(tmp.getParent());
 	}
 	
