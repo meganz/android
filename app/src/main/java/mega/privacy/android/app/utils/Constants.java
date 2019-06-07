@@ -231,6 +231,7 @@ public class Constants {
 	final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
     final public static int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
 	final public static int GENERAL_OTHERS_ADAPTER = 2023;
+	final public static int RECENTS_ADAPTER = 2024;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;

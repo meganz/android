@@ -328,7 +328,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 MegaNodeList nodeList = getMegaNodeListOfItem(item);
                 if (nodeList == null) break;
                 if (nodeList.size() == 1) {
-
+                    ((RecentsFragment) fragment).openFile(node);
                     break;
                 }
 

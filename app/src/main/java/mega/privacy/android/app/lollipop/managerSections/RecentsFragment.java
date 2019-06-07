@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,17 +31,25 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.FileUtils;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
@@ -237,6 +246,88 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
+    }
+
+    public void openFile (MegaNode node) {
+        Intent intent = null;
+
+        if (MimeTypeList.typeForName(node.getName()).isImage()) {
+            intent = new Intent(context, FullScreenImageViewerLollipop.class);
+            intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
+            intent.putExtra("nodeHandle", node.getHandle());
+
+            context.startActivity(intent);
+            return;
+        }
+
+        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), Util.getDownloadLocation(context));
+        boolean paramsSetSuccessfully = false;
+
+        if (FileUtils.isAudioOrVideo(node)) {
+            if (FileUtils.isInternalIntent(node)) {
+                intent = new Intent(Intent.ACTION_VIEW);
+            }
+            else {
+                intent = new Intent(context, AudioVideoPlayerLollipop.class);
+            }
+
+            intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
+            intent.putExtra("FILENAME", node.getName());
+
+            if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
+                paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);
+            }
+            else {
+                paramsSetSuccessfully = FileUtils.setStreamingIntentParams(context, node, megaApi, intent);
+            }
+
+            if (paramsSetSuccessfully) {
+                intent.putExtra("HANDLE", node.getHandle());
+                if (FileUtils.isOpusFile(node)){
+                    intent.setDataAndType(intent.getData(), "audio/*");
+                }
+            }
+        }
+        else if (MimeTypeList.typeForName(node.getName()).isURL()) {
+            intent = new Intent(Intent.ACTION_VIEW);
+
+            if (FileUtils.isLocalFile(context, node, megaApi, localPath)){
+                paramsSetSuccessfully = FileUtils.setURLIntentParams(context, node, intent, localPath);
+            }
+        }
+        else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
+            intent = new Intent(context, PdfViewerActivityLollipop.class);
+            intent.putExtra("inside", true);
+            intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
+
+            if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
+                paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);
+            }
+            else {
+                paramsSetSuccessfully = FileUtils.setStreamingIntentParams(context, node, megaApi, intent);
+            }
+
+            intent.putExtra("HANDLE", node.getHandle());
+        }
+
+        if (!MegaApiUtils.isIntentAvailable(context, intent)){
+            paramsSetSuccessfully = false;
+            ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
+        }
+
+        if (paramsSetSuccessfully) {
+            context.startActivity(intent);
+            return;
+        }
+
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(node.getHandle());
+        NodeController nC = new NodeController(context);
+        nC.prepareForDownload(handleList, true);
+    }
+
+    public void itemClick() {
+
     }
 
     @Override
