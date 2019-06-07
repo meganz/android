@@ -254,7 +254,7 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
         if (MimeTypeList.typeForName(node.getName()).isImage()) {
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
             intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
-            intent.putExtra("nodeHandle", node.getHandle());
+            intent.putExtra("handle", node.getHandle());
 
             context.startActivity(intent);
             return;

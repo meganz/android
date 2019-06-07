@@ -484,6 +484,42 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
+		else if (adapterType == Constants.RECENTS_ADAPTER) {
+			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			getlinkIcon.setVisible(false);
+			removelinkIcon.setVisible(false);
+			if (!MimeTypeList.typeForName(node.getName()).isGIF() || (MimeTypeList.typeForName(node.getName()).isGIF() && isDownloaded(node))) {
+				shareIcon.setVisible(true);
+				menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
+			else {
+				shareIcon.setVisible(false);
+			}
+			propertiesIcon.setVisible(true);
+			downloadIcon.setVisible(true);
+			copyIcon.setVisible(true);
+			removeIcon.setVisible(false);
+			chatIcon.setVisible(true);
+
+			int accessLevel = megaApi.getAccess(node);
+			switch (accessLevel) {
+				case MegaShare.ACCESS_READWRITE:
+				case MegaShare.ACCESS_READ:
+				case MegaShare.ACCESS_UNKNOWN: {
+					renameIcon.setVisible(false);
+					moveIcon.setVisible(false);
+					moveToTrashIcon.setVisible(false);
+					break;
+				}
+				case MegaShare.ACCESS_FULL:
+				case MegaShare.ACCESS_OWNER: {
+					renameIcon.setVisible(true);
+					moveIcon.setVisible(true);
+					moveToTrashIcon.setVisible(true);
+					break;
+				}
+			}
+		}
 		else {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
@@ -799,7 +835,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						nC = new NodeController(this);
 					}
 					boolean fromIncoming = false;
-					if (adapterType == Constants.SEARCH_ADAPTER) {
+					if (adapterType == Constants.SEARCH_ADAPTER || adapterType == Constants.RECENTS_ADAPTER) {
 						fromIncoming = nC.nodeComesFromIncoming(node);
 					}
 					if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
@@ -1012,16 +1048,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-		}
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+		Window window = this.getWindow();
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
@@ -1029,6 +1059,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		fromShared = intent.getBooleanExtra("fromShared", false);
 		MegaNode parentNode;
 		bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+
+		fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+		fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 
 		megaApi.addGlobalListener(this);
 
@@ -1129,31 +1162,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 
-				if (positionG >= mOffListImages.size()){
-					positionG = 0;
-				}
+				if (positionG >= mOffListImages.size()) positionG = 0;
 
 				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, mOffListImages);
-				viewPager.setAdapter(adapterOffline);
-
-				viewPager.setCurrentItem(positionG);
-
-				viewPager.setOnPageChangeListener(this);
-			}
-
-			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
-			else{
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
 
 			currentNode = mOffListImages.get(positionG);
 			fileNameTextView.setText(currentNode.getName());
 		}else if (adapterType == Constants.FILE_LINK_ADAPTER){
-//			draggableView.setDraggable(false);
 			url = intent.getStringExtra("urlFileLink");
 			String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
 			if(serialize!=null){
@@ -1188,12 +1204,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 			File currentImage = new File(offlinePathDirectory);
 			File offlineDirectory = new File(currentImage.getParent());
-//			if (Environment.getExternalStorageDirectory() != null){
-//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-//			}
-//			else{
-//				offlineDirectory = getFilesDir();
-//			}
 
 			paths.clear();
 			int imageNumber = 0;
@@ -1235,38 +1245,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				index++;
 			}
 
-			if(paths.size() == 0)
-			{
-				//No images to show (images deleted?)
-				//Close the image viewer
-				finish();
-				return;
-			}
+			if(paths.size() == 0) finish();
 
-			if(positionG >= paths.size())
-			{
-				//Invalid index. Show the first image
-				positionG = 0;
-			}
+			if(positionG >= paths.size()) positionG = 0;
 
-			if(adapterType == Constants.ZIP_ADAPTER){
-				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, paths, true);
-			}
+			adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, paths, true);
 
-			viewPager.setAdapter(adapterOffline);
-
-			viewPager.setCurrentItem(positionG);
-
-			viewPager.setOnPageChangeListener(this);
-
-			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
-			else{
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
 			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == Constants.SEARCH_ADAPTER){
@@ -1293,33 +1277,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 
-			if(imageHandles.size() == 0)
-			{
-				finish();
-				return;
-			}
+			if(imageHandles.size() == 0) finish();
 
-			if(positionG >= imageHandles.size())
-			{
-				positionG = 0;
-			}
-			
+			if(positionG >= imageHandles.size()) positionG = 0;
+
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
-
-			viewPager.setAdapter(adapterMega);
-
-			viewPager.setCurrentItem(positionG);
-
-			viewPager.setOnPageChangeListener(this);
-
-			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
-			else{
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
@@ -1342,36 +1304,25 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 
-			if(imageHandles.size() == 0)
-			{
-				finish();
-				return;
-			}
+			if(imageHandles.size() == 0) finish();
 
-			if(positionG >= imageHandles.size())
-			{
-				positionG = 0;
-			}
-
-			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
-			else{
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
+			if(positionG >= imageHandles.size()) positionG = 0;
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+		}
+		else if (adapterType == Constants.RECENTS_ADAPTER) {
+			long handle = intent.getLongExtra("handle", -1);
+			if (handle == -1) finish();
 
-			viewPager.setAdapter(adapterMega);
+			imageHandles.add(handle);
+			positionG = 0;
+			fileNameTextView.setText(megaApi.getNodeByHandle(handle).getName());
 
-			viewPager.setCurrentItem(positionG);
-
-			viewPager.setOnPageChangeListener(this);
-		}else{
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+		}
+		else{
 			if (parentNodeHandle == -1){
 				switch(adapterType){
 					case Constants.FILE_BROWSER_ADAPTER:{
@@ -1399,15 +1350,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-
-//			if (fromShared){
-//				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-//					nodes = sortByMailDescending(nodes);
-//				}
-//				else{
-//					nodes = sortByNameAscending(nodes);
-//				}
-//			}
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
@@ -1419,38 +1361,23 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					imageNumber++;
 				}
 			}
-//			Toast.makeText(this, ""+parentNode.getName() + "_" + imageHandles.size(), Toast.LENGTH_LONG).show();
 
-			if(imageHandles.size() == 0)
-			{
-				finish();
-				return;
-			}
+			if(imageHandles.size() == 0) finish();
 
-			if(positionG >= imageHandles.size())
-			{
-				positionG = 0;
-			}
-
-			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-
-			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
-			else{
-				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
-			}
+			if(positionG >= imageHandles.size()) positionG = 0;
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
-
-			viewPager.setAdapter(adapterMega);
-
-			viewPager.setCurrentItem(positionG);
-
-			viewPager.setOnPageChangeListener(this);
 		}
+
+		if (adapterType == Constants.OFFLINE_ADAPTER) {
+			viewPager.setAdapter(adapterOffline);
+		}
+		else {
+			viewPager.setAdapter(adapterMega);
+		}
+		viewPager.setCurrentItem(positionG);
+		viewPager.addOnPageChangeListener(this);
 
 		if (savedInstanceState == null && adapterMega!= null){
 			ViewTreeObserver observer = viewPager.getViewTreeObserver();
