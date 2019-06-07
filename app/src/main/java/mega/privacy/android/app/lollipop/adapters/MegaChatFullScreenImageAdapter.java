@@ -54,6 +54,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
 
 	private Activity activity;
@@ -160,15 +163,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				return 0;
 			}
 			else{
-				if (activity.getExternalCacheDir() != null){
-					cacheDir = activity.getExternalCacheDir();
-				}
-				else{
-					cacheDir = activity.getCacheDir();
-				}
-				destination = new File(cacheDir, node.getName());
+				destination = buildPreviewFile(activity, node.getName());
 
-				if (destination.exists()){
+				if (isFileAvailable(destination)){
 					if (destination.length() == node.getSize()){
 						File previewDir = PreviewUtils.getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
