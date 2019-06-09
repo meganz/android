@@ -875,7 +875,6 @@
 
     <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Eposta doğrulaması</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Devam etmek için epostanızı kontrol edin</string>
-    <string name="email_verification_text_error" context="Text of the alert dialog to inform the user when an error occurs when cancelling the account">Bir hata oluştu, lütfen tekrar deneyin.</string>
 
 
     <string name="alert_not_logged_in" context="Alert to inform the user that have to be logged in to perform the action">Bu eylemi gerçekleştirebilmek için giriş yapmanız gerekiyor.</string>
@@ -1824,7 +1823,6 @@
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">Çıkış yapmak üzeresiniz, lütfen hatırladığınızdan emin olmak için parolanızı test edin.\nParolanızı kaybederseniz, MEGA verilerinize erişimi kaybedersiniz.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Panoya kopyala</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Kurtarma Anahtarını Dışa Aktar</string>
-    <string name="option_logout_anyway" context="Option that permits user logout">Yine de çıkış yap</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Kurtarma Anahtarı</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Dosya Sistemine Kaydet</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Panoya kopyalandı</string>

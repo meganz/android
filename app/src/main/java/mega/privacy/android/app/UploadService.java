@@ -48,6 +48,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 /*
  * Service to Upload files
  */
@@ -188,16 +191,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private synchronized void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
-  
+
 		String action = intent.getAction();
 		log("action is " + action);
 		if(action != null){
-		    if(Constants.ACTION_CHILD_UPLOADED_OK.equals(action)){
+            if(Constants.ACTION_CHILD_UPLOADED_OK.equals(action)){
                 childUploadSucceeded++;
                 return;
             }else if(Constants.ACTION_CHILD_UPLOADED_FAILED.equals(action)){
                 childUploadFailed++;
-		        return;
+                return;
             }
             if (Constants.ACTION_OVERQUOTA_STORAGE.equals(action)) {
                 isOverquota = 1;
@@ -935,21 +938,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 				String qrFileName = megaApi.getMyEmail() + "QRcode.jpg";
 
-				if (getApplicationContext().getExternalCacheDir() != null) {
-					File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
-					File localFile = new File(qrDir, transfer.getFileName());
-					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
-						log("Delete file!: " + localFile.getAbsolutePath());
-						localFile.delete();
-					}
-				} else {
-					File qrDir = getApplicationContext().getDir("qrMEGA", 0);
-					File localFile = new File(qrDir, transfer.getFileName());
-					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
-						log("Delete file!: " + localFile.getAbsolutePath());
-						localFile.delete();
-					}
-				}
+				File localFile = buildQrFile(getApplicationContext(),transfer.getFileName());
+                if (isFileAvailable(localFile) && !localFile.getName().equals(qrFileName)) {
+                    log("Delete file!: " + localFile.getAbsolutePath());
+                    localFile.delete();
+                }
 
 				log("IN Finish: " + transfer.getFileName() + "path? " + transfer.getPath());
 				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;

@@ -11,7 +11,7 @@ public class Constants {
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
     public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
     public static final int BOOT_JOB_ID = 10097;
-    
+
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -131,7 +131,7 @@ public class Constants {
     public static final int REQUEST_CAMERA_UPLOAD = 10;
     public static final int REQUEST_CAMERA_ON_OFF = 11;
     public static final int REQUEST_CAMERA_ON_OFF_FIRST_TIME = 12;
-    
+
 
 	public static final int WRITE_LOG = 13;
 
@@ -342,4 +342,12 @@ public class Constants {
 	public static final int SNACKBAR_TYPE = 0;
 	public static final int MESSAGE_SNACKBAR_TYPE = 1;
 	public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
+
+	public static final int FILE_LINK = 200;
+	public static final int FOLDER_LINK = 201;
+	public static final int CHAT_LINK = 202;
+	public static final int CONTACT_LINK = 203;
+	public static final int ERROR_LINK = -1;
+
+	public static final String CONTACT_HANDLE = "contactHandle";
 }
