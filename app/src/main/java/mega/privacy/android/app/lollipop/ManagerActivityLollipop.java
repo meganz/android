@@ -43,6 +43,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -63,6 +64,7 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -199,6 +201,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
+import mega.privacy.android.app.utils.ProgressDialogUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
@@ -1742,6 +1745,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onCreate after call super");
 
 		boolean selectDrawerItemPending = true;
+		//upload from device, progress dialog should show when screen orientation changes.
+        if (ProgressDialogUtil.shouldShowDialog) {
+            ProgressDialogUtil.showProcessFileDialog(this,null);
+        }
 		if(savedInstanceState!=null){
 			log("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -5447,7 +5454,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		catch (Exception e){
 			log("Exception NotificationManager - remove all notifications");
 		}
-        
+
         createMyChatFolder();
 		setToolbarTitle();
 
@@ -13432,16 +13439,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			ProgressDialogUtil.showProcessFileDialog(this,intent);
 		}
 		else if (requestCode == Constants.CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
@@ -14357,6 +14355,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("EXTRA_FOLDER_PATH:" + folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				uploadServiceIntent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, paths.size());
+
 				startService(uploadServiceIntent);
 			}
 		}
@@ -15033,7 +15033,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			catch(Exception ex){}
 		}
-
+        ProgressDialogUtil.dissmisDialog();
 		long parentHandle = -1;
 		MegaNode parentNode = null;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -15109,10 +15109,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
 		}
 		else {
-			for (ShareInfo info : infos) {
-				if(info.isContact){
-					requestContactsPermissions(info, parentNode);
-				}
+            Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
+            for (ShareInfo info : infos) {
+                if(info.isContact){
+                    requestContactsPermissions(info, parentNode);
+                }
 				else{
 					showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.upload_began), -1);
 					Intent intent = new Intent(this, UploadService.class);
@@ -15120,7 +15121,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					intent.putExtra(UploadService.EXTRA_LAST_MODIFIED, info.getLastModified());
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+					intent.putExtra(UploadService.EXTRA_UPLOAD_COUNT, infos.size());
 					startService(intent);
 				}
 			}

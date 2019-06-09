@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.MediaStore;
 
 import java.io.BufferedOutputStream;
@@ -240,7 +239,10 @@ public class ShareInfo {
 		inputStream = null;
 		try {
 			inputStream = context.getContentResolver().openInputStream(uri);
-		} catch (Exception e) {
+		} catch (FileNotFoundException fileNotFound) {
+		    log("FileNotFoundException, can't find uri: " + uri);
+		    return;
+        } catch (Exception e) {
 			log("inputStream EXCEPTION!");
 			log(""+e);
 			String path = uri.getPath();
@@ -404,7 +406,7 @@ public class ShareInfo {
 		Cursor cursor = null;
 		try {
 			cursor = client.query(uri, null, null, null, null);
-		} catch (RemoteException e1) {
+		} catch (Exception e1) {
 			log("cursor EXCEPTION!!!");
 		}
 		if(cursor!=null){
