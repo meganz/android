@@ -471,7 +471,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		}
 		else{
 		    //TODO #REVERT IT
-			megaApi.changeApiUrl("https://staing.api.mega.co.nz/");
+			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
 		}
 
 		if (Util.DEBUG){
