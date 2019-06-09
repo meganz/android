@@ -10,7 +10,6 @@ import android.telephony.PhoneNumberUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import mega.privacy.android.app.utils.Util;
@@ -25,6 +24,8 @@ public class ContactsUtil {
 
         private Set<String> phoneNumberSet = new HashSet<>();
 
+        private Set<String> normalizedPhoneNumberSet = new HashSet<>();
+
         private Set<String> emailSet = new HashSet<>();
 
         public LocalContact(int id, String name) {
@@ -38,6 +39,10 @@ public class ContactsUtil {
 
         public void addPhoneNumber(String phoneNumer) {
             phoneNumberSet.add(phoneNumer);
+        }
+
+        public void addNormalizedPhoneNumber(String normalizedPhoneNumber) {
+            normalizedPhoneNumberSet.add(normalizedPhoneNumber);
         }
 
         public void addEmail(String email) {
@@ -56,6 +61,10 @@ public class ContactsUtil {
             return phoneNumberSet;
         }
 
+        public Set<String> getNormalizedPhoneNumberSet() {
+            return normalizedPhoneNumberSet;
+        }
+
         public Set<String> getEmailSet() {
             return emailSet;
         }
@@ -64,8 +73,8 @@ public class ContactsUtil {
             if (!emailSet.isEmpty()) {
                 return emailSet.toArray(new String[]{})[0];
             }
-            if (!phoneNumberSet.isEmpty()) {
-                return phoneNumberSet.toArray(new String[]{})[0];
+            if (!normalizedPhoneNumberSet.isEmpty()) {
+                return normalizedPhoneNumberSet.toArray(new String[]{})[0];
             }
             return null;
         }
@@ -83,7 +92,9 @@ public class ContactsUtil {
 
     public static List<LocalContact> getLocalContactList(Context context) {
         // use current default country code to normalize phonenumber.
-        String countryCode = Locale.getDefault().getCountry();
+        String countryCode = Util.getCountryCodeByNetwork(context);
+        log("coutry code is: " + countryCode);
+
         List<LocalContact> localContacts = new ArrayList<>();
         ContentResolver resolver = context.getContentResolver();
 
@@ -107,14 +118,16 @@ public class ContactsUtil {
                 if (phones != null) {
                     while (phones.moveToNext()) {
                         // try to get normalized phone number from system first.
-                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
-                        if (phoneNumber == null) {
+                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        contact.addPhoneNumber(phoneNumber);
+                        String normalizedPhoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
+
+                        if (normalizedPhoneNumber == null) {
                             // use current country code to normalize the phone number.
-                            phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
+                            normalizedPhoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
                         }
-                        if (phoneNumber != null) {
-                            contact.addPhoneNumber(phoneNumber);
+                        if (normalizedPhoneNumber != null) {
+                            contact.addNormalizedPhoneNumber(normalizedPhoneNumber);
                         }
                     }
                     phones.close();
