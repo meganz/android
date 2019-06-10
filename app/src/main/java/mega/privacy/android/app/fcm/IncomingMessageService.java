@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
@@ -34,37 +33,10 @@ public class IncomingMessageService extends IncomingCallService {
             log(cm.getActiveNetworkInfo().getState() + "");
             log(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
-        
-        PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,":MegaIncomingMessagePowerLock");
-        if (!wl.isHeld()) {
-            wl.acquire();
-        }
-        
         remoteMessage = intent.getParcelableExtra("remoteMessage");
-        createNotification();
+        createNotification(R.drawable.ic_new_messages,getString(R.string.retrieving_message_title));
         checkMessage();
         return START_NOT_STICKY;
-    }
-    
-    public void createNotification() {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_new_messages)
-                .setContentText(getString(R.string.retrieving_message_title))
-                .setAutoCancel(false);
-        NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE,importance);
-            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
-            if (mNotificationManager != null) {
-                mNotificationManager.createNotificationChannel(notificationChannel);
-            }
-        }
-        if (mNotificationManager != null) {
-            Notification notification = mBuilder.build();
-            startForeground(notificationId,notification);
-        }
     }
     
     private void checkMessage() {

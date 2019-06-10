@@ -1890,7 +1890,7 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
                 Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
                 // change the setting of chat summary channel
-                intent.putExtra(Settings.EXTRA_CHANNEL_ID, Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
+                intent.putExtra(Settings.EXTRA_CHANNEL_ID, Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2);
                 startActivity(intent);
             } else {
                 //Intent to new activity Chat Settings

@@ -63,8 +63,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     Handler h;
 
-    PowerManager.WakeLock wl;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -73,7 +71,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-
+        megaApi.dumpSession();
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         showMessageNotificationAfterPush = false;
@@ -188,9 +186,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("isIdle: " + isIdle);
                         if(!isActivityVisible || isIdle) {
                             log("launch foreground service!");
-                            wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingCallLock:");
-                            wl.acquire();
-                            wl.release();
                             startService(new Intent(this,IncomingCallService.class));
                             return;
                         }
@@ -219,9 +214,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         boolean isIdle = pm.isDeviceIdleMode();
                         log("isActivityVisible: " + app.isActivityVisible());
                         log("isIdle: " + isIdle);
-                        wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MegaIncomingMessageCallLock:");
-                        wl.acquire();
-                        wl.release();
                         if((!app.isActivityVisible() && megaApi.getRootNode() == null )|| isIdle) {
                             log("launch foreground service!");
                             Intent intent = new Intent(this,IncomingMessageService.class);

@@ -22,6 +22,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -47,8 +48,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     boolean isLoggingIn = false;
     boolean showMessageNotificationAfterPush = false;
     boolean beep = false;
-    WifiManager.WifiLock lock;
-    PowerManager.WakeLock wl;
 
     private static final int STOP_SELF_AFTER = 60 * 1000;
 
@@ -77,14 +76,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     public void onDestroy() {
         log("onDestroy incoming call foreground service");
         super.onDestroy();
-        if(wl != null){
-            log("wifi lock release");
-            wl.release();
-        }
-        if (lock != null) {
-            log("wake lock release");
-            lock.release();
-        }
         stop();
     }
 
@@ -98,24 +89,34 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     }
 
     public static final String NOTIFICATION_CHANNEL_ID = "10099";
+
+    //the new id for this channel, must use a new ID to create a channel with new default settings.
+    public static final String NOTIFICATION_CHANNEL_ID_V2 = "10098";
     public static final int notificationId = 1086;
 
-    public void createNotification() {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        mBuilder.setSmallIcon(R.drawable.ic_call_started)
+    public void createNotification(int smallIcon,String title) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID_V2);
+        mBuilder.setSmallIcon(smallIcon)
+                .setContentText(title)
                 .setAutoCancel(false);
-        NotificationManager mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,"NOTIFICATION_CHANNEL_NAME",importance);
-            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID_V2, Constants.NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE, importance);
+            //no sound and vibration for this channel.
+            notificationChannel.enableVibration(false);
+            notificationChannel.setSound(null, null);
             if (mNotificationManager != null) {
+                NotificationChannel oldChannel = mNotificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID);
+                if (oldChannel != null) {
+                    mNotificationManager.deleteNotificationChannel(NOTIFICATION_CHANNEL_ID);
+                }
                 mNotificationManager.createNotificationChannel(notificationChannel);
             }
         }
         if (mNotificationManager != null) {
             Notification notification = mBuilder.build();
-            startForeground(notificationId,notification);
+            startForeground(notificationId, notification);
         }
     }
 
@@ -127,18 +128,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             log(cm.getActiveNetworkInfo().getState() + "");
             log(cm.getActiveNetworkInfo().getDetailedState() + "");
         }
-        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        lock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF,"MegaIncomingCallWifiLock");
-        PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,":MegaIncomingCallPowerLock");
-        if (!wl.isHeld()) {
-            wl.acquire();
-        }
-        if (!lock.isHeld()) {
-            lock.acquire();
-        }
 
-        createNotification();
+        createNotification(R.drawable.ic_call_started,"");
         log("CALL notification");
         //Leave the flag showMessageNotificationAfterPush as it is
         //If true - wait until connection finish

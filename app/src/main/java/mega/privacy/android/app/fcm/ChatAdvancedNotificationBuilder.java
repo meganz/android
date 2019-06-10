@@ -64,7 +64,7 @@ public final class ChatAdvancedNotificationBuilder {
 
     private String notificationChannelIdChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_ID;
     private String notificationChannelNameChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_NAME;
-    private String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
+    private String notificationChannelIdChatSummaryV2 = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2;
     private String notificationChannelIdChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
     private String notificationChannelIdInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
     private String notificationChannelNameInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
@@ -498,7 +498,7 @@ public final class ChatAdvancedNotificationBuilder {
             if(vibration.equals("true")){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     //use the channel with vibration
-                    notificationBuilderO.setChannelId(notificationChannelIdChatSummary);
+                    notificationBuilderO.setChannelId(notificationChannelIdChatSummaryV2);
                 }
                 else{
                     notificationBuilder.setVibrate(new long[] {0, 500});
@@ -679,16 +679,16 @@ public final class ChatAdvancedNotificationBuilder {
 
     @TargetApi(Build.VERSION_CODES.O)
     public static void createChatSummaryChannel(Context context) {
-        String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
+        String notificationChannelIdChatSummaryV2 = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2;
         String notificationChannelNameChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
         String notificationChannelIdChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID;
         String notificationChannelNameChatSummaryNoVibrate = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_NAME;
 
-        NotificationChannel channelWithVibration = new NotificationChannel(notificationChannelIdChatSummary,notificationChannelNameChatSummary,NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel channelWithVibration = new NotificationChannel(notificationChannelIdChatSummaryV2,notificationChannelNameChatSummary,NotificationManager.IMPORTANCE_HIGH);
         channelWithVibration.setShowBadge(true);
         channelWithVibration.setVibrationPattern(new long[] {0,500});
-        channelWithVibration.enableLights(true);
         //green light
+        channelWithVibration.enableLights(true);
         channelWithVibration.setLightColor(Color.rgb(0,255,0));
         //current ringtone for notification
         channelWithVibration.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),Notification.AUDIO_ATTRIBUTES_DEFAULT);
@@ -700,6 +700,11 @@ public final class ChatAdvancedNotificationBuilder {
 
         NotificationManager manager = context.getSystemService(NotificationManager.class);
         if (manager != null) {
+            //delete old channel otherwise the new settings don't work.
+            NotificationChannel oldChannel = manager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
+            if(oldChannel != null) {
+                manager.deleteNotificationChannel(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID);
+            }
             manager.createNotificationChannel(channelWithVibration);
             manager.createNotificationChannel(channelNoVibration);
         }
@@ -747,7 +752,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                 NotificationCompat.Builder notificationBuilderO = null;
                 if (vibrationEnabled){
-                    notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummary);
+                    notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryV2);
                 }
                 else{
                     notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryNoVibrate);
