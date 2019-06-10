@@ -25,25 +25,25 @@ import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ContactInfo;
+import mega.privacy.android.app.lollipop.InvitationContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT_HEADER;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT_HEADER;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolderPhoneContactsLollipop> {
 
     private Context mContext;
-    private List<ContactInfo> contactData;
+    private List<InvitationContactInfo> contactData;
     private LayoutInflater inflater;
     private OnItemClickListener callback;
 
-    public ContactsAdapter(Context context, ArrayList<ContactInfo> phoneContacts, OnItemClickListener callback) {
+    public ContactsAdapter(Context context, ArrayList<InvitationContactInfo> phoneContacts, OnItemClickListener callback) {
         this.mContext = context;
-        this.contactData = phoneContacts == null ? new ArrayList<ContactInfo>() : phoneContacts;
+        this.contactData = phoneContacts == null ? new ArrayList<InvitationContactInfo>() : phoneContacts;
         this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.callback = callback;
     }
@@ -69,15 +69,15 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             log("CI contact get clicked");
             int position = getAdapterPosition();
             if (callback != null && position < contactData.size()) {
-                ContactInfo contactInfo = contactData.get(position);
-                if (contactInfo.getType() == TYPE_MEGA_CONTACT || contactInfo.getType() == TYPE_PHONE_CONTACT) {
-                    boolean isSelected = !contactInfo.isHighlighted();
+                InvitationContactInfo invitationContactInfo = contactData.get(position);
+                if (invitationContactInfo.getType() == TYPE_MEGA_CONTACT || invitationContactInfo.getType() == TYPE_PHONE_CONTACT) {
+                    boolean isSelected = !invitationContactInfo.isHighlighted();
                     if (isSelected) {
-                        contactInfo.setHighlighted(true);
+                        invitationContactInfo.setHighlighted(true);
                         setItemHighlighted(v);
                     } else {
-                        contactInfo.setHighlighted(false);
-                        setItemNormal(v, contactInfo.getBitmap());
+                        invitationContactInfo.setHighlighted(false);
+                        setItemNormal(v, invitationContactInfo.getBitmap());
                     }
 
                     callback.onItemClick(v, position);
@@ -100,14 +100,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         return contactData.get(position).getType();
     }
 
-    public ContactInfo getItem(int position) {
+    public InvitationContactInfo getItem(int position) {
         if (position < contactData.size()) {
             return contactData.get(position);
         }
         return null;
     }
 
-    public void setContactData(ArrayList<ContactInfo> contactData) {
+    public void setContactData(ArrayList<InvitationContactInfo> contactData) {
         this.contactData = contactData;
     }
 
@@ -131,7 +131,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolderPhoneContactsLollipop holder, int position) {
-        ContactInfo contact = getItem(position);
+        InvitationContactInfo contact = getItem(position);
         int type = contact.getType();
         switch (type) {
             case TYPE_MEGA_CONTACT_HEADER:
@@ -168,13 +168,13 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         return holder;
     }
 
-    private void bindHeader(ViewHolderPhoneContactsLollipop holder, ContactInfo contact) {
+    private void bindHeader(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact) {
         holder.headerTextView.setText(contact.getName());
         holder.headerTextView.setTextColor(mContext.getResources().getColor(R.color.black));
         holder.headerTextView.setBackgroundColor(Color.WHITE);
     }
 
-    private void bindContact(ViewHolderPhoneContactsLollipop holder, ContactInfo contact, boolean isMegaContact) {
+    private void bindContact(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact, boolean isMegaContact) {
         holder.contactMail = contact.getEmail();
         holder.contactName = contact.getName();
         holder.contactId = contact.getId();

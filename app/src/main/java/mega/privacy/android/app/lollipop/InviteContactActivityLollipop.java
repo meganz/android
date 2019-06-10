@@ -1,19 +1,16 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -44,10 +41,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
@@ -55,23 +52,23 @@ import mega.privacy.android.app.lollipop.adapters.ContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.contacts.ContactsUtil;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MANUAL_INPUT_EMAIL;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MANUAL_INPUT_PHONE;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_MEGA_CONTACT_HEADER;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT;
-import static mega.privacy.android.app.lollipop.ContactInfo.TYPE_PHONE_CONTACT_HEADER;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MANUAL_INPUT_EMAIL;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MANUAL_INPUT_PHONE;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
+import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
 
 
-public class InviteContactActivityLollipop extends PinActivityLollipop implements ContactsAdapter.OnItemClickListener, View.OnClickListener, RecyclerView.OnItemTouchListener, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface {
+public class InviteContactActivityLollipop extends PinActivityLollipop implements ContactsAdapter.OnItemClickListener, View.OnClickListener, RecyclerView.OnItemTouchListener, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaContactGetter.MegaContactUpdater {
 
     public static final int SCAN_QR_FOR_invite_contactS = 1111;
     public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
@@ -95,7 +92,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private ProgressBar progressBar;
     private String inputString;
     private ContactsAdapter contactsAdapter;
-    private ArrayList<ContactInfo> phoneContacts, megaContacts, addedContacts, filteredContacts, totalContacts;
+    private ArrayList<InvitationContactInfo> phoneContacts, megaContacts, addedContacts, filteredContacts, totalContacts;
     private FilterContactsTask filterContactsTask;
     private FastScroller fastScroller;
     private FloatingActionButton fabButton;
@@ -104,6 +101,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private LinearLayout itemContainer;
     private Handler handler;
     private LayoutInflater inflater;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,12 +118,13 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         handler = new Handler();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
+        context = getApplicationContext();
 
         phoneContacts = new ArrayList<>();
         addedContacts = new ArrayList<>();
         filteredContacts = new ArrayList<>();
         totalContacts = new ArrayList<>();
-        megaContacts = megaContactToPhoneContact(megaApi.getContacts());
+        megaContacts = new ArrayList<>();
 
         Toolbar tB = findViewById(R.id.invite_contact_toolbar);
         tB.setVisibility(View.VISIBLE);
@@ -199,15 +198,39 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             refreshAddedContactsView();
             setRecyclersVisibility();
             setTitleAB();
-            if(totalContacts.size() > 0){
+            if (totalContacts.size() > 0) {
                 setEmptyStateVisibility(false);
-            }else{
+            } else {
                 setEmptyStateVisibility(true);
                 showEmptyTextView();
             }
         } else {
             queryIfHasReadContactsPermissions();
         }
+    }
+
+    @Override
+    public void update(List<MegaContactGetter.MegaContact> contacts) {
+        megaContacts = megaContactToContactInfo(contacts);
+        totalContacts.clear();
+        filteredContacts.clear();
+
+        filteredContacts.addAll(megaContacts);
+        filteredContacts.addAll(phoneContacts);
+
+        //keep all contacts for records
+        totalContacts.addAll(filteredContacts);
+        refreshList();
+    }
+
+    @Override
+    public void onException(int errorCode, String requestString) {
+
+    }
+
+    @Override
+    public void noContacts() {
+
     }
 
     @Override
@@ -291,7 +314,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    private void setPhoneAdapterContacts(ArrayList<ContactInfo> contacts) {
+    private void setPhoneAdapterContacts(ArrayList<InvitationContactInfo> contacts) {
         log("setPhoneAdapterContacts");
         contactsAdapter.setContactData(contacts);
         contactsAdapter.notifyDataSetChanged();
@@ -329,52 +352,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             emptyTextView.setVisibility(View.GONE);
             emptySubTextView.setVisibility(View.GONE);
         }
-    }
-
-    private ArrayList<ContactInfo> getPhoneContacts() {
-        log("getPhoneContacts");
-        ArrayList<ContactInfo> contactList = new ArrayList<>();
-        ContactInfo phoneContactHeader = new ContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), "", "", TYPE_PHONE_CONTACT_HEADER);
-        contactList.add(phoneContactHeader);
-        log("inputString empty");
-        String filter = ContactsContract.CommonDataKinds.Email.DATA + " NOT LIKE ''  AND " + ContactsContract.Contacts.IN_VISIBLE_GROUP + "=1";
-
-        try {
-            ContentResolver cr = getBaseContext().getContentResolver();
-            String SORT_ORDER = ContactsContract.Contacts.SORT_KEY_PRIMARY;
-
-            Cursor c = cr.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    null, filter,
-                    null, SORT_ORDER);
-
-            while (c.moveToNext()) {
-                long id = c.getLong(c.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                String name = c.getString(c.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-                String emailAddress = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                log("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + emailAddress);
-
-                if ((!emailAddress.equalsIgnoreCase("")) && (emailAddress.contains("@")) && (!emailAddress.contains("s.whatsapp.net"))) {
-                    if (inputString == "" || inputString == null) {
-                        log("VALID Contact: " + name + " ---> " + emailAddress);
-                        ContactInfo contactPhone = new ContactInfo(id, name, emailAddress, null, TYPE_PHONE_CONTACT);
-                        contactList.add(contactPhone);
-                    } else if (!inputString.isEmpty() && (name.toUpperCase().contains(inputString.toUpperCase()) || emailAddress.toUpperCase().contains(inputString.toUpperCase()))) {
-                        log("VALID Contact: " + name + " ---> " + emailAddress + " inputString: " + inputString);
-                        ContactInfo contactPhone = new ContactInfo(id, name, emailAddress, null, TYPE_PHONE_CONTACT);
-                        contactList.add(contactPhone);
-                    }
-                }
-            }
-            c.close();
-
-            log("contactList.size() = " + contactList.size());
-
-        } catch (Exception e) {
-            log("Exception: " + e.getMessage());
-        }
-
-        return contactList;
     }
 
     private void initScanQR() {
@@ -609,12 +586,12 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onItemClick(View view, int position) {
-        ContactInfo contactInfo = contactsAdapter.getItem(position);
-        log("on Item click at " + position + " name is " + contactInfo.getName());
-        if (isContactAdded(contactInfo)) {
-            addedContacts.remove(contactInfo);
+        InvitationContactInfo invitationContactInfo = contactsAdapter.getItem(position);
+        log("on Item click at " + position + " name is " + invitationContactInfo.getName());
+        if (isContactAdded(invitationContactInfo)) {
+            addedContacts.remove(invitationContactInfo);
         } else {
-            addedContacts.add(contactInfo);
+            addedContacts.add(invitationContactInfo);
         }
 
         refreshAddedContactsView();
@@ -632,27 +609,50 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         setTitleAB();
     }
 
-    private ArrayList<ContactInfo> megaContactToPhoneContact(ArrayList<MegaUser> megaContacts) {
-        log("megaContactToPhoneContact " + megaContacts.size());
-        ArrayList<ContactInfo> result = new ArrayList<>();
+    private ArrayList<InvitationContactInfo> megaContactToContactInfo(List<MegaContactGetter.MegaContact> megaContacts) {
+        log("megaContactToContactInfo " + megaContacts.size());
+        ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (megaContacts.size() > 0) {
-            ContactInfo megaContactHeader = new ContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), "", "", TYPE_MEGA_CONTACT_HEADER);
+            InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), TYPE_MEGA_CONTACT_HEADER);
             result.add(megaContactHeader);
         } else {
             return result;
         }
 
-        for (MegaUser user : megaContacts) {
-            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-            long id = 0;
-            String name = "", email = "", phoneNumber = "";
-            if (contactDB != null) {
-                id = user.getHandle();
-                name = contactDB.getName() + contactDB.getLastName();
-                email = user.getEmail();
-                phoneNumber = "missing now ";//todo
-            }
-            ContactInfo info = new ContactInfo(id, name, email, phoneNumber, TYPE_MEGA_CONTACT);
+        for (MegaContactGetter.MegaContact contact : megaContacts) {
+            String handle = contact.getId();
+            String name = contact.getLocalName();
+            String email = contact.getEmail();
+            String phoneNumber = contact.getNormalizedPhoneNumber();
+            List<String> phoneNumberSet = new ArrayList<>();
+            phoneNumberSet.add(phoneNumber);
+            List<String> emailSet = new ArrayList<>();
+            emailSet.add(email);
+
+            InvitationContactInfo info = new InvitationContactInfo(handle, name, TYPE_MEGA_CONTACT, phoneNumberSet, emailSet);
+            result.add(info);
+        }
+
+        return result;
+    }
+
+    private ArrayList<InvitationContactInfo> localContactToContactInfo(List<ContactsUtil.LocalContact> localContacts) {
+        log("megaContactToContactInfo " + localContacts.size());
+        ArrayList<InvitationContactInfo> result = new ArrayList<>();
+        if (localContacts.size() > 0) {
+            InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_MEGA_CONTACT_HEADER);
+            result.add(megaContactHeader);
+        } else {
+            return result;
+        }
+
+        for (ContactsUtil.LocalContact contact : localContacts) {
+            long id = contact.getId();
+            String name = contact.getName();
+            List<String> phoneNumberSet = contact.getPhoneNumberList();
+            List<String> emailSet = contact.getEmailList();
+
+            InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_PHONE_CONTACT, phoneNumberSet, emailSet);
             result.add(info);
         }
 
@@ -670,8 +670,13 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             filteredContacts.clear();
             totalContacts.clear();
 
+//            MegaContactGetter megaContactGetter = new MegaContactGetter();
+//            megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
+//            megaContactGetter.getMegaContacts(megaApi, InviteContactActivityLollipop.this);
+
             //add new value
-            phoneContacts.addAll(getPhoneContacts());
+            List<ContactsUtil.LocalContact> localContacts = ContactsUtil.getLocalContactList(context);//todo
+            phoneContacts.addAll(localContactToContactInfo(localContacts));
             filteredContacts.addAll(megaContacts);
             filteredContacts.addAll(phoneContacts);
 
@@ -707,20 +712,20 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         protected Void doInBackground(Void... voids) {
             log("FilterContactsTask doInBackground");
             String query = inputString == null ? null : inputString.toLowerCase();
-            ArrayList<ContactInfo> megaContacts = new ArrayList<>();
-            ArrayList<ContactInfo> phoneContacts = new ArrayList<>();
+            ArrayList<InvitationContactInfo> megaContacts = new ArrayList<>();
+            ArrayList<InvitationContactInfo> phoneContacts = new ArrayList<>();
 
             if (query != null && !query.equals("")) {
                 for (int i = 0; i < totalContacts.size(); i++) {
-                    ContactInfo contactInfo = totalContacts.get(i);
-                    String email = contactInfo.getEmail().toLowerCase();
-                    String name = contactInfo.getName().toLowerCase();
-                    int type = contactInfo.getType();
+                    InvitationContactInfo invitationContactInfo = totalContacts.get(i);
+                    String email = invitationContactInfo.getEmail().toLowerCase();
+                    String name = invitationContactInfo.getName().toLowerCase();
+                    int type = invitationContactInfo.getType();
                     if ((email.contains(query) || name.contains(query))) {
                         if (type == TYPE_PHONE_CONTACT) {
-                            phoneContacts.add(contactInfo);
+                            phoneContacts.add(invitationContactInfo);
                         } else if (type == TYPE_MEGA_CONTACT) {
-                            megaContacts.add(contactInfo);
+                            megaContacts.add(invitationContactInfo);
                         }
                     }
                 }
@@ -728,11 +733,11 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
                 //add header
                 if (megaContacts.size() > 0) {
-                    filteredContacts.add(new ContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), "", "", TYPE_MEGA_CONTACT_HEADER));
+                    filteredContacts.add(new InvitationContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), TYPE_MEGA_CONTACT_HEADER));
                     filteredContacts.addAll(megaContacts);
                 }
                 if (phoneContacts.size() > 0) {
-                    filteredContacts.add(new ContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), "", "", TYPE_PHONE_CONTACT_HEADER));
+                    filteredContacts.add(new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_MEGA_CONTACT_HEADER));
                     filteredContacts.addAll(phoneContacts);
                 }
             } else {
@@ -774,8 +779,8 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContactInfo contactInfo = addedContacts.get(v.getId());
-                contactInfo.setHighlighted(false);
+                InvitationContactInfo invitationContactInfo = addedContacts.get(v.getId());
+                invitationContactInfo.setHighlighted(false);
                 addedContacts.remove(id);
                 refreshAddedContactsView();
                 refreshInviteContactButton();
@@ -793,16 +798,16 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         log("refreshAddedContactsView");
         itemContainer.removeAllViews();
         for (int i = 0; i < addedContacts.size(); i++) {
-            ContactInfo contactInfo = addedContacts.get(i);
+            InvitationContactInfo invitationContactInfo = addedContacts.get(i);
             String displayedLabel = "";
-            if (contactInfo.getName().equals("")) {
-                if (!contactInfo.getEmail().equals("")) {
-                    displayedLabel = contactInfo.getEmail();
-                } else if (!contactInfo.getPhoneNumber().equals("")) {
-                    displayedLabel = contactInfo.getPhoneNumber();
+            if (invitationContactInfo.getName().equals("")) {
+                if (!invitationContactInfo.getEmail().equals("")) {
+                    displayedLabel = invitationContactInfo.getEmail();
+                } else if (!invitationContactInfo.getPhoneNumber().equals("")) {
+                    displayedLabel = invitationContactInfo.getPhoneNumber();
                 }
             } else {
-                displayedLabel = contactInfo.getName();
+                displayedLabel = invitationContactInfo.getName();
             }
             itemContainer.addView(createContactTextView(displayedLabel, i));
         }
@@ -818,10 +823,10 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         enableFabButton(addedContacts.size() > 0 && isStringValidNow);
     }
 
-    private boolean isContactAdded(ContactInfo contactInfo) {
-        log("isContactAdded contact name is " + contactInfo.getName());
-        for (ContactInfo addedContact : addedContacts) {
-            if (addedContact.getId() == contactInfo.getId()) {
+    private boolean isContactAdded(InvitationContactInfo invitationContactInfo) {
+        log("isContactAdded contact name is " + invitationContactInfo.getName());
+        for (InvitationContactInfo addedContact : addedContacts) {
+            if (addedContact.getId() == invitationContactInfo.getId()) {
                 return true;
             }
         }
@@ -833,7 +838,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         setPhoneAdapterContacts(filteredContacts);
     }
 
-    private void inviteContacts(ArrayList<ContactInfo> addedContacts) {
+    private void inviteContacts(ArrayList<InvitationContactInfo> addedContacts) {
         log("inviteContacts");
 
         // Email contacts to be invited
@@ -844,7 +849,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         if (addedContacts != null) {
             String contactEmail;
             String contactPhone;
-            for (ContactInfo contact : addedContacts) {
+            for (InvitationContactInfo contact : addedContacts) {
                 contactEmail = contact.getEmail();
                 contactPhone = contact.getPhoneNumber();
                 if (contactEmail != null) {
@@ -891,15 +896,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     private void addContactInfo(String inputString, int type) {
         log("addContactInfo inputString is " + inputString + " type is " + type);
-        ContactInfo info = null;
+        InvitationContactInfo info = null;
         switch (type) {
             case TYPE_MANUAL_INPUT_EMAIL: {
-                info = new ContactInfo(inputString.hashCode(), "", inputString, "", TYPE_MANUAL_INPUT_EMAIL);
+                //info = new InvitationContactInfo(inputString.hashCode(), "", inputString, "", TYPE_MANUAL_INPUT_EMAIL);//todo
                 break;
             }
 
             case TYPE_MANUAL_INPUT_PHONE: {
-                info = new ContactInfo(inputString.hashCode(), "", "", inputString, TYPE_MANUAL_INPUT_PHONE);
+                //info = new InvitationContactInfo(inputString.hashCode(), "", "", inputString, TYPE_MANUAL_INPUT_PHONE);
                 break;
             }
             default:

@@ -49,6 +49,22 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     ", normalizedPhoneNumber='" + normalizedPhoneNumber + '\'' +
                     '}';
         }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getLocalName() {
+            return localName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getNormalizedPhoneNumber() {
+            return normalizedPhoneNumber;
+        }
     }
 
     public interface MegaContactUpdater {
