@@ -66,6 +66,9 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 /*
  * Background service to download files
  */
@@ -1490,19 +1493,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if((wl != null) && (wl.isHeld()))
 					try{ wl.release(); } catch(Exception ex) {}
 
-				log("Download cancelled: " + transfer.getNodeHandle());
+				log("Download canceled: " + transfer.getNodeHandle());
 
-				resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
-
-				File file = new File(transfer.getPath());
-				file.delete();
+				if(isVoiceClipType(transfer.getAppData())) {
+					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
+					File localFile = buildVoiceClipFile(this, transfer.getFileName());
+					if (isFileAvailable(localFile) && localFile.exists()) {
+						log("deleteOwnVoiceClip : exists");
+						localFile.delete();
+					}
+				}else{
+					File file = new File(transfer.getPath());
+					file.delete();
+				}
 				DownloadService.this.cancel();
-
 
 			}
 			else{
 				if (error.getErrorCode() == MegaError.API_OK) {
-					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
+					log("Download OK nodeHandle: " + transfer.getNodeHandle());
+
+					if(isVoiceClipType(transfer.getAppData())) resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER);
 
 					log("DOWNLOADFILE: " + transfer.getPath());
 
@@ -1588,18 +1599,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else
 				{
-					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
 
+					log("Download ERROR: " + transfer.getNodeHandle());
+					if(isVoiceClipType(transfer.getAppData()))resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
 
 					if(!transfer.isFolderTransfer()){
 						errorCount++;
 					}
 
-					if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
-						File file = new File(transfer.getPath());
-						file.delete();
-					}
-					else{
+					if(isVoiceClipType(transfer.getAppData())){
+						File localFile = buildVoiceClipFile(this, transfer.getFileName());
+						if (isFileAvailable(localFile) && localFile.exists()) {
+							log("deleteOwnVoiceClip : exists");
+							localFile.delete();
+						}
+					}else{
 						File file = new File(transfer.getPath());
 						file.delete();
 					}
@@ -1614,8 +1628,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void resultTransfersVoiceClip(long nodeHandle, int result){
+		log("resultTransfersVoiceClip:nodeHandle =  "+nodeHandle+", the result is "+result);
 		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED);
-		intent.putExtra("nodeHandle",nodeHandle);
+		intent.putExtra("nodeHandle", nodeHandle);
 		intent.putExtra("resultTransfer", result);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}

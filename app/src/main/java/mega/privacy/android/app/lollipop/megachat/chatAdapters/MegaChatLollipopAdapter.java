@@ -5751,11 +5751,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         final long messageId = message.getMsgId();
         long messageHandle = -1;
 
-
         holder.totalDurationOfVoiceClip = 0;
         MegaNodeList nodeListOwn = message.getMegaNodeList();
         if(nodeListOwn.size() >= 1 && ChatUtil.isVoiceClip(nodeListOwn.get(0).getName())) {
             holder.totalDurationOfVoiceClip = ChatUtil.getVoiceClipDuration(nodeListOwn.get(0));
+            messageHandle = message.getMegaNodeList().get(0).getHandle();
+
         }
 
         if(messagesPlaying == null) messagesPlaying = new ArrayList<>();
@@ -5841,7 +5842,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipDuration.setText("-:--");
 
             }else if (status == MegaChatMessage.STATUS_SENDING) {
-                log("bindVC:myMessage: STATUS_SENDING ");
+                log("bindVC:myMessage: STATUS_SENDING --- uploading VISIBLE");
                 holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
                 holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
@@ -8750,17 +8751,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public void finishedVoiceClipDownload(long nodeHandle, int resultTransfer){
         if(messages==null || messages.isEmpty() || messagesPlaying==null || messagesPlaying.isEmpty()) return;
+        log("finishedVoiceClipDownload:nodeHandle = "+nodeHandle+", the result of transfer is "+resultTransfer);
 
         for(MessageVoiceClip messagevc : messagesPlaying){
             if(messagevc.getMessageHandle() == nodeHandle){
                 messagevc.setIsAvailable(resultTransfer);
-                for(int i=0; i<messages.size();i++){
-                    if(messages.get(i).getMessage().getMsgId() == messagevc.getIdMessage()){
-                        int positionInAdapter = i+1;
+                for(int posArray=0; posArray<messages.size();posArray++){
+                    if(messages.get(posArray).getMessage().getMsgId() == messagevc.getIdMessage()){
+                        int positionInAdapter = posArray+1;
                         ViewHolderMessageChat holder = (ViewHolderMessageChat) listFragment.findViewHolderForAdapterPosition(positionInAdapter);
-                        if(holder!=null){
-                            notifyItemChanged(positionInAdapter);
-                        }
+                        if(holder!=null) notifyItemChanged(positionInAdapter);
                         break;
                     }
                 }
