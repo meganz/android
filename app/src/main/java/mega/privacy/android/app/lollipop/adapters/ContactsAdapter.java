@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,25 +28,56 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.InvitationContactInfo;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 
-public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolderPhoneContactsLollipop> {
+public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
 
-    private Context mContext;
+    private final String IMAGE_EXTENSION = ".jpg";
+    private Context context;
     private List<InvitationContactInfo> contactData;
     private LayoutInflater inflater;
     private OnItemClickListener callback;
+    private MegaApiAndroid megaApi;
 
-    public ContactsAdapter(Context context, ArrayList<InvitationContactInfo> phoneContacts, OnItemClickListener callback) {
-        this.mContext = context;
+    public ContactsAdapter(Context context, ArrayList<InvitationContactInfo> phoneContacts, OnItemClickListener callback, MegaApiAndroid megaApi) {
+        this.context = context;
         this.contactData = phoneContacts == null ? new ArrayList<InvitationContactInfo>() : phoneContacts;
-        this.inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.callback = callback;
+        this.megaApi = megaApi;
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if (e.getErrorCode() == MegaError.API_OK) {
+            notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
     }
 
     class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -170,7 +202,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     private void bindHeader(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact) {
         holder.headerTextView.setText(contact.getName());
-        holder.headerTextView.setTextColor(mContext.getResources().getColor(R.color.black));
+        holder.headerTextView.setTextColor(context.getResources().getColor(R.color.black));
         holder.headerTextView.setBackgroundColor(Color.WHITE);
     }
 
@@ -187,9 +219,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
             setItemHighlighted(holder.contactLayout);
         } else {
             log("contact is not selected");
-            Bitmap bitmap = null;
+            Bitmap bitmap;
             if (isMegaContact) {
-                //todo get Mega contact bitmap
+                bitmap = getMegaUserAvatar(contact);
             } else {
                 bitmap = createPhoneContactBitmap(holder.contactId);
             }
@@ -227,7 +259,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     private Bitmap createPhoneContactBitmap(long id) {
         log("createPhoneContactBitmap");
-        InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(),
+        InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
                 ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id));
         Bitmap photo = null;
         try {
@@ -247,35 +279,29 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        p.setColor(ContextCompat.getColor(mContext, R.color.color_default_avatar_phone));
+        p.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
 
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-            radius = defaultAvatar.getWidth() / 2;
-        } else {
-            radius = defaultAvatar.getHeight() / 2;
-        }
-
-        c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, p);
+        int radius = defaultAvatar.getWidth() / 2;
+        c.drawCircle(radius, radius, radius, p);
         return defaultAvatar;
     }
 
     private void setItemHighlighted(View view) {
         log("setItemHighlighted");
-        view.setBackgroundColor(mContext.getResources().getColor(R.color.contactSelected));
+        view.setBackgroundColor(context.getResources().getColor(R.color.contactSelected));
         ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
-        Bitmap image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_select_folder);
+        Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_select_avatar);
         if (image != null) {
+            TextView initialLetter = view.findViewById(R.id.contact_explorer_initial_letter);
+            initialLetter.setVisibility(View.GONE);
             imageView.setImageBitmap(image);
         }
 
-        TextView initialLetter = view.findViewById(R.id.contact_explorer_initial_letter);
-        initialLetter.setVisibility(View.GONE);
     }
 
     private void setItemNormal(View view, Bitmap bitmap) {
         log("setItemNormal");
-        view.setBackgroundColor(mContext.getResources().getColor(R.color.white));
+        view.setBackgroundColor(context.getResources().getColor(R.color.white));
         if (bitmap != null) {
             ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
             imageView.setImageBitmap(bitmap);
@@ -283,6 +309,39 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
         TextView initialLetter = view.findViewById(R.id.contact_explorer_initial_letter);
         initialLetter.setVisibility(View.VISIBLE);
+    }
+
+    private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
+        String email = contact.getEmail();
+        boolean isExternalCacheDirAvailable = context.getExternalCacheDir() != null;
+        String path;
+        if (isExternalCacheDirAvailable) {
+            path = context.getExternalCacheDir().getAbsolutePath() + File.separator + email + IMAGE_EXTENSION;
+        } else {
+            path = context.getCacheDir().getAbsolutePath() + File.separator + email + IMAGE_EXTENSION;
+        }
+
+        File avatar = new File(path);
+        if (avatar.exists()) {
+            BitmapFactory.Options bOpts = new BitmapFactory.Options();
+            Bitmap bitmap;
+            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+            bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+            if (bitmap == null) {
+                avatar.delete();
+                getMegaUserAvatar(email, path);
+            } else {
+                return bitmap;
+            }
+        } else {
+            getMegaUserAvatar(email, path);
+        }
+        return null;
+    }
+
+    private void getMegaUserAvatar(String email, String path) {
+        log("getting MegaUserAvatar for" + email + " will be saved to " + path);
+        megaApi.getUserAvatar(email, path, this);
     }
 
     private static void log(String message) {

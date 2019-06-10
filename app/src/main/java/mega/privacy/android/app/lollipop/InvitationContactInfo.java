@@ -46,7 +46,7 @@ public class InvitationContactInfo implements Parcelable {
     }
 
     public InvitationContactInfo(Parcel in) {
-        this.id = in.readLong();
+        this.id = in.readLong();//todo
         //this.isHighlighted = in.readBooleanArray(0);
         this.type = in.readInt();
 //        this.bitmap = in.readBit
@@ -100,8 +100,8 @@ public class InvitationContactInfo implements Parcelable {
         this.handle = handle;
     }
 
-    public String getEmail(){
-        if(emailList != null && !emailList.isEmpty()){
+    public String getEmail() {
+        if (emailList != null && !emailList.isEmpty()) {
             return emailList.get(0);
         }
 
@@ -109,7 +109,7 @@ public class InvitationContactInfo implements Parcelable {
     }
 
     public String getPhoneNumber() {
-        if(phoneNumberList != null && !phoneNumberList.isEmpty()){
+        if (phoneNumberList != null && !phoneNumberList.isEmpty()) {
             return phoneNumberList.get(0);
         }
 

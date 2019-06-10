@@ -102,6 +102,8 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private Handler handler;
     private LayoutInflater inflater;
     private Context context;
+    private boolean isGettingLocalContact;
+    private boolean isGettingMegaContact;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +174,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         recyclerViewList.setLayoutManager(linearLayoutManager);
         recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
-        contactsAdapter = new ContactsAdapter(this, filteredContacts, this);
+        contactsAdapter = new ContactsAdapter(this, filteredContacts, this, megaApi);
         recyclerViewList.setAdapter(contactsAdapter);
         containerContacts = findViewById(R.id.container_list_contacts);
 
@@ -210,17 +212,12 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     }
 
     @Override
-    public void update(List<MegaContactGetter.MegaContact> contacts) {
-        megaContacts = megaContactToContactInfo(contacts);
-        totalContacts.clear();
-        filteredContacts.clear();
-
-        filteredContacts.addAll(megaContacts);
-        filteredContacts.addAll(phoneContacts);
-
-        //keep all contacts for records
-        totalContacts.addAll(filteredContacts);
-        refreshList();
+    public synchronized void update(List<MegaContactGetter.MegaContact> contacts) {
+        isGettingMegaContact = false;
+        clearLists();
+        megaContacts.addAll(megaContactToContactInfo(contacts));
+        createList();
+        onGetContactCompleted();
     }
 
     @Override
@@ -288,20 +285,21 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
             if (hasReadContactsPermission) {
-                prepareToGetPhoneContacts();
+                prepareToGetContacts();
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_READ_CONTACTS);
             }
         } else {
-            prepareToGetPhoneContacts();
+            prepareToGetContacts();
         }
     }
 
-    private void prepareToGetPhoneContacts() {
-        log("prepareToGetPhoneContacts");
+    private void prepareToGetContacts() {
+        log("prepareToGetContacts");
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
-        new GetContactsTask().execute();
+        new GetPhoneContactsTask().execute();
+        new GetMegaContactsTask().execute();
     }
 
     private void visibilityFastScroller() {
@@ -513,7 +511,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             case Constants.REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     log("Permission granted");
-                    prepareToGetPhoneContacts();
+                    prepareToGetContacts();
                 } else {
                     log("Permission denied");
                     setEmptyStateVisibility(true);
@@ -598,15 +596,16 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         refreshInviteContactButton();
         //clear input text view after selection
         typeContactEditText.setText("");
-        //refresh scroll view
+        setTitleAB();
+    }
+
+    private void refreshHorizontalScrollView() {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 scrollView.fullScroll(android.view.View.FOCUS_RIGHT);
             }
         }, 100);
-
-        setTitleAB();
     }
 
     private ArrayList<InvitationContactInfo> megaContactToContactInfo(List<MegaContactGetter.MegaContact> megaContacts) {
@@ -659,24 +658,36 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return result;
     }
 
-    private class GetContactsTask extends AsyncTask<Void, Void, Void> {
+    private class GetMegaContactsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            log("GetContactsTask doInBackground");
+            log("GetPhoneContactsTask doInBackground");
 
             //clear cache
-            phoneContacts.clear();
-            filteredContacts.clear();
-            totalContacts.clear();
+            isGettingMegaContact = true;
+            MegaContactGetter megaContactGetter = new MegaContactGetter();
+            megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
+            megaContactGetter.getMegaContacts(megaApi, InviteContactActivityLollipop.this);
+            return null;
+        }
 
-//            MegaContactGetter megaContactGetter = new MegaContactGetter();
-//            megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
-//            megaContactGetter.getMegaContacts(megaApi, InviteContactActivityLollipop.this);
+        @Override
+        protected void onPostExecute(Void avoid) {
+            log("onPostExecute GetPhoneContactsTask");
+        }
+    }
+
+    private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            log("GetPhoneContactsTask doInBackground");
+
+            isGettingLocalContact = true;
 
             //add new value
-            List<ContactsUtil.LocalContact> localContacts = ContactsUtil.getLocalContactList(context);//todo
-            phoneContacts.addAll(localContactToContactInfo(localContacts));
+            phoneContacts.addAll(localContactToContactInfo(ContactsUtil.getLocalContactList(context)));
             filteredContacts.addAll(megaContacts);
             filteredContacts.addAll(phoneContacts);
 
@@ -687,22 +698,30 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
         @Override
         protected void onPostExecute(Void avoid) {
-            log("onPostExecute GetContactsTask");
+            log("onPostExecute GetPhoneContactsTask");
             InviteContactActivityLollipop.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    progressBar.setVisibility(View.GONE);
-                    refreshList();
-                    setRecyclersVisibility();
-                    visibilityFastScroller();
-
-                    if (totalContacts.size() > 0) {
-                        setEmptyStateVisibility(false);
-                    } else {
-                        showEmptyTextView();
-                    }
+                    isGettingLocalContact = false;
+                    onGetContactCompleted();
                 }
             });
+        }
+    }
+
+    private void onGetContactCompleted() {
+        if (isGettingLocalContact || isGettingMegaContact) {
+            return;
+        }
+        progressBar.setVisibility(View.GONE);
+        refreshList();
+        setRecyclersVisibility();
+        visibilityFastScroller();
+
+        if (totalContacts.size() > 0) {
+            setEmptyStateVisibility(false);
+        } else {
+            showEmptyTextView();
         }
     }
 
@@ -812,6 +831,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             itemContainer.addView(createContactTextView(displayedLabel, i));
         }
         itemContainer.invalidate();
+        refreshHorizontalScrollView();
     }
 
     private void refreshInviteContactButton() {
@@ -928,6 +948,18 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private void showSnackBar(String message) {
         Util.hideKeyboard(this, 0);
         showSnackbar(container, message);
+    }
+
+    private void clearLists() {
+        totalContacts.clear();
+        filteredContacts.clear();
+        megaContacts.clear();
+    }
+
+    private void createList() {
+        filteredContacts.addAll(megaContacts);
+        filteredContacts.addAll(phoneContacts);
+        totalContacts.addAll(filteredContacts);
     }
 
     public static void log(String message) {
