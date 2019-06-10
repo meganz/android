@@ -38,10 +38,12 @@ public class AnimationHelper {
     private AlphaAnimation alphaAnimation1;
     private AlphaAnimation alphaAnimation2;
     private Handler handler1, handler2;
-    private static int durationAlpha = 300;
-    private static int durationTraslate = 250;
-    private static int durationBasket = 600;
-    private static int durationMicro = 500;
+    private static int durationBlinkMicro =  500;
+
+    private static int durationAlpha = 250;
+    private static int durationHideBasket = 250;
+    private static int durationBasket = 250;
+    private static int durationMicro = 250;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
         this.context = context;
@@ -137,7 +139,7 @@ public class AnimationHelper {
 
     private TranslateAnimation initializeTranslateAnimation( float fromX, float toX){
         TranslateAnimation anim = new TranslateAnimation(fromX, toX, 0, 0);
-        anim.setDuration(durationTraslate);
+        anim.setDuration(durationHideBasket);
         return anim;
     }
 
@@ -199,7 +201,7 @@ public class AnimationHelper {
     public void animateSmallMicAlpha() {
         log("animateSmallMicAlpha()");
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alphaAnimation.setDuration(durationBasket);
+        alphaAnimation.setDuration(durationBlinkMicro);
         alphaAnimation.setRepeatMode(Animation.REVERSE);
         alphaAnimation.setRepeatCount(Animation.INFINITE);
         smallBlinkingMic.startAnimation(alphaAnimation);

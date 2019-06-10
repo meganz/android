@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -25,6 +26,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 
 public class ChatUtil {
 
@@ -101,6 +103,21 @@ public class ChatUtil {
             }
         }
         return false;
+    }
+
+    public static boolean isVoiceClip(String name){
+        if(MimeTypeList.typeForName(name).isAudioVoiceClip()) return true;
+        return false;
+    }
+
+    public static long getVoiceClipDuration(MegaNode node){
+        long duration = 0;
+        if(node.getDuration()<0){
+            duration = (-node.getDuration())*1000;
+        }else{
+            duration = (node.getDuration()*1000);
+        }
+        return duration;
     }
 
     /* Get the height of the action bar */

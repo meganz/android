@@ -136,7 +136,7 @@ public class RecordView extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 log("cancelRecordLayout:onClick -> hideViews");
-                hideViews(false);
+                hideViews();
             }
         });
 
@@ -163,23 +163,15 @@ public class RecordView extends RelativeLayout {
         return  isRecordingNow;
     }
 
-    private void hideViews(boolean lessThanASecond) {
-        log("hideViews lessThanASecond = "+lessThanASecond);
+    private void hideViews() {
+        log("hideViews");
         slideToCancelLayout.setVisibility(GONE);
         cancelRecordLayout.setVisibility(GONE);
         startStopCounterTime(false);
         playSound(Constants.TYPE_ERROR_RECORD);
-
-        if((!lessThanASecond) && (animationHelper!=null)){
-            animationHelper.animateBasket(basketInitialX);
-            animationHelper.setStartRecorded(false);
-            return;
-        }
-        if (lessThanASecond){
-            smallBlinkingMic.setVisibility(GONE);
-            inicializateAnimationHelper();
-            recordListenerOptions(CANCEL_RECORD, 0);
-        }
+        if(animationHelper==null) return;
+        animationHelper.animateBasket(basketInitialX);
+        animationHelper.setStartRecorded(false);
     }
 
 
@@ -461,14 +453,14 @@ public class RecordView extends RelativeLayout {
             direction = UserBehaviour.NONE;
         }
 
-        if ((direction == UserBehaviour.CANCELING) && ((userBehaviour!= UserBehaviour.CANCELING) || (motionEvent.getRawY() + recordBtnLayout.getWidth() / 2 > firstY)) && (isRecordingNow) ){
-            if ((recordBtnLayout!=null)&&(slideToCancelLayout.getX() <= (counterTime.getLeft())) && (recordListener!=null)){
+        if (isRecordingNow && direction == UserBehaviour.CANCELING && (userBehaviour != UserBehaviour.CANCELING || ((motionEvent.getRawY() + (recordBtnLayout.getWidth()/2)) > firstY)) && slideToCancelLayout.getVisibility() == VISIBLE && counterTime.getVisibility() == VISIBLE && recordListener!=null){
+            if (slideToCancelLayout.getX() < counterTime.getLeft()){
                 log("CANCELING ");
                 isSwiped = true;
                 userBehaviour = UserBehaviour.CANCELING;
                 animationHelper.moveRecordButtonAndSlideToCancelBack(recordBtnLayout, initialX);
                 slideToCancelTranslation(0);
-                hideViews(isLessThanOneSecond(time));
+                hideViews();
                 return;
             }
 
@@ -483,7 +475,7 @@ public class RecordView extends RelativeLayout {
             recordButtonTranslation(recordBtnLayout,valueToTranslation,0);
 
 
-        } else if((direction == UserBehaviour.LOCKING) && ((userBehaviour != UserBehaviour.LOCKING) || (motionEvent.getRawX() + recordBtnLayout.getWidth() / 2 > firstX)) && ((layoutLock.getVisibility() == VISIBLE) && (isLockpadShown))) {
+        } else if(isRecordingNow && direction == UserBehaviour.LOCKING && (userBehaviour != UserBehaviour.LOCKING || ((motionEvent.getRawX() + (recordBtnLayout.getWidth()/2)) > firstX)) && layoutLock.getVisibility() == VISIBLE && isLockpadShown && recordListener!=null) {
             if(((firstY - motionEvent.getRawY()) >= (layoutLock.getHeight() - (recordBtnLayout.getHeight()/2)))){
                 log("LOCKING");
                 userBehaviour = UserBehaviour.LOCKING;
@@ -510,7 +502,6 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionCancel(RelativeLayout recordBtnLayout){
         log("onActionCancel()");
-
         userBehaviour = UserBehaviour.NONE;
         elapsedTime = System.currentTimeMillis() - startTime;
         removeHandlerPadLock();

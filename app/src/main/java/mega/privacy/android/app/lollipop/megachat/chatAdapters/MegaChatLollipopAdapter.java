@@ -631,7 +631,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         SeekBar contentOwnMessageVoiceClipSeekBar;
         TextView contentOwnMessageVoiceClipDuration;
         RelativeLayout errorUploadingVoiceClip;
-        int totalDurationOfVoiceClip;
+        long totalDurationOfVoiceClip;
         RelativeLayout uploadingOwnProgressbarVoiceclip;
         ImageView notAvailableOwnVoiceclip;
         RelativeLayout uploadingContactProgressbarVoiceclip;
@@ -1412,7 +1412,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
             if (path != null) {
-                if((MimeTypeList.typeForName(path).isAudioVoiceClip()) && (type==Constants.TYPE_VOICE_CLIP)){
+                if( ChatUtil.isVoiceClip(path) && type==Constants.TYPE_VOICE_CLIP){
                     log("onBindViewHolderUploading:TYPE_VOICE_CLIP");
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
@@ -5754,16 +5754,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         holder.totalDurationOfVoiceClip = 0;
         MegaNodeList nodeListOwn = message.getMegaNodeList();
-        if(nodeListOwn.size()==1) {
-            MegaNode node = nodeListOwn.get(0);
-            messageHandle = node.getHandle();
-            if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
-                if(node.getDuration()<0){
-                    holder.totalDurationOfVoiceClip = (-node.getDuration())*1000;
-                }else{
-                    holder.totalDurationOfVoiceClip = (node.getDuration()*1000);
-                }
-            }
+        if(nodeListOwn.size() >= 1 && ChatUtil.isVoiceClip(nodeListOwn.get(0).getName())) {
+            holder.totalDurationOfVoiceClip = ChatUtil.getVoiceClipDuration(nodeListOwn.get(0));
         }
 
         if(messagesPlaying == null) messagesPlaying = new ArrayList<>();
@@ -5830,7 +5822,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //voice clip elements
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
-            holder.contentOwnMessageVoiceClipSeekBar.setMax(holder.totalDurationOfVoiceClip);
+            holder.contentOwnMessageVoiceClipSeekBar.setMax((int) holder.totalDurationOfVoiceClip);
 
             int status = message.getStatus();
             if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
@@ -6055,7 +6047,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //Voice clip elements:
             holder.contentContactMessageVoiceClipLayout.setVisibility(View.VISIBLE);
-            holder.contentContactMessageVoiceClipSeekBar.setMax(holder.totalDurationOfVoiceClip);
+            holder.contentContactMessageVoiceClipSeekBar.setMax((int) holder.totalDurationOfVoiceClip);
 
             if((holder.totalDurationOfVoiceClip == 0) || (currentMessagePlaying.getIsAvailable() == Constants.ERROR_VOICE_CLIP_TRANSFER)){
                 log("bindVC:ContMessage:SENT -> duraton 0 or available == error");
@@ -8830,15 +8822,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 log("playOrPauseVoiceClip:notPlaying: find voice clip");
                 MegaNodeList nodeList = currentMessage.getMessage().getMegaNodeList();
-                if(nodeList.size()==1 && MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip()){
-                    File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
-                    if(isFileAvailable(vcFile) && vcFile.length() == nodeList.get(0).getSize()){
-                        playVoiceClip(m, vcFile.getAbsolutePath());
-                        return;
-                    }
-                    log("findVoiceClip:not found");
-                    downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
-                }
+                if(nodeList.size()<1 || !ChatUtil.isVoiceClip(nodeList.get(0).getName())) break;
+
+                File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
+                if(!isFileAvailable(vcFile) || vcFile.length() != nodeList.get(0).getSize()) downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
+
+                playVoiceClip(m, vcFile.getAbsolutePath());
                 break;
             }
         }

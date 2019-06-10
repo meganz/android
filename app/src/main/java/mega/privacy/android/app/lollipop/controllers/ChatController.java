@@ -47,6 +47,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -1550,11 +1551,12 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        if(MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip()){
+        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
             checkSizeBeforeDownload(vcFile.getParentFile().getPath(), nodeList);
             return;
         }
+
         String downloadLocationDefaultPath = Util.getDownloadLocation(context);;
 
 
@@ -1660,7 +1662,7 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        if((MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip())){
+        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
             download(parentPath, nodeList);
             return;
         }
@@ -1779,9 +1781,7 @@ public class ChatController {
                             return;
                         }
 
-                        if(MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip()){
-                            return;
-                        }
+                        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())) return;
 
                         if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
                             log("MimeTypeList ZIP");
@@ -1944,16 +1944,13 @@ public class ChatController {
                         }
                         String serializeString = nodeToDownload.serialize();
 
-                        if(MimeTypeList.typeForName(nodeList.get(0).getName()).isAudioVoiceClip()){
-
+                        if(ChatUtil.isVoiceClip(nodeList.get(0).getName())){
                             service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
                             service.putExtra("type", Constants.EXTRA_VOICE_CLIP );
-                        }else{
-                            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
-                                service.putExtra("fromMV", true);
-                            }
-
+                        }else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                            service.putExtra("fromMV", true);
                         }
+
                         log("serializeString: "+serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                         service.putExtra(DownloadService.EXTRA_PATH, path);

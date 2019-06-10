@@ -321,21 +321,12 @@ public final class ChatAdvancedNotificationBuilder {
 
     private String checkMessageContentAttachmentOrVoiceClip(MegaChatMessage message){
         MegaNodeList nodeList = message.getMegaNodeList();
-        if((nodeList != null) && (nodeList.size() == 1)) {
-            MegaNode node = nodeList.get(0);
-            if((MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) ){
-                long duration = 0;
-                if(node.getDuration()<0){
-                    duration = (-node.getDuration())*1000;
-                }else{
-                    duration = (node.getDuration()*1000);
-                }
-                String result = "\uD83C\uDF99 " + ChatUtil.milliSecondsToTimer(duration);
-                return result;
-            }
-            return nodeList.get(0).getName();
-        }
-        return null;
+        if(nodeList == null || nodeList.size() < 1) return null;
+        if(!ChatUtil.isVoiceClip(nodeList.get(0).getName())) return nodeList.get(0).getName();
+        long duration = ChatUtil.getVoiceClipDuration(nodeList.get(0));
+        String result = "\uD83C\uDF99 " + ChatUtil.milliSecondsToTimer(duration);
+        return result;
+
     }
 
     private String checkMessageContentMeta(MegaChatMessage message){

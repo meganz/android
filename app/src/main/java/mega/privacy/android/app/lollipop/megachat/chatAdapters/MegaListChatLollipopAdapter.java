@@ -2458,22 +2458,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					long idLastMessage = chat.getLastMessageId();
 					long idChat = chat.getChatId();
-					long duration = 0;
 					MegaChatMessage m = megaChatApi.getMessage(idChat, idLastMessage);
-					if (m != null) {
-						MegaNodeList megaNodeList = m.getMegaNodeList();
-						if ((megaNodeList != null) && (megaNodeList.size() == 1)) {
-							MegaNode node = megaNodeList.get(0);
-							if (MimeTypeList.typeForName(node.getName()).isAudioVoiceClip()) {
-								if (node.getDuration() < 0) {
-									duration = (-node.getDuration()) * 1000;
-								} else {
-									duration = (node.getDuration() * 1000);
-								}
-							}
-						}
-						((ViewHolderNormalChatList) holder).voiceClipOrLocationText.setText(ChatUtil.milliSecondsToTimer(duration));
-					}
+					if (m == null || m.getMegaNodeList() == null || m.getMegaNodeList().size() < 1 || !ChatUtil.isVoiceClip(m.getMegaNodeList().get(0).getName()))return;
+					long duration = ChatUtil.getVoiceClipDuration(m.getMegaNodeList().get(0));
+					((ViewHolderNormalChatList) holder).voiceClipOrLocationText.setText(ChatUtil.milliSecondsToTimer(duration));
+
 				}
 
 				long lastMsgSender = chat.getLastMessageSender();

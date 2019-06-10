@@ -1997,19 +1997,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.prepare();
             myAudioRecorder.start();
             setRecordingNow(true);
-
         } catch (IOException e) {
-            log("error try to start recording");
-            if(myAudioRecorder!=null){
-                myAudioRecorder.reset();
-                myAudioRecorder.release();
-                myAudioRecorder = null;
-            }
-            outputFileVoiceNotes = null;
-            outputFileName = null;
-            setRecordingNow(false);
+            log("Error starting a recording");
+            controlErrorRecording();
             e.printStackTrace();
         }
+    }
+
+    private void controlErrorRecording(){
+        if(myAudioRecorder!=null){
+            myAudioRecorder.reset();
+            myAudioRecorder.release();
+            myAudioRecorder = null;
+        }
+        outputFileVoiceNotes = null;
+        outputFileName = null;
+        setRecordingNow(false);
     }
 
     /*
@@ -2018,12 +2021,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void cancelRecording(){
         log("cancelRecording");
         if(!isRecordingNow() || myAudioRecorder == null) return;
-        myAudioRecorder.stop();
-        myAudioRecorder.reset();
-        deleteOwnVoiceClip(outputFileName);
-        outputFileVoiceNotes = null;
-        setRecordingNow(false);
+        try{
+            myAudioRecorder.stop();
+            myAudioRecorder.reset();
+            deleteOwnVoiceClip(outputFileName);
+            outputFileVoiceNotes = null;
+            setRecordingNow(false);
 
+        }catch(RuntimeException stopException){
+            log("Error canceling a recording");
+            deleteOwnVoiceClip(outputFileName);
+            controlErrorRecording();
+
+        }
     }
 
     /*
@@ -2038,10 +2048,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             recordView.playSound(Constants.TYPE_END_RECORD);
             setRecordingNow(false);
             recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
-            uploadPictureOrVoiceClip(outputFileVoiceNotes, true);
+            uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
         }catch(RuntimeException ex){
-            log("sendRecording: error try to send recording");
+            log("Error sending a recording");
+            controlErrorRecording();
 
         }
     }
@@ -5345,7 +5356,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (isFileAvailable(localFile) && localFile.exists()) {
             log("deleteOwnVoiceClip : exists");
             localFile.delete();
-
         }
     }
 
@@ -7828,28 +7838,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
 
-    public void uploadPictureOrVoiceClip(String path, boolean isVoiceClip){
+    public void uploadPictureOrVoiceClip(String path){
         if(path == null) return;
+
         File selfie;
-        if(isVoiceClip){
+        if(ChatUtil.isVoiceClip(path)) {
             selfie = buildVoiceClipFile(this, outputFileName);
-        }else {
+        }else{
             selfie = new File(path);
         }
 
-        if(!(MimeTypeList.typeForName(selfie.getAbsolutePath()).isAudioVoiceClip()) && !(MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage())){
-            log("uploadPictureOrVoiceClip:it is not an audio or image");
-            return;
-        }
-
-        if(isVoiceClip && !isFileAvailable(selfie)) return;
+        if(!ChatUtil.isVoiceClip(selfie.getAbsolutePath()) && !MimeTypeList.typeForName(selfie.getAbsolutePath()).isImage()) return;
+        if(ChatUtil.isVoiceClip(selfie.getAbsolutePath()) && !isFileAvailable(selfie)) return;
 
         Intent intent = new Intent(this, ChatUploadService.class);
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
         pMsgSingle.setChatId(idChat);
-        if(isVoiceClip){
-            pMsgSingle.setType(Constants.TYPE_VOICE_CLIP);
-        }
+
+        if(ChatUtil.isVoiceClip(selfie.getAbsolutePath())) pMsgSingle.setType(Constants.TYPE_VOICE_CLIP);
+
         long timestamp = System.currentTimeMillis()/1000;
         pMsgSingle.setUploadTimestamp(timestamp);
 
@@ -7870,9 +7877,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             sendMessageToUI(newNodeAttachmentMsg);
         }
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
-        if(isVoiceClip){
-            intent.putExtra("type", Constants.EXTRA_VOICE_CLIP);
-        }
+        if(ChatUtil.isVoiceClip(selfie.getAbsolutePath())) intent.putExtra("type", Constants.EXTRA_VOICE_CLIP);
+
         startService(intent);
     }
 
@@ -7934,7 +7940,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 
         if((call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) && (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-            log("onChatCallUpdate ");
+            log("onChatCallUpdate - cancelRecording");
             cancelRecording();
         }
 
@@ -8216,7 +8222,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(publicFile!=null){
                         Uri finalUri = Uri.fromFile(publicFile);
                         galleryAddPic(finalUri);
-                        uploadPictureOrVoiceClip(publicFile.getPath(), false);
+                        uploadPictureOrVoiceClip(publicFile.getPath());
                     }
 
                 } catch (IOException e) {

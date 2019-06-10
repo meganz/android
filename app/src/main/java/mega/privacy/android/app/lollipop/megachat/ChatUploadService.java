@@ -40,6 +40,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -1149,7 +1150,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								} catch (Exception e) {
 								}
 							}
-						}else if(MimeTypeList.typeForName(transfer.getPath()).isAudioVoiceClip()){
+						}else if(ChatUtil.isVoiceClip(transfer.getPath())){
 							log("is Voice clip");
 							attachVoiceClips(transfer);
 						}
