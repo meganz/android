@@ -104,6 +104,8 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private Context context;
     private boolean isGettingLocalContact;
     private boolean isGettingMegaContact;
+    private MegaContactGetter megaContactGetter;
+    private List<ContactsUtil.LocalContact> rawLocalContacts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +129,9 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         filteredContacts = new ArrayList<>();
         totalContacts = new ArrayList<>();
         megaContacts = new ArrayList<>();
+
+        megaContactGetter = new MegaContactGetter();
+        megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
 
         Toolbar tB = findViewById(R.id.invite_contact_toolbar);
         tB.setVisibility(View.VISIBLE);
@@ -299,7 +304,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
         new GetPhoneContactsTask().execute();
-        new GetMegaContactsTask().execute();
     }
 
     private void visibilityFastScroller() {
@@ -658,26 +662,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         return result;
     }
 
-    private class GetMegaContactsTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            log("GetPhoneContactsTask doInBackground");
-
-            //clear cache
-            isGettingMegaContact = true;
-            MegaContactGetter megaContactGetter = new MegaContactGetter();
-            megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
-            megaContactGetter.getMegaContacts(megaApi, InviteContactActivityLollipop.this);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void avoid) {
-            log("onPostExecute GetPhoneContactsTask");
-        }
-    }
-
     private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -687,8 +671,9 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             isGettingLocalContact = true;
 
             //add new value
-            phoneContacts.addAll(localContactToContactInfo(ContactsUtil.getLocalContactList(context)));
+            rawLocalContacts = megaContactGetter.getLocalContacts(context);
             filteredContacts.addAll(megaContacts);
+            phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
             filteredContacts.addAll(phoneContacts);
 
             //keep all contacts for records
@@ -699,14 +684,15 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         @Override
         protected void onPostExecute(Void avoid) {
             log("onPostExecute GetPhoneContactsTask");
-            InviteContactActivityLollipop.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    isGettingLocalContact = false;
-                    onGetContactCompleted();
-                }
-            });
+            isGettingLocalContact = false;
+            getMegaContact();
         }
+    }
+
+    private void getMegaContact(){
+        //clear cache
+        isGettingMegaContact = true;
+        megaContactGetter.getMegaContacts(megaApi, rawLocalContacts);
     }
 
     private void onGetContactCompleted() {
@@ -810,7 +796,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
         TextView displayName = rowView.findViewById(R.id.contact_name);
         displayName.setText(name);
-        return rowView;
+        return rowView;addedContact.getId() == invitationContactInfo.getId()
     }
 
     private void refreshAddedContactsView() {
