@@ -1114,8 +1114,12 @@ public final class ChatAdvancedNotificationBuilder {
         log("showMissedCallNotification");
 
         MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
-
-        String notificationContent = chat.getPeerFullname(0);
+        String notificationContent;
+        if(chat.isGroup()){
+            notificationContent = chat.getTitle();
+        }else{
+            notificationContent = chat.getPeerFullname(0);
+        }
 
         long chatCallId = call.getId();
         String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
