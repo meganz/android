@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -185,7 +184,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
         for (ContactsUtil.LocalContact contact : localContacts) {
             String name = contact.getName();
-            Set<String> normalizedPhoneNumberSet = contact.getNormalizedPhoneNumberSet();
+            List<String> normalizedPhoneNumberSet = contact.getNormalizedPhoneNumberList();
             if (!normalizedPhoneNumberSet.isEmpty()) {
                 for (String phoneNumber : normalizedPhoneNumberSet) {
                     stringMap.set(phoneNumber, name);
