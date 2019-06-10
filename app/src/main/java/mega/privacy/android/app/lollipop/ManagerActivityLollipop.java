@@ -5079,7 +5079,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setToolbarTitle();
-        createMyChatFolder();
+        //createMyChatFolder();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -6265,7 +6265,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-                createMyChatFolder();
+               // createMyChatFolder();
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {
@@ -18830,14 +18830,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         }
     }
 
-	private void createMyChatFolder() {
-		if (Util.isChatEnabled()) {
-			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
-			if (parentNode == null && !isCreatingChatFolder) {
-				log("Create folder: " + CHAT_FOLDER);
-				isCreatingChatFolder = true;
-				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
-			}
-		}
-	}
+//	private void createMyChatFolder() {
+//		if (Util.isChatEnabled()) {
+//			MegaNode parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
+//			if (parentNode == null && !isCreatingChatFolder) {
+//				log("Create folder: " + CHAT_FOLDER);
+//				isCreatingChatFolder = true;
+//				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
+//			}
+//		}
+//	}
 }
