@@ -32,6 +32,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
         private String id;
 
+        private long handle;
+
         private String localName;
 
         private String email;
@@ -42,6 +44,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         public String toString() {
             return "\nMegaContact{" +
                     "id='" + id + '\'' +
+                    ", handle=" + handle +
                     ", localName='" + localName + '\'' +
                     ", email='" + email + '\'' +
                     ", normalizedPhoneNumber='" + normalizedPhoneNumber + '\'' +
@@ -50,6 +53,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
         public String getId() {
             return id;
+        }
+
+        public long getHandle() {
+            return handle;
         }
 
         public String getLocalName() {
@@ -72,7 +79,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
          *
          * @param megaContacts Registerd mega contacts with all the info needed.
          */
-        void update(List<MegaContact> megaContacts);
+        void onFinish(List<MegaContact> megaContacts);
 
         /**
          * When mega request failed.
@@ -117,6 +124,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                     MegaStringList list = table.get(i);
                     contact.normalizedPhoneNumber = list.get(0);
                     contact.id = list.get(1);
+                    contact.handle = getUserHandler(list.get(1));
                     //the normalized phone number is the key
                     contact.localName = map.get(list.get(0));
 
@@ -162,7 +170,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             if (currentContactIndex >= megaContacts.size()) {
                 //all the emails have been gotten.
                 if (updater != null) {
-                    updater.update(megaContacts);
+                    updater.onFinish(megaContacts);
                 }
                 currentContactIndex = 0;
             } else {
