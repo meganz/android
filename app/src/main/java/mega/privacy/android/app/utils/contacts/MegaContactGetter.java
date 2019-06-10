@@ -18,8 +18,6 @@ import nz.mega.sdk.MegaStringTable;
 
 public class MegaContactGetter implements MegaRequestListenerInterface {
 
-    private int contactsCount;
-
     private MegaContactUpdater updater;
 
     private List<MegaContact> megaContacts = new ArrayList<>();
@@ -76,6 +74,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         void noContacts();
     }
 
+    public List<ContactsUtil.LocalContact> getLocalContacts(Context context) {
+        return ContactsUtil.getLocalContactList(context);
+    }
+
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
         log("start: " + request.getRequestString());
@@ -93,9 +95,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 MegaStringMap map = request.getMegaStringMap();
                 MegaStringTable table = request.getMegaStringTable();
 
-                contactsCount = table.size();
                 MegaContact contact;
-                for (int i = 0; i < contactsCount; i++) {
+                for (int i = 0; i < table.size(); i++) {
                     contact = new MegaContact();
                     MegaStringList list = table.get(i);
                     contact.normalizedPhoneNumber = list.get(0);
@@ -168,8 +169,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         return megaContacts.get(currentContactIndex);
     }
 
-    public void getMegaContacts(MegaApiAndroid api, Context context) {
-        api.getRegisteredContacts(getRequestParameter(ContactsUtil.getLocalContactList(context)), this);
+    public void getMegaContacts(MegaApiAndroid api,List<ContactsUtil.LocalContact> localContacts) {
+        api.getRegisteredContacts(getRequestParameter(localContacts), this);
     }
 
     private long getUserHandler(String id) {

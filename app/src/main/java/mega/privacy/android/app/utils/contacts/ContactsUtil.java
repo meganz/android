@@ -79,7 +79,7 @@ public class ContactsUtil {
 
         @Override
         public String toString() {
-            return "LocalContact{" +
+            return "\nLocalContact{" +
                     "id=" + id +
                     ", name='" + name + '\'' +
                     ", phoneNumberList=" + phoneNumberList +
@@ -89,7 +89,7 @@ public class ContactsUtil {
         }
     }
 
-    public static List<LocalContact> getLocalContactList(Context context) {
+    static List<LocalContact> getLocalContactList(Context context) {
         // use current default country code to normalize phonenumber.
         String countryCode = Util.getCountryCodeByNetwork(context);
         log("coutry code is: " + countryCode);
@@ -97,56 +97,66 @@ public class ContactsUtil {
         List<LocalContact> localContacts = new ArrayList<>();
         ContentResolver resolver = context.getContentResolver();
 
-        //contacts uri
+        //get all the contacts
         Uri contactsUri = ContactsContract.Contacts.CONTENT_URI;
-        Cursor cursor = resolver.query(contactsUri, null, null, null, null);
-
+        Cursor cursor = resolver.query(contactsUri, new String[] {ContactsContract.Contacts._ID,ContactsContract.Contacts.DISPLAY_NAME}, null, null, null);
         LocalContact contact;
         if (cursor != null) {
             log("has " + cursor.getCount() + " contacts");
             while (cursor.moveToNext()) {
-                long id = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                long id = cursor.getLong(0);
+                String name = cursor.getString(1);
                 contact = new LocalContact(id, name);
-
-                // get phone numbers
-                Uri phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-                Cursor phones = resolver.query(phoneUri, null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + id,
-                        null, null);
-                if (phones != null) {
-                    while (phones.moveToNext()) {
-                        // try to get normalized phone number from system first.
-                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        contact.addPhoneNumber(phoneNumber);
-                        String normalizedPhoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
-
-                        if (normalizedPhoneNumber == null) {
-                            // use current country code to normalize the phone number.
-                            normalizedPhoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
-                        }
-                        if (normalizedPhoneNumber != null) {
-                            contact.addNormalizedPhoneNumber(normalizedPhoneNumber);
-                        }
-                    }
-                    phones.close();
-                }
-
-                // get emails
-                Uri emailUri = ContactsContract.CommonDataKinds.Email.CONTENT_URI;
-                Cursor emails = resolver.query(emailUri, null,
-                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + "=" + id,
-                        null, null);
-                if (emails != null) {
-                    while (emails.moveToNext()) {
-                        String email = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
-                        contact.addEmail(email);
-                    }
-                    emails.close();
-                }
                 localContacts.add(contact);
             }
             cursor.close();
+        }
+
+        // get phone numbers
+        Uri phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        Cursor phones = resolver.query(phoneUri,
+                new String[] {ContactsContract.CommonDataKinds.Phone.CONTACT_ID,ContactsContract.CommonDataKinds.Phone.NUMBER,ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER},
+                null,null, null);
+        if (phones != null) {
+            while (phones.moveToNext()) {
+                //notice the index order
+                long id = phones.getLong(0);
+                String phone = phones.getString(1);
+                String normalizedPhone = phones.getString(2);
+
+                for(LocalContact temp : localContacts) {
+                    if(temp.getId() == id) {
+                        temp.addPhoneNumber(phone);
+                        if (normalizedPhone == null) {
+                            // use current country code to normalize the phone number.
+                            normalizedPhone = PhoneNumberUtils.formatNumberToE164(phone, countryCode);
+                        }
+                        if (normalizedPhone != null) {
+                            temp.addNormalizedPhoneNumber(normalizedPhone);
+                        }
+                    }
+                }
+            }
+            phones.close();
+        }
+
+        // get emails
+        Uri emailUri = ContactsContract.CommonDataKinds.Email.CONTENT_URI;
+        Cursor emails = resolver.query(emailUri,
+                new String[] {ContactsContract.CommonDataKinds.Email.CONTACT_ID,ContactsContract.CommonDataKinds.Email.ADDRESS},
+                null,null, null);
+        if (emails != null) {
+            while (emails.moveToNext()) {
+                long id = emails.getLong(0);
+                String email = emails.getString(1);
+
+                for(LocalContact temp : localContacts) {
+                    if(temp.getId() == id) {
+                        temp.addEmail(email);
+                    }
+                }
+            }
+            emails.close();
         }
         return localContacts;
     }
