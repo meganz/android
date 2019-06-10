@@ -6422,7 +6422,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     return;
                 }else{
                     long newidChat = intent.getLongExtra("CHAT_ID", -1);
-                    if(intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(Constants.ACTION_OPEN_CHAT_LINK) || idChat == newidChat) {
+                    if(intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(Constants.ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
                         cleanBuffers();
                         adapter.notifyDataSetChanged();
                         closeChat(false);
