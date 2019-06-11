@@ -1556,7 +1556,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         mailError.setVisibility(View.GONE);
         typeContactLayout = (RelativeLayout) findViewById(R.id.layout_type_mail);
         typeContactLayout.setVisibility(View.GONE);
-        typeContactEditText = (EditText) findViewById(R.id.type_mail_edittext);
+        typeContactEditText = (EditText) findViewById(R.id.type_mail_edit_text);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Util.px2dp(40, outMetrics));
             typeContactLayout.setLayoutParams(params1);
@@ -2926,7 +2926,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             case R.id.add_contact_list_empty_invite_button:
             case R.id.layout_invite_contact: {
                 log("Invite contact pressed");
-                Intent in = new Intent(this, AddContactActivityLollipop.class);
+                Intent in = new Intent(this, InviteContactActivityLollipop.class);
                 in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
                 startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;

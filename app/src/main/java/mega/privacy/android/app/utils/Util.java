@@ -40,6 +40,7 @@ import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -335,6 +336,14 @@ public class Util {
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
 	}
+
+	public static String getCountryCodeByNetwork(Context context) {
+        TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        if(tm != null) {
+            return tm.getNetworkCountryIso();
+        }
+        return null;
+    }
 
 	public static int countMatches(Pattern pattern, String string)
 	{

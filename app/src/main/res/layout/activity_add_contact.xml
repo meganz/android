@@ -41,7 +41,7 @@
 				android:background="@color/white">
 
 				<EditText
-					android:id="@+id/type_mail_edittext"
+					android:id="@+id/type_mail_edit_text"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:maxLines="1"
@@ -63,7 +63,7 @@
 					android:layout_marginLeft="22dp"
 					android:layout_marginTop="-10dp"
 					android:id="@+id/add_contact_email_error"
-					android:layout_below="@id/type_mail_edittext">
+					android:layout_below="@id/type_mail_edit_text">
 
 					<ImageView
 						android:layout_width="wrap_content"
