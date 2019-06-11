@@ -7164,6 +7164,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
     private void hideCallInProgressLayout(MegaChatCall call){
+        invalidateOptionsMenu();
         log("hideCallInProgressLayout");
         if (callInProgressLayout.getVisibility() == View.GONE)  return;
         callInProgressLayout.setVisibility(View.GONE);
@@ -7171,7 +7172,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         ChatUtil.activateChrono(false, callInProgressChrono, call);
         setSubtitleVisibility();
         ChatUtil.activateChrono(false, subtitleChronoCall, call);
-        invalidateOptionsMenu();
+
     }
 
     @Override
