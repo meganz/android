@@ -227,12 +227,14 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
     @Override
     public void onException(int errorCode, String requestString) {
-
+        isGettingMegaContact = false;
+        onGetContactCompleted();
     }
 
     @Override
     public void noContacts() {
-
+        isGettingMegaContact = false;
+        onGetContactCompleted();
     }
 
     @Override
@@ -725,8 +727,9 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                     InvitationContactInfo invitationContactInfo = totalContacts.get(i);
                     String email = invitationContactInfo.getEmail().toLowerCase();
                     String name = invitationContactInfo.getName().toLowerCase();
+                    String phoneNumber = invitationContactInfo.getPhoneNumber();
                     int type = invitationContactInfo.getType();
-                    if ((email.contains(query) || name.contains(query))) {
+                    if ((email.contains(query) || name.contains(query) || phoneNumber.contains(query))) {
                         if (type == TYPE_PHONE_CONTACT) {
                             phoneContacts.add(invitationContactInfo);
                         } else if (type == TYPE_MEGA_CONTACT) {
