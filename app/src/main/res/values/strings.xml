@@ -2263,8 +2263,8 @@
 
 	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
 	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video conversion.</string>
-	<string name="title_compression_size_over_limit" context="display when compression larger than setting">Video Conversion Size</string>
-	<string name="message_compression_size_over_limit" context="display when compression larger than setting">The total size of the videos to convert exceeds %s, please plug in your device to continue.</string>
+	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video conversion size is too large</string>
+	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting">The total size of the videos to convert exceeds %s, please plug in your device to continue.</string>
 	<string name="message_keep_device_name" context="Message displayed when the user changes the 'Keep file names as in the device' setting">Setting will take affect from next time Camera Upload run</string>
 	<string name="message_compress_video" context="Notification message when compressiong video to show the converted percentage. Please, keep the placeholder because it for add the percentage value in runtime.">%s has been compressed </string>
 	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
