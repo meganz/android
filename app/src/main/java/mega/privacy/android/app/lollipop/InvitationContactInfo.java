@@ -19,9 +19,8 @@ public class InvitationContactInfo implements Parcelable {
     private boolean isHighlighted;
     private int type;
     private Bitmap bitmap;
-    private String name;
+    private String name, handle, selectedMethod;
     private List<String> phoneNumberList, emailList;
-    private String handle;
 
     public InvitationContactInfo(long id, String name, int type, List<String> phoneNumberList, List<String> emailList) {
         this.id = id;
@@ -37,19 +36,7 @@ public class InvitationContactInfo implements Parcelable {
         this.type = type;
     }
 
-    public InvitationContactInfo(String handle, String name, int type, List<String> phoneNumberList, List<String> emailList) {
-        this.handle = handle;
-        this.type = type;
-        this.name = name;
-        this.phoneNumberList = phoneNumberList;
-        this.emailList = emailList;
-    }
-
     public InvitationContactInfo(Parcel in) {
-        this.id = in.readLong();//todo
-        //this.isHighlighted = in.readBooleanArray(0);
-        this.type = in.readInt();
-//        this.bitmap = in.readBit
     }
 
     public int getType() {
@@ -114,6 +101,22 @@ public class InvitationContactInfo implements Parcelable {
         }
 
         return "";
+    }
+
+    public List<String> getPhoneNumberList() {
+        return phoneNumberList;
+    }
+
+    public List<String> getEmailList() {
+        return emailList;
+    }
+
+    public String getSelectedMethod() {
+        return selectedMethod;
+    }
+
+    public void setSelectedMethod(String selectedMethod) {
+        this.selectedMethod = selectedMethod;
     }
 
     public static final Creator<InvitationContactInfo> CREATOR = new Creator<InvitationContactInfo>() {

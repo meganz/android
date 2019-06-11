@@ -50,7 +50,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     private OnItemClickListener callback;
     private MegaApiAndroid megaApi;
 
-    public ContactsAdapter(Context context, ArrayList<InvitationContactInfo> phoneContacts, OnItemClickListener callback, MegaApiAndroid megaApi) {
+    public ContactsAdapter(Context context, List<InvitationContactInfo> phoneContacts, OnItemClickListener callback, MegaApiAndroid megaApi) {
         this.context = context;
         this.contactData = phoneContacts == null ? new ArrayList<InvitationContactInfo>() : phoneContacts;
         this.inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -139,8 +139,12 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         return null;
     }
 
-    public void setContactData(ArrayList<InvitationContactInfo> contactData) {
+    public void setContactData(List<InvitationContactInfo> contactData) {
         this.contactData = contactData;
+    }
+
+    public List<InvitationContactInfo> getData(){
+        return contactData;
     }
 
     @Override
@@ -302,16 +306,17 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     private void setItemNormal(View view, Bitmap bitmap) {
         log("setItemNormal");
         view.setBackgroundColor(context.getResources().getColor(R.color.white));
+        TextView initialLetter = view.findViewById(R.id.contact_explorer_initial_letter);
+        initialLetter.setVisibility(View.VISIBLE);
         if (bitmap != null) {
             ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
             imageView.setImageBitmap(bitmap);
         }
 
-        TextView initialLetter = view.findViewById(R.id.contact_explorer_initial_letter);
-        initialLetter.setVisibility(View.VISIBLE);
     }
 
     private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
+        log("getMegaUserAvatar");
         String email = contact.getEmail();
         boolean isExternalCacheDirAvailable = context.getExternalCacheDir() != null;
         String path;
