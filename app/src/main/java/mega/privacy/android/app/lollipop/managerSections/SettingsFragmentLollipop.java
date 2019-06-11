@@ -2946,7 +2946,10 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         params.setMargins(Util.px2dp(margin+5, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
-        text.setText(getString(R.string.settings_compression_queue_subtitle));
+        int minSize = 100;
+        int maxSzie = 1000;
+        String MB = getString(R.string.label_file_size_mega_byte);
+        text.setText(getString(R.string.settings_compression_queue_subtitle, minSize + MB, maxSzie + MB));
         layout.addView(text,params);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);

@@ -581,23 +581,19 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
                     log("ACTION_CANCEL_CAM_SYNC");
-                    String title = null;
-                    String text = null;
-                    if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                        title = getString(R.string.cam_sync_syncing);
-                        text = getString(R.string.cam_sync_cancel_sync);
-                    }
-                    AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,title,text,null);
+                    String title = getString(R.string.cam_sync_syncing);
+                    String text = getString(R.string.cam_sync_cancel_sync);
+                    AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, title, text, null);
                     builder.setPositiveButton(getString(R.string.cam_sync_stop),
                             new DialogInterface.OnClickListener() {
-                
+
                                 @Override
-                                public void onClick(DialogInterface dialog,int whichButton) {
+                                public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(LoginActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
                                 }
                             });
-                    builder.setNegativeButton(getString(R.string.general_cancel),null);
+                    builder.setNegativeButton(getString(R.string.general_cancel), null);
                     final AlertDialog dialog = builder.create();
                     try {
                         dialog.show();

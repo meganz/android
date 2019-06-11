@@ -3525,15 +3525,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					String path = intent.getStringExtra("IMAGE_PATH");
 					log("onPostResume: Path of the avatar: "+path);
 					megaApi.setAvatar(path, this);
-				}
-    			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
+				} else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
                     log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
-                    String title = null;
-                    String text = null;
-                    if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                        title = getString(R.string.cam_sync_syncing);
-                        text = getString(R.string.cam_sync_cancel_sync);
-                    }
+                    String text = getString(R.string.cam_sync_cancel_sync);
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage(text);
