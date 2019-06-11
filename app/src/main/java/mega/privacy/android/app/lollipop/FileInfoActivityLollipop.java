@@ -132,7 +132,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	boolean firstIncomingLevel=true;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
-    private static boolean isSendingToChat = false;
+
+    // The flag to indicate whether select chat is processing
+    private static boolean isSelectingChat = false;
 
     NodeController nC;
 
@@ -1471,9 +1473,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
             case R.id.cab_menu_file_info_send_to_chat: {
                 log("Send chat option");
-                if (!isSendingToChat) {
+                // Have the flag to stop triggering multiple selection page
+                if (!isSelectingChat) {
                     sendToChat();
-                    isSendingToChat = true;
+                    isSelectingChat = true;
                 }
                 break;
             }
@@ -2770,8 +2773,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         log("-------------------onActivityResult " + requestCode + "____" + resultCode);
 
         if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT) {
-            log("Selecgt contact has been finished");
-            isSendingToChat = false;
+            log("Select chat has been finished");
+            isSelectingChat = false;
         }
 
 		if (intent == null) {

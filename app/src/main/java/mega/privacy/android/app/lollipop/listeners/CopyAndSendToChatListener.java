@@ -18,7 +18,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
 
-
 /**
  * Created by mega on 19/09/18.
  */
@@ -51,7 +50,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
     }
 
-    private boolean checkParentNodeBeforeCopy(ArrayList<MegaNode> nodes) {
+    private boolean isMyChatFilesExist(ArrayList<MegaNode> nodes) {
         if (parentNode == null) {
             megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
             preservedNotOwnerNode = nodes;
@@ -67,7 +66,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
     public void copyNodes (ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes) {
         nodesCopied.addAll(ownerNodes);
         counter = nodes.size();
-        if (checkParentNodeBeforeCopy(nodes)) {
+        if (isMyChatFilesExist(nodes)) {
             for (int i=0; i<nodes.size(); i++) {
                 copyNode(nodes.get(i));
             }
@@ -107,8 +106,8 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
                 log("create My Chat Files folder successfully and copy the reserved nodes");
                 parentNode = megaApi.getNodeByPath("/" + CHAT_FOLDER);
                 if (this.preservedNotOwnerNode != null) {
-                    for (int i = 0; i < this.preservedNotOwnerNode.size(); i++) {
-                        copyNode(this.preservedNotOwnerNode.get(i));
+                    for (MegaNode node : preservedNotOwnerNode) {
+                        copyNode(node);
                     }
                 }
                 this.preservedNotOwnerNode = null;

@@ -5078,7 +5078,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		setToolbarTitle();
-        //createMyChatFolder();
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -6264,7 +6263,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
-               // createMyChatFolder();
 				searchQuery = "";
 				searchExpand = true;
 				if (drawerItem != DrawerItem.CHAT) {

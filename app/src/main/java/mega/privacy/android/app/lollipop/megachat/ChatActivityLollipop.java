@@ -334,7 +334,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ActionMode actionMode;
 
     private MegaNode myChatFilesNode;
+    // Data being stored when My Chat Files folder does not exist 
     private ArrayList<AndroidMegaChatMessage> preservedMessagesSelected;
+    // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
 
     private class UserTyping {
@@ -2003,7 +2005,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
         log("forwardMessages");
+        //Prevent trigger multiple forwarding messages screens in multiple clicks
         if (isForwardingMessage) {
+            log("forwarding message is on going");
             return;
         }
 
