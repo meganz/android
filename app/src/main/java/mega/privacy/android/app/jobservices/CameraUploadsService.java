@@ -43,9 +43,9 @@ import mega.privacy.android.app.VideoCompressor;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
-import mega.privacy.android.app.utils.CameraUploadImageProcessor;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.FileUtil;
+import mega.privacy.android.app.utils.ImageProcessor;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -1490,9 +1490,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             public void run() {
                                 File img = new File(finalRecord.getLocalPath());
                                 if(!preview.exists()) {
-                                    CameraUploadImageProcessor.createVideoPreview(CameraUploadsService.this,img, preview);
+                                    ImageProcessor.createVideoPreview(CameraUploadsService.this,img, preview);
                                 }
-                                CameraUploadImageProcessor.createVideoThumbnail(api,finalRecord.getLocalPath(),thumb);
+                                ImageProcessor.createVideoThumbnail(api,finalRecord.getLocalPath(),thumb);
                             }
                         });
                     } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
@@ -1502,9 +1502,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                             public void run() {
                                 File img = new File(finalRecord.getLocalPath());
                                 if(!preview.exists()) {
-                                    CameraUploadImageProcessor.createImagePreview(img, preview);
+                                    ImageProcessor.createImagePreview(img, preview);
                                 }
-                                CameraUploadImageProcessor.createImageThumbnail(api,finalRecord.getLocalPath(),thumb);
+                                ImageProcessor.createImageThumbnail(api,finalRecord.getLocalPath(),thumb);
                             }
                         });
                     }
