@@ -67,8 +67,8 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         nodesCopied.addAll(ownerNodes);
         counter = nodes.size();
         if (isMyChatFilesExist(nodes)) {
-            for (int i=0; i<nodes.size(); i++) {
-                copyNode(nodes.get(i));
+            for (MegaNode node : nodes) {
+                copyNode(node);
             }
         }
     }
