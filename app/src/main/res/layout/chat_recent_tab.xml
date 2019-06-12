@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:orientation="horizontal">
@@ -26,19 +26,33 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
                     android:src="@drawable/ic_collapse_acc"/>
                 <TextView
                     android:id="@+id/invite_title"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
                     android:layout_marginLeft="32dp"
                     android:layout_marginRight="16dp"
+                    android:layout_toRightOf="@+id/collapse_btn"
                     android:fontFamily="Roboto"
-                    android:text="See who's already on MEGA"
+                    android:text="@string/see_local_contacts_on_mega"
+                    android:layout_centerVertical="true"
                     android:textColor="#DE000000"
                     android:textSize="14sp"/>
-            </LinearLayout>
+                <ImageView
+                    android:id="@+id/more_contacts_title"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="8dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_right_arrow"
+                    android:visibility="gone"/>
+            </RelativeLayout>
             <FrameLayout
                 android:id="@+id/contacts_list_container"
                 android:layout_width="match_parent"
