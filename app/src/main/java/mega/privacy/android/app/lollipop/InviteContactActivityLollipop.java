@@ -22,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -687,6 +688,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         protected void onPostExecute(Void avoid) {
             log("onPostExecute GetPhoneContactsTask");
             isGettingLocalContact = false;
+            onGetContactCompleted();
             getMegaContact();
         }
     }
@@ -725,11 +727,19 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             if (query != null && !query.equals("")) {
                 for (int i = 0; i < totalContacts.size(); i++) {
                     InvitationContactInfo invitationContactInfo = totalContacts.get(i);
-                    String email = invitationContactInfo.getEmail().toLowerCase();
-                    String name = invitationContactInfo.getName().toLowerCase();
-                    String phoneNumber = invitationContactInfo.getPhoneNumber();
                     int type = invitationContactInfo.getType();
-                    if ((email.contains(query) || name.contains(query) || phoneNumber.contains(query))) {
+                    String name = invitationContactInfo.getName().toLowerCase();
+                    List<String> emailList = invitationContactInfo.getEmailList();
+                    List<String> phoneList = invitationContactInfo.getPhoneNumberList();
+
+                    boolean found = name.contains(query);
+                    if(!found){
+                        found = isContactFound(query, emailList);
+                    }
+                    if(!found){
+                        found = isContactFound(query, phoneList);
+                    }
+                    if(found){
                         if (type == TYPE_PHONE_CONTACT) {
                             phoneContacts.add(invitationContactInfo);
                         } else if (type == TYPE_MEGA_CONTACT) {
@@ -836,6 +846,19 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         log("isContactAdded contact name is " + invitationContactInfo.getName());
         for (InvitationContactInfo addedContact : addedContacts) {
             if (addedContact.getId() == invitationContactInfo.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isContactFound(String query, List<String> list){
+        if(list == null){
+            return false;
+        }
+
+        for(String s: list){
+            if(s.contains(query)){
                 return true;
             }
         }

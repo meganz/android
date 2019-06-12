@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class InvitationContactInfo implements Parcelable {
     private boolean isHighlighted;
     private int type;
     private Bitmap bitmap;
-    private String name, handle, selectedMethod;
+    private String name, handle;
     private List<String> phoneNumberList, emailList;
 
     public InvitationContactInfo(long id, String name, int type, List<String> phoneNumberList, List<String> emailList) {
@@ -64,6 +65,9 @@ public class InvitationContactInfo implements Parcelable {
     }
 
     public String getName() {
+        if(TextUtils.isEmpty(name)){
+            return "Contact does not have a name";
+        }
         return name;
     }
 
@@ -111,12 +115,14 @@ public class InvitationContactInfo implements Parcelable {
         return emailList;
     }
 
-    public String getSelectedMethod() {
-        return selectedMethod;
-    }
-
-    public void setSelectedMethod(String selectedMethod) {
-        this.selectedMethod = selectedMethod;
+    public String getDisplayInfo(boolean isSearchMode) {
+        if (!TextUtils.isEmpty(getEmail())) {
+            return getEmail();
+        } else if (!TextUtils.isEmpty(getPhoneNumber())) {
+            return getPhoneNumber();
+        } else {
+            return getName();
+        }
     }
 
     public static final Creator<InvitationContactInfo> CREATOR = new Creator<InvitationContactInfo>() {

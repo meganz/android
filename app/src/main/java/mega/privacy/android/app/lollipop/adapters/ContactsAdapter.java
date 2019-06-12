@@ -83,13 +83,13 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     class ViewHolderPhoneContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener {
         private RelativeLayout contactLayout;
         private TextView contactNameTextView;
-        private TextView phoneEmailTextView;
+        private TextView displayLabelTextView;
         private TextView headerTextView;
         private RoundedImageView imageView;
         private TextView initialLetter;
         private long contactId;
         private String contactName;
-        private String contactMail;
+        private String displayLabel;
 
         public ViewHolderPhoneContactsLollipop(View itemView) {
             super(itemView);
@@ -100,7 +100,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         public void onClick(View v) {
             log("CI contact get clicked");
             int position = getAdapterPosition();
-            if (callback != null && position < contactData.size()) {
+            if (callback != null && position >= 0 && position < contactData.size()) {
                 InvitationContactInfo invitationContactInfo = contactData.get(position);
                 if (invitationContactInfo.getType() == TYPE_MEGA_CONTACT || invitationContactInfo.getType() == TYPE_PHONE_CONTACT) {
                     boolean isSelected = !invitationContactInfo.isHighlighted();
@@ -143,7 +143,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         this.contactData = contactData;
     }
 
-    public List<InvitationContactInfo> getData(){
+    public List<InvitationContactInfo> getData() {
         return contactData;
     }
 
@@ -198,7 +198,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
         holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
-        holder.phoneEmailTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
+        holder.displayLabelTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);
         holder.imageView = rowView.findViewById(R.id.contact_explorer_thumbnail);
         holder.initialLetter = rowView.findViewById(R.id.contact_explorer_initial_letter);
         return holder;
@@ -211,11 +211,11 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     }
 
     private void bindContact(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact, boolean isMegaContact) {
-        holder.contactMail = contact.getEmail();
+        holder.displayLabel = contact.getDisplayInfo(false);
         holder.contactName = contact.getName();
         holder.contactId = contact.getId();
-        holder.contactNameTextView.setText(contact.getName());
-        holder.phoneEmailTextView.setText(contact.getEmail());
+        holder.contactNameTextView.setText(holder.contactName);
+        holder.displayLabelTextView.setText(holder.displayLabel);
         holder.contactLayout.setBackgroundColor(Color.WHITE);
 
         if (contact.isHighlighted()) {
@@ -236,9 +236,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
                 bitmap = createDefaultAvatar();
                 String initial = "";
                 if (isMegaContact &&
-                        holder.contactMail != null &&
-                        holder.contactMail.length() > 0) {
-                    initial = holder.contactMail.charAt(0) + "";
+                        holder.displayLabel != null &&
+                        holder.displayLabel.length() > 0) {
+                    initial = holder.displayLabel.charAt(0) + "";
 
                 } else if (holder.contactName != null &&
                         holder.contactName.length() > 0) {
