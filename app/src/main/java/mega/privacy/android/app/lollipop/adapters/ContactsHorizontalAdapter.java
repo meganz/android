@@ -88,6 +88,9 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         contacts.remove(currentPosition);
         recentChatsFragment.onContactsCountChange(contacts);
         notifyDataSetChanged();
+
+        //TODO send invitation request!
+        Util.showSnackBar(context,Constants.SNACKBAR_TYPE,context.getString(R.string.context_contact_request_sent, holder.textViewName.getText()),-1);
     }
 
     @Override
