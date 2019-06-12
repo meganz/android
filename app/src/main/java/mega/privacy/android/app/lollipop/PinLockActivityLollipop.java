@@ -968,7 +968,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+							message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 		            	showSnackbar(message);
@@ -1068,7 +1069,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 			        	showSnackbar(message);
@@ -1167,7 +1169,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 
@@ -1254,7 +1257,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
-		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
+									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 			        	showSnackbar(message);

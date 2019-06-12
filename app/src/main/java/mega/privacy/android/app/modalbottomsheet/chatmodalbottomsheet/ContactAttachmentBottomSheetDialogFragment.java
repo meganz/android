@@ -48,6 +48,9 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     Context context;
@@ -439,18 +442,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
     public void addAvatarParticipantPanel(long handle, String email, String name){
         log("addAvatarParticipantPanel: "+handle);
-        File avatar = null;
-
-        if(handle!=-1){
+        if (handle != -1) {
             //Ask for avatar
-            if (getActivity().getExternalCacheDir() != null){
-                avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-            }
-            else{
-                avatar = new File(getActivity().getCacheDir().getAbsolutePath(), email + ".jpg");
-            }
+            File avatar = buildAvatarFile(getActivity(),email + ".jpg");
             Bitmap bitmap = null;
-            if (avatar.exists()){
+            if (isFileAvailable(avatar)) {
                 if (avatar.length() > 0){
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
