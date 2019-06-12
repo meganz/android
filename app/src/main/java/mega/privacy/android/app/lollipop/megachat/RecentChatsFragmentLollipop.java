@@ -9,9 +9,9 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.os.SystemClock;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +19,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -50,14 +52,16 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.InviteContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -67,7 +71,7 @@ import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
-public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener {
+public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
@@ -92,6 +96,29 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     int lastFirstVisiblePosition;
 
     int numberOfClicks = 0;
+
+    //Invite bar
+    private AppBarLayout invitationBar;
+    private ImageView collapseBtn;
+    private TextView inviteTitle;
+    private FrameLayout invitationContainer;
+    private RelativeLayout requestPermissionLayout;
+    private Button dismissBtn;
+    private Button allowBtn;
+    private RelativeLayout contactsListLayout;
+    private RecyclerView contactsList;
+    private ImageView moreContacts;
+    private ImageView moreContactsTitle;
+
+    public static final int CONTACTS_COUNT = 4;
+
+    private static boolean isExpand;
+
+    private boolean grantedContactPermission;
+
+    private MegaContactGetter contactGetter;
+
+    private ContactsHorizontalAdapter adapter;
 
     //Empty screen
     TextView emptyTextView;
@@ -139,19 +166,65 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         else{
             log("Chat not enabled!");
         }
+        grantedContactPermission = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, context);
+        contactGetter = new MegaContactGetter();
+        contactGetter.setMegaContactUpdater(this);
+    }
+
+    @Override
+    public void onFinish(List<MegaContactGetter.MegaContact> megaContacts) {
+        if (megaContacts.size() > 0) {
+            onContactsCountChange(megaContacts);
+
+            if (megaContacts.size() > CONTACTS_COUNT) {
+                megaContacts = megaContacts.subList(0, CONTACTS_COUNT);
+            }
+
+            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+            isExpand = true;
+            invitationContainer.setVisibility(View.VISIBLE);
+            requestPermissionLayout.setVisibility(View.GONE);
+            contactsListLayout.setVisibility(View.VISIBLE);
+            collapseBtn.setVisibility(View.VISIBLE);
+            inviteTitle.setClickable(true);
+            moreContactsTitle.setVisibility(View.GONE);
+
+            adapter = new ContactsHorizontalAdapter((Activity) context, this,megaContacts);
+            contactsList.setLayoutManager(new GridLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
+            contactsList.setAdapter(adapter);
+        } else {
+            noContacts();
+        }
+    }
+
+    @Override
+    public void onException(int errorCode, String requestString) {
+        log(requestString + " failed, with error code: " + errorCode);
+
+    }
+
+    @Override
+    public void noContacts() {
+        invitationContainer.setVisibility(View.GONE);
+        inviteTitle.setText(getString(R.string.no_local_contacts_on_mega));
+        inviteTitle.setClickable(false);
+        collapseBtn.setVisibility(View.GONE);
+        moreContactsTitle.setVisibility(View.VISIBLE);
+    }
+
+    public void onContactsCountChange(List<MegaContactGetter.MegaContact> megaContacts) {
+        int count = megaContacts.size();
+        if(count > 0) {
+            String title = context.getResources().getQuantityString(R.plurals.quantity_of_local_contact, count, count);
+            inviteTitle.setText(title);
+        } else {
+            noContacts();
+        }
     }
 
     public void checkScroll() {
         if (listView != null) {
-            if (context instanceof ManagerActivityLollipop) {
-                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-                }
-                else {
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-                }
-            }
-            else if (context instanceof ArchivedChatsActivity) {
+        if (context instanceof ArchivedChatsActivity) {
                 if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                     ((ArchivedChatsActivity) context).changeActionBarElevation(true);
                 }
@@ -258,7 +331,54 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
 
+        //Invitation bar
+        invitationBar = v.findViewById(R.id.linear_layout_add);
+        collapseBtn = v.findViewById(R.id.collapse_btn);
+        collapseBtn.setOnClickListener(this);
+        inviteTitle = v.findViewById(R.id.invite_title);
+        inviteTitle.setOnClickListener(this);
+        requestPermissionLayout = v.findViewById(R.id.request_permission_layout);
+        dismissBtn = v.findViewById(R.id.dismiss_button);
+        dismissBtn.setOnClickListener(this);
+        allowBtn = v.findViewById(R.id.allow_button);
+        allowBtn.setOnClickListener(this);
+        invitationContainer = v.findViewById(R.id.contacts_list_container);
+        contactsListLayout = v.findViewById(R.id.contacts_list_layout);
+        contactsList = v.findViewById(R.id.contacts_list);
+        moreContacts = v.findViewById(R.id.more_contacts);
+        moreContacts.setOnClickListener(this);
+        moreContactsTitle = v.findViewById(R.id.more_contacts_title);
+        moreContactsTitle.setOnClickListener(this);
+        if(isExpand) {
+            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+            invitationContainer.setVisibility(View.VISIBLE);
+        }
+        if (grantedContactPermission) {
+            showPermissionGrantedView();
+        } else {
+            showPermissionDeniedView();
+        }
         return v;
+    }
+
+    private void showPermissionGrantedView() {
+        requestPermissionLayout.setVisibility(View.GONE);
+        contactsListLayout.setVisibility(View.VISIBLE);
+        collapseBtn.setVisibility(View.GONE);
+        inviteTitle.setClickable(false);
+        moreContactsTitle.setVisibility(View.GONE);
+        invitationContainer.setVisibility(View.GONE);
+
+        loadMegaContacts();
+    }
+
+    private void showPermissionDeniedView() {
+        invitationContainer.setVisibility(View.VISIBLE);
+        collapseBtn.setVisibility(View.VISIBLE);
+        inviteTitle.setClickable(true);
+        moreContactsTitle.setVisibility(View.GONE);
+        requestPermissionLayout.setVisibility(View.VISIBLE);
+        contactsListLayout.setVisibility(View.GONE);
     }
 
     public static RecentChatsFragmentLollipop newInstance() {
@@ -682,6 +802,28 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
                 break;
             }
+            case R.id.invite_title:
+            case R.id.dismiss_button:
+            case R.id.collapse_btn:
+                if(invitationContainer.getVisibility() == View.VISIBLE) {
+                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
+                    isExpand = false;
+                    invitationContainer.setVisibility(View.GONE);
+                } else {
+                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+                    isExpand = true;
+                    invitationContainer.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.allow_button:
+                log("request contact permission!");
+                requestPermissions(new String[] {Manifest.permission.READ_CONTACTS},Constants.REQUEST_READ_CONTACTS);
+                break;
+            case R.id.more_contacts_title:
+            case R.id.more_contacts:
+                log("to InviteContactActivityLollipop");
+                context.startActivity(new Intent(context, InviteContactActivityLollipop.class));
+                break;
         }
     }
 
@@ -1968,10 +2110,24 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 }
                 break;
             }
-
+            case Constants.REQUEST_READ_CONTACTS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    log("REQUEST_READ_CONTACTS");
+                    showPermissionGrantedView();
+                    grantedContactPermission = true;
+                } else {
+                    log("read contacts permission denied!");
+                    showPermissionDeniedView();
+                    grantedContactPermission = false;
+                }
+                break;
+            }
         }
     }
 
+    private void loadMegaContacts() {
+        contactGetter.getMegaContacts(megaApi, contactGetter.getLocalContacts(context));
+    }
 
     private static void log(String log) {
         Util.log("RecentChatsFragmentLollipop", log);

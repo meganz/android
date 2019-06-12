@@ -2375,6 +2375,14 @@
         <item context="Plural of file. 2 files" quantity="other">%d messages was not sent to %d chats</item>
     </plurals>
 
+    <plurals name="quantity_of_local_contact" context="How many local contacts have been on MEGA">
+        <item context="Singular of local contact. 1 contact" quantity="one">%d Contact on MEGA</item>
+        <item context="Plural of local contact. 2 contacts" quantity="other">%d Contacts on MEGA</item>
+    </plurals>
+    <string name="no_local_contacts_on_mega" context="None of your local contacts have benn on MEGA">You don\'t have contacts on MEGA, invite them now!</string>
+    <string name="see_local_contacts_on_mega" context="To see whom in your local contacts has been on MEGA">See who\'s already on MEGA</string>
+
+
     <string name="content_not_send" context="Alert shown when some content have not been sent because of any error occurs">The content was not sent to %d chats</string>
 
     <string name="new_group_chat_created" context="Label shown when a new group chat has been created correctly">New group chat created successfully</string>

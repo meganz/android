@@ -148,7 +148,7 @@ public class ChatExplorerFragment extends Fragment {
         display.getMetrics(outMetrics);
         density = getResources().getDisplayMetrics().density;
 
-        View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
+        View v = inflater.inflate(R.layout.chat_recent_explore, container, false);
 
         contentLayout = (RelativeLayout) v.findViewById(R.id.content_layout_chat_explorer);
         progressBar = (ProgressBar) v.findViewById(R.id.progressbar_chat_explorer);
