@@ -66,6 +66,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URLConnection;
@@ -474,12 +475,8 @@ public class Util {
         }
 	     
         try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null; 
-            }
-            return bmRotated;
+            WeakReference<Bitmap> rotatedBitmap = new WeakReference<>(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true));
+            return rotatedBitmap.get();
         }
         catch (Exception e) {
             e.printStackTrace();
