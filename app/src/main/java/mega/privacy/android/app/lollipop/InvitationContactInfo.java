@@ -13,21 +13,33 @@ public class InvitationContactInfo implements Parcelable {
     public static final int TYPE_PHONE_CONTACT = 3;
     public static final int TYPE_MANUAL_INPUT_EMAIL = 4;
     public static final int TYPE_MANUAL_INPUT_PHONE = 5;
-    private final String AT_SIGN = "@";
+    public static final Creator<InvitationContactInfo> CREATOR = new Creator<InvitationContactInfo>() {
+        @Override
+        public InvitationContactInfo createFromParcel(Parcel in) {
+            return new InvitationContactInfo(in);
+        }
 
+        @Override
+        public InvitationContactInfo[] newArray(int size) {
+            return new InvitationContactInfo[size];
+        }
+    };
+    private final String AT_SIGN = "@";
     private long id;
     private boolean isHighlighted;
     private int type;
     private Bitmap bitmap;
-    private String name, displayInfo;
+    private String name, displayInfo, handle, avatarColor;
 
-    public InvitationContactInfo(long id, String name, int type, String displayInfo) {
+    public InvitationContactInfo(long id, String name, int type, String displayInfo, String avatarColor) {
         this.id = id;
         this.type = type;
         this.name = name;
         this.displayInfo = displayInfo;
+        this.avatarColor = avatarColor;
     }
 
+    //this constructor is only for list header
     public InvitationContactInfo(long id, String name, int type) {
         this.id = id;
         this.type = type;
@@ -46,12 +58,12 @@ public class InvitationContactInfo implements Parcelable {
         this.type = type;
     }
 
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 
     public boolean isHighlighted() {
@@ -82,24 +94,31 @@ public class InvitationContactInfo implements Parcelable {
     }
 
     public String getDisplayInfo() {
-        return this.displayInfo;
+        if (!TextUtils.isEmpty(displayInfo)) {
+            return displayInfo;
+        }
+        return "";
+    }
+
+    public String getHandle() {
+        return handle;
+    }
+
+    public void setHandle(String handle) {
+        this.handle = handle;
     }
 
     public boolean isEmailContact() {
         return getDisplayInfo().contains(AT_SIGN);
     }
 
-    public static final Creator<InvitationContactInfo> CREATOR = new Creator<InvitationContactInfo>() {
-        @Override
-        public InvitationContactInfo createFromParcel(Parcel in) {
-            return new InvitationContactInfo(in);
-        }
+    public String getInitial() {
+        return String.valueOf(getName().charAt(0));
+    }
 
-        @Override
-        public InvitationContactInfo[] newArray(int size) {
-            return new InvitationContactInfo[size];
-        }
-    };
+    public String getAvatarColor() {
+        return avatarColor;
+    }
 
     @Override
     public int describeContents() {
