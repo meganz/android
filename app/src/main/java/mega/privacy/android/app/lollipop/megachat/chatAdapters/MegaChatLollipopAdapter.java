@@ -340,12 +340,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } catch (IOException e) {
                 }
 
-                DisplayMetrics outMetrics = Resources.getSystem().getDisplayMetrics();
-                int screenHeight = outMetrics.heightPixels;
-                int screenWidth = outMetrics.widthPixels;
-
-                // Calculate inSampleSize 56 dp toolbar height + 48 bottom bar = 104dp
-                options.inSampleSize = Util.calculateInSampleSize(options, screenWidth, (screenHeight - 104));
+                // Calculate inSampleSize
+                options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
 
                 // Decode bitmap with inSampleSize set
                 options.inJustDecodeBounds = false;
