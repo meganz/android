@@ -475,8 +475,13 @@ public class Util {
         }
 	     
         try {
-            WeakReference<Bitmap> rotatedBitmap = new WeakReference<>(Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true));
-            return rotatedBitmap.get();
+			Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+			if (bitmap != null && !bitmap.isRecycled()) {
+				bitmap.recycle();
+				bitmap = null;
+				System.gc();
+			}
+			return bmRotated;
         }
         catch (Exception e) {
             e.printStackTrace();

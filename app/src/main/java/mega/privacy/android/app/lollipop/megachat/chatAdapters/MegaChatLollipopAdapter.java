@@ -329,6 +329,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
+                options.inPreferredConfig = Bitmap.Config.RGB_565;
                 Bitmap preview;
 
                 ExifInterface exif;
