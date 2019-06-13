@@ -9,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -28,21 +30,31 @@ public class ChatUtil {
 
     /*Method to know if i'm participating in any A/V call*/
     public static boolean participatingInACall(MegaChatApiAndroid megaChatApi){
-        boolean activeCall = false;
-        if(megaChatApi!=null){
-            MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
-            MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-            MegaHandleList listCalls = megaChatApi.getChatCalls();
-            if((listCallsUserNoPresent!=null)&&(listCallsRingIn!=null)&&(listCalls!=null)){
-                long totalCallsNotPresent = listCallsUserNoPresent.size() + listCallsRingIn.size();
-                if(totalCallsNotPresent == listCalls.size()){
-                    activeCall = false;
-                }else{
-                    activeCall = true;
-                }
-            }
+        log("participatingInACall");
+        if(megaChatApi == null )return false;
+        MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+        MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
+
+        MegaHandleList listCalls = megaChatApi.getChatCalls();
+        log("participatingInACall: No calls in progress ");
+
+
+        if((listCalls.size() - listCallsDestroy.size()) == 0)return false;
+        log("participatingInACall:There is some call in progress");
+
+        if((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
+            log("participatingInACall:I'm not participating in any of the calls there");
+            return false;
         }
-        return activeCall;
+        if(listCallsRequestSent.size()>0){
+            log("participatingInACall: I'm doing a outgoing call");
+            return true;
+        }
+        log("participatingInACall:I'm in a call in progress");
+        return true;
+
     }
 
     /*Method to know the chat id which A / V call I am participating in*/
@@ -81,6 +93,25 @@ public class ChatUtil {
         intent.putExtra("callId", call.getId());
         context.startActivity(intent);
 
+    }
+
+    /*MEthod to show or hide the "return the call" layout*/
+    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, RelativeLayout callInProgressLayout, Chronometer callInProgressChrono){
+        if(!Util.isChatEnabled() || megaChatApi == null || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi) ){
+            callInProgressLayout.setVisibility(View.GONE);
+            activateChrono(false, callInProgressChrono, null);
+            return;
+        }
+        callInProgressLayout.setVisibility(View.VISIBLE);
+
+        long chatId = getChatCallInProgress(megaChatApi);
+        if(chatId == -1)return;
+        MegaChatCall call = megaChatApi.getChatCall(chatId);
+        if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+            activateChrono(true, callInProgressChrono, call);
+            return;
+        }
+        activateChrono(false, callInProgressChrono, null);
     }
 
     /*Method to know if a call is established*/

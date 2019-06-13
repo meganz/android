@@ -18209,7 +18209,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(call.getChatid() != -1){
 				if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
 					int callStatus = call.getStatus();
-					log("onChatCallUpdate:CHANGE_TYPE_STATUS: callStatus =  "+callStatus);
+					log("onChatCallUpdatecallStatus =  "+callStatus);
 
 					switch (callStatus) {
 						case MegaChatCall.CALL_STATUS_REQUEST_SENT:
@@ -18217,6 +18217,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 						case MegaChatCall.CALL_STATUS_DESTROYED:
 						case MegaChatCall.CALL_STATUS_USER_NO_PRESENT: {
+
 							setCallBadge();
 							rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
 							if ((rChatFL != null) && (rChatFL.isVisible())){

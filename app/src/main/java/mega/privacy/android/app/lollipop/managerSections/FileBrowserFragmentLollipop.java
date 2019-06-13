@@ -684,8 +684,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             setOverviewLayout();
 			showCallLayout();
-
-
 			return v;
         } else {
             log("Grid View");
@@ -1803,29 +1801,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-    public void showCallLayout(){
-        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && (megaChatApi!=null) &&(ChatUtil.participatingInACall(megaChatApi))){
-            log("showCallLayout");
-
-            if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
-                callInProgressLayout.setVisibility(View.VISIBLE);
-            }
-			long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
-			if((megaChatApi!=null) && (chatId != -1)){
-				MegaChatCall call = megaChatApi.getChatCall(chatId);
-				ChatUtil.activateChrono(true, callInProgressChrono, call);
-			}
-
-        }else{
-			ChatUtil.activateChrono(false, callInProgressChrono, null);
-            if(callInProgressLayout!=null){
-                callInProgressLayout.setVisibility(View.GONE);
-            }
-        }
-    }
+	public void showCallLayout(){
+		ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
+	}
 
 	//refresh list when item updated
 	public void refresh(long handle) {
+    	log("refresh!! ");
 		if (handle == -1) {
 			return;
 		}

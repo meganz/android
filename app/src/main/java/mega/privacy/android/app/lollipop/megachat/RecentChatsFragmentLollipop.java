@@ -416,22 +416,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    public void showCallLayout(){
-        if(!Util.isChatEnabled() || megaChatApi == null || !ChatUtil.participatingInACall(megaChatApi) || !(context instanceof ManagerActivityLollipop)){
-            callInProgressLayout.setVisibility(View.GONE);
-            ChatUtil.activateChrono(false, callInProgressChrono, null);
-            return;
-        }
-        if(callInProgressLayout.getVisibility() != View.VISIBLE){
-            callInProgressLayout.setVisibility(View.VISIBLE);
-        }
-        long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
-        if(chatId == -1)return;
-        MegaChatCall call = megaChatApi.getChatCall(chatId);
-        ChatUtil.activateChrono(true, callInProgressChrono, call);
-
-    }
-
     public void showEmptyChatScreen(){
         log("showEmptyChatScreen");
 
@@ -1615,8 +1599,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void refreshNode(MegaChatListItem item){
         log("refreshNode -> showCallLayout");
-        //call in progress layout:
-        showCallLayout();
+        ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         //elements of adapter
         long chatHandleToUpdate = item.getChatId();
@@ -1735,9 +1718,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(aB != null && aB.getTitle() != null){
             aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
         }
-
-
-        showCallLayout();
+        ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         if (context instanceof ManagerActivityLollipop) {
             String searchQuery = ((ManagerActivityLollipop) context).searchQuery;
