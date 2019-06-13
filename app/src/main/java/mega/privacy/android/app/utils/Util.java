@@ -345,6 +345,15 @@ public class Util {
         return null;
     }
 
+    public static boolean isRoaming(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(cm != null) {
+            NetworkInfo ni = cm.getActiveNetworkInfo();
+            return ni.isRoaming();
+        }
+        return true;
+    }
+
 	public static int countMatches(Pattern pattern, String string)
 	{
 		Matcher matcher = pattern.matcher(string);

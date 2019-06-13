@@ -128,8 +128,11 @@ public class ContactsUtil {
                     if(temp.getId() == id) {
                         temp.addPhoneNumber(phone);
                         if (normalizedPhone == null) {
-                            // use current country code to normalize the phone number.
-                            normalizedPhone = PhoneNumberUtils.formatNumberToE164(phone, countryCode);
+                            //If roaming, don't normalize the phone number.
+                            if(!Util.isRoaming(context)) {
+                                // use current country code to normalize the phone number.
+                                normalizedPhone = PhoneNumberUtils.formatNumberToE164(phone, countryCode);
+                            }
                         }
                         if (normalizedPhone != null) {
                             temp.addNormalizedPhoneNumber(normalizedPhone);
