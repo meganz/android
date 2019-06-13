@@ -734,6 +734,12 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                 } else if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
                     log("onCreate:IN_PROGRESS||JOINING");
+                    if(!chat.isGroup()){
+                        myAvatarLayout.setVisibility(View.VISIBLE);
+                        contactAvatarLayout.setVisibility(View.VISIBLE);
+                        setProfileAvatar(megaChatApi.getMyUserHandle());
+                        setProfileAvatar(chat.getPeerHandle(0));
+                    }
                     updateScreenStatus();
                     updateLocalSpeakerStatus();
 
@@ -775,6 +781,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         setProfileAvatar(megaChatApi.getMyUserHandle());
                         setProfileAvatar(chat.getPeerHandle(0));
                         myAvatarLayout.setVisibility(View.VISIBLE);
+                        contactAvatarLayout.setVisibility(View.VISIBLE);
+
                     }
                     updateLocalVideoStatus();
                     updateLocalAudioStatus();
