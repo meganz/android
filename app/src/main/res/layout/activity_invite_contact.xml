@@ -139,7 +139,9 @@
                         android:id="@+id/invite_contact_list_empty_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal" />
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/ic_empty_contacts"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/invite_contact_list_empty_text"

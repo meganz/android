@@ -73,14 +73,14 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private final String KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS";
     private final String KEY_FILTERED_CONTACTS = "KEY_FILTERED_CONTACTS";
     private final String KEY_TOTAL_CONTACTS = "KEY_TOTAL_CONTACTS";
+    private final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
     private final int ID_MEGA_CONTACTS_HEADER = -2;
     private final int ID_PHONE_CONTACTS_HEADER = -1;
 
     private DisplayMetrics outMetrics;
-    private MegaApplication app;
     private MegaApiAndroid megaApi;
     private ActionBar aB;
-    private RelativeLayout containerContacts, container;
+    private RelativeLayout containerContacts;
     private RecyclerView recyclerViewList;
     private ImageView emptyImageView;
     private TextView emptyTextView, emptySubTextView;
@@ -97,8 +97,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private Handler handler;
     private LayoutInflater inflater;
     private Context context;
-    private boolean isGettingLocalContact;
-    private boolean isGettingMegaContact;
+    private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted;
     private MegaContactGetter megaContactGetter;
     private List<ContactsUtil.LocalContact> rawLocalContacts;
 
@@ -111,7 +110,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        app = (MegaApplication) getApplication();
+        MegaApplication app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         handler = new Handler();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -141,7 +140,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
         scrollView = findViewById(R.id.scroller);
         itemContainer = findViewById(R.id.label_container);
-        container = findViewById(R.id.relative_container_invite_contact);
         fabButton = findViewById(R.id.fab_button_next);
         fabButton.setOnClickListener(this);
         typeContactEditText = findViewById(R.id.type_mail_edit_text);
@@ -193,14 +191,19 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             addedContacts = savedInstanceState.getParcelableArrayList(KEY_ADDED_CONTACTS);
             filteredContacts = savedInstanceState.getParcelableArrayList(KEY_FILTERED_CONTACTS);
             totalContacts = savedInstanceState.getParcelableArrayList(KEY_TOTAL_CONTACTS);
+            isPermissionGranted = savedInstanceState.getBoolean(KEY_IS_PERMISSION_GRANTED, false);
             refreshAddedContactsView();
             setRecyclersVisibility();
             setTitleAB();
             if (totalContacts.size() > 0) {
                 setEmptyStateVisibility(false);
-            } else {
+            } else if (isPermissionGranted) {
                 setEmptyStateVisibility(true);
                 showEmptyTextView();
+            } else {
+                setEmptyStateVisibility(true);
+                emptyTextView.setText(R.string.no_contacts_permissions);
+                emptyImageView.setVisibility(View.VISIBLE);
             }
         } else {
             queryIfHasReadContactsPermissions();
@@ -274,6 +277,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         outState.putParcelableArrayList(KEY_ADDED_CONTACTS, addedContacts);
         outState.putParcelableArrayList(KEY_FILTERED_CONTACTS, filteredContacts);
         outState.putParcelableArrayList(KEY_TOTAL_CONTACTS, totalContacts);
+        outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted);
     }
 
     @Override
@@ -307,11 +311,13 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
             if (hasReadContactsPermission) {
+                isPermissionGranted = true;
                 prepareToGetContacts();
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_READ_CONTACTS);
             }
         } else {
+            isPermissionGranted = true;
             prepareToGetContacts();
         }
     }
@@ -522,11 +528,13 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             case Constants.REQUEST_READ_CONTACTS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     log("Permission granted");
+                    isPermissionGranted = true;
                     prepareToGetContacts();
                 } else {
                     log("Permission denied");
                     setEmptyStateVisibility(true);
                     emptyTextView.setText(R.string.no_contacts_permissions);
+                    emptyImageView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                 }
             }
