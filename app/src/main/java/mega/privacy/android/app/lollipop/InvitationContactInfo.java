@@ -5,8 +5,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
-import java.util.List;
-
 public class InvitationContactInfo implements Parcelable {
 
     public static final int TYPE_MEGA_CONTACT_HEADER = 0;
@@ -15,26 +13,38 @@ public class InvitationContactInfo implements Parcelable {
     public static final int TYPE_PHONE_CONTACT = 3;
     public static final int TYPE_MANUAL_INPUT_EMAIL = 4;
     public static final int TYPE_MANUAL_INPUT_PHONE = 5;
+    public static final Creator<InvitationContactInfo> CREATOR = new Creator<InvitationContactInfo>() {
+        @Override
+        public InvitationContactInfo createFromParcel(Parcel in) {
+            return new InvitationContactInfo(in);
+        }
 
+        @Override
+        public InvitationContactInfo[] newArray(int size) {
+            return new InvitationContactInfo[size];
+        }
+    };
+    private final String AT_SIGN = "@";
     private long id;
     private boolean isHighlighted;
     private int type;
     private Bitmap bitmap;
-    private String name, handle;
-    private List<String> phoneNumberList, emailList;
+    private String name, displayInfo, handle, avatarColor;
 
-    public InvitationContactInfo(long id, String name, int type, List<String> phoneNumberList, List<String> emailList) {
+    public InvitationContactInfo(long id, String name, int type, String displayInfo, String avatarColor) {
         this.id = id;
         this.type = type;
         this.name = name;
-        this.phoneNumberList = phoneNumberList;
-        this.emailList = emailList;
+        this.displayInfo = displayInfo;
+        this.avatarColor = avatarColor;
     }
 
+    //this constructor is only for list header
     public InvitationContactInfo(long id, String name, int type) {
         this.id = id;
-        this.name = name;
         this.type = type;
+        this.name = name;
+        this.displayInfo = "";
     }
 
     public InvitationContactInfo(Parcel in) {
@@ -48,12 +58,12 @@ public class InvitationContactInfo implements Parcelable {
         this.type = type;
     }
 
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
     public Bitmap getBitmap() {
         return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 
     public boolean isHighlighted() {
@@ -65,8 +75,8 @@ public class InvitationContactInfo implements Parcelable {
     }
 
     public String getName() {
-        if(TextUtils.isEmpty(name)){
-            return "Contact does not have a name";
+        if (TextUtils.isEmpty(name)) {
+            return getDisplayInfo();
         }
         return name;
     }
@@ -79,63 +89,36 @@ public class InvitationContactInfo implements Parcelable {
         return id;
     }
 
-    public String getHandle() {
-        return handle;
-    }
-
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getDisplayInfo() {
+        if (!TextUtils.isEmpty(displayInfo)) {
+            return displayInfo;
+        }
+        return "";
+    }
+
+    public String getHandle() {
+        return handle;
     }
 
     public void setHandle(String handle) {
         this.handle = handle;
     }
 
-    public String getEmail() {
-        if (emailList != null && !emailList.isEmpty()) {
-            return emailList.get(0);
-        }
-
-        return "";
+    public boolean isEmailContact() {
+        return getDisplayInfo().contains(AT_SIGN);
     }
 
-    public String getPhoneNumber() {
-        if (phoneNumberList != null && !phoneNumberList.isEmpty()) {
-            return phoneNumberList.get(0);
-        }
-
-        return "";
+    public String getInitial() {
+        return String.valueOf(getName().charAt(0));
     }
 
-    public List<String> getPhoneNumberList() {
-        return phoneNumberList;
+    public String getAvatarColor() {
+        return avatarColor;
     }
-
-    public List<String> getEmailList() {
-        return emailList;
-    }
-
-    public String getDisplayInfo(boolean isSearchMode) {
-        if (!TextUtils.isEmpty(getEmail())) {
-            return getEmail();
-        } else if (!TextUtils.isEmpty(getPhoneNumber())) {
-            return getPhoneNumber();
-        } else {
-            return getName();
-        }
-    }
-
-    public static final Creator<InvitationContactInfo> CREATOR = new Creator<InvitationContactInfo>() {
-        @Override
-        public InvitationContactInfo createFromParcel(Parcel in) {
-            return new InvitationContactInfo(in);
-        }
-
-        @Override
-        public InvitationContactInfo[] newArray(int size) {
-            return new InvitationContactInfo[size];
-        }
-    };
 
     @Override
     public int describeContents() {
