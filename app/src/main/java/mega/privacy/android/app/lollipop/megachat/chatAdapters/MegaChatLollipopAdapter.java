@@ -306,17 +306,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Bitmap> {
+    private class ChatUploadingPreviewAsyncTask extends AsyncTask<String, Void, Boolean> {
 
         MegaChatLollipopAdapter.ViewHolderMessageChat holder;
         String filePath;
+        MegaChatLollipopAdapter adapter;
+        int position;
 
-        public ChatUploadingPreviewAsyncTask(MegaChatLollipopAdapter.ViewHolderMessageChat holder) {
-            this.holder = holder;
+        public ChatUploadingPreviewAsyncTask(MegaChatLollipopAdapter adapter, int position) {
+            this.adapter = adapter;
+            this.position = position;
         }
 
         @Override
-        protected Bitmap doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
 
             filePath = params[0];
             File currentFile = new File(filePath);
@@ -348,8 +351,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     preview = Util.rotateBitmap(preview, orientation);
 
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
-                    PreviewUtils.setPreviewCache(fingerprintCache, preview);
-                    return preview;
+                    if (preview != null) {
+                        PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                        return true;
+                    }
+                    return false;
                 }
             } else if (MimeTypeList.typeForName(filePath).isPdf()) {
                 log("Is pdf");
@@ -377,9 +383,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("Compress OK");
                         long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                         PreviewUtils.setPreviewCache(fingerprintCache, preview);
-                        return preview;
+                        return true;
                     } else if (!result) {
                         log("Not Compress");
+                        return false;
                     }
                 } catch (Exception e) {
                     log("Pdf thumbnail could not be created");
@@ -415,7 +422,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 log("Compress OK");
                                 long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                                 PreviewUtils.setPreviewCache(fingerprintCache, bmPreview);
-                                return bmPreview;
+                                return true;
+                            } else {
+                                return false;
                             }
                         } catch (Exception e) {
                             log("Error with FileOutputStream: " + e.getMessage());
@@ -437,18 +446,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            return null;
+            return false;
         }
 
         @Override
-        protected void onPostExecute(Bitmap preview) {
+        protected void onPostExecute(Boolean isContinue) {
             log("ChatUploadingPreviewAsyncTask-onPostExecute");
-            if (preview != null) {
-                if (holder.filePathUploading.equals(filePath)) {
-                    setUploadingPreview(holder, preview);
-                } else {
-                    log("The filePaths are not equal!");
-                }
+            if (isContinue) {
+              adapter.notifyItemChanged(position);
             } else {
                 log("The preview is NULL!");
             }
@@ -1242,7 +1247,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
                         }
                         try {
-                            new ChatUploadingPreviewAsyncTask(((ViewHolderMessageChat) holder)).execute(path);
+                            new ChatUploadingPreviewAsyncTask(this, position).execute(path);
 
                         } catch (Exception e) {
                             //Too many AsyncTasks
