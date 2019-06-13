@@ -28,6 +28,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -115,7 +117,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
         context = getApplicationContext();
-        defaultLocalContactAvatarColor = "#777777";//R.color.color_default_avatar_phone;
+        defaultLocalContactAvatarColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
 
         phoneContacts = new ArrayList<>();
         addedContacts = new ArrayList<>();
@@ -160,9 +162,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
 
         RelativeLayout scanQRButton = findViewById(R.id.layout_scan_qr);
         scanQRButton.setOnClickListener(this);
-
-        RelativeLayout moreButton = findViewById(R.id.layout_more);
-        moreButton.setOnClickListener(this);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerViewList = findViewById(R.id.invite_contact_list);
@@ -209,6 +208,43 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        log("onCreateOptionsMenu");
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_invite_contact, menu);
+
+        MenuItem scanQrMenuItem = menu.findItem(R.id.action_more);
+        scanQrMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_more, R.color.black));
+        scanQrMenuItem.setVisible(true);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        log("onOptionsItemSelected");
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home: {
+                onBackPressed();
+                break;
+            }
+            case R.id.action_more: {
+                log("more button clicked - share invitation through other app");
+                String message = "This is my text to send.";
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, message);//todo update the message
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public synchronized void onFinish(List<MegaContactGetter.MegaContact> contacts) {
         isGettingMegaContact = false;
         clearLists();
@@ -227,19 +263,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     public void noContacts() {
         isGettingMegaContact = false;
         onGetContactCompleted();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        log("onOptionsItemSelected");
-        int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home: {
-                onBackPressed();
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -486,16 +509,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 log("invite Contacts");
                 inviteContacts(addedContacts);
                 Util.hideKeyboard(this, 0);
-                break;
-            }
-            case R.id.layout_more: {
-                log("more button clicked - share invitation through other app");
-                String message = "This is my text to send.";
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, message);//todo update the message
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
                 break;
             }
         }
