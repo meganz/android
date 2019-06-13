@@ -875,7 +875,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-
         BitmapFactory.Options bOpts = new BitmapFactory.Options();
         bOpts.inPurgeable = true;
         bOpts.inInputShareable = true;
@@ -899,18 +898,22 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if(callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
             if(peerId == megaChatApi.getMyUserHandle()){
                 contactImage.setImageBitmap(bitmap);
+                contactImage.setVisibility(View.VISIBLE);
                 contactInitialLetter.setVisibility(GONE);
             }else{
                 myImage.setImageBitmap(bitmap);
+                myImage.setVisibility(View.VISIBLE);
                 myInitialLetter.setVisibility(GONE);
             }
             return;
         }
         if(peerId == megaChatApi.getMyUserHandle()){
             myImage.setImageBitmap(bitmap);
+            myImage.setVisibility(View.VISIBLE);
             myInitialLetter.setVisibility(GONE);
         }else{
             contactImage.setImageBitmap(bitmap);
+            contactImage.setVisibility(View.VISIBLE);
             contactInitialLetter.setVisibility(GONE);
         }
     }

@@ -217,14 +217,14 @@ public class ChatUtil {
     }
 
     public static void activateChrono(boolean activateChrono, Chronometer chronometer, MegaChatCall callChat){
-        if((activateChrono) && ((callChat!=null)&&(chronometer!=null)&&(chronometer.getVisibility() == GONE))){
+        if(activateChrono && callChat!=null && chronometer!=null && chronometer.getVisibility() == GONE){
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
             chronometer.start();
             chronometer.setFormat(" %s");
-        }else if((chronometer!=null) && (chronometer.getVisibility()==View.VISIBLE)){
-                chronometer.stop();
-                chronometer.setVisibility(View.GONE);
+        }else if(chronometer!=null){
+            chronometer.stop();
+            chronometer.setVisibility(View.GONE);
         }
     }
 

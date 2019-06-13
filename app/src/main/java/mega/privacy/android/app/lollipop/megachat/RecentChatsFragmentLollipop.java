@@ -417,23 +417,19 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void showCallLayout(){
-        if(Util.isChatEnabled() && (context instanceof ManagerActivityLollipop) && (megaChatApi!=null) &&(ChatUtil.participatingInACall(megaChatApi))){
-            log("showCallLayout");
-
-            if((callInProgressLayout!=null) && (callInProgressLayout.getVisibility() != View.VISIBLE)){
-                callInProgressLayout.setVisibility(View.VISIBLE);
-            }
-            long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
-            if((megaChatApi!=null) && (chatId != -1)){
-                MegaChatCall call = megaChatApi.getChatCall(chatId);
-                ChatUtil.activateChrono(true, callInProgressChrono, call);
-            }
-        }else{
+        if(!Util.isChatEnabled() || megaChatApi == null || !ChatUtil.participatingInACall(megaChatApi) || !(context instanceof ManagerActivityLollipop)){
+            callInProgressLayout.setVisibility(View.GONE);
             ChatUtil.activateChrono(false, callInProgressChrono, null);
-            if(callInProgressLayout!=null){
-                callInProgressLayout.setVisibility(View.GONE);
-            }
+            return;
         }
+        if(callInProgressLayout.getVisibility() != View.VISIBLE){
+            callInProgressLayout.setVisibility(View.VISIBLE);
+        }
+        long chatId = ChatUtil.getChatCallInProgress(megaChatApi);
+        if(chatId == -1)return;
+        MegaChatCall call = megaChatApi.getChatCall(chatId);
+        ChatUtil.activateChrono(true, callInProgressChrono, call);
+
     }
 
     public void showEmptyChatScreen(){
