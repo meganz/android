@@ -873,11 +873,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         fabButton.setEnabled(enableFabButton);
     }
 
-    private void showSnackBar(String message) {
-        Util.hideKeyboard(this, 0);
-        showSnackbar(container, message);
-    }
-
     private void clearLists() {
         totalContacts.clear();
         filteredContacts.clear();
