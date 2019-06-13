@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.SystemClock;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -172,6 +171,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     @Override
     public void onFinish(List<MegaContactGetter.MegaContact> megaContacts) {
+        if(!isAdded()) {
+            return;
+        }
         if (megaContacts.size() > 0) {
             onContactsCountChange(megaContacts);
 
