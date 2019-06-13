@@ -211,7 +211,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     }
 
     private void bindContact(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact, boolean isMegaContact) {
-        holder.displayLabel = contact.getDisplayInfo(false);
+        holder.displayLabel = contact.getDisplayInfo();
         holder.contactName = contact.getName();
         holder.contactId = contact.getId();
         holder.contactNameTextView.setText(holder.contactName);
@@ -317,7 +317,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
         log("getMegaUserAvatar");
-        String email = contact.getEmail();
+        String email = contact.getDisplayInfo();
         boolean isExternalCacheDirAvailable = context.getExternalCacheDir() != null;
         String path;
         if (isExternalCacheDirAvailable) {
