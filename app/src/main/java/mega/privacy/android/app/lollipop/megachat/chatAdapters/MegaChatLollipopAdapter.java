@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -328,8 +329,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
-                //Default Config.ARGB_8888 requires much more memory, which would lead to crash on some devices
-                options.inPreferredConfig = Bitmap.Config.RGB_565;
                 Bitmap preview;
 
                 ExifInterface exif;
@@ -340,8 +339,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } catch (IOException e) {
                 }
 
-                // Calculate inSampleSize
-                options.inSampleSize = Util.calculateInSampleSize(options, 1000, 1000);
+                DisplayMetrics outMetrics = Resources.getSystem().getDisplayMetrics();
+                int screenHeight = outMetrics.heightPixels;
+                int screenWidth = outMetrics.widthPixels;
+
+                // Calculate inSampleSize 56 dp toolbar height + 48 bottom bar = 104dp
+                options.inSampleSize = Util.calculateInSampleSize(options, screenWidth, (screenHeight - 104));
 
                 // Decode bitmap with inSampleSize set
                 options.inJustDecodeBounds = false;
