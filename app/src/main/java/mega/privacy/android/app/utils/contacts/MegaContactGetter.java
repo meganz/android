@@ -4,17 +4,21 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaStringTable;
+import nz.mega.sdk.MegaUser;
 
 public class MegaContactGetter implements MegaRequestListenerInterface {
 
@@ -167,8 +171,19 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             }
             //get next contact's email.
             currentContactIndex++;
+            //all the emails have been gotten.
             if (currentContactIndex >= megaContacts.size()) {
-                //all the emails have been gotten.
+                // filter out
+                filterOutContacts(api);
+                filterOutPendingContacts(api);
+                Collections.sort(megaContacts, new Comparator<MegaContact>() {
+
+                    @Override
+                    public int compare(MegaContact o1, MegaContact o2) {
+                        return o1.localName.compareTo(o2.localName);
+                    }
+                });
+
                 if (updater != null) {
                     updater.onFinish(megaContacts);
                 }
@@ -177,6 +192,38 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 MegaContact nextContact = getCurrentContactIndex();
                 if (nextContact != null) {
                     api.getUserEmail(getUserHandler(nextContact.id), this);
+                }
+            }
+        }
+    }
+
+    private void filterOutContacts(MegaApiJava api) {
+        for(MegaUser user : api.getContacts()) {
+            log(user.getVisibility() + " -> " + user.getEmail());
+            for(MegaContact contact : megaContacts) {
+                boolean hasSameEamil = user.getEmail().equals(contact.getEmail());
+                boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
+                boolean isBlocked = user.getVisibility() == MegaUser.VISIBILITY_BLOCKED;
+
+                if (hasSameEamil && (isContact || isBlocked)) {
+                    megaContacts.remove(contact);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void filterOutPendingContacts(MegaApiJava api) {
+        for(MegaContactRequest request : api.getOutgoingContactRequests()) {
+            log(request.getStatus() + " -> " + request.getTargetEmail());
+            for(MegaContact contact : megaContacts) {
+                boolean hasSameEamil = request.getTargetEmail().equals(contact.getEmail());
+                boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
+                boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
+
+                if(hasSameEamil && (isAccepted || isPending)) {
+                    megaContacts.remove(contact);
+                    break;
                 }
             }
         }

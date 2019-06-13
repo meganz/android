@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.SystemClock;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -98,7 +97,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     int numberOfClicks = 0;
 
     //Invite bar
-    private AppBarLayout invitationBar;
     private ImageView collapseBtn;
     private TextView inviteTitle;
     private FrameLayout invitationContainer;
@@ -173,6 +171,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     @Override
     public void onFinish(List<MegaContactGetter.MegaContact> megaContacts) {
+        if(!isAdded()) {
+            return;
+        }
         if (megaContacts.size() > 0) {
             onContactsCountChange(megaContacts);
 
@@ -180,11 +181,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 megaContacts = megaContacts.subList(0, CONTACTS_COUNT);
             }
 
-            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-            isExpand = true;
             invitationContainer.setVisibility(View.VISIBLE);
             requestPermissionLayout.setVisibility(View.GONE);
-            contactsListLayout.setVisibility(View.VISIBLE);
+            expandLayout(contactsListLayout);
             collapseBtn.setVisibility(View.VISIBLE);
             inviteTitle.setClickable(true);
             moreContactsTitle.setVisibility(View.GONE);
@@ -206,9 +205,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     @Override
     public void noContacts() {
         invitationContainer.setVisibility(View.GONE);
-        inviteTitle.setText(getString(R.string.no_local_contacts_on_mega));
+        inviteTitle.setText(R.string.no_local_contacts_on_mega);
         inviteTitle.setClickable(false);
-        collapseBtn.setVisibility(View.GONE);
+        collapseBtn.setVisibility(View.INVISIBLE);
         moreContactsTitle.setVisibility(View.VISIBLE);
     }
 
@@ -332,7 +331,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
 
         //Invitation bar
-        invitationBar = v.findViewById(R.id.linear_layout_add);
         collapseBtn = v.findViewById(R.id.collapse_btn);
         collapseBtn.setOnClickListener(this);
         inviteTitle = v.findViewById(R.id.invite_title);
@@ -364,7 +362,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     private void showPermissionGrantedView() {
         requestPermissionLayout.setVisibility(View.GONE);
         contactsListLayout.setVisibility(View.VISIBLE);
-        collapseBtn.setVisibility(View.GONE);
+        collapseBtn.setVisibility(View.INVISIBLE);
+        inviteTitle.setText(getString(R.string.get_registered_contacts));
         inviteTitle.setClickable(false);
         moreContactsTitle.setVisibility(View.GONE);
         invitationContainer.setVisibility(View.GONE);
@@ -376,9 +375,16 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         invitationContainer.setVisibility(View.VISIBLE);
         collapseBtn.setVisibility(View.VISIBLE);
         inviteTitle.setClickable(true);
+        inviteTitle.setText(R.string.see_local_contacts_on_mega);
         moreContactsTitle.setVisibility(View.GONE);
-        requestPermissionLayout.setVisibility(View.VISIBLE);
+        expandLayout(requestPermissionLayout);
         contactsListLayout.setVisibility(View.GONE);
+    }
+
+    private void expandLayout(View layout) {
+        layout.setVisibility(View.VISIBLE);
+        collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+        isExpand = true;
     }
 
     public static RecentChatsFragmentLollipop newInstance() {
@@ -810,9 +816,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     isExpand = false;
                     invitationContainer.setVisibility(View.GONE);
                 } else {
-                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-                    isExpand = true;
-                    invitationContainer.setVisibility(View.VISIBLE);
+                    expandLayout(invitationContainer);
                 }
                 break;
             case R.id.allow_button:

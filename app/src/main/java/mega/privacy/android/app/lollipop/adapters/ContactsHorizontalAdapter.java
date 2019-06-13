@@ -3,11 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -20,7 +16,6 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -32,6 +27,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaContactRequest;
 
 public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHorizontalAdapter.ContactViewHolder> implements View.OnClickListener {
 
@@ -68,7 +64,6 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         holder = new ContactViewHolder(v);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
-        holder.contactInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
@@ -88,6 +83,12 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         contacts.remove(currentPosition);
         recentChatsFragment.onContactsCountChange(contacts);
         notifyDataSetChanged();
+
+        String email = holder.contactMail;
+        log("sent invite to: " + email);
+        //ignore the callback
+        megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
+        Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
     }
 
     @Override
@@ -118,7 +119,6 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                         megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                     }
                 } else {
-                    holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatar.setImageBitmap(bitmap);
                 }
             } else {
