@@ -158,18 +158,14 @@ public class EmojiKeyboard extends LinearLayout {
         this.onEmojiBackspaceClickListener = onEmojiBackspaceClickListener;
     }
 
-    //KEYBOARDS:
-    public void hideBothKeyboard(Activity activity){
-        if (activity == null) return;
-        log("hideBothKeyboard()");
-        hideEmojiKeyboard();
-        hideLetterKeyboard();
-        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+    private void needToReplace() {
+        if (buttonListener == null) return;
+        buttonListener.needToPlace();
     }
 
+    //KEYBOARDS:
     public void showLetterKeyboard(){
         if (isLetterKeyboardShown || !(editInterface instanceof View)) return;
-
         log("showLetterKeyboard()");
         hideEmojiKeyboard();
         final View view = (View) editInterface;
@@ -183,16 +179,12 @@ public class EmojiKeyboard extends LinearLayout {
         needToReplace();
     }
 
-    private void needToReplace() {
-        if (buttonListener == null) return;
-        buttonListener.needToPlace();
-    }
+
     public void showEmojiKeyboard(){
         if (isEmojiKeyboardShown) return;
-
+        log("showEmojiKeyboard");
         hideLetterKeyboard();
         setVisibility(VISIBLE);
-
         isEmojiKeyboardShown = true;
         emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
         if (editInterface instanceof View){
@@ -204,9 +196,17 @@ public class EmojiKeyboard extends LinearLayout {
         needToReplace();
     }
 
+    public void hideBothKeyboard(Activity activity){
+        if (activity == null) return;
+        log("hideBothKeyboard()");
+        hideEmojiKeyboard();
+        hideLetterKeyboard();
+        emojiIcon.setImageResource(R.drawable.ic_emojicon);
+    }
+
     public void hideLetterKeyboard() {
         if (!isLetterKeyboardShown || !(editInterface instanceof View)) return;
-
+        log("hideLetterKeyboard() ");
         final View view = (View) editInterface;
         view.clearFocus();
         final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -217,18 +217,20 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void hideEmojiKeyboard(){
-        if(isEmojiKeyboardShown){
-            log("hideEmojiKeyboard() ");
-            recentEmoji.persist();
-            variantEmoji.persist();
-            setVisibility(GONE);
-            needToReplace();
-            isEmojiKeyboardShown = false;
-            if (editInterface instanceof View) {
-                final View view = (View) editInterface;
-                view.clearFocus();
-            }
+        if(!isEmojiKeyboardShown) return;
+        log("hideEmojiKeyboard() ");
+        recentEmoji.persist();
+        variantEmoji.persist();
+        setVisibility(GONE);
+
+        isEmojiKeyboardShown = false;
+        if (editInterface instanceof View) {
+            final View view = (View) editInterface;
+            view.clearFocus();
         }
+
+        needToReplace();
+
     }
 
     public void setListenerActivated(boolean listenerActivated) {

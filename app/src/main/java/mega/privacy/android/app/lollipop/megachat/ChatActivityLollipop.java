@@ -867,7 +867,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         emojiKeyboard.setOnPlaceButtonListener(new OnPlaceButtonListener() {
             @Override
             public void needToPlace() {
-
+                log("needTOPlaced");
                 if(sendIcon.getVisibility() != View.VISIBLE){
                     recordLayout.setVisibility(View.VISIBLE);
                     recordButtonLayout.setVisibility(View.VISIBLE);
@@ -2167,10 +2167,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     *Place the record button with the corresponding margins
     */
     public void placeRecordButton(int recordButtonState){
-        log("placeRecordButton");
+        log("placeRecordButton ----- > "+recordButtonState);
         int marginBottomVoicleLayout;
         recordView.recordButtonTranslation(recordButtonLayout,0,0);
-        if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
+        if((fileStorageLayout!=null && fileStorageLayout.isShown()) ||
+                (emojiKeyboard!=null && emojiKeyboard.getEmojiKeyboardShown())){
             marginBottomVoicleLayout = keyboardHeight+marginBottomDesactivated;
         }else {
             marginBottomVoicleLayout = marginBottomDesactivated;
@@ -2179,16 +2180,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         int value = 0;
         int marginBottom = marginBottomVoicleLayout;
         int marginRight = 0;
-        if((recordButtonState == RECORD_BUTTON_SEND)||(recordButtonState == RECORD_BUTTON_DESACTIVATED)){
+        if(recordButtonState == RECORD_BUTTON_SEND || recordButtonState == RECORD_BUTTON_DESACTIVATED){
             log("placeRecordButton:SEND||DESACTIVATED");
             value = 48;
             if(recordButtonState == RECORD_BUTTON_DESACTIVATED){
+                log("placeRecordButton: DESACTIVATED");
                 marginRight = Util.px2dp(14, outMetrics);
             }
         }else if(recordButtonState == RECORD_BUTTON_ACTIVATED){
             log("placeRecordButton:ACTIVATED");
             value = 80;
-            if(((fileStorageLayout!=null) && (fileStorageLayout.isShown())) || ((emojiKeyboard!=null) && (emojiKeyboard.getEmojiKeyboardShown()))){
+            if((fileStorageLayout!=null && fileStorageLayout.isShown()) ||
+                    (emojiKeyboard!=null && emojiKeyboard.getEmojiKeyboardShown())){
                 marginBottom = keyboardHeight+marginBottomActivated;
             }else {
                 marginBottom = marginBottomActivated;
@@ -3059,10 +3062,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         closeChat(true);
 
-        if(emojiKeyboard!=null && ((emojiKeyboard.getLetterKeyboardShown())||(emojiKeyboard.getEmojiKeyboardShown()))){
+        if(emojiKeyboard!=null && (emojiKeyboard.getLetterKeyboardShown() || emojiKeyboard.getEmojiKeyboardShown())){
             emojiKeyboard.hideBothKeyboard(this);
-        }
-        else{
+        }else{
             if(fileStorageLayout.isShown()){
                 hideFileStorage();
             }else{
