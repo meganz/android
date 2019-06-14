@@ -91,6 +91,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 
 	public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING";
 	public static final String ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING";
+	private static final int COMPRESSION_QUEUE_SIZE_MIN = 100;
+	private static final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -106,8 +108,6 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 	private final String KEY_SET_QUEUE_DIALOG = "KEY_SET_QUEUE_DIALOG";
     private final String KEY_SET_QUEUE_SIZE = "KEY_SET_QUEUE_SIZE";
 
-	private final int COMPRESSION_QUEUE_SIZE_MIN = 100;
-	private final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
 	public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
@@ -2946,10 +2946,8 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
         params.setMargins(Util.px2dp(margin+5, outMetrics), Util.px2dp(0, outMetrics), Util.px2dp(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
-        int minSize = 100;
-        int maxSzie = 1000;
         String MB = getString(R.string.label_file_size_mega_byte);
-        text.setText(getString(R.string.settings_compression_queue_subtitle, minSize + MB, maxSzie + MB));
+        text.setText(getString(R.string.settings_compression_queue_subtitle, COMPRESSION_QUEUE_SIZE_MIN + MB, COMPRESSION_QUEUE_SIZE_MAX + MB));
         layout.addView(text,params);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
