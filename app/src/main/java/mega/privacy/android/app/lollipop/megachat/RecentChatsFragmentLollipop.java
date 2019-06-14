@@ -59,7 +59,6 @@ import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -176,7 +175,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if(!isAdded()) {
             return;
         }
-        TL.log(this, "@#@", "megacontacts: "+ megaContacts.size());
         if (megaContacts.size() > 0) {
             onContactsCountChange(megaContacts);
             preExpand();

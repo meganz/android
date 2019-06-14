@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -350,6 +349,5 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private static void log(String message) {
         Util.log("MegaContactGetter", message);
-        TL.log("MegaContactGetter", "@#@", message);
     }
 }
