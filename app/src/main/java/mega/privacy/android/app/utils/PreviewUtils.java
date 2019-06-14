@@ -10,8 +10,11 @@ import android.provider.MediaStore;
 import android.view.Display;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import mega.privacy.android.app.PreviewCache;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 
@@ -71,6 +74,48 @@ public class PreviewUtils {
         }
         return bmp;
     }
+
+    public static Bitmap getPreviewFromCacheAndFolder(String path, Context context, MegaApiAndroid megaApi) {
+		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
+		Bitmap bitmap = previewCache.get(fingerprintCache);
+		if (bitmap == null) {
+			File previewDir = getPreviewFolder(context);
+			File preview = new File(previewDir, fingerprintCache+".jpg");
+			if (preview.exists()){
+				if (preview.length() > 0){
+					bitmap = getBitmapForCache(preview, context);
+					if (bitmap == null) {
+						preview.delete();
+					}
+					else{
+						previewCache.put(fingerprintCache, bitmap);
+					}
+				}
+			}
+		}
+		return bitmap;
+	}
+
+	public static void putRotatedPreviewToFolder(String path, Bitmap rotatedBitmap, MegaApiAndroid megaApi, Context context) {
+		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
+		File previewDir = getPreviewFolder(context);
+		File preview = new File(previewDir, fingerprintCache + ".jpg");
+		FileOutputStream outStream = null;
+		try {
+			outStream = new FileOutputStream(preview);
+			boolean result = rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+			if (result) {
+				log("Put rotated bitmap to folder cache successfully");
+			} else {
+				log("Put rotated bitmap to folder cache failed");
+			}
+			if (outStream != null) {
+				outStream.close();
+			}
+		} catch (Exception ex) {
+			log("The exception is " + ex.toString());
+		}
+	}
 
 	public static Bitmap createVideoPreview(String filePath, int kind) {
 		Bitmap bitmap = null;

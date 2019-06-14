@@ -353,6 +353,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
                     if (preview != null) {
                         PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                        PreviewUtils.putRotatedPreviewToFolder(filePath, preview, megaApi, context);
                         return true;
                     }
                     return false;
@@ -383,6 +384,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         log("Compress OK");
                         long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                         PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                        PreviewUtils.putRotatedPreviewToFolder(filePath, preview, megaApi, context);
                         return true;
                     } else if (!result) {
                         log("Not Compress");
@@ -422,6 +424,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 log("Compress OK");
                                 long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
                                 PreviewUtils.setPreviewCache(fingerprintCache, bmPreview);
+                                PreviewUtils.putRotatedPreviewToFolder(filePath, bmPreview, megaApi, context);
                                 return true;
                             } else {
                                 return false;
@@ -1229,13 +1232,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 Bitmap preview = null;
                 ((ViewHolderMessageChat) holder).filePathUploading = path;
                 log("Path of the file: " + path);
-                long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
 
                 if (MimeTypeList.typeForName(path).isImage() || MimeTypeList.typeForName(path).isPdf() || MimeTypeList.typeForName(path).isVideo()) {
 
                     ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
 
-                    preview = PreviewUtils.getPreviewFromCache(fingerprintCache);
+                    preview = PreviewUtils.getPreviewFromCacheAndFolder(path, context, megaApi);
+
                     if (preview != null) {
                         setUploadingPreview((ViewHolderMessageChat) holder, preview);
                         log("preview!");
