@@ -1,6 +1,7 @@
 package mega.privacy.android.app.utils.contacts;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -24,9 +27,38 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private MegaContactUpdater updater;
 
+    private Context context;
+
     private List<MegaContact> megaContacts = new ArrayList<>();
 
     private int currentContactIndex;
+
+    private DatabaseHandler dbH;
+
+    private SharedPreferences preferences;
+
+    private long lastSyncTimestamp;
+
+        public static final int DAY = 24 * 60 * 60 * 1000;
+    public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
+
+    //TEST SETTINGS
+//    public static final int WEEK = 5 * 60 * 1000;
+//    public static final int DAY = 2 * 60 * 1000;
+
+    private static final String LAST_SYNC_TIMESTAMP_FILE = "lastsynctimestamp";
+    private static final String LAST_SYNC_TIMESTAMP_KEY = "lastsyncmegacontactstimestamp";
+
+    public MegaContactGetter(Context context) {
+        this.context = context;
+        dbH = DatabaseHandler.getDbHandler(context);
+        preferences = context.getSharedPreferences(LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
+        lastSyncTimestamp = preferences.getLong(LAST_SYNC_TIMESTAMP_KEY, 0);
+    }
+
+    private void updateLastSyncTimestamp() {
+        preferences.edit().putLong(LAST_SYNC_TIMESTAMP_KEY, System.currentTimeMillis()).apply();
+    }
 
     public void setMegaContactUpdater(MegaContactUpdater updater) {
         this.updater = updater;
@@ -74,6 +106,26 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         public String getNormalizedPhoneNumber() {
             return normalizedPhoneNumber;
         }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public void setHandle(long handle) {
+            this.handle = handle;
+        }
+
+        public void setLocalName(String localName) {
+            this.localName = localName;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public void setNormalizedPhoneNumber(String normalizedPhoneNumber) {
+            this.normalizedPhoneNumber = normalizedPhoneNumber;
+        }
     }
 
     public interface MegaContactUpdater {
@@ -101,7 +153,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         void noContacts();
     }
 
-    public List<ContactsUtil.LocalContact> getLocalContacts(Context context) {
+    public List<ContactsUtil.LocalContact> getLocalContacts() {
         return ContactsUtil.getLocalContactList(context);
     }
 
@@ -173,19 +225,16 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             currentContactIndex++;
             //all the emails have been gotten.
             if (currentContactIndex >= megaContacts.size()) {
-                // filter out
-                filterOutContacts(api);
-                filterOutPendingContacts(api);
-                Collections.sort(megaContacts, new Comparator<MegaContact>() {
+                // save to db
+                dbH.clearMegaContacts();
+                dbH.batchInsertMegaContacts(megaContacts);
+                updateLastSyncTimestamp();
 
-                    @Override
-                    public int compare(MegaContact o1, MegaContact o2) {
-                        return o1.localName.compareTo(o2.localName);
-                    }
-                });
+                // filter out
+                List<MegaContact> list = filterOut(api,megaContacts);
 
                 if (updater != null) {
-                    updater.onFinish(megaContacts);
+                    updater.onFinish(list);
                 }
                 currentContactIndex = 0;
             } else {
@@ -197,36 +246,53 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         }
     }
 
-    private void filterOutContacts(MegaApiJava api) {
-        for(MegaUser user : api.getContacts()) {
-            log(user.getVisibility() + " -> " + user.getEmail());
-            for(MegaContact contact : megaContacts) {
+    private List<MegaContact> filterOut(MegaApiJava api, List<MegaContact> list) {
+        List<MegaContact> conatcs = filterOutContacts(api, list);
+        List<MegaContact> retrunList = filterOutPendingContacts(api, conatcs);
+        Collections.sort(retrunList, new Comparator<MegaContact>() {
+
+            @Override
+            public int compare(MegaContact o1, MegaContact o2) {
+                return o1.localName.compareTo(o2.localName);
+            }
+        });
+        return retrunList;
+    }
+
+    private List<MegaContact> filterOutContacts(MegaApiJava api, List<MegaContact> list) {
+        log("filterOutContacts");
+        for (MegaUser user : api.getContacts()) {
+            log("contact visibility: " + user.getVisibility() + " -> " + user.getEmail());
+            for (MegaContact contact : list) {
                 boolean hasSameEamil = user.getEmail().equals(contact.getEmail());
                 boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;
                 boolean isBlocked = user.getVisibility() == MegaUser.VISIBILITY_BLOCKED;
 
                 if (hasSameEamil && (isContact || isBlocked)) {
-                    megaContacts.remove(contact);
+                    list.remove(contact);
                     break;
                 }
             }
         }
+        return list;
     }
 
-    private void filterOutPendingContacts(MegaApiJava api) {
-        for(MegaContactRequest request : api.getOutgoingContactRequests()) {
-            log(request.getStatus() + " -> " + request.getTargetEmail());
-            for(MegaContact contact : megaContacts) {
+    private List<MegaContact> filterOutPendingContacts(MegaApiJava api, List<MegaContact> list) {
+        log("filterOutPendingContacts");
+        for (MegaContactRequest request : api.getOutgoingContactRequests()) {
+            log("contact request: " + request.getStatus() + " -> " + request.getTargetEmail());
+            for (MegaContact contact : list) {
                 boolean hasSameEamil = request.getTargetEmail().equals(contact.getEmail());
                 boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;
                 boolean isPending = request.getStatus() == MegaContactRequest.STATUS_UNRESOLVED;
 
-                if(hasSameEamil && (isAccepted || isPending)) {
-                    megaContacts.remove(contact);
+                if (hasSameEamil && (isAccepted || isPending)) {
+                    list.remove(contact);
                     break;
                 }
             }
         }
+        return list;
     }
 
     private MegaContact getCurrentContactIndex() {
@@ -240,8 +306,18 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
         return megaContacts.get(currentContactIndex);
     }
 
-    public void getMegaContacts(MegaApiAndroid api,List<ContactsUtil.LocalContact> localContacts) {
-        api.getRegisteredContacts(getRequestParameter(localContacts), this);
+    public void getMegaContacts(MegaApiAndroid api, List<ContactsUtil.LocalContact> localContacts, long period) {
+        if (System.currentTimeMillis() - lastSyncTimestamp > period) {
+            log("getMegaContacts request from server");
+            api.getRegisteredContacts(getRequestParameter(localContacts), this);
+        } else {
+            log("getMegaContacts load from database");
+            if (updater != null) {
+                List<MegaContact> list = dbH.getMegaContacts();
+                list = filterOut(api,list);
+                updater.onFinish(list);
+            }
+        }
     }
 
     private long getUserHandler(String id) {
@@ -263,7 +339,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 }
             }
         }
-        log("start: " + stringMap.size());
+        log("local contacts size is: " + stringMap.size());
         return stringMap;
     }
 
@@ -274,5 +350,6 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private static void log(String message) {
         Util.log("MegaContactGetter", message);
+        TL.log("MegaContactGetter", "@#@", message);
     }
 }

@@ -130,7 +130,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         totalContacts = new ArrayList<>();
         megaContacts = new ArrayList<>();
 
-        megaContactGetter = new MegaContactGetter();
+        megaContactGetter = new MegaContactGetter(context);
         megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
 
         Toolbar tB = findViewById(R.id.invite_contact_toolbar);
@@ -661,7 +661,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private void getMegaContact() {
         //clear cache
         isGettingMegaContact = true;
-        megaContactGetter.getMegaContacts(megaApi, rawLocalContacts);
+        megaContactGetter.getMegaContacts(megaApi, rawLocalContacts, MegaContactGetter.DAY);
     }
 
     private void onGetContactCompleted() {
@@ -689,7 +689,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             isGettingLocalContact = true;
 
             //add new value
-            rawLocalContacts = megaContactGetter.getLocalContacts(context);
+            rawLocalContacts = megaContactGetter.getLocalContacts();
             filteredContacts.addAll(megaContacts);
             phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
             filteredContacts.addAll(phoneContacts);

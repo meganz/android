@@ -11,6 +11,7 @@ import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -18,14 +19,16 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 44;
+	private static final int DATABASE_VERSION = 45;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -41,6 +44,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_MSG_NODES = "msgnodes";
 	private static final String TABLE_NODE_ATTACHMENTS = "nodeattachments";
 	private static final String TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle";
+	private static final String TABLE_MEGA_CONTACTS = "megacontacts";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -162,6 +166,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_PENDING_MSG_TRANSFER_TAG = "transfertag";
 	private static final String KEY_PENDING_MSG_STATE = "state";
 
+	private static final String KEY_MEGA_CONTACTS_ID = "userid";
+	private static final String KEY_MEGA_CONTACTS_HANDLE = "handle";
+	private static final String KEY_MEGA_CONTACTS_LOCAL_NAME = "localname";
+	private static final String KEY_MEGA_CONTACTS_EMAIL = "email";
+	private static final String KEY_MEGA_CONTACTS_PHONE_NUMBER = "phonenumber";
+    private static final String CREATE_MEGA_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MEGA_CONTACTS + "("
+            + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_MEGA_CONTACTS_ID + " TEXT,"
+            + KEY_MEGA_CONTACTS_HANDLE + " TEXT,"
+            + KEY_MEGA_CONTACTS_LOCAL_NAME + " TEXT,"
+            + KEY_MEGA_CONTACTS_EMAIL + " TEXT,"
+            + KEY_MEGA_CONTACTS_PHONE_NUMBER + " TEXT)";
+
     private static DatabaseHandler instance;
     
     private static SQLiteDatabase db;
@@ -266,6 +283,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_NEW_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PENDING_MSG_SINGLE + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_PENDING_MSG_ID_CHAT + " TEXT, " + KEY_PENDING_MSG_TIMESTAMP + " TEXT, " +KEY_PENDING_MSG_TEMP_KARERE + " TEXT, " + KEY_PENDING_MSG_FILE_PATH + " TEXT, " + KEY_PENDING_MSG_NAME + " TEXT, " +KEY_PENDING_MSG_NODE_HANDLE + " TEXT, " +KEY_PENDING_MSG_FINGERPRINT + " TEXT, " + KEY_PENDING_MSG_TRANSFER_TAG + " INTEGER, " + KEY_PENDING_MSG_STATE + " INTEGER" +")";
 		db.execSQL(CREATE_NEW_PENDING_MSG_TABLE);
+
+        db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
 	}
 
 	@Override
@@ -603,6 +622,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_AUTO_PLAY + " BOOLEAN;");
             db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTO_PLAY + " = '" + encrypt("false") + "';");
         }
+
+        if(oldVersion <= 44) {
+            //TODO add prefference
+            db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
+        }
 	}
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -772,6 +796,72 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         
         return userCredentials; 
 	}
+
+    public void batchInsertMegaContacts(List<MegaContactGetter.MegaContact> contacts) {
+        if(contacts == null || contacts.size() == 0) {
+            log("empty mega contacts list.");
+            return;
+        }
+        db.beginTransaction();
+        try{
+            ContentValues values;
+            for(MegaContactGetter.MegaContact contact : contacts) {
+                values = new ContentValues();
+                values.put(KEY_MEGA_CONTACTS_ID, encrypt(contact.getId()));
+                values.put(KEY_MEGA_CONTACTS_HANDLE, encrypt(String.valueOf(contact.getHandle())));
+                values.put(KEY_MEGA_CONTACTS_LOCAL_NAME, encrypt(contact.getLocalName()));
+                values.put(KEY_MEGA_CONTACTS_EMAIL, encrypt(contact.getEmail()));
+                values.put(KEY_MEGA_CONTACTS_PHONE_NUMBER, encrypt(contact.getNormalizedPhoneNumber()));
+
+                db.insert(TABLE_MEGA_CONTACTS, null, values);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public List<MegaContactGetter.MegaContact> getMegaContacts() {
+        String sql = "SELECT * FROM " + TABLE_MEGA_CONTACTS;
+        Cursor cursor = db.rawQuery(sql, null);
+        if (cursor != null) {
+            List<MegaContactGetter.MegaContact> contacts = new ArrayList<>();
+            try {
+                MegaContactGetter.MegaContact contact;
+                while(cursor.moveToNext()) {
+                    contact = new MegaContactGetter.MegaContact();
+
+                    String id = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_ID));
+                    contact.setId(decrypt(id));
+                    String handle = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_HANDLE));
+                    contact.setHandle(Long.valueOf(decrypt(handle)));
+                    String localName = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_LOCAL_NAME));
+                    contact.setLocalName(decrypt(localName));
+                    String email = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_EMAIL));
+                    contact.setEmail(decrypt(email));
+                    String phoneNumber = cursor.getString(cursor.getColumnIndex(KEY_MEGA_CONTACTS_PHONE_NUMBER));
+                    contact.setNormalizedPhoneNumber(decrypt(phoneNumber));
+
+                    contacts.add(contact);
+                }
+                return contacts;
+            } finally {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    public void clearMegaContacts() {
+        log("delete table " + TABLE_MEGA_CONTACTS);
+        db.execSQL("DELETE FROM " + TABLE_MEGA_CONTACTS);
+    }
+
+    public void deleteMegaContactByEmail(String email) {
+        log("delete mega contact: " + email);
+        String sql = "DELETE FROM " + TABLE_MEGA_CONTACTS + " WHERE " + KEY_MEGA_CONTACTS_EMAIL + "='" + email +"'";
+        db.execSQL(sql);
+    }
 
     public EphemeralCredentials getEphemeral(){
         EphemeralCredentials ephemeralCredentials = null;
