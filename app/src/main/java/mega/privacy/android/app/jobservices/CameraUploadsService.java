@@ -76,7 +76,8 @@ import static mega.privacy.android.app.utils.Util.ONTRANSFERUPDATE_REFRESH_MILLI
 import static mega.privacy.android.app.utils.Util.context;
 
 public class CameraUploadsService extends Service implements NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface, VideoCompressionCallback {
-    
+
+    private static final String OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "overquotanotification";
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
     public static String SECONDARY_UPLOADS = "Media Uploads";
@@ -525,8 +526,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     continue;
                 }
 
-                // only retry for 20 times
-                int counter = 20;
+                // only retry for 60 seconds
+                int counter = 60;
                 while (ERROR_NOT_ENOUGH_SPACE.equals(newPath) && running && counter != 0) {
                     counter--;
                     try {
@@ -1806,100 +1807,66 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         
         mNotificationManager.notify(notificationId,mNotification);
     }
-    
-    private void showProgressNotification(int progressPercent,PendingIntent pendingIntent,String message,String subText,String contentText) {
+
+    private void showProgressNotification(int progressPercent, PendingIntent pendingIntent, String message, String subText, String contentText) {
         mNotification = null;
-        mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
-        
+        mBuilder = new NotificationCompat.Builder(mContext, notificationChannelId);
+        mBuilder
+                .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                .setProgress(100, progressPercent, false)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
+                .setContentTitle(message)
+                .setContentText(contentText)
+                .setOnlyAlertOnce(true);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
-            channel.setSound(null,null);
+            channel.setSound(null, null);
             mNotificationManager.createNotificationChannel(channel);
-            
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100,progressPercent,false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
-                    .setContentTitle(message)
-                    .setSubText(subText)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-            
-            mNotification = mBuilder.build();
+            mBuilder.setSubText(subText);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100,progressPercent,false)
-                    .setContentIntent(pendingIntent)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
-                    .setOngoing(true).setContentTitle(message).setSubText(subText)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true);
-            mNotification = mBuilder.build();
+            mBuilder.setSubText(subText);
         } else {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100,progressPercent,false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
-                    .setContentTitle(message).setContentInfo(subText)
-                    .setContentText(contentText)
-                    .setOnlyAlertOnce(true)
-                    .setColor(ContextCompat.getColor(this,R.color.mega));
-            mNotification = mBuilder.build();
+            mBuilder.setColor(ContextCompat.getColor(this, R.color.mega))
+                    .setContentInfo(subText);
         }
-        
-        mNotificationManager.notify(notificationId,mNotification);
+        mNotification = mBuilder.build();
+        mNotificationManager.notify(notificationId, mNotification);
     }
-    
+
     private void showStorageOverQuotaNotification() {
         log("showStorageOverQuotaNotification");
-        
+
         String contentText = getString(R.string.download_show_info);
         String message = getString(R.string.overquota_alert_title);
-        
-        Intent intent = new Intent(this,ManagerActivityLollipop.class);
+
+        Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext,"overquotanotification");
-        
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, OVER_QUOTA_NOTIFICATION_CHANNEL_ID);
+        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
+                .setContentIntent(PendingIntent.getActivity(mContext, 0, intent, 0))
+                .setAutoCancel(true)
+                .setTicker(contentText)
+                .setContentTitle(message)
+                .setOngoing(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("overquotanotification",notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(OVER_QUOTA_NOTIFICATION_CHANNEL_ID, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
-            channel.setSound(null,null);
+            channel.setSound(null, null);
             mNotificationManager.createNotificationChannel(channel);
-            
-            builder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false);
-            
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.build());
+            builder.setContentText(contentText);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentText(contentText)
-                    .setOngoing(false);
-            
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.build());
+            builder.setContentText(contentText);
         } else {
-            builder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
-                    .setAutoCancel(true).setTicker(contentText)
-                    .setContentTitle(message).setContentInfo(contentText)
-                    .setColor(ContextCompat.getColor(this,R.color.mega))
-                    .setOngoing(false);
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,builder.build());
+            builder.setContentInfo(contentText)
+                    .setColor(ContextCompat.getColor(this, R.color.mega));
+
         }
+        mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build());
     }
     
     private void removeGPSCoordinates(String filePath) {
