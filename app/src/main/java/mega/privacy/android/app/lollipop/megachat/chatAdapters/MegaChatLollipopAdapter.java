@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -352,7 +351,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(filePath));
                     if (preview != null) {
+                        //put preview bitmap to memory cache
                         PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                        //save preview file as folder cache
                         PreviewUtils.putRotatedPreviewToFolder(filePath, preview, megaApi, context);
                         return true;
                     }
@@ -383,7 +384,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (preview != null && result) {
                         log("Compress OK");
                         long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
+                        //put preview bitmap to memory cache
                         PreviewUtils.setPreviewCache(fingerprintCache, preview);
+                        //save preview file as folder cache
                         PreviewUtils.putRotatedPreviewToFolder(filePath, preview, megaApi, context);
                         return true;
                     } else if (!result) {
@@ -423,7 +426,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             if (result) {
                                 log("Compress OK");
                                 long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(previewFile.getPath()));
+                                //put preview bitmap to memory cache
                                 PreviewUtils.setPreviewCache(fingerprintCache, bmPreview);
+                                //save preview file as folder cache
                                 PreviewUtils.putRotatedPreviewToFolder(filePath, bmPreview, megaApi, context);
                                 return true;
                             } else {
@@ -456,6 +461,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         protected void onPostExecute(Boolean isContinue) {
             log("ChatUploadingPreviewAsyncTask-onPostExecute");
             if (isContinue) {
+                //notify adapter to update view
               adapter.notifyItemChanged(position);
             } else {
                 log("The preview is NULL!");

@@ -11,7 +11,6 @@ import android.view.Display;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import mega.privacy.android.app.PreviewCache;
 import nz.mega.sdk.MegaApiAndroid;
@@ -100,7 +99,7 @@ public class PreviewUtils {
 		long fingerprintCache = MegaApiAndroid.base64ToHandle(megaApi.getFingerprint(path));
 		File previewDir = getPreviewFolder(context);
 		File preview = new File(previewDir, fingerprintCache + ".jpg");
-		FileOutputStream outStream = null;
+		FileOutputStream outStream;
 		try {
 			outStream = new FileOutputStream(preview);
 			boolean result = rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
