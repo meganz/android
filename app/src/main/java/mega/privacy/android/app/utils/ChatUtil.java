@@ -247,16 +247,19 @@ public class ChatUtil {
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
-    public static void activateChrono(boolean activateChrono, Chronometer chronometer, MegaChatCall callChat){
-        if(activateChrono && callChat!=null && chronometer!=null && chronometer.getVisibility() == GONE){
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat){
+        log("activateChrono");
+        if(chronometer == null || callChat == null)return;
+
+        if(activateChrono){
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));
             chronometer.start();
             chronometer.setFormat(" %s");
-        }else if(chronometer!=null){
-            chronometer.stop();
-            chronometer.setVisibility(View.GONE);
+            return;
         }
+        chronometer.stop();
+        chronometer.setVisibility(View.GONE);
     }
 
     private static void log(String message) {

@@ -7155,23 +7155,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
     private void showCallInProgressLayout(String text, boolean chrono, MegaChatCall call){
         log("showCallInProgressLayout");
+        ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
         if(callInProgressLayout.getVisibility() == View.VISIBLE) return;
         callInProgressLayout.setVisibility(View.VISIBLE);
         callInProgressLayout.setOnClickListener(this);
         callInProgressText.setText(text);
-        ChatUtil.activateChrono(chrono, callInProgressChrono, call);
 
     }
     private void hideCallInProgressLayout(MegaChatCall call){
         invalidateOptionsMenu();
+        ChatUtil.activateChrono(false, callInProgressChrono, call);
+        ChatUtil.activateChrono(false, subtitleChronoCall, call);
+
         log("hideCallInProgressLayout");
         if (callInProgressLayout.getVisibility() == View.GONE)  return;
         callInProgressLayout.setVisibility(View.GONE);
         callInProgressLayout.setOnClickListener(null);
-        ChatUtil.activateChrono(false, callInProgressChrono, call);
         setSubtitleVisibility();
-        ChatUtil.activateChrono(false, subtitleChronoCall, call);
 
     }
 
@@ -7213,12 +7214,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void showCallLayout(MegaChatCall call){
         log("showCallLayout");
-        if((call==null)&&(megaChatApi!=null)){
-            call = megaChatApi.getChatCall(idChat);
-            if (call == null) {
-                return;
-            }
-        }
+        if(megaChatApi == null) return;
+        if(call == null) call = megaChatApi.getChatCall(idChat);
+        if (call == null)return;
 
         if((call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) || (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN)){
             if(isGroup()){
@@ -7263,33 +7261,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 subtitleCall.setVisibility(View.VISIBLE);
                 individualSubtitleToobar.setVisibility(View.GONE);
                 groupalSubtitleToolbar.setVisibility(View.GONE);
-                ChatUtil.activateChrono(true, subtitleChronoCall, call);
-                usersWithVideo();
-            }else{
-                log("showCallLayout: IN_PROGRESS - Individual");
-                //Individual:
-                ChatUtil.activateChrono(false, subtitleChronoCall, call);
             }
+            usersWithVideo();
+            ChatUtil.activateChrono(true, subtitleChronoCall, call);
             invalidateOptionsMenu();
         }
     }
 
     private  void usersWithVideo(){
-        if(megaChatApi!=null){
-            MegaChatCall call = megaChatApi.getChatCall(idChat);
-            if(call!=null){
-                if(isGroup() && (subtitleCall.getVisibility() == View.VISIBLE)){
-                    int usersWithVideo = call.getNumParticipants(MegaChatCall.VIDEO);
-                    int totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
-                    if((usersWithVideo > 0) && (totalVideosAllowed != 0)){
-                        participantsText.setText(usersWithVideo + "/" + totalVideosAllowed);
-                        participantsLayout.setVisibility(View.VISIBLE);
-                    }else{
-                        participantsLayout.setVisibility(View.GONE);
-                    }
-                }
-            }
+        if(megaChatApi == null || !isGroup() ||  megaChatApi.getChatCall(idChat) == null || subtitleCall.getVisibility() != View.VISIBLE) return;
+
+        int usersWithVideo = megaChatApi.getChatCall(idChat).getNumParticipants(MegaChatCall.VIDEO);
+        int totalVideosAllowed = megaChatApi.getMaxVideoCallParticipants();
+        if(usersWithVideo <= 0 || totalVideosAllowed == 0) {
+            participantsLayout.setVisibility(View.GONE);
+            return;
         }
+        participantsText.setText(usersWithVideo + "/" + totalVideosAllowed);
+        participantsLayout.setVisibility(View.VISIBLE);
     }
 
     public void goToEnd(){

@@ -1167,7 +1167,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mSensorManager.unregisterListener(this);
         }
         clearHandlers();
-
+        ChatUtil.activateChrono(false,callInProgressChrono,callChat);
         restoreHeightAndWidth();
 
         if (megaChatApi != null) {
@@ -2871,89 +2871,84 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
     public void updateSubTitle() {
         log("updateSubTitle");
-        if ((callChat == null) && (megaChatApi != null)) {
-            callChat = megaChatApi.getChatCall(chatId);
+
+        getCall();
+        if(callChat == null) return;
+        chat = megaChatApi.getChatRoom(chatId);
+        if(chat == null) return;
+        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+            log("updateSubTitle:REQUEST_SENT");
+            subtitleToobar.setVisibility(View.VISIBLE);
+            ChatUtil.activateChrono(false, callInProgressChrono, callChat);
+            if (chat.isGroup()) {
+                subtitleToobar.setText(getString(R.string.outgoing_call_starting));
+                return;
+            }
+            if(callChat.hasVideoInitialCall())   {
+                subtitleToobar.setText(getString(R.string.outgoing_video_call_starting).toLowerCase());
+                return;
+            }
+            subtitleToobar.setText(getString(R.string.outgoing_audio_call_starting).toLowerCase());
+            return;
         }
-        if (callChat != null) {
-            if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-                log("updateSubTitle:REQUEST_SENT");
-                if ((chat == null) && (megaChatApi != null)) {
-                    chat = megaChatApi.getChatRoom(chatId);
-                }
-                subtitleToobar.setVisibility(View.VISIBLE);
-                ChatUtil.activateChrono(false, callInProgressChrono, callChat);
-                if (chat != null) {
-                    if (chat.isGroup()) {
-                        subtitleToobar.setText(getString(R.string.outgoing_call_starting));
-                    }else{
-                        if(callChat.hasVideoInitialCall())   {
-                            subtitleToobar.setText(getString(R.string.outgoing_video_call_starting).toLowerCase());
-                        }else{
-                            subtitleToobar.setText(getString(R.string.outgoing_audio_call_starting).toLowerCase());
-                        }
-                    }
-                }else{
-                    subtitleToobar.setText(getString(R.string.outgoing_call_starting));
-                }
 
-            } else if (callChat.getStatus() <= MegaChatCall.CALL_STATUS_RING_IN) {
-                log("updateSubTitle:RING_IN");
-                subtitleToobar.setVisibility(View.VISIBLE);
-                ChatUtil.activateChrono(false, callInProgressChrono, callChat);
-                subtitleToobar.setText(getString(R.string.incoming_call_starting));
+        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+            log("updateSubTitle:RING_IN");
+            subtitleToobar.setVisibility(View.VISIBLE);
+            ChatUtil.activateChrono(false, callInProgressChrono, callChat);
+            subtitleToobar.setText(getString(R.string.incoming_call_starting));
+            return;
 
-            } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                log("updateSubTitle:IN_PROGRESS");
-                if ((chat == null) && (megaChatApi != null)) {
-                    chat = megaChatApi.getChatRoom(chatId);
-                }
-                if (chat != null) {
-                    if (chat.isGroup()) {
-                        log("updateSubTitle:group call in progress");
-                        boolean isInProgress = false;
-                        MegaHandleList listPeerids = callChat.getSessionsPeerid();
-                        MegaHandleList listClientids = callChat.getSessionsClientid();
-                        for(int i=0; i<listPeerids.size(); i++){
-                            MegaChatSession userSession = callChat.getMegaChatSession(listPeerids.get(i), listClientids.get(i));
-                            if((userSession!=null)&&(userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS)){
-                                isInProgress = true;
-                                break;
-                            }
-                        }
-
-                        if(isInProgress){
-                            log("session in progress");
-                            subtitleToobar.setVisibility(GONE);
-                            ChatUtil.activateChrono(true, callInProgressChrono, callChat);
-                        }else{
-                            log("Error getting the session of the user or session not in progress ");
-                            subtitleToobar.setText(getString(R.string.chat_connecting));
-                            subtitleToobar.setVisibility(View.VISIBLE);
-                            ChatUtil.activateChrono(false, callInProgressChrono, callChat);
-                        }
-
-                    } else {
-                        log("updateSubTitle:individual call in progress");
-
-                        linearParticipants.setVisibility(GONE);
-                        MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
-                        if ((userSession != null) && (userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS)){
-                            log("session in progress");
-                            subtitleToobar.setVisibility(View.GONE);
-                            ChatUtil.activateChrono(true, callInProgressChrono, callChat);
-                        } else {
-                            log("Error getting the session of the user or session not in progress ");
-                            subtitleToobar.setText(getString(R.string.chat_connecting));
-                            subtitleToobar.setVisibility(View.VISIBLE);
-                            ChatUtil.activateChrono(false, callInProgressChrono, callChat);
-                        }
+        }
+        if (callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || callChat.getStatus() == MegaChatCall.CALL_STATUS_JOINING) {
+            log("updateSubTitle:IN_PROGRESS || JOINING");
+            if (chat.isGroup()) {
+                log("updateSubTitle:group call in progress");
+                boolean isInProgress = false;
+                MegaHandleList listPeerids = callChat.getSessionsPeerid();
+                MegaHandleList listClientids = callChat.getSessionsClientid();
+                for(int i=0; i<listPeerids.size(); i++){
+                    MegaChatSession userSession = callChat.getMegaChatSession(listPeerids.get(i), listClientids.get(i));
+                    if((userSession!=null)&&(userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS)){
+                        isInProgress = true;
+                        break;
                     }
                 }
-            } else {
-                subtitleToobar.setVisibility(GONE);
+                if(isInProgress){
+                    log("session in progress");
+                    subtitleToobar.setVisibility(GONE);
+                    ChatUtil.activateChrono(true, callInProgressChrono, callChat);
+                    return;
+                }
+
+                log("Error getting the session of the user or session not in progress ");
+                subtitleToobar.setText(getString(R.string.chat_connecting));
+                subtitleToobar.setVisibility(View.VISIBLE);
                 ChatUtil.activateChrono(false, callInProgressChrono, callChat);
+                return;
+
+            }
+
+            log("updateSubTitle:individual call in progress");
+
+            linearParticipants.setVisibility(GONE);
+            MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
+            if(userSession == null){
+                subtitleToobar.setText(getString(R.string.chat_connecting));
+                subtitleToobar.setVisibility(View.VISIBLE);
+                ChatUtil.activateChrono(false, callInProgressChrono, callChat);
+                return;
+            }
+
+            if (userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS){
+                log("session in progress");
+                subtitleToobar.setVisibility(View.GONE);
+                ChatUtil.activateChrono(true, callInProgressChrono, callChat);
+                return;
             }
         }
+        subtitleToobar.setVisibility(GONE);
+        ChatUtil.activateChrono(false, callInProgressChrono, callChat);
     }
 
     private void updateSubtitleNumberOfVideos() {
