@@ -135,6 +135,16 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/no_permission_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/contacts_phone"
+                        android:visibility="gone"
+                        android:paddingLeft="15dp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
                     <ImageView
                         android:id="@+id/invite_contact_list_empty_image"
                         android:layout_width="wrap_content"

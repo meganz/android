@@ -56,26 +56,31 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MANUAL_INPUT_EMAIL;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MANUAL_INPUT_PHONE;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
+import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
 
 
 public class InviteContactActivityLollipop extends PinActivityLollipop implements InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
     public static final int SCAN_QR_FOR_invite_contactS = 1111;
     public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
-    private final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
-    private final String KEY_MEGA_CONTACTS = "KEY_MEGA_CONTACTS";
-    private final String KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS";
-    private final String KEY_FILTERED_CONTACTS = "KEY_FILTERED_CONTACTS";
-    private final String KEY_TOTAL_CONTACTS = "KEY_TOTAL_CONTACTS";
-    private final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
-    private final int ID_MEGA_CONTACTS_HEADER = -2;
-    private final int ID_PHONE_CONTACTS_HEADER = -1;
+    private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
+    private static final String KEY_MEGA_CONTACTS = "KEY_MEGA_CONTACTS";
+    private static final String KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS";
+    private static final String KEY_FILTERED_CONTACTS = "KEY_FILTERED_CONTACTS";
+    private static final String KEY_TOTAL_CONTACTS = "KEY_TOTAL_CONTACTS";
+    private static final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
+    private static final int ID_MEGA_CONTACTS_HEADER = -2;
+    private static final int ID_PHONE_CONTACTS_HEADER = -1;
 
     private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
@@ -83,7 +88,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private RelativeLayout containerContacts;
     private RecyclerView recyclerViewList;
     private ImageView emptyImageView;
-    private TextView emptyTextView, emptySubTextView;
+    private TextView emptyTextView, emptySubTextView, noPermissionHeader;
     private ProgressBar progressBar;
     private String inputString, defaultLocalContactAvatarColor;
     private InvitationContactsAdapter invitationContactsAdapter;
@@ -100,6 +105,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted;
     private MegaContactGetter megaContactGetter;
     private List<ContactsUtil.LocalContact> rawLocalContacts;
+    private String contactLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +185,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         emptyTextView = findViewById(R.id.invite_contact_list_empty_text);
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
         emptySubTextView = findViewById(R.id.invite_contact_list_empty_subtext);
+        noPermissionHeader = findViewById(R.id.no_permission_header);
 
         progressBar = findViewById(R.id.add_contact_progress_bar);
         progressBar = findViewById(R.id.invite_contact_progress_bar);
@@ -208,6 +215,33 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         } else {
             queryIfHasReadContactsPermissions();
         }
+
+        MegaRequestListenerInterface getContactLinkCallback = new MegaRequestListenerInterface() {
+            @Override
+            public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+            }
+
+            @Override
+            public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+            }
+
+            @Override
+            public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+                if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE && e.getErrorCode() == MegaError.API_OK) {
+                    contactLink = CONTACT_LINK_BASE_URL + MegaApiAndroid.handleToBase64(request.getNodeHandle());
+                } else {
+                    contactLink = "";
+                }
+            }
+
+            @Override
+            public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+                contactLink = "";
+            }
+        };
+        megaApi.contactLinkCreate(false, getContactLinkCallback);
     }
 
     @Override
@@ -235,10 +269,10 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             }
             case R.id.action_more: {
                 log("more button clicked - share invitation through other app");
-                String message = "This is my text to send.";
+                String message = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, message);//todo update the message
+                sendIntent.putExtra(Intent.EXTRA_TEXT, message);
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
                 break;
@@ -530,12 +564,14 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                     log("Permission granted");
                     isPermissionGranted = true;
                     prepareToGetContacts();
+                    noPermissionHeader.setVisibility(View.GONE);
                 } else {
                     log("Permission denied");
                     setEmptyStateVisibility(true);
                     emptyTextView.setText(R.string.no_contacts_permissions);
                     emptyImageView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
+                    noPermissionHeader.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -840,7 +876,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
             recipents += (phone + ";");
             log("setResultPhoneContacts: " + phone);
         }
-        String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message);
+        String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
         Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents));
         smsIntent.putExtra("sms_body", smsBody);
         startActivity(smsIntent);

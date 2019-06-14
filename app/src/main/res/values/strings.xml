@@ -2464,7 +2464,7 @@
     <string name="alert_enter_group_name" context="Alert shown when the user it is creating a chat link and the chat has not title">To create a chat link you must name the group.</string>
     <string name="invite_contacts_to_start_chat" context="Text shown when an account doesn't have any contact added and it's trying to start a new chat conversation">Invite contacts and start chatting securely with MEGA\'s encrypted chat.</string>
 
-    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite start a chat">Hi, Have encrpted conversations on Mega withe me and get 50GB free storage.</string>
+    <string name="invite_contacts_to_start_chat_text_message" context="Text sent to recipients to invite to be contact. Placeholder: contact link url.">Hi, Have encrypted conversations on Mega with me and get 50GB free storage. %1$s</string>
 
     <string name="no_chat_link_available" context="In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say 'not link available' and not auto create it.">No chat link available.</string>
     <string name="chat_link_deleted" context="Alert shown when it has been deleted successfully a chat link">Chat link deleted successfully.</string>
