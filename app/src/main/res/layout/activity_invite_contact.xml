@@ -139,11 +139,13 @@
                         android:id="@+id/no_permission_header"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/contacts_phone"
-                        android:visibility="gone"
                         android:paddingLeft="15dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:text="@string/contacts_phone"
                         android:textColor="@color/black"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/invite_contact_list_empty_image"

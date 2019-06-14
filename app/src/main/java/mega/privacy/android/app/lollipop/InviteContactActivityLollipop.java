@@ -211,6 +211,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 setEmptyStateVisibility(true);
                 emptyTextView.setText(R.string.no_contacts_permissions);
                 emptyImageView.setVisibility(View.VISIBLE);
+                noPermissionHeader.setVisibility(View.VISIBLE);
             }
         } else {
             queryIfHasReadContactsPermissions();
