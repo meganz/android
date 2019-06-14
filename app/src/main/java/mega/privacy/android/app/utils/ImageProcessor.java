@@ -153,6 +153,6 @@ public class ImageProcessor {
     }
 
     private static void log(String msg) {
-        Util.log("CameraUploadImageProcessor",msg);
+        Util.log("ImageProcessor",msg);
     }
 }

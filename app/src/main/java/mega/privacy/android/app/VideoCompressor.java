@@ -10,9 +10,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
-public class VideoCompressor {
-
-    private VideoDownsampling compressor;
+public class VideoCompressor extends VideoDownsampling{
 
     private List<SyncRecord> pendingList;
 
@@ -28,16 +26,14 @@ public class VideoCompressor {
 
     private int currentFileIndex;
 
-    private boolean isRunning;
-
     public void stop() {
-        isRunning = false;
+        setRunning(false);
         log("video compressor stopped");
     }
 
     public VideoCompressor(Context context, VideoCompressionCallback callback) {
+        super(context);
         this.updater = callback;
-        compressor = new VideoDownsampling(context);
     }
 
     public void setPendingList(List<SyncRecord> pendingList) {
@@ -74,8 +70,8 @@ public class VideoCompressor {
     }
 
     public void start() {
-        isRunning = true;
-        for (int i = 0; i < totalCount && isRunning; i++) {
+        setRunning(true);
+        for (int i = 0; i < totalCount && isRunning(); i++) {
             currentFileIndex = i + 1;
             SyncRecord record = pendingList.get(i);
             log("video compressor start: " + record.toString());
@@ -87,10 +83,10 @@ public class VideoCompressor {
                 return;
             }
 
-            VideoDownsampling.VideoUpload video = new VideoDownsampling.VideoUpload(path, record.getNewPath(), size, -1);
+            VideoUpload video = new VideoUpload(path, record.getNewPath(), size, -1);
             try {
-                compressor.prepareAndChangeResolution(video);
-                if (isRunning) {
+                prepareAndChangeResolution(video);
+                if (isRunning()) {
                     updater.onCompressSuccessful(record);
                 }
             } catch (Exception ex) {
@@ -105,16 +101,16 @@ public class VideoCompressor {
         stop();
     }
 
-    public boolean isRunning() {
-        return isRunning;
-    }
-
     public int getTotalCount() {
         return totalCount;
     }
 
     public int getCurrentFileIndex() {
         return currentFileIndex;
+    }
+
+    public long getTotalRead() {
+        return totalRead;
     }
 
     private static void log(String message) {

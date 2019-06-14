@@ -43,7 +43,9 @@ public class VideoDownsampling {
 
     static ConcurrentLinkedQueue<VideoUpload> queue;
 
-    public static class VideoUpload{
+    private boolean isRunning = true;
+
+    protected class VideoUpload{
         String original;
         String outFile;
         long idPendingMessage;
@@ -62,6 +64,14 @@ public class VideoDownsampling {
     public VideoDownsampling(Context context) {
         this.context = context;
         queue = new ConcurrentLinkedQueue<VideoUpload>();
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
     }
 
     public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
@@ -379,7 +389,7 @@ public class VideoDownsampling {
 
         int pendingAudioDecoderOutputBufferIndex = -1;
         boolean muxing = false;
-        while ((!videoEncoderDone) || (!audioEncoderDone)) {
+        while ((!videoEncoderDone || !audioEncoderDone) && isRunning) {
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
