@@ -39,9 +39,9 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     private ContactViewHolder holder;
 
-    private DatabaseHandler dbH;
-
     private MegaApiAndroid megaApi;
+
+    private DatabaseHandler dbH;
 
     public ContactsHorizontalAdapter(Activity context, RecentChatsFragmentLollipop recentChatsFragment, List<MegaContactGetter.MegaContact> data) {
         this.context = context;
@@ -64,6 +64,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         holder = new ContactViewHolder(v);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
+        holder.contactInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
         holder.textViewName = v.findViewById(R.id.name_chip);
         holder.textViewName.setMaxWidth(Util.px2dp(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
@@ -88,6 +89,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         log("sent invite to: " + email);
         //ignore the callback
         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
+        dbH.deleteMegaContactByEmail(email);
         Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
     }
 
@@ -119,6 +121,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
                         megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
                     }
                 } else {
+                    holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatar.setImageBitmap(bitmap);
                 }
             } else {

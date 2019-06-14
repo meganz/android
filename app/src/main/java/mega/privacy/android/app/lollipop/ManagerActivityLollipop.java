@@ -202,6 +202,7 @@ import mega.privacy.android.app.utils.billing.IabHelper;
 import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1850,6 +1851,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		transfersInProgress = new ArrayList<Integer>();
+
+        //sync local contacts to see who's on mega.
+        if(Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this)) {
+            MegaContactGetter getter = new MegaContactGetter(this);
+            getter.getMegaContacts(megaApi, getter.getLocalContacts(), MegaContactGetter.WEEK);
+        }
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
