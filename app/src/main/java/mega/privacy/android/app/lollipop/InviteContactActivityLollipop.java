@@ -81,6 +81,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private static final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
     private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
+    private static final int USER_INDEX_NONE_EXIST = -1;
 
     private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
@@ -921,7 +922,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
                 return i;
             }
         }
-        return -1;
+        return USER_INDEX_NONE_EXIST;
     }
 
     private void enableFabButton(Boolean enableFabButton) {

@@ -38,7 +38,8 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE
 
 public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
 
-    private final String IMAGE_EXTENSION = ".jpg";
+    private final static String IMAGE_EXTENSION = ".jpg";
+    private final static int HEADER_HOLDER_ID = -1;
     private Context context;
     private List<InvitationContactInfo> contactData;
     private LayoutInflater inflater;
@@ -179,7 +180,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         View rowView = inflater.inflate(R.layout.contact_list_section_header, parentView, false);
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
-        holder.contactId = -1;
+        holder.contactId = HEADER_HOLDER_ID;
         return holder;
     }
 
