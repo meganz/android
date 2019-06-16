@@ -4687,8 +4687,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					setFirstNavigationLevel(true);
+					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				}
-				aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				break;
 			}
 			case MEDIA_UPLOADS:{

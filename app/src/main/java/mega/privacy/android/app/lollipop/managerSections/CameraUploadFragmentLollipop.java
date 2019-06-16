@@ -1036,7 +1036,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
 			}
 
-			showEmptyResults();
+            if (((ManagerActivityLollipop)context).getIsSearchEnabled()) {
+                showEmptySearchResults();
+            } else {
+                showEmptyResults();
+            }
+
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
