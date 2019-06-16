@@ -29,10 +29,6 @@ public class JobUtil {
 
     public static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
 
-    public static final int DAEMON_JOB_ID = 9979;
-
-    public static final long DAEMON_INTERVAL = SCHEDULER_INTERVAL;
-
     public static synchronized boolean isJobScheduled(Context context,int id) {
         JobScheduler js = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (js != null) {

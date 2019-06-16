@@ -39,6 +39,9 @@ public class VideoDownsampling {
     private int mWidth = 1280;
     private int mHeight = 720;
 
+    private static final int MEDIUM_WIDTH = 1280;
+    private static final int MEDIUM_HEIGHT = 720;
+
     static Context context;
 
     static ConcurrentLinkedQueue<VideoUpload> queue;
@@ -123,7 +126,7 @@ public class VideoDownsampling {
         }
     }
 
-    public void prepareAndChangeResolution(VideoUpload video) throws Exception {
+    protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
         log("prepareAndChangeResolution");
         Exception exception = null;
         String mInputFile = video.original;
@@ -275,11 +278,11 @@ public class VideoDownsampling {
 
         int rotation = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
         if (rotation == 90 || rotation == 270) {
-            mWidth = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-            mHeight = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+            mWidth = MEDIUM_HEIGHT;
+            mHeight = MEDIUM_WIDTH;
         } else {
-            mWidth = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-            mHeight = Integer.valueOf(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+            mWidth = MEDIUM_WIDTH;
+            mHeight = MEDIUM_HEIGHT;
         }
     }
 
