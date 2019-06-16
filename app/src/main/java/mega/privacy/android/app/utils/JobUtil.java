@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -72,10 +73,11 @@ public class JobUtil {
     }
 
     public static synchronized void startCameraUploadService(Context context) {
-        boolean isOverquota = isOverquota(context);
-
-        if (!CameraUploadsService.isServiceRunning && !isOverquota) {
-            Intent newIntent = new Intent(context, CameraUploadsService.class);
+        boolean isOverQuota = isOverquota(context);
+        boolean hasReadPermission = Util.hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+        log("startCameraUploadService isOverQuota:" + isOverQuota + ", hasStoragePermission:" + hasReadPermission);
+        if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission) {
+            Intent newIntent = new Intent(context,CameraUploadsService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 log("startCameraUploadService: starting on Oreo or above: ");
                 context.startForegroundService(newIntent);
