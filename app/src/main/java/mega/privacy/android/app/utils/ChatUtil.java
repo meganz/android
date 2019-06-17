@@ -95,9 +95,10 @@ public class ChatUtil {
 
     }
 
-    /*MEthod to show or hide the "return the call" layout*/
-    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, RelativeLayout callInProgressLayout, Chronometer callInProgressChrono){
-        if(!Util.isChatEnabled() || megaChatApi == null || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi) ){
+    /*Method to show or hide the "return the call" layout*/
+    public static void showCallLayout(Context context, MegaChatApiAndroid megaChatApi, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono){
+        if(megaChatApi == null)return;
+        if(!Util.isChatEnabled() || !(context instanceof ManagerActivityLollipop) || !participatingInACall(megaChatApi) ){
             callInProgressLayout.setVisibility(View.GONE);
             activateChrono(false, callInProgressChrono, null);
             return;
@@ -248,9 +249,7 @@ public class ChatUtil {
     }
 
     public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall callChat){
-        log("activateChrono");
         if(chronometer == null || callChat == null)return;
-
         if(activateChrono){
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (callChat.getDuration()*1000));

@@ -7185,8 +7185,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("onChatCallUpdate:STATUS: "+callStatus);
 
                 switch (callStatus) {
+                    case MegaChatCall.CALL_STATUS_RING_IN:{
+                        MegaApplication.setCallLayoutStatus(idChat, false);
+                        showCallLayout(call);
+                        break;
+                    }
                     case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-                    case MegaChatCall.CALL_STATUS_RING_IN:
                     case MegaChatCall.CALL_STATUS_REQUEST_SENT:
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
                         showCallLayout(call);
@@ -7234,24 +7238,36 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 showCallInProgressLayout(textLayout, false, call);
+                return;
 
-            }else{
-                //Individual:
-                log("showCallLayout: USER_NO_PRESENT || RING_IN - Individual");
-                hideCallInProgressLayout(call);
             }
+            //Individual:
+            if(call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN && MegaApplication.getCallLayoutStatus(idChat)){
+                log("showCallLayout: RING_IN - Individual");
+                ChatUtil.activateChrono(false, subtitleChronoCall, call);
+                showCallInProgressLayout(getString(R.string.call_in_progress_layout), false, call);
+                return;
+            }
+            log("showCallLayout: USER_NO_PRESENT - Individual");
+            hideCallInProgressLayout(call);
+            return;
 
-        }else if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+        }
+
+        if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
             log("showCallLayout: REQUEST_SENT");
 
             if(MegaApplication.getCallLayoutStatus(idChat)){
                 ChatUtil.activateChrono(false, subtitleChronoCall, call);
                 showCallInProgressLayout(getString(R.string.call_in_progress_layout), false, call);
-            }else{
-                hideCallInProgressLayout(call);
+                return;
             }
 
-        }else if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+            hideCallInProgressLayout(call);
+            return;
+        }
+
+        if(call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS){
             log("showCallLayout: IN_PROGRESS");
 
             showCallInProgressLayout(getString(R.string.call_in_progress_layout), true, call);
@@ -7265,6 +7281,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             usersWithVideo();
             ChatUtil.activateChrono(true, subtitleChronoCall, call);
             invalidateOptionsMenu();
+            return;
         }
     }
 

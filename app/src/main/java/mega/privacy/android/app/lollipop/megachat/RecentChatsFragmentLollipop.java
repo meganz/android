@@ -1598,7 +1598,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void refreshNode(MegaChatListItem item){
-        log("refreshNode -> showCallLayout");
+        log("refreshNode");
         ChatUtil.showCallLayout(context, megaChatApi, callInProgressLayout, callInProgressChrono);
 
         //elements of adapter

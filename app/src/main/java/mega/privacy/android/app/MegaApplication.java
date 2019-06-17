@@ -1860,11 +1860,9 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		log("Launch call: "+chatRoom.getTitle());
-
-		if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT){
+		if(call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN){
 			setCallLayoutStatus(call.getChatid(), true);
 		}
-
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {
