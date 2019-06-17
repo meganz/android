@@ -38,7 +38,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private long lastSyncTimestamp;
 
-        public static final int DAY = 24 * 60 * 60 * 1000;
+    public static final int DAY = 24 * 60 * 60 * 1000;
     public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
 
     //TEST SETTINGS
@@ -230,7 +230,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 updateLastSyncTimestamp();
 
                 // filter out
-                List<MegaContact> list = filterOut(api,megaContacts);
+                List<MegaContact> list = filterOut(api, megaContacts);
 
                 if (updater != null) {
                     updater.onFinish(list);
@@ -313,7 +313,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
             log("getMegaContacts load from database");
             if (updater != null) {
                 List<MegaContact> list = dbH.getMegaContacts();
-                list = filterOut(api,list);
+                list = filterOut(api, list);
                 updater.onFinish(list);
             }
         }

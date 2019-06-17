@@ -89,7 +89,6 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         log("sent invite to: " + email);
         //ignore the callback
         megaApi.inviteContact(email, null, MegaContactRequest.INVITE_ACTION_ADD);
-        dbH.deleteMegaContactByEmail(email);
         Util.showSnackBar(context, Constants.SNACKBAR_TYPE, context.getString(R.string.context_contact_request_sent, email), -1);
     }
 
