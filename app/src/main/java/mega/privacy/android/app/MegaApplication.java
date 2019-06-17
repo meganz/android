@@ -1395,9 +1395,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		log("Launch local broadcast");
-		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		if(config.isPending()==false){
+			log("Launch local broadcast");
+			Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE);
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		}
 	}
 
 	@Override

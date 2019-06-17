@@ -111,13 +111,8 @@ public class ChatUtil {
     }
 
     public static long getVoiceClipDuration(MegaNode node){
-        long duration = 0;
-        if(node.getDuration()<0){
-            duration = (-node.getDuration())*1000;
-        }else{
-            duration = (node.getDuration()*1000);
-        }
-        return duration;
+        if(node.getDuration()<0) return 0;
+        return node.getDuration()*1000;
     }
 
     /* Get the height of the action bar */

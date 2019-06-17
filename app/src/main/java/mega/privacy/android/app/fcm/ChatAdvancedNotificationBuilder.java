@@ -324,9 +324,7 @@ public final class ChatAdvancedNotificationBuilder {
         if(nodeList == null || nodeList.size() < 1) return null;
         if(!ChatUtil.isVoiceClip(nodeList.get(0).getName())) return nodeList.get(0).getName();
         long duration = ChatUtil.getVoiceClipDuration(nodeList.get(0));
-        String result = "\uD83C\uDF99 " + ChatUtil.milliSecondsToTimer(duration);
-        return result;
-
+        return "\uD83C\uDF99 " + ChatUtil.milliSecondsToTimer(duration);
     }
 
     private String checkMessageContentMeta(MegaChatMessage message){

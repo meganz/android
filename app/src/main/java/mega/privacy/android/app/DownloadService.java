@@ -1498,7 +1498,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if(isVoiceClipType(transfer.getAppData())) {
 					resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
 					File localFile = buildVoiceClipFile(this, transfer.getFileName());
-					if (isFileAvailable(localFile) && localFile.exists()) {
+					if (isFileAvailable(localFile)) {
 						log("deleteOwnVoiceClip : exists");
 						localFile.delete();
 					}
@@ -1599,21 +1599,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else
 				{
-
 					log("Download ERROR: " + transfer.getNodeHandle());
-					if(isVoiceClipType(transfer.getAppData()))resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
-
-					if(!transfer.isFolderTransfer()){
-						errorCount++;
-					}
-
 					if(isVoiceClipType(transfer.getAppData())){
+						resultTransfersVoiceClip(transfer.getNodeHandle(), Constants.ERROR_VOICE_CLIP_TRANSFER);
 						File localFile = buildVoiceClipFile(this, transfer.getFileName());
-						if (isFileAvailable(localFile) && localFile.exists()) {
+						if (isFileAvailable(localFile)) {
 							log("deleteOwnVoiceClip : exists");
 							localFile.delete();
 						}
 					}else{
+						if(!transfer.isFolderTransfer()){
+							errorCount++;
+						}
 						File file = new File(transfer.getPath());
 						file.delete();
 					}
@@ -2253,7 +2250,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					downloadedBytesToOverquota = megaApi.getTotalDownloadedBytes() + megaApiFolder.getTotalDownloadedBytes();
 					isOverquota = true;
 					log("downloaded bytes to reach overquota: "+downloadedBytesToOverquota);
-					if(isVoiceClipType(transfer.getAppData())) return;
 					showTransferOverquotaNotification();
 				}
 			}

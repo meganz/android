@@ -5827,7 +5827,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             int status = message.getStatus();
             if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
-                log("bindVC:myMessage: STATUS_SERVER_REJECTED || STATUS_SENDING_MANUAL MANUAL");
+                log("bindVC:myMessage: STATUS_SERVER_REJECTED || STATUS_SENDING_MANUAL");
                 holder.notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                 holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
@@ -5842,7 +5842,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipDuration.setText("-:--");
 
             }else if (status == MegaChatMessage.STATUS_SENDING) {
-                log("bindVC:myMessage: STATUS_SENDING --- uploading VISIBLE");
+                log("bindVC:myMessage: STATUS_SENDING ");
                 holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
                 holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
