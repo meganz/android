@@ -40,12 +40,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -58,10 +58,11 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
+
 
 public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
-    public static final String AUTO_LOGIN = "autoLogin";
     float scaleH, scaleW;
     float density;
     DisplayMetrics outMetrics;
@@ -126,30 +127,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
     };
 
-    private BroadcastReceiver autoLoginReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null && AUTO_LOGIN.equals(intent.getAction())){
-                if(loginFragment != null) {
-                    MegaChatApiAndroid megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
-                    megaChatApi.logout();
-                    DatabaseHandler dbH = DatabaseHandler.getDbHandler(LoginActivityLollipop.this);
-                    if(dbH.getCredentials() != null) {
-                        loginFragment.startFastLogin();
-                    } else {
-                        loginFragment.performLogin();
-                    }
-                }
-            }
-        }
-    };
-
     @Override
     protected void onDestroy() {
         log("onDestroy");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(autoLoginReceiver);
         if (megaApi != null) {
             megaApi.removeGlobalListener(this);
             megaApi.removeRequestListener(this);
@@ -220,7 +201,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-        LocalBroadcastManager.getInstance(this).registerReceiver(autoLoginReceiver, new IntentFilter(AUTO_LOGIN));
 
         showFragment(visibleFragment);
     }
@@ -912,12 +892,24 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     public void onEvent(MegaApiJava api, MegaEvent event) {
         log("onEvent");
         if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
-            log("Event received: "+event.getText()+"_"+event.getNumber());
-            if(event.getNumber()==200){
+            int whyAmIBlocked = event.getNumber();
+            if(whyAmIBlocked ==200){
                 accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
             }
-            else if(event.getNumber()==300){
+            else if(whyAmIBlocked ==300){
                 accountBlocked = getString(R.string.account_suspended_breache_ToS);
+            } else if(whyAmIBlocked == 500) {
+                accountBlocked = getString(R.string.error_account_suspended);
+                int state = api.smsAllowedState();
+                log("state: " + state);
+                if (state != 0) {
+                    if (!MegaApplication.isVerifySMSShowed()) {
+                        Intent intent = new Intent(this, SMSVerificationActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        intent.putExtra(NAME_USER_LOCKED,true);
+                        startActivity(intent);
+                    }
+                }
             }
         }
     }

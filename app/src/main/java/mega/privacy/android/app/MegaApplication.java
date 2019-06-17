@@ -142,7 +142,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	private static boolean registeredChatListeners = false;
 
-	private static boolean isVerifySMSShowed = false;
+    private static boolean isVerifySMSShowed = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -163,6 +163,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		intent.putExtra("actionType", Constants.GO_OFFLINE);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
+
+    public static boolean isVerifySMSShowed() {
+        return isVerifySMSShowed;
+    }
 
     public static void smsVerifyShowed(boolean isShowed) {
 	    isVerifySMSShowed = isShowed;
@@ -409,7 +413,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
+        isVerifySMSShowed = false;
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
@@ -1374,16 +1378,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
             int state = api.smsAllowedState();
             log("whyAmIBlocked: " + whyAmIBlocked);
             log("state: " + state);
-            boolean b = state != 0;
-            if (event.getNumber() == 500 && b) {
+            if (whyAmIBlocked == 500 && state != 0) {
                 if (!isVerifySMSShowed) {
                     Intent intent = new Intent(this,SMSVerificationActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     intent.putExtra(NAME_USER_LOCKED,true);
                     startActivity(intent);
                 }
-            } else {
-                //go back to login page.
             }
         }
 	}

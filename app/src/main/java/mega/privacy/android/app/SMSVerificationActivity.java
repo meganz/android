@@ -82,35 +82,36 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         helperText = findViewById(R.id.verify_account_helper);
         if (isUserLocked) {
             String text = getResources().getString(R.string.verify_account_helper_locked);
-            //learn more
-            int start = text.length();
-            text += getResources().getString(R.string.verify_account_helper_learn_more);
-            int end = text.length();
-            SpannableString spanString = new SpannableString(text);
-            ClickableSpan clickableSpan = new ClickableSpan() {
-                @Override
-                public void onClick(View textView) {
-                    //todo open external link
-                    log("Learn more clicked");
-                    String url = "https://mega.nz/terms";
-                    Intent openTermsIntent = new Intent(SMSVerificationActivity.this, WebViewActivityLollipop.class);
-                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(url));
-                    startActivity(openTermsIntent);
-                }
-        
-                @Override
-                public void updateDrawState(TextPaint ds) {
-                    super.updateDrawState(ds);
-                    ds.setUnderlineText(false);
-                    ds.setColor(getResources().getColor(R.color.accentColor));
-                    ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-                }
-            };
-            spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            helperText.setText(spanString);
-            helperText.setMovementMethod(LinkMovementMethod.getInstance());
-            helperText.setHighlightColor(Color.TRANSPARENT);
+            helperText.setText(text);
+            //TODO due to the 'learn more' url is unavailable, comment out the below for now.
+//            int start = text.length();
+//            text += getResources().getString(R.string.verify_account_helper_learn_more);
+//            int end = text.length();
+//            SpannableString spanString = new SpannableString(text);
+//            ClickableSpan clickableSpan = new ClickableSpan() {
+//                @Override
+//                public void onClick(View textView) {
+//                    //todo open external link
+//                    log("Learn more clicked");
+//                    String url = "https://mega.nz/terms";
+//                    Intent openTermsIntent = new Intent(SMSVerificationActivity.this, WebViewActivityLollipop.class);
+//                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                    openTermsIntent.setData(Uri.parse(url));
+//                    startActivity(openTermsIntent);
+//                }
+//
+//                @Override
+//                public void updateDrawState(TextPaint ds) {
+//                    super.updateDrawState(ds);
+//                    ds.setUnderlineText(false);
+//                    ds.setColor(getResources().getColor(R.color.accentColor));
+//                    ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+//                }
+//            };
+//            spanString.setSpan(clickableSpan,start,end,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//            helperText.setText(spanString);
+//            helperText.setMovementMethod(LinkMovementMethod.getInstance());
+//            helperText.setHighlightColor(Color.TRANSPARENT);
         } else {
             boolean isAchievementUser = megaApi.isAchievementsEnabled();
             log("is achievement user: " + isAchievementUser);
@@ -227,7 +228,9 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 if (this.countryCodeList != null) {
                     launchCountryPicker();
                 } else {
+                    //TODO give the chance to re-load
                     log("Country code is not loaded");
+                    megaApi.getCountryCallingCodes(this);
                 }
                 break;
             }

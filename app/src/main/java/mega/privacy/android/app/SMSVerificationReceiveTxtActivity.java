@@ -685,12 +685,15 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                     public void run() {
                         //haven't logged in, need to auto-login
                         if(api.getRootNode() == null) {
-                            //auto login
-                            Intent intent = new Intent(LoginActivityLollipop.AUTO_LOGIN);
-                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                            Intent intent = new Intent(SMSVerificationReceiveTxtActivity.this, LoginActivityLollipop.class);
+                            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            setResult(RESULT_OK);
+                            finish();
                         }
-                        setResult(RESULT_OK);
-                        finish();
                     }
                 }, 2000);
             } else {

@@ -2185,9 +2185,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         verify2faProgressBar.setVisibility(View.GONE);
                     }
                     verifyShowError();
-                }else if(error.getErrorCode() == MegaError.API_EBLOCKED){
-                    //do nothing here, MegaApplication will hanlde blocked.
-                    errorMessage = getString(R.string.error_account_suspended);
                 }
                 else{
                     if (error.getErrorCode() == MegaError.API_ENOENT) {
@@ -2202,9 +2199,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                         errorMessage = getString(R.string.account_not_validated_login);
                     }
-                    else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                        errorMessage = getString(R.string.error_account_suspended);
-                    }
                     else{
                         errorMessage = error.getErrorString();
                     }
@@ -2216,7 +2210,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         }
                     }
 
-                    if(!errorMessage.isEmpty()){
+                    if(!errorMessage.isEmpty() && error.getErrorCode() != MegaError.API_EBLOCKED){
                         ((LoginActivityLollipop)context).showSnackbar(errorMessage);
                     }
 
@@ -2337,8 +2331,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
                     errorMessage = getString(R.string.account_not_validated_login);
-                } else if (error.getErrorCode() == MegaError.API_EBLOCKED) {
-                    errorMessage = getString(R.string.error_account_suspended);
                 }
                 else{
                     errorMessage = error.getErrorString();
@@ -2366,7 +2358,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
                 else{
-                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    if(error.getErrorCode() != MegaError.API_EBLOCKED) {
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
                 }
 
                 if(chatSettings==null) {
