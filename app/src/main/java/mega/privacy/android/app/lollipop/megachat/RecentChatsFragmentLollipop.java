@@ -51,7 +51,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.InviteContactActivityLollipop;
+import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -823,8 +823,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 break;
             case R.id.more_contacts_title:
             case R.id.more_contacts:
-                log("to InviteContactActivityLollipop");
-                context.startActivity(new Intent(context, InviteContactActivityLollipop.class));
+                log("to InviteContactActivity");
+                context.startActivity(new Intent(context, InviteContactActivity.class));
                 break;
         }
     }
