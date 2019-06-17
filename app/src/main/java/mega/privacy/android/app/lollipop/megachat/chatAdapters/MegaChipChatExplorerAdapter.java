@@ -38,6 +38,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
+
 public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipChatExplorerAdapter.ViewHolderChips> implements View.OnClickListener{
 
     ArrayList<ChatExplorerListItem> items;
@@ -231,21 +234,13 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             String userHandle = MegaApiAndroid.userHandleToBase64(handle);
 
             if(holder.email == null){
-                if (context.getExternalCacheDir() != null) {
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandle + ".jpg");
-                }else {
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), userHandle + ".jpg");
-                }
+                avatar = buildAvatarFile(context,userHandle + ".jpg");
             }else{
-                if (context.getExternalCacheDir() != null){
-                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.email + ".jpg");
-                }else{
-                    avatar = new File(context.getCacheDir().getAbsolutePath(), holder.email + ".jpg");
-                }
+                avatar = buildAvatarFile(context,holder.email + ".jpg");
             }
 
             Bitmap bitmap = null;
-            if (avatar.exists()){
+            if (isFileAvailable(avatar)){
                 if (avatar.length() > 0){
                     BitmapFactory.Options bOpts = new BitmapFactory.Options();
                     bOpts.inPurgeable = true;
@@ -259,12 +254,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                             return;
                         }
 
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(holder.email, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(holder.email, context.getCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-                        }
+                        megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
                     }else{
                         holder.avatar.setImageBitmap(Util.getCircleBitmap(bitmap));
                     }
@@ -275,11 +265,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                         return;
                     }
 
-                    if (context.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(holder.email, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-                    }else{
-                        megaApi.getUserAvatar(holder.email, context.getCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-                    }
+                    megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
                 }
             }else{
 
@@ -288,12 +274,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                     return;
                 }
 
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(holder.email, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-                }
-                else{
-                    megaApi.getUserAvatar(holder.email, context.getCacheDir().getAbsolutePath() + "/" + holder.email + ".jpg", listener);
-                }
+                megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
             }
         }
     }
