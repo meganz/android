@@ -41,6 +41,7 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -58,6 +59,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -97,7 +99,7 @@ import static mega.privacy.android.app.utils.Util.toCDATA;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.6.0_227";
+	static final public String USER_AGENT = "MEGAAndroid/3.6.2_239";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -232,8 +234,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					AccountController.localLogoutApp(getApplicationContext());
 				}
 			}
-			else if(request.getType() == MegaRequest.TYPE_LOGIN){
-				log("BackgroundRequestListener:onRequestFinish:TYPE_LOGIN");
+			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
+				log("BackgroundRequestListener:onRequestFinish:TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
 				}
@@ -328,19 +330,22 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 					if(myAccountInfo!=null && request.getMegaAccountDetails()!=null){
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
-						myAccountInfo.setAccountDetails();
+						myAccountInfo.setAccountDetails(request.getNumDetails());
 
-						MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
+						boolean sessions = (request.getNumDetails() & myAccountInfo.hasSessionsDetails) != 0;
+						if (sessions) {
+							MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
 
-						if(megaAccountSession!=null){
-							log("getMegaAccountSESSION not Null");
-							dbH.setExtendedAccountDetailsTimestamp();
-							long mostRecentSession = megaAccountSession.getMostRecentUsage();
+							if(megaAccountSession!=null){
+								log("getMegaAccountSESSION not Null");
+								dbH.setExtendedAccountDetailsTimestamp();
+								long mostRecentSession = megaAccountSession.getMostRecentUsage();
 
-							String date = TimeUtils.formatDateAndTime(getApplicationContext(),mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
+								String date = TimeUtils.formatDateAndTime(getApplicationContext(),mostRecentSession, TimeUtils.DATE_LONG_FORMAT);
 
-							myAccountInfo.setLastSessionFormattedDate(date);
-							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
+								myAccountInfo.setLastSessionFormattedDate(date);
+								myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
+							}
 						}
 
 						log("onRequest TYPE_ACCOUNT_DETAILS: "+myAccountInfo.getUsedPerc());
@@ -574,7 +579,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					});
 		}
 		EmojiCompat.init(config);
-
+		// clear the cache files stored in the external cache folder.
+        CacheFolderManager.clearPublicCache(this);
 
 //		initializeGA();
 		
@@ -600,7 +606,10 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	}
 
 	public void askForAccountDetails(){
-
+		log("askForAccountDetails");
+		if (dbH != null) {
+			dbH.resetAccountDetailsTimeStamp();
+		}
 		megaApi.getAccountDetails(null);
 	}
 

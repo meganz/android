@@ -682,8 +682,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
     @Override
     public void onBackPressed() {
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         if (confirm2FAIsShown) {
             confirm2FAIsShown = false;
@@ -700,7 +699,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 update2FASetting();
             }
             else {
-                super.callToSuperBack = true;
                 super.onBackPressed();
             }
         }

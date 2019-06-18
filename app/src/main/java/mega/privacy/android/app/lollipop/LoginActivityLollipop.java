@@ -103,6 +103,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     String firstNameTemp = null;
     String lastNameTemp = null;
 
+    static boolean isBackFromLoginPage;
+    static boolean isFetchingNodes;
+
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -201,7 +204,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
-
+        isBackFromLoginPage = false;
         showFragment(visibleFragment);
     }
 
@@ -218,7 +221,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 switch (visibleFragment) {
                     case Constants.LOGIN_FRAGMENT: {
                         if (loginFragment != null && loginFragment.isAdded()) {
-                            loginFragment.returnToLogin();
+//                            loginFragment.returnToLogin();
+                            onBackPressed();
                         }
                         break;
                     }
@@ -552,8 +556,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
     @Override
     public void onBackPressed() {
         log("onBackPressed");
-        super.callToSuperBack = false;
-        super.onBackPressed();
+        retryConnectionsAndSignalPresence();
 
         int valueReturn = -1;
 
@@ -585,7 +588,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
         }
 
         if (valueReturn == 0) {
-            super.callToSuperBack = true;
             super.onBackPressed();
         }
     }
@@ -904,7 +906,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 log("state: " + state);
                 if (state != 0) {
                     if (!MegaApplication.isVerifySMSShowed()) {
-                        Intent intent = new Intent(this, SMSVerificationActivity.class);
+                        Intent intent = new Intent(getApplication(), SMSVerificationActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         intent.putExtra(NAME_USER_LOCKED,true);
                         startActivity(intent);

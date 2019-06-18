@@ -61,7 +61,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/mega_evt_tls.cpp \
     sdk/src/mega_ccronexpr.cpp \
     sdk/src/raid.cpp
-    
+
 C_SOURCES = sdk/src/mega_glob.c
 
 HEADERS= sdk/include/mega.h \
@@ -114,7 +114,8 @@ HEADERS= sdk/include/mega.h \
 	sdk/include/mega/mega_zxcvbn.h \
         sdk/include/mega/mediafileattribute.h \
 	sdk/include/mega/mega_evt_tls.h \
-	sdk/include/mega/mega_evt_queue.h
+	sdk/include/mega/mega_evt_queue.h \
+	sdk/include/mega/raid.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp

@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -655,7 +656,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     public void onRequestStart(MegaApiJava api,MegaRequest request) {
-
+        confirmButton.setClickable(false);
     }
 
     @Override
@@ -665,6 +666,7 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
 
     @Override
     public void onRequestFinish(final MegaApiJava api,MegaRequest request,MegaError e) {
+        confirmButton.setClickable(true);
         if (request.getType() == MegaRequest.TYPE_CHECK_SMS_VERIFICATIONCODE) {
             log("send verification code,get " +  e.getErrorCode());
             if (e.getErrorCode() == MegaError.API_EEXPIRED) {
@@ -689,11 +691,9 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                             intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
-                            finish();
-                        } else {
-                            setResult(RESULT_OK);
-                            finish();
                         }
+                        setResult(RESULT_OK);
+                        finish();
                     }
                 }, 2000);
             } else {

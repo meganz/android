@@ -33,6 +33,7 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     boolean receivedEmail = false;
     MegaApiAndroid megaApi;
     boolean isPreview = false;
+    int pos;
 
     public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle, boolean isPreview) {
         this.context = context;
@@ -41,6 +42,22 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         this.isUserHandle = true;
         this.userHandle = userHandle;
         this.isPreview = isPreview;
+
+        dbH = DatabaseHandler.getDbHandler(context);
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+    }
+
+    public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle, boolean isPreview, int pos) {
+        this.context = context;
+        this.holder = holder;
+        this.adapter = adapter;
+        this.isUserHandle = true;
+        this.userHandle = userHandle;
+        this.isPreview = isPreview;
+        this.pos = pos;
 
         dbH = DatabaseHandler.getDbHandler(context);
 
@@ -77,6 +94,22 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
         log("onRequestFinish()");
 
         if (e.getErrorCode() == MegaError.API_OK){
+            if (adapter == null) {
+                return;
+            }
+
+            if(adapter instanceof MegaChatLollipopAdapter && holder == null){
+                log("holder is NULL 1");
+                holder = ((MegaChatLollipopAdapter)adapter).queryIfHolderNull(pos);
+                if (holder == null) {
+                    log("holder is NULL 2");
+                    return;
+                }
+            }
+            else {
+                log("otro adapter holder is NULL");
+            }
+
             if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
                 log("->First name received");
                 firstName = request.getText();
