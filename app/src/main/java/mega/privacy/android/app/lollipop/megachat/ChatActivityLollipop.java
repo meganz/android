@@ -1070,9 +1070,56 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private void initializeInputText(){
+        hideKeyboard();
+        setChatSubtitle();
+
+        ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+        if(prefs!=null){
+            String written = prefs.getWrittenText();
+            if(written!=null && !written.isEmpty()){
+                textChat.setText(written);
+                sendIcon.setVisibility(View.VISIBLE);
+                sendIcon.setEnabled(true);
+                sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
+                textChat.setHint(" ");
+                textChat.setMinLines(1);
+                textChat.setMaxLines(5);
+
+                currentRecordButtonState = 0;
+                recordLayout.setVisibility(View.GONE);
+                recordButtonLayout.setVisibility(View.GONE);
+                return;
+            }
+        }else{
+            prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "");
+            dbH.setChatItemPreferences(prefs);
+        }
+        refreshTextInput();
+    }
+
+    private void refreshTextInput(){
+        recordButtonStates(RECORD_BUTTON_DESACTIVATED);
+        sendIcon.setVisibility(View.GONE);
+        sendIcon.setEnabled(false);
+        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
+        if (chatRoom != null) {
+            megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+
+            if (chatRoom.hasCustomTitle()) {
+                textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
+            } else {
+                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+            }
+        }
+
+        textChat.setMinLines(1);
+        textChat.setMaxLines(1);
+    }
+
     public void showChat(String textSnackbar){
         if(idChat!=-1) {
-            //REcover chat
+            //Recover chat
             log("Recover chat with id: " + idChat);
             chatRoom = megaChatApi.getChatRoom(idChat);
             if(chatRoom==null){
@@ -1080,27 +1127,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 finish();
             }
 
-            ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-            if(prefs!=null){
-                String written = prefs.getWrittenText();
-                if(written!=null && (!written.isEmpty())){
-                    textChat.setText(written);
-                    sendIcon.setEnabled(true);
-                    sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
-                    textChat.setHint(" ");
-                    textChat.setMinLines(1);
-                    textChat.setMaxLines(5);
-                    sendIcon.setVisibility(View.VISIBLE);
-                    currentRecordButtonState = 0;
-                    recordLayout.setVisibility(View.GONE);
-                    recordButtonLayout.setVisibility(View.GONE);
-                }else{
-                    refreshTextInput();
-                }
-            }else{
-                prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "");
-                dbH.setChatItemPreferences(prefs);
-            }
+            initializeInputText();
 
             megaChatApi.closeChatRoom(idChat, this);
             boolean result = megaChatApi.openChatRoom(idChat, this);
@@ -7479,38 +7506,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    private void initializeTextChat(){
-        hideKeyboard();
-        setChatSubtitle();
-
-        ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-        if(prefs!=null){
-            String written = prefs.getWrittenText();
-            if(written!=null && (!written.isEmpty())){
-                textChat.setText(written);
-                sendIcon.setVisibility(View.VISIBLE);
-                currentRecordButtonState = 0;
-
-                recordLayout.setVisibility(View.GONE);
-                recordButtonLayout.setVisibility(View.GONE);
-                textChat.setHint(" ");
-                textChat.setMinLines(1);
-                textChat.setMaxLines(5);
-                return;
-            }
-        }else{
-            prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "");
-            dbH.setChatItemPreferences(prefs);
-        }
-        recordButtonStates(RECORD_BUTTON_DESACTIVATED);
-        if(chatRoom.hasCustomTitle()){
-            textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-        }else{
-            textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
-        }
-        textChat.setMinLines(1);
-        textChat.setMaxLines(1);
-    }
 
    @Override
     protected void onResume(){
@@ -8356,24 +8351,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
     }
 
-    private void refreshTextInput(){
-        recordButtonStates(RECORD_BUTTON_DESACTIVATED);
-        sendIcon.setVisibility(View.GONE);
-        sendIcon.setEnabled(false);
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
-        if (chatRoom != null) {
-            megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
-            if (chatRoom.hasCustomTitle()) {
-                textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-            } else {
-                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
-            }
-        }
-
-        textChat.setMinLines(1);
-        textChat.setMaxLines(1);
-    }
 
     public void setShareLinkDialogDismissed (boolean dismissed) {
         isShareLinkDialogDismissed = dismissed;
