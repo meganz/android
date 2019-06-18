@@ -685,6 +685,97 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 	}
 
+	private void showOverquotaNotification(){
+		String message = "";
+		if (isOverquota != 0){
+			message = getString(R.string.overquota_alert_title);
+		}
+
+		Intent intent;
+		intent = new Intent(ChatUploadService.this, ManagerActivityLollipop.class);
+
+		switch (isOverquota) {
+			case 1:
+				intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+				break;
+			case 2:
+				intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+				break;
+			default:break;
+		}
+		PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, 0);
+		Notification notification = null;
+		int currentapiVersion = Build.VERSION.SDK_INT;
+
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setShowBadge(true);
+			channel.setSound(null, null);
+			mNotificationManager.createNotificationChannel(channel);
+
+			NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message)
+					.setOnlyAlertOnce(true)
+					.setAutoCancel(true)
+					.setColor(ContextCompat.getColor(this,R.color.mega));
+
+			notification = mBuilderCompat.build();
+
+		}else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message)
+					.setAutoCancel(true)
+					.setOnlyAlertOnce(true);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
+			notification = mBuilder.build();
+
+		}else if (currentapiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
+			mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message)
+					.setAutoCancel(true)
+					.setContentText(getString(R.string.chat_upload_title_notification))
+					.setOnlyAlertOnce(true);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
+			notification = mBuilder.getNotification();
+
+		}else{
+			notification.flags |= Notification.FLAG_ONGOING_EVENT;
+			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+			notification.contentIntent = pendingIntent;
+			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
+			notification.contentView.setTextViewText(R.id.status_text, message);
+		}
+
+		if (!isForeground) {
+			log("starting foreground");
+			try {
+				startForeground(notificationId, notification);
+				isForeground = true;
+			}
+			catch (Exception e){
+				log("startforeground exception: " + e.getMessage());
+				isForeground = false;
+			}
+		} else {
+			mNotificationManager.notify(notificationId, notification);
+		}
+	}
+
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 		log("updatePpogressNotification");
@@ -976,7 +1067,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log(transfer.getPath() + "\nUpload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
-
 		if((transfer.getType()==MegaTransfer.TYPE_UPLOAD)) {
 			switch (e.getErrorCode())
 			{
@@ -992,9 +1082,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 					}else {
 						log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-						if(!transfer.getAppData().contains(Constants.EXTRA_VOICE_CLIP)) {
-							updateProgressNotification();
+						if(transfer.getAppData().contains(Constants.EXTRA_VOICE_CLIP)){
+							showOverquotaNotification();
+							break;
 						}
+
+						updateProgressNotification();
+
 					}
 
 					break;
@@ -1008,7 +1102,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 			log("onTransferFinish: " + transfer.getPath());
-
 			String appData = transfer.getAppData();
 
 			if(appData!=null && appData.contains(Constants.UPLOAD_APP_DATA_CHAT)){

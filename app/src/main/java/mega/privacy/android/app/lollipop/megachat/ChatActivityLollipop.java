@@ -761,6 +761,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onClick(View v) {
                 log("recordButton.setOnRecordClickListener:onClick");
+                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
+
                 sendRecording();
             }
         });
@@ -780,6 +782,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onLessThanSecond() {
                 log("recordView.setOnRecordListener:onLessThanSecond");
                 if(!isAllowedToRecord()) return;
+                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 showBubble();
             }
 
@@ -797,6 +800,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onFinish(long recordTime) {
                 log("recordView.setOnRecordListener:onFinish");
+                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 sendRecording();
             }
 
@@ -2049,12 +2053,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void sendRecording(){
         log("sendRecording");
         if((!recordView.isRecordingNow()) || (myAudioRecorder == null)) return;
+
         try{
             log("sendRecording: playSound - RECORD_FINISHED");
             myAudioRecorder.stop();
             recordView.playSound(Constants.TYPE_END_RECORD);
             setRecordingNow(false);
-            recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
         }catch(RuntimeException ex){
@@ -2162,7 +2166,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void showBubble(){
         log("showBubble");
-        recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
         recordView.playSound(Constants.TYPE_ERROR_RECORD);
         bubbleLayout.setAlpha(1);
         bubbleLayout.setVisibility(View.VISIBLE);
@@ -7832,7 +7835,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         Intent intent = new Intent(this, ChatUploadService.class);
         PendingMessageSingle pMsgSingle = new PendingMessageSingle();
         pMsgSingle.setChatId(idChat);
-
         if(ChatUtil.isVoiceClip(selfie.getAbsolutePath())) pMsgSingle.setType(Constants.TYPE_VOICE_CLIP);
 
         long timestamp = System.currentTimeMillis()/1000;

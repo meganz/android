@@ -75,6 +75,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MessageVoiceClip;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
@@ -96,6 +97,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.VOICE_CLIP_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildPreviewFile;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
@@ -1409,11 +1411,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).pinnedContactLocationInfoText.setVisibility(View.GONE);
 
             String path = message.getPendingMessage().getFilePath();
+            File voiceClipDir = CacheFolderManager.getCacheFolder(context, VOICE_CLIP_FOLDER);
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
             if (path != null) {
-                if( ChatUtil.isVoiceClip(path) && type==Constants.TYPE_VOICE_CLIP){
-                    log("onBindViewHolderUploading:TYPE_VOICE_CLIP");
+                if(ChatUtil.isVoiceClip(path) && (type==Constants.TYPE_VOICE_CLIP) || path.contains(voiceClipDir.getAbsolutePath())){
+                    log("onBindViewHolderUploading:TYPE_VOICE_CLIP - message.getPendingMessage().getState() "+message.getPendingMessage().getState());
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
@@ -1441,7 +1444,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING) {
                         ((ViewHolderMessageChat) holder).errorUploadingVoiceClip.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.VISIBLE);
-
                         ((ViewHolderMessageChat) holder).notAvailableOwnVoiceclip.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
                         ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
