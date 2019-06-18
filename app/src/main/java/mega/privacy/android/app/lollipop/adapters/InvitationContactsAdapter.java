@@ -35,10 +35,13 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT;
 import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 
 public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationContactsAdapter.ViewHolderPhoneContactsLollipop> implements MegaRequestListenerInterface {
 
-    private final String IMAGE_EXTENSION = ".jpg";
+    private final static String IMAGE_EXTENSION = ".jpg";
+    private final static int HEADER_HOLDER_ID = -1;
     private Context context;
     private List<InvitationContactInfo> contactData;
     private LayoutInflater inflater;
@@ -179,7 +182,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         View rowView = inflater.inflate(R.layout.contact_list_section_header, parentView, false);
         ViewHolderPhoneContactsLollipop holder = new ViewHolderPhoneContactsLollipop(rowView);
         holder.headerTextView = rowView.findViewById(R.id.section_header);
-        holder.contactId = -1;
+        holder.contactId = HEADER_HOLDER_ID;
         return holder;
     }
 
@@ -271,35 +274,24 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
         log("getMegaUserAvatar");
         String email = contact.getDisplayInfo();
-        boolean isExternalCacheDirAvailable = context.getExternalCacheDir() != null;
-        String path;
-        if (isExternalCacheDirAvailable) {
-            path = context.getExternalCacheDir().getAbsolutePath() + File.separator + email + IMAGE_EXTENSION;
-        } else {
-            path = context.getCacheDir().getAbsolutePath() + File.separator + email + IMAGE_EXTENSION;
-        }
-
-        File avatar = new File(path);
-        if (avatar.exists()) {
+        File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
+        String path = avatar.getAbsolutePath();
+        if (isFileAvailable(avatar)) {
+            log("avatar exists in: " + avatar.getAbsolutePath());
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
             Bitmap bitmap;
             bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
             if (bitmap == null) {
                 avatar.delete();
-                getMegaUserAvatar(email, path);
+                megaApi.getUserAvatar(email, path, this);
             } else {
                 return bitmap;
             }
         } else {
-            getMegaUserAvatar(email, path);
+            megaApi.getUserAvatar(email, path, this);
         }
         return null;
-    }
-
-    private void getMegaUserAvatar(String email, String path) {
-        log("getting MegaUserAvatar for" + email + " will be saved to " + path);
-        megaApi.getUserAvatar(email, path, this);
     }
 
     private static void log(String message) {

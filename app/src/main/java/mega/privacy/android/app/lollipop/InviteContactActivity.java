@@ -82,6 +82,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
     private static final int PHONE_NUMBER_MIN_LENGTH = 5;
+    private static final int USER_INDEX_NONE_EXIST = -1;
+    private static final int MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20;
 
     private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
@@ -368,7 +370,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private void visibilityFastScroller() {
         log("visibilityFastScroller");
         fastScroller.setRecyclerView(recyclerViewList);
-        if (totalContacts.size() < 20) {
+        if (totalContacts.size() < MIN_LIST_SIZE_FOR_FAST_SCROLLER) {
             fastScroller.setVisibility(View.GONE);
         } else {
             fastScroller.setVisibility(View.VISIBLE);
@@ -457,28 +459,26 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         log("onTextChanged: s is " + s.toString() + "start: " + start + " before: " + before + " count: " + count);
-        if (s != null) {
-            if (s.length() > 0) {
-                String temp = s.toString();
-                char last = s.charAt(s.length() - 1);
-                if (last == ' ') {
-                    String processedString = temp.trim();
-                    boolean isEmailValid = isValidEmail(processedString);
-                    boolean isPhoneValid = isValidPhone(processedString);
-                    if (isEmailValid) {
-                        addContactInfo(processedString, TYPE_MANUAL_INPUT_EMAIL);
-                    } else if (isPhoneValid) {
-                        addContactInfo(processedString, TYPE_MANUAL_INPUT_PHONE);
-                    }
-                    if (isEmailValid || isPhoneValid) {
-                        typeContactEditText.getText().clear();
-                    }
-                    if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Util.hideKeyboard(this, 0);
-                    }
-                } else {
-                    log("Last character is: " + last);
+        if (!TextUtils.isEmpty(s)) {
+            String temp = s.toString();
+            char last = s.charAt(s.length() - 1);
+            if (last == ' ') {
+                String processedString = temp.trim();
+                boolean isEmailValid = isValidEmail(processedString);
+                boolean isPhoneValid = isValidPhone(processedString);
+                if (isEmailValid) {
+                    addContactInfo(processedString, TYPE_MANUAL_INPUT_EMAIL);
+                } else if (isPhoneValid) {
+                    addContactInfo(processedString, TYPE_MANUAL_INPUT_PHONE);
                 }
+                if (isEmailValid || isPhoneValid) {
+                    typeContactEditText.getText().clear();
+                }
+                if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Util.hideKeyboard(this, 0);
+                }
+            } else {
+                log("Last character is: " + last);
             }
         }
 
@@ -922,7 +922,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
                 return i;
             }
         }
-        return -1;
+        return USER_INDEX_NONE_EXIST;
     }
 
     private void enableFabButton(Boolean enableFabButton) {

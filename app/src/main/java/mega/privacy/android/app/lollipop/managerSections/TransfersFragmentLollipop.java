@@ -101,7 +101,7 @@ public class TransfersFragmentLollipop extends Fragment {
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setHasFixedSize(true);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(null);
 		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -263,12 +263,12 @@ public class TransfersFragmentLollipop extends Fragment {
                 break;
             }
         }
-		
+
 		if(position == -1){
 		    return;
         }
-        
-		if(!tL.isEmpty()){
+
+		if(!tL.isEmpty() && position < tL.size()){
 			tL.remove(position);
 		}
 

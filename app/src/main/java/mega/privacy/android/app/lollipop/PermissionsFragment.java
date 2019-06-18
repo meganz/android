@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import mega.privacy.android.app.PermissionsImageAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -28,37 +27,32 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
     public static final int PERMISSIONS_FRAGMENT = 666;
 
-    final int READ_WRITE = 0;
-    final int CAMERA = 1;
-    final int CALLS = 2;
-    final int CONTACTS = 3;
+    private static final int READ_WRITE = 0;
+    private static final int CAMERA = 1;
+    private static final int CALLS = 2;
+    private static final int CONTACTS = 3;
+    private static final int PERMISSION_FLOW_PAGE_SIZE = 4;
 
-    Context context;
+    private Context context;
 
-    LinearLayout setupLayout;
-    Button notNowButton;
-    Button setupButton;
-    LinearLayout allowAccessLayout;
-    PermissionsImageAdapter adapter;
-    ImageView imgDisplay;
-    TextView itemsText;
-    TextView titleDisplay;
-    TextView subtitleDisplay;
-    LinearLayout itemsLayout;
-    Button notNow2Button;
-    Button enableButton;
+    private LinearLayout setupLayout;
+    private LinearLayout allowAccessLayout;
+    private ImageView imgDisplay;
+    private TextView itemsText;
+    private TextView titleDisplay;
+    private TextView subtitleDisplay;
+    private LinearLayout itemsLayout;
 
-    boolean isAllowingAccessShown = false;
-    int permissionsPosition = 0;
-    int numItems = 0;
-    int[] items = new int[4];
-    int currentPermission = 0;
-    boolean writeGranted = false;
-    boolean readGranted = false;
-    boolean cameraGranted = false;
-    boolean microphoneGranted = false;
-    boolean contactsGranted = false;
-//    boolean writeCallsGranted = false;
+    private boolean isAllowingAccessShown;
+    private int permissionsPosition = 0;
+    private int numItems = 0;
+    private int[] items = new int[PERMISSION_FLOW_PAGE_SIZE];
+    private int currentPermission = 0;
+    private boolean writeGranted;
+    private boolean readGranted;
+    private boolean cameraGranted;
+    private boolean microphoneGranted;
+    private boolean contactsGranted;
 
     int[] mImages;
     String[] mTitles;
@@ -82,55 +76,51 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
         View v = inflater.inflate(R.layout.fragment_permissions, container, false);
-
         ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
 
-        setupLayout = (LinearLayout) v.findViewById(R.id.setup_fragment_container);
-        notNowButton = (Button) v.findViewById(R.id.not_now_button);
+        setupLayout = v.findViewById(R.id.setup_fragment_container);
+        Button notNowButton, setupButton, notNow2Button, enableButton;
+        notNowButton = v.findViewById(R.id.not_now_button);
         notNowButton.setOnClickListener(this);
-        setupButton = (Button) v.findViewById(R.id.setup_button);
+        setupButton = v.findViewById(R.id.setup_button);
         setupButton.setOnClickListener(this);
-        allowAccessLayout = (LinearLayout) v.findViewById(R.id.allow_access_fragment_container);
-        itemsText = (TextView) v.findViewById(R.id.items_text);
-        imgDisplay = (ImageView) v.findViewById(R.id.image_permissions);
-        titleDisplay = (TextView) v.findViewById(R.id.title_permissions);
-        subtitleDisplay = (TextView) v.findViewById(R.id.subtitle_permissions);
+        allowAccessLayout = v.findViewById(R.id.allow_access_fragment_container);
+        itemsText = v.findViewById(R.id.items_text);
+        imgDisplay = v.findViewById(R.id.image_permissions);
+        titleDisplay = v.findViewById(R.id.title_permissions);
+        subtitleDisplay = v.findViewById(R.id.subtitle_permissions);
+        itemsLayout = v.findViewById(R.id.items_layout);
 
-        itemsLayout = (LinearLayout) v.findViewById(R.id.items_layout);
-
-        mImages = new int[] {
+        mImages = new int[]{
                 R.drawable.photos,
                 R.drawable.enable_camera,
                 R.drawable.calls,
                 R.drawable.contacts
         };
 
-        mTitles = new String[] {
+        mTitles = new String[]{
                 context.getString(R.string.allow_acces_media_title),
                 context.getString(R.string.allow_acces_camera_title),
                 context.getString(R.string.allow_acces_calls_title),
                 context.getString(R.string.allow_acces_contact_title)
         };
 
-        mSubtitles =  new String[] {
+        mSubtitles = new String[]{
                 context.getString(R.string.allow_acces_media_subtitle),
                 context.getString(R.string.allow_acces_camera_subtitle),
                 context.getString(R.string.allow_acces_calls_subtitle_microphone),
                 context.getString(R.string.allow_acces_contact_subtitle)
         };
 
-
-        notNow2Button = (Button) v.findViewById(R.id.not_now_button_2);
+        notNow2Button = v.findViewById(R.id.not_now_button_2);
         notNow2Button.setOnClickListener(this);
-        enableButton = (Button) v.findViewById(R.id.enable_button);
+        enableButton = v.findViewById(R.id.enable_button);
         enableButton.setOnClickListener(this);
-
-
 
         return v;
     }
@@ -147,7 +137,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             cameraGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.CAMERA);
             microphoneGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO);
             contactsGranted = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this.getActivity());
-//          writeCallsGranted = ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG);
 
             if (!readGranted || !writeGranted) {
                 items[numItems] = READ_WRITE;
@@ -177,7 +166,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             currentPermission = savedInstanceState.getInt("currentPermission", 0);
             items = savedInstanceState.getIntArray("items");
             microphoneGranted = savedInstanceState.getBoolean("microphoneGranted", false);
-//          writeCallsGranted = savedInstanceState.getBoolean("writeCallsGranted", false);
 
             setContent(currentPermission);
 
@@ -301,25 +289,12 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     void askForCallsPermissions() {
-//        if (!microphoneGranted && !writeCallsGranted)  {
-//            log("RECORD_AUDIO and WRITE_CALL_LOG");
-//            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-//                    new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_CALL_LOG},
-//                    PERMISSIONS_FRAGMENT);
-//        }
-//        else if (!microphoneGranted) {
         if (!microphoneGranted) {
             log("RECORD_AUDIO");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_FRAGMENT);
         }
-//        else if (!writeCallsGranted) {
-//            log("WRITE_CALL_LOG");
-//            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-//                    new String[]{Manifest.permission.WRITE_CALL_LOG},
-//                    PERMISSIONS_FRAGMENT);
-//        }
     }
 
     void askForContactsPermissions() {
@@ -340,7 +315,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     }
 
     public boolean askingForMicrophoneAndWriteCallsLog () {
-        if (!microphoneGranted/* && !writeCallsGranted*/) {
+        if (!microphoneGranted) {
             return true;
         }
         else {
@@ -361,7 +336,6 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         outState.putInt("currentPermission", currentPermission);
         outState.putIntArray("items", items);
         outState.putBoolean("microphoneGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO));
-//        outState.putBoolean("writeCallsGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.WRITE_CALL_LOG));
     }
 
     @Override
