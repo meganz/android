@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
@@ -50,10 +51,11 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
-public class RecentsFragment extends Fragment implements View.OnClickListener, StickyHeaderHandler {
+public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     private RecentsFragment recentsFragment;
     private Context context;
@@ -74,6 +76,8 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
     private LinearLayout listLayout;
     private RecyclerView listView;
     private FastScroller fastScroller;
+    private RecyclerView multipleBucketView;
+    private LinearLayoutManager linearLayoutManager;
 
     public static RecentsFragment newInstance() {
         log("newInstance");
@@ -194,6 +198,9 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
                 fastScroller.setVisibility(View.VISIBLE);
             }
         }
+
+        multipleBucketView = (RecyclerView) v.findViewById(R.id.multiple_bucket_view);
+        multipleBucketView.setVisibility(View.GONE);
 
         return v;
     }
@@ -327,13 +334,16 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
         nC.prepareForDownload(handleList, true);
     }
 
-    public void itemClick() {
+    public void openMultipleBucket (MegaRecentActionBucket bucket) {
+        MegaNodeList nodeList = bucket.getNodes();
+        if (nodeList == null) return;
 
-    }
+        if (bucket.isMedia()) {
 
-    @Override
-    public void onClick(View v) {
+        }
+        else {
 
+        }
     }
 
     @Override

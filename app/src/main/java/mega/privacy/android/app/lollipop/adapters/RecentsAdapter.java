@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
@@ -115,6 +116,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         holder.actionIcon = (ImageView) v.findViewById(R.id.action_image);
         holder.time = (TextView) v.findViewById(R.id.time_text);
         holder.mediaLayout = (LinearLayout) v.findViewById(R.id.media_bucket_layout);
+        holder.mediaRecycler = (RecyclerView) v.findViewById(R.id.media_recyler);
 
         v.setTag(holder);
         return holder;
@@ -226,6 +228,12 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     holder.mediaLayout.setVisibility(View.VISIBLE);
                     holder.title.setText(getMediaTitle(nodeList));
                     holder.imageThumbnail.setImageResource(R.drawable.media);
+
+                    MediaRecentsAdapter adapter = new MediaRecentsAdapter(context, this, bucket.getNodes());
+
+                    holder.mediaRecycler.setHasFixedSize(true);
+                    holder.mediaRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+                    holder.mediaRecycler.setAdapter(adapter);
                 }
                 else {
                     holder.title.setText(context.getString(R.string.title_bucket, node.getName(), (nodeList.size()-1)));
@@ -331,7 +339,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     ((RecentsFragment) fragment).openFile(node);
                     break;
                 }
-
+                if (item.getBucket() == null) break;
+                ((RecentsFragment) fragment).openMultipleBucket(item.getBucket());
                 break;
             }
         }

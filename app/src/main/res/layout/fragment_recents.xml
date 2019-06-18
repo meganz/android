@@ -53,6 +53,13 @@
 
             </FrameLayout>
 
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/multiple_bucket_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice"
+                android:orientation="vertical"/>
+
             <mega.privacy.android.app.components.scrollBar.FastScroller
                 android:id="@+id/fastscroll"
                 android:orientation="vertical"

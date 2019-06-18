@@ -110,7 +110,16 @@
             android:id="@+id/media_bucket_layout"
             android:layout_width="match_parent"
             android:layout_height="88dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_below="@+id/bucket_layout">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/media_recyler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:choiceMode="multipleChoice"
+                android:orientation="horizontal"
+                android:paddingLeft="70dp"/>
 
         </LinearLayout>
         
