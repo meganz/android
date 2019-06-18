@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -46,6 +47,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -590,6 +592,11 @@ public class AccountController implements View.OnClickListener{
 
         dbH.clearChatSettings();
         dbH.setEnabledChat(true + "");
+
+        //clear mega contacts and reset last sync time.
+        dbH.clearMegaContacts();
+        SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
+        preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi) {

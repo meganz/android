@@ -41,12 +41,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     public static final int DAY = 24 * 60 * 60 * 1000;
     public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
 
-    //TEST SETTINGS
-//    public static final int WEEK = 5 * 60 * 1000;
-//    public static final int DAY = 2 * 60 * 1000;
-
-    private static final String LAST_SYNC_TIMESTAMP_FILE = "lastsynctimestamp";
-    private static final String LAST_SYNC_TIMESTAMP_KEY = "lastsyncmegacontactstimestamp";
+    public static final String LAST_SYNC_TIMESTAMP_FILE = "lastsynctimestamp";
+    public static final String LAST_SYNC_TIMESTAMP_KEY = "lastsyncmegacontactstimestamp";
 
     public MegaContactGetter(Context context) {
         this.context = context;
@@ -170,6 +166,7 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_GET_REGISTERED_CONTACTS) {
             if (e.getErrorCode() == MegaError.API_OK) {
+                megaContacts.clear();
                 MegaStringMap map = request.getMegaStringMap();
                 MegaStringTable table = request.getMegaStringTable();
 

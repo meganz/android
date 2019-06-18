@@ -170,6 +170,23 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         contactGetter.setMegaContactUpdater(this);
     }
 
+    private class FourColumnLayoutManager extends GridLayoutManager {
+
+        public FourColumnLayoutManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
+            super(context, spanCount, orientation, reverseLayout);
+        }
+
+        @Override
+        public boolean canScrollHorizontally() {
+            return false;
+        }
+
+        @Override
+        public boolean canScrollVertically() {
+            return false;
+        }
+    }
+
     @Override
     public void onFinish(List<MegaContactGetter.MegaContact> megaContacts) {
         if(!isAdded()) {
@@ -185,7 +202,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             moreContactsTitle.setVisibility(View.GONE);
 
             adapter = new ContactsHorizontalAdapter((Activity) context, this,megaContacts);
-            contactsList.setLayoutManager(new GridLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
+            contactsList.setLayoutManager(new FourColumnLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
             contactsList.setAdapter(adapter);
         } else {
             noContacts();
