@@ -235,7 +235,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private boolean isLessThanOneSecond(long time) {
-        return time <= 1500;
+        return time <= 2000;
     }
 
     private void recordListenerOptions(int option, long recordTime){
@@ -362,7 +362,7 @@ public class RecordView extends RelativeLayout {
         public void run() {
             if(flagRB){
                 startStopCounterTime(true);
-                handlerShowPadLock.postDelayed(runPadLock, 1000);
+                handlerShowPadLock.postDelayed(runPadLock, 1500);
                 recordListenerOptions(START_RECORD, 0);
             }
         }
