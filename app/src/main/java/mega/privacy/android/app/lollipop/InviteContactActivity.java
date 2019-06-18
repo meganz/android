@@ -69,7 +69,7 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE
 import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
 
 
-public class InviteContactActivityLollipop extends PinActivityLollipop implements InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
+public class InviteContactActivity extends PinActivityLollipop implements InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
     public static final int SCAN_QR_FOR_invite_contactS = 1111;
     public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
@@ -81,6 +81,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     private static final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
     private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
+    private static final int PHONE_NUMBER_MIN_LENGTH = 5;
     private static final int USER_INDEX_NONE_EXIST = -1;
 
     private DisplayMetrics outMetrics;
@@ -132,7 +133,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
         megaContacts = new ArrayList<>();
 
         megaContactGetter = new MegaContactGetter(context);
-        megaContactGetter.setMegaContactUpdater(InviteContactActivityLollipop.this);
+        megaContactGetter.setMegaContactUpdater(InviteContactActivity.this);
 
         Toolbar tB = findViewById(R.id.invite_contact_toolbar);
         tB.setVisibility(View.VISIBLE);
@@ -444,7 +445,7 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     }
 
     private boolean isValidPhone(CharSequence target) {
-        boolean result = target != null && Constants.PHONE_NUMBER.matcher(target).matches();
+        boolean result = target != null && target.length() > PHONE_NUMBER_MIN_LENGTH;
         log("isValidPhone" + result);
         return result;
     }
@@ -945,6 +946,6 @@ public class InviteContactActivityLollipop extends PinActivityLollipop implement
     }
 
     public static void log(String message) {
-        Util.log("InviteContactActivityLollipop", message);
+        Util.log("InviteContactActivity", message);
     }
 }

@@ -19,7 +19,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
@@ -624,7 +623,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         if(oldVersion <= 44) {
-            //TODO add prefference
             db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
         }
 	}
@@ -855,12 +853,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void clearMegaContacts() {
         log("delete table " + TABLE_MEGA_CONTACTS);
         db.execSQL("DELETE FROM " + TABLE_MEGA_CONTACTS);
-    }
-
-    public void deleteMegaContactByEmail(String email) {
-        log("delete mega contact: " + email);
-        String sql = "DELETE FROM " + TABLE_MEGA_CONTACTS + " WHERE " + KEY_MEGA_CONTACTS_EMAIL + "='" + email +"'";
-        db.execSQL(sql);
     }
 
     public EphemeralCredentials getEphemeral(){

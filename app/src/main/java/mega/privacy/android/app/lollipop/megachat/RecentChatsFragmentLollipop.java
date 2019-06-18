@@ -51,7 +51,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.InviteContactActivityLollipop;
+import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -177,9 +177,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
         if (megaContacts.size() > 0) {
             onContactsCountChange(megaContacts);
-            preExpand();
+            expandContainer();
             requestPermissionLayout.setVisibility(View.GONE);
-            expandLayout(contactsListLayout);
+            contactsListLayout.setVisibility(View.VISIBLE);
             collapseBtn.setVisibility(View.VISIBLE);
             inviteTitle.setClickable(true);
             moreContactsTitle.setVisibility(View.GONE);
@@ -192,10 +192,23 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    private void expandContainer() {
+        if(isExpand || isFirstTime) {
+            invitationContainer.setVisibility(View.VISIBLE);
+            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+            isFirstTime = false;
+            isExpand = true;
+        } else {
+            invitationContainer.setVisibility(View.GONE);
+            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
+            isExpand = false;
+        }
+    }
+
     @Override
     public void onException(int errorCode, String requestString) {
         log(requestString + " failed, with error code: " + errorCode);
-
+        noContacts();
     }
 
     @Override
@@ -343,28 +356,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         moreContacts.setOnClickListener(this);
         moreContactsTitle = v.findViewById(R.id.more_contacts_title);
         moreContactsTitle.setOnClickListener(this);
-        if(isExpand) {
-            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-            invitationContainer.setVisibility(View.VISIBLE);
-        }
-        if (grantedContactPermission) {
-            showPermissionGrantedView();
-        } else {
-            showPermissionDeniedView();
-        }
-        return v;
-    }
 
-    private void preExpand() {
-        if(isFirstTime || isExpand) {
-            invitationContainer.setVisibility(View.VISIBLE);
-            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-            isFirstTime = false;
-        } else {
-            invitationContainer.setVisibility(View.GONE);
-            collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
-            isExpand = false;
-        }
+        return v;
     }
 
     private void showPermissionGrantedView() {
@@ -381,18 +374,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
 
     private void showPermissionDeniedView() {
-        preExpand();
+        expandContainer();
         collapseBtn.setVisibility(View.VISIBLE);
         inviteTitle.setClickable(true);
         inviteTitle.setText(R.string.see_local_contacts_on_mega);
         moreContactsTitle.setVisibility(View.GONE);
-        expandLayout(requestPermissionLayout);
         contactsListLayout.setVisibility(View.GONE);
-    }
-
-    private void expandLayout(View layout) {
-        layout.setVisibility(View.VISIBLE);
-        isExpand = true;
+        requestPermissionLayout.setVisibility(View.VISIBLE);
     }
 
     public static RecentChatsFragmentLollipop newInstance() {
@@ -819,14 +807,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             case R.id.invite_title:
             case R.id.dismiss_button:
             case R.id.collapse_btn:
-                isFirstTime = false;
                 if(invitationContainer.getVisibility() == View.VISIBLE) {
+                    invitationContainer.setVisibility(View.GONE);
                     collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
                     isExpand = false;
-                    invitationContainer.setVisibility(View.GONE);
                 } else {
+                    invitationContainer.setVisibility(View.VISIBLE);
                     collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-                    expandLayout(invitationContainer);
+                    isExpand = true;
                 }
                 break;
             case R.id.allow_button:
@@ -835,8 +823,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 break;
             case R.id.more_contacts_title:
             case R.id.more_contacts:
-                log("to InviteContactActivityLollipop");
-                context.startActivity(new Intent(context, InviteContactActivityLollipop.class));
+                log("to InviteContactActivity");
+                context.startActivity(new Intent(context, InviteContactActivity.class));
                 break;
         }
     }
@@ -1950,6 +1938,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         }
 
+        grantedContactPermission = Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, context);
+        if (grantedContactPermission) {
+            showPermissionGrantedView();
+        } else {
+            showPermissionDeniedView();
+        }
         super.onResume();
     }
 

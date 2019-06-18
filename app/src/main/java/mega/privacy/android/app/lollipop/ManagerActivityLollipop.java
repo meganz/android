@@ -135,7 +135,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingMessageService;
-import mega.privacy.android.app.fcm.MegaFirebaseMessagingService;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.SharesPageAdapter;
@@ -193,7 +192,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -12090,7 +12088,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void addContactFromPhone(){
-		Intent in = new Intent(this, InviteContactActivityLollipop.class);
+		Intent in = new Intent(this, InviteContactActivity.class);
 		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
 	}

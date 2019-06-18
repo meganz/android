@@ -331,11 +331,6 @@ public class Constants {
 					")+"
 	);
 
-	public static final Pattern PHONE_NUMBER
-			= Pattern.compile(
-			"\\d{9}|(?:\\d{3}-){2}\\d{4}|\\(\\d{3}\\)\\d{3}-?\\d{4}"
-	);
-
 	public static int FROM_INCOMING_SHARES= 140;
 	public static int FROM_INBOX= 150;
 
