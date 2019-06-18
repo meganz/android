@@ -1188,7 +1188,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         i.putExtra("from", Constants.FROM_INBOX);
                     }
                 }
-                else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH) {
+                else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH
+                        || (context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop) context).isOnRecents())) {
                     if (nC.nodeComesFromIncoming(node)){
                         i.putExtra("from", Constants.FROM_INCOMING_SHARES);
                         int dBT = nC.getIncomingLevel(node);

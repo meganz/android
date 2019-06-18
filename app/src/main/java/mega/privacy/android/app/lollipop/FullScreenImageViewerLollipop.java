@@ -916,30 +916,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void intentToSendFile(File previewFile){
 		log("intentToSendFile");
 
-		if(previewFile!=null){
-			if (previewFile.exists()){
-				Intent share = new Intent(android.content.Intent.ACTION_SEND);
-				share.setType("image/*");
+		if (previewFile == null || !previewFile.exists()) showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-					log("Use provider to share");
-					Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",previewFile);
-					share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-					share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				}
-				else{
-					share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-				}
+		Intent share = new Intent(android.content.Intent.ACTION_SEND);
+		share.setType("image/*");
 
-				startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-			}
-			else{
-				showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
-			}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			log("Use provider to share");
+			Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",previewFile);
+			share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+			share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		}
 		else{
-			showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.full_image_viewer_not_preview), -1);
+			share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
 		}
+
+		startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
 	}
 
 	@Override

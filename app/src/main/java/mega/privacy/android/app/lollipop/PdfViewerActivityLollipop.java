@@ -1469,6 +1469,41 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                 }
             }
+            else if (type == Constants.RECENTS_ADAPTER) {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                if (!isUrl) {
+                    shareMenuItem.setVisible(true);
+                }
+                else {
+                    shareMenuItem.setVisible(false);
+                }
+                propertiesMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(true);
+                copyMenuItem.setVisible(true);
+                removelinkMenuItem.setVisible(false);
+                chatMenuItem.setVisible(true);
+
+                int accessLevel = megaApi.getAccess(node);
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_READ:
+                    case MegaShare.ACCESS_UNKNOWN: {
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                    case MegaShare.ACCESS_FULL:
+                    case MegaShare.ACCESS_OWNER: {
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+                        break;
+                    }
+                }
+            }
             else {
                 shareMenuItem.setVisible(true);
                 boolean shareVisible = true;
