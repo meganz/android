@@ -685,14 +685,19 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        //haven't logged in, need to auto-login
+                        //haven't logged in, if has credential will auto-login
                         if(api.getRootNode() == null) {
-                            Intent intent = new Intent(SMSVerificationReceiveTxtActivity.this, LoginActivityLollipop.class);
+                            //prevent chat disconnected issue.
+                            MegaChatApiAndroid megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+                            megaChatApi.logout();
+
+                            Intent intent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
                             intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
+                        } else {
+                            setResult(RESULT_OK);
                         }
-                        setResult(RESULT_OK);
                         finish();
                     }
                 }, 2000);

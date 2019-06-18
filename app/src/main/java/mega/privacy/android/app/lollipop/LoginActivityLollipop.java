@@ -906,7 +906,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaGlobalLis
                 log("state: " + state);
                 if (state != 0) {
                     if (!MegaApplication.isVerifySMSShowed()) {
-                        Intent intent = new Intent(getApplication(), SMSVerificationActivity.class);
+                        log("rederect to SMSVerificationActivity in LoginActivity");
+                        Intent intent = new Intent(getApplicationContext(), SMSVerificationActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         intent.putExtra(NAME_USER_LOCKED,true);
                         startActivity(intent);

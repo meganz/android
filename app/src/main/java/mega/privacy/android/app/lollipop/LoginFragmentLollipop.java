@@ -3249,20 +3249,4 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private static void log(String log) {
         Util.log("LoginFragmentLollipop", log);
     }
-
-    @Override
-    public void onActivityResult(int requestCode,int resultCode,Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
-        if (requestCode == Constants.REQUEST_CODE_SMS_VERIFICATION && resultCode == RESULT_OK) {
-            UserCredentials credentials = dbH.getCredentials();
-            if(credentials != null) {
-                log("unblock, and fast login");
-                startFastLogin();
-            } else {
-                log("unblock");
-                et_user.setText(lastEmail);
-                et_password.setText("");
-            }
-        }
-    }
 }

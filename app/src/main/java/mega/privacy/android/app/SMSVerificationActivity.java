@@ -2,17 +2,10 @@ package mega.privacy.android.app;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -26,9 +19,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -268,7 +259,6 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
             divider1.setBackgroundColor(Color.parseColor("#8A000000"));
         } else if (requestCode == Constants.REQUEST_CODE_VERIFY_CODE && resultCode == RESULT_OK) {
             log("onActivityResult REQUEST_CODE_VERIFY_CODE OK");
-            TL.log(this,"@#@","onActivityResult REQUEST_CODE_VERIFY_CODE OK");
             setResult(RESULT_OK);
             finish();
         }
