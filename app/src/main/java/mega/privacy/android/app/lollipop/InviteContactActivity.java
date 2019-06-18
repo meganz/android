@@ -79,6 +79,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private static final String KEY_FILTERED_CONTACTS = "KEY_FILTERED_CONTACTS";
     private static final String KEY_TOTAL_CONTACTS = "KEY_TOTAL_CONTACTS";
     private static final String KEY_IS_PERMISSION_GRANTED = "KEY_IS_PERMISSION_GRANTED";
+    private static final String KEY_IS_GET_CONTACT_COMPLETED = "KEY_IS_GET_CONTACT_COMPLETED";
     private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
     private static final int PHONE_NUMBER_MIN_LENGTH = 5;
@@ -104,8 +105,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private LinearLayout itemContainer;
     private Handler handler;
     private LayoutInflater inflater;
-    private Context context;
-    private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted;
+    private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted, isGetContactCompleted;
     private MegaContactGetter megaContactGetter;
     private List<ContactsUtil.LocalContact> rawLocalContacts;
     private String contactLink;
@@ -124,7 +124,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
         handler = new Handler();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
-        context = getApplicationContext();
+        Context context = getApplicationContext();
         defaultLocalContactAvatarColor = "#" + Integer.toHexString(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
 
         phoneContacts = new ArrayList<>();
@@ -196,6 +196,10 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
 
         //orientation changes
         if (savedInstanceState != null) {
+            isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED);
+        }
+
+        if (isGetContactCompleted) {
             phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
             megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
             addedContacts = savedInstanceState.getParcelableArrayList(KEY_ADDED_CONTACTS);
@@ -288,6 +292,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     @Override
     public synchronized void onFinish(List<MegaContactGetter.MegaContact> contacts) {
         isGettingMegaContact = false;
+        isGetContactCompleted = true;
         clearLists();
         megaContacts.addAll(megaContactToContactInfo(contacts));
         fillUpLists();
@@ -297,12 +302,14 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     @Override
     public void onException(int errorCode, String requestString) {
         isGettingMegaContact = false;
+        isGetContactCompleted = true;
         onGetContactCompleted();
     }
 
     @Override
     public void noContacts() {
         isGettingMegaContact = false;
+        isGetContactCompleted = true;
         onGetContactCompleted();
     }
 
@@ -316,6 +323,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
         outState.putParcelableArrayList(KEY_FILTERED_CONTACTS, filteredContacts);
         outState.putParcelableArrayList(KEY_TOTAL_CONTACTS, totalContacts);
         outState.putBoolean(KEY_IS_PERMISSION_GRANTED, isPermissionGranted);
+        outState.putBoolean(KEY_IS_GET_CONTACT_COMPLETED, isGetContactCompleted);
     }
 
     @Override

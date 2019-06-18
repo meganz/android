@@ -24,7 +24,7 @@ public class InvitationContactInfo implements Parcelable {
             return new InvitationContactInfo[size];
         }
     };
-    private final String AT_SIGN = "@";
+    private static final String AT_SIGN = "@";
     private long id;
     private boolean isHighlighted;
     private int type;
@@ -45,9 +45,6 @@ public class InvitationContactInfo implements Parcelable {
         this.type = type;
         this.name = name;
         this.displayInfo = "";
-    }
-
-    public InvitationContactInfo(Parcel in) {
     }
 
     public int getType() {
@@ -127,6 +124,22 @@ public class InvitationContactInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeInt(isHighlighted ? 1 : 0);
+        dest.writeInt(type);
+        dest.writeString(name);
+        dest.writeString(displayInfo);
+        dest.writeString(handle);
+        dest.writeString(avatarColor);
+    }
 
+    public InvitationContactInfo(Parcel in) {
+        id = in.readLong();
+        isHighlighted = in.readInt() == 1;
+        type = in.readInt();
+        name = in.readString();
+        displayInfo = in.readString();
+        handle = in.readString();
+        avatarColor = in.readString();
     }
 }
