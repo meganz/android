@@ -639,6 +639,20 @@ public class Util {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
+
+	/*
+	 * Check is device on Mobile Data
+	 */
+	public static boolean isOnMobileData(Context context) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = null;
+		if (connectivityManager != null) {
+			networkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		}
+		return networkInfo == null ? false : networkInfo.isConnected();
+	}
 	
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
@@ -719,7 +733,7 @@ public class Util {
         }
     }
     
-    private static void cleanDir(File dir) {
+    public static void cleanDir(File dir) {
         File[] files = dir.listFiles();
 
 		if(files !=null){
@@ -1027,14 +1041,7 @@ public class Util {
 	 * Check is file belongs to the app
 	 */
 	public static boolean isLocal(Context context, File file) {
-		File tmp = null;
-		if (context.getExternalCacheDir() != null){
-			tmp = new File (context.getExternalCacheDir(), "tmp");
-		}
-		else{
-			tmp = context.getDir("tmp", 0);
-		}
-			
+        File tmp = context.getDir("tmp", 0);
 		return file.getAbsolutePath().contains(tmp.getParent());
 	}
 	
@@ -1307,20 +1314,38 @@ public class Util {
 		return numberOfNodes;
 	}
 	
-	public static String getLocalIpAddress()
+	public static String getLocalIpAddress(Context context)
   {
 		  try {
 			  for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				  NetworkInterface intf = en.nextElement();
+				  String interfaceName = intf.getName();
+
+				  // Ensure get the IP from the current active network interface
+				  if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					  ConnectivityManager cm =
+							  (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+					  String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
+					  if (interfaceName.compareTo(activeInterfaceName) != 0) {
+					  	continue;
+					  }
+				  }
+				  else {
+					  if ((isOnWifi(context) && !interfaceName.contains("wlan") && !interfaceName.contains("ath")) ||
+							  (isOnMobileData(context) && !interfaceName.contains("data") && !interfaceName.contains("rmnet"))) {
+					  	continue;
+					  }
+				  }
+
 				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					  InetAddress inetAddress = enumIpAddr.nextElement();
-					  if (!inetAddress.isLoopbackAddress()) {
-						  return inetAddress.getHostAddress().toString();
+					  if (inetAddress != null && !inetAddress.isLoopbackAddress()) {
+					  	return inetAddress.getHostAddress();
 					  }
 				  }
 			  }
 		  } catch (Exception ex) {
-			  log("Error IP Address: " + ex.toString());
+			  log("Error getting local IP address: " + ex.toString());
 		  }
 		  return null;
    }
