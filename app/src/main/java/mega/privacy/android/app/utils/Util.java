@@ -2330,7 +2330,7 @@ public class Util {
 	 * @param longitude longitude of the location to format
 	 * @return string with the location formatted in degrees, minutes and seconds
 	 */
-	public static  String convertToDegrees(float latitude, float longitude) {
+	public static String convertToDegrees(float latitude, float longitude) {
         StringBuilder builder = new StringBuilder();
 
 		formatCoordinate(builder, latitude);
@@ -2363,8 +2363,14 @@ public class Util {
 		builder.append("°");
 		builder.append(degreesSplit[1]);
 		builder.append("'");
-		degreesSplit = degreesSplit[2].split("\\.");
-		builder.append(degreesSplit[0]);
+
+		try {
+			builder.append(Math.round(Float.parseFloat(degreesSplit[2].replace(",", "."))));
+		} catch (Exception e) {
+			log("Error rounding seconds in coordinates: " + e.toString());
+			builder.append(degreesSplit[2]);
+		}
+
 		builder.append("''");
 	}
 
