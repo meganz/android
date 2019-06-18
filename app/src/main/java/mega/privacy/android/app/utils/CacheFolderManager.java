@@ -23,7 +23,7 @@ public final class CacheFolderManager {
             if (cacheFolder.mkdir()) {
                 return cacheFolder;
             } else {
-                return null;
+                return context.getCacheDir();
             }
         }
     }
@@ -85,10 +85,7 @@ public final class CacheFolderManager {
 
     private static File getCacheFile(Context context,String folderName,String fileName) {
         File parent = getCacheFolder(context,folderName);
-        if (parent != null) {
-            return new File(parent,fileName);
-        }
-        return null;
+        return new File(parent,fileName);
     }
 
     public static boolean isFileAvailable(File file) {
