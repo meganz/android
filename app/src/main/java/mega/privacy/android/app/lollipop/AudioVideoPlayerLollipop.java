@@ -450,16 +450,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-        }
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
         tB = (Toolbar) findViewById(R.id.call_toolbar);
         if (tB == null) {
@@ -2276,6 +2270,40 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
+            else if (adapterType == Constants.RECENTS_ADAPTER) {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                chatRemoveMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                if (!isUrl) {
+                    shareMenuItem.setVisible(true);
+                }
+                else {
+                    shareMenuItem.setVisible(false);
+                }
+                removelinkMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+
+                int accessLevel = megaApi.getAccess(node);
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_READ:
+                    case MegaShare.ACCESS_UNKNOWN: {
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                    case MegaShare.ACCESS_FULL:
+                    case MegaShare.ACCESS_OWNER: {
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+                        break;
+                    }
+                }
+            }
             else {
                 log("onCreateOptionsMenu else");
                 boolean shareVisible = true;
@@ -3137,7 +3165,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 nC = new NodeController(this);
             }
             boolean fromIncoming = false;
-            if (adapterType == Constants.SEARCH_ADAPTER) {
+            if (adapterType == Constants.SEARCH_ADAPTER || adapterType == Constants.RECENTS_ADAPTER) {
                 fromIncoming = nC.nodeComesFromIncoming(node);
             }
             if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {

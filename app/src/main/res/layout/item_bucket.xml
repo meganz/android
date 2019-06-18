@@ -73,7 +73,8 @@
                         android:textColor="@color/mail_my_account"
                         android:singleLine="true"
                         android:ellipsize="middle"
-                        android:layout_gravity="center_vertical"/>
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"/>
 
                     <ImageView
                         android:id="@+id/shared_image"

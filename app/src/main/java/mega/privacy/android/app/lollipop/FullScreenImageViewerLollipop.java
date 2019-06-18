@@ -495,11 +495,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else {
 				shareIcon.setVisible(false);
 			}
-			propertiesIcon.setVisible(true);
-			downloadIcon.setVisible(true);
-			copyIcon.setVisible(true);
 			removeIcon.setVisible(false);
-			chatIcon.setVisible(true);
 
 			int accessLevel = megaApi.getAccess(node);
 			switch (accessLevel) {

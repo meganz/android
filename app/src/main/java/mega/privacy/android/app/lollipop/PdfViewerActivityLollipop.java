@@ -280,16 +280,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
 
-//        if (!renamed){
-//            uri = intent.getData();
-//            log("URI pdf: "+uri);
-//            if (uri == null){
-//                log("uri null");
-//                finish();
-//                return;
-//            }
-//        }
-
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
@@ -460,32 +450,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
 
-//        if(megaApi==null||megaApi.getRootNode()==null){
-//            log("Refresh session - sdk");
-//            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-//            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-//            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intentLogin);
-//            finish();
-//            return;
-//        }
-//
-//        if(Util.isChatEnabled()){
-//            if (megaChatApi == null){
-//                megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-//            }
-//
-//            if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-//                log("Refresh session - karere");
-//                Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-//                intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-//                intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(intentLogin);
-//                finish();
-//                return;
-//            }
-//        }
-
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
             log("Tb is Null");
@@ -499,16 +463,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
-        }
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
 
         bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
         fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
@@ -1471,19 +1429,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
             else if (type == Constants.RECENTS_ADAPTER) {
                 MegaNode node = megaApi.getNodeByHandle(handle);
+                chatRemoveMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(false);
                 if (!isUrl) {
                     shareMenuItem.setVisible(true);
                 }
                 else {
                     shareMenuItem.setVisible(false);
                 }
-                propertiesMenuItem.setVisible(true);
-                downloadMenuItem.setVisible(true);
-                copyMenuItem.setVisible(true);
                 removelinkMenuItem.setVisible(false);
-                chatMenuItem.setVisible(true);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
 
                 int accessLevel = megaApi.getAccess(node);
                 switch (accessLevel) {
@@ -2169,7 +2126,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 nC = new NodeController(this);
             }
             boolean fromIncoming = false;
-            if (type == Constants.SEARCH_ADAPTER) {
+            if (type == Constants.SEARCH_ADAPTER || type == Constants.RECENTS_ADAPTER) {
                 fromIncoming = nC.nodeComesFromIncoming(node);
             }
             if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {

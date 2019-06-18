@@ -265,14 +265,15 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
 
         if (FileUtils.isAudioOrVideo(node)) {
             if (FileUtils.isInternalIntent(node)) {
-                intent = new Intent(Intent.ACTION_VIEW);
+                intent = new Intent(context, AudioVideoPlayerLollipop.class);
             }
             else {
-                intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                intent = new Intent(Intent.ACTION_VIEW);
             }
 
             intent.putExtra("adapterType", Constants.RECENTS_ADAPTER);
             intent.putExtra("FILENAME", node.getName());
+            intent.putExtra("isPlayList", false);
 
             if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
                 paramsSetSuccessfully = FileUtils.setLocalIntentParams(context, node, intent, localPath, false);
@@ -310,7 +311,7 @@ public class RecentsFragment extends Fragment implements View.OnClickListener, S
             intent.putExtra("HANDLE", node.getHandle());
         }
 
-        if (!MegaApiUtils.isIntentAvailable(context, intent)){
+        if (intent != null && !MegaApiUtils.isIntentAvailable(context, intent)){
             paramsSetSuccessfully = false;
             ((ManagerActivityLollipop)context).showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
         }
