@@ -2322,37 +2322,51 @@ public class Util {
 		return dp;
 	}
 
+	/**
+	 * This method formats the coordinates of a location in degrees, minutes and seconds
+	 * and returns a string with it
+	 *
+	 * @param latitude latitude of the location to format
+	 * @param longitude longitude of the location to format
+	 * @return string with the location formatted in degrees, minutes and seconds
+	 */
 	public static  String convertToDegrees(float latitude, float longitude) {
         StringBuilder builder = new StringBuilder();
 
-        String latitudeDegrees = Location.convert(Math.abs(latitude), Location.FORMAT_MINUTES);
-        String[] latitudeSplit = latitudeDegrees.split(":");
-        builder.append(latitudeSplit[0]);
-        builder.append("°");
-        builder.append(latitudeSplit[1]);
-        builder.append("'");
-
+		formatCoordinate(builder, latitude);
         if (latitude < 0) {
-            builder.append(" S ");
+            builder.append("S ");
         } else {
-            builder.append(" N ");
+            builder.append("N ");
         }
 
-        String longitudeDegrees = Location.convert(Math.abs(longitude), Location.FORMAT_MINUTES);
-        String[] longitudeSplit = longitudeDegrees.split(":");
-        builder.append(longitudeSplit[0]);
-        builder.append("°");
-        builder.append(longitudeSplit[1]);
-        builder.append("'");
-
+		formatCoordinate(builder, longitude);
         if (longitude < 0) {
-            builder.append(" W");
+            builder.append("W");
         } else {
-            builder.append(" E");
+            builder.append("E");
         }
 
         return builder.toString();
     }
+
+	/**
+	 * This method formats a coordinate in degrees, minutes and seconds
+	 *
+	 * @param builder StringBuilder where the string formatted it's going to be built
+	 * @param coordinate coordinate to format
+	 */
+	private static void formatCoordinate (StringBuilder builder, float coordinate) {
+		String degrees = Location.convert(Math.abs(coordinate), Location.FORMAT_SECONDS);
+		String[] degreesSplit = degrees.split(":");
+		builder.append(degreesSplit[0]);
+		builder.append("°");
+		builder.append(degreesSplit[1]);
+		builder.append("'");
+		degreesSplit = degreesSplit[2].split("\\.");
+		builder.append(degreesSplit[0]);
+		builder.append("''");
+	}
 
 	public static void hideKeyboard(Activity activity, int flag){
 
