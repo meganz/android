@@ -85,7 +85,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         private long contactId;
         private String contactName, displayLabel;
 
-        public ViewHolderPhoneContactsLollipop(View itemView) {
+        private ViewHolderPhoneContactsLollipop(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
         }

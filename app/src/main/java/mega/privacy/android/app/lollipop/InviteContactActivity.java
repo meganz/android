@@ -71,7 +71,7 @@ import static mega.privacy.android.app.utils.Constants.CONTACT_LINK_BASE_URL;
 
 public class InviteContactActivity extends PinActivityLollipop implements InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
-    public static final int SCAN_QR_FOR_invite_contactS = 1111;
+    public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
     public static final String INVITE_CONTACT_SCAN_QR = "inviteContacts";
     private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
     private static final String KEY_MEGA_CONTACTS = "KEY_MEGA_CONTACTS";
@@ -85,6 +85,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
     private static final int PHONE_NUMBER_MIN_LENGTH = 5;
     private static final int USER_INDEX_NONE_EXIST = -1;
     private static final int MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20;
+    private static final int ADDED_CONTACT_VIEW_MARGIN_LEFT = 10;
 
     private DisplayMetrics outMetrics;
     private MegaApiAndroid megaApi;
@@ -196,7 +197,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
 
         //orientation changes
         if (savedInstanceState != null) {
-            isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED);
+            isGetContactCompleted = savedInstanceState.getBoolean(KEY_IS_GET_CONTACT_COMPLETED, false);
         }
 
         if (isGetContactCompleted) {
@@ -429,7 +430,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
         log("initScanQR");
         Intent intent = new Intent(this, QRCodeActivity.class);
         intent.putExtra(INVITE_CONTACT_SCAN_QR, true);
-        startActivityForResult(intent, SCAN_QR_FOR_invite_contactS);
+        startActivityForResult(intent, SCAN_QR_FOR_INVITE_CONTACTS);
     }
 
     private void refreshKeyboard() {
@@ -442,7 +443,9 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
             View view = getCurrentFocus();
             if (view != null) {
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.restartInput(view);
+                if (inputMethodManager != null) {
+                    inputMethodManager.restartInput(view);
+                }
             }
         }
     }
@@ -537,7 +540,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
             return true;
         }
         if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
-            if (addedContacts.isEmpty() || addedContacts == null) {
+            if (addedContacts.isEmpty()) {
                 Util.hideKeyboard(this, 0);
             } else {
                 inviteContacts(addedContacts);
@@ -783,8 +786,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Invita
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
 
-        final int MARGIN_LEFT = Util.px2dp(10, outMetrics);
-        params.setMargins(MARGIN_LEFT, 0, 0, 0);
+        params.setMargins(Util.px2dp(ADDED_CONTACT_VIEW_MARGIN_LEFT, outMetrics), 0, 0, 0);
         View rowView = inflater.inflate(R.layout.selected_contact_item, null, false);
         rowView.setLayoutParams(params);
         rowView.setId(id);
