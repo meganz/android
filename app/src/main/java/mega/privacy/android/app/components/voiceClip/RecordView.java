@@ -60,7 +60,7 @@ public class RecordView extends RelativeLayout {
     private float initialX=0;
     private float basketInitialX = 0;
 
-    private long startTime, elapsedTime = 0;
+    private long startTime, finalTime = 0;
     private Context context;
     private OnRecordListener recordListener;
     private boolean isSwiped, isLessThanSecondAllowed = false;
@@ -235,7 +235,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private boolean isLessThanOneSecond(long time) {
-        return time <= 2000;
+        return time <= 1500;
     }
 
     private void recordListenerOptions(int option, long recordTime){
@@ -296,6 +296,18 @@ public class RecordView extends RelativeLayout {
         if(type == Constants.TYPE_START_RECORD) {
             recordListenerOptions(FINISH_SOUND,0);
         }
+    }
+
+    public void startRecordingTime(){
+        log("StartRecordingTime");
+        slideToCancelLayout.setVisibility(VISIBLE);
+        cancelRecordLayout.setVisibility(GONE);
+        isSwiped = false;
+
+        startStopCounterTime(true);
+        startTime = System.currentTimeMillis();
+        handlerStartRecord.postDelayed(runStartRecord, 100); //500 milliseconds delay to record
+        flagRB = true;
     }
 
     public void playSound(int type) {
@@ -361,9 +373,7 @@ public class RecordView extends RelativeLayout {
         @Override
         public void run() {
             if(flagRB){
-                startStopCounterTime(true);
                 handlerShowPadLock.postDelayed(runPadLock, 1500);
-                recordListenerOptions(START_RECORD, 0);
             }
         }
     };
@@ -395,10 +405,8 @@ public class RecordView extends RelativeLayout {
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
-
+        startTime = 0;
         startStopCounterTime(false);
-
-        slideToCancelLayout.setVisibility(VISIBLE);
 
         initialX = recordBtnLayout.getX();
         firstX = motionEvent.getRawX();
@@ -409,13 +417,7 @@ public class RecordView extends RelativeLayout {
         userBehaviour = UserBehaviour.NONE;
         basketInitialX = basketImg.getX() - 90;
 
-        cancelRecordLayout.setVisibility(GONE);
-        smallBlinkingMic.setVisibility(VISIBLE);
-        startTime = System.currentTimeMillis();
-        isSwiped = false;
-        animationHelper.animateSmallMicAlpha();
-        handlerStartRecord.postDelayed(runStartRecord, 500); //500 milliseconds delay to record
-        flagRB = true;
+        recordListenerOptions(START_RECORD, 0);
     }
 
     private void slideToCancelTranslation(float translationX){
@@ -438,7 +440,6 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionMove(RelativeLayout recordBtnLayout, MotionEvent motionEvent) {
         log("onActionMove()");
-        long time = System.currentTimeMillis() - startTime;
         if (isSwiped) return;
 
         UserBehaviour direction;
@@ -503,7 +504,6 @@ public class RecordView extends RelativeLayout {
     protected void onActionCancel(RelativeLayout recordBtnLayout){
         log("onActionCancel()");
         userBehaviour = UserBehaviour.NONE;
-        elapsedTime = System.currentTimeMillis() - startTime;
         removeHandlerPadLock();
         flagRB = false;
         firstX = 0;
@@ -518,11 +518,12 @@ public class RecordView extends RelativeLayout {
         showLock(false);
         recordListenerOptions(CANCEL_RECORD, 0);
     }
+
     protected void onActionUp(RelativeLayout recordBtnLayout) {
         log("onActionUp()");
 
         userBehaviour = UserBehaviour.NONE;
-        elapsedTime = System.currentTimeMillis() - startTime;
+        finalTime = System.currentTimeMillis() - startTime;
         removeHandlerPadLock();
         flagRB = false;
         firstX = 0;
@@ -534,7 +535,7 @@ public class RecordView extends RelativeLayout {
         slideToCancelTranslation(0);
         startStopCounterTime(false);
 
-        if (!isLessThanSecondAllowed && isLessThanOneSecond(elapsedTime) && !isSwiped) {
+        if (!isLessThanSecondAllowed && isLessThanOneSecond(finalTime) && !isSwiped) {
             log("onActionUp:less than a second");
             recordListenerOptions(LESS_SECOND_RECORD, 0);
             inicializateAnimationHelper();
@@ -543,7 +544,7 @@ public class RecordView extends RelativeLayout {
 
         log("onActionUp:more than a second");
         if (!isSwiped) {
-            recordListenerOptions(FINISH_RECORD, elapsedTime);
+            recordListenerOptions(FINISH_RECORD, finalTime);
             if(animationHelper!=null){
                 animationHelper.clearAlphaAnimation(true);
                 animationHelper.setStartRecorded(false);
@@ -562,11 +563,12 @@ public class RecordView extends RelativeLayout {
             return;
         }
 
-        if(counterTime.getVisibility() == GONE){
-            counterTime.setVisibility(VISIBLE);
-            counterTime.setBase(SystemClock.elapsedRealtime());
-            counterTime.start();
-        }
+        if(counterTime.getVisibility() != GONE) return;
+        counterTime.setVisibility(VISIBLE);
+        smallBlinkingMic.setVisibility(VISIBLE);
+        animationHelper.animateSmallMicAlpha();
+        counterTime.setBase(SystemClock.elapsedRealtime());
+        counterTime.start();
     }
 
     public void setOnRecordListener(OnRecordListener recordListener) {

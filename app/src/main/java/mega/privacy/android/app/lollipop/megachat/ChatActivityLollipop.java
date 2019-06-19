@@ -2005,9 +2005,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             myAudioRecorder.setOutputFile(outputFileVoiceNotes);
+            setRecordingNow(true);
+            recordView.startRecordingTime();
             myAudioRecorder.prepare();
             myAudioRecorder.start();
-            setRecordingNow(true);
+
         } catch (IOException e) {
             log("Error starting a recording");
             controlErrorRecording();
@@ -2231,13 +2233,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("setRecordingNow -> "+recordingNow);
         recordView.setRecordingNow(recordingNow);
         if(recordView.isRecordingNow()){
+            recordButtonStates(RECORD_BUTTON_ACTIVATED);
+
             if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
                 ChatUtil.lockOrientationLandscape(this);
             }else{
                 ChatUtil.lockOrientationPortrait(this);
             }
 
-            recordButtonStates(RECORD_BUTTON_ACTIVATED);
             if(emojiKeyboard!=null) emojiKeyboard.setListenerActivated(false);
             return;
         }
