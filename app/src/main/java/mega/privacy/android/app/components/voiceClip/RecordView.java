@@ -563,7 +563,10 @@ public class RecordView extends RelativeLayout {
             return;
         }
 
-        if(counterTime.getVisibility() != GONE) return;
+        if(counterTime.getVisibility() != GONE) {
+            return;
+        }
+
         counterTime.setVisibility(VISIBLE);
         smallBlinkingMic.setVisibility(VISIBLE);
         animationHelper.animateSmallMicAlpha();

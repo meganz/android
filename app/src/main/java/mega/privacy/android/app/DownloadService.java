@@ -1722,13 +1722,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 	}
 
-	public void saveOfflineChatFile (MegaTransfer transfer){
-		log("saveOfflineChatFile: "+transfer.getNodeHandle());
+	public void saveOfflineChatFile (MegaTransfer transfer) {
+		log("saveOfflineChatFile: " + transfer.getNodeHandle());
 
 		MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(),-1, DB_FILE, 0, "-1");
 		long checkInsert=dbH.setOfflineFile(mOffInsert);
 		log("Test insert Chat File: "+checkInsert);
-
 	}
 
 	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
@@ -2226,7 +2225,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			if (canceled) {
-				log("Transfer cancel: ");
+				log("Transfer cancel: " + transfer.getNodeHandle());
 
 				if((lock != null) && (lock.isHeld()))
 					try{ lock.release(); } catch(Exception ex) {}
