@@ -109,7 +109,6 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -938,7 +937,7 @@ public class Util {
 			        String path =  cursor.getString(dataColumn);
 			        cursor.close();
 			        cursor = null;
-			        if(new File(path).exists()){
+			        if (new File(path).exists()) {
 						return path;
 					}
 				}

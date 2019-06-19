@@ -6,9 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
-import android.os.Environment;
 import android.util.TypedValue;
-import java.io.File;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +24,6 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 
 public class ChatUtil {
 
@@ -105,14 +102,12 @@ public class ChatUtil {
         return false;
     }
 
-    public static boolean isVoiceClip(String name){
-        if(MimeTypeList.typeForName(name).isAudioVoiceClip()) return true;
-        return false;
+    public static boolean isVoiceClip(String name) {
+        return MimeTypeList.typeForName(name).isAudioVoiceClip();
     }
 
-    public static long getVoiceClipDuration(MegaNode node){
-        if(node.getDuration()<0) return 0;
-        return node.getDuration()*1000;
+    public static long getVoiceClipDuration(MegaNode node) {
+        return node.getDuration() < 0 ? 0 : node.getDuration()*1000;
     }
 
     /* Get the height of the action bar */
