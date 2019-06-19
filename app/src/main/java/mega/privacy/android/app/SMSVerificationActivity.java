@@ -47,6 +47,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private boolean isSelectedCountryValid, isPhoneNumberValid, isUserLocked, shouldDisableNextButton;
     private String selectedCountryCode, selectedCountryName, selectedDialCode;
     private ArrayList<String> countryCodeList;
+    private boolean pendingSelectingCountryCode = false;
     
     
     @Override
@@ -220,9 +221,9 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                 if (this.countryCodeList != null) {
                     launchCountryPicker();
                 } else {
-                    //TODO give the chance to re-load
                     log("Country code is not loaded");
                     megaApi.getCountryCallingCodes(this);
+                    pendingSelectingCountryCode = true;
                 }
                 break;
             }
@@ -429,8 +430,13 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
                     codedCountryCode.add(contentBuffer.toString());
                 }
                 this.countryCodeList = codedCountryCode;
+                if (pendingSelectingCountryCode) {
+                    launchCountryPicker();
+                    pendingSelectingCountryCode = false;
+                }
             } else {
                 log("the country code is not responded correctly");
+                Util.showSnackBar(this, Constants.SNACKBAR_TYPE, getString(R.string.verify_account_not_loading_country_code), -1);
             }
         }
     }

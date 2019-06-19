@@ -678,6 +678,7 @@
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
 	<string name="verify_account_confirm_button" context="button label - submit verification code">Confirm</string>
 	<string name="verify_account_invalid_country_code" context="error message if user click next button without select country code">Please select a country code</string>
+    <string name="verify_account_not_loading_country_code" context="error message if the country code cannot be fetched">Country codes could not be fetched.</string>
 	<string name="verify_account_invalid_phone_number" context="error message if user click next button without enter a valid phone number">Please enter a valid phone number</string>
 	<string name="verify_account_already_verified" context="error message if user click next button without enter a verified phone number">Your phone number has been verified</string>
 	<string name="verify_account_enter_txt_label" context="label tell user to enter received txt to below input boxes">Please type the verification code sent to</string>
