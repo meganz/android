@@ -303,6 +303,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_FRAGMENT);
         }
     }
+
     void showSetupLayout () {
         setupLayout.setVisibility(View.VISIBLE);
         allowAccessLayout.setVisibility(View.GONE);
