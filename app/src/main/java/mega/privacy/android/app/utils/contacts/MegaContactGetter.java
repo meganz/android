@@ -38,6 +38,10 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private long lastSyncTimestamp;
 
+    //For testing 1 min and 2 mins.
+//    public static final int DAY = 1 * 60 * 1000;
+//    public static final int WEEK = 2 * 60 * 1000;
+
     public static final int DAY = 24 * 60 * 60 * 1000;
     public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
 
@@ -174,8 +178,12 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
                 for (int i = 0; i < table.size(); i++) {
                     contact = new MegaContact();
                     MegaStringList list = table.get(i);
-                    contact.normalizedPhoneNumber = list.get(0);
                     contact.id = list.get(1);
+                    if(api.getMyUserHandle().equals(contact.id)) {
+                        log("it's myself");
+                        continue;
+                    }
+                    contact.normalizedPhoneNumber = list.get(0);
                     contact.handle = getUserHandler(list.get(1));
                     //the normalized phone number is the key
                     contact.localName = map.get(list.get(0));

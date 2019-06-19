@@ -17,12 +17,12 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -37,11 +37,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     private List<MegaContactGetter.MegaContact> contacts;
 
-    private ContactViewHolder holder;
-
     private MegaApiAndroid megaApi;
-
-    private DatabaseHandler dbH;
 
     public ContactsHorizontalAdapter(Activity context, RecentChatsFragmentLollipop recentChatsFragment, List<MegaContactGetter.MegaContact> data) {
         this.context = context;
@@ -50,7 +46,6 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             megaApi = ((MegaApplication) context.getApplication()).getMegaApi();
         }
         this.recentChatsFragment = recentChatsFragment;
-        dbH = DatabaseHandler.getDbHandler(context);
     }
 
     @NonNull
@@ -62,7 +57,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_add_avatar, parent, false);
 
-        holder = new ContactViewHolder(v);
+        ContactViewHolder holder = new ContactViewHolder(v);
         holder.itemLayout = v.findViewById(R.id.chip_layout);
         holder.contactInitialLetter = v.findViewById(R.id.contact_list_initial_letter);
         holder.textViewName = v.findViewById(R.id.name_chip);
@@ -99,43 +94,27 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         holder.contactMail = email;
         holder.textViewName.setText(megaContact.getLocalName());
         UserAvatarListener listener = new UserAvatarListener(context, holder);
-        File avatar;
         setDefaultAvatar(megaContact, holder);
-        //TODO Use CacheManager
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), email + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
-        }
+        File avatar = CacheFolderManager.buildAvatarFile(context,email + ".jpg");
         Bitmap bitmap;
-        if (avatar.exists()) {
+        if (CacheFolderManager.isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (bitmap == null) {
-                    avatar.delete();
-                    if (context.getExternalCacheDir() != null) {
-                        megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                    } else {
-                        megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
+                    if(avatar.delete()) {
+                        log("delete avatar successfully.");
                     }
+                    megaApi.getUserAvatar(email,avatar.getAbsolutePath(), listener);
                 } else {
                     holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatar.setImageBitmap(bitmap);
                 }
             } else {
-                if (context.getExternalCacheDir() != null) {
-                    megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                } else {
-                    megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-                }
+                megaApi.getUserAvatar(email,avatar.getAbsolutePath(), listener);
             }
         } else {
-            if (context.getExternalCacheDir() != null) {
-                megaApi.getUserAvatar(email, context.getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-            } else {
-                megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", listener);
-            }
+            megaApi.getUserAvatar(email,avatar.getAbsolutePath(), listener);
         }
     }
 
@@ -165,7 +144,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
         RelativeLayout itemLayout;
 
-        public ContactViewHolder(View itemView) {
+        ContactViewHolder(View itemView) {
             super(itemView);
         }
     }
