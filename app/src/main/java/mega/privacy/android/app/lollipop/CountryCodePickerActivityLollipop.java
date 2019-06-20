@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -256,21 +255,20 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     public class Country {
 
-        private String name = "";
-        private String countryCode = "";
-        private String code = "";
-        private Context context;
-        private final String prefix = "country_";
+        private String name;
+        private String countryCode;
+        private String code;
 
         public Country() {
-
+            name = "";
+            countryCode = "";
+            code = "";
         }
 
         public Country(String name,String code,String countryCode) {
-            this.context = getApplicationContext();
             this.code = code;
             this.countryCode = countryCode;
-            this.name = getTranslatableCountryName(countryCode, name);
+            this.name = name;
         }
 
         public String getName() {
@@ -278,16 +276,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         }
 
         public void setName(String name) {
-            this.name = getTranslatableCountryName(this.countryCode,name);
-        }
-        
-        public String getTranslatableCountryName(String countryCode,String name){
-            int stringId = context.getResources().getIdentifier(prefix + countryCode.toLowerCase(), "string", context.getPackageName());
-            if(stringId > 0){
-                return context.getString(stringId);
-            }else{
-                return name;
-            }
+            this.name = name;
         }
 
         public String getCode() {
@@ -305,10 +294,15 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
         public void setCountryCode(String countryCode) {
             this.countryCode = countryCode;
         }
-    }
 
-    public static void countrySelected() {
-
+        @Override
+        public String toString() {
+            return "Country{" +
+                    "name='" + name + '\'' +
+                    ", countryCode='" + countryCode + '\'' +
+                    ", code='" + code + '\'' +
+                    '}';
+        }
     }
     
     @Override
