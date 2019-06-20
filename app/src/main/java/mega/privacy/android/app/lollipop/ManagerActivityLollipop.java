@@ -1861,11 +1861,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		transfersInProgress = new ArrayList<Integer>();
 
-        //sync local contacts to see who's on mega.
-        if(Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this)) {
-            MegaContactGetter getter = new MegaContactGetter(this);
-            getter.getMegaContacts(megaApi, getter.getLocalContacts(), MegaContactGetter.WEEK);
-        }
+		//sync local contacts to see who's on mega.
+		if (Util.checkPermissionGranted(Manifest.permission.READ_CONTACTS, this)) {
+			MegaContactGetter getter = new MegaContactGetter(this);
+			getter.getMegaContacts(megaApi, getter.getLocalContacts(), MegaContactGetter.WEEK);
+		}
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -7326,7 +7326,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if (drawerItem == DrawerItem.CHAT){
 				log("in Chat Section");
 				ChatController chatController = new ChatController(this);
-				if(Util.isChatEnabled()){
+				if (Util.isChatEnabled()) {
 					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.getTag());
 
 					if (searchExpand) {
@@ -12015,7 +12015,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void addContactFromPhone(){
+	public void addContactFromPhone() {
 		Intent in = new Intent(this, InviteContactActivity.class);
 		in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
