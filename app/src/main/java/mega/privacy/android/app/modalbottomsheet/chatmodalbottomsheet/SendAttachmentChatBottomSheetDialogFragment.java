@@ -113,7 +113,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BottomSheetDial
                 break;
             }
         }
-//        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }

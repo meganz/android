@@ -10,19 +10,15 @@ import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiLongClickListener;
-import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.Util;
 
@@ -35,20 +31,14 @@ public class EmojiKeyboard extends LinearLayout {
     private EmojiVariantPopup variantPopup;
     private View rootView;
     private ImageButton emojiIcon;
-    private FrameLayout fragment;
-    private RelativeLayout recordButtonLayout;
-    private RecordView recordView;
     private int keyboardHeight;
-    private int marginBottom;
     private OnEmojiClickListener onEmojiClickListener;
     private OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
     private OnPlaceButtonListener buttonListener;
 
 
     boolean isListenerActivated  = true;
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
+
 
     private boolean isLetterKeyboardShown = false;
     private boolean isEmojiKeyboardShown = false;
@@ -132,30 +122,18 @@ public class EmojiKeyboard extends LinearLayout {
         super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(keyboardHeight, MeasureSpec.EXACTLY));
     }
 
-    public void init(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon, FrameLayout fragment, RelativeLayout recordButtonLayout, RecordView recordView) {
+    public void init(Activity context, EmojiEditTextInterface editText, ImageButton emojiIcon) {
         this.editInterface = editText;
         this.emojiIcon = emojiIcon;
         this.activity = context;
-        this.fragment = fragment;
-        this.recordButtonLayout = recordButtonLayout;
-        this.recordView = recordView;
 
-        display = activity.getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        density  = getResources().getDisplayMetrics().density;
 
         activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
         keyboardHeight = outMetrics.heightPixels / 2 - ChatUtil.getActionBarHeight(activity, getResources());
-        marginBottom = Util.px2dp(48, outMetrics);
         requestLayout();
-    }
-
-    public void setOnEmojiClickListener(OnEmojiClickListener onEmojiClickListener) {
-        this.onEmojiClickListener = onEmojiClickListener;
-    }
-    public void setOnEmojiBackspaceClickListener(OnEmojiBackspaceClickListener onEmojiBackspaceClickListener) {
-        this.onEmojiBackspaceClickListener = onEmojiBackspaceClickListener;
     }
 
     private void needToReplace() {

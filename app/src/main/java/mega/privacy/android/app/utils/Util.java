@@ -1180,12 +1180,10 @@ public class Util {
 			calendar.setTimeInMillis(timestamp * 1000L);
 			calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-			Date currenTimeZone = (Date) calendar.getTime();
-			String dateTime = sdf.format(currenTimeZone);
-			String nameResult = dateTime+".m4a";
-			 return nameResult;
+			return sdf.format(calendar.getTime()) + ".m4a";
 
 		}catch (Exception e) {}
+
 		return null;
 	}
 	
@@ -2306,20 +2304,6 @@ public class Util {
         }
         return rootView;
     }
-
-	public static float toPixel(float dp, Context context){
-		Resources resources = context.getResources();
-		DisplayMetrics metrics = resources.getDisplayMetrics();
-		float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-		return px;
-	}
-
-	public static float toDp(float px, Context context){
-		Resources resources = context.getResources();
-		DisplayMetrics metrics = resources.getDisplayMetrics();
-		float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-		return dp;
-	}
 
 	/**
 	 * This method formats the coordinates of a location in degrees, minutes and seconds

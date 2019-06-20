@@ -44,7 +44,6 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -426,7 +425,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				String data = isVoiceClipType(type)? Constants.EXTRA_VOICE_CLIP : "";
 				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
 
-			}else{
+			}
+			else {
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 			}
         }
@@ -1466,7 +1466,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferStart:Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
+		log("Download start: " + transfer.getFileName() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if ((transfer.getType() == MegaTransfer.TYPE_DOWNLOAD)) {

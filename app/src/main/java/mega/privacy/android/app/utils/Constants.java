@@ -255,7 +255,7 @@ public class Constants {
 	final public static int CONTACT_TYPE_DEVICE = 1;
 	final public static int CONTACT_TYPE_BOTH = 2;
 
-	public static int TYPE_VOICE_CLIP = 3;
+	final public static int TYPE_VOICE_CLIP = 3;
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;

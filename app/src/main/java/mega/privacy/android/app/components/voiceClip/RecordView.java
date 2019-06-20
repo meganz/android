@@ -40,16 +40,16 @@ public class RecordView extends RelativeLayout {
         NONE
     }
 
-    private final int START_RECORD = 1;
-    private final int CANCEL_RECORD = 2;
-    private final int LOCK_RECORD = 3;
-    private final int FINISH_RECORD = 4;
-    private final int LESS_SECOND_RECORD = 5;
-    private final int FINISH_SOUND = 6;
+    private final static int START_RECORD = 1;
+    private final static int CANCEL_RECORD = 2;
+    private final static int LOCK_RECORD = 3;
+    private final static int FINISH_RECORD = 4;
+    private final static int LESS_SECOND_RECORD = 5;
+    private final static int FINISH_SOUND = 6;
 
-    private int SOUND_START = R.raw.record_start;
-    private int SOUND_END = R.raw.record_finished;
-    private int SOUND_ERROR = R.raw.record_error;
+    private final static int SOUND_START = R.raw.record_start;
+    private final static int SOUND_END = R.raw.record_finished;
+    private final static int SOUND_ERROR = R.raw.record_error;
 
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
@@ -73,15 +73,14 @@ public class RecordView extends RelativeLayout {
     private boolean isLockpadShown = false;
     private boolean isRecordingNow = false;
 
-    Handler handlerStartRecord = new Handler();
-    Handler handlerShowPadLock = new Handler();
-    float previewX = 0;
+    private Handler handlerStartRecord = new Handler();
+    private Handler handlerShowPadLock = new Handler();
+    private float previewX = 0;
     private Animation animJump, animJumpFast;
-    int cont = 0;
+    private int cont = 0;
 
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
+    private DisplayMetrics outMetrics;
+    private Display display;
 
     private float lastX, lastY;
     private float firstX, firstY;
@@ -91,23 +90,22 @@ public class RecordView extends RelativeLayout {
     public RecordView(Context context) {
         super(context);
         this.context = context;
-        init(context, null, -1, -1);
+        init(context);
     }
 
     public RecordView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        init(context, attrs, -1, -1);
+        init(context);
     }
 
     public RecordView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        init(context, attrs, defStyleAttr, -1);
+        init(context);
     }
 
-
-    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    private void init(Context context) {
         View view = View.inflate(context, R.layout.record_view_layout, null);
         addView(view);
 
@@ -117,7 +115,6 @@ public class RecordView extends RelativeLayout {
         display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
-        density  = getResources().getDisplayMetrics().density;
 
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
         slideToCancel.setText(context.getString(R.string.slide_to_cancel).toUpperCase(Locale.getDefault()));
@@ -497,7 +494,6 @@ public class RecordView extends RelativeLayout {
     private void inicializateAnimationHelper(){
         if(animationHelper == null) return;
         animationHelper.clearAlphaAnimation(false);
-//        animationHelper.onAnimationEnd();
         animationHelper.setStartRecorded(false);
     }
 
@@ -623,13 +619,6 @@ public class RecordView extends RelativeLayout {
         image1.setVisibility(GONE);
     }
 
-    public void destroyHandlers(){
-        log("destroyHandlers");
-        removeHandlerRecord();
-        removeHandlerPadLock();
-        clearAnimations(imageArrow);
-        clearAnimations(imageLock);
-    }
     public static void log(String message) {
         Util.log("RecordView",message);
     }

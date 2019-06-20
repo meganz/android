@@ -132,10 +132,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    private static int STATUS_PLAYING = 2;
-    private static int STATUS_PAUSED = 1;
-    private static int STATUS_STOPPED = 0;
-
     Context context;
     int positionClicked;
     ArrayList<AndroidMegaChatMessage> messages;

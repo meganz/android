@@ -64,6 +64,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
+import static mega.privacy.android.app.utils.CacheFolderManager.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 
 public class ChatController {
@@ -279,23 +280,33 @@ public class ChatController {
     public void deleteMessage(MegaChatMessage message, long chatId){
         log("deleteMessage");
         MegaChatMessage messageToDelete;
-        if(message!=null){
+        if(message == null) return;
 
-            if((message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) || (message.getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                log("deleteMessage:Delete node attachment message or voice clip message");
-                if((message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) && (message.getMegaNodeList()!=null) && (message.getMegaNodeList().size()>0) && (message.getMegaNodeList().get(0)!=null)){
-                    ((ChatActivityLollipop) context).deleteOwnVoiceClip(message.getMegaNodeList().get(0).getName());
-                }
-                megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
+        if(message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP){
+            log("deleteMessage:Delete node attachment message or voice clip message");
+            if(message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null){
+                deleteOwnVoiceClip(context, message.getMegaNodeList().get(0).getName());
             }
-            else{
-                log("Delete normal message");
-                messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
-                if(messageToDelete==null){
-                    log("The message cannot be deleted");
-                }
-            }
+            megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
+            return;
         }
+
+        log("Delete normal message");
+        messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+        if(messageToDelete == null){
+            log("The message cannot be deleted");
+        }
+    }
+
+    /*
+     * Delete a voice note from local storage
+     */
+    public static void deleteOwnVoiceClip(Context mContext, String nameFile){
+        log("deleteOwnVoiceClip");
+        File localFile = buildVoiceClipFile(mContext, nameFile);
+        if(!isFileAvailable(localFile) || !localFile.exists()) return;
+
+        localFile.delete();
     }
 
     public void alterParticipantsPermissions(long chatid, long uh, int privilege){

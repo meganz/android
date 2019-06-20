@@ -1,7 +1,5 @@
 package mega.privacy.android.app.components.voiceClip;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -9,12 +7,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.graphics.drawable.AnimatorInflaterCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -35,15 +31,9 @@ public class AnimationHelper {
     private AnimatorSet micAnimation;
     private TranslateAnimation translateAnimation1;
     private TranslateAnimation translateAnimation2;
-    private AlphaAnimation alphaAnimation1;
-    private AlphaAnimation alphaAnimation2;
     private Handler handler1, handler2;
-    private static int durationBlinkMicro =  500;
-
-    private static int durationAlpha = 250;
-    private static int durationHideBasket = 250;
-    private static int durationBasket = 250;
-    private static int durationMicro = 250;
+    private final static int DURATION_BLINK_MICRO =  500;
+    private final static int DURATION_ALPHA =  250;
 
     public AnimationHelper(Context context, ImageView basketImg, ImageView smallBlinkingMic) {
         this.context = context;
@@ -67,9 +57,6 @@ public class AnimationHelper {
         micAnimation = (AnimatorSet) AnimatorInflaterCompat.loadAnimator(context, R.animator.delete_mic_animation);
         micAnimation.setTarget(smallBlinkingMic); // set the view you want to animate
 
-        alphaAnimation1 = initializeAlphaAnimation(0.2f, 1.0f);
-        alphaAnimation2 = initializeAlphaAnimation(1.0f, 0.0f);
-
         translateAnimation1 = initializeTranslateAnimation(basketInitialX,basketInitialX+90);
         translateAnimation2 = initializeTranslateAnimation(basketInitialX+90,basketInitialX);
 
@@ -83,7 +70,7 @@ public class AnimationHelper {
                 basketImg.setVisibility(VISIBLE);
                 basketImg.startAnimation(translateAnimation1);
             }
-        }, durationAlpha);
+        }, DURATION_ALPHA);
 
         translateAnimation1.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -103,7 +90,7 @@ public class AnimationHelper {
                         basketImg.startAnimation(translateAnimation2);
                         smallBlinkingMic.setVisibility(INVISIBLE);
                     }
-                }, durationBasket);
+                }, DURATION_ALPHA);
             }
             @Override
             public void onAnimationRepeat(Animation animation) {
@@ -132,14 +119,14 @@ public class AnimationHelper {
 
     private AlphaAnimation initializeAlphaAnimation(float start, float end){
         AlphaAnimation anim = new AlphaAnimation(start, end);
-        anim.setDuration(durationAlpha);
+        anim.setDuration(DURATION_ALPHA);
         anim.setFillAfter(true);
         return anim;
     }
 
     private TranslateAnimation initializeTranslateAnimation( float fromX, float toX){
         TranslateAnimation anim = new TranslateAnimation(fromX, toX, 0, 0);
-        anim.setDuration(durationHideBasket);
+        anim.setDuration(DURATION_ALPHA);
         return anim;
     }
 
@@ -201,7 +188,7 @@ public class AnimationHelper {
     public void animateSmallMicAlpha() {
         log("animateSmallMicAlpha()");
         alphaAnimation = new AlphaAnimation(0.0f, 1.0f);
-        alphaAnimation.setDuration(durationBlinkMicro);
+        alphaAnimation.setDuration(DURATION_BLINK_MICRO);
         alphaAnimation.setRepeatMode(Animation.REVERSE);
         alphaAnimation.setRepeatCount(Animation.INFINITE);
         smallBlinkingMic.startAnimation(alphaAnimation);
@@ -210,7 +197,7 @@ public class AnimationHelper {
     public void moveRecordButtonAndSlideToCancelBack(final RelativeLayout recordBtnLayout, float initialX) {
         ValueAnimator anim = ValueAnimator.ofFloat(recordBtnLayout.getX(), initialX);
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
-        anim.setDuration(durationMicro);
+        anim.setDuration(DURATION_ALPHA);
 
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener()
         {
