@@ -338,21 +338,21 @@ public class Util {
 	}
 
 	public static String getCountryCodeByNetwork(Context context) {
-        TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        if(tm != null) {
-            return tm.getNetworkCountryIso();
-        }
-        return null;
-    }
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		if (tm != null) {
+			return tm.getNetworkCountryIso();
+		}
+		return null;
+	}
 
-    public static boolean isRoaming(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(cm != null) {
-            NetworkInfo ni = cm.getActiveNetworkInfo();
-            return ni.isRoaming();
-        }
-        return true;
-    }
+	public static boolean isRoaming(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (cm != null) {
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			return ni.isRoaming();
+		}
+		return true;
+	}
 
 	public static int countMatches(Pattern pattern, String string)
 	{
@@ -2330,7 +2330,7 @@ public class Util {
 				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
 	}
 
-	public static boolean checkPermissionGranted (String permission, Context context) {
+	public static boolean checkPermissionGranted(String permission, Context context) {
 		try {
 			return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
 		} catch (IllegalArgumentException ex) {
