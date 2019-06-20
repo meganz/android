@@ -189,7 +189,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     @Override
     public void onFinish(List<MegaContactGetter.MegaContact> megaContacts) {
-        if(!isAdded()) {
+        if (!isAdded()) {
             return;
         }
         if (megaContacts.size() > 0) {
@@ -201,7 +201,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             inviteTitle.setClickable(true);
             moreContactsTitle.setVisibility(View.GONE);
 
-            adapter = new ContactsHorizontalAdapter((Activity) context, this,megaContacts);
+            adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
             contactsList.setLayoutManager(new FourColumnLayoutManager(getContext(), CONTACTS_COUNT, GridLayoutManager.VERTICAL, false));
             contactsList.setAdapter(adapter);
         } else {
@@ -210,7 +210,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     private void expandContainer() {
-        if(isExpand || isFirstTime) {
+        if (isExpand || isFirstTime) {
             invitationContainer.setVisibility(View.VISIBLE);
             collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
             isFirstTime = false;
@@ -239,7 +239,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void onContactsCountChange(List<MegaContactGetter.MegaContact> megaContacts) {
         int count = megaContacts.size();
-        if(count > 0) {
+        if (count > 0) {
             String title = context.getResources().getQuantityString(R.plurals.quantity_of_local_contact, count, count);
             inviteTitle.setText(title);
         } else {
@@ -249,11 +249,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     public void checkScroll() {
         if (listView != null) {
-        if (context instanceof ArchivedChatsActivity) {
+            if (context instanceof ArchivedChatsActivity) {
                 if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                     ((ArchivedChatsActivity) context).changeActionBarElevation(true);
-                }
-                else {
+                } else {
                     ((ArchivedChatsActivity) context).changeActionBarElevation(false);
                 }
             }
@@ -824,7 +823,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             case R.id.invite_title:
             case R.id.dismiss_button:
             case R.id.collapse_btn:
-                if(invitationContainer.getVisibility() == View.VISIBLE) {
+                if (invitationContainer.getVisibility() == View.VISIBLE) {
                     invitationContainer.setVisibility(View.GONE);
                     collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
                     isExpand = false;
@@ -836,7 +835,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                 break;
             case R.id.allow_button:
                 log("request contact permission!");
-                requestPermissions(new String[] {Manifest.permission.READ_CONTACTS},Constants.REQUEST_READ_CONTACTS);
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_READ_CONTACTS);
                 break;
             case R.id.more_contacts_title:
             case R.id.more_contacts:
@@ -2117,7 +2116,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     private void loadMegaContacts() {
-        contactGetter.getMegaContacts(megaApi, contactGetter.getLocalContacts(),MegaContactGetter.DAY);
+        contactGetter.getMegaContacts(megaApi, contactGetter.getLocalContacts(), MegaContactGetter.DAY);
     }
 
     private static void log(String log) {

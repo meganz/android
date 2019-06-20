@@ -60,8 +60,8 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
                             } else if (holder instanceof LastContactsAdapter.ViewHolder) {
                                 ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
-                            } else if(holder instanceof ContactsHorizontalAdapter.ContactViewHolder) {
-                                ((ContactsHorizontalAdapter.ContactViewHolder)holder).avatar.setImageBitmap(bitmap);
+                            } else if (holder instanceof ContactsHorizontalAdapter.ContactViewHolder) {
+                                ((ContactsHorizontalAdapter.ContactViewHolder) holder).avatar.setImageBitmap(bitmap);
                             }
                             holder.contactInitialLetter.setVisibility(View.GONE);
                         }
