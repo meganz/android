@@ -99,7 +99,7 @@ public class ContactsUtil {
 
         //get all the contacts
         Uri contactsUri = ContactsContract.Contacts.CONTENT_URI;
-        Cursor cursor = resolver.query(contactsUri, new String[] {ContactsContract.Contacts._ID,ContactsContract.Contacts.DISPLAY_NAME}, null, null, null);
+        Cursor cursor = resolver.query(contactsUri, new String[]{ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME}, null, null, null);
         LocalContact contact;
         if (cursor != null) {
             log("has " + cursor.getCount() + " contacts");
@@ -115,8 +115,8 @@ public class ContactsUtil {
         // get phone numbers
         Uri phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         Cursor phones = resolver.query(phoneUri,
-                new String[] {ContactsContract.CommonDataKinds.Phone.CONTACT_ID,ContactsContract.CommonDataKinds.Phone.NUMBER,ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER},
-                null,null, null);
+                new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID, ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER},
+                null, null, null);
         if (phones != null) {
             while (phones.moveToNext()) {
                 //notice the index order
@@ -124,12 +124,12 @@ public class ContactsUtil {
                 String phone = phones.getString(1);
                 String normalizedPhone = phones.getString(2);
 
-                for(LocalContact temp : localContacts) {
-                    if(temp.getId() == id) {
+                for (LocalContact temp : localContacts) {
+                    if (temp.getId() == id) {
                         temp.addPhoneNumber(phone);
                         if (normalizedPhone == null) {
                             //If roaming, don't normalize the phone number.
-                            if(!Util.isRoaming(context)) {
+                            if (!Util.isRoaming(context)) {
                                 // use current country code to normalize the phone number.
                                 normalizedPhone = PhoneNumberUtils.formatNumberToE164(phone, countryCode);
                             }
@@ -146,15 +146,15 @@ public class ContactsUtil {
         // get emails
         Uri emailUri = ContactsContract.CommonDataKinds.Email.CONTENT_URI;
         Cursor emails = resolver.query(emailUri,
-                new String[] {ContactsContract.CommonDataKinds.Email.CONTACT_ID,ContactsContract.CommonDataKinds.Email.ADDRESS},
-                null,null, null);
+                new String[]{ContactsContract.CommonDataKinds.Email.CONTACT_ID, ContactsContract.CommonDataKinds.Email.ADDRESS},
+                null, null, null);
         if (emails != null) {
             while (emails.moveToNext()) {
                 long id = emails.getLong(0);
                 String email = emails.getString(1);
 
-                for(LocalContact temp : localContacts) {
-                    if(temp.getId() == id) {
+                for (LocalContact temp : localContacts) {
+                    if (temp.getId() == id) {
                         temp.addEmail(email);
                     }
                 }
