@@ -475,11 +475,11 @@ public class AccountController implements View.OnClickListener{
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
             notificationManager.cancelAll();
         }
         catch(Exception e){
             log("EXCEPTION removing all the notifications");
+            e.printStackTrace();
         }
 
         File offlineDirectory = null;
@@ -490,30 +490,34 @@ public class AccountController implements View.OnClickListener{
             offlineDirectory = context.getFilesDir();
         }
 
-        try {
-            Util.deleteFolderAndSubfolders(context, offlineDirectory);
-        } catch (IOException e) {}
+        removeFolder(context, offlineDirectory);
 
         File thumbDir = ThumbnailUtils.getThumbFolder(context);
+        removeFolder(context, thumbDir);
+
         File previewDir = PreviewUtils.getPreviewFolder(context);
-
-        try {
-            Util.deleteFolderAndSubfolders(context, thumbDir);
-        } catch (IOException e) {}
-
-        try {
-            Util.deleteFolderAndSubfolders(context, previewDir);
-        } catch (IOException e) {}
+        removeFolder(context, previewDir);
 
         File externalCacheDir = context.getExternalCacheDir();
-        File cacheDir = context.getCacheDir();
-        try {
-            Util.deleteFolderAndSubfolders(context, externalCacheDir);
-        } catch (IOException e) {}
+        removeFolder(context, externalCacheDir);
 
-        try {
-            Util.deleteFolderAndSubfolders(context, cacheDir);
-        } catch (IOException e) {}
+        File cacheDir = context.getCacheDir();
+        removeFolder(context, cacheDir);
+
+        File temporalPicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR);
+        removeFolder(context, temporalPicDir);
+
+        File profilePicDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.profilePicDIR);
+        removeFolder(context, profilePicDir);
+
+        File logDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR);
+        removeFolder(context, logDir);
+
+        File advancesDevicesDIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR);
+        removeFolder(context, advancesDevicesDIR);
+
+        File chatTempDIR = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.chatTempDIR);
+        removeFolder(context, chatTempDIR);
 
         final String pathOldMK = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
         final File fMKOld = new File(pathOldMK);
@@ -555,6 +559,7 @@ public class AccountController implements View.OnClickListener{
                 context.startService(stopIntent);
             }
         }
+
         dbH.clearOffline();
 
         dbH.clearContacts();
@@ -571,6 +576,15 @@ public class AccountController implements View.OnClickListener{
 
         dbH.clearChatSettings();
         dbH.setEnabledChat(true + "");
+    }
+
+    public static void removeFolder(Context context, File folder) {
+        try {
+            Util.deleteFolderAndSubfolders(context, folder);
+        } catch (IOException e) {
+            log("Exception deleting" + folder.getName() + "directory");
+            e.printStackTrace();
+        }
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
@@ -595,15 +609,12 @@ public class AccountController implements View.OnClickListener{
         else{
             megaApi.logout();
         }
-
-        localLogoutApp(context);
     }
 
     static public void logoutConfirmed(Context context){
         log("logoutConfirmed");
 
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
-        dbH.clearChatSettings();
+        localLogoutApp(context);
 
         PackageManager m = context.getPackageManager();
         String s = context.getPackageName();
