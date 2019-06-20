@@ -1389,6 +1389,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setVisibility(View.GONE);
 
+            ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.GONE);
+
+
             //Hide layouts location messages
             ((ViewHolderMessageChat) holder).transparentCoatingLocation.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).uploadingProgressBarLocation.setVisibility(View.GONE);

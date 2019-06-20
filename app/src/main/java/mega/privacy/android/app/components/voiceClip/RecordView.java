@@ -51,19 +51,18 @@ public class RecordView extends RelativeLayout {
     private final static int SOUND_END = R.raw.record_finished;
     private final static int SOUND_ERROR = R.raw.record_error;
 
+    private final static int SECONDS_ALLOWED = 1;
     private ImageView smallBlinkingMic, basketImg;
     private Chronometer counterTime;
     private TextView slideToCancel;
     private ShimmerLayout slideToCancelLayout;
     private RelativeLayout cancelRecordLayout;
     private TextView textCancelRecord;
-    private float initialX=0;
-    private float basketInitialX = 0;
-
+    private float initialX, basketInitialX = 0;
     private long startTime, finalTime = 0;
     private Context context;
     private OnRecordListener recordListener;
-    private boolean isSwiped, isLessThanSecondAllowed = false;
+    private boolean isSwiped = false;
     private MediaPlayer player = null;
     private AudioManager audioManager;;
     private AnimationHelper animationHelper;
@@ -115,6 +114,7 @@ public class RecordView extends RelativeLayout {
         display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
+        startTime = 0;
 
         slideToCancel = view.findViewById(R.id.slide_to_cancel);
         slideToCancel.setText(context.getString(R.string.slide_to_cancel).toUpperCase(Locale.getDefault()));
@@ -232,7 +232,7 @@ public class RecordView extends RelativeLayout {
     }
 
     private boolean isLessThanOneSecond(long time) {
-        return time <= 1500;
+        return time <= SECONDS_ALLOWED;
     }
 
     private void recordListenerOptions(int option, long recordTime){
@@ -242,25 +242,27 @@ public class RecordView extends RelativeLayout {
                 recordListener.onStart();
                 break;
             }
-            case CANCEL_RECORD:{
-                recordListener.onCancel();
+            case LESS_SECOND_RECORD:{
+                removeHandlerRecord();
+                recordListener.onLessThanSecond();
                 break;
             }
-
             case LOCK_RECORD:{
                 recordListener.onLock();
                 break;
             }
-            case LESS_SECOND_RECORD:{
-                recordListener.onLessThanSecond();
-                break;
-            }
-            case FINISH_RECORD:{
-                recordListener.onFinish(recordTime);
+            case CANCEL_RECORD:{
+                removeHandlerRecord();
+                recordListener.onCancel();
                 break;
             }
             case FINISH_SOUND:{
                 recordListener.finishedSound();
+                break;
+            }
+            case FINISH_RECORD:{
+                removeHandlerRecord();
+                recordListener.onFinish(recordTime);
                 break;
             }
             default:break;
@@ -302,7 +304,8 @@ public class RecordView extends RelativeLayout {
         isSwiped = false;
 
         startStopCounterTime(true);
-        startTime = System.currentTimeMillis();
+        log("StartRecordingTime");
+
         handlerStartRecord.postDelayed(runStartRecord, 100); //500 milliseconds delay to record
         flagRB = true;
     }
@@ -348,21 +351,25 @@ public class RecordView extends RelativeLayout {
             player.setVolume(log1, log1);
             player.setLooping(false);
             player.prepare();
-            player.start();
-            if(type == Constants.TYPE_START_RECORD) {
-                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        recordListenerOptions(FINISH_SOUND,0);
-                        mp.reset();
-                    }
-                });
-            }else{
-                player.setOnCompletionListener(null);
-            }
+
 
         } catch (IOException e) {
             e.printStackTrace();
+            recordListenerOptions(FINISH_SOUND,0);
+            return;
+        }
+
+        player.start();
+        if(type == Constants.TYPE_START_RECORD) {
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    recordListenerOptions(FINISH_SOUND,0);
+                    mp.reset();
+                }
+            });
+        }else{
+            player.setOnCompletionListener(null);
         }
     }
 
@@ -402,7 +409,6 @@ public class RecordView extends RelativeLayout {
         animationHelper.setStartRecorded(true);
         animationHelper.resetBasketAnimation();
         animationHelper.resetSmallMic();
-        startTime = 0;
         startStopCounterTime(false);
 
         initialX = recordBtnLayout.getX();
@@ -506,7 +512,6 @@ public class RecordView extends RelativeLayout {
         firstY = 0;
         lastX = 0;
         lastY = 0;
-
         recordButtonTranslation(recordBtnLayout,0,0);
         slideToCancelTranslation(0);
         startStopCounterTime(false);
@@ -517,9 +522,13 @@ public class RecordView extends RelativeLayout {
 
     protected void onActionUp(RelativeLayout recordBtnLayout) {
         log("onActionUp()");
-
         userBehaviour = UserBehaviour.NONE;
-        finalTime = System.currentTimeMillis() - startTime;
+        if(startTime == 0){
+            finalTime = 0;
+        }
+        else {
+            finalTime = System.currentTimeMillis() - startTime;
+        }
         removeHandlerPadLock();
         flagRB = false;
         firstX = 0;
@@ -531,22 +540,22 @@ public class RecordView extends RelativeLayout {
         slideToCancelTranslation(0);
         startStopCounterTime(false);
 
-        if (!isLessThanSecondAllowed && isLessThanOneSecond(finalTime) && !isSwiped) {
+        if (isLessThanOneSecond(finalTime/1000) && !isSwiped) {
             log("onActionUp:less than a second");
+            startTime = 0;
             recordListenerOptions(LESS_SECOND_RECORD, 0);
             inicializateAnimationHelper();
             return;
         }
 
         log("onActionUp:more than a second");
+        showLock(false);
         if (!isSwiped) {
             recordListenerOptions(FINISH_RECORD, finalTime);
-            if(animationHelper!=null){
-                animationHelper.clearAlphaAnimation(true);
-                animationHelper.setStartRecorded(false);
-            }
+            if(animationHelper == null) return;
+            animationHelper.clearAlphaAnimation(true);
+            animationHelper.setStartRecorded(false);
         }
-        showLock(false);
     }
 
     private void startStopCounterTime(boolean start){
@@ -556,13 +565,14 @@ public class RecordView extends RelativeLayout {
             displaySlideToCancel();
             counterTime.stop();
             counterTime.setVisibility(GONE);
+            startTime = 0;
             return;
         }
 
         if(counterTime.getVisibility() != GONE) {
             return;
         }
-
+        startTime = System.currentTimeMillis();
         counterTime.setVisibility(VISIBLE);
         smallBlinkingMic.setVisibility(VISIBLE);
         animationHelper.animateSmallMicAlpha();
@@ -577,9 +587,6 @@ public class RecordView extends RelativeLayout {
         animationHelper.setOnBasketAnimationEndListener(onBasketAnimationEndListener);
     }
 
-    public void setLessThanSecondAllowed(boolean isAllowed) {
-        isLessThanSecondAllowed = isAllowed;
-    }
     public static void collapse(final View v, int duration, int targetHeight) {
         int prevHeight  = v.getHeight();
         ValueAnimator valueAnimator = ValueAnimator.ofInt(prevHeight, targetHeight);
@@ -600,7 +607,7 @@ public class RecordView extends RelativeLayout {
         if (handlerShowPadLock == null) return;
         handlerShowPadLock.removeCallbacksAndMessages(null);
 
-        if(runPadLock==null) return;
+        if(runPadLock == null) return;
         handlerShowPadLock.removeCallbacks(runPadLock);
 
     }
@@ -609,7 +616,7 @@ public class RecordView extends RelativeLayout {
         if (handlerStartRecord == null) return;
         handlerStartRecord.removeCallbacksAndMessages(null);
 
-        if(runStartRecord==null) return;
+        if(runStartRecord == null) return;
         handlerStartRecord.removeCallbacks(runStartRecord);
 
     }

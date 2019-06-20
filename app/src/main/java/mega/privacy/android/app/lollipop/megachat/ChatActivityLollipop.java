@@ -636,7 +636,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButton.setEnabled(true);
         recordButton.setHapticFeedbackEnabled(true);
         recordView = findViewById(R.id.record_view);
-        recordView.setLessThanSecondAllowed(false);
         recordView.setVisibility(View.GONE);
         bubbleLayout = findViewById(R.id.bubble_layout);
         BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.turn_on_notifications_text));
@@ -775,7 +774,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onLessThanSecond() {
                 log("recordView.setOnRecordListener:onLessThanSecond");
                 if(!isAllowedToRecord()) return;
-                recordButton.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK);
                 showBubble();
             }
 
@@ -800,6 +798,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void finishedSound() {
                 log("recordView.setOnRecordListener:finishedSound ---> startRecording");
+                if(!isAllowedToRecord()) return;
+
                 startRecording();
             }
         });
@@ -1996,29 +1996,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             myAudioRecorder.reset();
             myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             myAudioRecorder.setOutputFile(outputFileVoiceNotes);
-            setRecordingNow(true);
-            recordView.startRecordingTime();
+            myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             myAudioRecorder.prepare();
-            myAudioRecorder.start();
 
         } catch (IOException e) {
-            log("Error starting a recording");
             controlErrorRecording();
             e.printStackTrace();
+            return;
         }
+        if(myAudioRecorder == null) return;
+        myAudioRecorder.start();
+        setRecordingNow(true);
+        recordView.startRecordingTime();
     }
 
     private void controlErrorRecording(){
-        if(myAudioRecorder!=null){
-            myAudioRecorder.reset();
-            myAudioRecorder.release();
-            myAudioRecorder = null;
-        }
         outputFileVoiceNotes = null;
         outputFileName = null;
         setRecordingNow(false);
+
+        if(myAudioRecorder == null) return;
+        myAudioRecorder.reset();
+        myAudioRecorder.release();
+        myAudioRecorder = null;
     }
 
     /*
@@ -2030,6 +2031,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         try{
             myAudioRecorder.stop();
             myAudioRecorder.reset();
+            myAudioRecorder = null;
             ChatController.deleteOwnVoiceClip(this, outputFileName);
             outputFileVoiceNotes = null;
             setRecordingNow(false);
@@ -2050,16 +2052,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if((!recordView.isRecordingNow()) || (myAudioRecorder == null)) return;
 
         try{
-            log("sendRecording: playSound - RECORD_FINISHED");
             myAudioRecorder.stop();
             recordView.playSound(Constants.TYPE_END_RECORD);
             setRecordingNow(false);
             uploadPictureOrVoiceClip(outputFileVoiceNotes);
             outputFileVoiceNotes = null;
         }catch(RuntimeException ex){
-            log("Error sending a recording");
             controlErrorRecording();
-
         }
     }
 
