@@ -95,26 +95,26 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         holder.textViewName.setText(megaContact.getLocalName());
         UserAvatarListener listener = new UserAvatarListener(context, holder);
         setDefaultAvatar(megaContact, holder);
-        File avatar = CacheFolderManager.buildAvatarFile(context,email + ".jpg");
+        File avatar = CacheFolderManager.buildAvatarFile(context, email + ".jpg");
         Bitmap bitmap;
         if (CacheFolderManager.isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (bitmap == null) {
-                    if(avatar.delete()) {
+                    if (avatar.delete()) {
                         log("delete avatar successfully.");
                     }
-                    megaApi.getUserAvatar(email,avatar.getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
                 } else {
                     holder.contactInitialLetter.setVisibility(View.GONE);
                     holder.avatar.setImageBitmap(bitmap);
                 }
             } else {
-                megaApi.getUserAvatar(email,avatar.getAbsolutePath(), listener);
+                megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
             }
         } else {
-            megaApi.getUserAvatar(email,avatar.getAbsolutePath(), listener);
+            megaApi.getUserAvatar(email, avatar.getAbsolutePath(), listener);
         }
     }
 
