@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +30,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -1539,11 +1536,24 @@ public class SettingsFragmentLollipop extends PreferenceFragmentCompat implement
 								if (fs[1] != null){
 									log("external not NULL");
 									String sdRoot = Util.getSDCardRoot(fs[1]);
-                                    Intent intent = new Intent(context, FileStorageActivityLollipop.class);
-                                    intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
-                                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
-                                    startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
+									//some devices don't allow app to write on SD card, for example, HUAWE LDN-LX2(OS 8.0).
+									if(new File(sdRoot).canWrite()) {
+                                        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+                                        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT,sdRoot);
+                                        startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
+                                    } else {
+									    //fix the default download location on the folder which always has the write permission.
+                                        String path = fs[1].getAbsolutePath();
+                                        dbH.setStorageDownloadLocation(path);
+                                        if (downloadLocation != null){
+                                            downloadLocation.setSummary(path);
+                                        }
+                                        if (downloadLocationPreference != null){
+                                            downloadLocationPreference.setSummary(path);
+                                        }
+                                    }
 								}
 								else{
 									log("external NULL -- intent to FileStorageActivityLollipop");
