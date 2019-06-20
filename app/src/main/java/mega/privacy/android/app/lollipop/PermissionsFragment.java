@@ -158,8 +158,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             currentPermission = items[0];
             setContent(currentPermission);
             showSetupLayout();
-        }
-        else {
+        } else {
             isAllowingAccessShown = savedInstanceState.getBoolean("isAllowingAccessShown", false);
             permissionsPosition = savedInstanceState.getInt("permissionsPosition", 0);
             numItems = savedInstanceState.getInt("numItems", 0);
@@ -171,8 +170,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
 
             if (isAllowingAccessShown) {
                 showAllowAccessLayout();
-            }
-            else {
+            } else {
                 showSetupLayout();
             }
         }
@@ -181,17 +179,16 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
             ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
         }
 
-        if (numItems == 1){
+        if (numItems == 1) {
             itemsLayout.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             itemsText.setText(getString(R.string.wizard_steps_indicator, permissionsPosition + 1, numItems));
         }
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.not_now_button: {
                 ((ManagerActivityLollipop) context).destroyPermissionsFragment();
                 break;
@@ -212,18 +209,19 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    public void setNextPermission () {
+    public void setNextPermission() {
         if (items != null && items.length > 0) {
-            for (int i=0; i<numItems; i++) {
+            for (int i = 0;
+                 i < numItems;
+                 i++) {
                 if (items[i] == currentPermission) {
-                    if (i+1 < numItems) {
+                    if (i + 1 < numItems) {
                         permissionsPosition++;
-                        currentPermission = items[i+1];
+                        currentPermission = items[i + 1];
                         setContent(currentPermission);
                         itemsText.setText(getString(R.string.wizard_steps_indicator, permissionsPosition + 1, numItems));
                         break;
-                    }
-                    else {
+                    } else {
                         ((ManagerActivityLollipop) context).destroyPermissionsFragment();
                     }
                 }
@@ -231,13 +229,13 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    void setContent (int permission) {
+    void setContent(int permission) {
         imgDisplay.setImageDrawable(ContextCompat.getDrawable(context, mImages[permission]));
         titleDisplay.setText(mTitles[permission]);
         subtitleDisplay.setText(mSubtitles[permission]);
     }
 
-    void askForPermission () {
+    void askForPermission() {
 
         switch (currentPermission) {
             case READ_WRITE: {
@@ -260,20 +258,18 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    void askForMediaPermissions () {
-        if (!readGranted && !writeGranted)  {
+    void askForMediaPermissions() {
+        if (!readGranted && !writeGranted) {
             log("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
-        }
-        else if (!writeGranted) {
+        } else if (!writeGranted) {
             log("WRITE_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_FRAGMENT);
-        }
-        else if (!readGranted) {
+        } else if (!readGranted) {
             log("READ_EXTERNAL_STORAGE");
             ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -304,27 +300,26 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    void showSetupLayout () {
+    void showSetupLayout() {
         setupLayout.setVisibility(View.VISIBLE);
         allowAccessLayout.setVisibility(View.GONE);
     }
 
-    void showAllowAccessLayout () {
+    void showAllowAccessLayout() {
         isAllowingAccessShown = true;
         setupLayout.setVisibility(View.GONE);
         allowAccessLayout.setVisibility(View.VISIBLE);
     }
 
-    public boolean askingForMicrophoneAndWriteCallsLog () {
+    public boolean askingForMicrophoneAndWriteCallsLog() {
         if (!microphoneGranted) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public int getCurrentPermission () {
+    public int getCurrentPermission() {
         return currentPermission;
     }
 
