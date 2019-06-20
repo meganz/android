@@ -175,6 +175,13 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (locationManager != null) locationManager.removeUpdates(this);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isFullScreenEnabled", isFullScreenEnabled);
