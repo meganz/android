@@ -279,9 +279,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         if (isFileAvailable(avatar)) {
             log("avatar exists in: " + avatar.getAbsolutePath());
             BitmapFactory.Options bOpts = new BitmapFactory.Options();
-            Bitmap bitmap;
-            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-            bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+            Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
             if (bitmap == null) {
                 avatar.delete();
                 megaApi.getUserAvatar(email, path, this);

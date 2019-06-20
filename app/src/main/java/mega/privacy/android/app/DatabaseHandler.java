@@ -797,14 +797,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
     public void batchInsertMegaContacts(List<MegaContactGetter.MegaContact> contacts) {
-        if(contacts == null || contacts.size() == 0) {
+        if (contacts == null || contacts.size() == 0) {
             log("empty mega contacts list.");
             return;
         }
+        log("batchInsertMegaContacts contacts size is: " + contacts.size());
         db.beginTransaction();
-        try{
+        try {
             ContentValues values;
-            for(MegaContactGetter.MegaContact contact : contacts) {
+            for (MegaContactGetter.MegaContact contact : contacts) {
                 values = new ContentValues();
                 values.put(KEY_MEGA_CONTACTS_ID, encrypt(contact.getId()));
                 values.put(KEY_MEGA_CONTACTS_HANDLE, encrypt(String.valueOf(contact.getHandle())));
