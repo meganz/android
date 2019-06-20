@@ -248,15 +248,15 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private List<MegaContact> filterOut(MegaApiJava api, List<MegaContact> list) {
         List<MegaContact> contacts = filterOutContacts(api, list);
-        List<MegaContact> retrunList = filterOutPendingContacts(api, contacts);
-        Collections.sort(retrunList, new Comparator<MegaContact>() {
+        List<MegaContact> returnList = filterOutPendingContacts(api, contacts);
+        Collections.sort(returnList, new Comparator<MegaContact>() {
 
             @Override
             public int compare(MegaContact o1, MegaContact o2) {
                 return o1.localName.compareTo(o2.localName);
             }
         });
-        return retrunList;
+        return returnList;
     }
 
     private List<MegaContact> filterOutContacts(MegaApiJava api, List<MegaContact> list) {
