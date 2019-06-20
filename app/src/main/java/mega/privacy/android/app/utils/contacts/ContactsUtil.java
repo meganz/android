@@ -67,16 +67,6 @@ public class ContactsUtil {
             return emailList;
         }
 
-        public String getSinglePrefferedContactDetail() {
-            if (!emailList.isEmpty()) {
-                return emailList.get(0);
-            }
-            if (!normalizedPhoneNumberList.isEmpty()) {
-                return normalizedPhoneNumberList.get(0);
-            }
-            return null;
-        }
-
         @Override
         public String toString() {
             return "\nLocalContact{" +

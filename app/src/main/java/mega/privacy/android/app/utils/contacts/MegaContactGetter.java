@@ -38,15 +38,11 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
 
     private long lastSyncTimestamp;
 
-    //For testing 1 min and 2 mins.
-//    public static final int DAY = 1 * 60 * 1000;
-//    public static final int WEEK = 2 * 60 * 1000;
-
     public static final int DAY = 24 * 60 * 60 * 1000;
     public static final int WEEK = 7 * 24 * 60 * 60 * 1000;
 
-    public static final String LAST_SYNC_TIMESTAMP_FILE = "lastsynctimestamp";
-    public static final String LAST_SYNC_TIMESTAMP_KEY = "lastsyncmegacontactstimestamp";
+    public static final String LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp";
+    public static final String LAST_SYNC_TIMESTAMP_KEY = "last_sync_mega_contacts_timestamp";
 
     public MegaContactGetter(Context context) {
         this.context = context;
@@ -251,8 +247,8 @@ public class MegaContactGetter implements MegaRequestListenerInterface {
     }
 
     private List<MegaContact> filterOut(MegaApiJava api, List<MegaContact> list) {
-        List<MegaContact> conatcs = filterOutContacts(api, list);
-        List<MegaContact> retrunList = filterOutPendingContacts(api, conatcs);
+        List<MegaContact> contacts = filterOutContacts(api, list);
+        List<MegaContact> retrunList = filterOutPendingContacts(api, contacts);
         Collections.sort(retrunList, new Comparator<MegaContact>() {
 
             @Override
