@@ -421,12 +421,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			log("CurrentDocument is not null");
 
-			if(highPriority){
-				String data = isVoiceClipType(type)? Constants.EXTRA_VOICE_CLIP : "";
+			if (highPriority) {
+				String data = isVoiceClipType(type) ? Constants.EXTRA_VOICE_CLIP : "";
 				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
-
-			}
-			else {
+			} else {
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 			}
         }
@@ -1466,7 +1464,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void
 	onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Download start: " + transfer.getFileName() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
+		log("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads() + ",totalDownloads(folder): " + megaApiFolder.getTotalDownloads());
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if ((transfer.getType() == MegaTransfer.TYPE_DOWNLOAD)) {
