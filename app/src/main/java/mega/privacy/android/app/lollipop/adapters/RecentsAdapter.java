@@ -229,7 +229,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     holder.title.setText(getMediaTitle(nodeList));
                     holder.imageThumbnail.setImageResource(R.drawable.media);
 
-                    MediaRecentsAdapter adapter = new MediaRecentsAdapter(context, this, bucket.getNodes());
+                    MediaRecentsAdapter adapter = new MediaRecentsAdapter(context, fragment, bucket.getNodes());
 
                     holder.mediaRecycler.setHasFixedSize(true);
                     holder.mediaRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));

@@ -40,6 +40,7 @@ import java.util.HashMap;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
+import mega.privacy.android.app.lollipop.adapters.MediaRecentsAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
@@ -398,44 +399,44 @@ public class ThumbnailUtilsLollipop {
 				if (bitmap == null) return;
 
 				thumbnailCache.put(handle, bitmap);
+
+				Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+
 				if(holder instanceof MegaNodeAdapter.ViewHolderBrowserList){
 					if ((((MegaNodeAdapter.ViewHolderBrowserList)holder).document == handle)){
 						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
-						Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 						((MegaNodeAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-						adapter.notifyDataSetChanged();
-						log("Thumbnail update");
 					}
 				}
 				else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
 					if ((((VersionsFileAdapter.ViewHolderVersion)holder).document == handle)){
 						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
-						Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 						((VersionsFileAdapter.ViewHolderVersion)holder).imageView.startAnimation(fadeInAnimation);
-						adapter.notifyDataSetChanged();
-						log("Thumbnail update");
 					}
 				}
 				else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserList){
 					if ((((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).document == handle)){
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(bitmap);
-						Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-						int position = holder.getAdapterPosition();
-						adapter.notifyItemChanged(position);
-						log("Thumbnail update");
 					}
 				}
 				else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
 					RecentsAdapter.ViewHolderBucket viewHolderBucket = (RecentsAdapter.ViewHolderBucket) holder;
 					if (viewHolderBucket.getDocument() == handle) {
 						viewHolderBucket.setImageThumbnail(bitmap);
-						Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 						viewHolderBucket.getImageThumbnail().startAnimation(fadeInAnimation);
-						adapter.notifyItemChanged(viewHolderBucket.getAdapterPosition());
-						log("Thumbnail update");
 					}
 				}
+				else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+					MediaRecentsAdapter.ViewHolderMediaBucket viewHolderMediaBucket = (MediaRecentsAdapter.ViewHolderMediaBucket) holder;
+					if (viewHolderMediaBucket.getDocument() == handle) {
+						viewHolderMediaBucket.setImage(bitmap);
+						viewHolderMediaBucket.getThumbnail().startAnimation(fadeInAnimation);
+					}
+				}
+
+				log("Thumbnail update");
+				adapter.notifyItemChanged(holder.getAdapterPosition());
 			}
 			else{
 				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
@@ -1267,6 +1268,9 @@ public class ThumbnailUtilsLollipop {
 			else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
 				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
 			}
+			else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
 		}
 	}
 
@@ -1326,6 +1330,9 @@ public class ThumbnailUtilsLollipop {
 		else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
 			((RecentsAdapter.ViewHolderBucket) holder).setImageThumbnail(bitmap);
 		}
+		else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
+			((MediaRecentsAdapter.ViewHolderMediaBucket) holder).setImage(bitmap);
+		}
 
 		thumbnailCache.put(document.getHandle(), bitmap);
 		adapter.notifyItemChanged(holder.getAdapterPosition());
@@ -1336,29 +1343,25 @@ public class ThumbnailUtilsLollipop {
 	private static void onThumbnailGeneratedGrid(Context context, File thumbFile, MegaNode document, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter){
 		log("onThumbnailGeneratedGrid");
 
-		if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+		if(holder instanceof MegaNodeAdapter.ViewHolderBrowserGrid){
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
 			((MegaNodeAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-			thumbnailCache.put(document.getHandle(), bitmap);
-			adapter.notifyDataSetChanged();
 		}
 		else if(holder instanceof NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid){
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-			Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setVisibility(View.VISIBLE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewIcon.setVisibility(View.GONE);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).imageViewThumb.setImageBitmap(bitmap);
 			((NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid)holder).thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-			thumbnailCache.put(document.getHandle(), bitmap);
-			adapter.notifyDataSetChanged();
 		}
+
+		thumbnailCache.put(document.getHandle(), bitmap);
+		adapter.notifyItemChanged(holder.getAdapterPosition());
 
 		log("AttachThumbnailTask end");
 	}
@@ -1381,25 +1384,6 @@ public class ThumbnailUtilsLollipop {
 		} //Si no, no hago nada
 		
 	}
-	
-//	public static void createThumbnailList(Context context, MegaNode document, MegaNodeAdapter.ViewHolderBrowserList holder, MegaApiAndroid megaApi, MegaNodeAdapter adapter){
-//
-//		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
-//			log("no image");
-//			return;
-//		}
-//
-//		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
-//		if(localPath != null) //Si la tengo en el sistema de ficheros
-//		{
-//			log("localPath no es nulo: " + localPath);
-//			ResizerParams params = new ResizerParams();
-//			params.document = document;
-//			params.file = new File(localPath);
-//			new AttachThumbnailTaskList(context, megaApi, holder, adapter).execute(params);
-//		} //Si no, no hago nada
-//
-//	}
 
 	public static void createThumbnailList(Context context, MegaNode document, RecyclerView.ViewHolder holder, MegaApiAndroid megaApi, RecyclerView.Adapter adapter){
 

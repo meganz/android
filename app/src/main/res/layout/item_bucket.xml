@@ -119,7 +119,9 @@
                 android:layout_height="wrap_content"
                 android:choiceMode="multipleChoice"
                 android:orientation="horizontal"
-                android:paddingLeft="70dp"/>
+                android:paddingLeft="70dp"
+                android:clipToPadding="false"
+                android:layout_gravity="center_vertical"/>
 
         </LinearLayout>
         

@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="2dp">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/thumbnail_view"
         android:layout_width="72dp"
-        android:layout_height="72dp" />
+        android:layout_height="72dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp" />
 
     <ImageView
         android:id="@+id/video_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:paddingBottom="12dp"
-        android:src="@drawable/ic_play_white"/>
+        android:layout_alignLeft="@+id/thumbnail_view"
+        android:layout_alignBottom="@id/thumbnail_view"
+        android:src="@drawable/ic_play_white"
+        android:paddingBottom="2dp"/>
 </RelativeLayout>

@@ -525,6 +525,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public long parentHandleSearch;
 	public long parentHandleInbox;
 	public String pathNavigationOffline;
+	private  int deepBrowserTreeRecents = 0;
 	public int deepBrowserTreeIncoming = 0;
 	public int deepBrowserTreeOutgoing = 0;
 	int indexCloud = -1;
@@ -1663,6 +1664,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			outState.putInt("deepBrowserTreeOutgoing", deepBrowserTreeOutgoing);
 		}
 
+		outState.putInt("deepBrowserTreeRecents", deepBrowserTreeRecents);
+
 		if (viewPagerCloud != null) {
 			indexCloud = viewPagerCloud.getCurrentItem();
 		}
@@ -1767,6 +1770,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("savedInstanceState -> parentHandleOutgoing: "+parentHandleOutgoing);
 			parentHandleSearch = savedInstanceState.getLong("parentHandleSearch", -1);
 			parentHandleInbox = savedInstanceState.getLong("parentHandleInbox", -1);
+			deepBrowserTreeRecents =  savedInstanceState.getInt("deepBrowserTreeRecents", 0);
 			deepBrowserTreeIncoming = savedInstanceState.getInt("deepBrowserTreeIncoming", 0);
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
@@ -4503,6 +4507,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if (getTabItemCloud() == RECENTS_TAB) {
+					if (isRecentsAdded() && getDeepBrowserTreeRecents() > 0
+							&& rF.isBucketSelectedMedia() && rF.getBucketSelected().getNodes() != null) {
+						aB.setTitle((rF.getBucketSelected().getNodes().size() + " " + getString(R.string.general_files)).toUpperCase());
+						firstNavigationLevel = false;
+						break;
+					}
+					firstNavigationLevel = true;
 					aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
 				}
 				break;
@@ -4739,61 +4750,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("updateNavigationToolbarIcon");
         Intent myService = new Intent(this, IncomingMessageService.class);
         stopService(myService);
-		//Just working on 4.4.+
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
-			int totalHistoric = megaApi.getNumUnreadUserAlerts();
-			int totalIpc = 0;
-			ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
-			if(requests!=null) {
-				totalIpc = requests.size();
-			}
+		int totalHistoric = megaApi.getNumUnreadUserAlerts();
+		int totalIpc = 0;
+		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
+		if(requests!=null) {
+			totalIpc = requests.size();
+		}
 
-			int totalNotifications = totalHistoric + totalIpc;
+		int totalNotifications = totalHistoric + totalIpc;
 
-			if(totalNotifications==0){
-				if(isFirstNavigationLevel()){
-					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
-							|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
-						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
-					}
-					else {
-						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
-					}
-				}
-				else{
-					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
-				}
-			}
-			else{
-				if(isFirstNavigationLevel()){
-					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
-							|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
-						badgeDrawable.setProgress(1.0f);
-					}
-					else {
-						badgeDrawable.setProgress(0.0f);
-					}
-				}
-				else{
-					badgeDrawable.setProgress(1.0f);
-				}
-
-				if(totalNotifications>9){
-					badgeDrawable.setText("9+");
-				}
-				else{
-					badgeDrawable.setText(totalNotifications+"");
-				}
-
-				aB.setHomeAsUpIndicator(badgeDrawable);
-			}
-
-		} else {
+		if(totalNotifications==0){
 			if(isFirstNavigationLevel()){
 				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
-						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
+					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
 				else {
 					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
@@ -4802,6 +4773,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 			}
+		}
+		else{
+			if(isFirstNavigationLevel()){
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS || drawerItem == DrawerItem.TRANSFERS){
+					badgeDrawable.setProgress(1.0f);
+				}
+				else {
+					badgeDrawable.setProgress(0.0f);
+				}
+			}
+			else{
+				badgeDrawable.setProgress(1.0f);
+			}
+
+			if(totalNotifications>9){
+				badgeDrawable.setText("9+");
+			}
+			else{
+				badgeDrawable.setText(totalNotifications+"");
+			}
+
+			aB.setHomeAsUpIndicator(badgeDrawable);
 		}
 	}
 
@@ -7529,8 +7523,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						//Cloud Drive
-						if (getTabItemCloud() == RECENTS_TAB) {
-							viewPagerCloud.setCurrentItem(CLOUD_TAB);
+						if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded()) {
+							rF.onBackPressed();
 						}
 						else if (getTabItemCloud() == CLOUD_TAB && isCloudAdded()) {
 							fbFLol.onBackPressed();
@@ -9312,9 +9306,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded() && rF.onBackPressed() == 0) {
-				viewPagerCloud.setCurrentItem(CLOUD_TAB);
-				return;
+			if (getTabItemCloud() == RECENTS_TAB && isRecentsAdded() ) {
+				if (rF.onBackPressed() == 0) {
+					viewPagerCloud.setCurrentItem(CLOUD_TAB);
+					return;
+				}
 			}
 			else if (isCloudAdded() && fbFLol.onBackPressed() == 0) {
 				super.onBackPressed();
@@ -18591,5 +18587,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				megaApi.createFolder(CHAT_FOLDER, megaApi.getRootNode(), this);
 			}
 		}
+	}
+
+	public void showTabCloud (boolean show) {
+		if (show)
+			tabLayoutCloud.setVisibility(View.VISIBLE);
+		else
+			tabLayoutCloud.setVisibility(View.GONE);
+	}
+
+	public void setDeepBrowserTreeRecents (int deepBrowserTreeRecents) {
+		this.deepBrowserTreeRecents = deepBrowserTreeRecents;
+	}
+
+	public int getDeepBrowserTreeRecents () {
+		return deepBrowserTreeRecents;
 	}
 }

@@ -33,6 +33,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
 
     public MediaRecentsAdapter(Context context, Object fragment, MegaNodeList nodeList) {
         this.context = context;
+        this.fragment = fragment;
         this.nodes = nodeList;
 
         megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApi();
@@ -40,11 +41,20 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
 
     public class ViewHolderMediaBucket extends RecyclerView.ViewHolder {
 
+        private long document;
         private ImageView thumbnail;
         private ImageView videoIcon;
 
         public void setImage (Bitmap image) {
             this.thumbnail.setImageBitmap(image);
+        }
+
+        public ImageView getThumbnail() {
+            return thumbnail;
+        }
+
+        public long getDocument() {
+            return document;
         }
 
         public  ViewHolderMediaBucket (View itemView) {
@@ -72,6 +82,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         MegaNode node = getItemAtPosition(position);
         if (node == null) return;
 
+        holder.document = node.getHandle();
         holder.thumbnail.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
         Bitmap thumbnail = ThumbnailUtils.getThumbnailFromCache(node);
@@ -93,7 +104,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         }
 
         if (thumbnail != null) {
-            holder.setImage(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumbnail, Util.px2dp(2, outMetrics)));
+            holder.setImage(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumbnail, Util.px2dp(1, outMetrics)));
         }
 
         if (MimeTypeList.typeForName(node.getName()).isVideo()) {
